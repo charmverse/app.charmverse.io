@@ -1,3 +1,6 @@
+import type { UserWallet } from '@charmverse/core/prisma-client';
+
+import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { LoggedInUser } from 'models';
 import type { EmailPreferences } from 'pages/api/profile/onboarding-email';
 
@@ -29,6 +32,10 @@ export function useResetRecoveryCode() {
   );
 }
 
+export function useVerifyRecoveryCode() {
+  return usePOST<{ backupCode: string }, { user: LoggedInUser; backupCode: string }>(`/api/profile/otp/recovery-code`);
+}
+
 export function useSetPrimaryWallet() {
   return usePUT<{ walletId: string }, void>(`/api/profile/primary-wallet`);
 }
@@ -38,5 +45,21 @@ export function useVerifyOtp() {
 }
 
 export function useGetTriggerUser() {
-  return useGETtrigger<undefined, LoggedInUser>('/api/profile');
+  return useGETtrigger<undefined, LoggedInUser | null>('/api/profile');
+}
+
+export function useLogin() {
+  return usePOST<Web3LoginRequest, LoggedInUser | { otpRequired: true }>('/api/session/login');
+}
+
+export function useLogout() {
+  return usePOST<undefined, undefined>(`/api/session/logout`);
+}
+
+export function useCreateUser() {
+  return usePOST<Web3LoginRequest, LoggedInUser>('/api/profile');
+}
+
+export function useRemoveWallet() {
+  return usePOST<Pick<UserWallet, 'address'>, LoggedInUser>('/api/profile/remove-wallet');
 }

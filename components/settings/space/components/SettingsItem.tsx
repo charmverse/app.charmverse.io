@@ -31,8 +31,13 @@ export function SettingsItem({
       disableGutters
       secondaryAction={
         !!actions && (
-          <IconButton aria-label='Open identity options' disabled={disabled} {...bindTrigger(identityMenuState)}>
-            <MoreHoriz />
+          <IconButton
+            aria-label='Open identity options'
+            size='small'
+            disabled={disabled}
+            {...bindTrigger(identityMenuState)}
+          >
+            <MoreHoriz color='secondary' fontSize='small' />
           </IconButton>
         )
       }

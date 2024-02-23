@@ -6,6 +6,7 @@ import {
   avalanche,
   base,
   baseGoerli,
+  baseSepolia,
   bsc,
   celo,
   fantom,
@@ -17,10 +18,10 @@ import {
   mantleTestnet,
   optimism,
   polygon,
+  polygonZkEvm,
   polygonMumbai,
   sepolia,
   zkSync,
-  zkSyncTestnet,
   zora,
   taikoJolnir,
   taikoTestnetSepolia
@@ -76,12 +77,12 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: mainnet.id,
     viem: mainnet,
-    chainName: 'Ethereum',
+    chainName: mainnet.name,
     alchemyUrl: 'https://eth-mainnet.g.alchemy.com',
-    blockExplorerUrls: ['https://etherscan.io'],
+    blockExplorerUrls: [mainnet.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
-    rpcUrls: ['https://eth.llamarpc.com'],
+    rpcUrls: mainnet.rpcUrls.public.http,
     shortName: 'eth',
     litNetwork: 'ethereum',
     unlockNetwork: true,
@@ -94,12 +95,11 @@ const RPC: Record<string, IChainDetails> = {
     chainName: 'Ethereum - Goerli',
     alchemyUrl: 'https://eth-goerli.g.alchemy.com',
     rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
-    blockExplorerUrls: ['https://goerli.etherscan.io/'],
-    gnosisUrl: 'https://safe-transaction-goerli.safe.global',
+    blockExplorerUrls: ['https://goerli.etherscan.io'],
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
+    litNetwork: 'goerli',
     testnet: true,
-    shortName: 'gor',
-    litNetwork: 'goerli'
+    shortName: 'gor'
   },
   SEPOLIA: {
     ...EVM_DEFAULT,
@@ -109,7 +109,7 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-sepolia.safe.global',
     chainName: 'Ethereum - Sepolia',
     rpcUrls: ['https://ethereum-sepolia.blockpi.network/v1/rpc/public'],
-    blockExplorerUrls: ['https://sepolia.etherscan.io/'],
+    blockExplorerUrls: ['https://sepolia.etherscan.io'],
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
     testnet: true,
     shortName: 'sep',
@@ -125,7 +125,7 @@ const RPC: Record<string, IChainDetails> = {
     alchemyUrl: 'https://opt-mainnet.g.alchemy.com',
     rpcUrls: ['https://mainnet.optimism.io'],
     gnosisUrl: 'https://safe-transaction-optimism.safe.global',
-    blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+    blockExplorerUrls: ['https://optimistic.etherscan.io'],
     iconUrl: '/images/cryptoLogos/optimism.svg',
     shortName: 'oeth',
     litNetwork: 'optimism',
@@ -148,6 +148,19 @@ const RPC: Record<string, IChainDetails> = {
     unlockNetwork: true,
     hypersubNetwork: true
   },
+  BASE_SEPOLIA: {
+    ...EVM_DEFAULT,
+    chainId: baseSepolia.id,
+    viem: baseSepolia,
+    chainName: 'Base - Goerli Testnet',
+    alchemyUrl: 'https://base-sepolia.g.alchemy.com/v2',
+    rpcUrls: ['https://sepolia.base.org'],
+    gnosisUrl: 'https://safe-transaction-base-sepolia.safe.global',
+    blockExplorerUrls: ['https://sepolia-explorer.base.org'],
+    iconUrl: '/images/cryptoLogos/base-logo.svg',
+    shortName: 'base-sepolia',
+    testnet: true
+  },
   BASE_TESTNET: {
     ...EVM_DEFAULT,
     chainId: baseGoerli.id,
@@ -158,8 +171,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://goerli.basescan.org'],
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base-testnet',
-    testnet: true,
     litNetwork: 'baseGoerli',
+    testnet: true,
     unlockNetwork: true
   },
   // https://docs.zora.co/docs/zora-network/network
@@ -167,11 +180,11 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: zora.id,
     viem: zora,
-    chainName: 'Zora',
-    rpcUrls: ['https://rpc.zora.energy'],
-    blockExplorerUrls: ['https://explorer.zora.energy'],
+    chainName: zora.name,
+    rpcUrls: zora.rpcUrls.public.http,
+    blockExplorerUrls: [zora.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zora-logo.svg',
-    shortName: 'zora',
+    shortName: zora.network,
     litNetwork: 'zora'
   },
   POLYGON: {
@@ -191,7 +204,26 @@ const RPC: Record<string, IChainDetails> = {
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     litNetwork: 'polygon',
-    shortName: 'matic',
+    shortName: polygon.network,
+    unlockNetwork: true
+  },
+  POLYGON_ZKEVM: {
+    chainId: polygonZkEvm.id,
+    viem: polygonZkEvm,
+    chainName: polygonZkEvm.name,
+    nativeCurrency: {
+      name: 'Polygon',
+      symbol: 'MATIC',
+      decimals: 18,
+      address: '0x0000000000000000000000000000000000000000',
+      logoURI: 'https://assets.coingecko.com/asset_platforms/images/122/small/polygonzkevm.jpg'
+    },
+    alchemyUrl: 'https://polygonzkevm-mainnet.g.alchemy.com/',
+    rpcUrls: polygonZkEvm.rpcUrls.public.http,
+    blockExplorerUrls: [polygonZkEvm.blockExplorers.default.url],
+    gnosisUrl: 'https://safe-transaction-zkevm.safe.global/',
+    iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
+    shortName: polygonZkEvm.network,
     unlockNetwork: true
   },
   MUMBAI: {
@@ -210,8 +242,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://mumbai.polygonscan.com'],
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
     testnet: true,
-    shortName: 'maticmum',
     litNetwork: 'mumbai',
+    shortName: 'maticmum',
     unlockNetwork: true
   },
   ARBITRUM: {
@@ -269,6 +301,7 @@ const RPC: Record<string, IChainDetails> = {
     chainId: avalanche.id,
     viem: avalanche,
     chainName: 'Avalanche',
+    alchemyUrl: 'https://avalanche.public-rpc.com',
     nativeCurrency: {
       name: 'Avalanche',
       symbol: 'AVAX',
@@ -288,6 +321,7 @@ const RPC: Record<string, IChainDetails> = {
     chainId: bsc.id,
     viem: bsc,
     chainName: 'Binance Smart Chain',
+    alchemyUrl: 'https://bsc-dataseed1.defibit.io',
     nativeCurrency: {
       name: 'Binance Coin',
       symbol: 'BNB',
@@ -307,6 +341,7 @@ const RPC: Record<string, IChainDetails> = {
     chainId: gnosis.id,
     viem: gnosis,
     chainName: 'Gnosis',
+    alchemyUrl: 'wss://rpc.gnosischain.com/wss',
     nativeCurrency: {
       name: 'xDAI',
       symbol: 'XDAI',
@@ -315,15 +350,17 @@ const RPC: Record<string, IChainDetails> = {
       logoURI: 'https://assets.coingecko.com/coins/images/11062/small/xdai.png?1614727492'
     },
     rpcUrls: ['https://rpc.xdaichain.com'],
-    blockExplorerUrls: ['https://blockscout.com/poa/xdai'],
+    blockExplorerUrls: ['https://gnosisscan.io'],
     gnosisUrl: 'https://safe-transaction-gnosis-chain.safe.global',
     iconUrl: '/images/cryptoLogos/gnosis-logo.svg',
     shortName: 'gno',
+    unlockNetwork: true,
     litNetwork: 'xdai'
   },
   FANTOM: {
     chainId: fantom.id,
     viem: fantom,
+    alchemyUrl: 'https://rpc2.fantom.network',
     chainName: 'Fantom Opera',
     nativeCurrency: {
       name: 'Fantom',
@@ -354,8 +391,8 @@ const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://explorer.celo.org'],
     iconUrl: '/images/cryptoLogos/celo-celo-logo.svg',
     shortName: 'celo',
-    litNetwork: 'celo',
-    unlockNetwork: true
+    unlockNetwork: true,
+    litNetwork: 'celo'
   },
   HARMONY: {
     chainId: harmonyOne.id,
@@ -386,7 +423,7 @@ const RPC: Record<string, IChainDetails> = {
       logoURI: 'https://assets.coingecko.com/coins/images/4344/small/Y88JAze.png?1565065793'
     },
     rpcUrls: ['https://api.s0.ps.hmny.io'],
-    blockExplorerUrls: ['https://explorer.ps.hmny.io/'],
+    blockExplorerUrls: ['https://explorer.ps.hmny.io'],
     iconUrl: '/images/cryptoLogos/harmony-one-logo.svg',
     shortName: 'hmy-ps-s0',
     testnet: true
@@ -416,31 +453,22 @@ const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: zkSync.id,
     viem: zkSync,
-    chainName: 'zkSync Era',
-    rpcUrls: ['https://mainnet.era.zksync.io'],
-    blockExplorerUrls: ['https://explorer.zksync.io'],
+    chainName: zkSync.name,
+    alchemyUrl: 'https://mainnet.era.zksync.io',
+    rpcUrls: zkSync.rpcUrls.public.http,
+    blockExplorerUrls: [zkSync.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
-    shortName: 'zksync'
-  },
-  ZKSYNC_DEV: {
-    ...EVM_DEFAULT,
-    chainId: zkSyncTestnet.id,
-    viem: zkSyncTestnet,
-    chainName: 'zkSync Era - Testnet',
-    rpcUrls: ['https://testnet.era.zksync.dev'],
-    blockExplorerUrls: ['https://goerli.explorer.zksync.io'],
-    iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
-    shortName: 'zksync-goerli',
-    testnet: true
+    shortName: zkSync.name,
+    unlockNetwork: true
   }
 } as const;
 
 export type Blockchain = keyof typeof RPC;
 
 export const RPCList = Object.values(RPC)
-  // filter out testnets in prod, except for Goerli
-  .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id);
+  // filter out testnets in prod, except for Goerli and Sepolia
+  .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id);
 
 export function getChainShortname(chainId: string | number): string {
   const parsedChainId = parseInt(chainId.toString());
@@ -502,18 +530,14 @@ export function getChainExplorerLink(
   return '';
 }
 
-export type IChainDetailsWithLit = IChainDetails & { litNetwork: NonNullable<IChainDetails['litNetwork']> };
+export const alchemyChains = RPCList.filter((chain) => !!chain.alchemyUrl).sort(sortChainList);
 
-export const litChains: IChainDetailsWithLit[] = RPCList.filter(
-  (chain): chain is IChainDetailsWithLit => !!chain.litNetwork
-).sort(sortChainList);
-
-export const litDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.litNetwork)
+export const daoChains = RPCList.filter((chain) =>
+  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.chainName.toLowerCase())
 );
 
-export const builderDaoChains: IChainDetailsWithLit[] = litChains.filter((chain) =>
-  ['ethereum', 'base', 'optimism', 'zora'].includes(chain.litNetwork)
+export const builderDaoChains = RPCList.filter((chain) =>
+  ['ethereum', 'base', 'optimism', 'zora'].includes(chain.chainName.toLowerCase())
 );
 
 export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);

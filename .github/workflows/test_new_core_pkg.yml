@@ -19,7 +19,7 @@ jobs:
           EVENT_CONTEXT: ${{ toJSON(github.event) }}
         run: |
           echo $EVENT_CONTEXT
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/install
         with:
@@ -67,7 +67,7 @@ jobs:
             test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -78,7 +78,7 @@ jobs:
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -86,7 +86,7 @@ jobs:
           mask-aws-account-id: 'no'
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
       - name: Run permissions api docker image
         id: run_permissions_api
         run: |

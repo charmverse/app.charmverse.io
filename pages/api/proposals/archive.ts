@@ -1,5 +1,4 @@
 import { UnauthorisedActionError, InvalidInputError } from '@charmverse/core/errors';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -13,7 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(archiveProposalController);
 
-async function archiveProposalController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsers>) {
+async function archiveProposalController(req: NextApiRequest, res: NextApiResponse) {
   const { proposalIds, archived } = req.body as ArchiveProposalRequest;
   const userId = req.session.user.id;
 

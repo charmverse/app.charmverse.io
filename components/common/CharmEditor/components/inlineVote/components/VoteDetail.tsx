@@ -6,13 +6,13 @@ import { Box, Button, Card, Chip, Divider, FormControl, List, ListItem, ListItem
 import Tooltip from '@mui/material/Tooltip';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import React from 'react';
+import type { EditorView } from 'prosemirror-view';
+import React, { useRef } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import Avatar from 'components/common/Avatar';
 import { CharmEditor } from 'components/common/CharmEditor';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
 import Modal from 'components/common/Modal';
@@ -38,6 +38,7 @@ export interface VoteDetailProps {
   cancelVote?: (voteId: string) => Promise<void>;
   updateDeadline: (voteId: string, deadline: Date) => Promise<void>;
   disableVote?: boolean;
+  view: EditorView | null;
 }
 
 const StyledFormControl = styled(FormControl)`
@@ -56,12 +57,13 @@ export function VoteDetail({
   detailed = false,
   vote,
   isProposal,
-  disableVote
+  disableVote,
+  view
 }: VoteDetailProps) {
   const { deadline, totalVotes, content, id, title, userChoice, voteOptions, aggregatedResult, type, maxChoices } =
     vote;
   const { user } = useUser();
-  const view = useEditorViewContext();
+  const anchorRef = useRef<HTMLElement>(null);
   const { data: userVotes, mutate } = useSWR(detailed ? `/votes/${id}/user-votes` : null, () =>
     charmClient.votes.getUserVotes(id)
   );
@@ -133,11 +135,12 @@ export function VoteDetail({
 
   return (
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
-      <Box display='flex' justifyContent='space-between' alignItems='center'>
+      <Box ref={anchorRef} display='flex' justifyContent='space-between' alignItems='center'>
         <Typography variant='h6' fontWeight='bold' component='span'>
           {title || 'Poll on this proposal'}
         </Typography>
         <VoteActionsMenu
+          anchorRef={anchorRef}
           deleteVote={deleteVote}
           cancelVote={cancelVote}
           isProposalVote={!!isProposal}
@@ -260,6 +263,7 @@ export function VoteDetail({
           castVote={castVote}
           deleteVote={deleteVote}
           updateDeadline={updateDeadline}
+          view={view}
         />
       </Modal>
     </VotesWrapper>

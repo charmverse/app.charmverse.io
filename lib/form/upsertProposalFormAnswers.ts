@@ -57,7 +57,6 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
       const field = form.formFields.find((f) => f.id === a.fieldId);
       const existingAnswer = existingAnswers.find((e) => e.fieldId === a.fieldId);
       const answerId = existingAnswer?.id || v4();
-
       return prisma.formFieldAnswer.upsert({
         where: { id: answerId },
         create: {

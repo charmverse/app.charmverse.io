@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
@@ -115,36 +116,11 @@ export const getSortedCards = createSelector(getCards, (cards) => {
 
 export const getTemplates = (state: RootState): { [key: string]: Card } => state.cards.templates;
 
-export const getSortedTemplates = createSelector(getTemplates, (templates) => {
-  return Object.values(templates).sort((a, b) => a.title.localeCompare(b.title)) as Card[];
-});
-
 export function getCard(cardId: string): (state: RootState) => Card | undefined {
   return (state: RootState): Card | undefined => {
     return state.cards.cards[cardId] || state.cards.templates[cardId];
   };
 }
-
-export const getCurrentBoardCards = createSelector(
-  (state: RootState) => state.boards.current,
-  getCards,
-  (boardId: string, cards: { [key: string]: Card }) => {
-    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  }
-);
-
-export const getCurrentBoardTemplates = createSelector(
-  (state: RootState) => state.boards.current,
-  getTemplates,
-  (
-    boardId: string,
-    templates: {
-      [key: string]: Card;
-    }
-  ) => {
-    return Object.values(templates).filter((c) => c.parentId === boardId) as Card[];
-  }
-);
 
 function titleOrCreatedOrder(cardA: PageMeta, cardB: PageMeta) {
   const aValue = cardA.title;
@@ -181,9 +157,10 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 
 export function sortCards(
   cardPages: CardPage[],
-  board: Board,
+  board: Pick<Board, 'fields'>,
   activeView: BoardView,
   members: Record<string, Member>,
+  relationPropertiesCardsRecord: PageListItemsRecord,
   localSort?: ISortOption[] | null
 ): CardPage[] {
   if (!activeView) {
@@ -230,6 +207,16 @@ export function sortCards(
           if (typeof bValue !== 'number') {
             bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
           }
+        } else if (template.type === 'relation') {
+          const pageListItems = relationPropertiesCardsRecord[template.id] ?? [];
+          const aPageListItems = Array.isArray(aValue)
+            ? aValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
+            : [];
+          const bPageListItems = Array.isArray(bValue)
+            ? bValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
+            : [];
+          aValue = aPageListItems.join(', ');
+          bValue = bPageListItems.join(', ');
         }
 
         let result = 0;
@@ -384,5 +371,22 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
         return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       return result;
+    }
+  );
+
+export const makeSelectBoardTemplates = () =>
+  createSelector(
+    (state: RootState, boardId: string) => {
+      const cards = getTemplates(state);
+      return {
+        cards,
+        boardId
+      };
+    },
+    ({ cards, boardId }) => {
+      if (!cards) {
+        return [];
+      }
+      return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
     }
   );

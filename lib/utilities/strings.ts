@@ -49,6 +49,10 @@ export function isUrl(text: string) {
   }
 }
 
+export function isLocalhostUrl(text: string) {
+  return /^https?:\/\/(localhost|0|10|127|192(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}|\[::1?\])/gi.test(text);
+}
+
 // generate a color based on a string. Copied from https://medium.com/@pppped/compute-an-arbitrary-color-for-user-avatar-starting-from-his-username-with-javascript-cd0675943b66
 export function stringToColor(name: string, saturation = 50, lightness = 60) {
   if (name === '') {

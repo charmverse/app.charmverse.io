@@ -8,13 +8,6 @@ import { withSessionSsr } from 'lib/session/withSession';
 
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context) => {
   const sessionUserId = context.req.session?.user?.id;
-  // 1. handle user not logged in
-  if (!sessionUserId) {
-    // show the normal login UI
-    return {
-      props: {}
-    };
-  }
 
   // retrieve space by domain, and then last page view by spaceId
   const domainOrCustomDomain = context.query.domain as string;
@@ -29,7 +22,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     }
   });
 
-  // 2. Handle when case does not exist
+  // 1. Handle when case does not exist
   if (!space) {
     log.warn('User tried to access space that does not exist', { domain: context.query.domain, userId: sessionUserId });
     return {
@@ -40,9 +33,17 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
     };
   }
 
-  // 3. send user to default page for the space
+  // 2. send user to default page for the space
 
-  let destination = await getDefaultPageForSpace({ host: context.req.headers.host, space, userId: sessionUserId });
+  const pageRedirect = await getDefaultPageForSpace({ host: context.req.headers.host, space, userId: sessionUserId });
+
+  if (pageRedirect == null) {
+    return {
+      props: {}
+    };
+  }
+
+  let destination = pageRedirect;
 
   // append existing query params, lie 'account' or 'subscription'
   Object.keys(context.query).forEach((key) => {

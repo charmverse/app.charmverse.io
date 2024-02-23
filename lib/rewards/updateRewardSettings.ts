@@ -5,7 +5,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
-import type { RewardReviewer, RewardWithUsers } from './interfaces';
+import type { RewardReviewer, RewardWithUsers, RewardType } from './interfaces';
 import { setRewardUsers } from './setRewardUsers';
 
 export type UpdateableRewardFields = Partial<
@@ -21,7 +21,12 @@ export type UpdateableRewardFields = Partial<
     | 'customReward'
     | 'fields'
   >
-> & { reviewers?: RewardReviewer[]; allowedSubmitterRoles?: string[] | null; assignedSubmitters?: string[] | null };
+> & {
+  reviewers?: RewardReviewer[];
+  allowedSubmitterRoles?: string[] | null;
+  assignedSubmitters?: string[] | null;
+  rewardType?: RewardType;
+};
 
 export type RewardUpdate = {
   rewardId: string;

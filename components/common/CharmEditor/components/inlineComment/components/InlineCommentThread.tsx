@@ -42,7 +42,7 @@ export function InlineCommentThread({
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
-  const { updateThreadPluginState } = useInlineComment();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids
@@ -75,7 +75,7 @@ export function InlineCommentThread({
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread
-                  canCreateComments={permissions?.comment}
+                  enableComments={permissions?.comment}
                   inline={ids.length === 1}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}

@@ -1,7 +1,8 @@
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useRef, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useEffect, useRef, useState } from 'react';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
@@ -16,12 +17,15 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import { getRewardType } from 'lib/rewards/getRewardType';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
 export function NewRewardButton({ showPage }: { showPage: (pageId: string) => void }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
+  const router = useRouter();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const overrideContentModalPopupState = usePopupState({ variant: 'popover', popupId: 'override-content' });
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
@@ -32,12 +36,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const { templates, isLoading } = useRewardTemplates();
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
-
   const { trigger: trashPages } = useTrashPages();
   function deleteTemplate(pageId: string) {
     return trashPages({ pageIds: [pageId], trash: true });
   }
-
   const isDisabled = !currentSpacePermissions?.createBounty;
 
   function createTemplate() {
@@ -73,7 +75,10 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       type: 'bounty',
       templateId: template.page.id
     });
-    setRewardValues(template.reward);
+    setRewardValues({
+      rewardType: getRewardType(template.reward),
+      ...template.reward
+    });
   }
 
   function selectTemplate(template: RewardTemplate | null) {
@@ -93,19 +98,24 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
     setSelectedTemplate(template);
   }
 
-  let disabledTooltip: string | undefined;
-
   const isTemplate = newPageValues?.type === 'bounty_template';
-  if (!newPageValues?.title) {
-    disabledTooltip = 'Page title is required';
-  } else if (!isTemplate) {
-    // these values are not required for templates
-    if (!rewardValues.reviewers?.length) {
-      disabledTooltip = 'Reviewer is required';
-    } else if (rewardValues.assignedSubmitters && rewardValues.assignedSubmitters.length === 0) {
-      disabledTooltip = 'You need to assign at least one submitter';
+  const errors = getRewardErrors({
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    page: {
+      title: newPageValues?.title || '',
+      type: newPageValues?.type || 'bounty'
     }
-  }
+  });
+  const disabledTooltip = errors.join(', ');
+
+  useEffect(() => {
+    if (router.query.new) {
+      createNewReward();
+    } else if (router.query.new_template) {
+      createTemplate();
+    }
+  }, [router.query.new_template, router.query.new]);
 
   return (
     <>

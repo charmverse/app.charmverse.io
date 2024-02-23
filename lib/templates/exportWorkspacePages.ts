@@ -187,10 +187,6 @@ export async function exportWorkspacePages({
           }
         }
       });
-      // unset categoryId until its removed from the db
-      if (proposal?.categoryId) {
-        proposal.categoryId = null;
-      }
       node.proposal = proposal;
     }
 

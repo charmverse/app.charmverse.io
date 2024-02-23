@@ -1,4 +1,3 @@
-import type { ProposalFlowPermissionFlags } from '@charmverse/core/permissions';
 import { rest } from 'msw';
 import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
 import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
@@ -45,9 +44,6 @@ const spaceHandlers = {
   spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
     return res(ctx.json(spaces));
   }),
-  proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
-    return res(ctx.json(getDefaultWorkflows(req.params.spaceId)));
-  }),
   spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
     const result: BlockCountInfo = { count: 1000 };
     return res(ctx.json(result));
@@ -57,9 +53,6 @@ const spaceHandlers = {
 const pageHandlers = {
   pageComments: rest.get(`/api/pages/:pageId/comments`, (req, res, ctx) => {
     return res(ctx.json([]));
-  }),
-  proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
-    return res(ctx.json(proposalTemplates));
   })
 };
 
@@ -67,20 +60,16 @@ const proposalHandlers = {
   proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
     return res(ctx.json(proposalTemplates));
   }),
-  proposalFlowFlags: rest.get(`/api/proposals/:pageId/compute-flow-flags`, (req, res, ctx) => {
-    const permissions: ProposalFlowPermissionFlags = {
-      draft: true,
-      discussion: true,
-      review: true,
-      reviewed: true,
-      vote_active: true,
-      vote_closed: true,
-      evaluation_active: true,
-      evaluation_closed: true
-    };
-    return res(ctx.json(permissions));
+  proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
+    return res(ctx.json(getDefaultWorkflows(req.params.spaceId)));
+  })
+};
+
+const rewardHandlers = {
+  rewardBlocks: rest.get(`/api/spaces/:spaceId/rewards/blocks`, (req, res, ctx) => {
+    return res(ctx.json([]));
   }),
-  reviewerIds: rest.get(`/api/proposals/:pageId/get-user-reviewerids`, (req, res, ctx) => {
+  rewardTemplates: rest.get(`/api/spaces/:spaceId/reward-templates`, (req, res, ctx) => {
     return res(ctx.json([]));
   })
 };
@@ -98,5 +87,6 @@ export const handlers = {
   ...spaceHandlers,
   ...pageHandlers,
   ...proposalHandlers,
+  ...rewardHandlers,
   ...userHandlers
 };

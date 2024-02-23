@@ -5,6 +5,7 @@ import React, { useState, useCallback } from 'react';
 import { useIntl } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -31,7 +32,6 @@ type Props = {
   onDrop?: (srcCard: Card, dstCard: Card) => void;
   // eslint-disable-next-line
   showCard: (cardId: string | null) => void;
-  isManualSort: boolean;
   hideLinkedBounty?: boolean;
 };
 
@@ -74,10 +74,9 @@ const KanbanCard = React.memo((props: Props) => {
   );
   const visiblePropertyTemplates = props.visiblePropertyTemplates || [];
   let className = props.isSelected ? 'KanbanCard selected' : 'KanbanCard';
-  if (props.isManualSort && isOver) {
+  if (isOver) {
     className += ' dragover';
   }
-  const { space } = useCurrentSpace();
 
   const router = useRouter();
   const { pages } = usePages();

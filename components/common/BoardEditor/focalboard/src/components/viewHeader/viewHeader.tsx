@@ -5,7 +5,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
-import { mutate } from 'swr';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
@@ -19,8 +18,6 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import { mutator } from '../../mutator';
-import { getCurrentBoardTemplates } from '../../store/cards';
-import { useAppSelector } from '../../store/hooks';
 import IconButton from '../../widgets/buttons/iconButton';
 import AddViewMenu from '../addViewMenu';
 
@@ -57,7 +54,6 @@ type Props = {
 function ViewHeader(props: Props) {
   const router = useRouter();
   const { pages, refreshPage } = usePages();
-  const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
@@ -92,13 +88,10 @@ function ViewHeader(props: Props) {
   }
 
   async function deleteCardTemplate(pageId: string) {
-    const card = cardTemplates.find((c) => c.id === pageId);
-    if (card) {
-      try {
-        await trashPages({ pageIds: [card.id], trash: true });
-      } catch (error) {
-        showError(error);
-      }
+    try {
+      await trashPages({ pageIds: [pageId], trash: true });
+    } catch (error) {
+      showError(error);
     }
   }
 
@@ -167,6 +160,7 @@ function ViewHeader(props: Props) {
             )}
           </>
         )}
+
         <div className='octo-spacer' />
 
         <Box className='view-actions'>
@@ -230,7 +224,7 @@ function ViewHeader(props: Props) {
                   addCardTemplate={props.addCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}
-                  boardId={viewsBoard.id}
+                  templatesBoardId={activeBoard?.id}
                 />
               )}
             </>

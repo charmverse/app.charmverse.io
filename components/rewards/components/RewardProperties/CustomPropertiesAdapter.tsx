@@ -1,33 +1,68 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { usePropertiesMutator } from 'components/rewards/components/RewardProperties/hooks/useRewardsMutator';
-import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
+import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import type { RewardCard, RewardFieldsProp, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+
+import { mapRewardToCardPage } from '../../hooks/useRewardsBoardAdapter';
+import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
+
+import { usePropertiesMutator } from './hooks/useRewardsMutator';
 
 type Props = {
-  reward: { spaceId?: string; id?: string } & RewardFieldsProp;
+  reward: BoardReward;
   onChange?: (properties: RewardPropertiesField) => void;
   readOnly?: boolean;
 };
-
 export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   const { user } = useUser();
+  const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
-  const { boardCustomProperties, card, cards, activeView, views, rewardPage, setBoardReward } = useRewardsBoard();
-  const mutator = usePropertiesMutator({ reward, onChange });
+  const { getRewardPage } = useRewardPage();
+  const { membersRecord } = useMembers();
+  const { board, cards, activeView, views } = useRewardsBoardAndBlocks();
 
-  useEffect(() => {
-    setBoardReward(reward);
-    return () => setBoardReward(null);
-  }, [reward, setBoardReward]);
+  const mutator = usePropertiesMutator({ onChange });
+
+  // card from current reward
+  const rewardPage = getRewardPage(reward?.id);
+  const card =
+    reward &&
+    space &&
+    mapRewardToCardPage({
+      reward,
+      rewardPage,
+      spaceId: space.id,
+      members: membersRecord
+    }).card;
+
+  const boardCustomProperties = useMemo(() => {
+    if (board) {
+      return {
+        ...board,
+        fields: {
+          ...board.fields,
+          // extract non-custom properties
+          cardProperties: board.fields.cardProperties.filter((p) => !p.id.startsWith('__'))
+        }
+      };
+    }
+    return board;
+  }, [board]);
+
+  if (!boardCustomProperties || !card) {
+    return null;
+  }
 
   return (
     <CardDetailProperties
       board={boardCustomProperties}
-      card={card as RewardCard}
+      card={card}
       cards={cards}
       activeView={activeView}
       views={views}
@@ -36,6 +71,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       pageUpdatedBy={rewardPage?.updatedBy || user?.id || ''}
       mutator={mutator ?? undefined}
       disableEditPropertyOption={!isAdmin}
+      boardType='rewards'
     />
   );
 }

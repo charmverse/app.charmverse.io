@@ -18,7 +18,7 @@ export function SpaceCredentialSettings() {
   const { space, refreshCurrentSpace } = useCurrentSpace();
   useTrackPageView({ type: 'settings/credentials' });
   const isAdmin = useIsAdmin();
-  const [credentialLogo, setCredentialLogo] = useState(space?.credentialLogo ?? null);
+  const [credentialLogo, setCredentialLogo] = useState(space?.credentialLogo ?? '');
   const { trigger, isMutating } = useUpdateSpace(space?.id);
   return (
     <>
@@ -58,7 +58,7 @@ export function SpaceCredentialSettings() {
           }}
           disableElevation
           size='large'
-          disabled={isMutating || credentialLogo === space?.credentialLogo}
+          disabled={isMutating || credentialLogo === (space?.credentialLogo ?? '')}
           onClick={() => {
             trigger({ credentialLogo }).then(() => refreshCurrentSpace());
           }}

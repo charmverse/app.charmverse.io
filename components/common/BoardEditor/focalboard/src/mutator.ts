@@ -4,7 +4,13 @@ import type { PageMeta } from '@charmverse/core/pages';
 import charmClient from 'charmClient';
 import type { Block, BlockPatch } from 'lib/focalboard/block';
 import { createPatchesFromBlocks } from 'lib/focalboard/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type {
+  Board,
+  IPropertyOption,
+  IPropertyTemplate,
+  PropertyType,
+  RelationPropertyData
+} from 'lib/focalboard/board';
 import { createBoard } from 'lib/focalboard/board';
 import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
@@ -108,7 +114,6 @@ export class Mutator {
 
   async updateBlock(newBlock: Block, oldBlock: Block, description: string): Promise<void> {
     const [updatePatch, undoPatch] = createPatchesFromBlocks(newBlock, oldBlock);
-
     await undoManager.perform(
       async () => {
         await this.patchBlock(newBlock.id, updatePatch, publishIncrementalUpdate);
@@ -387,15 +392,10 @@ export class Mutator {
 
   async insertPropertyTemplate(
     board: Board,
-    activeView: BoardView,
+    activeView?: BoardView,
     index = -1,
     template?: IPropertyTemplate
   ): Promise<string> {
-    if (!activeView) {
-      Utils.assertFailure('insertPropertyTemplate: no activeView');
-      return '';
-    }
-
     const newTemplate = template || {
       id: Utils.createGuid(IDType.BlockID),
       name: 'New Property',
@@ -413,7 +413,7 @@ export class Mutator {
 
     let description = 'add property';
 
-    if (activeView.fields.viewType === 'table') {
+    if (activeView?.fields.viewType === 'table') {
       oldBlocks.push(activeView);
 
       const newActiveView = createBoardView(activeView);
@@ -651,13 +651,27 @@ export class Mutator {
     return this.updateBlocks(newBlocks, oldBlocks, description);
   }
 
+  async updateProperty(board: Board, propertyId: string, updatedProperty: IPropertyTemplate) {
+    const newBoard = createBoard({ block: board });
+    const cardPropertyIndex = board.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === propertyId);
+
+    if (cardPropertyIndex === -1) {
+      throw new Error(`Cannot find property with id: ${propertyId}`);
+    }
+
+    newBoard.fields.cardProperties[cardPropertyIndex] = updatedProperty;
+
+    await this.updateBlock(newBoard, board, 'changed property');
+  }
+
   async changePropertyTypeAndName(
     board: Board,
     cards: Card[],
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
     newName: string,
-    views: BoardView[]
+    views: BoardView[],
+    relationData?: RelationPropertyData
   ) {
     const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
@@ -666,7 +680,6 @@ export class Mutator {
     const newBoard = createBoard({ block: board });
     const cardProperty = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id);
     const newTemplate = propertyTemplate.id === Constants.titleColumnId ? cardProperty || titleProperty : cardProperty;
-
     if (!newTemplate) {
       return;
     }
@@ -681,6 +694,10 @@ export class Mutator {
 
     newTemplate.type = newType;
     newTemplate.name = newName;
+
+    if (newTemplate?.type === 'relation' && relationData) {
+      newTemplate.relationData = relationData;
+    }
 
     const oldBlocks: Block[] = [board];
     const newBlocks: Block[] = [newBoard];

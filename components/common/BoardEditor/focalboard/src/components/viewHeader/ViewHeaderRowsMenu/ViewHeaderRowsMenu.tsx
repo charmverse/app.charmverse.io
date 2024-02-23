@@ -5,6 +5,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,11 +15,13 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
+import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
 
 import { ArchiveProposals } from './components/ArchiveProposals';
+import { BatchPaymentRewards } from './components/BatchPaymentRewards';
 import { StyledMenuItem } from './components/PropertyMenu';
 import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
@@ -53,8 +56,11 @@ const validPropertyTypes = [
   'proposalAuthor',
   'proposalReviewer',
   'proposalStep',
-  'proposalStatus'
+  'proposalStatus',
+  'relation'
 ] as PropertyType[];
+
+const invalidPropertyIds = [...defaultRewardPropertyIds];
 
 export type ViewHeaderRowsMenuProps = {
   board: Board;
@@ -73,6 +79,8 @@ export type ViewHeaderRowsMenuProps = {
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
+  showRewardsBatchPaymentButton?: boolean;
+  showTrashIcon?: boolean;
 };
 
 export function ViewHeaderRowsMenu({
@@ -90,7 +98,9 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsAuthors,
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
-  onChangeProposalsSteps
+  onChangeProposalsSteps,
+  showRewardsBatchPaymentButton,
+  showTrashIcon = !board.fields.sourceType
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -98,8 +108,7 @@ export function ViewHeaderRowsMenu({
   const { trigger: trashPages } = useTrashPages();
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
-
-  const showTrashIcon = !board.fields.sourceType; // dont allow deleting cards for proposals-as-a-source
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   async function deleteCheckedCards() {
     if (checkedIds.length > 1) {
@@ -136,7 +145,7 @@ export function ViewHeaderRowsMenu({
     try {
       await mutator.changePropertyValues(checkedCards, propertyTemplate.id, userIds);
     } catch (error) {
-      showError(error, 'There was an error updating properties');
+      showError(error, 'There was an error updating person property');
     }
     const previousValue = propertyValue
       ? typeof propertyValue === 'string'
@@ -165,12 +174,36 @@ export function ViewHeaderRowsMenu({
     });
   }
 
+  const onRelationPropertyChange = async ({
+    checkedCards,
+    pageListItemIds,
+    propertyTemplate
+  }: {
+    checkedCards: Card[];
+    pageListItemIds: string[];
+    propertyTemplate: IPropertyTemplate;
+  }) => {
+    try {
+      for (const card of checkedCards) {
+        await syncRelationPropertyValue({
+          cardId: card.id,
+          templateId: propertyTemplate.id,
+          boardId: board.id,
+          pageIds: pageListItemIds
+        });
+      }
+    } catch (err) {
+      showError(err, 'There was an error updating relation property');
+    }
+  };
+
   const filteredPropertyTemplates = useMemo(() => {
     return propertyTemplates.filter(
       (propertyTemplate) =>
         !propertyTemplate.formFieldId &&
         validPropertyTypes.includes(propertyTemplate.type) &&
-        propertyTemplate.id !== Constants.titleColumnId
+        propertyTemplate.id !== Constants.titleColumnId &&
+        !invalidPropertyIds.includes(propertyTemplate.id)
     );
   }, [propertyTemplates]);
 
@@ -191,6 +224,7 @@ export function ViewHeaderRowsMenu({
             <PropertyTemplateMenu
               isAdmin={isAdmin}
               board={board}
+              onRelationPropertyChange={onRelationPropertyChange}
               checkedIds={checkedIds}
               cards={cards}
               propertyTemplate={propertyTemplate}
@@ -216,6 +250,7 @@ export function ViewHeaderRowsMenu({
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
+      {showRewardsBatchPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>

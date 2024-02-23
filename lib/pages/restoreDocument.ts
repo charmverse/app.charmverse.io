@@ -21,7 +21,7 @@ export function replayDocumentHistory(diffs: PageDiff[]): PageContent {
     // Make sure diffs are in correct order
     .sort((a, b) => a.version - b.version)
     // Extract prosemirror change step
-    .map((diff) => (diff.data as any).ds as ProsemirrorJSONStep)
+    .map((diff) => (diff.data as any).ds as ProsemirrorJSONStep[])
     // Diff ds is stored as an array, unwind this
     .flat()
     // Just in case there are some null diffs

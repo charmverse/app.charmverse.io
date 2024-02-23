@@ -9,10 +9,11 @@ import type { ReactNode } from 'react';
 import React, { memo, useLayoutEffect, useMemo, useState } from 'react';
 
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import PageThread from 'components/common/CharmEditor/components/thread/PageThread';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useInlineComment } from 'hooks/useInlineComment';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -55,11 +56,11 @@ function getThreadList({
   threads,
   userId
 }: {
-  threads: CommentThreadsMap;
+  threads?: CommentThreadsMap;
   threadFilter: 'resolved' | 'open' | 'all' | 'you';
   userId?: string | null;
 }) {
-  const allThreads = Object.values(threads).filter(isTruthy);
+  const allThreads = threads ? Object.values(threads).filter(isTruthy) : [];
   const unResolvedThreads = allThreads.filter((thread) => thread && !thread.resolved);
   const resolvedThreads = allThreads.filter((thread) => thread && thread.resolved);
   let threadList: ThreadWithComments[] = [];
@@ -132,7 +133,6 @@ function useHighlightThreadBox({
     }
   }, [router.query.inlineCommentId]);
 }
-
 function CommentsSidebar({
   handleThreadFilterChange,
   threadFilter,
@@ -140,19 +140,21 @@ function CommentsSidebar({
   onDeleteComment,
   onToggleResolve,
   scrollToThreadElement,
-  canCreateComments
+  enableComments,
+  isLoading
 }: {
   threadList: ThreadWithComments[];
   threadFilter: 'resolved' | 'open' | 'all' | 'you';
   handleThreadFilterChange: SelectProps['onChange'];
-  canCreateComments: boolean;
+  enableComments: boolean;
   onToggleResolve?: (threadId: string, remove: boolean) => void;
   onDeleteComment?: (threadId: string) => void;
   scrollToThreadElement?: (threadId: string) => void;
+  isLoading: boolean;
 }) {
   return (
     <>
-      <Box display='flex' alignItems='center' gap={1}>
+      <Box display='flex' alignItems='center' gap={1} px={1}>
         <InputLabel>Filter</InputLabel>
         <Select variant='outlined' value={threadFilter} onChange={handleThreadFilterChange}>
           <MenuItem value='open'>Open</MenuItem>
@@ -161,8 +163,10 @@ function CommentsSidebar({
           <MenuItem value='all'>All</MenuItem>
         </Select>
       </Box>
-      <StyledSidebar className='charm-inline-comment-sidebar' sx={{ height: '100%' }}>
-        {threadList.length === 0 ? (
+      <StyledSidebar data-test='inline-comment-sidebar' sx={{ height: '100%', px: 1 }}>
+        {isLoading ? (
+          <LoadingComponent />
+        ) : threadList.length === 0 ? (
           <NoCommentsMessage
             icon={
               <MessageOutlinedIcon
@@ -181,7 +185,7 @@ function CommentsSidebar({
             (resolvedThread) =>
               resolvedThread && (
                 <PageThread
-                  canCreateComments={canCreateComments}
+                  enableComments={enableComments}
                   showFindButton
                   key={resolvedThread.id}
                   threadId={resolvedThread.id}
@@ -198,12 +202,12 @@ function CommentsSidebar({
 }
 
 function EditorCommentsSidebarComponent({
-  canCreateComments,
+  enableComments,
   threads,
   openSidebar
 }: {
-  threads: CommentThreadsMap;
-  canCreateComments: boolean;
+  threads?: CommentThreadsMap;
+  enableComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
 }) {
   const { user } = useUser();
@@ -216,65 +220,76 @@ function EditorCommentsSidebarComponent({
       userId: user?.id
     });
   }, [threads, threadFilter, user?.id]);
-
   const handleThreadClassChange: SelectProps['onChange'] = (event) => {
     setThreadFilter(event.target.value as any);
   };
 
-  const view = useEditorViewContext();
+  useHighlightThreadBox({
+    openSidebar,
+    setThreadFilter,
+    threads: threads ? Object.values(threads).filter(isTruthy) : []
+  });
+  const { view } = useCharmEditorView();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   // view.state.doc stays the same (empty content) even when the document content changes
-  const extractedThreadIds = isEmptyDocument(view.state.doc)
-    ? new Set(Object.keys(threads))
-    : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
+  const extractedThreadIds =
+    !view || !threads
+      ? new Set()
+      : isEmptyDocument(view.state.doc)
+      ? new Set(Object.keys(threads))
+      : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
   // Making sure the position sort doesn't filter out comments that are not in the view
-  const inlineThreadsIds = Array.from(
-    new Set([
-      ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
-      ...allThreads.map((thread) => thread?.id)
-    ])
-  ).filter((id) => extractedThreadIds.has(id));
+  const inlineThreadsIds =
+    view && threads
+      ? Array.from(
+          new Set([
+            ...findTotalInlineComments(view.state.schema, view.state.doc, threads, true).threadIds,
+            ...allThreads.map((thread) => thread?.id)
+          ])
+        ).filter((id) => extractedThreadIds.has(id))
+      : [];
 
   const threadListSet = new Set(threadList.map((thread) => thread.id));
   const sortedThreadList = inlineThreadsIds
     .filter((inlineThreadsId) => threadListSet.has(inlineThreadsId))
-    .map((filteredThreadId) => threads[filteredThreadId])
-    .filter(isTruthy);
-  const { updateThreadPluginState } = useInlineComment();
-
-  useHighlightThreadBox({
-    openSidebar,
-    setThreadFilter,
-    threads: Object.values(threads).filter(isTruthy)
-  });
+    .map((filteredThreadId) => threads && threads[filteredThreadId])
+    .filter(isTruthy)
+    // sort these since we convert it to a map afer the server responds
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 
   return (
     <CommentsSidebar
-      canCreateComments={canCreateComments}
+      enableComments={enableComments}
       handleThreadFilterChange={handleThreadClassChange}
+      isLoading={!view || !threads}
       threadFilter={threadFilter}
       threadList={sortedThreadList}
       onDeleteComment={(threadId) => {
-        removeInlineCommentMark(view, threadId, true);
-        updateThreadPluginState({
-          remove: true,
-          threadId
-        });
+        if (view) {
+          removeInlineCommentMark(view, threadId, true);
+          updateThreadPluginState({
+            remove: true,
+            threadId
+          });
+        }
       }}
       onToggleResolve={(threadId, remove) => {
-        removeInlineCommentMark(view, threadId);
-        updateThreadPluginState({
-          remove,
-          threadId
-        });
+        if (view) {
+          removeInlineCommentMark(view, threadId);
+          updateThreadPluginState({
+            remove,
+            threadId
+          });
+        }
       }}
     />
   );
 }
 
 function FormCommentsSidebarComponent({
-  canCreateComments,
+  enableComments,
   threads,
   openSidebar,
   formFields
@@ -284,8 +299,8 @@ function FormCommentsSidebarComponent({
         options: SelectOptionType[];
       })[]
     | null;
-  threads: CommentThreadsMap;
-  canCreateComments: boolean;
+  threads?: CommentThreadsMap;
+  enableComments: boolean;
   openSidebar: (view: PageSidebarView) => void;
 }) {
   const { user } = useUser();
@@ -326,14 +341,15 @@ function FormCommentsSidebarComponent({
   useHighlightThreadBox({
     openSidebar,
     setThreadFilter,
-    threads: Object.values(threads).filter(isTruthy)
+    threads: threads ? Object.values(threads).filter(isTruthy) : []
   });
 
   return (
     <CommentsSidebar
       handleThreadFilterChange={handleThreadFilterChange}
-      canCreateComments={canCreateComments}
+      enableComments={enableComments}
       threadFilter={threadFilter}
+      isLoading={!threads}
       threadList={threadList}
       scrollToThreadElement={(threadId) => {
         const fieldAnswerElements = document.querySelectorAll('.proposal-form-field-answer');
@@ -369,7 +385,7 @@ export function NoCommentsMessage({
   children?: ReactNode;
 }) {
   return (
-    <EmptyThreadContainerBox>
+    <EmptyThreadContainerBox data-test='empty-message'>
       <Center id='center'>
         {icon}
         <Typography variant='subtitle1' color='secondary'>

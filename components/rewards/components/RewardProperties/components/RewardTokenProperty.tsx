@@ -10,12 +10,13 @@ import { SelectPreviewContainer } from 'components/common/BoardEditor/components
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
-import { RewardTokenInfo } from 'components/rewards/components/RewardProperties/components/RewardTokenInfo';
 import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
+
+import { RewardAmount } from '../../RewardStatusBadge';
 
 export type RewardTokenDetails = {
   chainId: number;
@@ -126,16 +127,30 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
   return (
     <>
-      <SelectPreviewContainer readOnly={readOnly} displayType='details' onClick={openTokenSettings}>
-        <RewardTokenInfo
-          chainId={currentReward.chainId}
-          symbolOrAddress={currentReward.rewardToken}
-          rewardAmount={currentReward.rewardAmount}
-        />
+      <SelectPreviewContainer
+        data-test='open-reward-value-dialog'
+        readOnly={readOnly}
+        displayType='details'
+        onClick={openTokenSettings}
+      >
+        <Box>
+          <RewardAmount
+            reward={{
+              chainId: currentReward.chainId,
+              customReward: currentReward.customReward,
+              rewardAmount: currentReward.rewardAmount,
+              rewardToken: currentReward.rewardToken
+            }}
+            truncate={true}
+            truncatePrecision={2}
+            typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
+          />
+        </Box>
       </SelectPreviewContainer>
 
       <Dialog
         open={isOpen}
+        data-test='reward-value-configuration'
         onClose={handleClose}
         title='Reward token details'
         footerActions={
@@ -153,6 +168,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
 
             <Button
               disabled={!isValid}
+              data-test='save-reward-value'
               onClick={handleSubmit(onSubmit)}
               sx={{
                 alignSelf: 'flex-start'
@@ -195,7 +211,7 @@ export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props
                   disabled={readOnly || !isTruthy(watchChainId)}
                   readOnly={readOnly}
                   cryptoList={availableCryptos}
-                  chainId={currentReward?.chainId ?? undefined}
+                  chainId={currentReward?.chainId ?? watchChainId}
                   defaultValue={value ?? undefined}
                   value={value ?? undefined}
                   hideBackdrop={true}

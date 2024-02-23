@@ -1,6 +1,4 @@
 import type { Space, User } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 

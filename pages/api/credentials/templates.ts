@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import type { CreateCredentialTemplateInput } from 'lib/credentials/templates';
 import { createCredentialTemplate, getCredentialTemplates, updateCredentialTemplate } from 'lib/credentials/templates';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireSpaceMembership } from 'lib/middleware/requireSpaceMembership';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -28,11 +29,16 @@ async function getCredentialsController(req: NextApiRequest, res: NextApiRespons
 }
 
 async function createCredentialController(req: NextApiRequest, res: NextApiResponse) {
-  const signed = await createCredentialTemplate({
+  const credentialTemplate = await createCredentialTemplate({
     ...(req.body as CreateCredentialTemplateInput),
     spaceId: req.body.spaceId as string
   });
-  return res.status(201).json(signed);
+  trackUserAction('credential_template_created', {
+    credentialTemplateId: credentialTemplate.id,
+    spaceId: credentialTemplate.spaceId,
+    userId: req.session.user.id
+  });
+  return res.status(201).json(credentialTemplate);
 }
 
 async function updateCredentialController(req: NextApiRequest, res: NextApiResponse) {
@@ -56,6 +62,13 @@ async function updateCredentialController(req: NextApiRequest, res: NextApiRespo
   }
 
   await updateCredentialTemplate({ templateId: credentialTemplate.id, fields: req.body });
+
+  trackUserAction('credential_template_updated', {
+    credentialTemplateId: credentialTemplate.id,
+    spaceId: credentialTemplate.spaceId,
+    userId: req.session.user.id
+  });
+
   return res.status(200).json({ success: true });
 }
 
@@ -84,6 +97,13 @@ async function deleteCredentialController(req: NextApiRequest, res: NextApiRespo
       id: credentialTemplate.id
     }
   });
+
+  trackUserAction('credential_template_deleted', {
+    credentialTemplateId: credentialTemplate.id,
+    spaceId: credentialTemplate.spaceId,
+    userId: req.session.user.id
+  });
+
   return res.status(200).json({ success: true });
 }
 

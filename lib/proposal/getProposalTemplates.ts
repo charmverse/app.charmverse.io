@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
+import type { SpaceResourcesRequest, ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
@@ -9,7 +9,23 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 import type { ProposalWithUsersAndRubric } from './interface';
 
-export type ProposalTemplate = ProposalWithUsersAndRubric & { page: Page };
+export type ProposalTemplate = Omit<ProposalWithUsersAndRubric, 'permissions'> & { page: Page };
+
+// mock permissions since they dont actually matter
+const mockPermissions: ProposalPermissionFlags = {
+  evaluate: true,
+  comment: true,
+  edit: true,
+  delete: true,
+  view: false,
+  view_notes: false,
+  view_private_fields: true,
+  create_vote: false,
+  make_public: false,
+  archive: false,
+  unarchive: false,
+  move: false
+};
 
 export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<ProposalTemplate[]> {
   if (!stringUtils.isUUID(spaceId)) {
@@ -74,9 +90,16 @@ export async function getProposalTemplates({ spaceId, userId }: SpaceResourcesRe
     }
   });
 
-  const res = templates.map(
-    (proposal) => mapDbProposalToProposal({ proposal, canAccessPrivateFormFields: true }) as ProposalTemplate
-  );
+  const res = templates.map((proposal) => {
+    const mappedProposal = mapDbProposalToProposal({
+      proposal,
+      permissions: mockPermissions
+    });
+    return {
+      ...mappedProposal,
+      page: proposal.page
+    } as ProposalTemplate;
+  });
 
   if (!isAdmin) {
     return res.filter((template) => !template.archived);

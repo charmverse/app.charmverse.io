@@ -9,7 +9,7 @@ import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/
 import type { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import PropertyMenu from 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
@@ -46,14 +46,15 @@ export function CardDetailProperty({
   onDrop,
   syncWithPageId,
   mutator,
-  disableEditPropertyOption
+  disableEditPropertyOption,
+  showCard
 }: {
   syncWithPageId?: string | null;
   readOnly: boolean;
   property: IPropertyTemplate;
   card: Card;
   board: Board;
-  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: VoidFunction;
   pageUpdatedAt: string;
   pageUpdatedBy: string;
@@ -61,10 +62,10 @@ export function CardDetailProperty({
   mutator: Mutator;
   disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
+  showCard?: (cardId: string | null) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });
-
   return (
     <Stack
       ref={columnRef}
@@ -97,11 +98,12 @@ export function CardDetailProperty({
           </PropertyNameContainer>
           <Menu {...bindMenu(changePropertyPopupState)}>
             <PropertyMenu
+              board={board}
               onDelete={onDelete}
               deleteDisabled={deleteDisabledMessage?.length !== 0}
               property={property}
-              onTypeAndNameChanged={(newType, newName) => {
-                onTypeAndNameChanged(newType, newName);
+              onTypeAndNameChanged={(newType, newName, relationData) => {
+                onTypeAndNameChanged(newType, newName, relationData);
                 changePropertyPopupState.close();
               }}
             />
@@ -109,6 +111,7 @@ export function CardDetailProperty({
         </Box>
       )}
       <PropertyValueElement
+        showCard={showCard}
         readOnly={readOnly}
         syncWithPageId={syncWithPageId}
         card={card}

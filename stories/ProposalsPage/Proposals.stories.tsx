@@ -1,8 +1,9 @@
 import { Box } from '@mui/material';
 import { rest } from 'msw';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
+import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { PopulatedEvaluation } from 'lib/proposal/interface';
@@ -12,11 +13,12 @@ import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-import { ProposalsPageStory } from './ProposalsPageStory';
+import { ProposalsPageStory, withProposalProviders } from './components/ProposalsPageStory';
 
 export default {
   title: 'Proposals/Views',
-  component: ProposalPageComponent
+  component: ProposalPageComponent,
+  decorators: [withProposalProviders, withCharmEditorProviders]
 };
 
 export function ProposalsPage() {
@@ -49,7 +51,7 @@ export function ProposalInEvaluation() {
   return (
     <GlobalContext>
       <Box sx={{ overflowY: 'auto' }}>
-        <DocumentPage page={page} readOnly={true} savePage={() => {}} />
+        <DocumentPageWithSidebars page={page} readOnly={true} savePage={() => {}} />
       </Box>
     </GlobalContext>
   );

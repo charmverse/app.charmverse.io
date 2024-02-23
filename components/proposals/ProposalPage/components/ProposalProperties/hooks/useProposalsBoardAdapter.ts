@@ -29,9 +29,10 @@ import {
   PROPOSAL_EVALUATION_TYPE_ID
 } from 'lib/proposal/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalFields, ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import type { ProposalFields } from 'lib/proposal/interface';
 
-export type BoardProposal = { spaceId?: string; id?: string; fields: ProposalFields | null };
+export type BoardProposal = { createdAt: string; spaceId?: string; id?: string; fields: ProposalFields | null };
 
 export function useProposalsBoardAdapter() {
   const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
@@ -42,7 +43,28 @@ export function useProposalsBoardAdapter() {
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
   const proposalPage = pages[boardProposal?.id || ''];
   const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
-  const proposal = { ...boardProposal, ...proposalData };
+
+  const proposal: ProposalWithUsersLite = {
+    authors: [],
+    currentStep: { title: '', step: 'draft', id: '', index: 0, result: 'in_progress' },
+    reviewers: [],
+    evaluations: [],
+    id: '',
+    createdAt: '',
+    createdBy: '',
+    status: 'draft',
+    spaceId: '',
+    ...boardProposal,
+    ...proposalData,
+    fields: {
+      ...proposalData?.fields,
+      properties: {
+        ...proposalData?.fields?.properties,
+        ...boardProposal?.fields?.properties
+      }
+    },
+    rewardIds: []
+  };
   const isLoading = isProposalsLoading || isPagesLoading;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
@@ -72,13 +94,14 @@ export function useProposalsBoardAdapter() {
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);
 
     if (!viewBlock) {
-      return getDefaultTableView({ board });
+      const boardView = getDefaultTableView({ board });
+      // sort by created at desc by default
+      if (!boardView.fields.sortOptions?.length) {
+        boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
+      }
+      return boardView;
     }
     const boardView = blockToFBBlock(viewBlock) as BoardView;
-    // sort by created at desc by default
-    if (!boardView.fields.sortOptions?.length) {
-      boardView.fields.sortOptions = [{ propertyId: CREATED_AT_ID, reversed: true }];
-    }
 
     return boardView;
   }, [board, proposalBlocks]);
@@ -90,7 +113,12 @@ export function useProposalsBoardAdapter() {
           const page = pages[p?.id];
           const isStructuredProposal = !!p.formId;
           return {
-            ...mapProposalToCardPage({ proposal: p, proposalPage: page, spaceId: space?.id }),
+            ...mapProposalToCardPage({
+              proposal: p,
+              proposalPage: page,
+              spaceId: space?.id,
+              createdAt: page?.createdAt.toString()
+            }),
             isStructuredProposal,
             proposal: {
               archived: p.archived,
@@ -132,7 +160,7 @@ export function useProposalsBoardAdapter() {
     }
 
     const sortedCardPages = activeView
-      ? sortCards(cards, board, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
       : [];
 
     return sortedCardPages;
@@ -154,11 +182,12 @@ export function useProposalsBoardAdapter() {
   });
 
   // card from current proposal
-  const card: Card<ProposalPropertyValue> = mapProposalToCardPage({
-    proposal: proposal as ProposalWithUsersLite,
+  const { card } = mapProposalToCardPage({
+    proposal,
     proposalPage,
-    spaceId: space?.id
-  }).card;
+    createdAt: proposalPage?.createdAt?.toString() || boardProposal?.createdAt,
+    spaceId: space?.id || ''
+  });
 
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card);
@@ -185,10 +214,12 @@ export function useProposalsBoardAdapter() {
 function mapProposalToCardPage({
   proposal,
   proposalPage,
+  createdAt = new Date().toString(),
   spaceId
 }: {
   proposal: ProposalWithUsersLite | null;
   proposalPage?: PageMeta;
+  createdAt?: string;
   spaceId?: string;
 }) {
   const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
@@ -212,10 +243,9 @@ function mapProposalToCardPage({
           )
         : []
   };
-
   const card: Card<ProposalPropertyValue> = {
     id: proposal?.id || '',
-    spaceId: proposalSpaceId,
+    spaceId: '',
     parentId: '',
     schema: 1,
     title: proposalPage?.title || '',
@@ -223,7 +253,7 @@ function mapProposalToCardPage({
     type: 'card' as BlockTypes,
     updatedBy: proposalPage?.updatedBy || '',
     createdBy: proposalPage?.createdBy || '',
-    createdAt: proposalPage?.createdAt ? new Date(proposalPage?.createdAt).getTime() : 0,
+    createdAt: new Date(createdAt).getTime(),
     updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
     deletedAt: null,
     fields: { properties: {}, ...proposalFields, contentOrder: [] }

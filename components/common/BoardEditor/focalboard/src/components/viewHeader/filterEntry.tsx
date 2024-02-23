@@ -15,14 +15,18 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { RPCList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
-import type { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/PagesAutocomplete';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { DatePicker } from 'components/common/DatePicker';
+import { PageIcon } from 'components/common/PageIcon';
+import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
@@ -35,6 +39,7 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import { isTruthy } from 'lib/utilities/types';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -45,6 +50,7 @@ type Props = {
   filter: FilterClause;
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 function formatCondition(condition: string) {
@@ -77,12 +83,14 @@ function FilterPropertyValue({
   properties,
   filter: initialFilter,
   changeViewFilter,
-  currentFilter
+  currentFilter,
+  relationPropertiesCardsRecord
 }: {
   filter: FilterClause;
   properties: IPropertyTemplate[];
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
+  relationPropertiesCardsRecord: PageListItemsRecord;
 }) {
   const [filter, setFilter] = useState(initialFilter);
 
@@ -92,7 +100,7 @@ function FilterPropertyValue({
   }, {});
   const { members } = useMembers();
   const isPropertyTypePerson =
-    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy|proposalEvaluatedBy/) ||
+    propertyRecord[filter.propertyId].type.match(/person|createdBy|updatedBy|proposalEvaluatedBy|proposalAuthor/) ||
     filter.propertyId === PROPOSAL_REVIEWERS_BLOCK_ID ||
     filter.propertyId === AUTHORS_BLOCK_ID;
   const isPropertyTypeEvaluationType = propertyRecord[filter.propertyId].type === 'proposalEvaluationType';
@@ -258,6 +266,54 @@ function FilterPropertyValue({
           })}
         </Select>
       );
+    } else if (property.type === 'relation') {
+      const pageListItems = relationPropertiesCardsRecord[property.id];
+      return (
+        <Select<string[]>
+          size='small'
+          multiple
+          displayEmpty
+          value={filter.values}
+          onChange={updateMultiSelectValue}
+          renderValue={(pageListItemIds) => {
+            return pageListItemIds.length === 0 ? (
+              <Typography color='secondary' fontSize='small'>
+                Select a page
+              </Typography>
+            ) : (
+              <RelationPageListItemsContainer
+                pageListItems={pageListItemIds
+                  .map((pageListItemId) => {
+                    const pageListItem = pageListItems.find((_pageListItem) => _pageListItem.id === pageListItemId);
+                    return pageListItem;
+                  })
+                  .filter(isTruthy)}
+              />
+            );
+          }}
+        >
+          {pageListItems.map((pageListItem) => {
+            return (
+              <MenuItem
+                key={pageListItem.id}
+                value={pageListItem.id}
+                selected={!!filter.values.find((selectedPageListItemId) => selectedPageListItemId === pageListItem.id)}
+              >
+                <ListItemIcon>
+                  <PageIcon
+                    icon={pageListItem.icon}
+                    isEditorEmpty={!pageListItem.hasContent}
+                    pageType={pageListItem.type}
+                  />
+                </ListItemIcon>
+                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
+                  {pageListItem.title ? pageListItem.title : 'Untitled'}
+                </PageTitle>
+              </MenuItem>
+            );
+          })}
+        </Select>
+      );
     } else {
       return (
         <Select<string[]>
@@ -366,20 +422,16 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'date') {
     return (
       <DatePicker
-        value={new Date(Number(filter.values[0]))}
+        value={DateTime.fromMillis(parseInt(filter.values[0]))}
         onChange={updateDateValue}
-        renderInput={(props) => (
-          <TextField
-            {...props}
-            inputProps={{
-              ...props.inputProps,
-              sx: { fontSize: 'small' },
-              readOnly: true,
-              placeholder: 'Select a date'
-            }}
-            disabled
-          />
-        )}
+        slotProps={{
+          textField: {
+            placeholder: 'Select a date',
+            inputProps: {
+              sx: { fontSize: 'small' }
+            }
+          }
+        }}
       />
     );
   }
@@ -391,17 +443,19 @@ function FilterEntry(props: Props) {
   const deleteFilterClausePopupState = usePopupState({ variant: 'popover' });
   const { properties: viewProperties, filter, changeViewFilter, currentFilter } = props;
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
-  const properties: IPropertyTemplate[] = containsTitleProperty
-    ? viewProperties
-    : [
-        {
-          id: Constants.titleColumnId,
-          name: 'Title',
-          type: 'text',
-          options: []
-        },
-        ...viewProperties
-      ];
+  const properties: IPropertyTemplate[] = (
+    containsTitleProperty
+      ? viewProperties
+      : [
+          {
+            id: Constants.titleColumnId,
+            name: 'Title',
+            type: 'text',
+            options: []
+          },
+          ...viewProperties
+        ]
+  ).filter((prop) => prop.type !== 'proposalReviewerNotes') as IPropertyTemplate[];
 
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 
@@ -504,6 +558,7 @@ function FilterEntry(props: Props) {
         </PopupState>
         <FilterPropertyValue
           filter={filter}
+          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
           properties={properties}
           changeViewFilter={changeViewFilter}
           currentFilter={currentFilter}

@@ -1,4 +1,4 @@
-import { GET } from '@charmverse/core/http';
+import { GET, PUT } from '@charmverse/core/http';
 import { getChainById } from 'connectors/chains';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
@@ -82,21 +82,12 @@ export async function getNFTs({
   walletId: string;
 }): Promise<NFTData[]> {
   const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-  const filterSpam = chainId === 1 || chainId === 137;
 
   const responses = await paginatedCall(
     (params) => {
       return GET<AlchemyNftResponse>(url, {
         ...params,
-        owner: address,
-        // Only use spam filters on chains we know that work.
-        // Including the request params throw an error when calling for Arbitrum, maybe others
-        ...(filterSpam
-          ? {
-              spamConfidenceLevel: 'HIGH',
-              excludeFilters: ['SPAM']
-            }
-          : {})
+        owner: address
       });
     },
     (response) => (response.pageKey ? { pageKey: response.pageKey } : null)
@@ -155,6 +146,27 @@ export async function getNFTOwners({
 
   return res.owners;
 }
+
+// export async function getTokenBalances({
+//   ownerAddress,
+//   chainAddress,
+//   chainId
+// }: {
+//   ownerAddress: string;
+//   chainAddress: string;
+//   chainId: SupportedChainId;
+// }) {
+//   const url = `${getAlchemyBaseUrl(chainId)}`;
+//   const payload = {
+//     jsonrpc: '2.0',
+//     method: 'alchemy_getTokenBalances',
+//     params: [ownerAddress, [chainAddress]],
+//     id: chainId
+//   };
+
+//   const res = await PUT<AlchemyNft>(url, payload);
+//   return res;
+// }
 
 function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: SupportedChainId): NFTData | null {
   if (nft.error) {

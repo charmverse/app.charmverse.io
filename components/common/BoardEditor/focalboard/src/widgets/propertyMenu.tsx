@@ -5,16 +5,19 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
+
+import { DeleteRelationPropertyModal } from '../components/properties/relation/DeleteRelationPropertyModal';
 
 import { PropertyTypes } from './propertyTypes';
 import { typeDisplayName } from './typeDisplayName';
 
 type Props = {
-  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: (id: string) => void;
   deleteDisabled?: boolean;
   property: IPropertyTemplate;
+  board: Board;
 };
 
 const PropertyMenu = React.memo((props: Props) => {
@@ -24,8 +27,8 @@ const PropertyMenu = React.memo((props: Props) => {
   const propertyName = props.property.name;
   const [name, setName] = useState(propertyName);
   const changePropertyTypePopupState = usePopupState({ variant: 'popover', popupId: 'card-property-type' });
+  const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
   const intl = useIntl();
-
   return (
     <Stack gap={1}>
       <TextField
@@ -82,12 +85,23 @@ const PropertyMenu = React.memo((props: Props) => {
         }}
       >
         <PropertyTypes
-          onClick={(type) => {
-            props.onTypeAndNameChanged(type, name);
-            changePropertyTypePopupState.close();
+          selectedTypes={[propertyType]}
+          onClick={({ type, relationData }) => {
+            if (type !== propertyType) {
+              // only change the type if it's different
+              props.onTypeAndNameChanged(type, name, relationData);
+              changePropertyTypePopupState.close();
+            }
           }}
         />
       </Menu>
+      {showRelationPropertyDeletePopup.isOpen && (
+        <DeleteRelationPropertyModal
+          board={props.board}
+          template={props.property}
+          onClose={showRelationPropertyDeletePopup.close}
+        />
+      )}
     </Stack>
   );
 });

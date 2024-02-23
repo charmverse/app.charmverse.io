@@ -9,7 +9,7 @@ import { usePropertiesMutator } from '../hooks/usePropertiesMutator';
 import { useProposalsBoardAdapter } from '../hooks/useProposalsBoardAdapter';
 
 type Props = {
-  proposal: { fields: ProposalFields | null; id?: string };
+  proposal: { createdAt: string; fields: ProposalFields | null; id?: string };
   onChange?: (properties: ProposalFields['properties']) => void;
   readOnly?: boolean;
   readOnlyProperties?: string[];
@@ -45,6 +45,7 @@ export function CustomPropertiesAdapter({ proposal, onChange, readOnly, readOnly
       mutator={mutator ?? undefined}
       readOnlyProperties={readOnlyProperties}
       disableEditPropertyOption={!isAdmin}
+      boardType='proposals'
     />
   );
 }

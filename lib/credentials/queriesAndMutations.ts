@@ -2,18 +2,22 @@ import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
+import { optimism } from 'viem/chains';
 
-import { credentialsWalletPrivateKey, graphQlServerEndpoint } from 'config/constants';
+import { credentialsWalletPrivateKey, graphQlServerEndpoint, isStagingEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
-import type { EASAttestationFromApi } from './external/getExternalCredentials';
+import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
+import { attestationSchemaIds } from './schemas';
 import type { ProposalCredential } from './schemas';
 
 const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
-  persistForSeconds: 300,
+  // Allows us to bypass native
+  persistForSeconds: isStagingEnv ? 5 : 300,
+  skipRedisCache: isStagingEnv,
   cacheKeyPrefix: 'ceramic'
 });
 
@@ -38,8 +42,8 @@ export type PublishedSignedCredential = Omit<CredentialFromCeramic, 'content'> &
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
-  mutation CreateCredentials($i: CreateSignedCredentialFourInput!) {
-    createSignedCredentialFour(input: $i) {
+  mutation CreateCredentials($i: CreateCharmVerseCredentialInput!) {
+    createCharmVerseCredential(input: $i) {
       document {
         id
         sig
@@ -73,7 +77,7 @@ function getParsedCredential(credential: CredentialFromCeramic): EASAttestationF
     content: parsed,
     attester: credential.issuer,
     timeCreated: new Date(credential.timestamp).valueOf(),
-    type: 'internal'
+    type: 'charmverse'
   };
 }
 
@@ -93,13 +97,13 @@ export async function publishSignedCredential(input: CredentialToPublish): Promi
         }
       }
     })
-    .then((doc) => getParsedCredential(doc.data.createSignedCredentialFour.document));
+    .then((doc) => getParsedCredential(doc.data.createCharmVerseCredential.document));
   return record;
 }
 
 const GET_CREDENTIALS = gql`
-  query GetCredentials($filter: SignedCredentialFourFiltersInput!) {
-    signedCredentialFourIndex(filters: $filter, first: 1000) {
+  query GetCredentials($filter: CharmVerseCredentialFiltersInput!) {
+    charmVerseCredentialIndex(filters: $filter, first: 1000) {
       edges {
         node {
           id
@@ -122,8 +126,11 @@ export async function getCharmverseCredentialsByWallets({
   wallets
 }: {
   wallets: string[];
-}): Promise<EASAttestationFromApi[]> {
-  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey as string).address.toLowerCase();
+}): Promise<EASAttestationWithFavorite[]> {
+  if (typeof credentialsWalletPrivateKey !== 'string') {
+    return [];
+  }
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
   if (!wallets.length) {
     return [];
   }
@@ -134,6 +141,7 @@ export async function getCharmverseCredentialsByWallets({
       variables: {
         filter: {
           where: {
+            schemaId: { equalTo: attestationSchemaIds.proposal[optimism.id] },
             recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
@@ -142,7 +150,7 @@ export async function getCharmverseCredentialsByWallets({
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
     })
-    .then(({ data }) => data.signedCredentialFourIndex.edges.map((e: any) => getParsedCredential(e.node)));
+    .then(({ data }) => data.charmVerseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
 
   const credentialIds = charmverseCredentials.map((c) => c.id);
 
@@ -168,12 +176,40 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
+  const favoriteCredentials = await prisma.favoriteCredential.findMany({
+    where: {
+      issuedCredentialId: {
+        in: issuedCredentials.map((a) => a.id)
+      }
+    },
+    select: {
+      index: true,
+      issuedCredentialId: true,
+      id: true
+    }
+  });
+
   return charmverseCredentials.map((credential) => {
     const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
+    const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
+    const iconUrl = issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork;
+
+    if (favoriteCredential) {
+      return {
+        ...credential,
+        iconUrl,
+        favoriteCredentialId: favoriteCredential.id,
+        index: favoriteCredential.index,
+        issuedCredentialId: issuedCredential?.id
+      };
+    }
 
     return {
       ...credential,
-      iconUrl: issuedCredential?.proposal.space.credentialLogo ?? issuedCredential?.proposal.space.spaceArtwork
+      iconUrl,
+      favoriteCredentialId: null,
+      index: -1,
+      issuedCredentialId: issuedCredential?.id
     };
   });
 }

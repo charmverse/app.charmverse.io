@@ -50,6 +50,7 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
+    createdAt: proposalPage.createdAt.toString(),
     archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
@@ -86,8 +87,11 @@ export function ProposalProperties({
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
           readOnlyCustomProperties={readOnlyCustomProperties}
+          readOnlyRewards={!proposal?.permissions.edit}
           rewardIds={proposal?.rewardIds}
           readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
+          isStructuredProposal={!!proposal?.formId}
+          isProposalTemplate={proposalPage.type === 'proposal_template'}
         />
       </div>
     </Box>

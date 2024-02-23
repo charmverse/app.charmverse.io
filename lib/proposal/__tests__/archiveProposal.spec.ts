@@ -1,4 +1,3 @@
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
 import { archiveProposals } from '../archiveProposals';

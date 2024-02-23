@@ -30,7 +30,8 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
       where: {
         spaceId,
         page: {
-          type: 'bounty_template'
+          type: 'bounty_template',
+          deletedAt: null
         }
       },
       include: {

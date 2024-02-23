@@ -5,8 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
 import { getCurrentStep } from 'lib/proposal/getCurrentStep';
 import type { ProposalFields } from 'lib/proposal/interface';
 import type {
@@ -84,7 +84,15 @@ export async function createCardsFromProposals({
       },
       deletedAt: null
     },
-    include: {
+    select: {
+      id: true,
+      path: true,
+      title: true,
+      content: true,
+      contentText: true,
+      hasContent: true,
+      createdAt: true,
+      spaceId: true,
       proposal: {
         select: {
           id: true,
@@ -263,16 +271,19 @@ export async function createCardsFromProposals({
       properties[proposalProps.proposalStep.id] = currentStep.title;
     }
 
+    if (proposalProps.proposalAuthor && pageProposal.proposal) {
+      properties[proposalProps.proposalAuthor.id] = pageProposal.proposal.authors.map((author) => author.userId);
+    }
+
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
     const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
-    const accessPrivateFields = await canAccessPrivateFields({
-      userId,
-      proposal: pageProposal.proposal ?? undefined,
-      proposalId: pageProposal.proposal!.id
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: pageProposal.proposal!.id,
+      userId
     });
-
-    const formFieldProperties = await updateCardFormFieldPropertiesValue({
+    const accessPrivateFields = permissions.view_private_fields;
+    const formFieldProperties = updateCardFormFieldPropertiesValue({
       accessPrivateFields,
       cardProperties: boardBlockCardProperties,
       formFields,

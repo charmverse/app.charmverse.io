@@ -7,12 +7,13 @@ import Box from '@mui/material/Box';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { SyntheticEvent, ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
+import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -45,7 +46,8 @@ type TabPanelProps = BoxProps & {
 
 const accountTabs: Record<UserSettingsTab['path'], typeof ProfileSettings> = {
   account: AccountSettings,
-  profile: ProfileSettings
+  profile: ProfileSettings,
+  charms: CharmsSettings
 };
 
 const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
@@ -61,6 +63,7 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
+  const spaceStyles = value === 'space' ? { p: 0 } : undefined;
 
   return (
     <Box
@@ -70,7 +73,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && <DialogContent>{children}</DialogContent>}
+      {value === index && <DialogContent sx={{ overflowY: 'visible', ...spaceStyles }}>{children}</DialogContent>}
     </Box>
   );
 }
@@ -87,13 +90,14 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
   const { mappedFeatures } = useSpaceFeatures();
-
-  const showCredentialsTab = useIsCharmverseSpace();
+  const isCvSpace = useIsCharmverseSpace();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
+  const displayAccountItems = isCvSpace ? ACCOUNT_TABS : ACCOUNT_TABS.filter((tab) => tab.path !== 'charms');
+
   return (
     <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
@@ -109,7 +113,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         <Box mt={2} py={0.5}>
           <SectionName>Account</SectionName>
         </Box>
-        {ACCOUNT_TABS.map((tab) => (
+        {displayAccountItems.map((tab) => (
           <SidebarLink
             key={tab.path}
             data-test={`space-settings-tab-${tab.path}`}
@@ -126,7 +130,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         )}
         {currentSpace &&
           isSpaceSettingsVisible &&
-          SPACE_SETTINGS_TABS.filter((tab) => (showCredentialsTab ? true : tab.path !== 'credentials')).map((tab) => (
+          SPACE_SETTINGS_TABS.map((tab) => (
             <SidebarLink
               data-test={`space-settings-tab-${tab.path}`}
               key={tab.path}
@@ -195,7 +199,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             </TabPanel>
           );
         })}
-        {SPACE_SETTINGS_TABS.filter((tab) => (showCredentialsTab ? true : tab.path !== 'credentials')).map((tab) => {
+        {SPACE_SETTINGS_TABS.map((tab) => {
           const TabView = spaceTabs[tab.path];
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>

@@ -29,7 +29,7 @@ export class BangleEditor<PluginMetadata = any> {
         const newState = this.view.state.apply(transaction);
         this.view.updateState(newState);
       },
-      attributes: { class: 'bangle-editor' },
+      attributes: { class: 'bangle-editor', 'data-test': 'charm-editor-input' },
       ...pmViewOpts
     });
 

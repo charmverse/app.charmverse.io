@@ -29,7 +29,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
               viewBox="0 0 24 24"
             >
               <path
-                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
               />
             </svg>
           </div>
@@ -46,7 +46,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -56,7 +56,7 @@ exports[`components/table/TableRow should match snapshot 1`] = `
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
                 />
               </svg>
             </div>
@@ -133,7 +133,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
               viewBox="0 0 24 24"
             >
               <path
-                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
               />
             </svg>
           </div>
@@ -150,7 +150,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -160,7 +160,7 @@ exports[`components/table/TableRow should match snapshot, collapsed tree 1`] = `
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
                 />
               </svg>
             </div>
@@ -237,7 +237,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
               viewBox="0 0 24 24"
             >
               <path
-                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
               />
             </svg>
           </div>
@@ -254,7 +254,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -264,7 +264,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
                 />
               </svg>
             </div>
@@ -305,6 +305,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       </div>
       <div
         class="octo-table-cell"
+        data-test="database-card-card-1-column-property1"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
@@ -327,6 +328,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
                 >
                   <div
                     class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                    data-test="select-preview-value-value1"
                   >
                     <span
                       class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -342,6 +344,7 @@ exports[`components/table/TableRow should match snapshot, display properties 1`]
       </div>
       <div
         class="octo-table-cell"
+        data-test="database-card-card-1-column-property2"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
@@ -405,7 +408,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
               viewBox="0 0 24 24"
             >
               <path
-                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
               />
             </svg>
           </div>
@@ -422,7 +425,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -432,7 +435,7 @@ exports[`components/table/TableRow should match snapshot, isSelected 1`] = `
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
                 />
               </svg>
             </div>
@@ -501,7 +504,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -511,7 +514,7 @@ exports[`components/table/TableRow should match snapshot, read-only 1`] = `
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
                 />
               </svg>
             </div>
@@ -589,7 +592,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
               viewBox="0 0 24 24"
             >
               <path
-                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
               />
             </svg>
           </div>
@@ -606,7 +609,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
             style="align-self: flex-start; align-items: flex-start;"
           >
             <div
-              class="css-jm1ma0"
+              class="css-1s68mph"
             >
               <svg
                 aria-hidden="true"
@@ -616,7 +619,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"
+                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
                 />
               </svg>
             </div>
@@ -657,6 +660,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       </div>
       <div
         class="octo-table-cell"
+        data-test="database-card-card-1-column-property1"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div
@@ -679,6 +683,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
                 >
                   <div
                     class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorTurquoise MuiChip-filledTurquoise css-zuoxmo-MuiChip-root"
+                    data-test="select-preview-value-value1"
                   >
                     <span
                       class="MuiChip-label MuiChip-labelSmall css-wjsjww-MuiChip-label"
@@ -694,6 +699,7 @@ exports[`components/table/TableRow should match snapshot, resizing column 1`] = 
       </div>
       <div
         class="octo-table-cell"
+        data-test="database-card-card-1-column-property2"
         style="align-items: flex-start; width: 100px; overflow-x: hidden;"
       >
         <div

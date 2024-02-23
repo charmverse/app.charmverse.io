@@ -10,8 +10,10 @@ import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -19,7 +21,6 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
@@ -29,7 +30,7 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
@@ -54,6 +55,7 @@ import type { RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
+import { ProposalNotesLink } from '../../../components/properties/ProposalNotesLink';
 import { TextInput } from '../../../components/properties/TextInput';
 import type { Mutator } from '../mutator';
 import defaultMutator from '../mutator';
@@ -85,6 +87,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  showCard?: (cardId: string | null) => void;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -139,9 +142,9 @@ function PropertyValueElement(props: Props) {
     proposal
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   const isAdmin = useIsAdmin();
-
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
@@ -181,6 +184,8 @@ function PropertyValueElement(props: Props) {
       return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
     return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (propertyTemplate.type === 'proposalReviewerNotes') {
+    return <ProposalNotesLink pageId={props.card.id} />;
   }
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
@@ -275,6 +280,32 @@ function PropertyValueElement(props: Props) {
         onChange={() => null}
         systemRoles={[allMembersSystemRole, authorSystemRole]}
         value={propertyValue as any}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+      />
+    );
+  } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
+    return (
+      <RelationPropertyPagesAutocomplete
+        boardProperties={board.fields.cardProperties}
+        propertyTemplate={propertyTemplate}
+        selectedPageListItemIds={
+          typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
+        }
+        showCard={props.showCard}
+        displayType={displayType}
+        emptyPlaceholderContent={emptyDisplayValue}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+        onChange={(pageListItemIds) => {
+          syncRelationPropertyValue({
+            templateId: propertyTemplate.id,
+            pageIds: pageListItemIds,
+            boardId: board.id,
+            cardId: card.id
+          }).catch((error) => {
+            showError(error);
+          });
+        }}
+        readOnly={readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );

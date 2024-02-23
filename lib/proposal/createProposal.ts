@@ -2,7 +2,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers, ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -13,7 +13,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/interface';
 
-import { getPagePath } from '../pages';
+import { generatePagePathFromPathAndTitle } from '../pages';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import type { VoteSettings } from './interface';
@@ -37,9 +37,9 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
 
 export type CreateProposalInput = {
   pageId?: string;
-  pageProps?: PageProps;
+  pageProps: PageProps;
   proposalTemplateId?: string | null;
-  authors?: string[];
+  authors: string[];
   userId: string;
   spaceId: string;
   evaluations: ProposalEvaluationInput[];
@@ -52,11 +52,6 @@ export type CreateProposalInput = {
   selectedCredentialTemplates?: string[];
   sourcePageId?: string;
   sourcePostId?: string;
-};
-
-export type CreatedProposal = {
-  page: PageWithPermissions;
-  proposal: ProposalWithUsers;
 };
 
 export async function createProposal({
@@ -188,7 +183,7 @@ export async function createProposal({
         headerImage: pageProps?.headerImage,
         icon: pageProps?.icon,
         id: proposalId,
-        path: getPagePath(),
+        path: generatePagePathFromPathAndTitle({ title: pageProps?.title ?? '' }),
         proposalId,
         sourceTemplateId: pageProps?.sourceTemplateId,
         title: pageProps?.title ?? '',

@@ -6,12 +6,9 @@ import type {
   InviteLink,
   Page,
   PaymentMethod,
-  Space,
   TelegramUser,
-  TokenGateToRole,
   User,
-  UserDetails,
-  UserWallet
+  UserDetails
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
@@ -22,7 +19,6 @@ import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
-import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
@@ -58,7 +54,6 @@ import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
 import { TrackApi } from './apis/trackApi';
-import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -105,8 +100,6 @@ class CharmClient {
 
   permissions = new PermissionsApi();
 
-  unstoppableDomains = new UnstoppableDomainsApi();
-
   votes = new VotesApi();
 
   subscription = new SubscriptionApi();
@@ -119,29 +112,6 @@ class CharmClient {
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
-  }
-
-  async login({ address, walletSignature }: Web3LoginRequest) {
-    const user = await http.POST<LoggedInUser | { otpRequired: true }>('/api/session/login', {
-      address,
-      walletSignature
-    });
-    return user;
-  }
-
-  async logout() {
-    await http.POST('/api/session/logout');
-  }
-
-  getUser() {
-    return http.GET<LoggedInUser>('/api/profile');
-  }
-
-  createUser({ address, walletSignature }: Web3LoginRequest) {
-    return http.POST<LoggedInUser>('/api/profile', {
-      address,
-      walletSignature
-    });
   }
 
   updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
@@ -162,10 +132,6 @@ class CharmClient {
 
   addUserWallets(data: AuthSig[]) {
     return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
-  }
-
-  removeUserWallet(address: Pick<UserWallet, 'address'>) {
-    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
   }
 
   getPublicPageByViewId(viewId: string) {
@@ -355,10 +321,6 @@ class CharmClient {
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
-  }
-
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
-    return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 
   createProposalSource({ pageId }: { pageId: string }) {

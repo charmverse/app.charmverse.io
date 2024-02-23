@@ -82,7 +82,6 @@ describe('src/components/gallery/GalleryCard', () => {
                 visibleTitle={true}
                 isSelected={true}
                 readOnly={false}
-                isManualSort={true}
                 onDrop={jest.fn()}
               />
             </ReduxProvider>
@@ -106,7 +105,6 @@ describe('src/components/gallery/GalleryCard', () => {
                 visibleTitle={true}
                 isSelected={true}
                 readOnly={false}
-                isManualSort={true}
                 onDrop={jest.fn()}
               />
             </ReduxProvider>
@@ -132,7 +130,6 @@ describe('src/components/gallery/GalleryCard', () => {
                 visibleTitle={true}
                 isSelected={true}
                 readOnly={false}
-                isManualSort={true}
                 onDrop={jest.fn()}
               />
             </ReduxProvider>

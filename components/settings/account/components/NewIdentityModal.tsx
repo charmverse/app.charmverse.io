@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
@@ -38,7 +37,6 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 };
 
 export function NewIdentityModal({ isOpen, onClose }: Props) {
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
   const { user, updateUser } = useUser();
   const { showMessage } = useSnackbar();
@@ -60,7 +58,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     }
   );
 
-  const isConnectingWallet = isConnectingIdentity || isVerifyingWallet || isSigning;
+  const isConnectingWallet = isVerifyingWallet || isSigning;
 
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
 

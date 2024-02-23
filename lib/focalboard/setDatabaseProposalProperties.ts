@@ -43,12 +43,32 @@ export async function setDatabaseProposalProperties({
       }
     },
     select: {
+      proposal: {
+        orderBy: {
+          page: {
+            createdAt: 'asc'
+          }
+        },
+        select: {
+          page: {
+            select: {
+              createdAt: true
+            }
+          }
+        }
+      },
       id: true,
-      formFields: true
+      formFields: {
+        orderBy: {
+          index: 'asc'
+        }
+      }
     }
   });
 
-  const formFields = forms.flatMap((p) => p.formFields);
+  const formFields = forms
+    .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
+    .flatMap((p) => p.formFields);
   const proposals = await prisma.proposal.findMany({
     where: {
       spaceId: boardBlock.spaceId
@@ -118,6 +138,23 @@ export function getBoardProperties({
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
   const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
   const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
+  const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
+  const proposalReviewerNotes = generateUpdatedProposalReviewerNotesProperty({ boardProperties });
+
+  const existingReviewerNotesPropIndex = boardProperties.findIndex((p) => p.type === 'proposalReviewerNotes');
+  if (existingReviewerNotesPropIndex > -1) {
+    boardProperties[existingReviewerNotesPropIndex] = proposalReviewerNotes;
+  } else {
+    boardProperties.push(proposalReviewerNotes);
+  }
+
+  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
+
+  if (existingAuthorPropIndex > -1) {
+    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
+  } else {
+    boardProperties.push(proposalAuthorProp);
+  }
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -274,6 +311,32 @@ function addProposalEvaluationProperties({
       });
     }
   }
+}
+
+function generateUpdatedProposalReviewerNotesProperty(
+  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
+): IPropertyTemplate {
+  const existingProposalReviewerNotes = boardProperties.find((p) => p.type === 'proposalReviewerNotes');
+
+  return {
+    ...(existingProposalReviewerNotes ?? {
+      ...proposalDbProperties.proposalReviewerNotes(),
+      id: uuid()
+    })
+  };
+}
+
+function generateUpdatedProposalAuthorProperty(
+  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
+): IPropertyTemplate {
+  const existingProposalAuthorProperty = boardProperties.find((p) => p.type === 'proposalAuthor');
+
+  return {
+    ...(existingProposalAuthorProperty ?? {
+      ...proposalDbProperties.proposalAuthor(),
+      id: uuid()
+    })
+  };
 }
 
 function generateUpdatedProposalStepProperty({

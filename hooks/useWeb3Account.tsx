@@ -10,10 +10,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { getAddress, parseAbi, recoverMessageAddress } from 'viem';
+import type { ConnectorData } from 'wagmi';
 import { useAccount, useConnect, useNetwork, usePublicClient, useSignMessage } from 'wagmi';
 
-import charmClient from 'charmClient';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
+import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
@@ -70,23 +70,24 @@ export const Web3Context = createContext<Readonly<IContext>>({
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
-  const { address: account, connector: activeConnector } = useAccount();
-  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
+  const { address: account, connector: activeConnector, isConnecting } = useAccount();
+  const { open: openVerifyOtpModal, isOpen: isVerifyOtpModalOpen, close: closeVerifyOtpModal } = useVerifyLoginOtp();
   const router = useRouter();
   const { chain } = useNetwork();
   const chainId = chain?.id;
   const { signMessageAsync } = useSignMessage({});
 
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const [isSigning, setIsSigning] = useState(false);
-  const verifiableWalletDetected = !!account && !isConnectingIdentity;
+  const verifiableWalletDetected = !!account;
 
   // We only expose this account if there is no active user, or the account is linked to the current user
   const [storedAccount, setStoredAccount] = useState<string | null>(null);
 
   const [, setLitAuthSignature] = useLocalStorage<AuthSig | null>('lit-auth-signature', null, true);
   const [, setLitProvider] = useLocalStorage<string | null>('lit-web3-provider', null, true);
-  const { user, setUser, logoutUser } = useUser();
+  const { user, updateUser, logoutUser } = useUser();
+  const { trigger: login } = useLogin();
+  const { trigger: createUser } = useCreateUser();
 
   const { connectors, connectAsync } = useConnect();
 
@@ -183,37 +184,43 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setSignature(account, signature, true);
 
       try {
-        // Refresh the user account. This was required as otherwise the user would not be able to see the first page upon joining the space
-        const resp = await charmClient.login({ address: signature.address, walletSignature: signature });
+        const resp = await login(
+          { address: signature.address, walletSignature: signature },
+          {
+            onSuccess: async (_resp) => {
+              if ('id' in _resp) {
+                // User is returned
+                updateUser(_resp);
+              } else {
+                // Open the otp modal for verification
+                openVerifyOtpModal();
+              }
+            }
+          }
+        );
 
-        if ('id' in resp) {
-          // User is returned
-          setUser(resp);
-          return resp;
-        } else {
-          // Open the otp modal for verification
-          openVerifyOtpModal();
-          return;
-        }
+        return resp && 'id' in resp ? resp : undefined;
       } catch (err) {
         if ((err as SystemError)?.errorType === 'Disabled account') {
           throw err;
         }
 
-        const newProfile = await charmClient.createUser({ address: signature.address, walletSignature: signature });
+        const newProfile = await createUser({ address: signature.address, walletSignature: signature });
         setSignature(account, signature, true);
-        setUser(newProfile);
+        if (newProfile) {
+          updateUser(newProfile);
+        }
         return newProfile;
       }
     },
-    [account, setSignature, setUser, requestSignature, router, verifiableWalletDetected]
+    [account, router]
   );
 
   // Only expose account if current user and account match up
   useEffect(() => {
     const userOwnsAddress = user?.wallets.some((w) => lowerCaseEqual(w.address, account));
     // Case 1: user is connecting wallets
-    if (isConnectingIdentity) {
+    if (isConnecting) {
       // Don't update new values
     }
     // Case 2: user is logged in and account is linked to user or user is adding a new wallet
@@ -249,16 +256,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         logoutUser();
       }
     }
-  }, [
-    account,
-    isConnectingIdentity,
-    accountUpdatePaused,
-    user,
-    storedAccount,
-    setSignature,
-    loginFromWeb3Account,
-    logoutUser
-  ]);
+  }, [account, isConnecting, accountUpdatePaused, !!user, storedAccount]);
 
   const logoutWallet = useCallback(() => {
     if (account) {
@@ -267,29 +265,45 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
     }
   }, [account]);
 
-  const { trigger: triggerDisconnectWallet, isMutating: isDisconnectingWallet } = useSWRMutation(
-    '/profile/remove-wallet',
-    (_url, { arg }: Readonly<{ arg: UserWallet['address'] }>) =>
-      account && user ? charmClient.removeUserWallet({ address: arg }) : null,
-    {
-      async onSuccess(updatedUser) {
-        logoutWallet();
-
-        setLitAuthSignature(null);
-        setLitProvider(null);
-        setStoredAccount(null);
-        setUser(updatedUser);
-        activeConnector?.disconnect();
-        await mutate(`/nfts/${updatedUser?.id}`);
-        await mutate(`/orgs/${updatedUser?.id}`);
-        await mutate(`/poaps/${updatedUser?.id}`);
+  useEffect(() => {
+    const handleConnectorUpdate = ({ account: _acc }: ConnectorData) => {
+      // This runs every time the wallet account changes.
+      if (_acc) {
+        if (isVerifyOtpModalOpen) {
+          logoutWallet();
+          closeVerifyOtpModal();
+        }
       }
-    }
-  );
+    };
+
+    activeConnector?.on('change', handleConnectorUpdate);
+
+    return () => {
+      activeConnector?.off('change', handleConnectorUpdate);
+    };
+  }, []);
+
+  const { trigger: triggerDisconnectWallet, isMutating: isDisconnectingWallet } = useRemoveWallet();
 
   const disconnectWallet = useCallback(
     async (address: string) => {
-      await triggerDisconnectWallet(address);
+      await triggerDisconnectWallet(
+        { address },
+        {
+          onSuccess: async (updatedUser) => {
+            logoutWallet();
+
+            setLitAuthSignature(null);
+            setLitProvider(null);
+            setStoredAccount(null);
+            updateUser(updatedUser);
+            activeConnector?.disconnect();
+            await mutate((key) => typeof key === 'string' && key.startsWith(`/nfts/${updatedUser?.id}`));
+            await mutate((key) => typeof key === 'string' && key.startsWith(`/orgs/${updatedUser?.id}`));
+            await mutate((key) => typeof key === 'string' && key.startsWith(`/poaps/${updatedUser?.id}`));
+          }
+        }
+      );
     },
     [triggerDisconnectWallet]
   );

@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
@@ -26,7 +26,7 @@ import {
 import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
-import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
+import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -38,6 +38,7 @@ import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
 import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
+import { RewardsHeaderRowsMenu } from './components/RewardsHeaderRowsMenu';
 import { useRewards } from './hooks/useRewards';
 
 const CalendarFullView = dynamic(
@@ -55,10 +56,12 @@ export function RewardsPage({ title }: { title: string }) {
   const { hasAccess, isLoadingAccess } = useHasMemberLevel('member');
   const canSeeRewards = hasAccess || isFreeSpace || currentSpace?.publicBountyBoard === true;
   const { getRewardPage } = useRewardPage();
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
+  const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const isAdmin = useIsAdmin();
 
-  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoard();
+  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoardAndBlocks();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
@@ -75,7 +78,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const { visible: visibleGroups, hidden: hiddenGroups } = activeView
     ? getVisibleAndHiddenGroups(
-        cardPages as CardPage[],
+        cardPages,
         activeView.fields.visibleOptionIds,
         activeView.fields.hiddenOptionIds,
         groupByProperty
@@ -131,13 +134,15 @@ export function RewardsPage({ title }: { title: string }) {
     updateURLQuery({ viewId });
   };
 
-  if (isLoadingAccess) {
+  if (isLoadingAccess || !activeBoard) {
     return null;
   }
 
   if (!canSeeRewards) {
     return <ErrorPage message='You cannot access rewards for this space' />;
   }
+
+  const showViewHeaderRowsMenu = checkedIds.length !== 0 && activeBoard;
 
   return (
     <DatabaseContainer>
@@ -163,36 +168,50 @@ export function RewardsPage({ title }: { title: string }) {
             </Box>
           </Box>
         </DatabaseTitle>
-        <>
-          <Stack direction='row' alignItems='center' justifyContent='space-between' gap={1}>
-            <Stack mb={0.5} direction='row' alignItems='center'>
-              <ViewTabs
-                openViewOptions={() => setShowSidebar(true)}
-                board={activeBoard}
-                views={views}
-                readOnly={!isAdmin}
-                showView={showView}
-                activeView={activeView}
-                disableUpdatingUrl
-                maxTabsShown={3}
-                readOnlyViewIds={defaultRewardViews}
-                supportedViewTypes={supportedRewardViewTypes}
-              />
+        <Stack gap={0.75}>
+          <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
+            {showViewHeaderRowsMenu ? (
+              <div style={{ marginBottom: 4 }}>
+                <RewardsHeaderRowsMenu
+                  visiblePropertyIds={activeView?.fields.visiblePropertyIds}
+                  board={activeBoard}
+                  cards={cards as Card[]}
+                  checkedIds={checkedIds}
+                  setCheckedIds={setCheckedIds}
+                  refreshRewards={() => {}}
+                />
+              </div>
+            ) : (
+              <>
+                <ViewTabs
+                  openViewOptions={() => setShowSidebar(true)}
+                  board={activeBoard}
+                  views={views}
+                  readOnly={!isAdmin}
+                  showView={showView}
+                  activeView={activeView}
+                  disableUpdatingUrl
+                  maxTabsShown={3}
+                  readOnlyViewIds={defaultRewardViews}
+                  supportedViewTypes={supportedRewardViewTypes}
+                />
+                {isAdmin && !!views.length && views.length <= 3 && (
+                  <Stack mb='-5px'>
+                    <AddViewMenu
+                      board={activeBoard}
+                      activeView={activeView}
+                      views={views}
+                      showView={showView}
+                      supportedViewTypes={supportedRewardViewTypes}
+                    />
+                  </Stack>
+                )}
+              </>
+            )}
 
-              {!!views.length && views.length <= 3 && (
-                <Stack mb='-5px'>
-                  <AddViewMenu
-                    board={activeBoard}
-                    activeView={activeView}
-                    views={views}
-                    showView={showView}
-                    supportedViewTypes={supportedRewardViewTypes}
-                  />
-                </Stack>
-              )}
-            </Stack>
+            <div className='octo-spacer' />
 
-            <Stack direction='row' alignItems='center' mb={1} gap={0.5}>
+            <Box className='view-actions'>
               {withDisplayBy && (
                 <ViewHeaderDisplayByMenu
                   properties={activeBoard?.fields.cardProperties ?? []}
@@ -219,12 +238,11 @@ export function RewardsPage({ title }: { title: string }) {
                   }}
                 />
               )}
-            </Stack>
-          </Stack>
-          <Divider />
+            </Box>
+          </div>
 
           <ViewSettingsRow activeView={activeView} canSaveGlobally={isAdmin} />
-        </>
+        </Stack>
       </DatabaseStickyHeader>
 
       {loadingData ? (
@@ -238,9 +256,16 @@ export function RewardsPage({ title }: { title: string }) {
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
+                    boardType='rewards'
+                    setSelectedPropertyId={(_setSelectedPropertyId) => {
+                      setSelectedPropertyId(_setSelectedPropertyId);
+                      setShowSidebar(true);
+                    }}
+                    setCheckedIds={setCheckedIds}
+                    checkedIds={checkedIds}
                     board={activeBoard}
                     activeView={activeView}
-                    cardPages={cardPages as CardPage[]}
+                    cardPages={cardPages}
                     groupByProperty={groupByProperty}
                     views={views}
                     visibleGroups={[]}
@@ -249,7 +274,6 @@ export function RewardsPage({ title }: { title: string }) {
                     disableAddingCards
                     showCard={showRewardOrApplication}
                     readOnlyTitle
-                    readOnlyRows
                     cardIdToFocusOnRender=''
                     addCard={async () => {}}
                     onCardClicked={() => {}}
@@ -263,7 +287,7 @@ export function RewardsPage({ title }: { title: string }) {
                 {activeView.fields.viewType === 'calendar' && (
                   <CalendarFullView
                     board={activeBoard}
-                    cards={cards as Card[]}
+                    cards={cards}
                     activeView={activeView}
                     readOnly={!isAdmin}
                     dateDisplayProperty={dateDisplayProperty}
@@ -277,7 +301,7 @@ export function RewardsPage({ title }: { title: string }) {
                   <Kanban
                     board={activeBoard}
                     activeView={activeView}
-                    cards={cards as Card[]}
+                    cards={cards}
                     groupByProperty={groupByProperty}
                     visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
                     hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
@@ -305,6 +329,10 @@ export function RewardsPage({ title }: { title: string }) {
 
             {isAdmin && (
               <ViewSidebar
+                sidebarView={selectedPropertyId ? 'card-property' : undefined}
+                setSelectedPropertyId={setSelectedPropertyId}
+                selectedPropertyId={selectedPropertyId}
+                cards={cards}
                 views={views}
                 board={activeBoard}
                 rootBoard={activeBoard}

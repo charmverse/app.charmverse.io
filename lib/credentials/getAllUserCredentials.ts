@@ -3,7 +3,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { getAllOnChainAttestations, type EASAttestationFromApi } from './external/getExternalCredentials';
+import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
+import { getAllOnChainAttestations } from './external/getOnchainCredentials';
+import { getGitcoinCredentialsByWallets } from './getGitcoinCredentialsByWallets';
 import { getCharmverseCredentialsByWallets } from './queriesAndMutations';
 
 // Use these wallets to return at least 1 of all the tracked credentials
@@ -15,7 +17,7 @@ const testWallets = [
   '0xe18B1dFb94BB3CEC3B47663F997D824D9cD0f4D2'
 ];
 
-export async function getAllUserCredentials({ userId }: { userId: string }): Promise<EASAttestationFromApi[]> {
+export async function getAllUserCredentials({ userId }: { userId: string }): Promise<EASAttestationWithFavorite[]> {
   if (!stringUtils.isUUID(userId)) {
     throw new InvalidInputError('userId is invalid');
   }
@@ -37,8 +39,12 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
       log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
+    getGitcoinCredentialsByWallets({ wallets }).catch((error) => {
+      log.error(`Error loading Gitcoin Ceramic credentials for user ${userId}`, { error, userId });
+      return [];
+    }),
     getAllOnChainAttestations({ wallets })
   ]).then((data) => data.flat());
 
-  return allCredentials;
+  return allCredentials.sort((a, b) => b.timeCreated - a.timeCreated);
 }

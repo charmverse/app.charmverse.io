@@ -1,16 +1,20 @@
+import type { BountyStatus } from '@charmverse/core/prisma';
 import { Divider, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
+import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardWithUsersAndPageMeta, RewardWithUsers } from 'lib/rewards/interfaces';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import debouncePromise from 'lib/utilities/debouncePromise';
 
 import { RewardSignupButton } from '../../../rewards/components/RewardProperties/components/RewardSignupButton';
+
+type RewardsValue = UpdateableRewardFieldsWithType & { id?: string; status?: BountyStatus };
 
 export function RewardProperties(props: {
   readOnly?: boolean;
@@ -35,53 +39,44 @@ export function RewardProperties(props: {
     templateId,
     readOnlyTemplate
   } = props;
-  const { updateReward, refreshReward } = useRewards();
-  const [currentReward, setCurrentReward] = useState<Partial<RewardCreationData & RewardWithUsers> | undefined>(
-    initialReward
-  );
+  const { updateReward } = useRewards();
+  const [currentReward, setCurrentReward] = useState<RewardsValue | undefined>();
   useEffect(() => {
     if (initialReward) {
-      setCurrentReward(initialReward);
+      setCurrentReward({
+        ...initialReward,
+        rewardType: getRewardType(initialReward)
+      });
     }
   }, [initialReward]);
 
   const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
-  async function resyncReward() {
-    const _rewardId = currentReward?.id;
-    if (_rewardId) {
-      const updated = await refreshReward(_rewardId);
-      setCurrentReward({ ...currentReward, ...updated });
-      rewardChanged?.();
-    }
-  }
+  const debouncedUpdateReward = useMemo(() => debouncePromise(updateReward, 500), [updateReward]);
 
   const readOnly = parentReadOnly || !isSpaceMember || props.readOnly;
 
-  async function applyRewardUpdates(updates: Partial<UpdateableRewardFields>) {
+  async function applyRewardUpdates(updates: Partial<RewardsValue>) {
     if (readOnly) {
       return;
     }
 
-    setCurrentReward((_currentReward) => ({ ...(_currentReward as RewardWithUsers), ...updates }));
-
+    setCurrentReward((_currentReward) => ({ rewardType: 'token', ..._currentReward, ...updates }));
     if (currentReward?.id) {
-      await updateReward({ rewardId: currentReward.id, updateContent: updates });
-      resyncReward();
+      debouncedUpdateReward({ rewardId: currentReward.id, updateContent: updates }).then(() => {
+        rewardChanged?.();
+      });
     }
   }
 
   if (!currentReward) {
     return null;
   }
-
   return (
     <Stack flex={1}>
       <RewardPropertiesForm
         pageId={pageId}
-        refreshPermissions={refreshPagePermissionsList}
-        useDebouncedInputs
         values={currentReward}
         onChange={applyRewardUpdates}
         readOnly={readOnly}

@@ -1,11 +1,9 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { Box, Tooltip, Typography } from '@mui/material';
-import { useState } from 'react';
+import { Box } from '@mui/material';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { Button } from 'components/common/Button';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';

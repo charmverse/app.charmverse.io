@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { isProposalAuthor } from '@charmverse/core/permissions';
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -40,19 +39,13 @@ async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiRe
   });
 
   if (permissions.view !== true) {
-    const pagePermissions = proposal?.page?.id
-      ? await permissionsApiClient.pages.computePagePermissions({
-          resourceId: proposal.page.id,
-          userId
-        })
-      : null;
-
-    if (!pagePermissions?.read) {
-      throw new NotFoundError();
-    }
+    throw new NotFoundError();
   }
 
-  const answers = await getProposalFormAnswers({ proposalId, userId });
+  const answers = await getProposalFormAnswers({
+    proposalId,
+    canViewPrivateFields: permissions.view_private_fields
+  });
 
   return res.status(200).json(answers);
 }
@@ -64,20 +57,19 @@ async function upsertProposalFormAnswersHandler(
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const proposal = await prisma.proposal.findUnique({ where: { id: proposalId }, include: { authors: true } });
+  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+    resourceId: proposalId,
+    userId
+  });
 
-  if (!proposal) {
-    throw new InvalidInputError(`Proposal with id ${proposalId} does not exist`);
+  if (!permissions.edit) {
+    throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
+
+  const proposal = await prisma.proposal.findUniqueOrThrow({ where: { id: proposalId }, select: { formId: true } });
 
   if (!proposal.formId) {
     throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
-  }
-
-  const isAuthor = isProposalAuthor({ userId, proposal });
-
-  if (!isAuthor) {
-    throw new ActionNotPermittedError('Only authors can edit proposal form answers');
   }
 
   const { answers } = req.body as { answers: FieldAnswerInput[] };

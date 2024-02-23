@@ -26,6 +26,7 @@ import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
+import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -64,7 +65,7 @@ export async function generateSpaceUser({
       username: 'Username',
       wallets: {
         create: {
-          address: randomETHWalletAddress()
+          address: randomETHWalletAddress().toLowerCase()
         }
       },
       spaceRoles: {
@@ -871,12 +872,6 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
 
 type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
 
-type ProposalReviewerInput = {
-  group: 'system_role' | 'role' | 'user';
-  id: string;
-  evaluationId?: string;
-};
-
 /**
  * Creates a proposal with the linked authors and reviewers
  */
@@ -1051,7 +1046,7 @@ export async function generateForumComment({
     data: {
       createdAt: new Date(),
       createdBy,
-      content: {},
+      content: Prisma.JsonNull,
       contentText,
       updatedAt: new Date(),
       deletedAt: null,

@@ -1,13 +1,14 @@
 import { capitalize } from 'lodash';
 import { useState } from 'react';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { members } from 'stories/lib/mockData';
 import { v4 } from 'uuid';
 
 import { formFieldTypes } from 'components/common/form/constants';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { FormFieldInputs as CustomFormFieldInputs } from 'components/common/form/FormFieldInputs';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
+import { FormFieldsInput as CustomFormFieldsInput } from 'components/common/form/FormFieldsInput';
 import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 
@@ -64,8 +65,8 @@ export function FormFieldsEditor() {
 export function FormFieldsInputs() {
   return (
     <GlobalContext>
-      <CustomFormFieldInputs
-        isReviewer={false}
+      <CustomFormFieldsInput
+        enableComments={true}
         formFields={formFieldTypes.map((formFieldType, index) => {
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
           return {
@@ -87,8 +88,8 @@ export function FormFieldsInputs() {
 export function FormFieldsInputsDisplay() {
   return (
     <GlobalContext>
-      <CustomFormFieldInputs
-        isReviewer={false}
+      <CustomFormFieldsInput
+        enableComments={true}
         disabled
         formFields={formFieldTypes.map((formFieldType, index) => {
           const label = capitalize(formFieldType.replaceAll(/_/g, ' '));
@@ -167,6 +168,7 @@ export function FormFieldsInputsDisplay() {
 }
 
 export default {
-  title: 'FormFields',
-  component: FormFieldsEditor
+  title: 'common/Structured Form',
+  component: FormFieldsEditor,
+  decorators: [withCharmEditorProviders]
 };

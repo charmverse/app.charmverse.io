@@ -1,30 +1,23 @@
 import PageHeader from 'components/[pageId]/DocumentPage/components/PageHeader';
 import CharmEditorComponent from 'components/common/CharmEditor/CharmEditor';
+import { CharmEditorProvider } from 'hooks/useCharmEditor';
+import { CharmEditorViewProvider } from 'hooks/useCharmEditorView';
+import { ThreadsProvider } from 'hooks/useThreads';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+export function CharmEditorStorybookProviders({ children }: { children: React.ReactNode }) {
+  return (
+    <CharmEditorViewProvider>
+      <ThreadsProvider>
+        <CharmEditorProvider>{children}</CharmEditorProvider>
+      </ThreadsProvider>
+    </CharmEditorViewProvider>
+  );
+}
 
 export function renderEditorWithContent({ content, title }: { content?: PageContent; title?: string }) {
   return (
-    <CharmEditorComponent
-      allowClickingFooter={true}
-      placeholderText='Custom placeholder... start typing / to see commands'
-      readOnly={false}
-      autoFocus={true}
-      pageId='123'
-      disablePageSpecificFeatures={false}
-      enableSuggestingMode={false}
-      enableVoting={true}
-      pageType='page'
-      pagePermissions={undefined}
-      onConnectionEvent={() => {}}
-      snapshotProposalId={null}
-      onParticipantUpdate={() => {}}
-      style={{
-        minHeight: '100px'
-      }}
-      disableNestedPages={true}
-      content={content}
-      isContentControlled={true}
-    >
+    <CharmEditorStorybookProviders>
       <PageHeader
         headerImage=''
         icon=''
@@ -35,6 +28,34 @@ export function renderEditorWithContent({ content, title }: { content?: PageCont
         readOnlyTitle={false}
         focusDocumentEditor={() => null}
       />
-    </CharmEditorComponent>
+      <CharmEditorComponent
+        allowClickingFooter={true}
+        placeholderText='Custom placeholder... start typing / to see commands'
+        readOnly={false}
+        autoFocus={true}
+        pageId='123'
+        disablePageSpecificFeatures={false}
+        enableSuggestingMode={false}
+        enableVoting={true}
+        pageType='page'
+        pagePermissions={undefined}
+        onConnectionEvent={() => {}}
+        onParticipantUpdate={() => {}}
+        style={{
+          minHeight: '100px'
+        }}
+        disableNestedPages={true}
+        content={content}
+        isContentControlled={true}
+      />
+    </CharmEditorStorybookProviders>
   );
 }
+
+export const withCharmEditorProviders = (Story: any) => {
+  return (
+    <CharmEditorStorybookProviders>
+      <Story />
+    </CharmEditorStorybookProviders>
+  );
+};

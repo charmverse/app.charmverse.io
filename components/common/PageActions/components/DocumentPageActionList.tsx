@@ -15,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import charmClient from 'charmClient';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
+import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -49,7 +50,6 @@ export type PageActionMeta = Pick<
   | 'parentId'
   | 'path'
   | 'proposalId'
-  | 'snapshotProposalId'
   | 'syncWithPageId'
   | 'title'
   | 'type'
@@ -237,10 +237,11 @@ export function DocumentPageActionList({
           label={<Typography variant='body2'>Full width</Typography>}
         />
       </ListItemButton>
-      {!isInsideDialog && !isStructuredProposal && (
+      {!isInsideDialog && (
         <>
           <Divider />
           <ListItemButton
+            data-test='view-comments-button'
             disabled={!pagePermissions?.comment}
             onClick={() => {
               setActiveView('comments');
@@ -252,22 +253,27 @@ export function DocumentPageActionList({
             </ListItemIcon>
             <ListItemText primary='View comments' />
           </ListItemButton>
-          <ListItemButton
-            onClick={() => {
-              setActiveView('suggestions');
-              onComplete();
-            }}
-          >
-            <ListItemIcon>
-              <RateReviewOutlinedIcon fontSize='small' />
-            </ListItemIcon>
-            <ListItemText primary='View suggestions' />
-          </ListItemButton>
+          {!isStructuredProposal && (
+            <ListItemButton
+              onClick={() => {
+                setActiveView('suggestions');
+                onComplete();
+              }}
+            >
+              <ListItemIcon>
+                <RateReviewOutlinedIcon fontSize='small' />
+              </ListItemIcon>
+              <ListItemText primary='View suggestions' />
+            </ListItemButton>
+          )}
         </>
       )}
       <Divider />
       {(page.type === 'card' || page.type === 'card_synced' || page.type === 'page') && (
-        <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+        <>
+          <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+          <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
+        </>
       )}
       {page && (
         <DuplicatePageAction

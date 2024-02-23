@@ -5,10 +5,9 @@ import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
+import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { mutate } from 'swr';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
@@ -16,7 +15,6 @@ import { PageActionsMenu } from 'components/common/PageActions/components/PageAc
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -29,7 +27,6 @@ import { isTouchScreen } from 'lib/utilities/browser';
 import { mergeRefs } from 'lib/utilities/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
-import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import PropertyValueElement from '../propertyValueElement';
@@ -135,10 +132,8 @@ function TableRow(props: Props) {
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
-  const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-
-  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+  const enabled = !isTouchScreen() && !props.readOnly;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
@@ -222,6 +217,7 @@ function TableRow(props: Props) {
     readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
+
   return (
     <div
       data-test={`database-row-${card.id}`}
@@ -239,19 +235,23 @@ function TableRow(props: Props) {
     >
       {!props.readOnly && (
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <div
-            className='icons row-actions'
-            onClick={handleClick}
-            ref={drag}
-            style={{
-              padding: 0
-            }}
-          >
-            <Box className='charm-drag-handle disable-drag-selection'>
-              <DragIndicatorIcon color='secondary' />
-            </Box>
-          </div>
-          {setCheckedIds && (
+          {!isNested && (
+            <div
+              className='icons row-actions'
+              onClick={handleClick}
+              ref={drag}
+              style={{
+                padding: 0
+              }}
+            >
+              <Box className='charm-drag-handle disable-drag-selection'>
+                <DragIndicatorIcon color='secondary' />
+              </Box>
+            </div>
+          )}
+          {isNested ? (
+            <div style={{ marginLeft: 24 }} />
+          ) : setCheckedIds ? (
             <StyledCheckbox
               className='table-row-checkbox disable-drag-selection'
               checked={isChecked}
@@ -270,7 +270,7 @@ function TableRow(props: Props) {
               disableRipple
               disableTouchRipple
             />
-          )}
+          ) : null}
         </Stack>
       )}
 
@@ -355,10 +355,12 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
               overflowX: 'hidden'
             }}
+            data-test={`database-card-${card.id}-column-${template.id}`}
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
+              showCard={(cardId) => cardId && props.showCard(cardId)}
               readOnly={props.readOnly}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
@@ -391,7 +393,7 @@ function TableRow(props: Props) {
   );
 }
 
-export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
+function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
   return (
     <>
       <TableRow
@@ -414,6 +416,8 @@ export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages
                 subPages={subPage.subPages}
                 indentTitle={30}
                 isNested
+                // Don't allow subrows to be selected
+                setCheckedIds={() => {}}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}
               />
             )))}

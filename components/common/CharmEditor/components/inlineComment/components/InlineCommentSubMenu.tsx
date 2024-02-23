@@ -43,7 +43,7 @@ export function InlineCommentSubMenu({
 }) {
   const view = useEditorViewContext();
   const { trigger: createThread } = useCreateThread();
-  const { extractTextFromSelection, updateThreadPluginState } = useInlineComment();
+  const { extractTextFromSelection, updateThreadPluginState } = useInlineComment(view);
   const { refetchThreads } = useThreads();
 
   const handleSubmit = async ({ commentContent, event, threadAccessGroups }: InlineCommentInputHandleSubmitParams) => {

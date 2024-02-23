@@ -24,7 +24,6 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
     username: deterministicRandomName(id),
     path: uuid(),
     spacesOrder: [],
-    xpsEngineId: null,
     wallets: [
       {
         ensname: null,
@@ -33,10 +32,9 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
       }
     ],
     spaceRoles: [],
-    unstoppableDomains: [],
     favorites: [],
     googleAccounts: [],
     verifiedEmails: [],
     ...user
-  };
+  } as LoggedInUser;
 }

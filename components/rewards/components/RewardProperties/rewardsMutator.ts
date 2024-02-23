@@ -1,12 +1,18 @@
 /* eslint-disable default-param-last */
 import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { RewardBlocksContextType } from 'hooks/useRewardBlocks';
+import type { RewardBlocksContextType } from 'components/rewards/hooks/useRewardBlocks';
 import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type {
+  Board,
+  IPropertyOption,
+  IPropertyTemplate,
+  PropertyType,
+  RelationPropertyData
+} from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { RewardPropertiesBlockFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
 export interface BlockChange {
   block: Block;
@@ -63,22 +69,28 @@ export class RewardsMutator extends Mutator {
     propertyTemplate: IPropertyTemplate,
     newType: PropertyType,
     newName: string,
-    views: BoardView[]
+    views: BoardView[],
+    relationData?: RelationPropertyData
   ) {
-    this.blocksContext.updateProperty({ ...propertyTemplate, type: newType, name: newName });
+    this.blocksContext.updateProperty({
+      ...propertyTemplate,
+      type: newType,
+      name: newName,
+      relationData: newType === 'relation' ? relationData : propertyTemplate.relationData
+    });
   }
 
   async reorderProperties(boardId: string, cardProperties: IPropertyTemplate[]): Promise<void> {
-    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
-    const oldFields = rewardBoardBlock?.fields || {};
+    const rewardsBoardBlock = this.blocksContext.rewardsBoardBlock;
+    const oldFields = rewardsBoardBlock?.fields || {};
 
-    if (!rewardBoardBlock) {
+    if (!rewardsBoardBlock) {
       return;
     }
 
     await this.blocksContext.updateBlock({
-      ...rewardBoardBlock,
-      fields: { ...oldFields, cardProperties } as RewardPropertiesBlockFields
+      ...rewardsBoardBlock,
+      fields: { ...oldFields, cardProperties }
     });
   }
 
@@ -114,13 +126,13 @@ export class RewardsMutator extends Mutator {
   }
 
   async changePropertyOption(board: Board, template: IPropertyTemplate, updatedOption: IPropertyOption) {
-    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
+    const rewardsBoardBlock = this.blocksContext.rewardsBoardBlock;
 
-    const updatedProperties = rewardBoardBlock?.fields?.cardProperties
-      ? [...rewardBoardBlock.fields.cardProperties]
+    const updatedProperties = rewardsBoardBlock?.fields?.cardProperties
+      ? [...rewardsBoardBlock.fields.cardProperties]
       : [];
 
-    if (!rewardBoardBlock) {
+    if (!rewardsBoardBlock) {
       return;
     }
 
@@ -137,11 +149,11 @@ export class RewardsMutator extends Mutator {
       };
     });
 
-    const oldFields = rewardBoardBlock?.fields || {};
+    const oldFields = rewardsBoardBlock?.fields || {};
 
     await this.blocksContext.updateBlock({
-      ...rewardBoardBlock,
-      fields: { ...oldFields, cardProperties: properties } as RewardPropertiesBlockFields
+      ...rewardsBoardBlock,
+      fields: { ...oldFields, cardProperties: properties }
     });
   }
 
@@ -151,13 +163,13 @@ export class RewardsMutator extends Mutator {
     option: IPropertyOption,
     description = 'add option'
   ) {
-    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
+    const rewardsBoardBlock = this.blocksContext.rewardsBoardBlock;
 
-    const updatedProperties = rewardBoardBlock?.fields?.cardProperties
-      ? [...rewardBoardBlock.fields.cardProperties]
+    const updatedProperties = rewardsBoardBlock?.fields?.cardProperties
+      ? [...rewardsBoardBlock.fields.cardProperties]
       : [];
 
-    if (!rewardBoardBlock) {
+    if (!rewardsBoardBlock) {
       return;
     }
 
@@ -166,23 +178,23 @@ export class RewardsMutator extends Mutator {
     if (udpatedTemplate) {
       udpatedTemplate.options = udpatedTemplate.options ? [...udpatedTemplate.options, option] : [option];
 
-      const oldFields = rewardBoardBlock?.fields || {};
+      const oldFields = rewardsBoardBlock?.fields || {};
 
       await this.blocksContext.updateBlock({
-        ...rewardBoardBlock,
-        fields: { ...oldFields, cardProperties: updatedProperties } as RewardPropertiesBlockFields
+        ...rewardsBoardBlock,
+        fields: { ...oldFields, cardProperties: updatedProperties }
       });
     }
   }
 
   async deletePropertyOption(board: Board, template: IPropertyTemplate, option: IPropertyOption) {
-    const rewardBoardBlock = this.blocksContext.rewardBoardBlock;
+    const rewardsBoardBlock = this.blocksContext.rewardsBoardBlock;
 
-    const updatedProperties = rewardBoardBlock?.fields?.cardProperties
-      ? [...rewardBoardBlock.fields.cardProperties]
+    const updatedProperties = rewardsBoardBlock?.fields?.cardProperties
+      ? [...rewardsBoardBlock.fields.cardProperties]
       : [];
 
-    if (!rewardBoardBlock) {
+    if (!rewardsBoardBlock) {
       return;
     }
 
@@ -191,11 +203,11 @@ export class RewardsMutator extends Mutator {
     if (udpatedTemplate) {
       udpatedTemplate.options = udpatedTemplate.options?.filter((o) => o.id !== option.id) || [];
 
-      const oldFields = rewardBoardBlock?.fields || {};
+      const oldFields = rewardsBoardBlock?.fields || {};
 
       await this.blocksContext.updateBlock({
-        ...rewardBoardBlock,
-        fields: { ...oldFields, cardProperties: updatedProperties } as RewardPropertiesBlockFields
+        ...rewardsBoardBlock,
+        fields: { ...oldFields, cardProperties: updatedProperties }
       });
     }
   }
