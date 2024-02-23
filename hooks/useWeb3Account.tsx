@@ -157,6 +157,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setIsSigning(false);
       throw err;
     }
+    // activeConnector is not directly referenced, but is important so that WalletConnect issues a request on the correct chain
   }, [account, chainId, activeConnector, setSignature, signMessageAsync]);
 
   const loginFromWeb3Account = useCallback(

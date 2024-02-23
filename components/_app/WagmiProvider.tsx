@@ -12,8 +12,6 @@ type Props = {
 export function WagmiProvider({ children }: Props) {
   const [config, setConfig] = useState(() => (isTestEnv && !isDevEnv ? undefined : wagmiConfig));
 
-  console.log('WAGMICONFIG', config);
-
   useEffect(() => {
     // get config with mocked injector for tests
     if (isTestEnv && !isDevEnv && typeof window !== 'undefined' && !config) {
