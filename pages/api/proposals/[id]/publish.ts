@@ -10,6 +10,7 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 import { publishProposal } from 'lib/proposal/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -56,6 +57,11 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       spaceId: true
     }
   });
+  const { isAdmin } = await hasAccessToSpace({
+    spaceId: proposalPage.spaceId,
+    userId,
+    adminOnly: false
+  });
 
   const isProposalArchived = proposalPage.proposal?.archived || false;
   if (isProposalArchived) {
@@ -82,7 +88,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     requireTemplates: false
   });
 
-  if (errors.length > 0) {
+  if (errors.length > 0 && !isAdmin) {
     throw new InvalidInputError(errors.join('\n'));
   }
 
