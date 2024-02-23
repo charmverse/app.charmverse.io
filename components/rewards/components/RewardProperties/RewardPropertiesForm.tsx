@@ -1,7 +1,5 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
-import styled from '@emotion/styled';
-import type { TextFieldProps } from '@mui/material';
-import { Box, Collapse, Divider, Stack, TextField, Tooltip } from '@mui/material';
+import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
@@ -20,18 +18,20 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
+import type { RewardApplicationType } from 'lib/rewards/getApplicationType';
+import { getApplicationType } from 'lib/rewards/getApplicationType';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { Reward, RewardReviewer, RewardWithUsers, RewardType } from 'lib/rewards/interfaces';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
 
-import { RewardApplicationType } from './components/RewardApplicationType';
+import { RewardApplicationTypeSelect } from './components/RewardApplicationTypeSelect';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardTokenProperty } from './components/RewardTokenProperty';
-import type { RewardTokenDetails } from './components/RewardTokenProperty';
 import { RewardTypeSelect } from './components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
 
@@ -51,31 +51,6 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-function getApplicationType(values: UpdateableRewardFields, forcedApplicationType?: RewardApplicationType) {
-  if (forcedApplicationType) {
-    return forcedApplicationType;
-  }
-
-  let applicationType: RewardApplicationType = values?.approveSubmitters ? 'application_required' : 'direct_submission';
-
-  if (values?.assignedSubmitters?.length) {
-    applicationType = 'assigned';
-  }
-
-  return applicationType;
-}
-
-// If it is a new reward and not using a template, use Token
-// If neither rewardToken nor customReward is set, use None
-function getRewardType(values: UpdateableRewardFields, isNewReward: boolean, isFromTemplate: boolean): RewardType {
-  return values.customReward
-    ? 'custom'
-    : values.rewardToken
-    ? 'token'
-    : isNewReward && !isFromTemplate
-    ? 'token'
-    : 'none';
-}
 export function RewardPropertiesForm({
   onChange,
   values,
@@ -297,7 +272,7 @@ export function RewardPropertiesForm({
               <PropertyLabel readOnly highlighted>
                 Application Type
               </PropertyLabel>
-              <RewardApplicationType
+              <RewardApplicationTypeSelect
                 readOnly={readOnlyApplicationType}
                 value={rewardApplicationType}
                 onChange={setRewardApplicationType}

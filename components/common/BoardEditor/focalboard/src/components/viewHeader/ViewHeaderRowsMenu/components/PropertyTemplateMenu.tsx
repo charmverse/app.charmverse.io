@@ -1,21 +1,37 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { Box } from '@mui/material';
+import type { DateTime } from 'luxon';
 
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { ControlledProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import {
+  DUE_DATE_ID,
+  REWARD_AMOUNT,
+  REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
+  REWARD_REVIEWERS_BLOCK_ID,
+  REWARD_TOKEN
+} from 'lib/rewards/blocks/constants';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardReviewer, RewardTokenDetails } from 'lib/rewards/interfaces';
 
 import mutator from '../../../../mutator';
+import { TokenAmount } from '../../../properties/tokenAmount/tokenAmount';
+import { TokenChain } from '../../../properties/tokenChain/tokenChain';
 
 import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
+import { RewardCustomValuePropertyTemplateMenu } from './RewardCustomValuePropertyTemplateMenu';
+import { RewardsDueDatePropertyTemplateMenu } from './RewardsDueDatePropertyTemplateMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
 import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
 
@@ -30,6 +46,10 @@ export type PropertyTemplateMenuProps = {
   onChangeProposalsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onChangeProposalsSteps?: (pageIds: string[], evaluationId: string, moveForward: boolean) => Promise<void>;
   onChangeProposalsStatuses?: (pageIds: string[], result: ProposalEvaluationResult | null) => Promise<void>;
+  onChangeRewardsDueDate?: (pageIds: string[], dueDate: DateTime | null) => Promise<void>;
+  onChangeRewardsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
+  onChangeRewardsToken?: (rewardToken: RewardTokenDetails | null) => Promise<void>;
+  onChangeCustomRewardsValue?: (customReward: string) => Promise<void>;
   onRelationPropertyChange: (a: {
     checkedCards: Card[];
     pageListItemIds: string[];
@@ -59,6 +79,10 @@ export function PropertyTemplateMenu({
   onChangeProposalsStatuses,
   onPersonPropertyChange,
   onRelationPropertyChange,
+  onChangeRewardsDueDate,
+  onChangeRewardsReviewers,
+  onChangeRewardsToken,
+  onChangeCustomRewardsValue,
   firstCheckedProposal,
   disabledTooltip,
   lastChild
@@ -103,6 +127,21 @@ export function PropertyTemplateMenu({
     }
 
     case 'person': {
+      if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+        return (
+          <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+            <UserAndRoleSelect
+              onChange={async (options) => {
+                await onChangeRewardsReviewers?.(checkedIds, options);
+                if (onChange) {
+                  onChange();
+                }
+              }}
+              value={(propertyValue ?? []) as unknown as RewardReviewer[]}
+            />
+          </PropertyMenu>
+        );
+      }
       return (
         <PersonPropertyTemplateMenu
           lastChild={lastChild}
@@ -173,6 +212,21 @@ export function PropertyTemplateMenu({
     }
 
     case 'date': {
+      if (propertyTemplate.id === DUE_DATE_ID) {
+        return (
+          <RewardsDueDatePropertyTemplateMenu
+            cards={checkedCards}
+            lastChild={lastChild}
+            propertyTemplate={propertyTemplate}
+            onAccept={async (value) => {
+              await onChangeRewardsDueDate?.(checkedIds, value);
+              if (onChange) {
+                onChange();
+              }
+            }}
+          />
+        );
+      }
       return (
         <DatePropertyTemplateMenu
           lastChild={lastChild}
@@ -249,7 +303,62 @@ export function PropertyTemplateMenu({
       return null;
     }
 
+    case 'tokenAmount':
+    case 'tokenChain': {
+      const firstTokenRewardCard = checkedCards.find((card) => card.fields.properties[REWARD_TOKEN]);
+      if (!firstTokenRewardCard) {
+        return null;
+      }
+
+      const symbolOrAddress = firstTokenRewardCard.fields.properties[REWARD_TOKEN] as string;
+      const chainId = firstTokenRewardCard.fields.properties[REWARD_CHAIN] as string;
+      const rewardAmount = firstTokenRewardCard.fields.properties[REWARD_AMOUNT] as number;
+
+      return (
+        <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
+          <Box display='flex' px='4px'>
+            <RewardTokenDialog
+              readOnly={
+                getRewardType({
+                  chainId: Number(chainId),
+                  rewardAmount,
+                  rewardToken: symbolOrAddress
+                }) !== 'token'
+              }
+              currentReward={{
+                chainId: Number(chainId),
+                rewardAmount,
+                rewardToken: symbolOrAddress
+              }}
+              onChange={(rewardToken) => {
+                onChangeRewardsToken?.(rewardToken);
+                if (onChange) {
+                  onChange();
+                }
+              }}
+            >
+              {propertyTemplate.type === 'tokenAmount' ? (
+                <TokenAmount amount={rewardAmount} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+              ) : (
+                <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />
+              )}
+            </RewardTokenDialog>
+          </Box>
+        </PropertyMenu>
+      );
+    }
+
     default: {
+      if (propertyTemplate.id === REWARD_CUSTOM_VALUE) {
+        return (
+          <RewardCustomValuePropertyTemplateMenu
+            lastChild={lastChild}
+            cards={checkedCards}
+            propertyTemplate={propertyTemplate}
+            onChange={onChangeCustomRewardsValue ?? ((() => {}) as any)}
+          />
+        );
+      }
       return (
         <TextPropertyTemplateMenu
           lastChild={lastChild}

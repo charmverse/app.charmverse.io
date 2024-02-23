@@ -1,6 +1,9 @@
 import styled from '@emotion/styled';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Stack, Tooltip, Typography } from '@mui/material';
+import PaidIcon from '@mui/icons-material/Paid';
+import type { SxProps } from '@mui/material';
+import { ListItemText, Stack, Tooltip, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -15,7 +18,15 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
-import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
+import {
+  APPLICANT_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_CUSTOM_VALUE,
+  REWARD_PROPOSAL_LINK,
+  REWARD_STATUS_BLOCK_ID
+} from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
@@ -57,10 +68,19 @@ const validPropertyTypes = [
   'proposalReviewer',
   'proposalStep',
   'proposalStatus',
-  'relation'
+  'relation',
+  'tokenAmount',
+  'tokenChain'
 ] as PropertyType[];
 
-const invalidPropertyIds = [...defaultRewardPropertyIds];
+const invalidPropertyIds = [
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  APPLICANT_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID
+];
 
 export type ViewHeaderRowsMenuProps = {
   board: Board;
@@ -73,14 +93,23 @@ export type ViewHeaderRowsMenuProps = {
   isStepDisabled?: boolean;
   isStatusDisabled?: boolean;
   isReviewersDisabled?: boolean;
+  isMarkPaidDisabled?: boolean;
+  isMarkCompleteDisabled?: boolean;
   onArchiveProposals?: (archived: boolean) => void;
   onChange?: VoidFunction;
   onChangeProposalsAuthors?: PropertyTemplateMenuProps['onChangeProposalsAuthors'];
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
-  showRewardsBatchPaymentButton?: boolean;
+  onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
+  onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
+  onChangeRewardsToken?: PropertyTemplateMenuProps['onChangeRewardsToken'];
+  onChangeCustomRewardsValue?: PropertyTemplateMenuProps['onChangeCustomRewardsValue'];
+  showRewardsPaymentButton?: boolean;
   showTrashIcon?: boolean;
+  onMarkRewardsAsPaid?: () => Promise<void>;
+  onMarkRewardsAsComplete?: () => Promise<void>;
+  sx?: SxProps;
 };
 
 export function ViewHeaderRowsMenu({
@@ -93,14 +122,23 @@ export function ViewHeaderRowsMenu({
   isStepDisabled,
   isStatusDisabled,
   isReviewersDisabled,
+  isMarkPaidDisabled,
+  isMarkCompleteDisabled,
+  onChangeCustomRewardsValue,
   onArchiveProposals,
   onChange,
   onChangeProposalsAuthors,
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
   onChangeProposalsSteps,
-  showRewardsBatchPaymentButton,
-  showTrashIcon = !board.fields.sourceType
+  onChangeRewardsDueDate,
+  onChangeRewardsReviewers,
+  showRewardsPaymentButton,
+  showTrashIcon = !board.fields.sourceType,
+  onMarkRewardsAsComplete,
+  onMarkRewardsAsPaid,
+  onChangeRewardsToken,
+  sx
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -212,7 +250,7 @@ export function ViewHeaderRowsMenu({
   }
 
   return (
-    <StyledStack className='disable-drag-selection'>
+    <StyledStack className='disable-drag-selection' sx={sx}>
       <StyledMenuItem firstChild lastChild={!showTrashIcon && filteredPropertyTemplates.length === 0}>
         <Typography onClick={() => setCheckedIds([])} color='primary' variant='body2'>
           {checkedIds.length} selected
@@ -235,7 +273,11 @@ export function ViewHeaderRowsMenu({
               onChangeProposalsReviewers={onChangeProposalsReviewers}
               onChangeProposalsStatuses={onChangeProposalsStatuses}
               onChangeProposalsSteps={onChangeProposalsSteps}
+              onChangeRewardsDueDate={onChangeRewardsDueDate}
+              onChangeRewardsReviewers={onChangeRewardsReviewers}
               onPersonPropertyChange={onPersonPropertyChange}
+              onChangeRewardsToken={onChangeRewardsToken}
+              onChangeCustomRewardsValue={onChangeCustomRewardsValue}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={
                 propertyTemplate.type === 'proposalStep' && isStepDisabled
@@ -250,7 +292,41 @@ export function ViewHeaderRowsMenu({
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
-      {showRewardsBatchPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
+      {onMarkRewardsAsPaid && (
+        <Tooltip title={isMarkPaidDisabled ? 'Selected rewards are already paid' : 'Mark selected rewards as paid'}>
+          <div>
+            <StyledMenuItem onClick={onMarkRewardsAsPaid} disabled={isDeleting || isMarkPaidDisabled}>
+              <PaidIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Mark paid' />
+            </StyledMenuItem>
+          </div>
+        </Tooltip>
+      )}
+      {onMarkRewardsAsComplete && (
+        <Tooltip
+          title={
+            isMarkCompleteDisabled ? `Selected rewards are already completed` : 'Mark selected rewards as complete'
+          }
+        >
+          <div>
+            <StyledMenuItem onClick={onMarkRewardsAsComplete} disabled={isDeleting || isMarkCompleteDisabled}>
+              <CheckCircleOutlinedIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Mark complete' />
+            </StyledMenuItem>
+          </div>
+        </Tooltip>
+      )}
+      {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>
