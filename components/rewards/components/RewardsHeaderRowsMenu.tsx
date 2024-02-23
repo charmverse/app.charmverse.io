@@ -4,10 +4,12 @@ import charmClient from 'charmClient';
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardTokenDetails } from 'lib/rewards/interfaces';
+import { isTruthy } from 'lib/utilities/types';
 
 import { useRewards } from '../hooks/useRewards';
 import { useRewardsBoardAdapter } from '../hooks/useRewardsBoardAdapter';
@@ -19,6 +21,8 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
   const { refreshRewards } = useRewardsBoardAdapter();
   const { updateReward, rewards } = useRewards();
   const { pages } = usePages();
+  const { showConfirmation } = useConfirmationModal();
+
   let propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
   if (visiblePropertyIds?.length) {
     visiblePropertyIds.forEach((propertyId) => {
@@ -67,25 +71,61 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
   }
 
   async function onMarkRewardsAsPaid() {
-    for (const pageId of checkedIds) {
-      const page = pages[pageId];
-      if (page?.bountyId) {
-        await charmClient.rewards.markRewardAsPaid(page.bountyId);
-      }
+    const checkedRewards = checkedIds
+      .map((pageId) => {
+        const rewardId = pages[pageId]?.bountyId;
+        return rewardId ? rewards?.find((r) => r.id === rewardId) : null;
+      })
+      .filter(isTruthy)
+      .filter((reward) => reward.status !== 'paid');
+
+    if (!checkedRewards.length) {
+      return;
+    }
+
+    const { confirmed } = await showConfirmation({
+      title: 'Mark as paid',
+      message: `Are you sure you want to mark ${checkedRewards.length} ${
+        checkedRewards.length > 1 ? 'rewards' : 'reward'
+      } as paid?`
+    });
+
+    if (!confirmed) {
+      return;
+    }
+
+    for (const reward of checkedRewards) {
+      await charmClient.rewards.markRewardAsPaid(reward.id);
     }
 
     await refreshRewards();
   }
 
   async function onMarkRewardsAsComplete() {
-    for (const pageId of checkedIds) {
-      const page = pages[pageId];
-      const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
-      if (reward && reward.status !== 'complete') {
-        await charmClient.rewards.closeReward(reward.id);
-      }
-    }
+    const checkedRewards = checkedIds
+      .map((pageId) => {
+        const rewardId = pages[pageId]?.bountyId;
+        return rewardId ? rewards?.find((r) => r.id === rewardId) : null;
+      })
+      .filter(isTruthy)
+      .filter((reward) => reward.status !== 'complete');
 
+    if (!checkedRewards.length) {
+      return;
+    }
+    const { confirmed } = await showConfirmation({
+      title: 'Mark as complete',
+      message: `Are you sure you want to mark ${checkedRewards.length} ${
+        checkedRewards.length > 1 ? 'rewards' : 'reward'
+      } as complete?`
+    });
+
+    if (!confirmed) {
+      return;
+    }
+    for (const reward of checkedRewards) {
+      await charmClient.rewards.closeReward(reward.id);
+    }
     await refreshRewards();
   }
 

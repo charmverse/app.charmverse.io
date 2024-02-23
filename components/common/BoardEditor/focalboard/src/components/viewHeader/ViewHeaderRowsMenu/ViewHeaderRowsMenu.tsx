@@ -300,7 +300,7 @@ export function ViewHeaderRowsMenu({
                   mr: 1
                 }}
               />
-              <ListItemText primary='Mark paid' />
+              <ListItemText primary='Mark selected rewards as paid' />
             </StyledMenuItem>
           </div>
         </Tooltip>
@@ -315,7 +315,7 @@ export function ViewHeaderRowsMenu({
                   mr: 1
                 }}
               />
-              <ListItemText primary='Mark complete' />
+              <ListItemText primary='Mark selected rewards as complete' />
             </StyledMenuItem>
           </div>
         </Tooltip>
