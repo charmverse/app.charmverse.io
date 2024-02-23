@@ -9,8 +9,9 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import { paidRewardStatuses } from 'lib/rewards/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardReviewer, RewardTokenDetails } from 'lib/rewards/interfaces';
+import type { RewardReviewer, RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utilities/types';
 
 import { useRewards } from '../hooks/useRewards';
@@ -90,10 +91,15 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
         const rewardId = pages[pageId]?.bountyId;
         return rewardId ? rewards?.find((r) => r.id === rewardId) : null;
       })
-      .filter(isTruthy)
-      .filter((reward) => reward.status !== 'paid');
+      .filter(
+        (reward): reward is RewardWithUsers =>
+          isTruthy(reward) &&
+          reward.status !== 'paid' &&
+          reward.applications.every((application) => paidRewardStatuses.includes(application.status))
+      );
 
     if (!checkedRewards.length) {
+      showMessage(`Please select rewards that have all their applications marked as paid or complete.`, 'warning');
       return;
     }
 
@@ -210,7 +216,12 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
 
   const rewardId = checkedIds.length ? pages[checkedIds[0]]?.bountyId : null;
   const reward = rewardId ? rewards?.find((r) => r.id === rewardId) : null;
-  const isMarkPaidDisabled = isMarkingPaid || (reward ? reward.status === 'paid' : false);
+  const isMarkPaidDisabled =
+    isMarkingPaid ||
+    (reward
+      ? reward.status === 'paid' ||
+        reward.applications.some((application) => !paidRewardStatuses.includes(application.status))
+      : false);
   const isMarkCompleteDisabled = isMarkingComplete || (reward ? reward.status !== 'open' : false);
 
   return (

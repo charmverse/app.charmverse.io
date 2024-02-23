@@ -23,7 +23,6 @@ import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
   REWARD_APPLICANTS_COUNT,
-  REWARD_CUSTOM_VALUE,
   REWARD_PROPOSAL_LINK,
   REWARD_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
@@ -293,7 +292,13 @@ export function ViewHeaderRowsMenu({
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
       {onMarkRewardsAsPaid && (
-        <Tooltip title={isMarkPaidDisabled ? 'Selected rewards are already paid' : 'Mark selected rewards as paid'}>
+        <Tooltip
+          title={
+            isMarkPaidDisabled
+              ? 'Selected rewards are already paid or have applications that are not in paid or complete status'
+              : 'Mark selected rewards as paid'
+          }
+        >
           <div>
             <StyledMenuItem onClick={onMarkRewardsAsPaid} disabled={isDeleting || isMarkPaidDisabled}>
               <PaidIcon
