@@ -51,6 +51,7 @@ import {
   REWARD_AMOUNT,
   REWARD_APPLICANTS_COUNT,
   REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
   REWARD_PROPOSAL_LINK,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
@@ -232,15 +233,15 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
-      return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
+      propertyValueElement = <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
-    return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+    propertyValueElement = <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
     }
 
-    return (
+    propertyValueElement = (
       <Box sx={{ a: { color: 'inherit' } }}>
         <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
           <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
@@ -248,7 +249,7 @@ function PropertyValueElement(props: Props) {
       </Box>
     );
   } else if (propertyTemplate.type === 'proposalReviewerNotes') {
-    return <ProposalNotesLink pageId={props.card.id} />;
+    propertyValueElement = <ProposalNotesLink pageId={props.card.id} />;
   } else if (propertyTemplate.type === 'tokenAmount' || propertyTemplate.type === 'tokenChain') {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
@@ -258,6 +259,7 @@ function PropertyValueElement(props: Props) {
         readOnly={
           readOnly ||
           !isAdmin ||
+          !reward ||
           getRewardType({
             chainId: Number(chainId),
             rewardAmount,
@@ -293,7 +295,7 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
     const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
     if (totalApplicants) {
-      return (
+      propertyValueElement = (
         <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
           <Box width={20} display='flex' alignItems='center'>
             <PersonIcon fontSize='small' />
@@ -649,11 +651,18 @@ function PropertyValueElement(props: Props) {
   if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
-    } else {
+    } else if (propertyTemplate.id !== REWARD_CUSTOM_VALUE) {
       propertyValueElement = (
         <TextInput
           {...commonProps}
-          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
+          readOnly={
+            readOnly ||
+            propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ||
+            propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID ||
+            propertyTemplate.id === REWARD_APPLICANTS_COUNT ||
+            propertyTemplate.id === REWARD_PROPOSAL_LINK ||
+            propertyTemplate.id === REWARD_CUSTOM_VALUE
+          }
           displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
         />
       );
