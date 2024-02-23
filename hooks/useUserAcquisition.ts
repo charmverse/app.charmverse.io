@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useUser } from 'hooks/useUser';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { setCookie } from 'lib/utilities/browser';
@@ -13,7 +14,7 @@ export function useUserAcquisition() {
 
   const { user } = useUser();
 
-  const router = useRouter();
+  const { router } = useCharmRouter();
 
   function setReferrer() {
     const currentReferrer = document.referrer;
@@ -41,6 +42,18 @@ export function useUserAcquisition() {
     }
   }
 
+  function setUserReferrerCode() {
+    const referrerCode = router.query.ref;
+
+    if (referrerCode) {
+      setCookie({
+        name: 'userReferrerCode' as SignupCookieType,
+        value: referrerCode as string,
+        expiresInDays: maxCookieAge
+      });
+    }
+  }
+
   /**
    * Nulls out data if there is an active user
    *
@@ -53,6 +66,7 @@ export function useUserAcquisition() {
       setLandingPage();
       setReferrer();
       setCampaign();
+      setUserReferrerCode();
     }
   }
 
