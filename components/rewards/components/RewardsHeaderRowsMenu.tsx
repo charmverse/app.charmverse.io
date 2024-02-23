@@ -153,6 +153,27 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
     await refreshRewards();
   }
 
+  async function onChangeCustomRewardsValue(customReward: string) {
+    const checkedRewards = checkedIds
+      .map((pageId) => {
+        const rewardId = pages[pageId]?.bountyId;
+        return rewardId ? rewards?.find((r) => r.id === rewardId) : null;
+      })
+      .filter(isTruthy)
+      .filter((reward) => getRewardType(reward) === 'custom');
+
+    for (const reward of checkedRewards) {
+      await updateReward({
+        rewardId: reward.id,
+        updateContent: {
+          customReward
+        }
+      });
+    }
+
+    await refreshRewards();
+  }
+
   const rewardId = checkedIds.length ? pages[checkedIds[0]]?.bountyId : null;
   const reward = rewardId ? rewards?.find((r) => r.id === rewardId) : null;
   const isMarkPaidDisabled = reward ? reward.status === 'paid' : false;
@@ -174,6 +195,7 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       showRewardsPaymentButton
       onMarkRewardsAsPaid={onMarkRewardsAsPaid}
       onMarkRewardsAsComplete={onMarkRewardsAsComplete}
+      onChangeCustomRewardsValue={onChangeCustomRewardsValue}
       onChangeRewardsToken={onChangeRewardsToken}
       isMarkPaidDisabled={isMarkPaidDisabled}
       isMarkCompleteDisabled={isMarkCompleteDisabled}

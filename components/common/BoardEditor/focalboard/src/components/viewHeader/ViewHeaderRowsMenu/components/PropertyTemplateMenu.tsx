@@ -16,6 +16,7 @@ import {
   DUE_DATE_ID,
   REWARD_AMOUNT,
   REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
@@ -29,6 +30,7 @@ import { TokenChain } from '../../../properties/tokenChain/tokenChain';
 import { DatePropertyTemplateMenu } from './DatePropertyTemplateMenu';
 import { PersonPropertyTemplateMenu } from './PersonPropertyTemplateMenu';
 import { PropertyMenu, StyledMenuItem } from './PropertyMenu';
+import { RewardCustomValuePropertyTemplateMenu } from './RewardCustomValuePropertyTemplateMenu';
 import { RewardsDueDatePropertyTemplateMenu } from './RewardsDueDatePropertyTemplateMenu';
 import { SelectPropertyTemplateMenu } from './SelectPropertyTemplateMenu';
 import { TextPropertyTemplateMenu } from './TextPropertyTemplateMenu';
@@ -47,6 +49,7 @@ export type PropertyTemplateMenuProps = {
   onChangeRewardsDueDate?: (pageIds: string[], dueDate: DateTime | null) => Promise<void>;
   onChangeRewardsReviewers?: (pageIds: string[], options: SelectOption[]) => Promise<void>;
   onChangeRewardsToken?: (rewardToken: RewardTokenDetails | null) => Promise<void>;
+  onChangeCustomRewardsValue?: (customReward: string) => Promise<void>;
   onRelationPropertyChange: (a: {
     checkedCards: Card[];
     pageListItemIds: string[];
@@ -79,6 +82,7 @@ export function PropertyTemplateMenu({
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
   onChangeRewardsToken,
+  onChangeCustomRewardsValue,
   firstCheckedProposal,
   disabledTooltip,
   lastChild
@@ -345,6 +349,16 @@ export function PropertyTemplateMenu({
     }
 
     default: {
+      if (propertyTemplate.id === REWARD_CUSTOM_VALUE) {
+        return (
+          <RewardCustomValuePropertyTemplateMenu
+            lastChild={lastChild}
+            cards={checkedCards}
+            propertyTemplate={propertyTemplate}
+            onChange={onChangeCustomRewardsValue ?? ((() => {}) as any)}
+          />
+        );
+      }
       return (
         <TextPropertyTemplateMenu
           lastChild={lastChild}

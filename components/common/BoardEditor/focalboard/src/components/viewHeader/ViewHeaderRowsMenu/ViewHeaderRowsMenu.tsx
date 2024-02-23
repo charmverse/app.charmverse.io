@@ -79,7 +79,6 @@ const invalidPropertyIds = [
   REWARDS_APPLICANTS_BLOCK_ID,
   APPLICANT_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_CUSTOM_VALUE,
   REWARDS_AVAILABLE_BLOCK_ID
 ];
 
@@ -105,6 +104,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
   onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
   onChangeRewardsToken?: PropertyTemplateMenuProps['onChangeRewardsToken'];
+  onChangeCustomRewardsValue?: PropertyTemplateMenuProps['onChangeCustomRewardsValue'];
   showRewardsPaymentButton?: boolean;
   showTrashIcon?: boolean;
   onMarkRewardsAsPaid?: () => Promise<void>;
@@ -124,6 +124,7 @@ export function ViewHeaderRowsMenu({
   isReviewersDisabled,
   isMarkPaidDisabled,
   isMarkCompleteDisabled,
+  onChangeCustomRewardsValue,
   onArchiveProposals,
   onChange,
   onChangeProposalsAuthors,
@@ -276,6 +277,7 @@ export function ViewHeaderRowsMenu({
               onChangeRewardsReviewers={onChangeRewardsReviewers}
               onPersonPropertyChange={onPersonPropertyChange}
               onChangeRewardsToken={onChangeRewardsToken}
+              onChangeCustomRewardsValue={onChangeCustomRewardsValue}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={
                 propertyTemplate.type === 'proposalStep' && isStepDisabled

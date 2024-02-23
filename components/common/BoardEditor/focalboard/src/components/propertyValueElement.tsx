@@ -304,6 +304,48 @@ function PropertyValueElement(props: Props) {
         </Stack>
       );
     }
+  } else if (propertyTemplate.id === REWARD_CUSTOM_VALUE) {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+
+    return (
+      <TextInput
+        placeholderText={emptyDisplayValue}
+        value={value.toString()}
+        onChange={setValue}
+        multiline={displayType === 'details' ? true : props.wrapColumn ?? false}
+        onSave={() => {
+          if (reward) {
+            try {
+              updateReward({
+                rewardId: reward.id,
+                updateContent: {
+                  customReward: value as string
+                }
+              });
+            } catch (error) {
+              showError(error);
+            }
+          }
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        wrapColumn={props.wrapColumn ?? false}
+        columnRef={props.columnRef}
+        readOnly={
+          readOnly ||
+          !isAdmin ||
+          !reward ||
+          getRewardType({
+            chainId: Number(chainId),
+            rewardAmount,
+            customReward: value as string,
+            rewardToken: symbolOrAddress
+          }) !== 'custom'
+        }
+        displayType={displayType}
+      />
+    );
   }
 
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
