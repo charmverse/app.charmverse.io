@@ -18,9 +18,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCardPage } from 'components/rewards/hooks/useRewardsBoardAdapter';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -50,7 +48,6 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-const rewardQueryKey = 'rewardId';
 export function ProposalRewardsTable({
   containerWidth,
   pendingRewards,
@@ -77,10 +74,43 @@ export function ProposalRewardsTable({
 
   const { getFeatureTitle } = useSpaceFeatures();
 
-  useRewardsNavigation(rewardQueryKey);
+  const tableView = useMemo(() => {
+    const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
+      const rewardType = getRewardType(page.reward);
+      if (rewardType) {
+        acc.add(rewardType);
+      }
+      return acc;
+    }, new Set());
+    return getProposalRewardsView({
+      board: boardBlock,
+      spaceId: space?.id,
+      rewardTypes: [...rewardTypesUsed],
+      includeStatus: rewardIds.length > 0
+    });
+  }, [space?.id, boardBlock, pendingRewards, rewardIds.length]);
 
-  const publishedRewards = (rewardIds || []).map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy);
+  const publishedRewards = useMemo(
+    () => rewardIds.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy),
+    [rewardIds, allRewards]
+  );
+  const cardPages = useMemo(
+    () =>
+      publishedRewards.length > 0
+        ? getCardsFromPublishedRewards(publishedRewards, pages)
+        : getCardsFromPendingRewards(pendingRewards || [], space?.id),
+    [pendingRewards, space?.id, pages, publishedRewards]
+  );
+
   const canCreatePendingRewards = !readOnly && !publishedRewards.length;
+  const newRewardErrors = getRewardErrors({
+    page: newPageValues,
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    isProposalTemplate
+  }).join(', ');
+
+  const loadingData = isLoading || isLoadingRewards || loadingPages;
 
   function closeDialog() {
     clearRewardValues();
@@ -117,10 +147,11 @@ export function ProposalRewardsTable({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    setRewardValues(
-      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
-      { skipDirty: true }
-    );
+    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    if (template?.reward) {
+      (newReward as any).rewardType = getRewardType(template.reward);
+    }
+    setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
@@ -173,39 +204,6 @@ export function ProposalRewardsTable({
       });
     }
   }
-
-  const newRewardErrors = getRewardErrors({
-    page: newPageValues,
-    reward: rewardValues,
-    rewardType: rewardValues.rewardType,
-    isProposalTemplate
-  }).join(', ');
-
-  const cardPages = useMemo(
-    () =>
-      publishedRewards.length > 0
-        ? getCardsFromPublishedRewards(publishedRewards, pages)
-        : getCardsFromPendingRewards(pendingRewards || [], space?.id),
-    [pendingRewards, space?.id, pages, allRewards]
-  );
-
-  const rewardTypes = useMemo(() => {
-    const typesSet = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
-      const rewardType = getRewardType(page.reward);
-      if (rewardType) {
-        acc.add(rewardType);
-      }
-      return acc;
-    }, new Set());
-    return [...typesSet];
-  }, [pendingRewards]);
-
-  const tableView = useMemo(
-    () => getProposalRewardsView({ board: boardBlock, spaceId: space?.id, rewardTypes }),
-    [space?.id, boardBlock, rewardTypes]
-  );
-
-  const loadingData = isLoading || isLoadingRewards || loadingPages;
 
   return (
     <>
@@ -320,7 +318,6 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
         ...reward
       } as BoardReward,
       rewardPage: {
-        id: draftId,
         // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
         boardId: null,
         bountyId: null,
@@ -344,7 +341,8 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
         title: '',
         updatedAt: new Date(),
         updatedBy: '',
-        ...page
+        ...page,
+        id: draftId
       }
     });
   });
