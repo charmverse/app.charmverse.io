@@ -55,7 +55,7 @@ export function getProposalErrors({
         errors.push('All required fields must be answered');
       }
     }
-  } else if (proposalType === 'free_form' && page.type !== 'proposal_template' && checkIsContentEmpty(page.content)) {
+  } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }
 
