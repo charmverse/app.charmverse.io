@@ -100,7 +100,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     requireTemplates: false
   });
 
-  if (errors.length > 0) {
+  if (errors.length > 0 && !isAdmin) {
     throw new InvalidInputError(errors.join('\n'));
   }
 
