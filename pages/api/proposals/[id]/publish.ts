@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -51,6 +52,15 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
             orderBy: {
               index: 'asc'
             }
+          },
+          form: {
+            include: {
+              formFields: {
+                orderBy: {
+                  index: 'asc'
+                }
+              }
+            }
           }
         }
       },
@@ -82,13 +92,15 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
         voteSettings: e.voteSettings as any,
         rubricCriteria: e.rubricCriteria as any[]
       })),
-      authors: proposalPage.proposal!.authors.map((a) => a.userId)
+      authors: proposalPage.proposal!.authors.map((a) => a.userId),
+      formAnswers: proposalPage.proposal!.formAnswers as unknown as FieldAnswerInput[],
+      formFields: proposalPage.proposal!.form?.formFields as unknown as FormFieldInput[]
     },
     isDraft: false,
     requireTemplates: false
   });
 
-  if (errors.length > 0 && !isAdmin) {
+  if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
   }
 
