@@ -11,7 +11,7 @@ export function getProposalErrors({
   isDraft,
   requireTemplates
 }: {
-  page: Pick<CreateProposalInput['pageProps'], 'title' | 'type'> & {
+  page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
     content?: any | null;
   };
   proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> & {
@@ -33,7 +33,7 @@ export function getProposalErrors({
     errors.push('Workflow is required');
   }
 
-  if (requireTemplates && page.type === 'proposal' && !proposal.proposalTemplateId) {
+  if (requireTemplates && page.type === 'proposal' && !proposal.proposalTemplateId && !page.sourceTemplateId) {
     errors.push('Template is required');
   }
   if (page.type === 'proposal' && proposal.authors.length === 0) {
