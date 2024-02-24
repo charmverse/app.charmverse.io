@@ -15,7 +15,7 @@ export function ProposalStickyFooter({
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
-  page: { title: string; content?: any; sourceTemplateId?: string };
+  page: { title: string; content?: any; sourceTemplateId: string | null };
   refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
