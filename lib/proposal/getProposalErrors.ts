@@ -1,4 +1,5 @@
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
+import { validateAnswers } from 'lib/form/validateAnswers';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utilities/types';
 
@@ -14,7 +15,10 @@ export function getProposalErrors({
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
     content?: any | null;
   };
-  proposal: Pick<CreateProposalInput, 'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations'> & {
+  proposal: Pick<
+    CreateProposalInput,
+    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers'
+  > & {
     workflowId?: string | null;
   };
   proposalType: 'structured' | 'free_form';
@@ -41,7 +45,16 @@ export function getProposalErrors({
   }
 
   if (proposalType === 'structured') {
-    errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
+    if (page.type === 'proposal_template') {
+      // creating template - check if form fields exists
+      errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
+    } else if (proposal.formFields && proposal.formAnswers) {
+      const isValid = validateAnswers(proposal.formAnswers || [], proposal.formFields || []);
+      // saving proposal - check if required answers are filled
+      if (!isValid) {
+        errors.push('All required fields must be answered');
+      }
+    }
   } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }

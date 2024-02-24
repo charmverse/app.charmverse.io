@@ -4,6 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import { validateAnswers } from 'lib/form/validateAnswers';
 import { isTruthy } from 'lib/utilities/types';
 
 export type RubricAnswerUpsert = {
@@ -48,11 +49,7 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
     })
     .filter(isTruthy);
 
-  const hasAllRequiredAnswers = form.formFields.every(
-    (f) => !f.required || answersToSave.some((a) => a.fieldId === f.id && !!a.value)
-  );
-
-  if (!isDraft && !hasAllRequiredAnswers) {
+  if (!isDraft && !validateAnswers(answersToSave, form.formFields)) {
     throw new InvalidInputError(`All required fields must be answered`);
   }
 
