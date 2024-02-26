@@ -16,7 +16,6 @@ import {
   useRequiredMemberProperties,
   useRequiredUserDetailsForm
 } from 'components/members/hooks/useRequiredMemberProperties';
-import { useIdentityTypes } from 'components/settings/account/hooks/useIdentityTypes';
 import Avatar from 'components/settings/space/components/LargeAvatar';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { Social } from 'lib/members/interfaces';
@@ -68,7 +67,6 @@ function EditIconContainer({
 }
 
 export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }: UserDetailsProps) {
-  const identityTypes = useIdentityTypes();
   const { isBioRequired, isTimezoneRequired, isLinkedinRequired, isGithubRequired, isTwitterRequired } =
     useRequiredMemberProperties({ userId: user.id });
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
@@ -138,15 +136,7 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
           onChange={setSocial}
         />
       </Grid>
-      <IdentityModal
-        isOpen={identityModalState.isOpen}
-        close={identityModalState.close}
-        save={(username: string, identityType: IdentityType) => {
-          saveUser({ username, identityType });
-        }}
-        identityTypes={identityTypes}
-        identityType={(user?.identityType || 'Wallet') as IdentityType}
-      />
+      <IdentityModal isOpen={identityModalState.isOpen} close={identityModalState.close} />
     </>
   );
 }
