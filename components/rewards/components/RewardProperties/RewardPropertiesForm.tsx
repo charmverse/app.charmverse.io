@@ -1,4 +1,5 @@
-import type { BountyStatus } from '@charmverse/core/prisma-client';
+import { ProposalSystemRole } from '@charmverse/core/prisma';
+import { type BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
@@ -14,6 +15,10 @@ import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/check
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import {
+  allReviewersSystemRole,
+  authorSystemRole
+} from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
@@ -84,7 +89,7 @@ export function RewardPropertiesForm({
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
   const readOnlyApplicationType =
-    (!isAdmin && (readOnly || !!forcedApplicationType || !!template)) || isProposalTemplate;
+    (!isAdmin && (readOnly || !!forcedApplicationType || !!template)) || !!isProposalTemplate;
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
@@ -235,18 +240,27 @@ export function RewardPropertiesForm({
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                 Reviewers
               </PropertyLabel>
-              <UserAndRoleSelect
-                readOnly={readOnlyReviewers}
-                value={values.reviewers ?? []}
-                onChange={async (options) => {
-                  const reviewerOptions = options.filter(
-                    (option) => option.group === 'role' || option.group === 'user'
-                  ) as RewardReviewer[];
-                  await applyUpdates({
-                    reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
-                  });
-                }}
-              />
+              {isProposalTemplate ? (
+                <UserAndRoleSelect
+                  readOnly
+                  value={[{ group: 'system_role', id: ProposalSystemRole.all_reviewers }]}
+                  systemRoles={[allReviewersSystemRole]}
+                  onChange={() => {}}
+                />
+              ) : (
+                <UserAndRoleSelect
+                  readOnly={readOnlyReviewers}
+                  value={values.reviewers ?? []}
+                  onChange={async (options) => {
+                    const reviewerOptions = options.filter(
+                      (option) => option.group === 'role' || option.group === 'user'
+                    ) as RewardReviewer[];
+                    await applyUpdates({
+                      reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+                    });
+                  }}
+                />
+              )}
             </Box>
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -362,24 +376,34 @@ export function RewardPropertiesForm({
             )}
 
             {/* Select authors */}
-            {isAssignedReward && !isProposalTemplate && (
+            {isAssignedReward && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly required={!isTemplate && !readOnly} highlighted>
                   Assigned applicants
                 </PropertyLabel>
                 <Box display='flex' flex={1}>
-                  <UserSelect
-                    memberIds={values.assignedSubmitters ?? []}
-                    readOnly={readOnly}
-                    onChange={updateAssignedSubmitters}
-                    wrapColumn
-                    showEmptyPlaceholder
-                    error={
-                      !isNewReward && !values.assignedSubmitters?.length && !readOnly
-                        ? 'Requires at least one assignee'
-                        : undefined
-                    }
-                  />
+                  {isProposalTemplate ? (
+                    <UserAndRoleSelect
+                      readOnly
+                      wrapColumn
+                      value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+                      systemRoles={[authorSystemRole]}
+                      onChange={() => {}}
+                    />
+                  ) : (
+                    <UserSelect
+                      memberIds={values.assignedSubmitters ?? []}
+                      readOnly={readOnly}
+                      onChange={updateAssignedSubmitters}
+                      wrapColumn
+                      showEmptyPlaceholder
+                      error={
+                        !isNewReward && !values.assignedSubmitters?.length && !readOnly
+                          ? 'Requires at least one assignee'
+                          : undefined
+                      }
+                    />
+                  )}
                 </Box>
               </Box>
             )}

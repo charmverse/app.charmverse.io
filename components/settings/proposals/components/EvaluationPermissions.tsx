@@ -50,7 +50,7 @@ export const authorSystemRole = {
   label: 'Author'
 } as const;
 
-const currentReviewerSystemRole = {
+export const currentReviewerSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Reviewers selected for this evaluation'>
@@ -67,19 +67,21 @@ const currentVoterSystemRole = {
   label: 'Voters (Current Step)'
 };
 
+export const allReviewersSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Reviewers of any step in this workflow'>
+      <ProposalIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.all_reviewers,
+  label: 'All Reviewers'
+} as SystemRoleOptionPopulated<ProposalSystemRole>;
+
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   authorSystemRole,
   currentReviewerSystemRole,
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Reviewers of any step in this workflow'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.all_reviewers,
-    label: 'All Reviewers'
-  },
+  allReviewersSystemRole,
   allMembersSystemRole
 ];
 
