@@ -106,7 +106,10 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
   if (!apiKey || apiKey.length < 1) {
     throw new InvalidApiKeyError();
   }
-  const superApiKeyData = await getVerifiedSuperApiToken(apiKey, req.query?.spaceId as string);
+  const superApiKeyData = await getVerifiedSuperApiToken(
+    apiKey,
+    (req.query?.spaceId as string) || (req.body.spaceId as string)
+  );
 
   if (superApiKeyData) {
     // super api key without spaceId param
