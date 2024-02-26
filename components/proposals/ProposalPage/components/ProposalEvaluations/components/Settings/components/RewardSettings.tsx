@@ -74,6 +74,24 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
         </Typography>
       </FormLabel>
 
+      <Box display='flex' flex={1} flexDirection='column'>
+        <SelectField
+          includeSelectedOptions
+          placeholder='No template required'
+          value={value?.rewardsTemplateId || ''}
+          options={options}
+          onChange={async (rewardsTemplateId: string | string[]) => {
+            if (rewardsTemplateId === 'add_new') {
+              openNewPage({
+                type: 'bounty_template'
+              });
+            } else if (typeof rewardsTemplateId === 'string') {
+              onChangeSettings({ rewardsTemplateId: rewardsTemplateId ?? null });
+            }
+          }}
+        />
+      </Box>
+
       <NewPageDialog
         contentUpdated={contentUpdated || isDirty}
         disabledTooltip={disabledTooltip}
@@ -100,24 +118,6 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
           />
         </NewDocumentPage>
       </NewPageDialog>
-
-      <Box display='flex' flex={1} flexDirection='column'>
-        <SelectField
-          includeSelectedOptions
-          placeholder='No template required'
-          value={value?.rewardsTemplateId || ''}
-          options={options}
-          onChange={async (rewardsTemplateId: string | string[]) => {
-            if (rewardsTemplateId === 'add_new') {
-              openNewPage({
-                type: 'bounty_template'
-              });
-            } else if (typeof rewardsTemplateId === 'string') {
-              onChangeSettings({ rewardsTemplateId: rewardsTemplateId ?? null });
-            }
-          }}
-        />
-      </Box>
     </>
   );
 }
