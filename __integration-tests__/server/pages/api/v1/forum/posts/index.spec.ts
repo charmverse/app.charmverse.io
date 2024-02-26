@@ -73,13 +73,18 @@ describe('POST /api/v1/forum/posts', () => {
       spaceId: space.id
     });
     const superApiKey = await generateSuperApiKey({ spaceId: space.id });
-    const response = await request(baseUrl).post('/api/v1/forum/posts').set('Authorization', superApiKey.token).send({
-      contentMarkdown: 'first line of text',
-      userId: user.id,
-      spaceId: space.id,
-      title: 'Test',
-      categoryId: category.id
-    });
+    const response = await request(baseUrl)
+      .post('/api/v1/forum/posts')
+      .set('Authorization', superApiKey.token)
+      .send({
+        contentMarkdown: 'first line of text',
+        userId: user.id,
+        spaceId: space.id,
+        title: 'Test',
+        categoryId: category.id
+      })
+      .query({ spaceId: space.id });
+
     expect(response.statusCode).toBe(200);
 
     expect(response.body).toMatchObject(

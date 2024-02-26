@@ -106,10 +106,7 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
   if (!apiKey || apiKey.length < 1) {
     throw new InvalidApiKeyError();
   }
-  const superApiKeyData = await getVerifiedSuperApiToken(
-    apiKey,
-    (req.query?.spaceId as string) || (req.body.spaceId as string)
-  );
+  const superApiKeyData = await getVerifiedSuperApiToken(apiKey, req.query?.spaceId as string);
 
   if (superApiKeyData) {
     // super api key without spaceId param
@@ -152,7 +149,6 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
 export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
     const apiKeyCheck = await setRequestSpaceFromApiKey(req);
-
     if (apiKeyCheck.apiKey.type === 'space') {
       const client = await getPermissionsClient({ resourceId: req.authorizedSpaceId, resourceIdType: 'space' });
 
