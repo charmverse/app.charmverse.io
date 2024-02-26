@@ -5,30 +5,30 @@ import { builderDaoChains, daoChains } from 'connectors/chains';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
-import type { FormValues } from '../hooks/useDaoForm';
-import { useDaoForm } from '../hooks/useDaoForm';
+import type { FormValues } from '../hooks/useCommunitiesForm';
+import { useCommunitiesForm } from '../hooks/useCommunitiesForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
-import { getDaoAccessControlConditions } from '../utils/getDaoAccessControlConditions';
+import { getCommunitiesAccessControlConditions } from '../utils/getCommunitiesAccessControlConditions';
 import { daoCheck } from '../utils/utils';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 import { TokenGateFooter } from './TokenGateFooter';
 
-export function TokenGateDao() {
+export function TokenGateCommunities() {
   const {
     register,
     getValues,
     watch,
     formState: { errors, isValid },
     reset
-  } = useDaoForm();
+  } = useCommunitiesForm();
   const check = watch('check');
 
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
 
   const onSubmit = async () => {
     const values = getValues();
-    const valueProps = getDaoAccessControlConditions(values) || [];
+    const valueProps = getCommunitiesAccessControlConditions(values) || [];
     handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };
@@ -76,7 +76,7 @@ export function TokenGateDao() {
             })}
           />
           <TextInputField
-            label='DAO Contract Address'
+            label='Contract Address'
             error={errors.contract?.message}
             helperText={errors.contract?.message}
             {...register('contract')}

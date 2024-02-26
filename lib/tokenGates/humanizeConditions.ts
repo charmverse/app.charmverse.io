@@ -205,7 +205,7 @@ export function humanizeConditionsData(conditions: TokenGate['conditions']): Hum
           image,
           type: acc.type,
           content: [
-            { type: 'text', content: 'Guild' },
+            { type: 'text', content: 'Guild.xyz' },
             { type: 'text', content: acc.tokenIds.at(0) || '', props: { fontWeight: 600 } }
           ]
         };

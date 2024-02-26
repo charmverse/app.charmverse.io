@@ -13,6 +13,19 @@ export const ercAbi = [
     outputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'name',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
   }
 ] as const;
 

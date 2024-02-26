@@ -528,7 +528,7 @@ export function getChainExplorerLink(
 export const alchemyChains = RPCList.filter((chain) => !!chain.alchemyUrl).sort(sortChainList);
 
 export const daoChains = RPCList.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.chainName.toLowerCase())
+  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
 );
 
 export const builderDaoChains = RPCList.filter((chain) =>

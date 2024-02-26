@@ -15,7 +15,7 @@ export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = { score: '0', check: '' as FormValues['check'] };
 
-export function useGitcoinForm() {
+export function useCredentialsForm() {
   const methods = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
