@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { SpaceRole } from '@charmverse/core/prisma-client';
 
 import { getSpace } from 'lib/spaces/getSpace';
@@ -30,6 +31,7 @@ export async function customConditionJoinSpace({
   if (params.proposalTemplate) {
     // check if proposal id is valid
     spaceRole = await joinSpace({ userId, spaceId, source: 'proposal_template' });
+    log.info('User joined space via proposal template', { userId, spaceId, proposalTemplate: params.proposalTemplate });
   }
 
   if (spaceRole) {
