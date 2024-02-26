@@ -34,7 +34,7 @@ export async function requireSuperApiKey(req: NextApiRequest, res: NextApiRespon
   const detectedApiKey = getAPIKeyFromRequest(req);
 
   const superApiTokenData = detectedApiKey
-    ? await getVerifiedSuperApiToken(detectedApiKey, (req.query?.spaceId as string) || (req.body.spaceId as string))
+    ? await getVerifiedSuperApiToken(detectedApiKey, req.query?.spaceId as string)
     : null;
   if (superApiTokenData) {
     req.superApiToken = superApiTokenData.superApiKey;
