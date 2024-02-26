@@ -56,8 +56,12 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
   const disabledTooltip = errors.join(', ');
 
   async function saveForm() {
-    const success = await createReward(newPageValues);
-    if (success) {
+    const createdReward = await createReward(newPageValues);
+    if (createdReward) {
+      onChange({
+        rewardsTemplateId: createdReward.id,
+        enableRewards: true
+      });
       closeDialog();
     }
   }
