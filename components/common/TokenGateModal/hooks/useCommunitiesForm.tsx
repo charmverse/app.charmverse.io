@@ -3,6 +3,7 @@ import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { ercAbi } from 'lib/tokenGates/abis/abis';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import { daoCheck } from '../utils/utils';
@@ -26,26 +27,14 @@ const schema = yup.object({
         .test('isAddress', 'Invalid address', (value) => isValidChainAddress(value))
         .test('isContract', 'Invalid contract or chain', async (value, context) => {
           try {
-            await readContract({
-              address: value,
-              chainId: Number(context.parent.chain),
-              abi: [
-                {
-                  inputs: [],
-                  name: 'name',
-                  outputs: [
-                    {
-                      internalType: 'string',
-                      name: '',
-                      type: 'string'
-                    }
-                  ],
-                  stateMutability: 'view',
-                  type: 'function'
-                }
-              ] as const,
-              functionName: 'name'
-            });
+            if (context.parent.check === 'builder') {
+              await readContract({
+                address: value,
+                chainId: Number(context.parent.chain),
+                abi: ercAbi,
+                functionName: 'name'
+              });
+            }
             return true;
           } catch (err) {
             return false;
@@ -69,7 +58,7 @@ const defaultValues: FormValues = {
   guild: ''
 };
 
-export function useDaoForm() {
+export function useCommunitiesForm() {
   const methods = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',

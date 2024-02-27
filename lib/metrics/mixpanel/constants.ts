@@ -7,6 +7,6 @@ export const accessTypeDict: Record<TokenGateAccessType, string> = {
   dao_members: 'DAO Members',
   poap_collectors: 'POAP Collectors',
   nft_subscriber: 'NFT Membership',
-  guild: 'Guild member',
+  guild: 'Guild.xyz member',
   gitcoin_passport: 'Gitcoin Passport owner'
 };

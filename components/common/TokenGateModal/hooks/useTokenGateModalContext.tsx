@@ -15,10 +15,10 @@ export type DisplayedPage =
   | 'home'
   | 'review'
   | 'wallet'
-  | 'dao'
+  | 'communities'
   | 'unlock'
   | 'hypersub'
-  | 'gitcoin';
+  | 'credentials';
 export type Flow = 'single' | 'multiple_all' | 'multiple_one';
 
 type IContext = {
