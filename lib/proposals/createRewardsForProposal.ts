@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -9,7 +10,7 @@ import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
+import { publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
 
 export async function createRewardsForProposal({ proposalId, userId }: { userId: string; proposalId: string }) {
@@ -69,7 +70,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
   let rewardsToCreate = [...pendingRewards];
   const rewardsPromises = rewardsToCreate.map(async ({ page, reward, draftId }) => {
     // create reward
-    const { createdPageId } = await createReward({
+    const { createdPageId, reward: createdReward } = await createReward({
       ...reward,
       pageProps: page || {},
       spaceId: proposal.spaceId,
@@ -78,6 +79,16 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     });
     // filter out reward from pending rewards
     rewardsToCreate = rewardsToCreate.filter(({ draftId: d }) => d !== draftId);
+
+    trackUserAction('bounty_created', {
+      userId,
+      spaceId: proposal.spaceId,
+      resourceId: createdReward.id,
+      rewardToken: createdReward.rewardToken,
+      rewardAmount: createdReward.rewardAmount,
+      pageId: createdPageId || '',
+      customReward: createdReward.customReward
+    });
 
     return createdPageId;
   });
