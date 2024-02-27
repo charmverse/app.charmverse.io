@@ -297,7 +297,6 @@
     "@storybook/theming": "^7.5.3",
     "@svgdotjs/svg.js": "^3.2.0",
     "@svgr/webpack": "^8.0.1",
-    "@testing-library/dom": "^8.11.3",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
