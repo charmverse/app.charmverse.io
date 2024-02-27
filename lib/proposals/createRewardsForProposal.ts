@@ -4,7 +4,6 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { createReward } from 'lib/rewards/createReward';
 import { InvalidInputError } from 'lib/utils/errors';
@@ -38,6 +37,7 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       status: true,
       rewards: true,
       fields: true,
+      authors: true,
       reviewers: true,
       id: true
     }
@@ -49,15 +49,6 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     throw new InvalidStateError(`Archived proposals cannot be updated`);
   } else if (proposal.rewards?.length) {
     throw new InvalidStateError(`Rewards have already been created for this proposal`);
-  }
-
-  const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
-    resourceId: proposalId,
-    userId
-  });
-
-  if (!permissions.evaluate) {
-    throw new InvalidStateError('Only reviewers can create rewards for a proposal');
   }
 
   const fields = proposal.fields as ProposalFields;
@@ -72,6 +63,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     // create reward
     const { createdPageId, reward: createdReward } = await createReward({
       ...reward,
+      allowedSubmitterRoles: [],
+      assignedSubmitters: proposal.authors.map((a) => a.userId),
       pageProps: page || {},
       spaceId: proposal.spaceId,
       userId,

@@ -89,7 +89,7 @@ export function RewardPropertiesForm({
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
   const readOnlyApplicationType =
-    (!isAdmin && (readOnly || !!forcedApplicationType || !!template)) || !!isProposalTemplate;
+    !!forcedApplicationType || (!isAdmin && (readOnly || !!template)) || !!isProposalTemplate;
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
