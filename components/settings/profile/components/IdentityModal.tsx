@@ -153,10 +153,21 @@ function IdentityModal(props: IdentityModalProps) {
             const usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
             const wallet = user?.wallets.find((w) => shortWalletAddress(w.address) === item.secondaryUserName);
             const verifiedEmail = user?.verifiedEmails.find((e) => e.email === item.username);
+            const isPrimaryWallet =
+              wallet && primaryWallet ? lowerCaseEqual(wallet.address, primaryWallet.address) : false;
+            const isIdentityInUse =
+              item.type === 'RandomName' && generatedName !== item.username ? false : item.isInUse;
+            const isIdentityDisconnectDisabled = isIdentityInUse || cannotDisconnect;
+            const identityDisconnectMenuItemTooltip = cannotDisconnect
+              ? `You can't disconnect your last connected account`
+              : isIdentityInUse
+              ? `You can't disconnect your current active identity`
+              : '';
+
             return (
               <>
                 <Integration
-                  isInUse={item.type === 'RandomName' && generatedName !== item.username ? false : item.isInUse}
+                  isInUse={isIdentityInUse}
                   icon={item.icon}
                   identityType={item.type}
                   name={item.type === 'RandomName' ? 'Anonymous' : item.type}
@@ -171,54 +182,100 @@ function IdentityModal(props: IdentityModalProps) {
                               Verify Wallet
                             </MenuItem>
                           ) : null,
-                          <MenuItem
-                            disabled={lowerCaseEqual(wallet.address, primaryWallet?.address)}
+                          <Tooltip
                             key='set-primary'
-                            onClick={() => {
-                              onSetPrimaryWallet(wallet.id);
-                            }}
+                            title={
+                              user?.wallets?.length === 1
+                                ? `
+                              You need to have more than one wallet to set a primary wallet
+                            `
+                                : isPrimaryWallet
+                                ? 'Wallet already selected as primary wallet'
+                                : ''
+                            }
                           >
-                            Set as Primary
-                          </MenuItem>,
-                          <MenuItem
-                            disabled={cannotDisconnect || lowerCaseEqual(wallet.address, account)}
+                            <div>
+                              <MenuItem
+                                disabled={isPrimaryWallet || user?.wallets?.length === 1}
+                                onClick={() => {
+                                  onSetPrimaryWallet(wallet.id);
+                                }}
+                              >
+                                Set as Primary
+                              </MenuItem>
+                            </div>
+                          </Tooltip>,
+                          <Tooltip
                             key='disconnect'
-                            onClick={handleOpenDeleteModal(wallet.address)}
+                            title={
+                              lowerCaseEqual(wallet.address, account)
+                                ? "You can't disconnect your current active wallet."
+                                : cannotDisconnect
+                                ? `You can't disconnect your last wallet`
+                                : ''
+                            }
                           >
-                            Disconnect Wallet
-                          </MenuItem>
+                            <div>
+                              <MenuItem
+                                disabled={cannotDisconnect || lowerCaseEqual(wallet.address, account)}
+                                onClick={handleOpenDeleteModal(wallet.address)}
+                              >
+                                Disconnect Wallet
+                              </MenuItem>
+                            </div>
+                          </Tooltip>
                         ]
                       : item.type === 'Discord'
                       ? [
-                          <MenuItem disabled={cannotDisconnect} key='disconnect' onClick={connect}>
-                            Disconnect
-                          </MenuItem>
+                          <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                            <div>
+                              <MenuItem disabled={isIdentityDisconnectDisabled} key='disconnect' onClick={connect}>
+                                Disconnect
+                              </MenuItem>
+                            </div>
+                          </Tooltip>
                         ]
                       : item.type === 'Telegram'
                       ? [
-                          <MenuItem
-                            disabled={cannotDisconnect}
-                            key='disconnect'
-                            onClick={() => disconnectFromTelegram()}
-                          >
-                            Disconnect
-                          </MenuItem>
+                          <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                            <div>
+                              <MenuItem
+                                disabled={isIdentityDisconnectDisabled}
+                                key='disconnect'
+                                onClick={() => disconnectFromTelegram()}
+                              >
+                                Disconnect
+                              </MenuItem>
+                            </div>
+                          </Tooltip>
                         ]
                       : item.type === 'Google'
                       ? [
-                          <MenuItem key='disconnect' disabled={cannotDisconnect} onClick={disconnectGoogleAccount}>
-                            Disconnect
-                          </MenuItem>
+                          <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                            <div>
+                              <MenuItem
+                                disabled={isIdentityDisconnectDisabled}
+                                key='disconnect'
+                                onClick={disconnectGoogleAccount}
+                              >
+                                Disconnect
+                              </MenuItem>
+                            </div>
+                          </Tooltip>
                         ]
                       : item.type === 'VerifiedEmail' && verifiedEmail
                       ? [
-                          <MenuItem
-                            key='disconnect'
-                            disabled={cannotDisconnect}
-                            onClick={() => disconnectVerifiedEmailAccount(verifiedEmail.email)}
-                          >
-                            Disconnect
-                          </MenuItem>
+                          <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
+                            <div>
+                              <MenuItem
+                                disabled={isIdentityDisconnectDisabled}
+                                key='disconnect'
+                                onClick={() => disconnectVerifiedEmailAccount(verifiedEmail.email)}
+                              >
+                                Disconnect
+                              </MenuItem>
+                            </div>
+                          </Tooltip>
                         ]
                       : []
                   }
@@ -232,7 +289,7 @@ function IdentityModal(props: IdentityModalProps) {
                     ) : item.type === 'Wallet' ? (
                       <>
                         {wallet && primaryWallet && lowerCaseEqual(wallet.address, primaryWallet.address) && (
-                          <Chip size='small' sx={{ ml: 1 }} label='Primary' variant='outlined' />
+                          <Chip size='small' sx={{ ml: 1 }} label='Primary Wallet' variant='outlined' />
                         )}
                         {isAddress(usernameToDisplay) && (
                           <Tooltip

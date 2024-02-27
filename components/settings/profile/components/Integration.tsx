@@ -77,13 +77,15 @@ function Integration(props: IntegrationProps) {
               Select
             </Button>
           )}
-          <IconButton
-            aria-label={`Open ${identityType.toLowerCase()} identity options`}
-            {...bindTrigger(identityMenuState)}
-            disabled={menuActions.length === 0}
-          >
-            <MoreHoriz fontSize='small' />
-          </IconButton>
+          {menuActions && menuActions.length !== 0 && (
+            <IconButton
+              size='small'
+              aria-label={`Open ${identityType.toLowerCase()} identity options`}
+              {...bindTrigger(identityMenuState)}
+            >
+              <MoreHoriz fontSize='small' />
+            </IconButton>
+          )}
 
           <Menu
             {...bindMenu(identityMenuState)}
