@@ -31,6 +31,7 @@ type CredentialFromCeramic = {
   verificationUrl: string;
   chainId: ExternalCredentialChain | EasSchemaChain;
   schemaId: string;
+  charmverseId?: string;
   timestamp: Date;
 };
 
@@ -46,7 +47,7 @@ export type PublishedSignedCredential<T extends AttestationType = AttestationTyp
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
   mutation CreateCredentials($i: CreateCharmVerseCredentialInput!) {
-    createCharmVerseCredential(input: $i) {
+    createCharmverseCredential(input: $i) {
       document {
         id
         sig
@@ -58,6 +59,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
         recipient
         verificationUrl
         timestamp
+        charmverseId
       }
     }
   }
@@ -106,7 +108,7 @@ export async function publishSignedCredential(input: CredentialToPublish): Promi
 
 const GET_CREDENTIALS = gql`
   query GetCredentials($filter: CharmVerseCredentialFiltersInput!) {
-    charmVerseCredentialIndex(filters: $filter, first: 1000) {
+    charmverseCredentialIndex(filters: $filter, first: 1000) {
       edges {
         node {
           id
@@ -119,6 +121,7 @@ const GET_CREDENTIALS = gql`
           chainId
           schemaId
           timestamp
+          charmverseId
         }
       }
     }

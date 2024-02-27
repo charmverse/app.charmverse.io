@@ -1,5 +1,4 @@
 import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
-import EditIcon from '@mui/icons-material/Edit';
 import { Box, Tooltip } from '@mui/material';
 import Stack from '@mui/material/Stack';
 import { useState } from 'react';
@@ -73,7 +72,8 @@ export function CredentialTemplates() {
           <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
             <Button
               onClick={() => openDialog({ newTemplateType: 'proposal' })}
-              variant='text'
+              color='secondary'
+              variant='outlined'
               sx={{ width: 'fit-content' }}
               dataTest='add-proposal-credential'
             >
@@ -97,8 +97,8 @@ export function CredentialTemplates() {
           <Tooltip title={!isAdmin ? 'Only space admins can create credentials' : ''} arrow>
             <Button
               onClick={() => openDialog({ newTemplateType: 'reward' })}
-              variant='text'
-              sx={{ width: 'fit-content' }}
+              color='secondary'
+              variant='outlined'
               dataTest='add-proposal-credential'
             >
               + Add a credential
