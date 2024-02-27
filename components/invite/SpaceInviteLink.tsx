@@ -14,7 +14,7 @@ import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { CenteredBox } from './components/CenteredBox';
 

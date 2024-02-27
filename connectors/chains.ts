@@ -29,7 +29,7 @@ import {
 
 import { isProdEnv } from 'config/constants';
 import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
-import { uniqueValues } from 'lib/utilities/array';
+import { uniqueValues } from 'lib/utils/array';
 
 export interface IChainDetails {
   chainId: number;

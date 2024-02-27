@@ -5,7 +5,7 @@ import { Button } from 'components/common/Button';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 
 export function ResetResultButton({
   evaluation,

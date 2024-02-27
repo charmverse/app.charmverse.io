@@ -9,7 +9,7 @@ import { v4 } from 'uuid';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import { isValidEmail } from 'lib/utilities/strings';
+import { isValidEmail } from 'lib/utils/strings';
 
 const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 

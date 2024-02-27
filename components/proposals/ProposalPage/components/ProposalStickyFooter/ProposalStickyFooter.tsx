@@ -5,8 +5,8 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getProposalErrors } from 'lib/proposal/getProposalErrors';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { getProposalErrors } from 'lib/proposals/getProposalErrors';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 export function ProposalStickyFooter({
   proposal,

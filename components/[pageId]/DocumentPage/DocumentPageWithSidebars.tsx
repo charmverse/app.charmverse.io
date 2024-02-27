@@ -6,7 +6,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';

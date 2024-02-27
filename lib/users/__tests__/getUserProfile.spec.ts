@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from '../getUser';

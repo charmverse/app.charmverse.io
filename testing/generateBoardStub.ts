@@ -6,7 +6,7 @@ import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
 import type { CardFields } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 import { pageContentStub } from './generatePageStub';
 

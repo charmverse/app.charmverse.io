@@ -10,7 +10,7 @@ import requireValidation from 'lib/middleware/requireValidation';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { processTokenGateConditions } from 'lib/tokenGates/processTokenGateConditions';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -22,7 +22,7 @@ import { validate } from 'uuid';
 
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 export type PageWithBlocks = {
   blocks: {

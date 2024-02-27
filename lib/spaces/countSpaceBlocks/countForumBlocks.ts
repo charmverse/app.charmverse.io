@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
 
 import { countBlocks } from 'lib/prosemirror/countBlocks';
-import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
+import { defaultPaginatedPrismaTaskBatchSize, paginatedPrismaTask } from 'lib/utils/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 

@@ -11,8 +11,8 @@ import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/
 import { v4 as uuid } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
-import type { ProposalFields } from 'lib/proposal/interface';
-import { getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
+import type { ProposalFields } from 'lib/proposals/interfaces';
+import { getDefaultPermissions } from 'lib/proposals/workflows/defaultEvaluation';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];

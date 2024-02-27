@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { createBoardPropertyOptions } from 'components/common/PageActions/utils/databasePageOptions';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { TypeformFields, TypeformResponse } from './interfaces';
 

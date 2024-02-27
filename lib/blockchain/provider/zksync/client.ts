@@ -8,7 +8,7 @@ import { Provider } from 'zksync-web3';
 
 import { GET } from 'adapters/http';
 import type { NFTData } from 'lib/blockchain/getNFTs';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { supportedNetworks, type SupportedChainId } from './config';
 

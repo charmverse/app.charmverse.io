@@ -6,20 +6,20 @@ import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
   ProposalBlockWithTypedFields
-} from 'lib/proposal/blocks/interfaces';
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
-import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
-import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
-import type { ProposalTemplateMeta } from 'lib/proposal/getProposalTemplates';
-import type { GoBackToStepRequest } from 'lib/proposal/goBackToStep';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
-import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
-import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
+} from 'lib/proposals/blocks/interfaces';
+import type { CreateProposalInput } from 'lib/proposals/createProposal';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { RubricProposalsUserInfo } from 'lib/proposals/getProposalsEvaluatedByUser';
+import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
+import type { GoBackToStepRequest } from 'lib/proposals/goBackToStep';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
+import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
+import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
+import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
+import type { UpdateProposalLensPropertiesRequest } from 'lib/proposals/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
 import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';

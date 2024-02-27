@@ -11,8 +11,8 @@ import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { DisabledAccountError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 
 type LoginWithDiscord = {
   code: string;

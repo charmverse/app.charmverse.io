@@ -1,6 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 
-import { stringToValidPath } from 'lib/utilities/strings';
+import { stringToValidPath } from 'lib/utils/strings';
 
 export function getPagePath() {
   return `page-${Math.random().toString().replace('0.', '')}`;

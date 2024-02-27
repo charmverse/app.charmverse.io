@@ -11,7 +11,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';

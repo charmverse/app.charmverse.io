@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';

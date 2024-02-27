@@ -11,7 +11,7 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
 import { DocumentPageWithSidebars } from '../DocumentPage/DocumentPageWithSidebars';

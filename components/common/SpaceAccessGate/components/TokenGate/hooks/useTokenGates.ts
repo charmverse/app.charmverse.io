@@ -9,7 +9,7 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
 import type { TokenGateJoinType, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 type Props = {
   account?: string | null;

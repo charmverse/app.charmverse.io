@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { MissingDataError } from 'lib/utilities/errors';
+import { MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 export async function getUserProfile(

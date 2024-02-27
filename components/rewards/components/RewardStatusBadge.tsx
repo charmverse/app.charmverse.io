@@ -11,8 +11,8 @@ import millify from 'millify';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { fancyTrim } from 'lib/utilities/strings';
-import { isTruthy } from 'lib/utilities/types';
+import { fancyTrim } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 
 import { RewardStatusChip } from './RewardChip';
 

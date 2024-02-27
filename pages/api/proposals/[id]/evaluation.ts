@@ -4,8 +4,8 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
-import { updateProposalEvaluation } from 'lib/proposal/updateProposalEvaluation';
+import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
+import { updateProposalEvaluation } from 'lib/proposals/updateProposalEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

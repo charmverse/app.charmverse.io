@@ -7,7 +7,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposals/interfaces';
 
 import { RubricAnswersForm } from './RubricAnswersForm';
 import { RubricResults } from './RubricResults';

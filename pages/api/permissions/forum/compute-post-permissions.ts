@@ -7,8 +7,8 @@ import { PostNotFoundError } from 'lib/forums/posts/errors';
 import { onError, onNoMatch } from 'lib/middleware';
 import { getPermissionsClient } from 'lib/permissions/api';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { isUUID } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

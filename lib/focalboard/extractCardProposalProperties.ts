@@ -1,6 +1,6 @@
 import type { Block } from '@charmverse/core/prisma';
 
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 import type { CardFields, CardPropertyValue } from './card';
 import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';

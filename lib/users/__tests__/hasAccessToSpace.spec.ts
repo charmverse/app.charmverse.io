@@ -3,8 +3,8 @@ import { SpaceRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { InvalidInputError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
 import { AdministratorOnlyError, UserIsGuestError, UserIsNotSpaceMemberError } from '../errors';

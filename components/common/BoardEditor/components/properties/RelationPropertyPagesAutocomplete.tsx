@@ -5,7 +5,7 @@ import type { PageListItem } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { PagesAutocomplete } from './PagesAutocomplete';
 

@@ -29,7 +29,7 @@ import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';

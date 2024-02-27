@@ -17,7 +17,7 @@ import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useReservoir } from 'hooks/useReservoir';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { isValidUrl } from 'lib/utils/isValidUrl';
 
 import BlockAligner from '../../BlockAligner';
 import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';

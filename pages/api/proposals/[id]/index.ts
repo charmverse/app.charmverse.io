@@ -4,10 +4,10 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposal } from 'lib/proposal/getProposal';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import { updateProposal } from 'lib/proposal/updateProposal';
+import { getProposal } from 'lib/proposals/getProposal';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
+import { updateProposal } from 'lib/proposals/updateProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

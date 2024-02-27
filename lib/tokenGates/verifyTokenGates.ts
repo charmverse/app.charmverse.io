@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import { DataNotFoundError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 
 import type { TokenGateWithRoles } from './interfaces';
 import { validateTokenGate } from './validateTokenGate';

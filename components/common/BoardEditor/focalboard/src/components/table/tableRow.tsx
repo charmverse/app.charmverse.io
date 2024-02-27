@@ -23,8 +23,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { isTouchScreen } from 'lib/utilities/browser';
-import { mergeRefs } from 'lib/utilities/react';
+import { isTouchScreen } from 'lib/utils/browser';
+import { mergeRefs } from 'lib/utils/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
 import { Utils } from '../../utils';
