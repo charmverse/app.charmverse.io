@@ -7,8 +7,8 @@ import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent'
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import { shortWalletAddress, randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { uid } from 'lib/utilities/strings';
+import { shortWalletAddress, randomETHWalletAddress } from 'lib/utils/blockchain';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';

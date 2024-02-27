@@ -5,8 +5,8 @@ import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getNFT, verifyNFTOwner } from 'lib/blockchain/getNFTs';
 import { sessionUserRelations } from 'lib/session/config';
 import type { UserAvatar } from 'lib/users/interfaces';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+import { InvalidInputError } from 'lib/utils/errors';
+import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
 import type { LoggedInUser } from 'models';
 
 export async function updateProfileAvatar({
