@@ -15,7 +15,7 @@ handler.get(getTemplateController);
 
 async function getTemplateController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const pageId = req.query.id as string;
-  const userId = req.session.user.id as string | undefined;
+  const userId = req.session.user?.id as string | undefined;
 
   if (!pageId) {
     throw new InvalidInputError('Page ID is required');

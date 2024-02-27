@@ -80,4 +80,15 @@ describe('GET /api/proposals/templates/{templateId} - get a proposal template', 
       .set('Cookie', nonAdminCookie)
       .expect(404);
   });
+
+  it('should get a proposal template and respond with 200 for public user', async () => {
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: adminUser.id,
+      authors: [adminUser.id],
+      pageType: 'proposal_template'
+    });
+
+    await request(baseUrl).get(`/api/proposals/templates/${proposalTemplate.id}`).expect(200);
+  });
 });
