@@ -7,7 +7,7 @@ import {
   getWorkflowTemplates,
   upsertWorkflowTemplate,
   deleteWorkflowTemplate
-} from 'lib/proposal/workflows/controller';
+} from 'lib/proposals/workflows/controller';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 

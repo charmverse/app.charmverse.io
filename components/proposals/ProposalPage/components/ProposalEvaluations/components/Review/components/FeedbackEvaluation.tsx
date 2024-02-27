@@ -6,7 +6,7 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { Button } from 'components/common/Button';
 import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 
 export type Props = {

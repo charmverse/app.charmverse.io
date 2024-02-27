@@ -42,7 +42,7 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
-} from 'lib/proposal/blocks/constants';
+} from 'lib/proposals/blocks/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import { useSortable } from '../../hooks/sortable';

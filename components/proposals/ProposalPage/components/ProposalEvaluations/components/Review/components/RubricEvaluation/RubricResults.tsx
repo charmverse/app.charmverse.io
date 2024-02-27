@@ -19,9 +19,9 @@ import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import UserDisplay from 'components/common/UserDisplay';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
-import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { isNumber } from 'lib/utilities/numbers';
 
 import { PassFailEvaluation } from '../PassFailEvaluation';

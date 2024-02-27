@@ -8,7 +8,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalPendingReward } from 'lib/proposal/interface';
+import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utilities/dates';
 import { isTruthy } from 'lib/utilities/types';
 

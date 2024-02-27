@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, requireUser, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getOrCreateReviewerNotes } from 'lib/proposal/getOrCreateReviewerNotes';
+import { getOrCreateReviewerNotes } from 'lib/proposals/getOrCreateReviewerNotes';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utilities/errors';
 

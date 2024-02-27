@@ -5,8 +5,8 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposals } from 'lib/proposal/getProposals';
-import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import { getProposals } from 'lib/proposals/getProposals';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

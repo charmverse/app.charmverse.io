@@ -6,7 +6,7 @@ import type {
   ProposalEvaluationResultExtended,
   ProposalEvaluationStatus,
   ProposalEvaluationStep
-} from 'lib/proposal/interface';
+} from 'lib/proposals/interfaces';
 import type { BrandColor } from 'theme/colors';
 
 export const proposalDbProperties: {

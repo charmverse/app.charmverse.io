@@ -5,7 +5,7 @@ import { testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 

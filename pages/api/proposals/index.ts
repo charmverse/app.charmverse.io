@@ -7,8 +7,8 @@ import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProf
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
-import { createProposal } from 'lib/proposal/createProposal';
+import type { CreateProposalInput } from 'lib/proposals/createProposal';
+import { createProposal } from 'lib/proposals/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { relay } from 'lib/websockets/relay';

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { OptionalNullable } from 'lib/utilities/types';
 
 type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations'>> & {

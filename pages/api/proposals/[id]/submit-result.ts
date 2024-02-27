@@ -6,8 +6,8 @@ import nc from 'next-connect';
 import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
-import { submitEvaluationResult } from 'lib/proposal/submitEvaluationResult';
+import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
+import { submitEvaluationResult } from 'lib/proposals/submitEvaluationResult';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

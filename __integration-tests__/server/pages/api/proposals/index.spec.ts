@@ -5,7 +5,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
+import type { CreateProposalInput } from 'lib/proposals/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

@@ -6,8 +6,8 @@ import { v4 as uuid } from 'uuid';
 import { isTruthy } from 'lib/utilities/types';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
-import { createProposal } from 'lib/proposal/createProposal';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { createProposal } from 'lib/proposals/createProposal';
 
 // Import rows from a CSV that answer questions on a proposal template
 const templateId = '23630cb0-8a55-4bea-acf5-0f65579302e4';

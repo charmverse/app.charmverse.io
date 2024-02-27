@@ -3,8 +3,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, NotFoundError } from 'lib/middleware';
-import { getProposalTemplate } from 'lib/proposal/getProposalTemplate';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { getProposalTemplate } from 'lib/proposals/getProposalTemplate';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { InvalidInputError } from 'lib/utilities/errors';

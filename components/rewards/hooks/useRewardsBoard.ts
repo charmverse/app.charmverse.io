@@ -5,7 +5,7 @@ import { getDefaultBoard } from 'components/rewards/components/RewardsBoard/util
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type {
   RewardBlockInput,
   RewardBlockUpdateInput,

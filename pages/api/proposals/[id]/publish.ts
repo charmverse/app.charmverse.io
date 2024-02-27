@@ -8,8 +8,8 @@ import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issuePropos
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposalErrors } from 'lib/proposal/getProposalErrors';
-import { publishProposal } from 'lib/proposal/publishProposal';
+import { getProposalErrors } from 'lib/proposals/getProposalErrors';
+import { publishProposal } from 'lib/proposals/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
