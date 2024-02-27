@@ -337,12 +337,20 @@ export class WebSocketConnector {
         // message is empty
         return;
       }
+      const historyPlugin = this.editor.view.state.plugins.find((plugin) => (plugin as any).key === 'history$');
+      const historyPluginState = historyPlugin?.getState(this.editor.view.state);
       this.messages.client += 1;
+
       const wrappedMessage: WrappedMessage = {
         ...data,
         c: this.messages.client,
         s: this.messages.server
       };
+
+      if (wrappedMessage.type === 'diff') {
+        wrappedMessage.undo = historyPluginState?.prevRanges === null ?? false;
+      }
+
       this.messages.lastTen.push(wrappedMessage);
       this.messages.lastTen = this.messages.lastTen.slice(-10);
       this.waitForWS().then(() => {
