@@ -1,8 +1,7 @@
-import { guild } from '@guildxyz/sdk';
+import { guild, user } from 'lib/guild-xyz/client';
 
-export async function getUserMemberships(guildUrlOrId: string | number, address: string) {
-  const resp = await guild.get(guildUrlOrId);
-  const memberships = await guild.getUserMemberships(resp.id, address);
+export async function getUserMemberships(address: string) {
+  const memberships = await user.getMemberships(address);
 
   return memberships;
 }
