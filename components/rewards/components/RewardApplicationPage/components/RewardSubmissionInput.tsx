@@ -1,4 +1,3 @@
-import { isEmptyDocument } from '@bangle.dev/utils';
 import type { Application } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormLabel } from '@mui/material';

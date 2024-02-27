@@ -1,9 +1,5 @@
 import type { Command, EditorState, Node, NodeRange, NodeType, ResolvedPos, Schema, Transaction } from '@bangle.dev/pm';
 import {
-  autoJoin,
-  chainCommands,
-  Fragment,
-  liftListItem,
   liftTarget,
   NodeSelection,
   ReplaceAroundStep,
@@ -26,8 +22,6 @@ import {
   GapCursorSelection,
   hasParentNodeOfType,
   hasVisibleContent,
-  isEmptySelectionAtStart,
-  isFirstChildOfParent,
   isNodeEmpty,
   isRangeOfType,
   safeInsert,
@@ -35,6 +29,9 @@ import {
   validListParent,
   validPos
 } from '@bangle.dev/utils';
+import { autoJoin } from 'prosemirror-commands';
+import { Fragment } from 'prosemirror-model';
+import { liftListItem } from 'prosemirror-schema-list';
 
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';

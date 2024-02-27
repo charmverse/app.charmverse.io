@@ -1,9 +1,8 @@
-import type { Command } from '@bangle.dev/pm';
-import { chainCommands } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
-import { filter, isEmptySelectionAtStart, isFirstChildOfParent } from '@bangle.dev/utils';
+import { filter, isEmptySelectionAtStart } from '@bangle.dev/utils';
+import { chainCommands } from 'prosemirror-commands';
 import type { Node, NodeType } from 'prosemirror-model';
-import type { EditorState } from 'prosemirror-state';
+import type { Command, EditorState } from 'prosemirror-state';
 import { findParentNodeOfType } from 'prosemirror-utils';
 
 import { mergeListItemDown, mergeListItemUp } from './mergeListItems';

@@ -1,9 +1,10 @@
-import { markdownSerializer } from '@bangle.dev/markdown';
 import { Node } from '@bangle.dev/pm';
 
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { Member } from 'lib/members/interfaces';
+
+import { markdownSerializer } from './markdownSerializer';
 
 export type CharmMarkdownGeneratorOptions = {
   members?: Member[];
