@@ -19,7 +19,7 @@ export async function updateAllowedPlaybackDomains() {
       }
     });
     const customDomains = spaces.map((space) => space.customDomain).filter(isTruthy);
-    mux.Video.PlaybackRestrictions.putReferrer(playbackRestrictionId, {
+    mux.video.playbackRestrictions.updateReferrer(playbackRestrictionId, {
       allowed_domains: charmVerseDomains.concat(customDomains)
     });
     log.info('Updated referrers for mux playback restriction', { customDomains });
