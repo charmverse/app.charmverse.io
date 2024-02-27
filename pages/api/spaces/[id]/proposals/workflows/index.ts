@@ -9,7 +9,7 @@ import {
   deleteWorkflowTemplate
 } from 'lib/proposals/workflows/controller';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = defaultHandler();
 

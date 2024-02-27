@@ -1,4 +1,4 @@
-import { isExternalUrl } from 'lib/utilities/isExternalUrl';
+import { isExternalUrl } from 'lib/utils/isExternalUrl';
 
 describe('isExternalUrl', () => {
   it('should detect valid external url, when origin is not provided', () => {

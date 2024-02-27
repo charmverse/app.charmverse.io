@@ -6,7 +6,7 @@ import { v4 } from 'uuid';
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { InvalidStateError } from 'lib/middleware';
 import type { ProposalFields } from 'lib/proposals/interfaces';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';

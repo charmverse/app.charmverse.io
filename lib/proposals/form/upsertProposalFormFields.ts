@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
 export async function upsertProposalFormFields({
   proposalId,

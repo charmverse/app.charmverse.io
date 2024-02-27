@@ -39,11 +39,11 @@ import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { uniqueValues } from 'lib/utilities/array';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
-import { uid } from 'lib/utilities/strings';
+import { uniqueValues } from 'lib/utils/array';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { InvalidInputError } from 'lib/utils/errors';
+import { typedKeys } from 'lib/utils/objects';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import type { CustomBoardProps } from './generateBoardStub';

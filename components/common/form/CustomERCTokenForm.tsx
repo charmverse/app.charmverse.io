@@ -18,7 +18,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utils/errors';
 
 export type FormMode = 'create' | 'update';
 

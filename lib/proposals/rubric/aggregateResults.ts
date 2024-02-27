@@ -2,7 +2,7 @@ import { arrayUtils } from '@charmverse/core/utilities';
 import { mean, sum } from 'lodash';
 
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { isNumber, roundNumber } from 'lib/utilities/numbers';
+import { isNumber, roundNumber } from 'lib/utils/numbers';
 
 /**
  * null if no answers available

@@ -1,7 +1,7 @@
 import { Img } from '@react-email/img';
 
-import { stringToColor } from 'lib/utilities/strings';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { stringToColor } from 'lib/utils/strings';
+import { replaceS3Domain } from 'lib/utils/url';
 
 import Text from './Text';
 

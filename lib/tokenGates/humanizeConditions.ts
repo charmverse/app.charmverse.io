@@ -3,7 +3,7 @@ import type { TypographyProps } from '@mui/material/Typography';
 import { getChainById } from 'connectors/chains';
 import { formatEther } from 'viem';
 
-import { shortWalletAddress } from 'lib/utilities/blockchain';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 
 import type { Operator, TokenGate } from './interfaces';
 

@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { defaultPostCategories } from 'lib/forums/categories/generateDefaultPostCategories';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
 import { staticSpaceTemplates } from '../config';

@@ -24,7 +24,7 @@ import { getThreadsKey } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';

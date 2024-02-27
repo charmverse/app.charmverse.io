@@ -12,7 +12,11 @@ async function search() {
     include: {
       proposal: {
         include: {
-          evaluations: true
+          evaluations: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
         }
       }
     }

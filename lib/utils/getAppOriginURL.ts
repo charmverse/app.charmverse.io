@@ -1,6 +1,6 @@
 import { appSubdomain, isDevEnv, isStagingEnv } from 'config/constants';
-import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { isLocalhostAlias } from 'lib/utilities/domains/isLocalhostAlias';
+import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
+import { isLocalhostAlias } from 'lib/utils/domains/isLocalhostAlias';
 
 import { getSpaceDomainFromHost } from './domains/getSpaceDomainFromHost';
 

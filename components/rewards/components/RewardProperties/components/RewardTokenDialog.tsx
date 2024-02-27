@@ -16,7 +16,7 @@ import { RewardTokenSelect } from 'components/rewards/components/RewardPropertie
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 type FormInput = {
   chainId?: number;

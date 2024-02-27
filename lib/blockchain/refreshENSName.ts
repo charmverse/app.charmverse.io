@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getUserProfile } from 'lib/users/getUser';
-import { matchWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { matchWalletAddress } from 'lib/utils/blockchain';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 import { getENSName } from './getENSName';

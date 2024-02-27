@@ -24,7 +24,7 @@ import { useDrag, useDrop } from 'react-dnd';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { mergeRefs } from 'lib/utilities/react';
+import { mergeRefs } from 'lib/utils/react';
 
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';

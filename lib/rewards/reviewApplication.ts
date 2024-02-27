@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { getReward } from 'lib/rewards/getReward';
 import { verifyOrRejectApplications } from 'lib/rewards/verifyOrRejectApplications';
-import { DataNotFoundError, WrongStateError } from 'lib/utilities/errors';
+import { DataNotFoundError, WrongStateError } from 'lib/utils/errors';
 
 import { rollupRewardStatus } from './rollupRewardStatus';
 

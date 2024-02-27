@@ -3,7 +3,7 @@ import { FormFieldAnswer } from '@charmverse/core/prisma';
 import Papa from 'papaparse';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';

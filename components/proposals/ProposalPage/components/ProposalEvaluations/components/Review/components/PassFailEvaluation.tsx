@@ -9,7 +9,7 @@ import { allMembersSystemRole } from 'components/settings/proposals/components/E
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 export type Props = {
   hideReviewer?: boolean;

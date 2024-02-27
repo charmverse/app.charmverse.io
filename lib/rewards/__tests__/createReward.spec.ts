@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { RewardCreationData } from '../createReward';
 import { createReward } from '../createReward';

@@ -3,7 +3,7 @@ import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
 import { TENANT_URLS } from 'lib/summon/constants';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateUserAndSpace, generateSpaceUser } from 'testing/setupDatabase';
 
 import { getSummonProfile } from '../getSummonProfile';

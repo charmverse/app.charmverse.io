@@ -21,8 +21,8 @@ import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
-import { highlightDomElement, setUrlWithoutRerender } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
+import { highlightDomElement, setUrlWithoutRerender } from 'lib/utils/browser';
+import { isTruthy } from 'lib/utils/types';
 
 const Center = styled.div`
   text-align: center;

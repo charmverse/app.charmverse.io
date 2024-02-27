@@ -13,7 +13,7 @@ import { providePermissionClients } from 'lib/permissions/api/permissionsClientM
 import { withSessionRoute } from 'lib/session/withSession';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler

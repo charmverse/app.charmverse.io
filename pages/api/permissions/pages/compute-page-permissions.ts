@@ -8,8 +8,8 @@ import { PageNotFoundError } from 'lib/pages/server';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { isUUID } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { isUUID } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

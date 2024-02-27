@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
-import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UndesirableOperationError } from 'lib/utils/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

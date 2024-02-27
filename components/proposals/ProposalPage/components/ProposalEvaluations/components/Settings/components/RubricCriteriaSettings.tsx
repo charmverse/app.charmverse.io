@@ -11,7 +11,7 @@ import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { getNumberFromString } from 'lib/utilities/numbers';
+import { getNumberFromString } from 'lib/utils/numbers';
 
 export type RangeProposalCriteria = {
   id: string;

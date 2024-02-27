@@ -8,7 +8,7 @@ import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPe
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { PermissionResource } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

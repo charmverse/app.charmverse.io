@@ -2,9 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utils/blockchain';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { refreshENSName } from '../refreshENSName';

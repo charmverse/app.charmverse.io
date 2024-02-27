@@ -8,7 +8,7 @@ import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { reviewApplication } from 'lib/rewards/reviewApplication';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

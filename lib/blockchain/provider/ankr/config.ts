@@ -1,4 +1,4 @@
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 // Find supported chains:  https://www.npmjs.com/package/@ankr.com/ankr.js
 // Note: we commented out chains already supported by alchemy

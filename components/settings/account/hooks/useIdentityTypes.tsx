@@ -5,8 +5,8 @@ import type { IntegrationModel } from 'components/settings/profile/components/Id
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useUser } from 'hooks/useUser';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
-import randomName from 'lib/utilities/randomName';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
+import randomName from 'lib/utils/randomName';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useLensProfile } from './useLensProfile';

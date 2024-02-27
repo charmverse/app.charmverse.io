@@ -10,7 +10,7 @@ import type { RoleAssignment, RoleWithMembers } from 'lib/roles';
 import { assignRole, unassignRole } from 'lib/roles';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

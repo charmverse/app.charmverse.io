@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';

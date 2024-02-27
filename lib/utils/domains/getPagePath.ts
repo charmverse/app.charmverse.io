@@ -1,6 +1,6 @@
 import type { ParsedUrlQuery } from 'querystring';
 
-import { addQueryToUrl } from 'lib/utilities/url';
+import { addQueryToUrl } from 'lib/utils/url';
 
 import { getCustomDomainFromHost } from './getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from './getSpaceDomainFromHost';

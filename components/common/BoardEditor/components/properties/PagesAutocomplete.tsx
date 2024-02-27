@@ -22,7 +22,7 @@ import type { PageListItem } from 'components/common/PagesList';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 

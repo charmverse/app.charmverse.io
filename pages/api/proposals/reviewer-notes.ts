@@ -6,7 +6,7 @@ import { ActionNotPermittedError, requireUser, onError, onNoMatch } from 'lib/mi
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getOrCreateReviewerNotes } from 'lib/proposals/getOrCreateReviewerNotes';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

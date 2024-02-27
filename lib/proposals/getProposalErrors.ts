@@ -1,7 +1,7 @@
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import { validateAnswers } from 'lib/forms/validateAnswers';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
 

@@ -1,4 +1,4 @@
-import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
 
 export function getValidDefaultHost(host?: string | null) {
   if (!host && typeof window !== 'undefined') {

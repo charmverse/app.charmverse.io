@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
 import { validateAnswers } from 'lib/forms/validateAnswers';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 export type RubricAnswerUpsert = {
   proposalId: string;

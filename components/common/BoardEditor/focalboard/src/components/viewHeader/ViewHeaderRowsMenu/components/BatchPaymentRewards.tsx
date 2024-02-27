@@ -14,7 +14,7 @@ import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { PropertyMenu } from './PropertyMenu';
 

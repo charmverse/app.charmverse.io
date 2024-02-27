@@ -59,7 +59,7 @@ import {
 } from 'lib/rewards/blocks/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { ProposalNotesLink } from '../../../components/properties/ProposalNotesLink';
