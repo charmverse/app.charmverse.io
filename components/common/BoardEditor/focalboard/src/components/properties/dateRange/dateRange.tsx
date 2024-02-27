@@ -84,7 +84,6 @@ function DateRangePicker(props: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'dateRangePopup' });
   const { className, value, showEmptyPlaceholder, onChange } = props;
   const [dateProperty, setDateProperty] = useState<DateProperty>(createDatePropertyFromString(value as string));
-  const [datesPicked, setDatesPicked] = useState(0); // a state to keep track of whether user is picking start or end date
 
   function getDisplayDate(date: DateTime | null | undefined) {
     let displayDate = '';
@@ -131,9 +130,6 @@ function DateRangePicker(props: Props) {
   }
 
   function handleDayClick(date: DateTime | null) {
-    setDatesPicked(datesPicked + 1);
-    const isSettingEndDate = datesPicked % 2 !== 0;
-    // return;
     const range: DateProperty = {};
     if (date && isRange) {
       const newRange = addToRange(date, { from: dateFrom!, to: dateTo });
@@ -192,7 +188,17 @@ function DateRangePicker(props: Props) {
         alignItems={props.centerContent ? 'center' : 'flex-start'}
         className='octo-propertyvalue'
         data-testid='select-non-editable'
-        {...bindTrigger(popupState)}
+        onClick={(e) => {
+          if (!dateFrom) {
+            // add default start date
+            saveRangeValue({
+              from: DateTime.local().toMillis(),
+              to: undefined
+            });
+          }
+          popupState.open(e);
+        }}
+        // {...bindTrigger(popupState)}
         style={{ minHeight: '20px', minWidth: '25px' }}
       >
         {displayValue || (!displayValue && !showEmptyPlaceholder) ? (
@@ -204,6 +210,7 @@ function DateRangePicker(props: Props) {
       <Popover {...bindPopover(popupState)} onClose={onClose}>
         <Box display='flex' p={1} gap={1}>
           <TextField
+            autoFocus
             fullWidth={!dateTo}
             sx={{ width: dateTo ? '148px' : undefined }}
             size='small'
