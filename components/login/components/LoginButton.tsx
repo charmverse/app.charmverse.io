@@ -21,7 +21,7 @@ import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { SystemError } from 'lib/utilities/errors';
+import type { SystemError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models/User';
 
 import { DiscordLoginHandler } from './DiscordLoginHandler';

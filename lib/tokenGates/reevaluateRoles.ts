@@ -4,7 +4,7 @@ import type { AuthSig } from 'lib/blockchain/interfaces';
 import { getSpaceMembershipWithRoles } from 'lib/spaces/getSpaceMembershipWithRoles';
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { evaluateTokenGateEligibility } from 'lib/tokenGates/evaluateEligibility';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 export async function reevaluateRoles({
   authSig,

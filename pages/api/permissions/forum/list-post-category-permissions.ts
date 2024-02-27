@@ -6,7 +6,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { listPostCategoryPermissions } from 'lib/permissions/forum/listPostCategoryPermissions';
 import type { PermissionCompute } from 'lib/permissions/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -13,8 +13,8 @@ import {
   InsecureOperationError,
   InvalidInputError,
   UnauthorisedActionError
-} from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+} from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 
 import type { TokenGateJoinType } from './interfaces';
 import { verifyTokenGates } from './verifyTokenGates';

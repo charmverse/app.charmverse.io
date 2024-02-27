@@ -11,7 +11,7 @@ import {
 } from 'testing/setupDatabase';
 
 import { ExpectedAnError } from '../../../testing/errors';
-import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '../../utilities/errors';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from '../../utils/errors';
 
 let user: User;
 let space: Space;

@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

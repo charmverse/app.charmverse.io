@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import { getTimezonesWithOffset, toHoursAndMinutes } from 'lib/utilities/dates';
+import { getTimezonesWithOffset, toHoursAndMinutes } from 'lib/utils/dates';
 
 export interface Timezone {
   tz: string;

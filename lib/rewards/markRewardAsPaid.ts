@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { paidRewardStatuses } from './constants';
 import { getRewardOrThrow, rewardWithUsersInclude } from './getReward';

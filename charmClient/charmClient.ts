@@ -25,7 +25,7 @@ import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';

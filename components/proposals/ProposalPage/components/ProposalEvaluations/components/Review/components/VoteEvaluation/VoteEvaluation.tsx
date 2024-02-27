@@ -10,7 +10,7 @@ import { VoteDetail } from 'components/common/CharmEditor/components/inlineVote/
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric, PopulatedEvaluation } from 'lib/proposals/interfaces';
 
 import { PublishToSnapshot } from './components/PublishToSnapshot/PublishToSnapshot';
 import { SnapshotVoteDetails } from './components/SnapshotVoteDetails';

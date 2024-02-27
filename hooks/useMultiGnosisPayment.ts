@@ -12,7 +12,7 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from 'lib/gnosis/mantleClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { useCreateSafes } from './useCreateSafes';
 

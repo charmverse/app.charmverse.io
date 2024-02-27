@@ -5,7 +5,7 @@ import { memo } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 import type { PageSidebarView } from '../../hooks/usePageSidebar';

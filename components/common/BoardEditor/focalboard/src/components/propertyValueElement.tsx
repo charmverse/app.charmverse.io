@@ -41,9 +41,9 @@ import {
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
-import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
+import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import {
   DUE_DATE_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
@@ -59,7 +59,7 @@ import {
 } from 'lib/rewards/blocks/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import { ProposalNotesLink } from '../../../components/properties/ProposalNotesLink';

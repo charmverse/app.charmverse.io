@@ -93,4 +93,30 @@ export function getCollectablesAccessControlConditions(values: FormValues): Acce
       ];
     }
   }
+  if (collectableOption === 'Unlock' && contract) {
+    return [
+      {
+        condition: 'evm',
+        contractAddress: contract,
+        type: collectableOption,
+        chain: chainId,
+        method: 'getHasValidKey',
+        tokenIds: [],
+        quantity: '1'
+      }
+    ];
+  }
+  if (collectableOption === 'Hypersub' && contract) {
+    return [
+      {
+        condition: 'evm',
+        contractAddress: contract,
+        type: collectableOption,
+        chain: chainId,
+        method: 'balanceOf',
+        tokenIds: [],
+        quantity: '1'
+      }
+    ];
+  }
 }

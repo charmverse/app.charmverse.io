@@ -31,7 +31,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { PageIcon } from '../../PageIcon';
 

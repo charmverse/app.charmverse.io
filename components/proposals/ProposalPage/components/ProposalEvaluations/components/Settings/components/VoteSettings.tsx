@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
-import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
+import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
 
 type CreateVoteModalProps = {
   readOnly?: boolean;

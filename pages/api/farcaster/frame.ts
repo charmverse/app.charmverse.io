@@ -9,7 +9,7 @@ import * as http from 'adapters/http';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isLocalhostUrl } from 'lib/utilities/strings';
+import { isLocalhostUrl } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

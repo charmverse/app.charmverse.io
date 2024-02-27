@@ -6,9 +6,9 @@ import request from 'supertest';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import { upsertRubricCriteria } from 'lib/proposal/rubric/upsertRubricCriteria';
+} from 'lib/proposals/rubric/interfaces';
+import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
+import { upsertRubricCriteria } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/proposals/[id]/rubric-answers - Update proposal rubric criteria answers', () => {

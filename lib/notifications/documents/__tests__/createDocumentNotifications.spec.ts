@@ -13,7 +13,7 @@ import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { work } from 'lib/rewards/work';
 import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import {
   getApplicationCommentEntity,
   getCommentEntity,

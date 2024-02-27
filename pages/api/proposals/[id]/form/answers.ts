@@ -5,11 +5,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
-import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
+import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposalFormAnswers } from 'lib/proposal/form/getProposalFormAnswers';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import { getProposalFormAnswers } from 'lib/proposals/form/getProposalFormAnswers';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

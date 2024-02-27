@@ -2,8 +2,8 @@ import { GET, PUT } from '@charmverse/core/http';
 import { getChainById } from 'connectors/chains';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
-import { paginatedCall } from 'lib/utilities/async';
-import { isTruthy } from 'lib/utilities/types';
+import { paginatedCall } from 'lib/utils/async';
+import { isTruthy } from 'lib/utils/types';
 
 import type { NFTData } from '../../getNFTs';
 import { toInt } from '../ankr/client';

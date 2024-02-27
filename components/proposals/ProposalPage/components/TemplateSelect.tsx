@@ -1,5 +1,5 @@
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 const maxTitleLength = 35;
 

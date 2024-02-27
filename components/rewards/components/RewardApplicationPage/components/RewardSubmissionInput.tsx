@@ -20,7 +20,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardType } from 'lib/rewards/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { SystemError } from 'lib/utilities/errors';
+import type { SystemError } from 'lib/utils/errors';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 

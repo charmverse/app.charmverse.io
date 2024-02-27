@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { ChangeEvent } from 'react';
 
 import { useIMEComposition } from 'hooks/useIMEComposition';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 const StyledPageTitle = styled(TextField)`
   &.MuiFormControl-root {

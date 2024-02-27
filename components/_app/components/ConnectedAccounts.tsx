@@ -14,7 +14,7 @@ import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { shortenHex } from 'lib/utilities/blockchain';
+import { shortenHex } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 

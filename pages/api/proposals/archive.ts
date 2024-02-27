@@ -4,8 +4,8 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposals';
-import { archiveProposals } from 'lib/proposal/archiveProposals';
+import type { ArchiveProposalRequest } from 'lib/proposals/archiveProposals';
+import { archiveProposals } from 'lib/proposals/archiveProposals';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

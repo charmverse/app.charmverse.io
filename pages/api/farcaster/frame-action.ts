@@ -9,8 +9,8 @@ import { createFrameActionMessageWithSignerKey } from 'lib/farcaster/createFrame
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { decryptData } from 'lib/utilities/dataEncryption';
-import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { decryptData } from 'lib/utils/dataEncryption';
+import { isValidUrl } from 'lib/utils/isValidUrl';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

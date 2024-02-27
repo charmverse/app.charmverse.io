@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 

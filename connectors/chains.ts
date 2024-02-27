@@ -28,7 +28,8 @@ import {
 } from 'viem/chains';
 
 import { isProdEnv } from 'config/constants';
-import { uniqueValues } from 'lib/utilities/array';
+import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
+import { uniqueValues } from 'lib/utils/array';
 
 export interface IChainDetails {
   chainId: number;
@@ -525,10 +526,12 @@ export function getChainExplorerLink(
   return '';
 }
 
-export const alchemyChains = RPCList.filter((chain) => !!chain.alchemyUrl).sort(sortChainList);
+export const ercSupportedChains = RPCList.filter((chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId)).sort(
+  sortChainList
+);
 
 export const daoChains = RPCList.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon'].includes(chain.chainName.toLowerCase())
+  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
 );
 
 export const builderDaoChains = RPCList.filter((chain) =>

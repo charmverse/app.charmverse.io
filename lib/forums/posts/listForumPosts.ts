@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PaginatedResponse } from 'lib/public-api';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { PostSortOption } from './constants';
 import { defaultPostsPerResult, postSortOptions } from './constants';

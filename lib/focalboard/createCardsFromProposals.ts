@@ -6,13 +6,13 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import type { ProposalFields } from 'lib/proposal/interface';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
+} from 'lib/proposals/rubric/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';

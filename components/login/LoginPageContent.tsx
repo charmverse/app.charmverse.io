@@ -10,8 +10,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import type { ErrorType } from 'lib/utilities/errors';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
+import type { ErrorType } from 'lib/utils/errors';
 import splashImage from 'public/images/artwork/world.png';
 
 import { LoginButton } from './components/LoginButton';

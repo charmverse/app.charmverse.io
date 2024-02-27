@@ -5,7 +5,7 @@ import { getClient } from 'lib/google/authorization/authClient';
 import { loginWithGoogle } from 'lib/google/loginWithGoogle';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 export type LoginWithGoogleRequest = {
