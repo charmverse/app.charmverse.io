@@ -93,6 +93,7 @@ function simplifyTypeformAnswers(payload: Typeform.Response['answers']) {
           // @ts-ignore
           return { id, answer: (answer.phone_number as string | undefined) || '' };
         case 'choice':
+          // @ts-ignore see https://github.com/Typeform/js-api-client/issues/110
           return { id, answer: answer.choice?.label || answer.choice?.other };
         case 'choices':
           return {
