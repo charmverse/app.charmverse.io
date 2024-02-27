@@ -23,10 +23,8 @@ export type TokenGateVerificationRequest = {
   spaceId: string;
   tokenGateIds: string[];
   commit: boolean;
-  walletAddress: string;
   joinType?: TokenGateJoinType;
   reevaluate?: boolean;
-  authSig?: AuthSig;
 };
 
 type TokenGateVerificationResult = {
@@ -39,8 +37,7 @@ export async function applyTokenGates({
   userId,
   tokenGateIds,
   commit,
-  reevaluate = false,
-  walletAddress
+  reevaluate = false
 }: TokenGateVerificationRequest & { userId: string }): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
@@ -98,7 +95,7 @@ export async function applyTokenGates({
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
-  const verifiedTokenGates = await verifyTokenGates({ spaceId, userId, tokenGateIds, walletAddress });
+  const verifiedTokenGates = await verifyTokenGates({ spaceId, userId, tokenGateIds });
 
   if (verifiedTokenGates.length === 0) {
     trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });

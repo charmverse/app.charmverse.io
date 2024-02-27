@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -6,7 +5,7 @@ import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TokenGateWithRoles } from './interfaces';
-import { validateTokenGate } from './validateTokenGate';
+import { validateTokenGateWithMultipleWallets } from './validateTokenGate';
 
 export type TokenGateResult = TokenGateWithRoles & { grantedRoles: string[]; verified: boolean };
 
@@ -14,40 +13,34 @@ type Props = {
   userId: string;
   spaceId: string;
   tokenGateIds: string[];
-  walletAddress: string;
 };
 
-export async function verifyTokenGates({
-  spaceId,
-  userId,
-  tokenGateIds,
-  walletAddress
-}: Props): Promise<TokenGateResult[]> {
-  const space = await prisma.space.findUniqueOrThrow({
+export async function verifyTokenGates({ spaceId, userId, tokenGateIds }: Props): Promise<TokenGateResult[]> {
+  const tokenGates = await prisma.tokenGate.findMany({
     where: {
-      id: spaceId
+      spaceId
     },
     include: {
-      roles: true,
-      tokenGates: {
+      tokenGateToRoles: {
         include: {
-          tokenGateToRoles: {
-            include: {
-              role: true
-            }
-          }
+          role: true
         }
       }
     }
   });
-
-  const { tokenGates } = space;
 
   // We need to have at least one token gate that succeeded in order to proceed
   if (tokenGates.length === 0) {
     trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new DataNotFoundError('No token gates were found for this space.');
   }
+
+  const wallets = await prisma.userWallet.findMany({ where: { userId } });
+
+  if (wallets.length === 0) {
+    return [];
+  }
+
   const verifiedTokenGates: TokenGateResult[] = (
     await Promise.all(
       tokenGateIds.map(async (tkId) => {
@@ -57,10 +50,7 @@ export async function verifyTokenGates({
           return null;
         }
 
-        const verified = await validateTokenGate(matchingTokenGate, walletAddress).catch((error) => {
-          log.debug(`Error verifying token gate`, { tokenGateId: matchingTokenGate.id, error });
-          return null;
-        });
+        const verified = await validateTokenGateWithMultipleWallets(matchingTokenGate, wallets);
 
         if (!verified) {
           return null;

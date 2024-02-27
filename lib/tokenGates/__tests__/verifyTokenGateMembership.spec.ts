@@ -102,8 +102,7 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate.id],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate.id]
     });
     await deleteTokenGate(tokenGate.id);
 
@@ -143,8 +142,7 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id, tokenGate2.id, tokenGate3.id, tokenGate4.id],
-      walletAddress: '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4'
+      tokenGateIds: [tokenGate1.id, tokenGate2.id, tokenGate3.id, tokenGate4.id]
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -174,8 +172,7 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id, tokenGate2.id],
-      walletAddress
+      tokenGateIds: [tokenGate1.id, tokenGate2.id]
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -209,8 +206,7 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id, tokenGate2.id],
-      walletAddress
+      tokenGateIds: [tokenGate1.id, tokenGate2.id]
     });
 
     const verifyUser = (await getSpaceUser()) as UserToVerifyMembership;
@@ -249,8 +245,7 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id, tokenGate2.id],
-      walletAddress
+      tokenGateIds: [tokenGate1.id, tokenGate2.id]
     });
     await deleteTokenGate(tokenGate1.id);
 
@@ -292,8 +287,7 @@ describe('verifyTokenGateMembership', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate1.id, tokenGate2.id],
-      walletAddress
+      tokenGateIds: [tokenGate1.id, tokenGate2.id]
     });
     await deleteTokenGate(tokenGate1.id);
 

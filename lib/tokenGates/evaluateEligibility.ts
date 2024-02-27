@@ -1,21 +1,18 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { DataNotFoundError } from 'lib/utilities/errors';
 import { isTruthy } from 'lib/utilities/types';
 
 import type { TokenGate } from './interfaces';
-import { validateTokenGate } from './validateTokenGate';
+import { validateTokenGateWithMultipleWallets } from './validateTokenGate';
 
 export type TokenGateEvaluationAttempt = {
-  authSig: AuthSig;
   spaceIdOrDomain: string;
+  userId: string;
 };
 
 export type TokenGateEvaluationResult = {
-  walletAddress: string;
   canJoinSpace: boolean;
   eligibleGates: string[];
 };
@@ -24,23 +21,24 @@ export type TokenGateEvaluationResult = {
  * @eligibleGates List of generated tokens we can verify when joining a space
  */
 export async function evaluateTokenGateEligibility({
-  authSig,
-  spaceIdOrDomain
+  spaceIdOrDomain,
+  userId
 }: TokenGateEvaluationAttempt): Promise<TokenGateEvaluationResult> {
   const tokenGates = await validateSpaceWithTokenGates(spaceIdOrDomain);
-  const result = await evaluateTokenGate({ authSig, tokenGates });
+  const result = await evaluateTokenGate({ tokenGates, userId });
 
   return result;
 }
 
-export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: AuthSig; tokenGates: TokenGate[] }) {
+export async function evaluateTokenGate({ tokenGates, userId }: { tokenGates: TokenGate[]; userId: string }) {
+  const userWallets = await prisma.userWallet.findMany({
+    where: {
+      userId
+    }
+  });
+
   const tokenGateResults = await Promise.all(
-    tokenGates.map(async (tokenGate) =>
-      validateTokenGate(tokenGate, authSig.address).catch((error) => {
-        log.debug(`Error evaluating token gate`, { tokenGateId: tokenGate.id, error });
-        return null;
-      })
-    )
+    tokenGates.map(async (tokenGate) => validateTokenGateWithMultipleWallets(tokenGate, userWallets))
   );
 
   const successGates = tokenGateResults.filter(isTruthy);
@@ -48,14 +46,12 @@ export async function evaluateTokenGate({ authSig, tokenGates }: { authSig: Auth
   if (successGates.length === 0) {
     return {
       canJoinSpace: false,
-      eligibleGates: [],
-      walletAddress: authSig.address
+      eligibleGates: []
     };
   }
 
   return {
     canJoinSpace: true,
-    walletAddress: authSig.address,
     eligibleGates: successGates
   };
 }
