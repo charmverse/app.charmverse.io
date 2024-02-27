@@ -6,9 +6,9 @@ import { useTheme } from '@mui/material/styles';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import { useEditProfileDialog } from 'components/members/hooks/useEditProfileDialog';
 import { MemberActions } from 'components/settings/roles/components/MemberActions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import type { Member } from 'lib/members/interfaces';
 
 import { ProfileTabs } from './components/ProfileTabs';
@@ -33,14 +33,15 @@ export function MemberProfile({
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
   const isAdmin = useIsAdmin();
-  const { openSettings } = useSettingsDialog();
+  const { setIsOpen } = useEditProfileDialog();
+
   if (!space) {
     return null;
   }
 
   function onClickEdit() {
     onClose();
-    openSettings('profile');
+    setIsOpen(true);
   }
 
   return (

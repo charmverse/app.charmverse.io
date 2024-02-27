@@ -27,6 +27,7 @@ import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import RouteGuard from 'components/common/RouteGuard';
+import { EditProfileProvider } from 'components/members/hooks/useEditProfileDialog';
 import { UserProfileProvider } from 'components/members/hooks/useMemberDialog';
 import { RewardsProvider } from 'components/rewards/hooks/useRewards';
 import { isDevEnv, isProdEnv } from 'config/constants';
@@ -238,9 +239,11 @@ function DataProviders({ children }: { children: ReactNode }) {
                                       <MemberPropertiesProvider>
                                         <LensProvider config={lensConfig}>
                                           <FarcasterUserProvider>
-                                            <UserProfileProvider>
-                                              <PageTitleProvider>{children}</PageTitleProvider>
-                                            </UserProfileProvider>
+                                            <EditProfileProvider>
+                                              <UserProfileProvider>
+                                                <PageTitleProvider>{children}</PageTitleProvider>
+                                              </UserProfileProvider>
+                                            </EditProfileProvider>
                                           </FarcasterUserProvider>
                                         </LensProvider>
                                       </MemberPropertiesProvider>

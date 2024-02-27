@@ -4,6 +4,7 @@ import { mutate } from 'swr';
 
 import HexagonalAvatarMask from 'components/common/HexagonalAvatarMask';
 import { VerifyLoginOtpModal } from 'components/login/components/VerifyLoginOtpModal';
+import { EditMemberProfileDialogGlobal } from 'components/members/components/EditMemberProfileDialogGlobal';
 import { MemberProfileDialogGlobal } from 'components/members/components/MemberProfileDialogGlobal';
 import { useImportDiscordRoles } from 'components/settings/roles/hooks/useImportDiscordRoles';
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
@@ -84,6 +85,7 @@ export function GlobalComponents() {
     <>
       <HexagonalAvatarMask id='hexagon-avatar' />
       <MemberProfileDialogGlobal />
+      <EditMemberProfileDialogGlobal />
       <UserOnboardingDialogGlobal />
       <ConfirmationModal />
       <VerifyLoginOtpModal open={isVerifyOtpOpen} onClose={closeVerifyOtp} />

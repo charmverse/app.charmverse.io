@@ -13,9 +13,10 @@ import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Social, Member } from 'lib/members/interfaces';
+import type { Member, Social } from 'lib/members/interfaces';
+
+import { useEditProfileDialog } from '../hooks/useEditProfileDialog';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -42,11 +43,10 @@ function MemberDirectoryGalleryCard({
   member: Member;
 }) {
   const { formatDate } = useDateFormatter();
-  const { openSettings } = useSettingsDialog();
 
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-
+  const { setIsOpen } = useEditProfileDialog();
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
@@ -68,7 +68,7 @@ function MemberDirectoryGalleryCard({
 
   function onClickEdit(e: MouseEvent<HTMLElement>) {
     e.stopPropagation();
-    openSettings('profile');
+    setIsOpen(true);
   }
 
   const social = (member.profile?.social as Social) ?? {};
