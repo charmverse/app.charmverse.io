@@ -113,8 +113,8 @@ export async function validateTokenGateCondition(
     }
     // Guild.xyz member
     case condition.type === 'Guildxyz' && !!condition.tokenIds[0]: {
-      const memberships = await getUserMemberships(userAddress);
-      return memberships.some((g) => g.guildId.toString() === condition.tokenIds[0]);
+      const hasMembership = await getUserMemberships(condition.tokenIds[0], userAddress);
+      return hasMembership;
     }
     // Gitcoin Passport
     case condition.type === 'GitcoinPassport': {
