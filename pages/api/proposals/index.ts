@@ -60,7 +60,10 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
           proposal: {
             include: {
               evaluations: {
-                include: { reviewers: true }
+                include: { reviewers: true },
+                orderBy: {
+                  index: 'asc'
+                }
               }
             }
           }
