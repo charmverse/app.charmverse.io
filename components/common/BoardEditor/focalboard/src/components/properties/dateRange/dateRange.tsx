@@ -17,7 +17,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { Utils } from '../../../utils';
 import Editable from '../../../widgets/editable';
 
-const StyledPickersDay = styled.div`
+const PickersDayContainer = styled.div`
   &.highlighted {
     background-color: var(--charmeditor-active);
     border-radius: 0;
@@ -79,6 +79,7 @@ function timeZoneOffset(date: number): number {
 
 function DateRangePicker(props: Props) {
   const { formatDate } = useDateFormatter();
+  const [focusedInput, setFocusedInput] = useState<'from' | 'to'>('from');
   const toInputRef = useRef<HTMLInputElement>(null);
   const intl = useIntl();
   const popupState = usePopupState({ variant: 'popover', popupId: 'dateRangePopup' });
@@ -129,15 +130,29 @@ function DateRangePicker(props: Props) {
     setToInput(getDisplayDate(range.to ? DateTime.fromMillis(range.to) : undefined));
   }
 
-  function handleDayClick(date: DateTime | null) {
-    const range: DateProperty = {};
-    if (date && isRange) {
-      const newRange = addToRange(date, { from: dateFrom!, to: dateTo });
-      range.from = newRange.from?.toMillis();
-      range.to = newRange.to?.toMillis();
+  function handleDayClick(selected: DateTime | null) {
+    if (!selected) {
+      // not sure when this happens
+      return;
+    }
+    const range: DateProperty = { from: dateFrom?.toMillis(), to: dateTo?.toMillis() };
+    if (focusedInput === 'from') {
+      // if start is after end, set end to start
+      if (dateTo && dateTo < selected) {
+        range.from = dateTo.toMillis();
+        range.to = selected.toMillis();
+      } else {
+        range.from = selected.toMillis();
+      }
+      setFocusedInput('to');
     } else {
-      range.from = date ? date.toMillis() : undefined;
-      range.to = undefined;
+      if (dateFrom && dateFrom > selected) {
+        range.from = selected.toMillis();
+        range.to = dateFrom.toMillis();
+      } else {
+        range.to = selected.toMillis();
+      }
+      setFocusedInput('from');
     }
     saveRangeValue(range);
   }
@@ -215,8 +230,10 @@ function DateRangePicker(props: Props) {
             sx={{ width: dateTo ? '148px' : undefined }}
             size='small'
             value={fromInput || ''}
+            InputProps={{ className: isRange && focusedInput === 'from' ? 'Mui-focused' : undefined }}
             placeholder={formatDate(new Date(), { withYear: true })}
             onFocus={() => {
+              setFocusedInput('from');
               if (dateFrom) {
                 return setFromInput(Utils.inputDate(dateFrom.toJSDate(), intl));
               }
@@ -243,8 +260,10 @@ function DateRangePicker(props: Props) {
               inputRef={toInputRef}
               sx={{ width: '148px' }}
               value={toInput || ''}
+              InputProps={{ className: focusedInput === 'to' ? 'Mui-focused' : undefined }}
               placeholder={formatDate(new Date(), { withYear: true })}
               onFocus={() => {
+                setFocusedInput('to');
                 if (dateTo) {
                   return setToInput(Utils.inputDate(dateTo.toJSDate(), intl));
                 }
@@ -269,10 +288,11 @@ function DateRangePicker(props: Props) {
         </Box>
         <StaticDatePicker
           // selectedSections={{ startIndex: 5, endIndex: 9 }}
-          value={dateFrom}
-          onChange={handleDayClick}
+          // value={dateFrom}
+          // onChange={handleDayClick}
           closeOnSelect={false}
           slots={{
+            // @ts-ignore
             day: CalendarDaySlot,
             toolbar: HiddenElement,
             actionBar: HiddenElement
@@ -281,7 +301,9 @@ function DateRangePicker(props: Props) {
             day: {
               // @ts-ignore passing in custom props
               dateFrom,
-              dateTo
+              dateTo,
+              // @ts-ignore use onClick instead of onChange, since onChange does not trigger when clicking the current date. but with date range, we have two dates to consider
+              onClick: handleDayClick
             }
           }}
         />
@@ -300,8 +322,14 @@ function DateRangePicker(props: Props) {
   );
 }
 
-function CalendarDaySlot(props: PickersDayProps<DateTime> & { dateFrom?: DateTime; dateTo?: DateTime }) {
-  const { day, dateFrom, dateTo, outsideCurrentMonth } = props;
+function CalendarDaySlot(
+  props: PickersDayProps<DateTime> & {
+    dateFrom?: DateTime;
+    dateTo?: DateTime;
+    onClick?: (date: DateTime) => void;
+  }
+) {
+  const { day, dateFrom, dateTo, onClick, outsideCurrentMonth } = props;
 
   const isRange = !!dateTo;
 
@@ -310,7 +338,7 @@ function CalendarDaySlot(props: PickersDayProps<DateTime> & { dateFrom?: DateTim
   const isSelected = isStartDate || isEndDate;
   const isHighlighted = dateFrom && dateTo && dateFrom <= day && dateTo >= day;
   return (
-    <StyledPickersDay
+    <PickersDayContainer
       className={
         !outsideCurrentMonth && isRange && (isHighlighted || isSelected)
           ? `highlighted${isStartDate ? ' start-date' : ''}${isEndDate ? ' end-date' : ''}`
@@ -318,9 +346,9 @@ function CalendarDaySlot(props: PickersDayProps<DateTime> & { dateFrom?: DateTim
       }
     >
       <div>
-        <PickersDay {...props} selected={isSelected} />
+        <PickersDay {...props} onClick={() => onClick?.(day)} selected={isSelected} />
       </div>
-    </StyledPickersDay>
+    </PickersDayContainer>
   );
 }
 
