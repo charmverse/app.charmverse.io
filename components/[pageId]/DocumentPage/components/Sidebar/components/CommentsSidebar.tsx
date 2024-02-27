@@ -231,12 +231,11 @@ function EditorCommentsSidebarComponent({
   });
   const { view } = useCharmEditorView();
   const { updateThreadPluginState } = useInlineComment(view);
-
   // view.state.doc stays the same (empty content) even when the document content changes
   const extractedThreadIds =
     !view || !threads
       ? new Set()
-      : checkIsContentEmpty(view.state.doc as any)
+      : checkIsContentEmpty(view?.state.doc.toJSON())
       ? new Set(Object.keys(threads))
       : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
