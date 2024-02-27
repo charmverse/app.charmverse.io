@@ -1,4 +1,3 @@
-import { isEmptyDocument } from '@bangle.dev/utils';
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import MessageOutlinedIcon from '@mui/icons-material/MessageOutlined';
@@ -17,6 +16,7 @@ import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useInlineComment } from 'hooks/useInlineComment';
 import type { CommentThreadsMap } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
+import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { extractThreadIdsFromDoc } from 'lib/prosemirror/plugins/inlineComments/extractDeletedThreadIds';
 import { findTotalInlineComments } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
@@ -236,7 +236,7 @@ function EditorCommentsSidebarComponent({
   const extractedThreadIds =
     !view || !threads
       ? new Set()
-      : isEmptyDocument(view.state.doc)
+      : checkIsContentEmpty(view.state.doc as any)
       ? new Set(Object.keys(threads))
       : extractThreadIdsFromDoc(view.state.doc, specRegistry.schema);
 
