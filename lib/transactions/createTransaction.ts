@@ -50,7 +50,7 @@ export async function createTransaction({
     rewardToken: application.bounty?.rewardToken,
     rewardAmount: application.bounty?.rewardAmount,
     spaceId: application.bounty?.spaceId,
-    userId
+    userId: userId || ''
   });
 
   return tx;
