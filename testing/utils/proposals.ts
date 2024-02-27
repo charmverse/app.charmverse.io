@@ -12,6 +12,7 @@ import { v4 as uuid } from 'uuid';
 
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposal/interface';
+import { getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];
@@ -94,12 +95,16 @@ export async function generateProposal({
 /**
  * Generate a workflow which space members can always view, and has 3 steps: Feedback, Rubric, Vote
  */
+type OptionalField = 'id' | 'title' | 'permissions';
+
 export async function generateProposalWorkflow({
   spaceId,
-  title
+  title,
+  evaluations = []
 }: {
   spaceId: string;
   title?: string;
+  evaluations?: (Omit<WorkflowEvaluationJson, OptionalField> & Partial<Pick<WorkflowEvaluationJson, OptionalField>>)[];
 }): Promise<ProposalWorkflowTyped> {
   const existingFlows = await prisma.proposalWorkflow.count({
     where: {
@@ -117,79 +122,93 @@ export async function generateProposalWorkflow({
           id: spaceId
         }
       },
-      evaluations: [
-        {
+      evaluations: evaluations.map((evaluation) => {
+        return {
           id: uuid(),
-          permissions: [
-            // author permissions
-            ...['view', 'edit', 'comment', 'move'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.author
-            })),
-            // member permissions
-            ...['view', 'comment'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.space_member
-            }))
-          ],
-          title: 'Feedback',
-          type: 'feedback'
-        },
-        {
-          id: uuid(),
-          permissions: [
-            // author permissions
-            ...['view', 'edit', 'comment', 'move'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.author
-            })),
-            // reviewer permissions
-            ...['view', 'comment', 'move'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.current_reviewer
-            })),
-            // all reviewers - this is redundant since all members have view/comment access, but we include it as an example for user education
-            ...['view', 'comment'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.all_reviewers
-            })),
-            // member permissions
-            ...['view', 'comment'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.space_member
-            }))
-          ],
-          title: 'Rubric',
-          type: 'rubric'
-        },
-        {
-          id: uuid(),
-          permissions: [
-            // author permissions
-            ...['view', 'edit', 'comment', 'move'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.author
-            })),
-            // reviewer permissions
-            ...['view', 'comment', 'move'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.current_reviewer
-            })),
-            // all reviewers - this is redundant since all members have view/comment access, but we include it as an example for user education
-            ...['view', 'comment'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.all_reviewers
-            })),
-            // member permissions
-            ...['view', 'comment'].map((operation) => ({
-              operation: operation as ProposalOperation,
-              systemRole: ProposalSystemRole.space_member
-            }))
-          ],
-          title: 'Vote',
-          type: 'vote'
-        }
-      ] as WorkflowEvaluationJson[]
+          title: 'Evaluation step',
+          permissions: getDefaultPermissions(),
+          ...evaluation
+        };
+      })
     }
   }) as any as Promise<ProposalWorkflowTyped>;
+}
+
+export async function generateProposalWorkflowWithEvaluations(options: {
+  spaceId: string;
+  title?: string;
+}): Promise<ProposalWorkflowTyped> {
+  return generateProposalWorkflow({
+    ...options,
+    evaluations: [
+      {
+        permissions: [
+          // author permissions
+          ...['view', 'edit', 'comment', 'move'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.author
+          })),
+          // member permissions
+          ...['view', 'comment'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.space_member
+          }))
+        ],
+        title: 'Feedback',
+        type: 'feedback'
+      },
+      {
+        permissions: [
+          // author permissions
+          ...['view', 'edit', 'comment', 'move'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.author
+          })),
+          // reviewer permissions
+          ...['view', 'comment', 'move'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.current_reviewer
+          })),
+          // all reviewers - this is redundant since all members have view/comment access, but we include it as an example for user education
+          ...['view', 'comment'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.all_reviewers
+          })),
+          // member permissions
+          ...['view', 'comment'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.space_member
+          }))
+        ],
+        title: 'Rubric',
+        type: 'rubric'
+      },
+      {
+        permissions: [
+          // author permissions
+          ...['view', 'edit', 'comment', 'move'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.author
+          })),
+          // reviewer permissions
+          ...['view', 'comment', 'move'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.current_reviewer
+          })),
+          // all reviewers - this is redundant since all members have view/comment access, but we include it as an example for user education
+          ...['view', 'comment'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.all_reviewers
+          })),
+          // member permissions
+          ...['view', 'comment'].map((operation) => ({
+            operation: operation as ProposalOperation,
+            systemRole: ProposalSystemRole.space_member
+          }))
+        ],
+        title: 'Vote',
+        type: 'vote'
+      }
+    ]
+  });
 }

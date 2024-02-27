@@ -1,5 +1,5 @@
 import type { Member, MemberPropertyWithPermissions, PropertyValueWithDetails } from 'lib/members/interfaces';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
+import type { ProposalTemplateMeta } from 'lib/proposal/getProposalTemplates';
 import type { LoggedInUser } from 'models/User';
 import { createMemberProperty, createMemberPropertyValue } from 'testing/mocks/memberProperty';
 import { createMockSpace } from 'testing/mocks/space';
@@ -95,4 +95,4 @@ export const spaceRoles: ListSpaceRolesResponse[] = [
   { id: '2', name: 'Grant Reviewer', spacePermissions: [], source: null }
 ];
 
-export const proposalTemplates: ProposalTemplate[] = [];
+export const proposalTemplates: ProposalTemplateMeta[] = [];

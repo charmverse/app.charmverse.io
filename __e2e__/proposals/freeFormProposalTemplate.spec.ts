@@ -16,7 +16,7 @@ import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { optimism } from 'viem/chains';
 
 import type { ProposalPendingReward } from 'lib/proposal/interface';
-import { generateProposalWorkflow } from 'testing/utils/proposals';
+import { generateProposalWorkflowWithEvaluations } from 'testing/utils/proposals';
 
 test.describe.serial('Create and use Proposal Template', async () => {
   let space: Space;
@@ -102,8 +102,11 @@ test.describe.serial('Create and use Proposal Template', async () => {
         onboarded: true
       }
     });
-    proposalWorkflow = await generateProposalWorkflow({ spaceId: space.id, title: 'First workflow' });
-    secondProposalWorkflow = await generateProposalWorkflow({ spaceId: space.id, title: 'Second workflow' });
+    proposalWorkflow = await generateProposalWorkflowWithEvaluations({ spaceId: space.id, title: 'First workflow' });
+    secondProposalWorkflow = await generateProposalWorkflowWithEvaluations({
+      spaceId: space.id,
+      title: 'Second workflow'
+    });
     role = await testUtilsMembers.generateRole({
       createdBy: admin.id,
       spaceId: space.id
@@ -132,8 +135,6 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     // Select a workflow
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
-
-    // await proposalPage.workflowSelect.click();
 
     // Configure reviewers for rubric evaluation
     await proposalPage.selectEvaluationReviewer('rubric', role.id);
@@ -420,17 +421,15 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalPage.documentTitleInput.fill(userProposalConfig.title);
 
     // Check that configuration fields are readonly and user cannot edit proposal
-    const reviewerInput = (await proposalPage.getSelectedReviewers()).nth(1);
+    const reviewerInputs = await proposalPage.getSelectedReviewers();
+    await reviewerInputs.nth(1).waitFor();
+    const reviewerInput = reviewerInputs.nth(1);
 
-    const value = (await reviewerInput.allInnerTexts())[0].trim();
-
-    expect(value).toEqual(role.name);
+    await expect(reviewerInput).toHaveText(role.name);
 
     await expect(proposalPage.editRubricCriteriaLabel).toBeDisabled();
 
-    const content = (await proposalPage.charmEditor.allInnerTexts())[0];
-
-    expect(content.trim()).toEqual(templatePageContent.description);
+    await expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
 
     await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
 

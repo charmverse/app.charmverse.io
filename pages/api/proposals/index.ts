@@ -60,7 +60,10 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
           proposal: {
             include: {
               evaluations: {
-                include: { reviewers: true }
+                include: { reviewers: true },
+                orderBy: {
+                  index: 'asc'
+                }
               }
             }
           }
@@ -94,10 +97,6 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
       throw new ActionNotPermittedError('Inputs do not match the template');
     }
   }
-  // TODO: fix tests
-  // if (!req.body.workflowId) {
-  //   throw new InvalidInputError('You must provide a workflow ID');
-  // }
   const proposalPage = await createProposal({
     ...req.body,
     userId: req.session.user.id

@@ -4,10 +4,9 @@ import { v4 } from 'uuid';
 
 import { getENSName } from 'lib/blockchain/getENSName';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
+import { postUserCreate } from 'lib/users/postUserCreate';
 import { shortWalletAddress, randomETHWalletAddress } from 'lib/utilities/blockchain';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -57,8 +56,7 @@ export async function createUserFromWallet(
     }
 
     if (!skipTracking) {
-      updateTrackUserProfile(newUser, prisma);
-      trackUserAction('sign_up', { userId: newUser.id, identityType: 'Wallet', ...signupAnalytics });
+      postUserCreate({ user: newUser, identityType: 'Wallet', signupAnalytics });
     }
 
     return newUser;

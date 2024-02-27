@@ -5,7 +5,7 @@ import { getPublicClient } from 'lib/blockchain/publicClient';
 import { getGitcoinPassportScore } from 'lib/credentials/getGitcoinCredentialsByWallets';
 import { getUserMemberships } from 'lib/guild-xyz/getUserMemberships';
 
-import { ercAbi, molochDaoAbi } from './abis/abis';
+import { erc1155Abi, ercAbi, molochDaoAbi } from './abis/abis';
 import { subscriptionTokenV1ABI } from './hypersub/abi';
 import type { AccessControlCondition } from './interfaces';
 import { PublicLockV13 } from './unlock/abi';
@@ -40,8 +40,18 @@ export async function validateTokenGateCondition(
 
       return balance >= minimumQuantity;
     }
-    // ERC721 With Token Id or ERC1155 With Token Id
-    case condition.type === 'ERC1155' && !!contractAddress && !!condition.tokenIds.at(0):
+    // ERC1155 With Token Id
+    case condition.type === 'ERC1155' && !!contractAddress && !!condition.tokenIds.at(0): {
+      const tokenId = BigInt(condition.tokenIds.at(0) || 1);
+      const ownedNumberOfNFTs = await publicClient.readContract({
+        abi: erc1155Abi,
+        address: contractAddress,
+        functionName: 'balanceOf',
+        args: [userAddress, tokenId]
+      });
+
+      return ownedNumberOfNFTs > 0;
+    }
     case condition.type === 'ERC721' && !!contractAddress && !!condition.tokenIds.at(0): {
       const tokenId = BigInt(condition.tokenIds.at(0) || 1);
       const ownerAddress = await publicClient.readContract({
@@ -59,14 +69,15 @@ export async function validateTokenGateCondition(
     }
     // User is member of MolochDAOv2.1
     case condition.type === 'MolochDAOv2.1' && !!contractAddress: {
-      const isMemberOfMolochDao = await publicClient.readContract({
+      const memberOfMolochDaoInfo = await publicClient.readContract({
         abi: molochDaoAbi,
         address: contractAddress,
-        functionName: 'daos',
+        functionName: 'members',
         args: [userAddress]
       });
 
-      return isMemberOfMolochDao;
+      // Each position in the array is an attribute of the member.
+      return !!memberOfMolochDaoInfo?.at(3);
     }
     // Unlock Protocol member
     case condition.type === 'Unlock' && !!contractAddress: {

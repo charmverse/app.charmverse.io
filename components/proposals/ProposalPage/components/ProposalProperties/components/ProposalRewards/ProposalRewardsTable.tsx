@@ -1,11 +1,13 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { Box, Stack, Typography } from '@mui/material';
+import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
+import { Box, ListItemIcon, MenuItem, ListItemText, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
+import { ContextMenu } from 'components/common/ContextMenu';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -18,9 +20,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCardPage } from 'components/rewards/hooks/useRewardsBoardAdapter';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
-import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -50,7 +50,6 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-const rewardQueryKey = 'rewardId';
 export function ProposalRewardsTable({
   containerWidth,
   pendingRewards,
@@ -77,10 +76,43 @@ export function ProposalRewardsTable({
 
   const { getFeatureTitle } = useSpaceFeatures();
 
-  useRewardsNavigation(rewardQueryKey);
+  const tableView = useMemo(() => {
+    const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
+      const rewardType = getRewardType(page.reward);
+      if (rewardType) {
+        acc.add(rewardType);
+      }
+      return acc;
+    }, new Set());
+    return getProposalRewardsView({
+      board: boardBlock,
+      spaceId: space?.id,
+      rewardTypes: [...rewardTypesUsed],
+      includeStatus: rewardIds.length > 0
+    });
+  }, [space?.id, boardBlock, pendingRewards, rewardIds.length]);
 
-  const publishedRewards = (rewardIds || []).map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy);
+  const publishedRewards = useMemo(
+    () => rewardIds.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy),
+    [rewardIds, allRewards]
+  );
+  const cardPages = useMemo(
+    () =>
+      publishedRewards.length > 0
+        ? getCardsFromPublishedRewards(publishedRewards, pages)
+        : getCardsFromPendingRewards(pendingRewards || [], space?.id),
+    [pendingRewards, space?.id, pages, publishedRewards]
+  );
+
   const canCreatePendingRewards = !readOnly && !publishedRewards.length;
+  const newRewardErrors = getRewardErrors({
+    page: newPageValues,
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    isProposalTemplate
+  }).join(', ');
+
+  const loadingData = isLoading || isLoadingRewards || loadingPages;
 
   function closeDialog() {
     clearRewardValues();
@@ -117,10 +149,11 @@ export function ProposalRewardsTable({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    setRewardValues(
-      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
-      { skipDirty: true }
-    );
+    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    if (template?.reward) {
+      (newReward as any).rewardType = getRewardType(template.reward);
+    }
+    setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
@@ -174,38 +207,12 @@ export function ProposalRewardsTable({
     }
   }
 
-  const newRewardErrors = getRewardErrors({
-    page: newPageValues,
-    reward: rewardValues,
-    rewardType: rewardValues.rewardType,
-    isProposalTemplate
-  }).join(', ');
-
-  const cardPages = useMemo(
-    () =>
-      publishedRewards.length > 0
-        ? getCardsFromPublishedRewards(publishedRewards, pages)
-        : getCardsFromPendingRewards(pendingRewards || [], space?.id),
-    [pendingRewards, space?.id, pages, allRewards]
-  );
-
-  const rewardTypes = useMemo(() => {
-    const typesSet = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
-      const rewardType = getRewardType(page.reward);
-      if (rewardType) {
-        acc.add(rewardType);
-      }
-      return acc;
-    }, new Set());
-    return [...typesSet];
-  }, [pendingRewards]);
-
-  const tableView = useMemo(
-    () => getProposalRewardsView({ board: boardBlock, spaceId: space?.id, rewardTypes }),
-    [space?.id, boardBlock, rewardTypes]
-  );
-
-  const loadingData = isLoading || isLoadingRewards || loadingPages;
+  function deleteReward() {
+    if (currentPendingId) {
+      onDelete(currentPendingId);
+      closeDialog();
+    }
+  }
 
   return (
     <>
@@ -263,6 +270,20 @@ export function ProposalRewardsTable({
         onSave={saveForm}
         onCancel={closeDialog}
         isSaving={isSavingReward}
+        toolbar={
+          <Box display='flex' justifyContent='flex-end'>
+            {currentPendingId && (
+              <ContextMenu iconColor='secondary' popupId='reward-context'>
+                <MenuItem color='inherit' onClick={deleteReward}>
+                  <ListItemIcon>
+                    <TrashIcon />
+                  </ListItemIcon>
+                  <ListItemText>Delete</ListItemText>
+                </MenuItem>
+              </ContextMenu>
+            )}
+          </Box>
+        }
       >
         <NewDocumentPage
           key={newPageValues?.templateId}
@@ -320,7 +341,6 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
         ...reward
       } as BoardReward,
       rewardPage: {
-        id: draftId,
         // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
         boardId: null,
         bountyId: null,
@@ -344,7 +364,8 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
         title: '',
         updatedAt: new Date(),
         updatedBy: '',
-        ...page
+        ...page,
+        id: draftId
       }
     });
   });

@@ -1,8 +1,8 @@
 import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
-import type { FormValues } from '../hooks/useGitcoinForm';
+import type { FormValues } from '../hooks/useCredentialsForm';
 
-export function getGitcoinAccessControlConditions(values: FormValues): AccessControlCondition[] {
+export function getCredentialsAccessControlConditions(values: FormValues): AccessControlCondition[] {
   const { score = 0 } = values;
 
   return [

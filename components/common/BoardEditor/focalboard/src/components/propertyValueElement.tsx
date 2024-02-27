@@ -14,6 +14,7 @@ import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
 import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
+import { RewardsDueDatePicker } from 'components/common/BoardEditor/components/properties/RewardsDueDatePicker';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -26,6 +27,8 @@ import {
   RewardApplicationStatusChip
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -42,16 +45,20 @@ import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/b
 import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
 import {
+  DUE_DATE_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_AMOUNT,
   REWARD_APPLICANTS_COUNT,
   REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
   REWARD_PROPOSAL_LINK,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
   REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
-import type { RewardStatus } from 'lib/rewards/interfaces';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utilities/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -87,6 +94,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
   showCard?: (cardId: string | null) => void;
 };
 
@@ -128,6 +136,7 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
+  const { updateReward } = useRewards();
   const { showError } = useSnackbar();
   const {
     card,
@@ -139,7 +148,8 @@ function PropertyValueElement(props: Props) {
     displayType,
     mutator = defaultMutator,
     subRowsEmptyValueContent,
-    proposal
+    proposal,
+    reward
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
@@ -179,14 +189,165 @@ function PropertyValueElement(props: Props) {
 
   let propertyValueElement: ReactNode = null;
 
-  if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
+  if (propertyTemplate.id === DUE_DATE_ID) {
+    const dueDate = (card.fields.properties[DUE_DATE_ID] ?? null) as number | null;
+    propertyValueElement = (
+      <RewardsDueDatePicker
+        value={dueDate}
+        disabled={readOnly || !isAdmin}
+        onChange={(_value) => {
+          if (reward) {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                dueDate: _value?.toJSDate() || undefined
+              }
+            });
+          }
+        }}
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+    const reviewers = (card.fields.properties[REWARD_REVIEWERS_BLOCK_ID] as unknown as RewardReviewer[]) ?? [];
+    propertyValueElement = (
+      <UserAndRoleSelect
+        displayType={displayType}
+        readOnly={readOnly || !isAdmin}
+        onChange={(options) => {
+          if (!reward) {
+            return;
+          }
+          const reviewerOptions = options.filter(
+            (option) => option.group === 'role' || option.group === 'user'
+          ) as RewardReviewer[];
+          updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+            }
+          });
+        }}
+        value={reviewers}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
-      return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
+      propertyValueElement = <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
-    return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+    propertyValueElement = <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
+    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
+      return null;
+    }
+
+    propertyValueElement = (
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
+    );
   } else if (propertyTemplate.type === 'proposalReviewerNotes') {
-    return <ProposalNotesLink pageId={props.card.id} />;
+    propertyValueElement = <ProposalNotesLink pageId={props.card.id} />;
+  } else if (propertyTemplate.type === 'tokenAmount' || propertyTemplate.type === 'tokenChain') {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+    propertyValueElement = (
+      <RewardTokenDialog
+        readOnly={
+          readOnly ||
+          !isAdmin ||
+          !reward ||
+          getRewardType({
+            chainId: Number(chainId),
+            rewardAmount,
+            rewardToken: symbolOrAddress
+          }) !== 'token'
+        }
+        currentReward={{
+          chainId: Number(chainId),
+          rewardAmount,
+          rewardToken: symbolOrAddress
+        }}
+        onChange={(rewardToken) => {
+          if (rewardToken && reward) {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                chainId: rewardToken.chainId,
+                rewardToken: rewardToken.rewardToken,
+                rewardAmount: Number(rewardToken.rewardAmount),
+                customReward: null
+              }
+            });
+          }
+        }}
+      >
+        {propertyTemplate.type === 'tokenAmount' ? (
+          <TokenAmount amount={rewardAmount} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+        ) : (
+          <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />
+        )}
+      </RewardTokenDialog>
+    );
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      propertyValueElement = (
+        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
+          <Box width={20} display='flex' alignItems='center'>
+            <PersonIcon fontSize='small' />
+          </Box>
+          {totalApplicants}
+        </Stack>
+      );
+    }
+  } else if (propertyTemplate.id === REWARD_CUSTOM_VALUE) {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+
+    return (
+      <TextInput
+        placeholderText={emptyDisplayValue}
+        value={value.toString()}
+        onChange={setValue}
+        multiline={displayType === 'details' ? true : props.wrapColumn ?? false}
+        onSave={() => {
+          if (reward) {
+            try {
+              updateReward({
+                rewardId: reward.id,
+                updateContent: {
+                  customReward: value as string
+                }
+              });
+            } catch (error) {
+              showError(error);
+            }
+          }
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        wrapColumn={props.wrapColumn ?? false}
+        columnRef={props.columnRef}
+        readOnly={
+          readOnly ||
+          !isAdmin ||
+          !reward ||
+          getRewardType({
+            chainId: Number(chainId),
+            rewardAmount,
+            customReward: value as string,
+            rewardToken: symbolOrAddress
+          }) !== 'custom'
+        }
+        displayType={displayType}
+      />
+    );
   }
+
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
@@ -250,37 +411,6 @@ function PropertyValueElement(props: Props) {
         propertyValue={propertyValue as string}
         onChange={() => {}}
         displayType={displayType}
-      />
-    );
-  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
-    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
-      return null;
-    }
-
-    return (
-      <Box sx={{ a: { color: 'inherit' } }}>
-        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
-          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
-        </Link>
-      </Box>
-    );
-  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID && propertyTemplate.type !== 'proposalReviewer') {
-    if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
-    return (
-      <UserAndRoleSelect
-        displayType={displayType}
-        data-test='selected-reviewers'
-        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        onChange={() => null}
-        systemRoles={[allMembersSystemRole, authorSystemRole]}
-        value={propertyValue as any}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
@@ -535,29 +665,6 @@ function PropertyValueElement(props: Props) {
         centerContent={displayType !== 'table'}
       />
     );
-  } else if (propertyTemplate.type === 'tokenAmount') {
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = (
-      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
-    );
-  } else if (propertyTemplate.type === 'tokenChain') {
-    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
-  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
-    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
-    if (totalApplicants) {
-      return (
-        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
-          <Box width={20} display='flex' alignItems='center'>
-            <PersonIcon fontSize='small' />
-          </Box>
-          {totalApplicants}
-        </Stack>
-      );
-    }
   }
 
   const commonProps = {
@@ -586,11 +693,18 @@ function PropertyValueElement(props: Props) {
   if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
-    } else {
+    } else if (propertyTemplate.id !== REWARD_CUSTOM_VALUE) {
       propertyValueElement = (
         <TextInput
           {...commonProps}
-          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
+          readOnly={
+            readOnly ||
+            propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ||
+            propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID ||
+            propertyTemplate.id === REWARD_APPLICANTS_COUNT ||
+            propertyTemplate.id === REWARD_PROPOSAL_LINK ||
+            propertyTemplate.id === REWARD_CUSTOM_VALUE
+          }
           displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
         />
       );

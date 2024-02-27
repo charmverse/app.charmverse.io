@@ -144,7 +144,7 @@ describe('humanizeConditions', () => {
     };
     const data = humanizeConditionsData({ ...conditions });
     const result = humanizeConditions(data);
-    expect(result).toBe('Guild charmverse-guild');
+    expect(result).toBe('Guild.xyz charmverse-guild');
   });
 
   it('should return a Gitcoin passport condition', () => {

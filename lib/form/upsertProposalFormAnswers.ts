@@ -4,22 +4,31 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import { validateAnswers } from 'lib/form/validateAnswers';
 import { isTruthy } from 'lib/utilities/types';
 
 export type RubricAnswerUpsert = {
-  formId: string;
   proposalId: string;
   answers: FieldAnswerInput[];
 };
 
-export async function upsertProposalFormAnswers({ answers, formId, proposalId }: RubricAnswerUpsert) {
+export async function upsertProposalFormAnswers({ answers, proposalId }: RubricAnswerUpsert) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
-  } else if (!stringUtils.isUUID(formId)) {
-    throw new InvalidInputError(`Valid formId is required`);
   }
 
-  const form = await prisma.form.findUniqueOrThrow({ where: { id: formId }, include: { formFields: true } });
+  const proposal = await prisma.proposal.findUniqueOrThrow({
+    where: { id: proposalId },
+    select: { form: { include: { formFields: true } }, status: true }
+  });
+
+  const isDraft = proposal.status === 'draft';
+
+  if (!proposal.form) {
+    throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
+  }
+
+  const form = proposal.form;
 
   const existingAnswers = await prisma.formFieldAnswer.findMany({ where: { proposalId } });
 
@@ -36,19 +45,11 @@ export async function upsertProposalFormAnswers({ answers, formId, proposalId }:
         return null;
       }
 
-      if (field.required && !a.value) {
-        throw new InvalidInputError(`Value for field ${field.name} is required`);
-      }
-
       return a;
     })
     .filter(isTruthy);
 
-  const hasAllRequiredAnswers = form.formFields.every(
-    (f) => !f.required || answersToSave.some((a) => a.fieldId === f.id && !!a.value)
-  );
-
-  if (!hasAllRequiredAnswers) {
+  if (!isDraft && !validateAnswers(answersToSave, form.formFields)) {
     throw new InvalidInputError(`All required fields must be answered`);
   }
 

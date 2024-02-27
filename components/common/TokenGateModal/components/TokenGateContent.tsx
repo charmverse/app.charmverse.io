@@ -1,8 +1,8 @@
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 
 import { TokenGateCollectables } from './TokenGateCollectables';
-import { TokenGateDao } from './TokenGateDao';
-import { TokenGateGitcoin } from './TokenGateGitcoin';
+import { TokenGateCommunities } from './TokenGateCommunities';
+import { TokenGateCredentials } from './TokenGateCredentials';
 import { TokenGateHome } from './TokenGateHome';
 import { TokenGateReview } from './TokenGateReview';
 import { TokenGateTokens } from './TokenGateTokens';
@@ -31,12 +31,12 @@ export function TokenGateContent() {
     return <TokenGateWallet />;
   }
 
-  if (displayedPage === 'dao') {
-    return <TokenGateDao />;
+  if (displayedPage === 'communities') {
+    return <TokenGateCommunities />;
   }
 
-  if (displayedPage === 'gitcoin') {
-    return <TokenGateGitcoin />;
+  if (displayedPage === 'credentials') {
+    return <TokenGateCredentials />;
   }
 
   return null;

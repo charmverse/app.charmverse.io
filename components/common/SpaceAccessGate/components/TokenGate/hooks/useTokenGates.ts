@@ -39,7 +39,7 @@ export function useTokenGates({
 }: Props): TokenGateState {
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { getStoredSignature } = useWeb3Account();
+  const { getStoredSignature, requestSignature } = useWeb3Account();
   const { refreshUser, user } = useUser();
   const { trigger: verifyTokenGateAndJoin } = useVerifyTokenGate();
 
@@ -78,13 +78,20 @@ export function useTokenGates({
   async function joinSpace(onError: (error: any) => void) {
     setJoiningSpace(true);
 
+    const authSig = getStoredSignature(account || '') || (await requestSignature());
+
+    if (!authSig?.address) {
+      showMessage(`Can't verify signature of the wallet`, 'error');
+      return;
+    }
+
     try {
       await verifyTokenGateAndJoin({
         commit: true,
         spaceId: space.id,
         tokenGateIds: tokenGateResult?.eligibleGates ?? [],
         joinType,
-        walletAddress: account || ''
+        walletAddress: authSig.address || ''
       });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');

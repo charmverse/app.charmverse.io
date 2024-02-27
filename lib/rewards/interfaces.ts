@@ -32,3 +32,9 @@ export type RewardWithUsersAndPageMeta = Bounty & {
 export type ApplicationWithTransactions = Application & {
   transactions: Transaction[];
 };
+
+export type RewardTokenDetails = {
+  chainId: number;
+  rewardToken: string;
+  rewardAmount: number;
+};

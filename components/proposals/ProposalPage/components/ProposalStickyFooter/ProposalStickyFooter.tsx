@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { Button } from 'components/common/Button';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getProposalErrors } from 'lib/proposal/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
@@ -14,11 +15,12 @@ export function ProposalStickyFooter({
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
-  page: { title: string };
+  page: { title: string; content?: any; sourceTemplateId: string | null };
   refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
   const { showMessage } = useSnackbar();
+  const { space } = useCurrentSpace();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
 
   async function onClick() {
@@ -30,14 +32,20 @@ export function ProposalStickyFooter({
     refreshProposal();
   }
   const disabledTooltip = getProposalErrors({
-    proposal: {
-      type: 'proposal',
-      proposalType: isStructuredProposal ? 'structured' : 'free_form',
+    page: {
+      sourceTemplateId: page.sourceTemplateId,
+      content: page.content,
       title: page.title,
+      type: 'proposal'
+    },
+    isDraft: false, // isDraft skips all errors
+    proposalType: isStructuredProposal ? 'structured' : 'free_form',
+    proposal: {
       ...proposal,
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
-    }
+    },
+    requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
 
   return (

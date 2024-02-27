@@ -1,8 +1,9 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -16,6 +17,7 @@ import type { ProposalFields } from 'lib/proposal/interface';
 import { generatePagePathFromPathAndTitle } from '../pages';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
+import { getProposalErrors } from './getProposalErrors';
 import type { VoteSettings } from './interface';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
@@ -30,8 +32,6 @@ type PageProps = Partial<
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
-  // TODO: fix tests that need to pass in permissions
-  permissions?: WorkflowEvaluationJson['permissions'];
   voteSettings?: VoteSettings | null;
 };
 
@@ -44,7 +44,7 @@ export type CreateProposalInput = {
   spaceId: string;
   evaluations: ProposalEvaluationInput[];
   fields?: ProposalFields | null;
-  workflowId?: string;
+  workflowId: string;
   formFields?: FormFieldInput[];
   formAnswers?: FieldAnswerInput[];
   formId?: string;
@@ -53,7 +53,6 @@ export type CreateProposalInput = {
   sourcePageId?: string;
   sourcePostId?: string;
 };
-
 export async function createProposal({
   userId,
   spaceId,
@@ -76,24 +75,42 @@ export async function createProposal({
   const defaultAuthorsList = pageProps?.type !== 'proposal_template' ? [userId] : [];
   const authorsList = arrayUtils.uniqueValues([...(authors || []), ...defaultAuthorsList]);
 
-  const workflow = workflowId
-    ? ((await prisma.proposalWorkflow.findUnique({
-        where: {
-          id: workflowId
-        }
-      })) as ProposalWorkflowTyped | null)
-    : null;
-
   const evaluationIds = evaluations.map(() => uuid());
 
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
 
+  const errors = getProposalErrors({
+    page: {
+      title: pageProps.title ?? '',
+      type: pageProps.type,
+      content: pageProps.content
+    },
+    proposalType: formId || formFields?.length ? 'structured' : 'free_form',
+    proposal: {
+      authors: authorsList,
+      formFields,
+      evaluations,
+      workflowId
+    },
+    isDraft: !!isDraft,
+    requireTemplates: false
+  });
+
+  const workflow = (await prisma.proposalWorkflow.findUniqueOrThrow({
+    where: {
+      id: workflowId
+    }
+  })) as ProposalWorkflowTyped;
+
+  if (errors.length > 0) {
+    throw new InvalidInputError(errors.join('\n'));
+  }
+
   // retrieve permissions and apply evaluation ids to reviewers
-  evaluations.forEach(({ id: evaluationId, permissions: providedPermissions, reviewers: evalReviewers }, index) => {
-    const configuredEvaluation = workflow?.evaluations[index];
-    const permissions = configuredEvaluation?.permissions || providedPermissions;
+  evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers }, index) => {
+    const permissions = workflow.evaluations[index]?.permissions;
     if (!permissions) {
       throw new Error(
         `Cannot find permissions for evaluation step. Workflow: ${workflowId}. Evaluation: ${evaluationId}`
@@ -118,14 +135,8 @@ export async function createProposal({
 
   let proposalFormId = formId;
   // Always create new form for proposal templates
-  if (formFields?.length && pageProps?.type === 'proposal_template') {
+  if (formFields?.length && pageProps.type === 'proposal_template') {
     proposalFormId = await createForm(formFields);
-  }
-
-  for (const evaluation of evaluations) {
-    if (evaluation.reviewers.length === 0) {
-      throw new Error('No reviewers defined for proposal evaluation step');
-    }
   }
 
   // Using a transaction to ensure both the proposal and page gets created together
@@ -219,7 +230,7 @@ export async function createProposal({
 
   const proposalFormAnswers =
     formId && formAnswers?.length && page.type === 'proposal'
-      ? await upsertProposalFormAnswers({ formId, proposalId, answers: formAnswers })
+      ? await upsertProposalFormAnswers({ proposalId, answers: formAnswers })
       : null;
 
   await createVoteIfNecessary({

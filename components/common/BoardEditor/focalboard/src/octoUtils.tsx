@@ -1,6 +1,6 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
-import { DateUtils } from 'react-day-picker';
+import { DateTime } from 'luxon';
 
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
@@ -121,8 +121,8 @@ class OctoUtils {
       case 'date': {
         if (propertyValue) {
           const singleDate = new Date(parseInt(propertyValue as string, 10));
-          if (singleDate && DateUtils.isDate(singleDate)) {
-            displayValue = formatDate(new Date(parseInt(propertyValue as string, 10)));
+          if (singleDate && DateTime.fromJSDate(singleDate).isValid) {
+            displayValue = formatDate(singleDate);
           } else {
             try {
               const dateValue = JSON.parse(propertyValue as string);

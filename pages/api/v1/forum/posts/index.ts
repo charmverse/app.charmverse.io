@@ -6,6 +6,7 @@ import { createForumPost, trackCreateForumPostEvent } from 'lib/forums/posts/cre
 import { getPostVoteSummary, type ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import { listForumPosts } from 'lib/forums/posts/listForumPosts';
 import { requireKeys, InvalidStateError } from 'lib/middleware';
+import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
@@ -15,6 +16,10 @@ import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProf
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = apiHandler();
+
+handler.get(listPosts);
+
+handler.post(requireSuperApiKey, requireKeys(['userId', 'contentMarkdown', 'title', 'categoryId'], 'body'), createPost);
 
 /**
  * @swagger
@@ -117,7 +122,7 @@ interface CreateForumPostInput {
  *   post:
  *     summary: Create a new forum post
  *     tags:
- *      - 'Space API'
+ *      - 'Partner API'
  *     requestBody:
  *        description: Forum post to create
  *        content:
@@ -139,6 +144,7 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
   const payload = req.body as CreateForumPostInput;
+
   if (!spaceId) {
     throw new InvalidStateError('Space ID is undefined');
   }
@@ -229,10 +235,6 @@ async function createPost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
 
   return res.status(200).json(forumPost);
 }
-
-handler.post(requireKeys(['createdBy', 'contentMarkdown', 'title', 'categoryId'], 'body'), createPost);
-
-handler.get(listPosts);
 /**
  * @swagger
  * /forum/posts:
@@ -247,6 +249,16 @@ handler.get(listPosts);
  *        schema:
  *          type: string
  *          format: uuid
+ *      - name: page
+ *        in: query
+ *        description: results page to query
+ *        schema:
+ *          type: number
+ *      - name: count
+ *        in: query
+ *        description: results per request. 5 is default, 100 is max
+ *        schema:
+ *          type: number
  *     responses:
  *       200:
  *         description: List of forum posts
@@ -269,9 +281,15 @@ async function listPosts(
 ) {
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
+  const count = req.query.count ? parseInt(req.query.count as string) : undefined;
+  const page = req.query.page ? parseInt(req.query.page as string) : undefined;
   const categoryId = req.query.categoryId as string | undefined;
   if (!spaceId) {
     throw new InvalidStateError('Space ID is undefined');
+  }
+
+  if (count && (count < 1 || count > 100)) {
+    throw new InvalidStateError('Count must be between 1 and 100');
   }
 
   const space = await prisma.space.findUniqueOrThrow({
@@ -288,6 +306,8 @@ async function listPosts(
     spaceId: space.id,
     sort: 'new',
     authorSelect: userProfileSelect,
+    page,
+    count,
     categoryId
   });
 

@@ -303,7 +303,8 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.waitForNewProposalPage(space.domain);
 
     // Should be disabled as the required fields are not filled
-    await expect(proposalPage.saveDraftButton).toBeDisabled();
+    await expect(proposalPage.publishNewProposalButton).toBeDisabled();
+    await expect(proposalPage.saveDraftButton).toBeEnabled();
 
     await documentPage.documentTitleInput.fill('Proposal from structured template');
 

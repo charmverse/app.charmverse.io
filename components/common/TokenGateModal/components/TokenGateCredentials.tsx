@@ -4,22 +4,22 @@ import Select from '@mui/material/Select';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 
-import type { FormValues } from '../hooks/useGitcoinForm';
-import { useGitcoinForm } from '../hooks/useGitcoinForm';
+import type { FormValues } from '../hooks/useCredentialsForm';
+import { useCredentialsForm } from '../hooks/useCredentialsForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
-import { getGitcoinAccessControlConditions } from '../utils/getGitcoinAccessControlConditions';
+import { getCredentialsAccessControlConditions } from '../utils/getCredentialsAccessControlConditions';
 import { gitcoinPassportCheck } from '../utils/utils';
 
 import { TokenGateFooter } from './TokenGateFooter';
 
-export function TokenGateGitcoin() {
+export function TokenGateCredentials() {
   const {
     register,
     getValues,
     watch,
     formState: { errors, isValid },
     reset
-  } = useGitcoinForm();
+  } = useCredentialsForm();
 
   const check = watch('check');
 
@@ -27,7 +27,7 @@ export function TokenGateGitcoin() {
 
   const onSubmit = async () => {
     const values = getValues();
-    const valueProps = getGitcoinAccessControlConditions(values) || [];
+    const valueProps = getCredentialsAccessControlConditions(values) || [];
     handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };

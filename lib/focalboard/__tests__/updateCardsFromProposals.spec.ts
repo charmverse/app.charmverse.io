@@ -7,7 +7,7 @@ import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/
 import { InvalidStateError } from 'lib/middleware';
 import type { ProposalFields } from 'lib/proposal/interface';
 import { randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 

@@ -7,7 +7,7 @@ import { RPCList } from 'connectors/chains';
 
 import type { Operator, TokenGateConditions } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utilities/types';
-import { validateTokenGateConditions } from 'lib/tokenGates/validateTokenGateConditions';
+import { validateTokenGateConditions } from 'lib/tokenGates/validateTokenGateConditionsObject';
 
 const path = './config.json';
 
@@ -47,7 +47,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'ERC1155',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -61,7 +61,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'ERC1155',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -75,7 +75,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'ERC721',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -89,7 +89,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'ERC721',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -99,7 +99,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       } else if (!condition.standardContractType && condition.method === 'eth_getBalance') {
         return {
           contractAddress: '',
-          type: condition.standardContractType,
+          type: 'ERC20',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -113,7 +113,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'ERC20',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -123,7 +123,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       } else if (condition.standardContractType === 'MolochDAOv2.1') {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'MolochDAOv2.1',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -138,7 +138,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'Wallet',
           chain: chainId,
           condition: 'evm',
           method: condition.method,
@@ -148,7 +148,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       } else if (condition.standardContractType === 'CASK') {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'CASK',
           chain: chainId,
           condition: 'evm',
           method: 'balanceOf',
@@ -158,7 +158,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       } else if (condition.standardContractType === 'CASK') {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'CASK',
           chain: chainId,
           condition: 'evm',
           method: 'balanceOf',
@@ -168,7 +168,7 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       } else if (condition.standardContractType === 'POAP') {
         return {
           contractAddress: condition.contractAddress,
-          type: condition.standardContractType,
+          type: 'POAP',
           chain: chainId,
           condition: 'evm',
           method: condition.method === 'tokenURI' ? 'eventName' : 'eventId',
@@ -196,10 +196,7 @@ async function logNow() {
       type: true
     }
   });
-  // console.log(data.length);
-  // const found = data?.filter((i) => !!i.conditions?.unifiedAccessControlConditions?.find((c) => c.parameters));
-  // console.log('found', found.length, found?.conditions?.unifiedAccessControlConditions);
-  // return;
+
   const payload: Pick<TokenGate, 'conditions' | 'id' | 'spaceId' | 'type'>[] = data.map((item) => {
     if (item.type === 'lit') {
       const cond = transformToTokenGateCondition(item.conditions as any as JsonAccsRequest);

@@ -7,6 +7,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
+import { postUserCreate } from 'lib/users/postUserCreate';
 import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
 import { uid } from 'lib/utilities/strings';
 import type { LoggedInUser } from 'models';
@@ -92,7 +93,8 @@ export async function loginWithGoogle({
         },
         include: sessionUserRelations
       });
-      trackUserAction('sign_up', { userId: user.id, identityType: 'Google', ...signupAnalytics });
+
+      postUserCreate({ user, identityType: 'Google', signupAnalytics });
     } else {
       await prisma.googleAccount.update({
         where: {

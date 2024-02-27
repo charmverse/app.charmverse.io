@@ -94,12 +94,12 @@ function PagesListWithContext({
       icon: null
     }));
     const proposalPages: PageListItem[] = (proposalTemplates || []).map((template) => ({
-      id: template.page.id,
-      path: template.page.path || '',
+      id: template.pageId,
+      path: `/${template.pageId}`,
       hasContent: true,
-      originalTitle: template.page.title,
-      title: `Template > ${template.page.title}`,
-      type: template.page.type,
+      originalTitle: template.title,
+      title: `Template > ${template.title}`,
+      type: 'proposal_template',
       icon: null
     }));
 

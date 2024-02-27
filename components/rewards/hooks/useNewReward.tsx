@@ -62,13 +62,13 @@ export function useNewReward() {
             showMessage(err.message ?? 'Something went wrong', 'error');
             throw err;
           })
-          .then(() => {
+          .then((createdReward) => {
             setContentUpdated(false);
-            return true;
+            return createdReward ?? null;
           })
           .finally(() => {
             setIsSaving(false);
-            return false;
+            return null;
           });
       }
     },

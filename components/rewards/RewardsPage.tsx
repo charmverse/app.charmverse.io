@@ -171,16 +171,13 @@ export function RewardsPage({ title }: { title: string }) {
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
             {showViewHeaderRowsMenu ? (
-              <div style={{ marginBottom: 4 }}>
-                <RewardsHeaderRowsMenu
-                  visiblePropertyIds={activeView?.fields.visiblePropertyIds}
-                  board={activeBoard}
-                  cards={cards as Card[]}
-                  checkedIds={checkedIds}
-                  setCheckedIds={setCheckedIds}
-                  refreshRewards={() => {}}
-                />
-              </div>
+              <RewardsHeaderRowsMenu
+                visiblePropertyIds={activeView?.fields.visiblePropertyIds}
+                board={activeBoard}
+                cards={cards as Card[]}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+              />
             ) : (
               <>
                 <ViewTabs
@@ -320,7 +317,7 @@ export function RewardsPage({ title }: { title: string }) {
             ) : (
               <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
-                  description='Getting started with rewards'
+                  description='Getting started'
                   videoTitle='Rewards | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/bounties'
                 />

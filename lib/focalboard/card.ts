@@ -4,6 +4,7 @@ import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
 import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { RewardType } from 'lib/rewards/interfaces';
 
 export type CardPropertyValue = string | string[] | number;
 
@@ -30,11 +31,17 @@ export type CardPageProposal = {
   archived: boolean;
 };
 
+export type CardPageReward = {
+  id: string;
+  rewardType: RewardType;
+};
+
 export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
   page: PageMeta;
   proposal?: CardPageProposal;
+  reward?: CardPageReward;
   isStructuredProposal?: boolean;
 };
 

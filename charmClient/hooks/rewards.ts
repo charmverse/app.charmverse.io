@@ -47,7 +47,7 @@ export function useGetRewardBlocks({ spaceId, type }: { spaceId?: string; type?:
 // // Mutative requests
 
 export function useCreateReward() {
-  return usePOST<Omit<RewardCreationData, 'userId'>>('/api/rewards');
+  return usePOST<Omit<RewardCreationData, 'userId'>, RewardWithUsers>('/api/rewards');
 }
 
 export function useGetRewardTemplatesBySpace(spaceId?: string | null) {

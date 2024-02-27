@@ -1,5 +1,6 @@
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import type { IPropertyOption } from 'lib/focalboard/board';
+import type { RewardApplicationType } from 'lib/rewards/getApplicationType';
 
 export const rewardTypeOptions: IPropertyOption[] = [
   {
@@ -19,8 +20,6 @@ export const rewardTypeOptions: IPropertyOption[] = [
   }
 ];
 
-export type RewardApplicationType = 'application_required' | 'direct_submission' | 'assigned';
-
 type Props = {
   readOnly?: boolean;
   readOnlyMessage?: string;
@@ -28,7 +27,7 @@ type Props = {
   onChange: (value: RewardApplicationType) => void;
 };
 
-export function RewardApplicationType({ readOnly, readOnlyMessage, value, onChange }: Props) {
+export function RewardApplicationTypeSelect({ readOnly, readOnlyMessage, value, onChange }: Props) {
   function onValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     if (newValue) {

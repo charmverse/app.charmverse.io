@@ -14,27 +14,21 @@ import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context: GetServerSidePropsContext) => {
   const template = context.query?.template;
 
-  const customDomain = context.req.headers.host;
-
-  const spaceDomainFromPath = context.params?.domain;
-
-  const domainToUse = (spaceDomainFromPath ?? customDomain) as string | undefined;
-
+  // retrieve space by domain, and then last page view by spaceId
+  const domainOrCustomDomain = context.query.domain as string;
   const sessionUserId = context.req.session?.user?.id;
-
-  if (!domainToUse) {
-    return {
-      redirect: {
-        destination: `/`,
-        permanent: false
-      }
-    };
-  }
-
-  const space = await prisma.space.findFirst({
-    where: spaceDomainFromPath ? { domain: domainToUse } : { customDomain: domainToUse, isCustomDomainVerified: true },
+  const space = await prisma.space.findFirstOrThrow({
+    where: {
+      OR: [
+        {
+          customDomain: domainOrCustomDomain
+        },
+        { domain: domainOrCustomDomain }
+      ]
+    },
     select: {
       id: true,
+      domain: true,
       publicProposalTemplates: true
     }
   });
@@ -57,10 +51,10 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
   }
 
   // User is not a member, but space has not enabled public templates. Join via normal route
-  if (!space?.publicProposalTemplates || !template) {
+  if (!space.publicProposalTemplates || !template) {
     return {
       redirect: {
-        destination: `/join?domain=${domainToUse}`,
+        destination: `/join?domain=${space.domain}`,
         permanent: false
       }
     };
@@ -88,7 +82,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
       }
     };
   } catch (err) {
-    log.error('User could not join space via template', {
+    log.warn('User could not join space via template', {
       template,
       userId: sessionUserId,
       spaceId: space.id,
@@ -97,7 +91,7 @@ export const getServerSideProps: GetServerSideProps = withSessionSsr(async (cont
 
     return {
       redirect: {
-        destination: `/join?domain=${domainToUse}`,
+        destination: `/join?domain=${space.domain}`,
         permanent: false
       }
     };

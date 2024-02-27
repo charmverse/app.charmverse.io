@@ -1,6 +1,6 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { ListItemIcon, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
+import { ListItemIcon, ListItemText, Divider, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
@@ -33,8 +33,7 @@ const PropertyMenu = React.memo((props: Props) => {
     <Stack gap={1}>
       <TextField
         sx={{
-          mx: 1,
-          my: 1
+          mx: 1
         }}
         inputProps={{
           ref: nameTextbox
@@ -56,12 +55,6 @@ const PropertyMenu = React.memo((props: Props) => {
           }
         }}
       />
-      <MenuItem onClick={() => props.onDelete(propertyId)}>
-        <ListItemIcon>
-          <DeleteOutlinedIcon fontSize='small' />
-        </ListItemIcon>
-        <Typography variant='subtitle1'>Delete</Typography>
-      </MenuItem>
       <MenuItem
         {...bindTrigger(changePropertyTypePopupState)}
         sx={{
@@ -70,8 +63,15 @@ const PropertyMenu = React.memo((props: Props) => {
           justifyContent: 'space-between'
         }}
       >
-        <Typography variant='subtitle1'>Type: {typeDisplayName(intl, propertyType)}</Typography>
+        <ListItemText>Type: {typeDisplayName(intl, propertyType)}</ListItemText>
         <ArrowRightIcon fontSize='small' />
+      </MenuItem>
+      <Divider sx={{ my: '0 !important' }} />
+      <MenuItem onClick={() => props.onDelete(propertyId)}>
+        <ListItemIcon>
+          <DeleteOutlinedIcon fontSize='small' />
+        </ListItemIcon>
+        <ListItemText>Delete property</ListItemText>
       </MenuItem>
       <Menu
         {...bindMenu(changePropertyTypePopupState)}
