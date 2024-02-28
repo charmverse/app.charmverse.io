@@ -8,7 +8,7 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 
 type RewardOptions = Pick<ProposalFields, 'rewardsTemplateId' | 'enableRewards'>;

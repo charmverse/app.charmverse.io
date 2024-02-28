@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { DatabasePageNotFoundError } from 'lib/public-api/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import { validateFormRequestInput } from 'lib/zapier/validateFormRequestInput';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

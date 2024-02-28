@@ -4,7 +4,7 @@ import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
-import { randomETHWallet } from 'lib/utilities/blockchain';
+import { randomETHWallet } from 'lib/utils/blockchain';
 import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';

@@ -5,7 +5,7 @@ import charmClient from 'charmClient';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProposalEvaluationStep } from 'lib/proposal/interface';
+import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
 export function useBatchUpdateProposalStatusOrStep() {
   const { space } = useCurrentSpace();

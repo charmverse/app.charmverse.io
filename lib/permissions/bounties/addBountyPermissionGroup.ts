@@ -3,7 +3,7 @@ import { BountyPermissionLevel } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utils/errors';
 
 import type { TargetPermissionGroup } from '../interfaces';
 import { assigneeGroupIsValid } from '../validateAssigneeGroup';

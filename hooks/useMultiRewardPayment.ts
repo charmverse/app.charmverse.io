@@ -7,7 +7,7 @@ import { useCallback } from 'react';
 import { getAddress, parseUnits } from 'viem';
 
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { eToNumber } from 'lib/utilities/numbers';
+import { eToNumber } from 'lib/utils/numbers';
 
 import { usePages } from './usePages';
 

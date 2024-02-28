@@ -14,7 +14,7 @@ import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isUUID, prettyPrint } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 

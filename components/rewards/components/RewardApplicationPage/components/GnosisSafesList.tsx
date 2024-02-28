@@ -13,8 +13,8 @@ import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { shortenHex } from 'lib/utilities/blockchain';
-import { isTruthy } from 'lib/utilities/types';
+import { shortenHex } from 'lib/utils/blockchain';
+import { isTruthy } from 'lib/utils/types';
 
 type ApplicationLite = Pick<Application, 'id' | 'walletAddress' | 'bountyId' | 'createdBy'>;
 

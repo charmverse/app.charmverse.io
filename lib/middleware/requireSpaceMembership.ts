@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import type { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utils/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 

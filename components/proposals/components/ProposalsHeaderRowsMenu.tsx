@@ -10,8 +10,8 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { ProposalEvaluationStep } from 'lib/proposal/interface';
-import { isTruthy } from 'lib/utilities/types';
+import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import { isTruthy } from 'lib/utils/types';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from '../hooks/useProposals';

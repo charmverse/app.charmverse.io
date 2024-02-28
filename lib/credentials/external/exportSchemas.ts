@@ -8,7 +8,7 @@ import { createPublicClient, http } from 'viem';
 import { arbitrum, base, optimism } from 'viem/chains';
 
 import { clientToProvider } from 'hooks/useWeb3Signer';
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 import type { EasSchemaChain } from '../connectors';
 import { easConnectors, getOnChainSchemaUrl } from '../connectors';

@@ -23,7 +23,7 @@ import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import { shortenHex } from 'lib/utilities/blockchain';
+import { shortenHex } from 'lib/utils/blockchain';
 
 import { GnosisSafesList } from './GnosisSafesList';
 

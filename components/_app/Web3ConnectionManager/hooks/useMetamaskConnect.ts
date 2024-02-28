@@ -1,7 +1,7 @@
 import MetaMaskOnboarding from '@metamask/onboarding';
 import { useRef } from 'react';
 
-import { getBrowserPath, isTouchScreen } from 'lib/utilities/browser';
+import { getBrowserPath, isTouchScreen } from 'lib/utils/browser';
 
 const MM_DEEPLINK_SCHEMA = 'https://metamask.app.link/dapp/';
 

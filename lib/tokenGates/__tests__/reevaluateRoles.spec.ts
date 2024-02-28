@@ -26,8 +26,7 @@ describe('reevaluateRoles', () => {
 
     const res = await reevaluateRoles({
       spaceId: space.id,
-      userId: user.id,
-      authSig: {} as any
+      userId: user.id
     });
 
     expect(res.length).toBe(0);
@@ -44,8 +43,7 @@ describe('reevaluateRoles', () => {
 
     const res = await reevaluateRoles({
       spaceId: space.id,
-      userId: user.id,
-      authSig: { address: walletAddress } as any
+      userId: user.id
     });
 
     expect(res.length).toBe(2);
@@ -62,8 +60,7 @@ describe('reevaluateRoles', () => {
 
     const res = await reevaluateRoles({
       spaceId: space.id,
-      userId: user.id,
-      authSig: { address: walletAddress } as any
+      userId: user.id
     });
 
     expect(res.length).toBe(1);

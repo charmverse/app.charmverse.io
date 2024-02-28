@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { MemberProfileJson } from 'lib/profile/memberProfiles';
 import { memberProfileLabels, memberProfileNames } from 'lib/profile/memberProfiles';
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { sortArrayByObjectProperty } from 'lib/utils/array';
 
 export const useMemberProfileTypes = () => {
   const { space, isLoading } = useCurrentSpace();

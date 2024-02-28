@@ -7,7 +7,7 @@ import { createServer } from '__e2e__/utils/mockServer';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { getCurrentDate } from 'lib/utilities/dates';
+import { getCurrentDate } from 'lib/utils/dates';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateSpaceApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';

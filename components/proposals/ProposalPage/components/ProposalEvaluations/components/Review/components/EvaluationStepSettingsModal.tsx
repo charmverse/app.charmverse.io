@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { getEvaluationFormError } from 'lib/proposal/getProposalErrors';
+import { getEvaluationFormError } from 'lib/proposals/getProposalErrors';
 
 import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
 import { EvaluationStepSettings } from '../../Settings/components/EvaluationStepSettings';

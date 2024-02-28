@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPermissionsSubscription';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

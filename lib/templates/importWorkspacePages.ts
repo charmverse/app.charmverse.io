@@ -11,7 +11,7 @@ import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
 import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
 import { getSpace } from 'lib/spaces/getSpace';
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 import type { ExportedPage } from './exportWorkspacePages';
 import { getImportData } from './getImportData';

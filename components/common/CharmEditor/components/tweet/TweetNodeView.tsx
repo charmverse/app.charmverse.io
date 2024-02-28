@@ -6,7 +6,7 @@ import Script from 'next/script';
 import { useRef } from 'react';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { randomIntFromInterval } from 'lib/utilities/random';
+import { randomIntFromInterval } from 'lib/utils/random';
 
 import BlockAligner from '../BlockAligner';
 import { MediaSelectionPopup } from '../common/MediaSelectionPopup';

@@ -236,7 +236,6 @@ export const mockTokenGates: TokenGateWithRoles[] = [
 ];
 
 export const mockTokenGateResult: TokenGateEvaluationResult = {
-  walletAddress,
   canJoinSpace: true,
   eligibleGates: mockTokenGates.map((tokenGate) => tokenGate.id)
 };

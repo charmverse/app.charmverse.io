@@ -5,7 +5,7 @@ import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getProposalErrors } from 'lib/proposal/getProposalErrors';
+import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 

@@ -3,7 +3,7 @@ import { Box, Chip, FormControlLabel, FormGroup, Stack, TextField, Typography } 
 import { useEffect, useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
-import { getNumberFromString, percent } from 'lib/utilities/numbers';
+import { getNumberFromString, percent } from 'lib/utils/numbers';
 
 import type { SnapshotVotingProps, VoteChoiceFormProps } from '../SnapshotVotingForm';
 

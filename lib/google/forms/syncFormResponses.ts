@@ -8,8 +8,8 @@ import { createBoard } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
-import { WrongStateError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import { WrongStateError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
 import { syncThrottlePeriod } from './config';

@@ -23,7 +23,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 import Link from '../Link';
 

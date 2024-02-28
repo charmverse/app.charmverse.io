@@ -29,7 +29,7 @@ import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
@@ -89,7 +89,7 @@ export function RewardPropertiesForm({
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
   const readOnlyApplicationType =
-    (!isAdmin && (readOnly || !!forcedApplicationType || !!template)) || !!isProposalTemplate;
+    !!forcedApplicationType || (!isAdmin && (readOnly || !!template)) || !!isProposalTemplate;
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);

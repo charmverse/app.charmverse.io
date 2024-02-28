@@ -8,8 +8,8 @@ import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getUserProposalVotes } from 'lib/snapshot/getVotes';
 import { getVotingPower } from 'lib/snapshot/getVotingPower';
 import type { SnapshotProposal, VoteChoice } from 'lib/snapshot/interfaces';
-import { coerceToMilliseconds, relativeTime } from 'lib/utilities/dates';
-import { sleep } from 'lib/utilities/sleep';
+import { coerceToMilliseconds, relativeTime } from 'lib/utils/dates';
+import { sleep } from 'lib/utils/sleep';
 
 export type CastVote = (vote: VoteChoice) => Promise<void>;
 

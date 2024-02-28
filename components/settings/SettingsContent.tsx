@@ -20,7 +20,7 @@ import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import type { Feature } from 'lib/features/constants';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';

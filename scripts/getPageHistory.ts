@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 const spaceDomain = 'binding-amaranth-manatee';
 const pagePath = 'test-5942304006288427';

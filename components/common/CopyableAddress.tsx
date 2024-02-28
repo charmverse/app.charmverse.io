@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { Button } from 'components/common/Button';
-import { shortenHex } from 'lib/utilities/blockchain';
+import { shortenHex } from 'lib/utils/blockchain';
 
 const StyledButton = styled(Button)`
   color: inherit;

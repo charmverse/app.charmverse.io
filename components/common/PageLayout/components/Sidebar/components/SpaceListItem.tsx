@@ -8,7 +8,7 @@ import NextLink from 'next/link';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { Notification } from 'lib/notifications/interfaces';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import WorkspaceAvatar from './WorkspaceAvatar';
 

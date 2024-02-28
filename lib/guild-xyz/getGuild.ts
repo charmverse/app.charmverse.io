@@ -1,4 +1,4 @@
-import { guild } from '@guildxyz/sdk';
+import { guild } from './client';
 
 export async function getGuildDetails(guildUrlOrId: string | number) {
   const resp = await guild.get(guildUrlOrId);

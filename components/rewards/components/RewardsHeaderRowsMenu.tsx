@@ -12,7 +12,7 @@ import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { paidRewardStatuses } from 'lib/rewards/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { useRewards } from '../hooks/useRewards';
 import { useRewardsBoardAdapter } from '../hooks/useRewardsBoardAdapter';

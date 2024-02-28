@@ -6,7 +6,7 @@ import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupPr
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
-import { DataNotFoundError, DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, DuplicateDataError, InvalidInputError } from 'lib/utils/errors';
 
 import { updateSnapshotDomain } from './updateSnapshotDomain';
 import { updateSpaceCustomDomain } from './updateSpaceCustomDomain';

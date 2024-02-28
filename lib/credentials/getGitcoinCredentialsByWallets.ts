@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
-import { lowerCaseEqual } from 'lib/utilities/strings';
-import { isTruthy } from 'lib/utilities/types';
+import { lowerCaseEqual } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 
 import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 

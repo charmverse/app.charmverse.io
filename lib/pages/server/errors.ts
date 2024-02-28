@@ -1,4 +1,4 @@
-import { SystemError } from 'lib/utilities/errors';
+import { SystemError } from 'lib/utils/errors';
 
 export class PageNotFoundError extends SystemError {
   constructor(pageId: string) {

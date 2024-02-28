@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
-import { AggregateResults, aggregateResults } from 'lib/proposal/rubric/aggregateResults';
-import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import { writeToSameFolder } from 'lib/utilities/file';
-import { isNumber } from 'lib/utilities/numbers';
+import { AggregateResults, aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import { writeToSameFolder } from 'lib/utils/file';
+import { isNumber } from 'lib/utils/numbers';
 
 type ExportedProposal = {
   proposalUrl: string;

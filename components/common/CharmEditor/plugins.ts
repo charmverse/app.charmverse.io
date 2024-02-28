@@ -1,4 +1,4 @@
-import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 import { Plugin } from 'prosemirror-state';
@@ -17,6 +17,7 @@ import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/
 import * as emoji from './components/emojiSuggest/emojiSuggest.plugins';
 import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
+import * as hardBreak from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';

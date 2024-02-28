@@ -6,7 +6,7 @@ import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { getSummonRoleLabel } from 'lib/summon/getSummonRoleLabel';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';

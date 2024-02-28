@@ -3,11 +3,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, NotFoundError } from 'lib/middleware';
-import { getProposalTemplate } from 'lib/proposal/getProposalTemplate';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import { getProposalTemplate } from 'lib/proposals/getProposalTemplate';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -15,7 +15,7 @@ handler.get(getTemplateController);
 
 async function getTemplateController(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersAndRubric>) {
   const pageId = req.query.id as string;
-  const userId = req.session.user.id as string | undefined;
+  const userId = req.session.user?.id as string | undefined;
 
   if (!pageId) {
     throw new InvalidInputError('Page ID is required');

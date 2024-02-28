@@ -10,7 +10,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireKeys } from 'lib/middleware/requireKeys';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 

@@ -8,7 +8,7 @@ import * as yup from 'yup';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isUUID, isUrl, isValidEmail } from 'lib/utilities/strings';
+import { isUUID, isUrl, isValidEmail } from 'lib/utils/strings';
 
 import type { FieldType, FormFieldValue } from '../interfaces';
 

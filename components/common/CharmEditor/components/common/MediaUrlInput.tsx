@@ -1,7 +1,7 @@
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 
-import { isUrl } from 'lib/utilities/strings';
+import { isUrl } from 'lib/utils/strings';
 
 type InputProps = {
   placeholder: string;
