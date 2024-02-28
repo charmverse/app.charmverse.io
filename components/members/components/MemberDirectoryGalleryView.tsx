@@ -9,13 +9,12 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { SocialIcons } from 'components/members/components/SocialIcons';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Social, Member } from 'lib/members/interfaces';
+import type { Member, Social } from 'lib/members/interfaces';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -42,11 +41,10 @@ function MemberDirectoryGalleryCard({
   member: Member;
 }) {
   const { formatDate } = useDateFormatter();
-  const { openSettings } = useSettingsDialog();
 
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-
+  const { openEditProfile } = useMemberProfileDialog();
   const isDiscordHidden = !propertiesRecord.discord?.enabledViews.includes('gallery');
   const isTwitterHidden = !propertiesRecord.twitter?.enabledViews.includes('gallery');
   const isLinkedInHidden = !propertiesRecord.linked_in?.enabledViews.includes('gallery');
@@ -56,19 +54,19 @@ function MemberDirectoryGalleryCard({
   const googleProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.google?.id);
   const telegramProperty = member.properties.find((mp) => mp.memberPropertyId === propertiesRecord.telegram?.id);
 
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
 
   const isUserCard = user?.id === member.id && currentSpace;
 
   function openUserCard(e: MouseEvent<HTMLDivElement>) {
     e.preventDefault();
     e.stopPropagation();
-    showUserId(member.id);
+    showUserProfile(member.id);
   }
 
   function onClickEdit(e: MouseEvent<HTMLElement>) {
     e.stopPropagation();
-    openSettings('profile');
+    openEditProfile();
   }
 
   const social = (member.profile?.social as Social) ?? {};
