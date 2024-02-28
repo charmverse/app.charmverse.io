@@ -11,7 +11,7 @@ import { Typography } from 'components/common/Typography';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { capitalize } from 'lib/utilities/strings';
+import { capitalize } from 'lib/utils/strings';
 
 import { CredentialTemplateDialog } from './CredentialTemplateDialog';
 import { CredentialTemplateRow } from './CredentialTemplateRow';
