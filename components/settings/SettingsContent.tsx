@@ -13,7 +13,7 @@ import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -89,7 +89,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const { onClose: closeSettingsDialog } = useSettingsDialog();
 
   return (
@@ -116,7 +116,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
             onClick={() => {
               if (user && tab.path === 'profile') {
                 closeSettingsDialog();
-                showUserId(user.id);
+                showUserProfile(user.id);
                 return null;
               } else {
                 onSelectPath(tab.path);

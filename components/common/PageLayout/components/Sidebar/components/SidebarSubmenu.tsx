@@ -21,7 +21,7 @@ import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -95,7 +95,7 @@ export default function SidebarSubmenu({
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
 }) {
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const { notifications = [], otherSpacesUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
@@ -152,27 +152,27 @@ export default function SidebarSubmenu({
         ) : null}
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
-        {user && (
-          <MenuItem
-            onClick={() => {
-              showUserId(user.id);
-            }}
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'auto 1fr',
-              gridTemplateRows: 'auto auto',
-              columnGap: 1
-            }}
-          >
-            <UserDisplay userId={user?.id} hideName gridColumn='1' gridRow='1/3' />
-            <Typography variant='body2' noWrap>
-              {user?.username}
-            </Typography>
-            <Typography variant='body2' color='secondary'>
-              My Profile
-            </Typography>
-          </MenuItem>
-        )}
+        <MenuItem
+          onClick={() => {
+            if (user) {
+              showUserProfile(user.id);
+            }
+          }}
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gridTemplateRows: 'auto auto',
+            columnGap: 1
+          }}
+        >
+          <UserDisplay userId={user?.id} hideName gridColumn='1' gridRow='1/3' />
+          <Typography variant='body2' noWrap>
+            {user?.username}
+          </Typography>
+          <Typography variant='body2' color='secondary'>
+            My Profile
+          </Typography>
+        </MenuItem>
         <Divider />
         <Typography component='p' variant='caption' mx={2} mb={1}>
           My Spaces

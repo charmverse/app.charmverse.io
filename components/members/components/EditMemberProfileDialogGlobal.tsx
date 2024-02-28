@@ -7,7 +7,7 @@ import Dialog from 'components/common/BoardEditor/focalboard/src/components/dial
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ProfileSettings from 'components/settings/profile/ProfileSettings';
 
-import { useEditProfileDialog } from '../hooks/useEditProfileDialog';
+import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';
 
 const ContentContainer = styled(PageEditorContainer)`
   width: 100%;
@@ -15,7 +15,7 @@ const ContentContainer = styled(PageEditorContainer)`
 `;
 
 export function EditMemberProfileDialogGlobal() {
-  const { isOpen, setIsOpen } = useEditProfileDialog();
+  const { isEditProfileOpen, closeEditProfile } = useMemberProfileDialog();
 
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
   const [unsavedChanges, setUnsavedChanges] = useState(false);
@@ -24,11 +24,11 @@ export function EditMemberProfileDialogGlobal() {
     if (unsavedChanges) {
       confirmExitPopupState.open();
     } else {
-      setIsOpen(false);
+      closeEditProfile();
     }
   };
 
-  if (isOpen) {
+  if (isEditProfileOpen) {
     return (
       <>
         <Dialog onClose={handleCloseProfileEditModal}>
@@ -39,7 +39,7 @@ export function EditMemberProfileDialogGlobal() {
         <ConfirmDeleteModal
           onClose={() => {
             confirmExitPopupState.close();
-            setIsOpen(false);
+            closeEditProfile();
           }}
           title='Unsaved changes'
           open={confirmExitPopupState.isOpen}
@@ -48,7 +48,7 @@ export function EditMemberProfileDialogGlobal() {
           question='Are you sure you want to close this window? You have unsaved changes.'
           onConfirm={() => {
             confirmExitPopupState.close();
-            setIsOpen(false);
+            closeEditProfile();
           }}
         />
       </>

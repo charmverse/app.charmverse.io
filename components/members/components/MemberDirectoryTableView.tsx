@@ -25,7 +25,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
 import type { Member, Social } from 'lib/members/interfaces';
 
-import { useEditProfileDialog } from '../hooks/useEditProfileDialog';
+import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';
 
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
@@ -50,7 +50,7 @@ function MemberDirectoryTableRow({
   const twitterHandle = twitterUrl.split('/').at(-1);
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { setIsOpen } = useEditProfileDialog();
+  const { openEditProfile } = useMemberProfileDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -70,7 +70,7 @@ function MemberDirectoryTableRow({
             className='icons'
             onClick={(e) => {
               e.stopPropagation();
-              setIsOpen(true);
+              openEditProfile();
             }}
             style={{
               opacity: 1

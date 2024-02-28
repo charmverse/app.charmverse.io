@@ -16,7 +16,7 @@ import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { isProdEnv } from 'config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
@@ -80,7 +80,7 @@ export function Comment({
   });
   const commentContainerRef = useRef<HTMLDivElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const { commentId } = router.query as { commentId: string | null };
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -176,7 +176,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showUserId(commentUser.id);
+                  showUserProfile(commentUser.id);
                 }
               }}
             >
