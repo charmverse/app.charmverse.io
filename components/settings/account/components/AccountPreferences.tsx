@@ -22,8 +22,8 @@ import charmClient from 'charmClient';
 import { useColorMode } from 'context/darkMode';
 import { useUser } from 'hooks/useUser';
 import { useUserPreferences } from 'hooks/useUserPreferences';
-import { formatDateTime, getCurrentDate } from 'lib/utilities/dates';
-import debounce from 'lib/utilities/debounce';
+import { formatDateTime, getCurrentDate } from 'lib/utils/dates';
+import debounce from 'lib/utils/debounce';
 
 import Legend from '../../Legend';
 

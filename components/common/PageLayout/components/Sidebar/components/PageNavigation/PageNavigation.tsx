@@ -19,7 +19,7 @@ import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { NavIconHover } from './components/NavIconHover';
 import type { MenuNode, ParentMenuNode } from './components/TreeNode';

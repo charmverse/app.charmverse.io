@@ -13,7 +13,7 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { Constants } from 'lib/focalboard/constants';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';

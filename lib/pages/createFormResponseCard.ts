@@ -5,7 +5,7 @@ import { prismaToBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 import type { AddFormResponseInput, FormResponse } from 'lib/zapier/interfaces';
 import { parseFormData } from 'lib/zapier/parseFormData';

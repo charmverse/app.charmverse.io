@@ -9,7 +9,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useRoles } from 'hooks/useRoles';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 export function useImportDiscordRoles() {
   const { showMessage } = useSnackbar();

@@ -1,13 +1,12 @@
-import { prisma } from "@charmverse/core/prisma-client";
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
-import { getSpace } from "lib/spaces/getSpace";
-import { randomIntFromInterval } from "lib/utilities/random";
+import { getSpace } from 'lib/spaces/getSpace';
+import { randomIntFromInterval } from 'lib/utils/random';
 
 const minRubricScore = 0;
 const maxRubricScore = 20;
 
-
-async function generateRubricProposals({spaceIdOrDomain, amount}: {spaceIdOrDomain: string; amount: number}) {
+async function generateRubricProposals({ spaceIdOrDomain, amount }: { spaceIdOrDomain: string; amount: number }) {
   const space = await getSpace(spaceIdOrDomain);
 
   for (let i = 0; i < amount; i++) {
@@ -16,12 +15,20 @@ async function generateRubricProposals({spaceIdOrDomain, amount}: {spaceIdOrDoma
       userId: space.createdBy,
       proposalStatus: 'published',
       authors: [space.createdBy],
-      evaluationInputs: [{
-        evaluationType: 'rubric',
-        reviewers: [{group: 'user', id: space.createdBy}],
-        permissions: [{assignee: {group: 'space_member'}, operation: 'view'}],
-        rubricCriteria: [{title: 'test', description: 'test', parameters: {type: 'range', min: minRubricScore, max: maxRubricScore}}]
-      }]
+      evaluationInputs: [
+        {
+          evaluationType: 'rubric',
+          reviewers: [{ group: 'user', id: space.createdBy }],
+          permissions: [{ assignee: { group: 'space_member' }, operation: 'view' }],
+          rubricCriteria: [
+            {
+              title: 'test',
+              description: 'test',
+              parameters: { type: 'range', min: minRubricScore, max: maxRubricScore }
+            }
+          ]
+        }
+      ]
     });
 
     const evaluation = await prisma.proposalEvaluation.findFirstOrThrow({
@@ -37,8 +44,8 @@ async function generateRubricProposals({spaceIdOrDomain, amount}: {spaceIdOrDoma
       data: {
         userId: space.createdBy,
         comment: 'test',
-        evaluation: {connect: {id: evaluation.id}},
-        proposal: {connect: {id: proposal.id}},
+        evaluation: { connect: { id: evaluation.id } },
+        proposal: { connect: { id: proposal.id } },
         rubricCriteria: {
           connect: {
             id: evaluation.rubricCriteria[0].id
@@ -48,9 +55,8 @@ async function generateRubricProposals({spaceIdOrDomain, amount}: {spaceIdOrDoma
           score: randomIntFromInterval(minRubricScore, maxRubricScore)
         }
       }
-    })
+    });
   }
-  
 }
 
 // prisma.proposal.deleteMany({
@@ -61,5 +67,4 @@ async function generateRubricProposals({spaceIdOrDomain, amount}: {spaceIdOrDoma
 //   }
 // }).then(console.log)
 
-
-generateRubricProposals({amount: 15, spaceIdOrDomain: 'urgent-teal-piranha'})
+generateRubricProposals({ amount: 15, spaceIdOrDomain: 'urgent-teal-piranha' });

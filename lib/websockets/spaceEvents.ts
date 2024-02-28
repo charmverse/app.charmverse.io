@@ -257,6 +257,63 @@ export class SpaceEventHandler {
         });
         this.sendError(errorMessage);
       }
+    } else if (message.type === 'page_duplicated') {
+      const duplicatedPage = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: message.payload.pageId
+        },
+        select: {
+          id: true,
+          parentId: true,
+          type: true,
+          path: true
+        }
+      });
+
+      if (
+        duplicatedPage.parentId &&
+        (duplicatedPage.type === 'board' || duplicatedPage.type === 'page' || duplicatedPage.type === 'linked_board')
+      ) {
+        const pageDetails = await this.getPageDetails({
+          childPageId: duplicatedPage.id,
+          pageId: duplicatedPage.parentId
+        });
+
+        const { documentNode, documentRoom, participant, content } = pageDetails;
+        const lastValidPos = documentNode.content.size;
+        try {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: duplicatedPage.id, pos: lastValidPos }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_created'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: duplicatedPage.parentId,
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: duplicatedPage.id, pos: lastValidPos })
+            });
+          }
+        } catch (err) {
+          log.error(`Error duplicating a page and adding it to parent page content`, {
+            error: err,
+            pageId: duplicatedPage.id,
+            userId: this.userId,
+            message
+          });
+        }
+      }
     } else if (message.type === 'page_reordered_sidebar_to_sidebar' && this.userId && this.spaceId) {
       const { pageId, newParentId } = message.payload;
 

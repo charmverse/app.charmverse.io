@@ -11,7 +11,7 @@ import { CenteredPageContent } from 'components/common/PageLayout/components/Pag
 import { useFilteredMembers } from 'components/members/hooks/useFilteredMembers';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import type { Member } from 'lib/members/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
 import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';

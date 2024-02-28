@@ -6,7 +6,7 @@ import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/compon
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;

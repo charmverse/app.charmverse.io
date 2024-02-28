@@ -1,7 +1,9 @@
 import { log } from '@charmverse/core/log';
-import type { Upload as MuxUpload } from '@mux/mux-node';
+import type { Mux } from '@mux/mux-node';
 
 import { mux } from './muxClient';
+
+type MuxUpload = Mux.Video.Upload;
 
 export type Upload = {
   id: MuxUpload['id'];
@@ -15,11 +17,11 @@ export async function getUpload(uploadId: string): Promise<Upload> {
     throw new Error('Mux client not configured');
   }
   try {
-    const upload = await mux.Video.Uploads.get(uploadId);
+    const upload = await mux.video.uploads.retrieve(uploadId);
     if (!upload.asset_id) {
       throw new Error(`No asset id for mux upload. Upload id: ${uploadId}`);
     }
-    const asset = await mux.Video.Assets.get(upload.asset_id);
+    const asset = await mux.video.assets.retrieve(upload.asset_id);
     const playbackId = asset.playback_ids?.[0].id;
     return {
       id: upload.id,

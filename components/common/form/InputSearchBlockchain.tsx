@@ -7,7 +7,7 @@ import type { IChainDetails } from 'connectors/chains';
 import { RPCList, getChainById } from 'connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
   onChange?: (chainId: number) => void;

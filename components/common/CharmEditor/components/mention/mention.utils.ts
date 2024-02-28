@@ -1,5 +1,4 @@
-import type { Command } from '@bangle.dev/pm';
-import type { PluginKey } from 'prosemirror-state';
+import type { Command, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 
 import type { SuggestPluginState } from 'lib/prosemirror/interfaces';

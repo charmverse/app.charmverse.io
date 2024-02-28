@@ -10,7 +10,7 @@ import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DisabledAccountError } from 'lib/utilities/errors';
+import { DisabledAccountError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

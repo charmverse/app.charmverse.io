@@ -10,7 +10,7 @@ import { updateDatabaseSchema } from 'lib/public-api/updateDatabaseSchema';
 import type { BodyFormResponse, TypeformResponse } from 'lib/typeform/interfaces';
 import { simplifyTypeformResponse } from 'lib/typeform/simplifyTypeformResponse';
 import { transformWebhookBodyFormResponse } from 'lib/typeform/transformWebhookBodyFormResponse';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = apiPageKeyHandler();
 

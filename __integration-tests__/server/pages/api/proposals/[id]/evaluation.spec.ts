@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposal/rubric/interfaces';
-import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
+import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposals/rubric/interfaces';
+import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/proposals/[id]/evaluation - Update proposal evaluation', () => {

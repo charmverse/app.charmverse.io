@@ -13,8 +13,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { DialogTitle, Modal } from 'components/common/Modal';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import randomName from 'lib/utilities/randomName';
+import { shortWalletAddress } from 'lib/utils/blockchain';
+import randomName from 'lib/utils/randomName';
 
 import Integration from './Integration';
 

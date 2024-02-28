@@ -11,9 +11,9 @@ import { createBoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { PROPOSAL_RESULT_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
-import type { ProposalEvaluationStep } from 'lib/proposal/interface';
-import { getAbsolutePath } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
+import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import { getAbsolutePath } from 'lib/utils/browser';
+import { isTruthy } from 'lib/utils/types';
 
 import type { PageListItemsRecord } from '../../interfaces';
 

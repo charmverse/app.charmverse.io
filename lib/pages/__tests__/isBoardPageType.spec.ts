@@ -1,6 +1,6 @@
 import { PageType } from '@charmverse/core/prisma';
 
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 import { isBoardPageType } from '../isBoardPageType';
 

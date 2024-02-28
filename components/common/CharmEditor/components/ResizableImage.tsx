@@ -12,7 +12,7 @@ import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { uploadToS3 } from 'lib/aws/uploadToS3Browser';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 
 import { enableDragAndDrop } from '../utils';
 

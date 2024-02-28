@@ -21,7 +21,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSpaceInvitesList } from 'hooks/useSpaceInvitesList';
 import { useSpaces } from 'hooks/useSpaces';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 import { TogglePublicProposalTemplates } from './TogglePublicProposalTemplates';
 

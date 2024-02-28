@@ -8,7 +8,7 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 import LoadingComponent from '../LoadingComponent';
 

@@ -14,7 +14,7 @@ import type {
   ProposalNotification,
   VoteNotification
 } from 'lib/notifications/interfaces';
-import { getCurrentDate } from 'lib/utilities/dates';
+import { getCurrentDate } from 'lib/utils/dates';
 
 import { members } from '../lib/mockData';
 

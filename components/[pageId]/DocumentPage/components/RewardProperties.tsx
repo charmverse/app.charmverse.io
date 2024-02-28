@@ -11,7 +11,7 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 type RewardsValue = UpdateableRewardFieldsWithType & { id?: string; status?: BountyStatus };
 

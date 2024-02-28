@@ -2,7 +2,7 @@ import type { ProposalWorkflow, Space, User } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
+import type { CreateProposalInput } from 'lib/proposals/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateProposalWorkflow } from 'testing/utils/proposals';

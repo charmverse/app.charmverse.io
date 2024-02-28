@@ -13,7 +13,7 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import type { Block } from 'lib/focalboard/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';

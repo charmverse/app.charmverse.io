@@ -10,7 +10,7 @@ import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';

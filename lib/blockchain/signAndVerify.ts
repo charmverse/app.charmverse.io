@@ -1,8 +1,8 @@
 import { SiweMessage } from 'lit-siwe';
 import { getAddress, recoverMessageAddress } from 'viem';
 
-import { InvalidInputError } from '../utilities/errors';
-import { lowerCaseEqual } from '../utilities/strings';
+import { InvalidInputError } from '../utils/errors';
+import { lowerCaseEqual } from '../utils/strings';
 
 import type { AuthSig } from './interfaces';
 

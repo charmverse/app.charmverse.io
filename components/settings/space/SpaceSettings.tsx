@@ -30,10 +30,10 @@ import type { Feature } from 'lib/features/constants';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
-import { isTruthy } from 'lib/utilities/types';
+import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
+import { isTruthy } from 'lib/utils/types';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { ConnectCollabland } from './components/ConnectCollabland';

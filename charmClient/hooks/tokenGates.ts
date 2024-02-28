@@ -1,9 +1,8 @@
 import type { TokenGateToRole } from '@charmverse/core/prisma-client';
 
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateVerificationRequest } from 'lib/tokenGates/applyTokenGates';
 import type { TokenGateEvaluationAttempt, TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
-import type { TokenGate, TokenGateWithRoles, TokenGateConditions } from 'lib/tokenGates/interfaces';
+import type { TokenGate, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 
 import { useDELETE, useGET, usePOST, usePUT } from './helpers';
 
@@ -30,7 +29,9 @@ export function useReviewTokenGate<T = Pick<TokenGate, 'conditions'>>() {
 }
 
 export function useEvaluateTokenGateEligibility() {
-  return usePOST<TokenGateEvaluationAttempt, TokenGateEvaluationResult>('/api/token-gates/evaluate');
+  return usePOST<Pick<TokenGateEvaluationAttempt, 'spaceIdOrDomain'>, TokenGateEvaluationResult>(
+    '/api/token-gates/evaluate'
+  );
 }
 
 export function useVerifyTokenGate() {
@@ -38,5 +39,5 @@ export function useVerifyTokenGate() {
 }
 
 export function useReevaluateRoles() {
-  return usePOST<{ authSig: AuthSig; spaceId: string }, string[]>('/api/token-gates/reevaluate');
+  return usePOST<{ spaceId: string }, string[]>('/api/token-gates/reevaluate');
 }

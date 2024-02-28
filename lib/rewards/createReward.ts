@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 import { NotFoundError } from 'lib/middleware';
 import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { getRewardOrThrow } from './getReward';
 import { getRewardErrors } from './getRewardErrors';

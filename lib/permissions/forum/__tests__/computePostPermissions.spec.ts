@@ -7,7 +7,7 @@ import { objectUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';
 

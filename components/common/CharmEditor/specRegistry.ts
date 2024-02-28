@@ -15,6 +15,7 @@ import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
 import { spec as farcasterFrameSpec } from './components/farcasterFrame/farcasterFrameSpec';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
+import { hardBreakSpec } from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -44,7 +45,6 @@ import { spec as tableOfContentSpec } from './components/tableOfContents/tableOf
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
-import { hardBreakSpec } from './specs/hardBreakSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;

@@ -20,7 +20,7 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { isMac } from 'lib/utilities/browser';
+import { isMac } from 'lib/utils/browser';
 
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 

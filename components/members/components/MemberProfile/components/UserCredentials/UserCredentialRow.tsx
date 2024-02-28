@@ -13,7 +13,7 @@ import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialData } from 'lib/credentials/schemas';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 export function UserCredentialRow({
   credential,

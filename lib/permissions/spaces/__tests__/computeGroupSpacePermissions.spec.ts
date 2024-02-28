@@ -3,7 +3,7 @@ import { SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

@@ -8,7 +8,7 @@ import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';

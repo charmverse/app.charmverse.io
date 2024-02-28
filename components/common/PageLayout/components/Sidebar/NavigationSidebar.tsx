@@ -232,11 +232,7 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   return (
     <SidebarContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-        <SidebarSubmenu
-          closeSidebar={closeSidebar}
-          logoutCurrentUser={logoutCurrentUser}
-          openProfileModal={() => handleModalClick('profile')}
-        />
+        <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
         {space && (
           <>
             <Box mb={2}>

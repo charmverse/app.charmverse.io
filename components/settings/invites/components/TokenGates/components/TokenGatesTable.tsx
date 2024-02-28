@@ -6,10 +6,9 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import Typography from '@mui/material/Typography';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
 import { useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
-import { Web3Connection } from 'components/_app/Web3ConnectionManager';
 import Loader from 'components/common/Loader';
 import TableRow from 'components/common/Table/TableRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -42,40 +41,31 @@ const StyledTableRow = styled(TableRow)`
 const padding = 32;
 
 export default function TokenGatesTable({ isAdmin, isLoading, tokenGates, refreshTokenGates }: Props) {
-  const { account, walletAuthSignature, requestSignature } = useWeb3Account();
+  const { account } = useWeb3Account();
   const isMobile = useSmallScreen();
   const [testResult, setTestResult] = useState<TestResult>({});
   const { space } = useCurrentSpace();
-  const { connectWallet } = useContext(Web3Connection);
   const { trigger: verifyTokenGate } = useVerifyTokenGate();
 
   async function testConnect(tokenGate: TokenGate) {
-    if (account) {
-      const authSig = walletAuthSignature ?? (await requestSignature());
+    setTestResult({ status: 'loading' });
 
-      setTestResult({ status: 'loading' });
-
-      await verifyTokenGate(
-        {
-          commit: false,
-          spaceId: space?.id || '',
-          tokenGateIds: [tokenGate.id],
-          authSig,
-          walletAddress: account || ''
+    await verifyTokenGate(
+      {
+        commit: false,
+        spaceId: space?.id || '',
+        tokenGateIds: [tokenGate.id]
+      },
+      {
+        onError: (error) => {
+          log.warn('Error when verifying wallet', error);
+          setTestResult({ message: 'Your address does not meet the requirements', status: 'error' });
         },
-        {
-          onError: (error) => {
-            log.warn('Error when verifying wallet', error);
-            setTestResult({ message: 'Your address does not meet the requirements', status: 'error' });
-          },
-          onSuccess: () => {
-            setTestResult({ status: 'success' });
-          }
+        onSuccess: () => {
+          setTestResult({ status: 'success' });
         }
-      );
-    } else {
-      connectWallet();
-    }
+      }
+    );
   }
 
   return (

@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { paidRewardStatuses } from './constants';
 import { getRewardOrThrow, rewardWithUsersInclude } from './getReward';

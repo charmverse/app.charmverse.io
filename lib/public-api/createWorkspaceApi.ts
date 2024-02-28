@@ -13,9 +13,9 @@ import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { isValidUrl } from 'lib/utilities/isValidUrl';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { isValidUrl } from 'lib/utils/isValidUrl';
+import { uid } from 'lib/utils/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 

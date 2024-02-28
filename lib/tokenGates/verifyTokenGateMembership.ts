@@ -7,7 +7,7 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { TokenGateWithRoles } from './interfaces';
 import { validateTokenGate } from './validateTokenGate';
@@ -42,17 +42,14 @@ export async function verifyTokenGateMembership({
     return { verified: true, removedRoles: 0 };
   }
 
+  const wallets = await prisma.userWallet.findMany({ where: { userId } });
+
   const tokenGateVerificationPromises = userTokenGates.map(async (userTokenGate) => {
     const { tokenGate: tokenGateWithRoles, id, grantedRoles } = userTokenGate;
 
     if (!tokenGateWithRoles) {
       return { id, isVerified: false, roleIds: grantedRoles };
     }
-    const wallets = await prisma.userWallet.findMany({
-      where: {
-        userId
-      }
-    });
 
     const values = await Promise.all(
       wallets.map(async (w) => validateTokenGate(tokenGateWithRoles as any as TokenGateWithRoles, w.address))
@@ -72,7 +69,7 @@ export async function verifyTokenGateMembership({
           return r.value;
         }
         if (r.status === 'rejected') {
-          log.error('Error verifying token gate', { error: r.reason });
+          log.error('Error verifying token gate membership', { error: r.reason });
         }
         return undefined;
       })

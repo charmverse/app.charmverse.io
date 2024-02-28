@@ -7,7 +7,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { recordDatabaseEvent, type EventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
