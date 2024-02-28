@@ -16,9 +16,9 @@ import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/prof
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
-import type { SystemError } from 'lib/utilities/errors';
-import { MissingWeb3AccountError } from 'lib/utilities/errors';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { SystemError } from 'lib/utils/errors';
+import { MissingWeb3AccountError } from 'lib/utils/errors';
+import { lowerCaseEqual } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import { PREFIX, useLocalStorage } from './useLocalStorage';
