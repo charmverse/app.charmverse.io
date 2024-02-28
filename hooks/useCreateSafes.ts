@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 export function useCreateSafes(safeAddresses: string[]) {
   const [safes, setSafes] = useState<Safe[]>([]);

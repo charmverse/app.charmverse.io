@@ -8,7 +8,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import GitCoindPassportIcon from 'public/images/logos/gitcoin_passport.svg';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
-import DAOIcon from 'public/images/template_icons/nounish_icon.svg';
+import CommunitiesIcon from 'public/images/template_icons/nounish_icon.svg';
 
 import { useTokenGateModal, type DisplayedPage } from '../hooks/useTokenGateModalContext';
 
@@ -39,14 +39,14 @@ const requirementButton: ButtonProps[] = [
     iconColor: 'primary'
   },
   {
-    name: 'dao',
+    name: 'communities',
     title: 'Communities',
-    icon: DAOIcon,
+    icon: CommunitiesIcon,
     iconColor: 'error'
   },
   {
-    name: 'gitcoin',
-    title: 'Gitcoin',
+    name: 'credentials',
+    title: 'Credentials',
     icon: GitCoindPassportIcon
   }
 ];

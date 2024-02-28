@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 
 export function useCustomDomain() {
   const [customDomain, setIsOnCustomDomain] = useState('');

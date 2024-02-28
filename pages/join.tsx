@@ -13,7 +13,7 @@ import { SpaceAccessGateWithSearch } from 'components/common/SpaceAccessGate/Spa
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaces } from 'hooks/useSpaces';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-import { getAppUrl, getSpaceUrl } from 'lib/utilities/browser';
+import { getAppUrl, getSpaceUrl } from 'lib/utils/browser';
 
 export function AlternateRouteButton({ href, children }: { href: string; children: ReactNode }) {
   const { spaces } = useSpaces();

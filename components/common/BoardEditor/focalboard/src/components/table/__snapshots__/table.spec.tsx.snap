@@ -279,7 +279,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -461,7 +461,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -1047,7 +1047,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -1229,7 +1229,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -1815,7 +1815,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -1997,7 +1997,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -2583,7 +2583,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-1"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"
@@ -2765,7 +2765,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           <div
             class="TableRow octo-table-row"
             data-test="database-row-card-id-2"
-            style="background-color: transparent; opacity: 1; cursor: move;"
+            style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
           >
             <div
               class="MuiStack-root css-1v111ru-MuiStack-root"

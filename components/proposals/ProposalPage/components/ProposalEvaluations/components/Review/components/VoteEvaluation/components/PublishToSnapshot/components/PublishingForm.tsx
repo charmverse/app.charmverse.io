@@ -30,8 +30,8 @@ import { getSnapshotClient } from 'lib/snapshot/getSnapshotClient';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import type { SnapshotReceipt, SnapshotSpace, SnapshotVotingStrategy } from 'lib/snapshot/interfaces';
 import { SnapshotVotingMode } from 'lib/snapshot/interfaces';
-import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utilities/errors';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { ExternalServiceError, MissingWeb3AccountError, SystemError, UnknownError } from 'lib/utils/errors';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import ConnectSnapshot from './ConnectSnapshot';
 import { InputVotingStrategies } from './InputVotingStrategies';

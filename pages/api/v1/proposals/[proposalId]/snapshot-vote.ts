@@ -10,7 +10,7 @@ import { requireKeys } from 'lib/middleware';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
-import { coerceToMilliseconds, getCurrentDate } from 'lib/utilities/dates';
+import { coerceToMilliseconds, getCurrentDate } from 'lib/utils/dates';
 
 import type { GenerateSnapshotVoteMessageResponseBody } from './generate-vote-message';
 

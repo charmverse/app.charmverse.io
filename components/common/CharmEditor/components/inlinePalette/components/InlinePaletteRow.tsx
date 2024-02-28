@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 
-import { isTouchDevice, safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
+import { isTouchDevice, safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 
 import type { InlinePaletteSize } from './InlineCommandPalette';
 

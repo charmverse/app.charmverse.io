@@ -10,15 +10,15 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { ProposalEvaluationStep } from 'lib/proposal/interface';
-import { isTruthy } from 'lib/utilities/types';
+import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import { isTruthy } from 'lib/utils/types';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 import { useProposals } from '../hooks/useProposals';
 
 type Props = Pick<ViewHeaderRowsMenuProps, 'checkedIds' | 'setCheckedIds' | 'cards' | 'board' | 'onChange'> & {
   visiblePropertyIds?: string[];
-  refreshProposals: VoidFunction;
+  refreshProposals: () => Promise<any>;
 };
 export function ProposalsHeaderRowsMenu({
   board,
@@ -252,9 +252,7 @@ export function ProposalsHeaderRowsMenu({
       checkedIds={checkedIds}
       setCheckedIds={setCheckedIds}
       propertyTemplates={propertyTemplates}
-      onChange={() => {
-        refreshProposals();
-      }}
+      onChange={refreshProposals}
       firstCheckedProposal={firstCheckedProposal}
       isStepDisabled={isStepDisabled}
       isStatusDisabled={isStatusDisabled}

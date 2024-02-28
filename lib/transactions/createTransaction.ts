@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { refreshPaymentStatus } from 'lib/rewards/refreshPaymentStatus';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 import type { TransactionCreationData } from './interface';
 
@@ -9,11 +10,15 @@ export async function createTransaction({
   applicationId,
   chainId,
   transactionId,
-  safeTxHash
+  safeTxHash,
+  userId
 }: TransactionCreationData) {
   const application = await prisma.application.findUnique({
     where: {
       id: applicationId
+    },
+    include: {
+      bounty: true
     }
   });
 
@@ -38,6 +43,15 @@ export async function createTransaction({
   if (safeTxHash) {
     await refreshPaymentStatus({ applicationId });
   }
+
+  trackUserAction('bounty_paid', {
+    walletType: safeTxHash ? 'Gnosis Safe' : 'Individual Wallet',
+    resourceId: application.bountyId,
+    rewardToken: application.bounty?.rewardToken,
+    rewardAmount: application.bounty?.rewardAmount,
+    spaceId: application.bounty?.spaceId,
+    userId: userId || ''
+  });
 
   return tx;
 }

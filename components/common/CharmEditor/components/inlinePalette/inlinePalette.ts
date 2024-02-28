@@ -1,5 +1,6 @@
 import { keymap } from '@bangle.dev/pm';
-import { bangleWarn, valuePlugin } from '@bangle.dev/utils';
+import { valuePlugin } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 import type { Node, Schema } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 import { PluginKey } from 'prosemirror-state';
@@ -57,8 +58,8 @@ function pluginsFactory({ key }: { key: PluginKey }) {
     const tooltipDOMSpec = createTooltipDOM();
 
     if (!schema.marks[markName]) {
-      bangleWarn(
-        `Couldn't find the markName:${markName}, please make sure you have initialized to use the same markName you initialized the spec with`
+      log.warn(
+        `Couldn't find the markName: ${markName}, please make sure you have initialized to use the same markName you initialized the spec with`
       );
       throw new Error(`markName ${markName} not found`);
     }

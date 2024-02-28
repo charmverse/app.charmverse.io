@@ -10,7 +10,7 @@ import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/Bo
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { formatViewTitle } from 'lib/focalboard/boardView';
-import { mergeRefs } from 'lib/utilities/react';
+import { mergeRefs } from 'lib/utils/react';
 import { greyColor2 } from 'theme/colors';
 
 import BoardViewTreeItem from './BoardViewTreeItem';

@@ -15,13 +15,12 @@ import { SectionName } from 'components/common/PageLayout/components/Sidebar/com
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
 import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import type { Feature } from 'lib/features/constants';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
@@ -90,13 +89,11 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
   const { mappedFeatures } = useSpaceFeatures();
-  const isCvSpace = useIsCharmverseSpace();
 
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
-  const displayAccountItems = isCvSpace ? ACCOUNT_TABS : ACCOUNT_TABS.filter((tab) => tab.path !== 'charms');
 
   return (
     <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
@@ -113,7 +110,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         <Box mt={2} py={0.5}>
           <SectionName>Account</SectionName>
         </Box>
-        {displayAccountItems.map((tab) => (
+        {ACCOUNT_TABS.map((tab) => (
           <SidebarLink
             key={tab.path}
             data-test={`space-settings-tab-${tab.path}`}

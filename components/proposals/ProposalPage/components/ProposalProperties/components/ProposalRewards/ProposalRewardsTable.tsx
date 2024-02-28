@@ -1,11 +1,13 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
-import { Box, Stack, Typography } from '@mui/material';
+import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
+import { Box, ListItemIcon, MenuItem, ListItemText, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
+import { ContextMenu } from 'components/common/ContextMenu';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -24,13 +26,13 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { CardPage } from 'lib/focalboard/card';
 import type { PagesMap } from 'lib/pages';
-import type { ProposalPendingReward } from 'lib/proposal/interface';
+import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsers, RewardType, RewardReviewer } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { AttachRewardButton } from './AttachRewardButton';
 
@@ -205,6 +207,13 @@ export function ProposalRewardsTable({
     }
   }
 
+  function deleteReward() {
+    if (currentPendingId) {
+      onDelete(currentPendingId);
+      closeDialog();
+    }
+  }
+
   return (
     <>
       <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
@@ -261,6 +270,20 @@ export function ProposalRewardsTable({
         onSave={saveForm}
         onCancel={closeDialog}
         isSaving={isSavingReward}
+        toolbar={
+          <Box display='flex' justifyContent='flex-end'>
+            {currentPendingId && (
+              <ContextMenu iconColor='secondary' popupId='reward-context'>
+                <MenuItem color='inherit' onClick={deleteReward}>
+                  <ListItemIcon>
+                    <TrashIcon />
+                  </ListItemIcon>
+                  <ListItemText>Delete</ListItemText>
+                </MenuItem>
+              </ContextMenu>
+            )}
+          </Box>
+        }
       >
         <NewDocumentPage
           key={newPageValues?.templateId}

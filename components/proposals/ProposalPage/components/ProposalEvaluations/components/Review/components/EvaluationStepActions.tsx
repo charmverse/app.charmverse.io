@@ -2,7 +2,7 @@ import { Edit as EditIcon } from '@mui/icons-material';
 import { Box, IconButton, Tooltip } from '@mui/material';
 
 import { ResetResultButton } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Review/components/ResetResultButton';
-import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 import { GoBackButton } from './GoBackButton';
 

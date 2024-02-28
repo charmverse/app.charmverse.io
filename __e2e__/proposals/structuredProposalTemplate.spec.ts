@@ -5,8 +5,8 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
-import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
-import { defaultWorkflowTitle, getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
+import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
+import { defaultWorkflowTitle, getDefaultWorkflows } from 'lib/proposals/workflows/defaultWorkflows';
 
 import { loginBrowserUser } from '../utils/mocks';
 
@@ -303,7 +303,8 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.waitForNewProposalPage(space.domain);
 
     // Should be disabled as the required fields are not filled
-    await expect(proposalPage.saveDraftButton).toBeDisabled();
+    await expect(proposalPage.publishNewProposalButton).toBeDisabled();
+    await expect(proposalPage.saveDraftButton).toBeEnabled();
 
     await documentPage.documentTitleInput.fill('Proposal from structured template');
 

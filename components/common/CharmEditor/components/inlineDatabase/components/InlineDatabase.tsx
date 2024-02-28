@@ -14,7 +14,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 

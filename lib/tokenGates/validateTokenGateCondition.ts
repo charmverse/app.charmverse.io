@@ -5,7 +5,7 @@ import { getPublicClient } from 'lib/blockchain/publicClient';
 import { getGitcoinPassportScore } from 'lib/credentials/getGitcoinCredentialsByWallets';
 import { getUserMemberships } from 'lib/guild-xyz/getUserMemberships';
 
-import { ercAbi, molochDaoAbi } from './abis/abis';
+import { erc1155Abi, ercAbi, molochDaoAbi } from './abis/abis';
 import { subscriptionTokenV1ABI } from './hypersub/abi';
 import type { AccessControlCondition } from './interfaces';
 import { PublicLockV13 } from './unlock/abi';
@@ -40,10 +40,20 @@ export async function validateTokenGateCondition(
 
       return balance >= minimumQuantity;
     }
-    // ERC721 With Token Id or ERC1155 With Token Id
-    case condition.type === 'ERC1155' && !!contractAddress && !!condition.tokenIds.at(0):
-    case condition.type === 'ERC721' && !!contractAddress && !!condition.tokenIds.at(0): {
-      const tokenId = BigInt(condition.tokenIds.at(0) || 1);
+    // ERC1155 With Token Id
+    case condition.type === 'ERC1155' && !!contractAddress && !!condition.tokenIds[0]: {
+      const tokenId = BigInt(condition.tokenIds[0] || 1);
+      const ownedNumberOfNFTs = await publicClient.readContract({
+        abi: erc1155Abi,
+        address: contractAddress,
+        functionName: 'balanceOf',
+        args: [userAddress, tokenId]
+      });
+
+      return ownedNumberOfNFTs > 0;
+    }
+    case condition.type === 'ERC721' && !!contractAddress && !!condition.tokenIds[0]: {
+      const tokenId = BigInt(condition.tokenIds[0] || 1);
       const ownerAddress = await publicClient.readContract({
         abi: ercAbi,
         address: contractAddress,
@@ -54,19 +64,20 @@ export async function validateTokenGateCondition(
       return userAddress === ownerAddress;
     }
     // Owner of wallet address
-    case condition.type === 'Wallet' && !!condition.tokenIds.at(0): {
-      return userAddress === condition.tokenIds.at(0);
+    case condition.type === 'Wallet' && !!condition.tokenIds[0]: {
+      return userAddress === condition.tokenIds[0];
     }
     // User is member of MolochDAOv2.1
     case condition.type === 'MolochDAOv2.1' && !!contractAddress: {
-      const isMemberOfMolochDao = await publicClient.readContract({
+      const memberOfMolochDaoInfo = await publicClient.readContract({
         abi: molochDaoAbi,
         address: contractAddress,
-        functionName: 'daos',
+        functionName: 'members',
         args: [userAddress]
       });
 
-      return isMemberOfMolochDao;
+      // Each position in the array is an attribute of the member.
+      return !!memberOfMolochDaoInfo?.at(3);
     }
     // Unlock Protocol member
     case condition.type === 'Unlock' && !!contractAddress: {
@@ -92,22 +103,18 @@ export async function validateTokenGateCondition(
       return balance >= minimumQuantity;
     }
     // POAP event id or event name
-    case condition.type === 'POAP' && !!condition.tokenIds.at(0): {
+    case condition.type === 'POAP' && !!condition.tokenIds[0]: {
       const poaps = await getPoapsFromAddress(userAddress);
       const userHasPoap = poaps.some(
-        (poap) =>
-          String(poap.event.id) === condition.tokenIds.at(0) || poap.event.name.includes(condition.tokenIds.at(0) || '')
+        (poap) => String(poap.event.id) === condition.tokenIds[0] || poap.event.name.includes(condition.tokenIds[0])
       );
 
       return userHasPoap;
     }
     // Guild.xyz member
-    case condition.type === 'Guildxyz' && !!condition.tokenIds.at(0): {
-      const minimumQuantity = Number(condition.quantity || 1);
-      const memberships = await getUserMemberships(condition.tokenIds.at(0) || '', userAddress);
-      const membershipAccess = memberships.filter((m) => m.access);
-
-      return membershipAccess.length >= minimumQuantity;
+    case condition.type === 'Guildxyz' && !!condition.tokenIds[0]: {
+      const hasMembership = await getUserMemberships(condition.tokenIds[0], userAddress);
+      return hasMembership;
     }
     // Gitcoin Passport
     case condition.type === 'GitcoinPassport': {

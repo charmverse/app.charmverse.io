@@ -5,11 +5,11 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
-import { upsertProposalFormAnswers } from 'lib/form/upsertProposalFormAnswers';
+import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposalFormAnswers } from 'lib/proposal/form/getProposalFormAnswers';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
+import { getProposalFormAnswers } from 'lib/proposals/form/getProposalFormAnswers';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -66,15 +66,9 @@ async function upsertProposalFormAnswersHandler(
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  const proposal = await prisma.proposal.findUniqueOrThrow({ where: { id: proposalId }, select: { formId: true } });
-
-  if (!proposal.formId) {
-    throw new InvalidInputError(`Proposal ${proposalId} does not have a form`);
-  }
-
   const { answers } = req.body as { answers: FieldAnswerInput[] };
 
-  await upsertProposalFormAnswers({ answers, formId: proposal.formId, proposalId });
+  await upsertProposalFormAnswers({ answers, proposalId });
 
   res.status(200).end();
 }

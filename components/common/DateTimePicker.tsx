@@ -6,7 +6,11 @@ import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTim
 import { useState } from 'react';
 
 // customized date picker that opens when clicking the inpu
-export function DateTimePicker<T>({ variant, ...props }: DateTimePickerProps<T> & { variant?: 'card_property' }) {
+export function DateTimePicker<T>({
+  variant,
+  placeholder,
+  ...props
+}: DateTimePickerProps<T> & { variant?: 'card_property'; placeholder?: string | boolean }) {
   const [open, setOpen] = useState(false);
   return (
     <div style={{ position: 'relative' }}>
@@ -26,7 +30,11 @@ export function DateTimePicker<T>({ variant, ...props }: DateTimePickerProps<T> 
         slotProps={{
           ...props.slotProps,
           field: { ...props.slotProps?.field, clearable: true },
-          textField: { ...props.slotProps?.textField, placeholder: 'Empty', onClick: () => setOpen(true) }
+          textField: {
+            ...props.slotProps?.textField,
+            placeholder: typeof placeholder === 'string' ? placeholder ?? 'Empty' : placeholder === true ? 'Empty' : '',
+            onClick: () => setOpen(true)
+          }
         }}
       />
     </div>

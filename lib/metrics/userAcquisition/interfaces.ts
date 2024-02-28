@@ -4,7 +4,8 @@ export const signupCookieNames = [
   'appCampaign',
   'marketingReferrer',
   'marketingLandingPage',
-  'marketingCampaign'
+  'marketingCampaign',
+  'userReferrerCode'
 ] as const;
 
 export type SignupCookieType = (typeof signupCookieNames)[number];

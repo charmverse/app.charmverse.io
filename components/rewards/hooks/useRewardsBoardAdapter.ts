@@ -36,15 +36,16 @@ import {
 import type { RewardFields, RewardFieldsProp } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
+import { getRewardType } from 'lib/rewards/getRewardType';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string } & RewardFieldsProp;
 
 export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { rewards } = useRewards();
+  const { rewards, mutateRewards } = useRewards();
   const { rewardsBoardBlock: board, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
   const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
@@ -110,12 +111,18 @@ export function useRewardsBoardAdapter() {
         const page = getRewardPage(reward.id);
         if (!page || !space) return null;
 
-        return mapRewardToCardPage({
-          reward,
-          spaceId: space.id,
-          rewardPage: page,
-          members: membersRecord
-        }) as CardPage;
+        return {
+          ...mapRewardToCardPage({
+            reward,
+            spaceId: space.id,
+            rewardPage: page,
+            members: membersRecord
+          }),
+          reward: {
+            id: reward.id,
+            rewardType: getRewardType(reward)
+          }
+        } as CardPage;
       })
       .filter(isTruthy);
 
@@ -153,7 +160,8 @@ export function useRewardsBoardAdapter() {
     cards,
     cardPages,
     activeView,
-    views
+    views,
+    refreshRewards: mutateRewards
   };
 }
 

@@ -19,7 +19,7 @@ import charmClient from 'charmClient';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 enum ResultType {
   page = 'page',

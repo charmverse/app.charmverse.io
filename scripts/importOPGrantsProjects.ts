@@ -1,11 +1,11 @@
 import { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
 
 /*****
  * NOTE: This script creates new users and spaces for Optimism grants proposal projects.
@@ -22,7 +22,7 @@ type ProjectData = {
   space: Space;
   spaceImageUrl: string | null;
   owner: string;
-}
+};
 
 async function importProjects() {
   const importedNames = getImportedProjectNames();
@@ -76,7 +76,14 @@ async function importProjects() {
         // mark space as created from gitcoin in mixpanel
         await updateTrackGroupProfile(space, 'optimism-grants');
 
-        const projectInfo = { proposalTitle, twitter, authorTwitter, space, spaceImageUrl: spaceImage, owner: adminUserId };
+        const projectInfo = {
+          proposalTitle,
+          twitter,
+          authorTwitter,
+          space,
+          spaceImageUrl: spaceImage,
+          owner: adminUserId
+        };
 
         exportDataToCSV([projectInfo]);
         console.log('🟢 Finished Importing project', spaceName);
@@ -139,10 +146,9 @@ function getImportedProjectsData() {
 
 function getImportedProjectNames() {
   const data = getImportedProjectsData();
-  const names = data
-    .map((cols) => {
-      return cols[0] || '';
-    })
+  const names = data.map((cols) => {
+    return cols[0] || '';
+  });
 
   console.log('🔥 imported projects count', names.length);
 
@@ -201,6 +207,5 @@ function exportDataToCSV(data: ProjectData[]) {
     appendFileSync(FILE_OUTPUT_PATH, csvData.join('\n'));
   }
 }
-
 
 importProjects();

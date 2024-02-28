@@ -14,7 +14,7 @@ import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { PropertyMenu } from './PropertyMenu';
 
@@ -88,11 +88,9 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
   } else if (checkedIds.length === 0) {
     disabledTooltip = 'No rewards selected';
   } else if (filteredRewards.length === 0) {
-    disabledTooltip = `Selected rewards are not token rewards or are not on the ${
+    disabledTooltip = `Selected rewards are either not token rewards, not on the ${
       getChainById(chainId)?.chainName
-    } network`;
-  } else if (submissions.length === 0) {
-    disabledTooltip = `Selected rewards don't have any completed submissions`;
+    } network or don't have any completed submissions`;
   }
 
   if (disabledTooltip) {

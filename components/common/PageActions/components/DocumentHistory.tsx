@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 const StyledTypography = styled(Typography)`
   color: ${({ theme }) => theme.palette.grey[300]};

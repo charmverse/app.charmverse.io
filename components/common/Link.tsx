@@ -6,8 +6,8 @@ import type { MouseEvent, MouseEventHandler } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { getSubdomainPath } from 'lib/utilities/browser';
-import { isExternalUrl } from 'lib/utilities/isExternalUrl';
+import { getSubdomainPath } from 'lib/utils/browser';
+import { isExternalUrl } from 'lib/utils/isExternalUrl';
 
 const hoverStyle: { [key: string]: string } = {
   blue: 'color: #111',

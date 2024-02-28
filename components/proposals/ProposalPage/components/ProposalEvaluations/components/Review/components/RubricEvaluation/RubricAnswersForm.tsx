@@ -14,7 +14,7 @@ import { TextInput } from 'components/common/BoardEditor/components/properties/T
 import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { getNumberFromString } from 'lib/utilities/numbers';
+import { getNumberFromString } from 'lib/utils/numbers';
 import type { NestedDataTest } from 'testing/e2eType';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };

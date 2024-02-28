@@ -27,10 +27,10 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_EVALUATION_TYPE_ID
-} from 'lib/proposal/blocks/constants';
-import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
-import type { ProposalFields } from 'lib/proposal/interface';
+} from 'lib/proposals/blocks/constants';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 export type BoardProposal = { createdAt: string; spaceId?: string; id?: string; fields: ProposalFields | null };
 

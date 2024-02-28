@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { Prisma } from '@charmverse/core/prisma';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import { DataNotFoundError, SystemError } from 'lib/utilities/errors';
+import { DataNotFoundError, SystemError } from 'lib/utils/errors';
 
 import { UnknownError } from './errors';
 import { removeApiKeyFromQuery } from './removeApiKeyFromQuery';

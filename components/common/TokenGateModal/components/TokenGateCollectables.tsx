@@ -50,13 +50,11 @@ export function TokenGateCollectables() {
           }
           {...register('collectableOption')}
         >
-          {collectableOptions
-            .filter((col) => !((col.id === 'UNLOCK' || col.id === 'HYPERSUB') && flow !== 'single'))
-            .map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.name}
-              </MenuItem>
-            ))}
+          {collectableOptions.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name}
+            </MenuItem>
+          ))}
         </Select>
       </FieldWrapper>
       <TokenGateCollectableFields />

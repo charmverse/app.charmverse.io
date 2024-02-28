@@ -14,7 +14,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { PublicApiForumPost } from '../index';
 import { getPublicForumPost } from '../index';
 
-const handler = apiHandler().get(getProposal).use(requireSuperApiKey).put(updatePost).delete(deleteProposal);
+const handler = apiHandler().get(getPost).use(requireSuperApiKey).put(updatePost).delete(deleteProposal);
 
 type EmptySuccessResponse = { success: true };
 
@@ -162,7 +162,7 @@ async function updatePost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
  *                $ref: '#/components/schemas/ForumPost'
  *
  */
-async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
+async function getPost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
 

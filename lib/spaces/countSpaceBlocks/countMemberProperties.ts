@@ -3,7 +3,7 @@ import type { MemberPropertyValue } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import _sum from 'lodash/sum';
 
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
+import { paginatedPrismaTask } from 'lib/utils/paginatedPrismaTask';
 
 import type { BlocksCountQuery, GenericBlocksCount } from './interfaces';
 

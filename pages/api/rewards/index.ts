@@ -16,7 +16,7 @@ import { rewardWithUsersInclude } from 'lib/rewards/getReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

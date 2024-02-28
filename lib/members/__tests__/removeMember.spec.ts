@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { generatePage } from '__e2e__/utils/pages';
 
 import { InvalidStateError } from 'lib/middleware';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { removeMember } from '../removeMember';

@@ -14,8 +14,8 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isUUID } from 'lib/utilities/strings';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { isUUID } from 'lib/utils/strings';
+import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

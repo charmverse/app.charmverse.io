@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { usePropertiesMutator } from '../hooks/usePropertiesMutator';
 import { useProposalsBoardAdapter } from '../hooks/useProposalsBoardAdapter';

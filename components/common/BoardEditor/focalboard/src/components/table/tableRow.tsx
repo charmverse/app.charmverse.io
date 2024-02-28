@@ -23,8 +23,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { isTouchScreen } from 'lib/utilities/browser';
-import { mergeRefs } from 'lib/utilities/react';
+import { isTouchScreen } from 'lib/utils/browser';
+import { mergeRefs } from 'lib/utils/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
 import { Utils } from '../../utils';
@@ -69,6 +69,7 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -124,7 +125,8 @@ function TableRow(props: Props) {
     subRowsEmptyValueContent,
     isChecked,
     setCheckedIds,
-    proposal
+    proposal,
+    reward
   } = props;
   const { showError } = useSnackbar();
 
@@ -225,11 +227,9 @@ function TableRow(props: Props) {
       onClick={(e) => props.onClick?.(e, card)}
       ref={mergeRefs([cardRef, preview, drop])}
       style={{
-        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
-        ...(isChecked && {
-          background: 'rgba(35, 131, 226, 0.14)',
-          zIndex: 85
-        }),
+        backgroundColor:
+          isSelected || isChecked ? 'rgba(35, 131, 226, 0.14)' : isNested ? 'var(--input-bg)' : 'transparent',
+        zIndex: 85,
         ...style
       }}
     >
@@ -361,10 +361,11 @@ function TableRow(props: Props) {
           >
             <PropertyValueElement
               showCard={(cardId) => cardId && props.showCard(cardId)}
-              readOnly={props.readOnly}
+              readOnly={props.readOnly || Boolean(isNested)}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               proposal={proposal}
+              reward={reward}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}

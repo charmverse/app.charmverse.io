@@ -195,9 +195,6 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     // Workflow auto-selected when loading the proposal
     await expect(proposalPage.workflowSelect).toHaveText(workflow.title);
 
-    // Move into configuring the actual evaluation
-    await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
-
     await Promise.all([
       proposalPage.page.waitForResponse('**/api/proposals'),
       proposalPage.publishNewProposalButton.click()
@@ -305,8 +302,6 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     await expect(yesOption).toBeVisible();
 
     await Promise.all([page.waitForResponse('**/api/votes/**/cast'), yesOption.click()]);
-
-    await page.pause();
 
     const proposalVote = await prisma.vote.findFirstOrThrow({
       where: {

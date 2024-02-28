@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 
 import { disconnectGoogleAccount } from '../disconnectGoogleAccount';
 

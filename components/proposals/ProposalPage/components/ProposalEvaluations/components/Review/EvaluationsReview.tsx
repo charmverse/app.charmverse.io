@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 import { WorkflowSelect } from '../../../WorkflowSelect';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';

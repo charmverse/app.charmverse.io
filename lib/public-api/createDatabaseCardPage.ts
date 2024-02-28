@@ -9,7 +9,7 @@ import { getPagePath } from 'lib/pages/utils';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 import { getDatabaseWithSchema } from './getDatabaseWithSchema';

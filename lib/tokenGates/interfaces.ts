@@ -25,7 +25,8 @@ export type Method =
   | 'members'
   | 'balanceOfBatch'
   | 'eventId'
-  | 'eventName';
+  | 'eventName'
+  | 'getHasValidKey';
 
 export type AccessControlCondition = {
   /** Chain id. */

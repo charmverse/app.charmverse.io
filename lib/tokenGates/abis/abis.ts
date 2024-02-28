@@ -1,3 +1,4 @@
+// General ERC ABI used for multiple cases
 export const ercAbi = [
   {
     stateMutability: 'view',
@@ -12,6 +13,46 @@ export const ercAbi = [
     outputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'name',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  }
+] as const;
+
+export const erc1155Abi = [
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address'
+      },
+      {
+        internalType: 'uint256',
+        name: 'id',
+        type: 'uint256'
+      }
+    ],
+    name: 'balanceOf',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
   }
 ] as const;
 
@@ -24,11 +65,31 @@ export const molochDaoAbi = [
         type: 'address'
       }
     ],
-    name: 'daos',
+    name: 'members',
     outputs: [
       {
-        name: '',
+        name: 'delegateKey',
+        type: 'address'
+      },
+      {
+        name: 'shares',
+        type: 'uint256'
+      },
+      {
+        name: 'loot',
+        type: 'uint256'
+      },
+      {
+        name: 'exists',
         type: 'bool'
+      },
+      {
+        name: 'highestIndexYesVote',
+        type: 'uint256'
+      },
+      {
+        name: 'jailed',
+        type: 'uint256'
       }
     ],
     payable: false,

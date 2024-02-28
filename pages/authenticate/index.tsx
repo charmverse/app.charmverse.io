@@ -15,7 +15,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { useVerifyLoginOtp } from 'hooks/useVerifyLoginOtp';
-import { isValidEmail } from 'lib/utilities/strings';
+import { isValidEmail } from 'lib/utils/strings';
 
 export default function Authenticate() {
   const [loginError, setLoginError] = useState(false);

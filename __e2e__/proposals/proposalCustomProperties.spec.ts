@@ -5,7 +5,7 @@ import { testUtilsSpaces } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { generateUser, generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
@@ -43,8 +43,6 @@ test.describe.serial('Proposal custom properties', () => {
   test.beforeAll(async ({ browser }) => {
     ({ space, user: admin } = await generateUserAndSpace({
       isAdmin: true,
-      onboarded: true,
-      skipOnboarding: true,
       spaceDomain: `cvt-${uuid()}`
     }));
     member = await generateUser({

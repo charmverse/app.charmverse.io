@@ -12,7 +12,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type { ListSpaceRolesResponse } from 'pages/api/roles';
 
 import { EmptyPlaceholder } from './EmptyPlaceholder';

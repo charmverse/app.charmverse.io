@@ -21,6 +21,7 @@ export type SignupAnalytics = {
   signupLandingUrl: string;
   signupSource: SignupSource;
   signupCampaign: string;
+  referrerCode: string;
 };
 
 export type UserSignupEvent = BaseEventWithoutGroup &

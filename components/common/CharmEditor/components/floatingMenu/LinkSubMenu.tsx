@@ -1,9 +1,10 @@
-import { link } from '@bangle.dev/base-components';
 import { Stack, TextField } from '@mui/material';
 import React, { useState } from 'react';
 
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import FieldLabel from 'components/common/form/FieldLabel';
+
+import * as link from '../link/link';
 
 export function LinkSubMenu() {
   const view = useEditorViewContext();
