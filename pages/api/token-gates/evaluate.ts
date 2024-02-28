@@ -10,13 +10,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys(['authSig', 'spaceIdOrDomain'], 'body'))
+  .use(requireKeys(['spaceIdOrDomain'], 'body'))
   .post(evaluateWallet);
 
 async function evaluateWallet(req: NextApiRequest, res: NextApiResponse<TokenGateEvaluationResult>) {
   const body = req.body as TokenGateEvaluationAttempt;
+  const userId = req.session.user.id;
 
-  const result = await evaluateTokenGateEligibility(body);
+  const result = await evaluateTokenGateEligibility({ ...body, userId });
 
   res.status(200).send(result);
 }

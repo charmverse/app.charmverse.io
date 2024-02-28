@@ -69,8 +69,7 @@ describe('verifyTokenGateMemberships', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate.id],
-      walletAddress
+      tokenGateIds: [tokenGate.id]
     });
     await deleteTokenGate(tokenGate.id);
 
@@ -80,8 +79,7 @@ describe('verifyTokenGateMemberships', () => {
       spaceId: space2.id,
       userId: user2.id,
       commit: true,
-      tokenGateIds: [tokenGate2.id],
-      walletAddress
+      tokenGateIds: [tokenGate2.id]
     });
 
     const res = await verifyTokenGateMemberships();
@@ -101,8 +99,7 @@ describe('verifyTokenGateMemberships', () => {
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate.id],
-      walletAddress
+      tokenGateIds: [tokenGate.id]
     });
     await deleteTokenGate(tokenGate.id);
 
@@ -112,8 +109,7 @@ describe('verifyTokenGateMemberships', () => {
       spaceId: space2.id,
       userId: user.id,
       commit: true,
-      tokenGateIds: [tokenGate2.id],
-      walletAddress
+      tokenGateIds: [tokenGate2.id]
     });
 
     const res = await verifyTokenGateMemberships();
