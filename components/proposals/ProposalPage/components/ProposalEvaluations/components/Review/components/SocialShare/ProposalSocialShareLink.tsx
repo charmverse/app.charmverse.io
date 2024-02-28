@@ -6,7 +6,7 @@ import { BsTwitterX } from 'react-icons/bs';
 
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { capitalize } from 'lib/utilities/strings';
+import { capitalize } from 'lib/utils/strings';
 
 type ShareSite = 'x' | 'telegram' | 'warpcast';
 

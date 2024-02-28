@@ -10,8 +10,8 @@ import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesFo
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { DisabledAccountError } from 'lib/utilities/errors';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { DisabledAccountError } from 'lib/utils/errors';
 
 const handler = nc({
   onError,

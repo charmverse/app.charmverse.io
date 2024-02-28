@@ -8,7 +8,7 @@ import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { superApiHandler } from 'lib/public-api/handler';
 import { userProfileSelect, getUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { PublicApiPostComment } from '../../posts/[postId]/comments/index';
 

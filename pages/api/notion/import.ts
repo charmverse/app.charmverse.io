@@ -8,7 +8,7 @@ import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
 import type { FailedImportsError } from 'lib/notion/types';
 import { withSessionRoute } from 'lib/session/withSession';
-import { MissingDataError } from 'lib/utilities/errors';
+import { MissingDataError } from 'lib/utils/errors';
 
 const handler = nc({
   onError,

@@ -23,10 +23,10 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { UnauthorisedActionError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';

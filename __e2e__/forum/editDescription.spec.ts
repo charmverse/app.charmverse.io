@@ -1,7 +1,7 @@
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import { expect, test as base } from '@playwright/test';
 
-import { randomIntFromInterval } from 'lib/utilities/random';
+import { randomIntFromInterval } from 'lib/utils/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 

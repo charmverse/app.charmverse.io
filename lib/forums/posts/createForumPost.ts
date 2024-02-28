@@ -8,7 +8,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { extractPollIds } from 'lib/prosemirror/extractPollIds';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { InsecureOperationError } from 'lib/utils/errors';
 
 import { getPostPath } from './getPostPath';
 

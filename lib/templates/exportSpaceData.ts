@@ -1,6 +1,6 @@
 import type { Post, PostCategory, Role } from '@charmverse/core/prisma';
 
-import { writeToSameFolder } from 'lib/utilities/file';
+import { writeToSameFolder } from 'lib/utils/file';
 
 import { exportForumPosts } from './exportForumPosts';
 import type { ExportedPermissions } from './exportSpacePermissions';

@@ -9,7 +9,7 @@ import { ethers } from 'ethers';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { isMantleChain } from 'lib/gnosis/mantleClient';
-import { paginatedCall } from 'lib/utilities/async';
+import { paginatedCall } from 'lib/utils/async';
 
 import type { NFTData } from '../../getNFTs';
 

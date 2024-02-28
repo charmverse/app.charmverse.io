@@ -38,7 +38,7 @@ import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string } & RewardFieldsProp;
 

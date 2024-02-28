@@ -1,7 +1,6 @@
 import type { Command, EditorState, Node, NodeRange, NodeType, ResolvedPos, Schema, Transaction } from '@bangle.dev/pm';
 import {
   autoJoin,
-  chainCommands,
   Fragment,
   liftListItem,
   liftTarget,
@@ -35,6 +34,7 @@ import {
   validListParent,
   validPos
 } from '@bangle.dev/utils';
+import { chainCommands } from 'prosemirror-commands';
 
 import { isNodeTodo, removeTodoCheckedAttr, setTodoCheckedAttr } from './todo';
 import { liftFollowingList, liftSelectionList } from './transforms';

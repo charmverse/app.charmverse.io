@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { validate } from 'uuid';
 
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import { DataNotFoundError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 
 import type { TokenGate } from './interfaces';
 import { validateTokenGateWithMultipleWallets } from './validateTokenGate';

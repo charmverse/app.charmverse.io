@@ -5,8 +5,8 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
-import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
-import { defaultWorkflowTitle, getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
+import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
+import { defaultWorkflowTitle, getDefaultWorkflows } from 'lib/proposals/workflows/defaultWorkflows';
 
 import { loginBrowserUser } from '../utils/mocks';
 

@@ -1,7 +1,7 @@
 import { OverallBlocksCount, countSpaceBlocks } from 'lib/spaces/countSpaceBlocks/countAllSpaceBlocks';
 import { prisma } from '@charmverse/core/prisma-client';
-import { writeToSameFolder } from 'lib/utilities/file';
-import type { Space } from '@charmverse/core/prisma'
+import { writeToSameFolder } from 'lib/utils/file';
+import type { Space } from '@charmverse/core/prisma';
 import { countBlocks } from 'lib/prosemirror/countBlocks';
 
 function getTotal(counts: Record<string, number>): number {
@@ -168,69 +168,72 @@ async function countSpaceBlocksOldVersion({ spaceId }: { spaceId: string }) {
 
 /// END OLD CODE - The count space blocks above is an old version
 
-let record: OverallBlocksCount =  {
-  "total": 11,
-  "details": {
-    "comments": {
-      "total": 0,
-      "details": {
-        "applicationComment": 0,
-        "blockComment": 0,
-        "comment": 0,
-        "pageComments": 0,
-        "postComment": 0
+let record: OverallBlocksCount = {
+  total: 11,
+  details: {
+    comments: {
+      total: 0,
+      details: {
+        applicationComment: 0,
+        blockComment: 0,
+        comment: 0,
+        pageComments: 0,
+        postComment: 0
       }
     },
-    "forum": {
-      "total": 0,
-      "details": {
-        "categories": 0,
-        "posts": 0,
-        "postContentBlocks": 0
+    forum: {
+      total: 0,
+      details: {
+        categories: 0,
+        posts: 0,
+        postContentBlocks: 0
       }
     },
-    "editorContent": 0,
-    "pages": {
-      "total": 0,
-      "details": {
-        "documents": 0,
-        "rewards": 0,
-        "proposals": 0,
-        "databases": 0,
-        "cards": 0
+    editorContent: 0,
+    pages: {
+      total: 0,
+      details: {
+        documents: 0,
+        rewards: 0,
+        proposals: 0,
+        databases: 0,
+        cards: 0
       }
     },
-    "databaseProperties": {
-      "total": 0,
-      "details": {
-        "databaseViews": 2,
-        "databaseDescriptions": 0,
-        "databaseProperties": 0,
-        "databaseRowPropValues": 0
+    databaseProperties: {
+      total: 0,
+      details: {
+        databaseViews: 2,
+        databaseDescriptions: 0,
+        databaseProperties: 0,
+        databaseRowPropValues: 0
       }
     },
-    "memberProperties": {
-      "total": 0,
-      "details": {
-        "memberProperties": 0,
-        "memberPropertyValues": 0
+    memberProperties: {
+      total: 0,
+      details: {
+        memberProperties: 0,
+        memberPropertyValues: 0
       }
     },
-    "proposals": {
-      "total": 0,
-      "details": {
-        "proposalViews": 0,
-        "proposalProperties": 0,
-        "proposalPropertyValues": 0,
-        "proposalRubricAnswers": 0,
-        "proposalFormFields": 0
+    proposals: {
+      total: 0,
+      details: {
+        proposalViews: 0,
+        proposalProperties: 0,
+        proposalPropertyValues: 0,
+        proposalRubricAnswers: 0,
+        proposalFormFields: 0
       }
     }
-  },
-}
+  }
+};
 
 function camelToTitle(camelCase: string): string {
-  return camelCase.replace(/([A-Z])/g, ' $1').trim().replace(/^./, str => str.toUpperCase());
+  return camelCase
+    .replace(/([A-Z])/g, ' $1')
+    .trim()
+    .replace(/^./, (str) => str.toUpperCase());
 }
 
 function generateHeaders(record: OverallBlocksCount): string {
@@ -252,7 +255,7 @@ function generateRow(record: OverallBlocksCount, space: Pick<Space, 'domain'>, o
   for (const categoryKey in record.details) {
     const category = (record.details as any)[categoryKey];
     if (categoryKey === 'editorContent') {
-      dataRow.push(record.details.editorContent)
+      dataRow.push(record.details.editorContent);
     } else if (category.details) {
       dataRow.push(category.total);
       for (const detailKey in category.details) {
@@ -263,10 +266,8 @@ function generateRow(record: OverallBlocksCount, space: Pick<Space, 'domain'>, o
   return dataRow.join(',') + '\n';
 }
 
-
 async function init(offset?: number, take?: number) {
-
-  let csv = generateHeaders(record)
+  let csv = generateHeaders(record);
 
   const spaces = await prisma.space.findMany({
     orderBy: {
@@ -276,17 +277,17 @@ async function init(offset?: number, take?: number) {
     take: take
   });
 
-  const totalSpaces = spaces.length
+  const totalSpaces = spaces.length;
 
   for (let i = 0; i < totalSpaces; i++) {
     let space = spaces[i];
-    const oldCount = await countSpaceBlocksOldVersion({spaceId: space.id})
+    const oldCount = await countSpaceBlocksOldVersion({ spaceId: space.id });
     const data = await countSpaceBlocks({ spaceId: space.id });
-    csv += generateRow(data, space, oldCount.total)
-    console.log('Processed space', i +1 + (offset ?? 0) , '/', totalSpaces + (offset ?? 0))
+    csv += generateRow(data, space, oldCount.total);
+    console.log('Processed space', i + 1 + (offset ?? 0), '/', totalSpaces + (offset ?? 0));
   }
   const fileName = `space-data-${new Date().toISOString()}.csv`;
-  await writeToSameFolder({data: csv, fileName})
+  await writeToSameFolder({ data: csv, fileName });
 }
 
 init(7000, 500).then(() => {

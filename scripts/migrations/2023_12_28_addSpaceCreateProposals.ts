@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { ProposalCategoryPermissionLevel, SpacePermission, prisma } from '@charmverse/core/prisma-client';
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
+import { paginatedPrismaTask } from 'lib/utils/paginatedPrismaTask';
 
 const permissionsAllowingCreate: ProposalCategoryPermissionLevel[] = ['full_access', 'create_comment'];
 

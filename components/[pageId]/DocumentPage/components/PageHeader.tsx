@@ -17,7 +17,7 @@ import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIc
 import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
 import EmojiIcon from 'components/common/Emoji';
-import { randomIntFromInterval } from 'lib/utilities/random';
+import { randomIntFromInterval } from 'lib/utils/random';
 
 import { randomBannerImage } from './PageBanner';
 import { PageTitleInput } from './PageTitleInput';

@@ -26,13 +26,13 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { CardPage } from 'lib/focalboard/card';
 import type { PagesMap } from 'lib/pages';
-import type { ProposalPendingReward } from 'lib/proposal/interface';
+import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsers, RewardType, RewardReviewer } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { AttachRewardButton } from './AttachRewardButton';
 

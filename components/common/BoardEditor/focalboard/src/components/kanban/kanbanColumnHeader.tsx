@@ -14,7 +14,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { EVALUATION_STATUS_LABELS } from 'lib/focalboard/proposalDbProperties';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 import mutator from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';

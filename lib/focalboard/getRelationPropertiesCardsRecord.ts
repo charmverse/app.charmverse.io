@@ -2,7 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { PageListItem } from 'components/common/PagesList';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { IPropertyTemplate } from './board';
 

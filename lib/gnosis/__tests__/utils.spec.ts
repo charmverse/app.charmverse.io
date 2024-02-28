@@ -1,4 +1,4 @@
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 import { getGnosisSafeUrl, getGnosisTransactionQueueUrl, getGnosisTransactionUrl } from '../utils';
 

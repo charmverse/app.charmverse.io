@@ -7,12 +7,12 @@ import { useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type {
   ProposalBlockInput,
   ProposalBlockWithTypedFields,
   ProposalBoardBlock
-} from 'lib/proposal/blocks/interfaces';
+} from 'lib/proposals/blocks/interfaces';
 
 export type ProposalBlocksContextType = {
   proposalBlocks: ProposalBlockWithTypedFields[] | undefined;

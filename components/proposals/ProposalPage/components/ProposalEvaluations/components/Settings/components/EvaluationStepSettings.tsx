@@ -5,8 +5,8 @@ import type { SelectOption } from 'components/common/BoardEditor/components/prop
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 
 import { RubricCriteriaSettings } from './RubricCriteriaSettings';
 import type { RangeProposalCriteria } from './RubricCriteriaSettings';

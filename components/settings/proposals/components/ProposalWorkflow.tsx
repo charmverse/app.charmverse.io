@@ -23,7 +23,7 @@ import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
+import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';

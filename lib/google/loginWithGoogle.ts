@@ -8,8 +8,8 @@ import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProf
 import { sessionUserRelations } from 'lib/session/config';
 import { getUserProfile } from 'lib/users/getUser';
 import { postUserCreate } from 'lib/users/postUserCreate';
-import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { DisabledAccountError, InsecureOperationError, InvalidInputError, SystemError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import { verifyGoogleToken } from './verifyGoogleToken';

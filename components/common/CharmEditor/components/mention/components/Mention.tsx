@@ -10,7 +10,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 

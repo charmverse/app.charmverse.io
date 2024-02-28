@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { playbackRestrictionId } from './config';
 import { mux } from './muxClient';
@@ -19,7 +19,7 @@ export async function updateAllowedPlaybackDomains() {
       }
     });
     const customDomains = spaces.map((space) => space.customDomain).filter(isTruthy);
-    mux.Video.PlaybackRestrictions.putReferrer(playbackRestrictionId, {
+    mux.video.playbackRestrictions.updateReferrer(playbackRestrictionId, {
       allowed_domains: charmVerseDomains.concat(customDomains)
     });
     log.info('Updated referrers for mux playback restriction', { customDomains });

@@ -13,13 +13,13 @@ import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposa
 import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import type { ProposalFields } from 'lib/proposal/interface';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+} from 'lib/proposals/rubric/interfaces';
+import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';

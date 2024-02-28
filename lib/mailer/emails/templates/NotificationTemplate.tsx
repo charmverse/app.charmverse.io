@@ -10,8 +10,8 @@ import type { FeatureJson } from 'lib/features/constants';
 import { getNotificationMetadata } from 'lib/notifications/getNotificationMetadata';
 import type { Notification } from 'lib/notifications/interfaces';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import { getFormattedDateTime } from 'lib/utilities/dates';
-import { fancyTrim } from 'lib/utilities/strings';
+import { getFormattedDateTime } from 'lib/utils/dates';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { Avatar, Button, EmailWrapper, Feedback, Text } from './components';
 

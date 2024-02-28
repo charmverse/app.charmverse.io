@@ -15,7 +15,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { optimism } from 'viem/chains';
 
-import type { ProposalPendingReward } from 'lib/proposal/interface';
+import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { generateProposalWorkflowWithEvaluations } from 'testing/utils/proposals';
 
 test.describe.serial('Create and use Proposal Template', async () => {

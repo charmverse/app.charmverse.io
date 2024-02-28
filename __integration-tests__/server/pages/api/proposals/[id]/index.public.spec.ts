@@ -3,8 +3,8 @@ import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let author: User;

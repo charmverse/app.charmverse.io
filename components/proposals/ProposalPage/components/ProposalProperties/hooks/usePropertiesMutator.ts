@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 
 import { ProposalsMutator } from 'components/proposals/ProposalPage/components/ProposalProperties/proposalsMutator';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalPropertiesField } from 'lib/proposals/blocks/interfaces';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 
 type Props = {
   proposal: { spaceId?: string; id?: string; fields: ProposalFields | null };

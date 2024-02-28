@@ -11,8 +11,8 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
 import type { Member } from 'lib/members/interfaces';
-import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
-import { sanitizeForRegex } from 'lib/utilities/strings';
+import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
+import { sanitizeForRegex } from 'lib/utils/strings';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';

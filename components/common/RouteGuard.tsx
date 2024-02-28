@@ -10,8 +10,8 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
 import { filterSpaceByDomain } from 'lib/spaces/filterSpaceByDomain';
-import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utilities/browser';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { redirectToAppLogin, shouldRedirectToAppLogin } from 'lib/utils/browser';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 // Pages shared to the public that don't require user login
 // When adding a page here or any new top-level pages, please also add this page to DOMAIN_BLACKLIST in lib/spaces/config.ts
 const publicPages = [

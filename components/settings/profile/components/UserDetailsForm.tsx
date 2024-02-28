@@ -21,7 +21,7 @@ import Avatar from 'components/settings/space/components/LargeAvatar';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 
 import { useUpdateProfileAvatar } from '../hooks/useUpdateProfileAvatar';

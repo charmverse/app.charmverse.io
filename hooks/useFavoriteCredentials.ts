@@ -6,8 +6,8 @@ import {
   useRemoveFavoriteCredential,
   useReorderFavoriteCredentials
 } from 'charmClient/hooks/credentials';
-import { lowerCaseEqual } from 'lib/utilities/strings';
-import { isTruthy } from 'lib/utilities/types';
+import { lowerCaseEqual } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 import type { AddFavoriteCredentialPayload, ReorderFavoriteCredentialsPayload } from 'pages/api/credentials/favorites';
 
 import { useUser } from './useUser';

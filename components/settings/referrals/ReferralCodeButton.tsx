@@ -7,7 +7,7 @@ import { useReferralCode } from 'charmClient/hooks/referrals';
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getAppUrl } from 'lib/utilities/browser';
+import { getAppUrl } from 'lib/utils/browser';
 
 export function ReferralCodeButton() {
   const { user } = useUser();

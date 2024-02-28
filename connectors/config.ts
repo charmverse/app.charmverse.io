@@ -13,7 +13,7 @@ import { publicProvider } from 'wagmi/providers/public';
 
 import 'viem/window';
 import { isTestEnv } from 'config/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 const wagmiChainList = Object.values(wagmiChains);
 // map our RPC list to the wagmi chain list

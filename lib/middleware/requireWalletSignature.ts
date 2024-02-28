@@ -4,7 +4,7 @@ import type { NextHandler } from 'next-connect';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { isValidWalletSignature } from 'lib/blockchain/signAndVerify';
 
-import { MissingDataError } from '../utilities/errors';
+import { MissingDataError } from '../utils/errors';
 
 export type Web3LoginRequest = {
   address: string;

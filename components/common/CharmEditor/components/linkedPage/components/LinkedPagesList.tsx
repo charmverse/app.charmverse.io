@@ -12,9 +12,9 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
-import { safeScrollIntoViewIfNeeded } from 'lib/utilities/browser';
-import { stringSimilarity } from 'lib/utilities/strings';
-import { isTruthy } from 'lib/utilities/types';
+import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
+import { stringSimilarity } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';

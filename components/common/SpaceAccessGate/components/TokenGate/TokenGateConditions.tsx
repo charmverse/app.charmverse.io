@@ -10,7 +10,7 @@ import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
 import type { Operator } from 'lib/tokenGates/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 const StyledOperator = styled(Box)`
   &:after,
