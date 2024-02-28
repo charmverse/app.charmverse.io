@@ -49,6 +49,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
+    filter: 'reward',
     userId
   });
 
