@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta, PagesRequest } from '@charmverse/core/pages';
-import type { Prisma } from '@charmverse/core/prisma';
+import type { Prisma, PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -20,12 +20,13 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const userId = req.session?.user?.id;
 
   const spaceId = req.query.id as string;
-  const { archived, limit, search } = req.query as any as PagesRequest;
+  const { archived, limit, search, filter } = req.query as any as PagesRequest;
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
     userId,
     archived,
     limit,
+    filter,
     search
   });
   const pages: PageMeta[] = await prisma.page.findMany({
@@ -33,7 +34,8 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       spaceId,
       id: {
         in: accessiblePageIds
-      }
+      },
+      type: filter === 'card' ? filter : filter === 'not_card' ? { not: 'card' } : undefined
     },
     select: {
       id: true,
