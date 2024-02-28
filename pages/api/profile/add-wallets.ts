@@ -58,7 +58,7 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
       ]
     });
   } catch (e) {
-    log.error('Error adding wallet', e, { userId, address: shortenHex(payload.message.address) });
+    log.error('Error adding wallet', e, { userId, address: shortenHex(walletAddress) });
     throw new InvalidInputError('Wallet is already connected with another account');
   }
 
