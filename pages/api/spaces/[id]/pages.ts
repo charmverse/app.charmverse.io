@@ -35,7 +35,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       id: {
         in: accessiblePageIds
       },
-      type: filter === 'card' ? filter : filter === 'not_card' ? { not: 'card' } : undefined
+      type: filter === 'not_card' ? { not: 'card' } : undefined
     },
     select: {
       id: true,
