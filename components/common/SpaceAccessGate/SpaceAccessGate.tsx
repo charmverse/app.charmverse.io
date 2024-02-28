@@ -75,7 +75,7 @@ export function SpaceAccessGate({
         return;
       }
     }
-    await tokenGate.evaluateEligibility(authSig);
+    await tokenGate.evaluateEligibility();
   }
 
   function onError(error: any) {

@@ -15,13 +15,13 @@ import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { bindTrigger, bindMenu } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import type { MouseEvent } from 'react';
 import { useCallback, useState } from 'react';
 
 import Avatar from 'components/common/Avatar';
 import { CreateSpaceForm } from 'components/common/CreateSpaceForm';
 import { Modal } from 'components/common/Modal';
 import UserDisplay from 'components/common/UserDisplay';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { useUserDetails } from 'components/settings/profile/hooks/useUserDetails';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -90,13 +90,12 @@ const StyledCreateSpaceForm = styled(CreateSpaceForm)`
 
 export default function SidebarSubmenu({
   closeSidebar,
-  logoutCurrentUser,
-  openProfileModal
+  logoutCurrentUser
 }: {
   closeSidebar: () => void;
   logoutCurrentUser: () => void;
-  openProfileModal: (event: MouseEvent<Element, globalThis.MouseEvent>, path?: string) => void;
 }) {
+  const { showUserProfile } = useMemberProfileDialog();
   const { notifications = [], otherSpacesUnreadNotifications } = useNotifications();
   const theme = useTheme();
   const showMobileFullWidthModal = !useMediaQuery(theme.breakpoints.down('sm'));
@@ -154,7 +153,11 @@ export default function SidebarSubmenu({
       </StyledButton>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)} sx={{ maxWidth: '330px' }}>
         <MenuItem
-          onClick={openProfileModal}
+          onClick={() => {
+            if (user) {
+              showUserProfile(user.id);
+            }
+          }}
           sx={{
             display: 'grid',
             gridTemplateColumns: 'auto 1fr',

@@ -1,3 +1,6 @@
+import { log } from '@charmverse/core/log';
+import type { UserWallet } from '@charmverse/core/prisma-client';
+
 import type { TokenGate } from './interfaces';
 import { validateTokenGateCondition } from './validateTokenGateCondition';
 
@@ -24,4 +27,17 @@ export async function validateTokenGate(tokenGate: TokenGate, walletAddress: str
   } else {
     return null;
   }
+}
+
+export async function validateTokenGateWithMultipleWallets(tokenGate: TokenGate, wallets: UserWallet[]) {
+  const values = await Promise.all(
+    wallets.map(async (w) =>
+      validateTokenGate(tokenGate, w.address).catch((error) => {
+        log.debug(`Error validating token gate`, { tokenGateId: tokenGate.id, userWalletId: w.id, error });
+        return null;
+      })
+    )
+  );
+
+  return values.some((v) => !!v) ? tokenGate.id : null;
 }

@@ -4,8 +4,6 @@ import { createContext, useContext, useMemo, useState } from 'react';
 
 import { useCreateTokenGate } from 'charmClient/hooks/tokenGates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -64,7 +62,6 @@ export function TokenGateModalProvider({
   const [tokenGate, setTokenGate] = useState<Pick<TokenGate, 'conditions'>>();
   const { error: tokenError, isMutating: tokenLoading, trigger: createTokenGate } = useCreateTokenGate();
   const [flow, setFlow] = useState<Flow>('single');
-  const { walletAuthSignature, requestSignature } = useWeb3Account();
   const { space } = useCurrentSpace();
   const spaceId = space?.id || '';
 
@@ -100,16 +97,9 @@ export function TokenGateModalProvider({
 
     const conditions = { accessControlConditions, operator };
 
-    const authSig: AuthSig = walletAuthSignature ?? (await requestSignature());
-
-    if (!authSig) {
-      return;
-    }
-
     await createTokenGate({
       conditions,
       spaceId
-      // authSig // Check to see if we need authSig on token gate creating
     });
 
     onSuccess();
