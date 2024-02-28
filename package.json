@@ -288,6 +288,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@next/eslint-plugin-next": "^13.5.6",
     "@playwright/test": "^1.40.1",
+    "@spruceid/siwe-parser": "^2.0.2",
     "@storybook/addon-essentials": "^7.5.3",
     "@storybook/addon-interactions": "^7.5.3",
     "@storybook/addon-links": "^7.5.3",

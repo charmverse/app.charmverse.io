@@ -22,7 +22,7 @@ import { Fragment, useState } from 'react';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
-import { useSetPrimaryWallet } from 'charmClient/hooks/profile';
+import { useAddUserWallets, useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -31,7 +31,6 @@ import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { shortWalletAddress } from 'lib/utils/blockchain';
@@ -77,15 +76,7 @@ export function IdentityProviders() {
     }
   );
 
-  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
-      onSuccess(data) {
-        updateUser(data);
-      }
-    }
-  );
+  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useAddUserWallets();
 
   const onSetPrimaryWallet = async (walletId: string) => {
     try {
@@ -101,8 +92,12 @@ export function IdentityProviders() {
 
   const generateWalletAuth = async () => {
     try {
-      const authSig = await requestSignature();
-      await signSuccess(authSig);
+      const payload = await requestSignature();
+      await signSuccess(payload, {
+        onSuccess(data) {
+          updateUser(data);
+        }
+      });
     } catch (error) {
       log.error('Error requesting wallet signature in login page', error);
       showMessage('Wallet signature cancelled', 'info');
@@ -136,7 +131,7 @@ export function IdentityProviders() {
     disconnectTelegramError?.error;
 
   const onIdentityChange = async (event: SelectChangeEvent<string>) => {
-    const val = identityTypes.find((t) => t.type === event.target.value);
+    const val = identityTypes.find((t) => t.username === event.target.value);
 
     if (val) {
       await saveUser({
@@ -160,13 +155,13 @@ export function IdentityProviders() {
         </InputLabel>
         <Box display='flex' alignItems='center'>
           <Select
-            value={user?.identityType ?? ''}
+            value={user?.username || ''}
             onChange={onIdentityChange}
             disabled={isLoadingUserUpdate}
             sx={{ width: '400px', mr: 1 }}
           >
             {identityTypes.map((identity) => (
-              <MenuItem key={identity.type} value={identity.type}>
+              <MenuItem key={identity.username} value={identity.username}>
                 <Box display='flex' justifyContent='space-between' alignItems='center' width='100%'>
                   {identity.username}
                   <Chip variant='filled' label={identity.type.replace(/([A-Z])/g, ' $1').trim()} sx={{ ml: 2 }} />

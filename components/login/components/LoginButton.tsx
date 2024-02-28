@@ -20,7 +20,7 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { SystemError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models/User';
 
@@ -152,9 +152,9 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
-  async function handleWeb3Login(authSig: AuthSig) {
+  async function handleWeb3Login(payload: SignatureVerificationPayload) {
     try {
-      const resp = await loginFromWeb3Account(authSig);
+      const resp = await loginFromWeb3Account(payload);
       if (resp?.id) {
         handleLogin({ identityType: 'Wallet' });
       }

@@ -9,7 +9,7 @@ import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 import { getSpaceUrl } from 'lib/utils/browser';
 
@@ -66,10 +66,10 @@ export function SpaceAccessGate({
     }
   }
 
-  async function onWalletSignature(authSig: AuthSig) {
+  async function onWalletSignature(payload: SignatureVerificationPayload) {
     if (!user) {
       try {
-        await loginFromWeb3Account(authSig);
+        await loginFromWeb3Account(payload);
       } catch (err: any) {
         showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
         return;
