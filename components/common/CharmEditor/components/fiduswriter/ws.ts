@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { log } from '@charmverse/core/log';
+import type { Plugin } from 'prosemirror-state';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 
@@ -39,6 +40,7 @@ type WebSocketConnectorProps = {
   restartMessage: () => ClientRestartMessage; // Too many messages have been lost and we need to restart
   receiveData: (data: WrappedServerMessage) => void;
   resubscribed: () => void; // Cleanup when the client connects a second or subsequent time
+  historyPlugin?: Plugin<any> | null;
 };
 
 type ServerToClientEvents = { message: (message: WrappedMessage | RequestResendMessage) => void };
@@ -92,7 +94,8 @@ export class WebSocketConnector {
     resubscribed,
     restartMessage,
     receiveData,
-    onConnectionEvent
+    onConnectionEvent,
+    historyPlugin
   }: Omit<WebSocketConnectorProps, 'onError'>) {
     this.anythingToSend = anythingToSend;
     this.editor = editor;
@@ -102,6 +105,7 @@ export class WebSocketConnector {
     this.restartMessage = restartMessage;
     this.receiveData = receiveData;
     this.onConnectionEvent = onConnectionEvent;
+    this.historyPlugin = historyPlugin;
     this.onError = (error: Error) => {
       onConnectionEvent({ type: 'error', error });
     };
@@ -337,8 +341,6 @@ export class WebSocketConnector {
         // message is empty
         return;
       }
-      const historyPlugin = this.editor.view.state.plugins.find((plugin) => (plugin as any).key === 'history$');
-      const historyPluginState = historyPlugin?.getState(this.editor.view.state);
       this.messages.client += 1;
 
       const wrappedMessage: WrappedMessage = {
@@ -348,6 +350,7 @@ export class WebSocketConnector {
       };
 
       if (wrappedMessage.type === 'diff') {
+        const historyPluginState = this.historyPlugin?.getState(this.editor.view.state);
         wrappedMessage.undo = historyPluginState?.prevRanges === null ?? false;
       }
 

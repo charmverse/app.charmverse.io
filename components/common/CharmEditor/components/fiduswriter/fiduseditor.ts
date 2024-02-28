@@ -224,7 +224,8 @@ export class FidusEditor {
           default:
             break;
         }
-      }
+      },
+      historyPlugin: view?.state.plugins.find((plugin) => (plugin as any).key === 'history$') ?? null
     });
 
     this.initEditor(view);
