@@ -1,5 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { AttestationType } from '@charmverse/core/prisma-client';
+import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
+import type { AttestationType, CredentialEventType } from '@charmverse/core/prisma-client';
 import type {
   AttestationShareablePackageObject,
   SignedOffchainAttestation
@@ -7,8 +9,10 @@ import type {
 import { Offchain, createOffchainURL } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
 import { Wallet, providers } from 'ethers';
+import { v4 as uuid } from 'uuid';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import type { EasSchemaChain } from './connectors';
@@ -125,11 +129,36 @@ export async function signCharmverseAttestation({
 export async function signAndPublishCharmverseCredential({
   chainId,
   credential,
-  recipient
-}: CharmVerseCredentialInput) {
+  recipient,
+  event,
+  recipientUserId,
+  pageId,
+  proposalId,
+  rewardApplicationId,
+  credentialTemplateId
+}: CharmVerseCredentialInput & {
+  event: CredentialEventType;
+  recipientUserId: string;
+  credentialTemplateId: string;
+  pageId: string;
+  rewardApplicationId?: string;
+  proposalId?: string;
+}) {
+  const { spaceId } = await prisma.credentialTemplate.findUniqueOrThrow({
+    where: {
+      id: credentialTemplateId
+    },
+    select: {
+      spaceId: true
+    }
+  });
+
   const signedCredential = await signCharmverseAttestation({ chainId, credential, recipient });
 
-  const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
+  const publishedCredentialId = uuid();
+
+  const contentToPublish: Omit<PublishedSignedCredential, 'author'> = {
+    id: publishedCredentialId,
     chainId,
     recipient: signedCredential.recipient,
     content: credential.data,
@@ -138,12 +167,53 @@ export async function signAndPublishCharmverseCredential({
     verificationUrl: signedCredential.verificationUrl,
     issuer: signedCredential.signer,
     schemaId: getAttestationSchemaId({ chainId, credentialType: credential.type }),
-    sig: JSON.stringify(signedCredential.sig)
+    sig: JSON.stringify(signedCredential.sig),
+    charmverseId: publishedCredentialId
   };
 
-  const published = await publishSignedCredential(contentToPublish);
+  const signedPublished = await prisma.$transaction(async (tx) => {
+    await prisma.issuedCredential.create({
+      data: {
+        id: publishedCredentialId,
+        ceramicId: '-',
+        credentialEvent: event,
+        credentialTemplate: { connect: { id: credentialTemplateId } },
+        user: { connect: { id: recipientUserId } },
+        proposal: proposalId ? { connect: { id: proposalId } } : undefined,
+        rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
+      }
+    });
 
-  return published;
+    const published = await publishSignedCredential(contentToPublish);
+
+    return published;
+  });
+
+  trackUserAction('credential_issued', {
+    userId: recipientUserId,
+    spaceId,
+    trigger: event,
+    credentialTemplateId
+  });
+
+  log.info('Issued credential', {
+    pageId,
+    event,
+    proposalId,
+    userId: recipientUserId,
+    credentialTemplateId
+  });
+
+  await prisma.issuedCredential.update({
+    where: {
+      id: publishedCredentialId
+    },
+    data: {
+      ceramicId: signedPublished.id
+    }
+  });
+
+  return signedPublished;
 }
 
 function getOffchainUrl({ chainId, pkg }: { pkg: AttestationShareablePackageObject; chainId: EasSchemaChain }) {

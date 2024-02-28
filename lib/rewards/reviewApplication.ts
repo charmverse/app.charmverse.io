@@ -67,7 +67,7 @@ export async function reviewApplication({ applicationId, decision, userId }: App
   await verifyOrRejectApplications(application.bountyId);
   await rollupRewardStatus({ rewardId: application.bountyId });
 
-  if (approveStatus === 'complete') {
+  if (nextStatus === 'complete') {
     await issueRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: application.bountyId,

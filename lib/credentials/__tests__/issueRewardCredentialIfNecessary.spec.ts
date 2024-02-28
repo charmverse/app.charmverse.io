@@ -88,7 +88,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bounty: {
             id: reward.id
           }
@@ -109,37 +109,37 @@ describe('issueRewardCredentialIfNecessary', () => {
           userId: rewardCreatorAndSubmitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: creatorApplicationId
+          rewardApplicationId: creatorApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: rewardCreatorAndSubmitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: secondCredentialTemplate.id,
-          applicationId: creatorApplicationId
+          rewardApplicationId: creatorApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: submitterApplicationId
+          rewardApplicationId: submitterApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: secondCredentialTemplate.id,
-          applicationId: submitterApplicationId
+          rewardApplicationId: submitterApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: secondSubmitterApplicationId
+          rewardApplicationId: secondSubmitterApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: secondCredentialTemplate.id,
-          applicationId: secondSubmitterApplicationId
+          rewardApplicationId: secondSubmitterApplicationId
         })
       ])
     );
@@ -195,7 +195,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bounty: {
             id: reward.id
           }
@@ -214,7 +214,7 @@ describe('issueRewardCredentialIfNecessary', () => {
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: submitterApplicationId
+          rewardApplicationId: submitterApplicationId
         })
       ])
     );
@@ -259,7 +259,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bountyId: reward.id
         }
       }
@@ -315,7 +315,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bountyId: reward.id
         }
       }
@@ -333,25 +333,25 @@ describe('issueRewardCredentialIfNecessary', () => {
           userId: rewardCreatorAndSubmitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: creatorApplicationId
+          rewardApplicationId: creatorApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: rewardCreatorAndSubmitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: secondCredentialTemplate.id,
-          applicationId: creatorApplicationId
+          rewardApplicationId: creatorApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: submitterApplicationId
+          rewardApplicationId: submitterApplicationId
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: secondCredentialTemplate.id,
-          applicationId: submitterApplicationId
+          rewardApplicationId: submitterApplicationId
         })
       ])
     );
@@ -387,7 +387,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bountyId: reward.id
         }
       }
@@ -402,7 +402,7 @@ describe('issueRewardCredentialIfNecessary', () => {
           userId: rewardCreatorAndSubmitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: reward.applications[0].id
+          rewardApplicationId: reward.applications[0].id
         })
       ])
     );
@@ -435,7 +435,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bountyId: reward.id
         }
       }
@@ -486,7 +486,7 @@ describe('issueRewardCredentialIfNecessary', () => {
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
-        application: {
+        rewardApplication: {
           bounty: {
             id: reward.id
           }
@@ -503,19 +503,19 @@ describe('issueRewardCredentialIfNecessary', () => {
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: generatedApplications.complete.id
+          rewardApplicationId: generatedApplications.complete.id
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: generatedApplications.processing.id
+          rewardApplicationId: generatedApplications.processing.id
         }),
         expect.objectContaining<Partial<IssuedCredential>>({
           userId: submitter.id,
           credentialEvent: 'reward_submission_approved',
           credentialTemplateId: firstCredentialTemplate.id,
-          applicationId: generatedApplications.paid.id
+          rewardApplicationId: generatedApplications.paid.id
         })
       ])
     );

@@ -5,8 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { getPagePermalink, getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
+import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
 import { credentialEventLabels } from './constants';
@@ -86,14 +85,14 @@ export async function issueRewardCredentialsIfNecessary({
   const issuedCredentials = await prisma.issuedCredential.findMany({
     where: {
       credentialEvent: event,
-      applicationId: {
+      rewardApplicationId: {
         in: baseReward.applications.map((app) => app.id)
       }
     }
   });
 
   // Credential template ids grouped by user id
-  const credentialsToIssue: Record<string, { applicationId: string; credentialTemplateId: string }[]> = {};
+  const credentialsToIssue: Record<string, { rewardApplicationId: string; credentialTemplateId: string }[]> = {};
 
   for (const application of baseReward.applications) {
     const submitterUserId = application.createdBy;
@@ -102,7 +101,7 @@ export async function issueRewardCredentialsIfNecessary({
         (issuedCredential) =>
           issuedCredential.credentialTemplateId === credentialTemplateId &&
           issuedCredential.userId === submitterUserId &&
-          issuedCredential.applicationId === application.id
+          issuedCredential.rewardApplicationId === application.id
       );
       if (
         userHasNotReceivedCredential &&
@@ -113,7 +112,7 @@ export async function issueRewardCredentialsIfNecessary({
           credentialsToIssue[submitterUserId] = [];
         }
         credentialsToIssue[submitterUserId].push({
-          applicationId: application.id,
+          rewardApplicationId: application.id,
           credentialTemplateId
         });
       }
@@ -135,7 +134,7 @@ export async function issueRewardCredentialsIfNecessary({
 
     const credentialsToGiveUser = credentialsToIssue[submitterUserId].map((cred) => ({
       ...(baseReward.space.credentialTemplates.find((t) => t.id === cred.credentialTemplateId) as CredentialTemplate),
-      applicationId: cred.applicationId
+      applicationId: cred.rewardApplicationId
     }));
 
     const targetWallet = submitter.primaryWallet ?? submitter.wallets[0];
@@ -168,7 +167,11 @@ export async function issueRewardCredentialsIfNecessary({
                 Event: eventLabel,
                 rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
               }
-            }
+            },
+            credentialTemplateId: credentialTemplate.id,
+            event,
+            recipientUserId: submitterUserId,
+            pageId: baseReward.page.id
           });
 
           await prisma.issuedCredential.create({
@@ -176,24 +179,9 @@ export async function issueRewardCredentialsIfNecessary({
               ceramicId: publishedCredential.id,
               credentialEvent: event,
               credentialTemplate: { connect: { id: credentialTemplate.id } },
-              application: { connect: { id: credentialTemplate.applicationId } },
+              rewardApplication: { connect: { id: credentialTemplate.applicationId } },
               user: { connect: { id: submitterUserId } }
             }
-          });
-
-          trackUserAction('credential_issued', {
-            userId: submitterUserId,
-            spaceId: credentialTemplate.spaceId,
-            trigger: event,
-            credentialTemplateId: credentialTemplate.id
-          });
-
-          log.info('Issued credential', {
-            pageId: baseReward.page.id,
-            event,
-            rewardId,
-            userId: submitterUserId,
-            credentialTemplateId: credentialTemplate.id
           });
         }
       } catch (e) {

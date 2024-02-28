@@ -6,7 +6,6 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
@@ -168,6 +167,7 @@ export async function issueProposalCredentialsIfNecessary({
           const eventLabel = getEventLabel((value) =>
             getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
           );
+
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
           const publishedCredential = await signAndPublishCharmverseCredential({
             chainId: optimism.id,
@@ -181,32 +181,12 @@ export async function issueProposalCredentialsIfNecessary({
                 Event: eventLabel,
                 URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
               }
-            }
-          });
-
-          await prisma.issuedCredential.create({
-            data: {
-              ceramicId: publishedCredential.id,
-              credentialEvent: event,
-              credentialTemplate: { connect: { id: credentialTemplate.id } },
-              proposal: { connect: { id: proposalId } },
-              user: { connect: { id: authorUserId } }
-            }
-          });
-
-          trackUserAction('credential_issued', {
-            userId: authorUserId,
-            spaceId: credentialTemplate.spaceId,
-            trigger: event,
-            credentialTemplateId: credentialTemplate.id
-          });
-
-          log.info('Issued credential', {
-            pageId: proposalWithSpaceConfig.page.id,
+            },
+            credentialTemplateId: credentialTemplate.id,
             event,
+            recipientUserId: authorUserId,
             proposalId,
-            userId: authorUserId,
-            credentialTemplateId: credentialTemplate.id
+            pageId: proposalWithSpaceConfig.page.id
           });
         }
       } catch (e) {
