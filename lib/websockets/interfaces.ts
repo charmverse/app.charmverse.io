@@ -154,6 +154,13 @@ type PageReorderedEditorToEditor = {
   };
 };
 
+type PageDuplicated = {
+  type: 'page_duplicated';
+  payload: {
+    pageId: string;
+  };
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -199,7 +206,8 @@ export type ClientMessage =
   | PageCreated
   | PageReorderedSidebarToSidebar
   | PageReorderedSidebarToEditor
-  | PageReorderedEditorToEditor;
+  | PageReorderedEditorToEditor
+  | PageDuplicated;
 
 export type ServerMessage =
   | BlocksUpdated

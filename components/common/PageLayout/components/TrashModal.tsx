@@ -108,7 +108,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function restorePage(pageId: string) {
     const page = archivedPages[pageId];
     if (page && space) {
-      if (page.type === 'board' || page.type === 'page') {
+      if (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') {
         sendMessage({
           payload: {
             id: pageId

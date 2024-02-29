@@ -279,6 +279,101 @@ describe('page delete event handler', () => {
   });
 });
 
+describe('page_duplicated event handler', () => {
+  it(`Should add the nested page in the parent document content when it is not being viewed`, async () => {
+    const { childPages, spaceEventHandler, parentPage } = await socketSetup({
+      content: contentWithChildPageNode
+    });
+
+    const newChildPage = await testUtilsPages.generatePage({
+      createdBy: parentPage.createdBy,
+      spaceId: parentPage.spaceId,
+      parentId: parentPage.id
+    });
+
+    const message: ClientMessage = {
+      type: 'page_duplicated',
+      payload: {
+        pageId: newChildPage.id
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.page({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        }),
+        _.p('2'),
+        _.page({
+          id: newChildPage.id
+        })
+      ).toJSON()
+    );
+  });
+
+  it(`Should add the nested page in the parent document content when it is being viewed`, async () => {
+    const { childPages, spaceEventHandler, parentPage, socketEmitMockFn } = await socketSetup({
+      participants: true,
+      content: contentWithChildPageNode
+    });
+
+    const newChildPage = await testUtilsPages.generatePage({
+      createdBy: parentPage.createdBy,
+      spaceId: parentPage.spaceId,
+      parentId: parentPage.id
+    });
+
+    const message: ClientMessage = {
+      type: 'page_duplicated',
+      payload: {
+        pageId: newChildPage.id
+      }
+    };
+
+    await spaceEventHandler.onMessage(message);
+
+    const parentPageWithContent = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: parentPage.id
+      },
+      select: {
+        content: true
+      }
+    });
+
+    expect(parentPageWithContent.content).toMatchObject(
+      _.doc(
+        _.p('1'),
+        _.page({
+          id: childPages[0].id,
+          path: childPages[0].path,
+          type: childPages[0].type
+        }),
+        _.p('2'),
+        _.page({
+          id: newChildPage.id
+        })
+      ).toJSON()
+    );
+
+    expect(socketEmitMockFn).toHaveBeenCalled();
+  });
+});
+
 describe('page_restored event handler', () => {
   it('Restore nested pages and add it to parent page content when parent document has the nested page in its content and it is not being viewed', async () => {
     const { socketEmitMockFn, relayBroadcastMockFn, childPages, spaceEventHandler, parentPage } = await socketSetup({

@@ -30,7 +30,6 @@ type IContext = {
   walletAuthSignature?: AuthSig | null;
   chainId: any;
   requestSignature: () => Promise<AuthSig>;
-  getStoredSignature: (account: string) => AuthSig | null;
   logoutWallet: () => void;
   disconnectWallet: (address: UserWallet['address']) => Promise<void>;
   // A wallet is currently connected and can be used to generate signatures. This is different from a user being connected
@@ -47,7 +46,6 @@ export const Web3Context = createContext<Readonly<IContext>>({
   account: null,
   walletAuthSignature: null,
   requestSignature: () => Promise.resolve({} as AuthSig),
-  getStoredSignature: () => null,
   logoutWallet: () => null,
   disconnectWallet: async () => {},
   chainId: null,
@@ -331,7 +329,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       account: storedAccount,
       walletAuthSignature,
       requestSignature,
-      getStoredSignature,
       disconnectWallet,
       logoutWallet,
       chainId,

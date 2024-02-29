@@ -15,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .use(requireKeys(['spaceId', 'tokenGateIds', 'commit', 'walletAddress'], 'body'))
+  .use(requireKeys(['spaceId', 'tokenGateIds', 'commit'], 'body'))
   .post(verifyWallet);
 
 async function verifyWallet(req: NextApiRequest, res: NextApiResponse<void>) {
