@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import type { Signer } from 'ethers';
-import { utils } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/dist/cjs/lib/log';
 import { readContract } from '@wagmi/core';
 import { SiweMessage } from 'lit-siwe';
 import { getAddress, recoverMessageAddress, hashMessage, parseAbi } from 'viem';
@@ -102,6 +103,9 @@ export async function verifyEIP1271Signature({
     args: messageHash ? [messageHash, signature] : (null as any),
     functionName: 'isValidSignature',
     chainId
+  }).catch((err) => {
+    // We might be trying to read a contract that does not exist
+    return null;
   });
 
   return data === EIP1271_MAGIC_VALUE;
