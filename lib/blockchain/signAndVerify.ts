@@ -1,12 +1,11 @@
-import { log } from '@charmverse/core/dist/cjs/lib/log';
-import { readContract } from '@wagmi/core';
 import { SiweMessage } from 'lit-siwe';
-import { getAddress, recoverMessageAddress, hashMessage, parseAbi } from 'viem';
+import { getAddress, hashMessage, parseAbi, recoverMessageAddress } from 'viem';
 
 import { InvalidInputError } from '../utils/errors';
 import { lowerCaseEqual } from '../utils/strings';
 
 import type { AuthSig } from './interfaces';
+import { getPublicClient } from './publicClient';
 
 /**
  * @host - Domain prefixed with protocol ie. http://localhost:3000
@@ -96,17 +95,20 @@ export async function verifyEIP1271Signature({
 
   const messageHash = hashMessage(message);
 
-  const data = await readContract({
-    address: safeAddress as any,
-    account: safeAddress as any,
-    abi: gnosisEipVerifyAbi,
-    args: messageHash ? [messageHash, signature] : (null as any),
-    functionName: 'isValidSignature',
-    chainId
-  }).catch((err) => {
-    // We might be trying to read a contract that does not exist
-    return null;
-  });
+  const client = getPublicClient(chainId);
+
+  const data = await client
+    .readContract({
+      address: safeAddress as any,
+      account: safeAddress as any,
+      abi: gnosisEipVerifyAbi,
+      args: messageHash ? [messageHash, signature] : (null as any),
+      functionName: 'isValidSignature'
+    })
+    .catch((err) => {
+      // We might be trying to read a contract that does not exist
+      return null;
+    });
 
   return data === EIP1271_MAGIC_VALUE;
 }
