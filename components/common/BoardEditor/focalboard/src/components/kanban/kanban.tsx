@@ -14,7 +14,7 @@ import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
@@ -134,24 +134,10 @@ function Kanban(props: Props) {
     async (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => {
       const { selectedCardIds } = props;
       const optionId = option ? option.id : undefined;
-      const hasSort = activeView.fields.sortOptions?.length !== 0;
 
       let draggedCardIds = selectedCardIds;
       if (card) {
         draggedCardIds = Array.from(new Set(selectedCardIds).add(card.id));
-      }
-
-      if (hasSort) {
-        const { confirmed, cancelled } = await showConfirmation({
-          message: 'Would you like to remove sorting?'
-        });
-
-        if (confirmed && localViewSettings) {
-          localViewSettings.setLocalSort(null);
-          await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
-        } else if (cancelled) {
-          return;
-        }
       }
 
       if (draggedCardIds.length > 0) {
@@ -174,21 +160,7 @@ function Kanban(props: Props) {
             }
           }
           const newOrder = orderAfterMoveToColumn(draggedCardIds, optionId);
-          awaits.push(
-            mutator.changeViewCardOrder(
-              hasSort
-                ? {
-                    ...activeView,
-                    fields: {
-                      ...activeView.fields,
-                      sortOptions: []
-                    }
-                  }
-                : activeView,
-              newOrder,
-              description
-            )
-          );
+          awaits.push(mutator.changeViewCardOrder(activeView, newOrder, description));
           await Promise.all(awaits);
         });
       } else if (dstOption) {

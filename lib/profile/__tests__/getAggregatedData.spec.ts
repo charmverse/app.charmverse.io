@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import fetchMock from 'fetch-mock-jest';
 
 import { getAggregatedData } from 'lib/profile';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 import { generateBountyWithSingleApplication, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

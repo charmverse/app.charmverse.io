@@ -3,7 +3,7 @@ import { Space } from '@charmverse/core/prisma';
 import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContract';
 import { getProjectDetails, GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
@@ -11,7 +11,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
+import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
 import { DateTime } from 'luxon';
 
 /*****
@@ -21,7 +21,6 @@ import { DateTime } from 'luxon';
 
 const START_ID = 1100;
 const CHAIN_ID = 1;
-
 
 const provider = new AlchemyProvider(CHAIN_ID, process.env.ALCHEMY_API_KEY);
 const projectRegistry = getProjectRegistryContract({ providerOrSigner: provider, chainId: CHAIN_ID });
@@ -107,12 +106,12 @@ async function importGitCoinProjects() {
         // [adminUserId, ...extraAdmins].forEach((userId) => trackUserAction('join_a_workspace', { spaceId: space.id, userId, source: 'gitcoin-growth-hack' }));
 
         await prisma.additionalBlockQuota.create({
-          data:{
+          data: {
             spaceId: space.id,
             blockCount: EXTRA_BLOCK_QUOTA,
             expiresAt: DateTime.local().plus({ years: 1 }).endOf('day').toJSDate()
           }
-        })
+        });
 
         const projectInfo = { projectDetails, space, spaceImageUrl: spaceImage, bannerUrl };
         projectsData.push(projectInfo);

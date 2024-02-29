@@ -5,12 +5,12 @@ import type { ReactNode } from 'react';
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
@@ -33,7 +33,7 @@ const StyledTypography = styled(Typography)`
 `;
 
 export default function Mention({ node }: NodeViewProps) {
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { getMemberById } = useMembers();
   const { pages } = usePages();
@@ -67,7 +67,7 @@ export default function Mention({ node }: NodeViewProps) {
     value = (
       <MentionContainer color='secondary'>
         <Typography
-          onClick={() => member?.id && showUserId(member.id)}
+          onClick={() => member?.id && showUserProfile(member.id)}
           component='span'
           color='secondary'
           sx={{ cursor: 'pointer' }}

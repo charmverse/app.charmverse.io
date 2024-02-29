@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 
 import { generateRole, generateUserAndSpaceWithApiToken } from '../setupDatabase';
 

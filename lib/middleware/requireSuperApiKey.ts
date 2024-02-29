@@ -33,8 +33,9 @@ export async function provisionSuperApiKey(name: string, token?: string): Promis
 export async function requireSuperApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   const detectedApiKey = getAPIKeyFromRequest(req);
 
-  const superApiTokenData = detectedApiKey ? await getVerifiedSuperApiToken(detectedApiKey) : null;
-
+  const superApiTokenData = detectedApiKey
+    ? await getVerifiedSuperApiToken(detectedApiKey, req.query?.spaceId as string)
+    : null;
   if (superApiTokenData) {
     req.superApiToken = superApiTokenData.superApiKey;
     req.spaceIdRange = superApiTokenData.spaceIdRange;

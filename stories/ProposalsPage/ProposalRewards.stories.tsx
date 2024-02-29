@@ -8,7 +8,7 @@ import { useResizeObserver } from 'usehooks-ts';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
-import type { ProposalPendingReward } from 'lib/proposal/interface';
+import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';

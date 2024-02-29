@@ -8,7 +8,7 @@ import { isProdEnv } from 'config/constants';
 import { createHexKeyPair } from 'lib/farcaster/createHexKeyPair';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { encryptData } from 'lib/utilities/dataEncryption';
+import { encryptData } from 'lib/utils/dataEncryption';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

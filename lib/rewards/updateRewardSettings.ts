@@ -2,7 +2,7 @@ import type { Bounty as Reward } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utils/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import type { RewardReviewer, RewardWithUsers, RewardType } from './interfaces';

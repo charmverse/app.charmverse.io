@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';

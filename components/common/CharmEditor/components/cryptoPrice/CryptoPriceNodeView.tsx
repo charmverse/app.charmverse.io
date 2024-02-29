@@ -15,8 +15,8 @@ import { InputSearchCurrency } from 'components/common/form/InputSearchCurrency'
 import { RelativeTime } from 'components/common/RelativeTime';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { formatMoney } from 'lib/utilities/formatting';
-import { isTruthy } from 'lib/utilities/types';
+import { formatMoney } from 'lib/utils/formatting';
+import { isTruthy } from 'lib/utils/types';
 
 import { enableDragAndDrop } from '../../utils';
 

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 export function CopyPageLinkAction({
   path,

@@ -1,7 +1,7 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 export const hoverIconsStyle =
   ({

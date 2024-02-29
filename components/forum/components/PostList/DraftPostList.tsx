@@ -6,7 +6,7 @@ import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
 import { useForumCategories } from 'hooks/useForumCategories';
-import { relativeTime } from 'lib/utilities/dates';
+import { relativeTime } from 'lib/utils/dates';
 
 import { usePostDialog } from '../PostDialog/hooks/usePostDialog';
 

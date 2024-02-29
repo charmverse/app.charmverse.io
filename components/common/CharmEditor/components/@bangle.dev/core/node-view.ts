@@ -1,7 +1,6 @@
 /* eslint-disable no-use-before-define */
 import type { Decoration, DOMOutputSpec, EditorProps, EditorView, Node, Transaction } from '@bangle.dev/pm';
 import { Plugin, PluginKey } from '@bangle.dev/pm';
-import { bangleWarn } from '@bangle.dev/utils';
 import { log as _log } from '@charmverse/core/log';
 
 import { isDevEnv } from 'config/constants';
@@ -85,10 +84,8 @@ abstract class BaseNodeView {
     this._selected = false;
 
     if (!renderHandlers) {
-      bangleWarn(
-        'It appears the view =',
-        view,
-        ' was not associated with renderHandlers. You are either using nodeViews accidentally or have incorrectly setup nodeViews'
+      _log.warn(
+        `It appears the view =${view} was not associated with renderHandlers. You are either using nodeViews accidentally or have incorrectly setup nodeViews`
       );
       throw new Error(
         'You either did not pass the renderHandlers correct or it cannot find render handlers associated with the view.'

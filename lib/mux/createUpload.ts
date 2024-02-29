@@ -9,11 +9,11 @@ export async function createUpload() {
     throw new Error('Mux client not configured');
   }
   // const id = uuid(); - the 'passthrough' concept might have a use in the future
-  const upload = await mux.Video.Uploads.create({
-    cors_origin: baseUrl,
+  const upload = await mux.video.uploads.create({
+    cors_origin: baseUrl!,
     new_asset_settings: {
       // passthrough: id,
-      playback_policy: 'signed'
+      playback_policy: ['signed']
     }
   });
 

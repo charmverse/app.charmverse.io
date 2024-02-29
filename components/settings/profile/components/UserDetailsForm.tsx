@@ -2,7 +2,7 @@ import type { IdentityType, UserDetails as UserDetailsType } from '@charmverse/c
 import styled from '@emotion/styled';
 import EditIcon from '@mui/icons-material/Edit';
 import type { SxProps, Theme } from '@mui/material';
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import type { IconButtonProps } from '@mui/material/IconButton';
 import IconButton from '@mui/material/IconButton';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -20,7 +20,7 @@ import Avatar from 'components/settings/space/components/LargeAvatar';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { Social } from 'lib/members/interfaces';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 
 import { useUpdateProfileAvatar } from '../hooks/useUpdateProfileAvatar';
@@ -88,8 +88,8 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
 
   return (
     <>
-      <Grid container direction='column' spacing={2} mt={1} sx={sx}>
-        <Grid item>
+      <Stack spacing={2} mt={1} sx={sx} width='100%'>
+        <Box width='fit-content'>
           <Avatar
             name={user.username || ''}
             image={user.avatar}
@@ -100,30 +100,24 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
             isSaving={isSavingAvatar}
             isNft={hasNftAvatar(user)}
           />
-        </Grid>
-        <Grid item width='100%'>
-          <EditIconContainer data-testid='edit-identity' onClick={identityModalState.open}>
-            <IdentityIcon type={user.identityType as IdentityType} />
-            <Typography variant='h1' noWrap>
-              {shortWalletAddress(user.username)}
-            </Typography>
-          </EditIconContainer>
-        </Grid>
-        <Grid item>
-          <UserDescription
-            description={userDetails?.description || ''}
-            onChange={setDescription}
-            error={errors?.description}
-            required={isBioRequired}
-          />
-        </Grid>
-        <Grid item>
-          <TimezoneAutocomplete
-            required={isTimezoneRequired}
-            userTimezone={userDetails?.timezone}
-            onChange={setTimezone}
-          />
-        </Grid>
+        </Box>
+        <EditIconContainer data-testid='edit-identity' onClick={identityModalState.open}>
+          <IdentityIcon type={user.identityType as IdentityType} />
+          <Typography variant='h1' noWrap>
+            {shortWalletAddress(user.username)}
+          </Typography>
+        </EditIconContainer>
+        <UserDescription
+          description={userDetails?.description || ''}
+          onChange={setDescription}
+          error={errors?.description}
+          required={isBioRequired}
+        />
+        <TimezoneAutocomplete
+          required={isTimezoneRequired}
+          userTimezone={userDetails?.timezone}
+          onChange={setTimezone}
+        />
         <SocialInputs
           errors={errors?.social as FieldErrors<Record<keyof Social, string | null>>}
           required={{
@@ -135,7 +129,7 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
           social={userDetails?.social as Social}
           onChange={setSocial}
         />
-      </Grid>
+      </Stack>
       <IdentityModal isOpen={identityModalState.isOpen} close={identityModalState.close} />
     </>
   );

@@ -7,8 +7,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PageEventMap, StaticPageType } from 'lib/metrics/mixpanel/interfaces/PageEvent';
 import { filterVisiblePages } from 'lib/pages/filterVisiblePages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { fullyDecodeURI, getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 
 type ViewMeta = PageEventMap['page_view']['meta'];
 
@@ -115,6 +115,7 @@ async function getDefaultPageForSpaceRaw({
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
+    filter: 'not_card',
     userId,
     archived: false
   });

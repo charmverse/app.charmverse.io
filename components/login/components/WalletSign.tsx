@@ -8,8 +8,8 @@ import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import { isTouchScreen } from 'lib/utilities/browser';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { isTouchScreen } from 'lib/utils/browser';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 interface Props {
   signSuccess: (authSig: AuthSig) => void | Promise<any>;

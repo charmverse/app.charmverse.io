@@ -1,7 +1,7 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { countValueOccurrences } from '../utilities/numbers';
+import { countValueOccurrences } from '../utils/numbers';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';

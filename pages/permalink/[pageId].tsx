@@ -3,7 +3,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type { GetServerSidePropsContext } from 'next';
 
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
+import { getPagePath } from 'lib/utils/domains/getPagePath';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {
   const { pageId } = ctx.params ?? {};

@@ -6,8 +6,8 @@ import type { KeyedMutator } from 'swr';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
-import type { ProposalPropertyValue } from 'lib/proposal/blocks/interfaces';
-import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 
 import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { BoardProposal } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';

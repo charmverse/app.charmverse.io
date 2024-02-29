@@ -16,7 +16,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';

@@ -82,8 +82,8 @@ export function CharmsHistoryTab() {
 }
 
 const receivedLabels: Record<CharmActionTrigger, (data: { amount: number }) => string> = {
-  [CharmActionTrigger.referral]: ({ amount }) => `Received ${getAmountLabel(amount)} Charms for a referral`,
-  [CharmActionTrigger.referralReferee]: ({ amount }) => `Received ${getAmountLabel(amount)} Charms from a referral`
+  [CharmActionTrigger.referral]: ({ amount }) => `Received ${getAmountLabel(amount)} for a referral`,
+  [CharmActionTrigger.referralReferee]: ({ amount }) => `Received ${getAmountLabel(amount)} from a referral`
 };
 
 function getTransactionDescription(transaction: HistoryTransaction) {

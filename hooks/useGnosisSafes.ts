@@ -5,7 +5,7 @@ import { getAddress } from 'viem';
 
 import charmClient from 'charmClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import useMultiWalletSigs from './useMultiWalletSigs';
 import { useUser } from './useUser';

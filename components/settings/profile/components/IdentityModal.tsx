@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { Box, Chip, MenuItem, Tooltip, Typography } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -26,9 +25,9 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import randomName from 'lib/utilities/randomName';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utils/blockchain';
+import randomName from 'lib/utils/randomName';
+import { lowerCaseEqual } from 'lib/utils/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { useUserDetails } from '../hooks/useUserDetails';

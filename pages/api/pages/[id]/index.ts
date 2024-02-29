@@ -16,8 +16,8 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UndesirableOperationError } from 'lib/utilities/errors';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { UndesirableOperationError } from 'lib/utils/errors';
+import { replaceS3Domain } from 'lib/utils/url';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

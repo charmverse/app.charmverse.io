@@ -8,7 +8,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser }
 import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 import { castVote as castVoteService } from 'lib/votes/castVote';
 import type { UserVoteDTO } from 'lib/votes/interfaces';
 

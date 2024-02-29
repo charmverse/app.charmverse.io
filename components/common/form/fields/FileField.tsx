@@ -9,7 +9,7 @@ import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import Link from 'components/common/Link';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 
 import type { ControlFieldProps, FieldProps } from '../interfaces';
 

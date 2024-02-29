@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getProposalAction } from 'lib/proposal/getProposalAction';
+import { getProposalAction } from 'lib/proposals/getProposalAction';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 

@@ -1,8 +1,7 @@
-import type { GetGuildByIdResponse } from '@guildxyz/sdk';
-import { guild } from '@guildxyz/sdk';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { guild } from 'lib/guild-xyz/client';
 import { updateGuildRolesForSpace } from 'lib/guild-xyz/server/updateGuildRolesForSpace';
 import { onError, onNoMatch, requireKeys, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { findOrCreateRoles } from 'lib/roles/createRoles';
@@ -23,11 +22,10 @@ async function importRoles(
   res: NextApiResponse<{ importedRolesCount: number } | { error: string }>
 ) {
   const { spaceId, guildIds } = req.body as ImportGuildRolesPayload;
-  const guilds: GetGuildByIdResponse[] = await Promise.all(guildIds.map((guildId) => guild.get(guildId)));
-  const guildRoles: { id: number; name: string }[] = [];
-  guilds.forEach((_guild) => {
-    guildRoles.push(..._guild.roles.map((role) => ({ id: role.id, name: role.name })));
-  });
+  const guilds = await guild.getMany(guildIds);
+  const guildRoles: { id: number; name: string }[] = (
+    await Promise.all(guilds.map((g) => guild.role.getAll(g.id)))
+  ).flat();
   await findOrCreateRoles(guildRoles, spaceId, req.session.user.id, { source: 'guild_xyz' });
   await updateGuildRolesForSpace(spaceId);
   res.status(200).json({ importedRolesCount: Object.keys(guildRoles).length });

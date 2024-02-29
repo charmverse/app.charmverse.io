@@ -1,7 +1,7 @@
 import type { VoteOptions } from '@charmverse/core/prisma-client';
 import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 
-import { percent } from 'lib/utilities/numbers';
+import { percent } from 'lib/utils/numbers';
 
 type Props = {
   value: string | undefined | null;

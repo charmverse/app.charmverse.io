@@ -11,7 +11,7 @@ import { RewardTokenDialog } from 'components/rewards/components/RewardPropertie
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
-import type { ProposalWithUsersLite } from 'lib/proposal/getProposals';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import {
   DUE_DATE_ID,
   REWARD_AMOUNT,

@@ -19,9 +19,9 @@ import {
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
-} from 'lib/proposal/blocks/constants';
-import type { ProposalBoardBlock } from 'lib/proposal/blocks/interfaces';
-import type { ProposalEvaluationStatus } from 'lib/proposal/interface';
+} from 'lib/proposals/blocks/constants';
+import type { ProposalBoardBlock } from 'lib/proposals/blocks/interfaces';
+import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 

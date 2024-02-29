@@ -4,7 +4,7 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { InvalidStateError } from 'lib/middleware';
-import type { ProposalEvaluationResultExtended } from 'lib/proposal/interface';
+import type { ProposalEvaluationResultExtended } from 'lib/proposals/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';

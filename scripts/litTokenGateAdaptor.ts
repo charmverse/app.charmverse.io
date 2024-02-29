@@ -6,7 +6,7 @@ import type { JsonAccsRequest } from '@lit-protocol/types';
 import { RPCList } from 'connectors/chains';
 
 import type { Operator, TokenGateConditions } from 'lib/tokenGates/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import { validateTokenGateConditions } from 'lib/tokenGates/validateTokenGateConditionsObject';
 
 const path = './config.json';

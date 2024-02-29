@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { FrameButton } from 'frames.js';
 
 import { useFarcasterFrameAction, useGetFarcasterFrame } from 'charmClient/hooks/farcaster';
-import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { isValidUrl } from 'lib/utils/isValidUrl';
 
 import { useConfirmationModal } from './useConfirmationModal';
 import { useFarcasterUser } from './useFarcasterUser';

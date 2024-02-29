@@ -31,7 +31,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { PageIcon } from '../../PageIcon';
 
@@ -108,7 +108,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function restorePage(pageId: string) {
     const page = archivedPages[pageId];
     if (page && space) {
-      if (page.type === 'board' || page.type === 'page') {
+      if (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') {
         sendMessage({
           payload: {
             id: pageId

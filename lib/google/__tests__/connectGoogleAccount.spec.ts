@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { getUserProfile } from 'lib/users/getUser';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 
 import { connectGoogleAccount } from '../connectGoogleAccount';
 
