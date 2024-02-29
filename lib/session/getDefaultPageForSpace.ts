@@ -115,6 +115,7 @@ async function getDefaultPageForSpaceRaw({
 
   const accessiblePageIds = await permissionsApiClient.pages.getAccessiblePageIds({
     spaceId,
+    filter: 'not_card',
     userId,
     archived: false
   });

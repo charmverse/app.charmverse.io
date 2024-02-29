@@ -4,9 +4,10 @@ import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { useTrashPages } from 'charmClient/hooks/pages';
+import { useTrashPages, useInitialPagesForSpace } from 'charmClient/hooks/pages';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
@@ -59,6 +60,8 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const { sendMessage, subscribe } = useWebSocketClient();
   const { trigger: trashPages } = useTrashPages();
   const pagesDispatched = useRef(false);
+  // temporary optimization: load non-card pages first
+  const { data: initialPages } = useInitialPagesForSpace(currentSpace?.id);
   const {
     data,
     mutate: mutatePagesList,
@@ -81,7 +84,18 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     { refreshInterval, revalidateOnFocus: false }
   );
 
-  const pages = data || {};
+  const pages = useMemo<PagesMap>(() => {
+    if (data) {
+      return data;
+    }
+    if (initialPages) {
+      return initialPages.reduce<PagesMap>((acc, page) => {
+        acc[page.id] = page;
+        return acc;
+      }, {});
+    }
+    return {};
+  }, [data, initialPages]);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
