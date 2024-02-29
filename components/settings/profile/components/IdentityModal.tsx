@@ -10,7 +10,7 @@ import useSWRMutation from 'swr/mutation';
 import { isAddress } from 'viem';
 
 import charmClient from 'charmClient';
-import { useSetPrimaryWallet } from 'charmClient/hooks/profile';
+import { useAddUserWallets, useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { Modal } from 'components/common/Modal';
@@ -23,7 +23,6 @@ import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { countConnectableIdentities } from 'lib/users/countConnectableIdentities';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import randomName from 'lib/utils/randomName';
@@ -73,15 +72,7 @@ function IdentityModal(props: IdentityModalProps) {
   };
   const primaryWallet = user?.wallets?.find((w) => w.id === user.primaryWalletId);
 
-  const { trigger: signSuccess } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
-      onSuccess(data) {
-        updateUser(data);
-      }
-    }
-  );
+  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useAddUserWallets();
 
   const onSetPrimaryWallet = async (walletId: string) => {
     try {
@@ -97,8 +88,12 @@ function IdentityModal(props: IdentityModalProps) {
 
   const generateWalletAuth = async () => {
     try {
-      const authSig = await requestSignature();
-      await signSuccess(authSig);
+      const payload = await requestSignature();
+      await signSuccess(payload, {
+        onSuccess(data) {
+          updateUser(data);
+        }
+      });
     } catch (error) {
       log.error('Error requesting wallet signature in login page', error);
       showMessage('Wallet signature cancelled', 'info');
@@ -177,7 +172,7 @@ function IdentityModal(props: IdentityModalProps) {
                     item.type === 'Wallet' && wallet
                       ? [
                           verifiableWalletDetected && !account ? (
-                            <MenuItem key='verify' onClick={generateWalletAuth}>
+                            <MenuItem key='verify' onClick={generateWalletAuth} disabled={isVerifyingWallet}>
                               Verify Wallet
                             </MenuItem>
                           ) : null,
