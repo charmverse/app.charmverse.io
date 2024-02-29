@@ -157,8 +157,7 @@ export async function signAndPublishCharmverseCredential({
 
   const publishedCredentialId = uuid();
 
-  const contentToPublish: Omit<PublishedSignedCredential, 'author'> = {
-    id: publishedCredentialId,
+  const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
     chainId,
     recipient: signedCredential.recipient,
     content: credential.data,
@@ -171,22 +170,18 @@ export async function signAndPublishCharmverseCredential({
     charmverseId: publishedCredentialId
   };
 
-  const signedPublished = await prisma.$transaction(async (tx) => {
-    await prisma.issuedCredential.create({
-      data: {
-        id: publishedCredentialId,
-        ceramicId: '-',
-        credentialEvent: event,
-        credentialTemplate: { connect: { id: credentialTemplateId } },
-        user: { connect: { id: recipientUserId } },
-        proposal: proposalId ? { connect: { id: proposalId } } : undefined,
-        rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
-      }
-    });
+  const published = await publishSignedCredential(contentToPublish);
 
-    const published = await publishSignedCredential(contentToPublish);
-
-    return published;
+  await prisma.issuedCredential.create({
+    data: {
+      id: publishedCredentialId,
+      ceramicId: published.id,
+      credentialEvent: event,
+      credentialTemplate: { connect: { id: credentialTemplateId } },
+      user: { connect: { id: recipientUserId } },
+      proposal: proposalId ? { connect: { id: proposalId } } : undefined,
+      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
+    }
   });
 
   trackUserAction('credential_issued', {
@@ -204,16 +199,7 @@ export async function signAndPublishCharmverseCredential({
     credentialTemplateId
   });
 
-  await prisma.issuedCredential.update({
-    where: {
-      id: publishedCredentialId
-    },
-    data: {
-      ceramicId: signedPublished.id
-    }
-  });
-
-  return signedPublished;
+  return published;
 }
 
 function getOffchainUrl({ chainId, pkg }: { pkg: AttestationShareablePackageObject; chainId: EasSchemaChain }) {

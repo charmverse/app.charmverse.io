@@ -18,7 +18,7 @@ const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
   // Allows us to bypass native
   persistForSeconds: isStagingEnv ? 5 : 300,
-  skipRedisCache: isStagingEnv,
+  skipRedisCache: true,
   cacheKeyPrefix: 'ceramic'
 });
 

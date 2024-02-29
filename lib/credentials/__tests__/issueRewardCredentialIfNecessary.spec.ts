@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attest';
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateBounty, generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 

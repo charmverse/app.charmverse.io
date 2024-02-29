@@ -7,6 +7,7 @@ import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
+import { prettyPrint } from 'lib/utils/strings';
 
 import { signAndPublishCharmverseCredential } from './attest';
 import { credentialEventLabels } from './constants';
@@ -197,6 +198,8 @@ export async function issueProposalCredentialsIfNecessary({
           credentialsToGiveUser,
           error: e
         });
+
+        prettyPrint(e);
       }
     }
   }

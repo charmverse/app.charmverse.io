@@ -155,7 +155,7 @@ export async function issueRewardCredentialsIfNecessary({
           }
           const eventLabel = getEventLabel((value) => getFeatureTitle(value, baseReward.space.features as any[]));
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-          const publishedCredential = await signAndPublishCharmverseCredential({
+          await signAndPublishCharmverseCredential({
             chainId: optimism.id,
             recipient: targetWallet.address,
             credential: {
@@ -172,16 +172,6 @@ export async function issueRewardCredentialsIfNecessary({
             event,
             recipientUserId: submitterUserId,
             pageId: baseReward.page.id
-          });
-
-          await prisma.issuedCredential.create({
-            data: {
-              ceramicId: publishedCredential.id,
-              credentialEvent: event,
-              credentialTemplate: { connect: { id: credentialTemplate.id } },
-              rewardApplication: { connect: { id: credentialTemplate.applicationId } },
-              user: { connect: { id: submitterUserId } }
-            }
           });
         }
       } catch (e) {

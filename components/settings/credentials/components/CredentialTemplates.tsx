@@ -74,7 +74,8 @@ export function CredentialTemplates() {
               onClick={() => openDialog({ newTemplateType: 'proposal' })}
               color='secondary'
               variant='outlined'
-              sx={{ width: 'fit-content' }}
+              size='small'
+              disabled={!isAdmin}
               dataTest='add-proposal-credential'
             >
               + Add a credential
@@ -99,6 +100,8 @@ export function CredentialTemplates() {
               onClick={() => openDialog({ newTemplateType: 'reward' })}
               color='secondary'
               variant='outlined'
+              size='small'
+              disabled={!isAdmin}
               dataTest='add-proposal-credential'
             >
               + Add a credential
