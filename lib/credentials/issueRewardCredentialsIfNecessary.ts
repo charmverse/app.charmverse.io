@@ -171,6 +171,7 @@ export async function issueRewardCredentialsIfNecessary({
             credentialTemplateId: credentialTemplate.id,
             event,
             recipientUserId: submitterUserId,
+            rewardApplicationId: credentialTemplate.applicationId,
             pageId: baseReward.page.id
           });
         }

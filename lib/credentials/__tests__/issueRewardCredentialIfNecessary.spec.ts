@@ -4,17 +4,16 @@ import { testUtilsCredentials, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
-import { signAndPublishCharmverseCredential } from 'lib/credentials/attest';
 import { typedKeys } from 'lib/utils/objects';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateBounty, generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { issueRewardCredentialsIfNecessary } from '../issueRewardCredentialsIfNecessary';
-import type { PublishedSignedCredential } from '../queriesAndMutations';
+import { publishSignedCredential, type PublishedSignedCredential } from '../queriesAndMutations';
 import { getAttestationSchemaId } from '../schemas';
 
-jest.mock('lib/credentials/attest', () => ({
-  signAndPublishCharmverseCredential: jest.fn().mockImplementation(() =>
+jest.mock('lib/credentials/queriesAndMutations', () => ({
+  publishSignedCredential: jest.fn().mockImplementation(() =>
     Promise.resolve({
       chainId: optimism.id,
       content: {},
@@ -33,7 +32,7 @@ jest.mock('lib/credentials/attest', () => ({
   )
 }));
 
-const mockedSignAndPublishCharmverseCredential = jest.mocked(signAndPublishCharmverseCredential);
+const mockedPublishSignedCredential = jest.mocked(publishSignedCredential);
 
 describe('issueRewardCredentialIfNecessary', () => {
   it('should issue credentials once for a unique combination of user, reward submission and credential template', async () => {
@@ -84,7 +83,7 @@ describe('issueRewardCredentialIfNecessary', () => {
     });
 
     // 1 event types * 2 credential templates * 3 submissions
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(6);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(6);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -191,7 +190,7 @@ describe('issueRewardCredentialIfNecessary', () => {
     });
 
     // 1 credential template, and 1 submission targeted
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(1);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(1);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -255,7 +254,7 @@ describe('issueRewardCredentialIfNecessary', () => {
       rewardId: reward.id
     });
 
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(0);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(0);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -296,7 +295,7 @@ describe('issueRewardCredentialIfNecessary', () => {
       rewardId: reward.id
     });
 
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(2);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(2);
 
     const submitterApplication = await generateBountyApplication({
       applicationStatus: 'complete',
@@ -311,7 +310,7 @@ describe('issueRewardCredentialIfNecessary', () => {
     });
 
     // 2 previous calls + 2 current calls
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(4);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(4);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -383,7 +382,7 @@ describe('issueRewardCredentialIfNecessary', () => {
       rewardId: reward.id
     });
 
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(1);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(1);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -431,7 +430,7 @@ describe('issueRewardCredentialIfNecessary', () => {
       rewardId: reward.id
     });
 
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(0);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(0);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -482,7 +481,7 @@ describe('issueRewardCredentialIfNecessary', () => {
     });
 
     // Only 3 valid application statuses, complete, processing or paid
-    expect(mockedSignAndPublishCharmverseCredential).toHaveBeenCalledTimes(3);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(3);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
