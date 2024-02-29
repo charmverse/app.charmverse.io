@@ -348,7 +348,7 @@ function IdentityModal(props: IdentityModalProps) {
             );
           })}
         </Box>
-        <Button color='primary' endIcon={<NavigateNextIcon />} {...bindTrigger(accountsPopupState)}>
+        <Button color='primary' {...bindTrigger(accountsPopupState)}>
           + Add an account
         </Button>
       </Modal>
