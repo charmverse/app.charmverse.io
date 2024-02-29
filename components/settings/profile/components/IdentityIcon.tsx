@@ -5,10 +5,10 @@ import PersonIcon from '@mui/icons-material/Person';
 import TelegramIcon from '@mui/icons-material/Telegram';
 import { SiDiscord } from 'react-icons/si';
 
-type IconSize = 'medium' | 'small' | 'xSmall';
+export type IdentityIconSize = 'medium' | 'small' | 'xSmall';
 
 const sizeStyleMap: Record<
-  IconSize,
+  IdentityIconSize,
   {
     height: number;
     width: number;
@@ -32,7 +32,7 @@ const sizeStyleMap: Record<
   }
 };
 
-export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | null; size?: IconSize }) {
+export function IdentityIcon({ type, size = 'medium' }: { type: IdentityType | null; size?: IdentityIconSize }) {
   const { height, width } = sizeStyleMap[size];
 
   switch (type) {
