@@ -26,13 +26,18 @@ jest.mock('lib/credentials/queriesAndMutations', () => ({
       }),
       sig: 'Signature content',
       timestamp: new Date(),
-      type: 'proposal',
+      type: 'reward',
       verificationUrl: 'https://eas-explorer-example.com/verification'
     } as PublishedSignedCredential)
   )
 }));
 
 const mockedPublishSignedCredential = jest.mocked(publishSignedCredential);
+
+afterAll(() => {
+  jest.resetModules();
+  jest.resetAllMocks();
+});
 
 describe('issueRewardCredentialIfNecessary', () => {
   it('should issue credentials once for a unique combination of user, reward submission and credential template', async () => {
