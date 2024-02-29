@@ -219,7 +219,7 @@ const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/asset_platforms/images/122/small/polygonzkevm.jpg'
     },
-    alchemyUrl: 'https://polygonzkevm-mainnet.g.alchemy.com/',
+    alchemyUrl: 'https://polygonzkevm-mainnet.g.alchemy.com',
     rpcUrls: polygonZkEvm.rpcUrls.public.http,
     blockExplorerUrls: [polygonZkEvm.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zkevm.safe.global/',
