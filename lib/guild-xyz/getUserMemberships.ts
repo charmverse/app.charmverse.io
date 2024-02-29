@@ -1,14 +1,7 @@
-import { log } from '@charmverse/core/log';
+import { user } from 'lib/guild-xyz/client';
 
-import { guild, user } from 'lib/guild-xyz/client';
-
-export async function getUserMemberships(guildIdOrURL: string, address: string) {
-  const g = await guild.get(guildIdOrURL);
-  if (!g) {
-    log.error(`Guild not found: ${guildIdOrURL}`);
-    return false;
-  }
+export async function getUserMemberships(guildId: string | number, address: string) {
   const memberships = await user.getMemberships(address);
 
-  return memberships.some((membership) => membership.guildId === g.id);
+  return memberships.some((membership) => membership.guildId === Number(guildId));
 }

@@ -1,12 +1,20 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import { Box, Menu, MenuItem } from '@mui/material';
+import Box from '@mui/material/Box';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 
 import { Button } from 'components/common/Button';
 
 import type { Flow } from '../hooks/useTokenGateModalContext';
 
-export function TokenGateAddMultipleButton({ onClick }: { onClick: (flow: Flow) => void }) {
+export function TokenGateAddMultipleButton({
+  onClick,
+  disabled
+}: {
+  onClick: (flow: Flow) => void;
+  disabled: boolean;
+}) {
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'multiple-gates-menu' });
 
   return (
@@ -17,6 +25,7 @@ export function TokenGateAddMultipleButton({ onClick }: { onClick: (flow: Flow) 
         variant='outlined'
         disableElevation
         endIcon={<KeyboardArrowDownIcon />}
+        disabled={disabled}
         {...bindTrigger(menuPopupState)}
       >
         Add condition

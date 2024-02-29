@@ -66,12 +66,15 @@ export function TokenGateModalProvider({
   const spaceId = space?.id || '';
 
   const handleTokenGate = (_tokenGate: Pick<TokenGate, 'conditions'>) => {
+    const accessControlConditions = _tokenGate.conditions.accessControlConditions.map(
+      ({ name, image, ...rest }) => rest
+    );
     setTokenGate((prevState) => {
       return {
         conditions: {
           accessControlConditions: [
             ...(prevState?.conditions.accessControlConditions || []),
-            ..._tokenGate.conditions.accessControlConditions
+            ...accessControlConditions
           ],
           operator: _tokenGate.conditions.operator || prevState?.conditions.operator || 'OR'
         }
@@ -105,10 +108,6 @@ export function TokenGateModalProvider({
     onSuccess();
   };
 
-  const onSubmit = async () => {
-    await createAccessControlConditions();
-  };
-
   /**
    * Use this function to delete conditions
    */
@@ -132,7 +131,7 @@ export function TokenGateModalProvider({
 
   const value: IContext = useMemo(
     () => ({
-      onSubmit,
+      onSubmit: createAccessControlConditions,
       onDelete,
       resetModal,
       setDisplayedPage,

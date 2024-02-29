@@ -38,10 +38,15 @@ export function TokenGateReview() {
   useEffect(() => {
     if (tokenGate?.conditions) {
       reviewTokenGate(tokenGate, {
+        onSuccess: (tk) => {
+          // In case the API returns different information, we update the token gate
+          handleTokenGate(tk);
+          setDisplayedPage('review');
+        },
         onError: () => showMessage('Something went wrong. Please review your conditions.', 'error')
       });
     }
-  }, [tokenGate]);
+  }, [tokenGate?.conditions]);
 
   useEffect(() => {
     if (error) {
@@ -49,7 +54,7 @@ export function TokenGateReview() {
     }
   }, [error]);
 
-  const onSubmitCondition = async () => {
+  const onTokenGateSubmit = async () => {
     await onSubmit();
     showMessage('Token gate created successfully', 'success');
   };
@@ -63,6 +68,8 @@ export function TokenGateReview() {
   const goToHome = () => setDisplayedPage('home');
 
   const handleDelete = flow !== 'single' && conditionsData && conditionsData.length > 1 ? onDelete : undefined;
+
+  const isLoading = !conditionsData && isMutating;
 
   return (
     <>
@@ -80,13 +87,13 @@ export function TokenGateReview() {
           </CardContent>
         </Card>
       )}
-      {flow === 'single' && <TokenGateAddMultipleButton onClick={handleMultipleConditions} />}
+      {flow === 'single' && <TokenGateAddMultipleButton onClick={handleMultipleConditions} disabled={isLoading} />}
       {flow !== 'single' && (
-        <Button variant='outlined' onClick={goToHome}>
+        <Button variant='outlined' onClick={goToHome} disabled={isLoading}>
           Add a condition
         </Button>
       )}
-      <TokenGateFooter onSubmit={onSubmitCondition} onCancel={resetModal} loading={loadingToken} />
+      <TokenGateFooter onSubmit={onTokenGateSubmit} onCancel={resetModal} loading={loadingToken} />
     </>
   );
 }
