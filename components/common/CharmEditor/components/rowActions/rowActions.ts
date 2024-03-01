@@ -300,6 +300,10 @@ export function getNodeForRowPosition({
   while (topPos.depth > 1 || (topPos.depth === 1 && topPos.parentOffset > 0)) {
     const parentOffset = topPos.pos - (topPos.parentOffset > 0 ? topPos.parentOffset : 1); // if parentOffset is 0, step back by 1
     const parentOffsetNode = view.state.doc.resolve(parentOffset);
+    const nodeAfterType = topPos.nodeAfter?.type.name;
+    if (nodeAfterType === 'page') {
+      break;
+    }
     if (parentOffsetNode.node().type.name !== 'columnBlock') {
       topPos = parentOffsetNode;
     } else {
@@ -311,7 +315,7 @@ export function getNodeForRowPosition({
 
   let pmNode = topPos.node();
   // handle top-level children, where pmNode === doc
-  if (rowNodeOffset && rowNodeOffset > 0) {
+  if (rowNodeOffset !== undefined && rowNodeOffset >= 0) {
     const child = pmNode.maybeChild(rowNodeOffset);
     pmNode = child || pmNode;
   }
