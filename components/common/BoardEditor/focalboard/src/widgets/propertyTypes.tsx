@@ -4,8 +4,9 @@ import { useIntl } from 'react-intl';
 
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 
+import { RelationPropertyMenu } from '../components/properties/relation/RelationPropertyMenu/RelationPropertyMenu';
+
 import { iconForPropertyType } from './iconForPropertyType';
-import { RelationPropertyMenu } from './menu/RelationPropertyMenu';
 import { typeDisplayName } from './typeDisplayName';
 
 const propertyTypesList: PropertyType[] = [
@@ -29,7 +30,8 @@ const propertyTypesList: PropertyType[] = [
 export function PropertyTypes({
   selectedTypes = [],
   onClick,
-  isMobile
+  isMobile,
+  boardType
 }: {
   selectedTypes?: PropertyType[];
   onClick: (property: {
@@ -38,6 +40,8 @@ export function PropertyTypes({
     name?: IPropertyTemplate['name'];
   }) => void;
   isMobile?: boolean;
+  // This indicates what type of board (proposals, rewards or regular) this component is being used in
+  boardType?: 'proposals' | 'rewards';
 }) {
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
   const bindTriggerProps = bindTrigger(addRelationPropertyPopupState);
@@ -54,23 +58,25 @@ export function PropertyTypes({
             <Divider />
           </>
         )}
-        {propertyTypesList.map((type) => {
-          return (
-            <MenuItem
-              selected={selectedTypes.includes(type)}
-              data-test={`select-property-${type}`}
-              key={type}
-              {...(type === 'relation'
-                ? bindTriggerProps
-                : {
-                    onClick: () => onClick({ type })
-                  })}
-            >
-              <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
-              <Typography>{typeDisplayName(intl, type)}</Typography>
-            </MenuItem>
-          );
-        })}
+        {(boardType !== undefined ? propertyTypesList.filter((ptl) => ptl !== 'relation') : propertyTypesList).map(
+          (type) => {
+            return (
+              <MenuItem
+                selected={selectedTypes.includes(type)}
+                data-test={`select-property-${type}`}
+                key={type}
+                {...(type === 'relation'
+                  ? bindTriggerProps
+                  : {
+                      onClick: () => onClick({ type })
+                    })}
+              >
+                <ListItemIcon>{iconForPropertyType(type)}</ListItemIcon>
+                <Typography>{typeDisplayName(intl, type)}</Typography>
+              </MenuItem>
+            );
+          }
+        )}
       </Stack>
       <RelationPropertyMenu onClick={onClick} popupState={addRelationPropertyPopupState} />
     </>

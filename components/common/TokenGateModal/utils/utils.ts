@@ -2,8 +2,8 @@ export const collectableOptions = [
   { id: 'ERC721', name: 'ERC-721 NFT' },
   { id: 'ERC1155', name: 'ERC-1155 NFT' },
   { id: 'POAP', name: 'POAPS' },
-  { id: 'UNLOCK', name: 'Unlock Protocol' },
-  { id: 'HYPERSUB', name: 'Hypersub' }
+  { id: 'Unlock', name: 'Unlock Protocol' },
+  { id: 'Hypersub', name: 'Hypersub' }
 ] as const;
 
 export const poapTypes = [
@@ -28,5 +28,11 @@ export const nftCheck = [
 
 export const daoCheck = [
   { id: 'moloch', name: 'MolochDAOv2.1' },
-  { id: 'builder', name: 'Builder Protocol' }
+  { id: 'builder', name: 'Builder Protocol' },
+  { id: 'guild', name: 'Guild.xyz' }
+] as const;
+
+export const gitcoinPassportCheck = [
+  { id: 'exists', name: 'Gitcoin Passport Owner' },
+  { id: 'score', name: 'Gitcoin Passport Score' }
 ] as const;

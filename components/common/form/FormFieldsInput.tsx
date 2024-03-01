@@ -6,7 +6,6 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -162,6 +161,7 @@ function FormFieldsInputBase({
                   {...field}
                   rows={undefined}
                   maxRows={10}
+                  sx={{ mb: 2 }}
                   value={(field.value ?? '') as FormFieldValue}
                   placeholder={fieldTypePlaceholderRecord[formField.type]}
                   labelEndAdornment={

@@ -3,8 +3,8 @@ import type { Application, Page } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { getPagePath } from 'lib/pages/utils';
-import { randomETHWalletAddress as _randomETHWalletAddress } from 'lib/utilities/blockchain';
-import type { RequiredNotNull } from 'lib/utilities/types';
+import { randomETHWalletAddress as _randomETHWalletAddress } from 'lib/utils/blockchain';
+import type { RequiredNotNull } from 'lib/utils/types';
 
 export function generatePageToCreateStub({
   userId,

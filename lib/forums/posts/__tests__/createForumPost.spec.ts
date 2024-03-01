@@ -1,7 +1,7 @@
 import type { Post, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { InsecureOperationError } from 'lib/utils/errors';
 import { builders } from 'testing/prosemirror/builders';
 import { generateUserAndSpace, createVote } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
@@ -24,7 +24,7 @@ describe('createForumPost', () => {
       spaceId: space.id
     });
     const createdPage = await createForumPost({
-      content: {},
+      content: null,
       contentText: '',
       createdBy: user.id,
       spaceId: space.id,
@@ -51,7 +51,7 @@ describe('createForumPost', () => {
 
     await expect(
       createForumPost({
-        content: {},
+        content: null,
         contentText: '',
         createdBy: user.id,
         spaceId: space.id,

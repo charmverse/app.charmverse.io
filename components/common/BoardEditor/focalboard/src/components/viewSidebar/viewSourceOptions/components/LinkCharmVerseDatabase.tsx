@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react';
 import type { PageListItem } from 'components/common/PagesList';
 import { PagesList } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { allowedSourceDatabasePageTypes } from '../useSourceOptions';
 
@@ -28,17 +28,14 @@ export function LinkCharmVerseDatabase(props: Props) {
 
   const sortedPages = useMemo(() => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return (
-      props.pages ??
-      Object.values(pages)
-        .filter(
-          (p) =>
-            allowedSourceDatabasePageTypes.includes(p?.type || '') &&
-            p?.title?.toLowerCase().includes(lowerCaseSearchTerm)
-        )
-        .filter(isTruthy)
-        .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1))
-    );
+    return (props.pages ?? Object.values(pages))
+      .filter(
+        (p) =>
+          allowedSourceDatabasePageTypes.includes(p?.type || '') &&
+          p?.title?.toLowerCase().includes(lowerCaseSearchTerm)
+      )
+      .filter(isTruthy)
+      .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));
   }, [pages, props.pages, searchTerm]);
 
   return (

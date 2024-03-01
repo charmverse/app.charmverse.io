@@ -24,7 +24,7 @@ import { useDrag, useDrop } from 'react-dnd';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { mergeRefs } from 'lib/utilities/react';
+import { mergeRefs } from 'lib/utils/react';
 
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
@@ -90,6 +90,7 @@ function ExpandedFormField({
     <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' pr={4}>
         <Select<FormFieldType>
+          data-test='form-field-type-select'
           value={formField.type}
           onChange={(e) =>
             updateFormField({
@@ -104,7 +105,7 @@ function ExpandedFormField({
         >
           {formFieldTypes.map((fieldType) => {
             return (
-              <MenuItem key={fieldType} value={fieldType}>
+              <MenuItem data-test={`form-field-type-option-${fieldType}`} key={fieldType} value={fieldType}>
                 <Stack flexDirection='row' gap={1} alignItems='center'>
                   {fieldTypeIconRecord[fieldType]}
                   {fieldTypeLabelRecord[fieldType]}
@@ -123,7 +124,7 @@ function ExpandedFormField({
                 </ListItemIcon>
                 <Typography variant='subtitle1'>Duplicate</Typography>
               </MenuItem>
-              <MenuItem onClick={onDelete}>
+              <MenuItem data-test='delete-form-field' onClick={onDelete}>
                 <ListItemIcon>
                   <DeleteOutlinedIcon fontSize='small' />
                 </ListItemIcon>
@@ -132,7 +133,7 @@ function ExpandedFormField({
             </MenuList>
           }
         >
-          <IconButton size='small' sx={{ mt: '-20px' }}>
+          <IconButton data-test='form-field-more-options-popup' size='small' sx={{ mt: '-20px' }}>
             <MoreHoriz fontSize='small' />
           </IconButton>
         </PopperPopup>

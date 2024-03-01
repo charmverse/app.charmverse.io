@@ -1,7 +1,7 @@
 import type { VoteOptions } from '@charmverse/core/prisma-client';
 import { Box, FormControlLabel, Radio, RadioGroup, Typography } from '@mui/material';
 
-import { percent } from 'lib/utilities/numbers';
+import { percent } from 'lib/utils/numbers';
 
 type Props = {
   value: string | undefined | null;
@@ -17,6 +17,7 @@ export function SingleChoiceForm({ value, onChange, voteOptions, disabled, total
     <RadioGroup value={value} onChange={(e, v) => onChange(v)}>
       {voteOptions.map((voteOption) => (
         <FormControlLabel
+          data-test={`current-vote-${voteOption.name}`}
           key={voteOption.name}
           control={<Radio size='small' />}
           disabled={disabled}

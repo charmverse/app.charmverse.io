@@ -18,7 +18,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { SupportedChainId } from 'lib/blockchain/provider/alchemy/config';
 import type { ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utils/errors';
 
 export type FormMode = 'create' | 'update';
 
@@ -92,13 +92,14 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
       const tokenData = await charmClient.getTokenMetaData(tokenInfo);
       setValue('tokenSymbol', tokenData.symbol);
       trigger('tokenSymbol');
-      setValue('tokenLogo', tokenData.logo ?? undefined);
+      setValue('tokenLogo', tokenData.logo ?? null);
       trigger('tokenLogo');
-      setValue('tokenName', tokenData.name ?? undefined);
+      setValue('tokenName', tokenData.name ?? null);
       trigger('tokenName');
-      setValue('tokenDecimals', tokenData.decimals ?? undefined);
+      setValue('tokenDecimals', tokenData.decimals ?? null);
       trigger('tokenDecimals');
-      setAllowManualInput(false);
+      // If API returns empty data for any field, we allow manual input. Otherwise use pre-filled data
+      setAllowManualInput(!!(!tokenData.name || !tokenData.symbol || !tokenData.decimals || !tokenData.logo));
       setLoadingToken(false);
     } catch (error) {
       setValue('tokenLogo', null);
@@ -143,6 +144,11 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
   // Only checks the format, not if we can load the logo
   const validTokenLogoAddressFormat = !!values.tokenLogo && !errors.tokenLogo;
 
+  const isFormValid =
+    isValid &&
+    (!values.contractAddress ||
+      (values.contractAddress && values.tokenDecimals && values.tokenSymbol && values.tokenName));
+
   return (
     <div>
       {/* @ts-ignore */}
@@ -168,6 +174,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
               type='text'
               size='small'
               fullWidth
+              data-test='custom-token-contract-address'
               error={!!errors.contractAddress?.message}
               helperText={errors.contractAddress?.message}
               InputProps={{
@@ -187,6 +194,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 <Grid item xs={6} sx={{ pr: 2 }}>
                   <InputLabel>Token symbol</InputLabel>
                   <TextField
+                    data-test='custom-token-symbol'
                     InputProps={{
                       readOnly: !allowManualInput
                     }}
@@ -204,6 +212,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                     {...register('tokenDecimals', {
                       valueAsNumber: true
                     })}
+                    data-test='custom-token-decimals'
                     type='number'
                     size='small'
                     inputMode='numeric'
@@ -220,6 +229,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 <InputLabel>Token name</InputLabel>
                 <TextField
                   {...register('tokenName')}
+                  data-test='custom-token-name'
                   type='text'
                   size='small'
                   fullWidth
@@ -235,6 +245,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
                 <Grid item xs={validTokenLogoAddressFormat ? 8 : 12}>
                   <InputLabel>Token logo URL</InputLabel>
                   <TextField
+                    data-test='custom-token-logo-url'
                     {...register('tokenLogo')}
                     type='text'
                     size='small'
@@ -275,7 +286,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             </Grid>
           )}
           <Grid item>
-            <Button type='submit' disabled={!isValid || values.contractAddress === ''}>
+            <Button data-test='create-token-payment-method' type='submit' disabled={!isFormValid}>
               Create payment method
             </Button>
           </Grid>

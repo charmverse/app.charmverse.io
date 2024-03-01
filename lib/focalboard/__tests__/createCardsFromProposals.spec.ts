@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import type { ProposalFields } from 'lib/proposal/interface';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
@@ -64,11 +64,8 @@ describe('createCardsFromProposals', () => {
       spaceId: space.id,
       userId: user.id
     });
-
     const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
     expect(cards.length).toBe(1);
-
     expect(
       cards.every(
         (card) =>

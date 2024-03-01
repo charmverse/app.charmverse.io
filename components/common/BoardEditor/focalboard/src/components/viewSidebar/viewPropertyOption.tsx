@@ -4,6 +4,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
 import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/focalboard/board';
@@ -14,7 +15,8 @@ import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
-import { RelationPropertyOptions } from '../../widgets/menu/RelationPropertyMenu';
+import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
+import { RelationPropertyEditOptions } from '../properties/relation/RelationPropertyMenu/RelationPropertyOptions';
 import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
@@ -49,6 +51,7 @@ function ViewPropertyOption({
     [titlePropertyIndex, visiblePropertyIds]
   );
   const isVisible = visiblePropertyIdsWithTitle.includes(property.id);
+  const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
   const disabled =
     proposalPropertyTypesList.includes(property.type as any) ||
@@ -68,6 +71,10 @@ function ViewPropertyOption({
   };
 
   const deleteProperty = () => {
+    if (property.type === 'relation' && property.relationData?.showOnRelatedBoard) {
+      showRelationPropertyDeletePopup.open();
+      return;
+    }
     mutator.deleteProperty(board, views, cards, property.id);
     goBackStep();
   };
@@ -103,16 +110,18 @@ function ViewPropertyOption({
           mt: 2
         }}
       />
-      {property.type === 'relation' && (
+      {property.type === 'relation' && property.relationData && (
         <>
-          <RelationPropertyOptions
+          <RelationPropertyEditOptions
             onChange={(relationData) => {
               mutator.updateProperty(board, property.id, {
                 ...property,
                 relationData
               });
             }}
+            propertyId={property.id}
             relationData={property.relationData}
+            board={board}
           />
           <Divider sx={{ mt: 1 }} />
         </>
@@ -132,6 +141,13 @@ function ViewPropertyOption({
         <DeleteOutlinedIcon fontSize='small' />
         <Typography variant='body2'>Delete</Typography>
       </StyledMenuItem>
+      {showRelationPropertyDeletePopup.isOpen && (
+        <DeleteRelationPropertyModal
+          board={board}
+          template={property}
+          onClose={showRelationPropertyDeletePopup.close}
+        />
+      )}
     </Stack>
   );
 }

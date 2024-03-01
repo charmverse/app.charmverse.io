@@ -1,15 +1,13 @@
-import styled from '@emotion/styled';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import LinkIcon from '@mui/icons-material/Link';
 import ReplayIcon from '@mui/icons-material/Replay';
 import { Alert, Box, Paper, Stack, TextField, Tooltip, Typography } from '@mui/material';
-import { getTokenFromUrl } from 'frames.js';
 import { useMemo, useState } from 'react';
-import { GiDiamonds } from 'react-icons/gi';
 import { useCopyToClipboard } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
-import { Button } from 'components/common/Button';
+import { FarcasterButton } from 'components/common/CharmEditor/components/farcasterFrame/components/FarcasterButton';
+import { FarcasterMintButton } from 'components/common/CharmEditor/components/farcasterFrame/components/FarcasterMintButton';
 import LoadingComponent from 'components/common/LoadingComponent';
 import MultiTabs from 'components/common/MultiTabs';
 import PopperPopup from 'components/common/PopperPopup';
@@ -17,8 +15,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useFarcasterFrame } from 'hooks/useFarcasterFrame';
 import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useReservoir } from 'hooks/useReservoir';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { isValidUrl } from 'lib/utilities/isValidUrl';
+import { isValidUrl } from 'lib/utils/isValidUrl';
 
 import BlockAligner from '../../BlockAligner';
 import { MediaSelectionPopup } from '../../common/MediaSelectionPopup';
@@ -27,17 +26,6 @@ import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 
 import { FarcasterMiniProfile } from './FarcasterMiniProfile';
 import { FarcasterSigner } from './FarcasterSigner';
-
-const StyledButton = styled(Button)(({ theme, disabled }) => ({
-  width: '100%',
-  border: theme.palette.mode === 'dark' ? '' : `1px solid ${disabled ? 'transparent' : theme.palette.farcaster.main}`,
-  backgroundColor: theme.palette.mode === 'dark' ? theme.palette.farcaster.main : 'transparent',
-  color: theme.palette.mode === 'dark' ? '#fff' : theme.palette.farcaster.main,
-  '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.farcaster.dark : theme.palette.farcaster.light
-  },
-  height: '100%'
-}));
 
 export function FarcasterFrameNodeView({
   selected,
@@ -56,7 +44,7 @@ export function FarcasterFrameNodeView({
   const [clickedButtonIndex, setClickedButtonIndex] = useState<null | number>(null);
   const { farcasterUser, logout, farcasterProfile } = useFarcasterUser();
   const [inputText, setInputText] = useState('');
-  const isFarcasterUserAvailable = farcasterUser && farcasterUser.fid;
+  const isFarcasterUserAvailable = !!farcasterUser && !!farcasterUser.fid;
   const [, copyToClipboard] = useCopyToClipboard();
   const { showMessage } = useSnackbar();
   const [showEditPopup, setShowEditPopup] = useState(false);
@@ -253,13 +241,7 @@ export function FarcasterFrameNodeView({
             >
               {validFrameButtons.map((button) => (
                 <Tooltip
-                  title={
-                    button.action === 'mint'
-                      ? `Minting is not supported yet`
-                      : !isFarcasterUserAvailable
-                      ? 'Please sign in with Farcaster'
-                      : undefined
-                  }
+                  title={!isFarcasterUserAvailable ? 'Please sign in with Farcaster' : undefined}
                   key={`${button.index.toString()}`}
                 >
                   <div
@@ -268,41 +250,49 @@ export function FarcasterFrameNodeView({
                       width: isSmallScreen ? '100%' : `${100 / validFrameButtons.length}%`
                     }}
                   >
-                    <StyledButton
-                      disabled={
-                        button.action === 'mint' ||
-                        button.index === clickedButtonIndex ||
-                        isLoadingFrameAction ||
-                        !isFarcasterUserAvailable
-                      }
-                      onClick={() => {
-                        setClickedButtonIndex(button.index);
-                        submitOption({
-                          button,
-                          inputText,
-                          index: button.index
-                        }).finally(() => {
-                          setClickedButtonIndex(null);
-                        });
-                      }}
-                      loading={button.index === clickedButtonIndex}
-                    >
-                      {button.action === 'mint' && button.target && getTokenFromUrl(button.target) ? (
-                        <GiDiamonds style={{ marginRight: 4, fontSize: 14 }} />
-                      ) : null}
-                      <Typography
-                        variant='body2'
-                        sx={{
-                          fontWeight: 500,
-                          textWrap: 'wrap'
+                    {button.action === 'mint' ? (
+                      <FarcasterMintButton
+                        item={button}
+                        isFarcasterUserAvailable={isFarcasterUserAvailable}
+                        isLoadingFrameAction={isLoadingFrameAction}
+                        takerAddress={farcasterProfile?.connectedAddresses[0] || farcasterProfile?.address || ''}
+                        pageId={pageId}
+                        spaceId={space?.id}
+                        frameUrl={node.attrs.src}
+                      />
+                    ) : (
+                      <FarcasterButton
+                        disabled={
+                          button.index === clickedButtonIndex || isLoadingFrameAction || !isFarcasterUserAvailable
+                        }
+                        onClick={() => {
+                          setClickedButtonIndex(button.index);
+
+                          submitOption({
+                            button,
+                            inputText,
+                            index: button.index
+                          }).finally(() => {
+                            setClickedButtonIndex(null);
+                          });
                         }}
+                        loading={button.index === clickedButtonIndex}
                       >
-                        {button.label}
-                      </Typography>
-                      {button.action === 'post_redirect' || (button.action === 'link' && isValidUrl(button.target)) ? (
-                        <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} />
-                      ) : null}
-                    </StyledButton>
+                        <Typography
+                          variant='body2'
+                          sx={{
+                            fontWeight: 500,
+                            textWrap: 'wrap'
+                          }}
+                        >
+                          {button.label}
+                        </Typography>
+                        {button.action === 'post_redirect' ||
+                        (button.action === 'link' && isValidUrl(button.target)) ? (
+                          <CallMadeIcon sx={{ ml: 0.5, fontSize: 14 }} />
+                        ) : null}
+                      </FarcasterButton>
+                    )}
                   </div>
                 </Tooltip>
               ))}

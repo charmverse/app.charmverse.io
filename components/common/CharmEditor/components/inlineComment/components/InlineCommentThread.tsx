@@ -8,7 +8,7 @@ import { useEditorViewContext, usePluginState } from 'components/common/CharmEdi
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PageThread from '../../thread/PageThread';

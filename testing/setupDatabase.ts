@@ -26,23 +26,24 @@ import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/focalboard/board';
 import type { IViewType } from 'lib/focalboard/boardView';
+import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { uniqueValues } from 'lib/utilities/array';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
-import { uid } from 'lib/utilities/strings';
+import { uniqueValues } from 'lib/utils/array';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { InvalidInputError } from 'lib/utils/errors';
+import { typedKeys } from 'lib/utils/objects';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import type { CustomBoardProps } from './generateBoardStub';
@@ -1045,7 +1046,7 @@ export async function generateForumComment({
     data: {
       createdAt: new Date(),
       createdBy,
-      content: {},
+      content: Prisma.JsonNull,
       contentText,
       updatedAt: new Date(),
       deletedAt: null,

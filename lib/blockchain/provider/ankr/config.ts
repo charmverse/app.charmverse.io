@@ -1,4 +1,4 @@
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 // Find supported chains:  https://www.npmjs.com/package/@ankr.com/ankr.js
 // Note: we commented out chains already supported by alchemy
@@ -21,3 +21,7 @@ export const rpcApis: SupportedChainId[] = [5000];
 export const supportedMainnets: SupportedChainId[] = [56, 250, 43114, 5000];
 
 export const advancedAPIEndpoint = `https://rpc.ankr.com/multichain/${process.env.ANKR_API_ID}`;
+
+export function isAnkrChain(chainId: number): chainId is SupportedChainId {
+  return supportedMainnets.includes(chainId as SupportedChainId);
+}

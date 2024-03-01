@@ -8,7 +8,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
-import { getCookie, deleteCookie } from 'lib/utilities/browser';
+import { getCookie, deleteCookie } from 'lib/utils/browser';
 
 import { useRoles } from './useRoles';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';

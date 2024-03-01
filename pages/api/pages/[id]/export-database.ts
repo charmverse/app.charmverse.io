@@ -4,11 +4,11 @@ import nc from 'next-connect';
 
 import { loadAndGenerateCsv } from 'lib/focalboard/generateCsv';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
-import type { ContentToCompress, MarkdownPageToCompress } from 'lib/utilities/file';
-import { zipContent } from 'lib/utilities/file';
-import { paginatedPrismaTask } from 'lib/utilities/paginatedPrismaTask';
+import type { ContentToCompress, MarkdownPageToCompress } from 'lib/utils/file';
+import { zipContent } from 'lib/utils/file';
+import { paginatedPrismaTask } from 'lib/utils/paginatedPrismaTask';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

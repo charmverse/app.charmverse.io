@@ -18,7 +18,7 @@ import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';

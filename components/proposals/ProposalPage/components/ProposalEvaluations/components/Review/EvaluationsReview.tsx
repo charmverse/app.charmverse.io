@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 import { WorkflowSelect } from '../../../WorkflowSelect';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
@@ -116,7 +116,7 @@ export function EvaluationsReview({
   return (
     <LoadingComponent isLoading={!proposal}>
       <Collapse in={expandedContainer}>
-        <Tooltip title='Workflow can be changed in Draft step'>
+        <Tooltip title='Workflow can only be changed in Draft step'>
           <span>
             <WorkflowSelect value={proposal?.workflowId} readOnly />
           </span>
@@ -173,7 +173,6 @@ export function EvaluationsReview({
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
                 nextStep={proposal.evaluations[index + 1]}
-                hasMovePermission={proposal.permissions.move}
                 onSubmit={refreshProposal}
               />
             )}

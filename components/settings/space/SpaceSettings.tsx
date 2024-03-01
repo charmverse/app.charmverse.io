@@ -30,10 +30,10 @@ import type { Feature } from 'lib/features/constants';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { getSpaceUrl, getSubdomainPath } from 'lib/utilities/browser';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
-import { isTruthy } from 'lib/utilities/types';
+import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
+import { isTruthy } from 'lib/utils/types';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { ConnectCollabland } from './components/ConnectCollabland';
@@ -136,6 +136,7 @@ export function SpaceSettings({
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
   const watchSpaceArtwork = watch('spaceArtwork');
+  const watchPrimaryMemberIdentity = watch('primaryMemberIdentity') ?? undefined;
 
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
@@ -308,7 +309,11 @@ export function SpaceSettings({
             />
           </Grid>
           <Grid item>
-            <SpacePrimaryIdentity register={register} disabled={!isAdmin} />
+            <SpacePrimaryIdentity
+              primaryIdentity={watchPrimaryMemberIdentity}
+              register={register}
+              disabled={!isAdmin}
+            />
           </Grid>
           <Grid item>
             <FieldLabel>Custom Artwork</FieldLabel>

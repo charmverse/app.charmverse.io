@@ -2,7 +2,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 
 import { createWorkspaceApi } from '../createWorkspaceApi';
 import type { CreateWorkspaceRequestBody } from '../interfaces';

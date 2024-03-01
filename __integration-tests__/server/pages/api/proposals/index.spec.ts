@@ -1,10 +1,11 @@
 import type { Space, User, ProposalWorkflow, Role } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
+import type { CreateProposalInput } from 'lib/proposals/createProposal';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -14,7 +15,7 @@ let space: Space;
 let proposalCreator: User;
 let spaceMember: User;
 let proposalCreatorRole: Role;
-let workflow: ProposalWorkflow;
+let workflow: ProposalWorkflowTyped;
 
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
@@ -42,13 +43,14 @@ beforeAll(async () => {
     }
   });
 
-  workflow = await prisma.proposalWorkflow.create({
+  workflow = (await prisma.proposalWorkflow.create({
     data: {
       index: 0,
       title: 'Default flow',
       spaceId: space.id,
       evaluations: [
         {
+          id: uuid(),
           title: 'Pass/fail',
           permissions: [
             { systemRole: 'all_reviewers', operation: 'comment' },
@@ -58,7 +60,7 @@ beforeAll(async () => {
         }
       ]
     }
-  });
+  })) as ProposalWorkflowTyped;
 });
 
 describe('POST /api/proposals - Create a proposal', () => {
@@ -84,7 +86,6 @@ describe('POST /api/proposals - Create a proposal', () => {
           type: 'feedback',
           reviewers: [{ userId: proposalCreator.id }],
           title: 'Feedback',
-          permissions: [],
           index: 0,
           rubricCriteria: []
         }
@@ -107,7 +108,6 @@ describe('POST /api/proposals - Create a proposal', () => {
           type: 'feedback',
           reviewers: [{ userId: spaceMember.id }],
           title: 'Feedback',
-          permissions: [],
           index: 0,
           rubricCriteria: []
         }
@@ -134,11 +134,10 @@ describe('POST /api/proposals - Create a proposal', () => {
       authors: [proposalCreator.id, otherUser.id],
       evaluations: [
         {
-          id: uuid(),
+          id: workflow.evaluations[0]?.id,
           type: 'feedback',
           reviewers: [{ userId: proposalCreator.id }],
           title: 'Feedback',
-          permissions: [],
           index: 0,
           rubricCriteria: []
         }
@@ -163,8 +162,8 @@ describe('POST /api/proposals - Create a proposal', () => {
       evaluationInputs: [
         {
           evaluationType: 'pass_fail',
-          reviewers: [{ group: 'user', id: proposalCreator.id }, { group: 'space_member' }],
           permissions: [],
+          reviewers: [{ group: 'user', id: proposalCreator.id }, { group: 'space_member' }],
           title: 'Feedback'
         }
       ]
@@ -187,11 +186,11 @@ describe('POST /api/proposals - Create a proposal', () => {
           type: 'pass_fail',
           reviewers: [{ userId: proposalCreator.id }, { systemRole: 'space_member' }],
           title: 'Feedback',
-          permissions: [],
           index: 0,
           rubricCriteria: []
         }
-      ]
+      ],
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });
@@ -205,8 +204,8 @@ describe('POST /api/proposals - Create a proposal', () => {
       evaluationInputs: [
         {
           evaluationType: 'pass_fail',
-          reviewers: [{ group: 'user', id: proposalCreator.id }],
           permissions: [],
+          reviewers: [{ group: 'user', id: proposalCreator.id }],
           title: 'Feedback'
         }
       ]
@@ -229,11 +228,11 @@ describe('POST /api/proposals - Create a proposal', () => {
           type: 'feedback',
           reviewers: [{ userId: spaceMember.id }],
           title: 'Feedback',
-          permissions: [],
           index: 0,
           rubricCriteria: []
         }
-      ]
+      ],
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });
@@ -251,8 +250,8 @@ describe('POST /api/proposals - Create a proposal', () => {
       evaluationInputs: [
         {
           evaluationType: 'pass_fail',
-          reviewers: [{ group: 'user', id: proposalCreator.id }],
           permissions: [],
+          reviewers: [{ group: 'user', id: proposalCreator.id }],
           title: 'Feedback'
         }
       ]
@@ -275,11 +274,11 @@ describe('POST /api/proposals - Create a proposal', () => {
           type: 'feedback',
           reviewers: [{ userId: spaceMember.id }],
           title: 'Feedback',
-          permissions: [],
           index: 0,
           rubricCriteria: []
         }
-      ]
+      ],
+      workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
   });

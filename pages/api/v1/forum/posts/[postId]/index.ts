@@ -5,7 +5,8 @@ import { getForumPost } from 'lib/forums/posts/getForumPost';
 import { getPostVoteSummary } from 'lib/forums/posts/getPostMeta';
 import { updateForumPost } from 'lib/forums/posts/updateForumPost';
 import { InvalidStateError } from 'lib/middleware';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { requireSuperApiKey } from 'lib/middleware/requireSuperApiKey';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -13,11 +14,13 @@ import { withSessionRoute } from 'lib/session/withSession';
 import type { PublicApiForumPost } from '../index';
 import { getPublicForumPost } from '../index';
 
-const handler = apiHandler();
+const handler = apiHandler().get(getPost).use(requireSuperApiKey).put(updatePost).delete(deleteProposal);
+
+type EmptySuccessResponse = { success: true };
 
 /**
  * @swagger
- * components
+ * components:
  *  schemas:
  *    UpdateForumPostInput:
  *      type: object
@@ -48,7 +51,7 @@ interface UpdateForumPostInput {
  *   put:
  *     summary: Update a forum post
  *     tags:
- *      - 'Space API'
+ *      - 'Partner API'
  *     parameters:
  *      - name: postId
  *        in: path
@@ -137,10 +140,6 @@ async function updatePost(req: NextApiRequest, res: NextApiResponse<PublicApiFor
   return res.status(200).json(forumPost);
 }
 
-handler.put(updatePost);
-
-handler.get(getProposal);
-
 /**
  * @swagger
  * /forum/posts/{postId}:
@@ -163,7 +162,7 @@ handler.get(getProposal);
  *                $ref: '#/components/schemas/ForumPost'
  *
  */
-async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
+async function getPost(req: NextApiRequest, res: NextApiResponse<PublicApiForumPost>) {
   // This should never be undefined, but adding this safeguard for future proofing
   const spaceId = req.authorizedSpaceId;
 
@@ -201,6 +200,52 @@ async function getProposal(req: NextApiRequest, res: NextApiResponse<PublicApiFo
   });
 
   return res.status(200).json(result);
+}
+
+/**
+ * @swagger
+ * /forum/posts/{postId}:
+ *   delete:
+ *     summary: Delete a forum post
+ *     tags:
+ *      - 'Partner API'
+ *     parameters:
+ *       - name: postId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *
+ */
+async function deleteProposal(req: NextApiRequest, res: NextApiResponse<EmptySuccessResponse>) {
+  // This should never be undefined, but adding this safeguard for future proofing
+  const spaceId = req.authorizedSpaceId;
+
+  if (!spaceId) {
+    throw new InvalidStateError('Space ID is undefined');
+  }
+  const postId = req.query.postId;
+  if (typeof postId !== 'string') {
+    throw new InvalidStateError('Post ID is undefined');
+  }
+
+  await prisma.post.delete({
+    where: {
+      id: postId
+    },
+    select: {
+      category: true,
+      space: true,
+      author: {
+        select: userProfileSelect
+      }
+    }
+  });
+
+  return res.status(200).json({ success: true });
 }
 
 export default withSessionRoute(handler);

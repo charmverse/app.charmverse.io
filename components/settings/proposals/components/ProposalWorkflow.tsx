@@ -23,7 +23,7 @@ import { Button } from 'components/common/Button';
 import MultiTabs from 'components/common/MultiTabs';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getDefaultEvaluation } from 'lib/proposal/workflows/defaultEvaluation';
+import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
@@ -209,7 +209,7 @@ export function ProposalWorkflowItem({
           {({ value }) => (
             <Box pt={2}>
               {value === 'Steps' &&
-                workflow.evaluations.map((evaluation) => (
+                workflow.evaluations.map((evaluation, index) => (
                   <EvaluationRow
                     key={evaluation.id}
                     evaluation={evaluation}
@@ -221,9 +221,10 @@ export function ProposalWorkflowItem({
                   />
                 ))}
               {value === 'Permissions' &&
-                workflow.evaluations.map((evaluation) => (
+                workflow.evaluations.map((evaluation, index) => (
                   <EvaluationPermissionsRow
                     key={evaluation.id}
+                    isFirstEvaluation={index === 0}
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
@@ -257,7 +258,12 @@ export function ProposalWorkflowItem({
           )}
         </MultiTabs>
 
-        <EvaluationDialog evaluation={activeEvaluation} onClose={closeEvaluationStep} onSave={updateEvaluationStep} />
+        <EvaluationDialog
+          isFirstEvaluation={workflow.evaluations[0]?.id === activeEvaluation?.id}
+          evaluation={activeEvaluation}
+          onClose={closeEvaluationStep}
+          onSave={updateEvaluationStep}
+        />
       </AccordionDetails>
     </Accordion>
   );

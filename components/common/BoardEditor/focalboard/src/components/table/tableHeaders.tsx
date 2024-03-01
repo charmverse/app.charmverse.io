@@ -43,6 +43,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function TableHeaders(props: Props): JSX.Element {
@@ -176,16 +177,11 @@ function TableHeaders(props: Props): JSX.Element {
     );
   };
 
-  const titleSortOption = sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
-  let titleSorted: 'up' | 'down' | 'none' = 'none';
-  if (titleSortOption) {
-    titleSorted = titleSortOption.reversed ? 'down' : 'up';
-  }
-
   const propertyTypes = useMemo(
     () =>
       activeView && (
         <PropertyTypes
+          boardType={props.boardType}
           isMobile={isSmallScreen}
           onClick={async ({ type, relationData, name }) => {
             addPropertyPopupState.close();
@@ -200,14 +196,13 @@ function TableHeaders(props: Props): JSX.Element {
             if (relationData?.showOnRelatedBoard) {
               syncRelationProperty({
                 boardId: board.id,
-                created: true,
                 templateId: template.id
               });
             }
           }}
         />
       ),
-    [mutator, board, activeView, isSmallScreen]
+    [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
   return (

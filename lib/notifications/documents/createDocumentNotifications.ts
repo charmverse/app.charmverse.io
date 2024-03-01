@@ -64,7 +64,7 @@ async function getUserIdsFromMentionNode({
   spaceId: string;
   group: 'role' | 'user';
   value: string;
-}) {
+}): Promise<string[]> {
   const targetUserIds: string[] = [];
 
   if (group === 'role') {

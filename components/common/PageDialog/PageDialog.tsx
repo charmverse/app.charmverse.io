@@ -18,7 +18,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
@@ -165,7 +165,7 @@ function PageDialogBase(props: Props) {
             </Button>
             {page && (
               <Box display='flex' alignItems='center' gap={0.5}>
-                <DocumentHeaderElements isInsideDialog headerHeight={0} page={page} />
+                <DocumentHeaderElements headerHeight={0} page={page} />
               </Box>
             )}
           </Box>

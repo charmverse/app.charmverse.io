@@ -15,7 +15,7 @@ import Link from 'components/common/Link';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import useWebhookSubscription from 'hooks/useSpaceWebhook';
-import { isUrl } from 'lib/utilities/strings';
+import { isUrl } from 'lib/utils/strings';
 
 import Legend from '../Legend';
 import { UpgradeChip } from '../subscription/UpgradeWrapper';

@@ -12,7 +12,7 @@ import type { CreateSpaceProps } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getSpacesOfUser } from 'lib/spaces/getSpacesOfUser';
 import { checkUserBlacklistStatus } from 'lib/users/checkUserBlacklistStatus';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

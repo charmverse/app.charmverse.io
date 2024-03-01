@@ -16,12 +16,12 @@ import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentP
 import { PageTitleWithBreadcrumbs } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { HeaderSpacer, StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
 import PageContainer from 'components/common/PageLayout/components/PageContainer';
-import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoard';
+import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
+import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
-import { RewardBlocksProvider } from 'hooks/useRewardBlocks';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 

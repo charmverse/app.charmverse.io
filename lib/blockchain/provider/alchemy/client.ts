@@ -1,9 +1,9 @@
-import { GET } from '@charmverse/core/http';
+import { GET, PUT } from '@charmverse/core/http';
 import { getChainById } from 'connectors/chains';
 
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
-import { paginatedCall } from 'lib/utilities/async';
-import { isTruthy } from 'lib/utilities/types';
+import { paginatedCall } from 'lib/utils/async';
+import { isTruthy } from 'lib/utils/types';
 
 import type { NFTData } from '../../getNFTs';
 import { toInt } from '../ankr/client';
@@ -146,6 +146,27 @@ export async function getNFTOwners({
 
   return res.owners;
 }
+
+// export async function getTokenBalances({
+//   ownerAddress,
+//   chainAddress,
+//   chainId
+// }: {
+//   ownerAddress: string;
+//   chainAddress: string;
+//   chainId: SupportedChainId;
+// }) {
+//   const url = `${getAlchemyBaseUrl(chainId)}`;
+//   const payload = {
+//     jsonrpc: '2.0',
+//     method: 'alchemy_getTokenBalances',
+//     params: [ownerAddress, [chainAddress]],
+//     id: chainId
+//   };
+
+//   const res = await PUT<AlchemyNft>(url, payload);
+//   return res;
+// }
 
 function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: SupportedChainId): NFTData | null {
   if (nft.error) {

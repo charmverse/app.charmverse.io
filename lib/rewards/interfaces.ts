@@ -10,6 +10,8 @@ export type ApplicationMeta = Pick<
 
 export type RewardStatus = BountyStatus;
 
+export type RewardType = 'token' | 'custom' | 'none';
+
 export type Reward = Bounty;
 
 export type RewardWithUsers = Bounty & {
@@ -29,4 +31,10 @@ export type RewardWithUsersAndPageMeta = Bounty & {
 
 export type ApplicationWithTransactions = Application & {
   transactions: Transaction[];
+};
+
+export type RewardTokenDetails = {
+  chainId: number;
+  rewardToken: string;
+  rewardAmount: number;
 };

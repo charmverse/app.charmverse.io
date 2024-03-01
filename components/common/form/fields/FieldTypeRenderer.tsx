@@ -1,12 +1,16 @@
+import type { SxProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
+import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
+import { FileField } from './FileField';
+import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
 import { PersonInputField } from './PersonInputField';
 
@@ -26,6 +30,7 @@ type SelectProps = {
   Required<ControlFieldProps>;
 
 type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
+  sx?: SxProps;
   type: FieldType;
   textInputConfig?: TextInputConfig;
 } & TextInputConfig;
@@ -79,6 +84,14 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             onUpdateOption={onUpdateOption}
           />
         );
+      }
+
+      case 'image': {
+        return <ImageField {...fieldProps} />;
+      }
+
+      case 'file': {
+        return <FileField {...fieldProps} value={fieldProps.value as UploadedFileInfo} />;
       }
 
       default: {

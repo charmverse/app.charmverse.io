@@ -1,6 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
-import { Box, Grid, Hidden, IconButton, Stack, Typography } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useState } from 'react';
 import { v4 } from 'uuid';
@@ -17,12 +18,15 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import type { ProposalPendingReward } from 'lib/proposal/interface';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { ProposalPendingReward } from 'lib/proposals/interfaces';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
-import { AttachRewardButton, getDisabledTooltip } from './AttachRewardButton';
+import { AttachRewardButton } from './AttachRewardButton';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -59,6 +63,7 @@ export function ProposalRewards({
   const { rewards: allRewards } = useRewards();
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
+  const { getFeatureTitle } = useSpaceFeatures();
   const {
     updateURLQuery,
     navigateToSpacePath,
@@ -74,8 +79,10 @@ export function ProposalRewards({
   }
 
   async function saveForm() {
-    onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
-    closeDialog();
+    if (newPageValues) {
+      onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
+      closeDialog();
+    }
   }
 
   function createNewReward() {
@@ -100,10 +107,11 @@ export function ProposalRewards({
       ? template.reward.allowedSubmitterRoles
       : assignedSubmitters;
 
-    setRewardValues(
-      { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters },
-      { skipDirty: true }
-    );
+    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    if (template?.reward) {
+      (newReward as any).rewardType = getRewardType(template.reward);
+    }
+    setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
       ...template?.page,
@@ -116,9 +124,7 @@ export function ProposalRewards({
     setCurrentPendingId(v4());
   }
 
-  function editReward({ reward, page, draftId }: ProposalPendingReward) {
-    if (readOnly) return;
-
+  function showReward({ reward, page, draftId }: ProposalPendingReward) {
     setRewardValues(reward);
     openNewPage(page || undefined);
     setCurrentPendingId(draftId);
@@ -133,14 +139,15 @@ export function ProposalRewards({
       navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
       return;
     }
+    const pageIdToOpen = getRewardPage(rewardId)?.id;
 
-    const pageId = getRewardPage(rewardId)?.id || rewardId;
-    updateURLQuery({ [rewardQueryKey]: pageId });
+    updateURLQuery({ [rewardQueryKey]: pageIdToOpen });
   }
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      setRewardValues(template.reward);
+      const rewardType = getRewardType(template.reward);
+      setRewardValues({ rewardType, ...template.reward });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
@@ -154,6 +161,13 @@ export function ProposalRewards({
       });
     }
   }
+
+  const newRewardErrors = getRewardErrors({
+    page: newPageValues,
+    reward: rewardValues,
+    rewardType: rewardValues.rewardType,
+    isProposalTemplate
+  }).join(', ');
 
   if (rewards.length) {
     return (
@@ -245,22 +259,30 @@ export function ProposalRewards({
                         </Grid>
                       </Hidden>
 
-                      {!readOnly && (
-                        <Grid item xs={4} lg={2}>
-                          <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
-                            <IconButton
-                              size='small'
-                              onClick={() => editReward({ reward, page, draftId })}
-                              disabled={readOnly}
-                            >
-                              <Edit color='secondary' fontSize='small' />
-                            </IconButton>
-                            <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
-                              <Delete color='secondary' fontSize='small' />
-                            </IconButton>
-                          </Stack>
-                        </Grid>
-                      )}
+                      <Grid item xs={4} lg={2}>
+                        <Stack className='icons' sx={{ opacity: 0, transition: 'opacity 0.2s ease' }} direction='row'>
+                          <Tooltip title={readOnly ? 'View' : 'Edit'}>
+                            <span>
+                              <IconButton size='small' onClick={() => showReward({ reward, page, draftId })}>
+                                {readOnly ? (
+                                  <VisibilityIcon color='secondary' fontSize='small' />
+                                ) : (
+                                  <Edit color='secondary' fontSize='small' />
+                                )}
+                              </IconButton>
+                            </span>
+                          </Tooltip>
+                          {!readOnly && (
+                            <Tooltip title='Delete'>
+                              <span>
+                                <IconButton size='small' onClick={() => onDelete(draftId)} disabled={readOnly}>
+                                  <Delete color='secondary' fontSize='small' />
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          )}
+                        </Stack>
+                      </Grid>
                     </Grid>
                   </Stack>
                 </SelectPreviewContainer>
@@ -278,8 +300,8 @@ export function ProposalRewards({
       {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
 
       <NewPageDialog
-        contentUpdated={contentUpdated || isDirty}
-        disabledTooltip={getDisabledTooltip({ newPageValues, rewardValues, isProposalTemplate: !!isProposalTemplate })}
+        contentUpdated={!readOnly && (contentUpdated || isDirty)}
+        disabledTooltip={newRewardErrors}
         isOpen={!!newPageValues}
         onClose={closeDialog}
         onSave={saveForm}
@@ -288,7 +310,7 @@ export function ProposalRewards({
       >
         <NewDocumentPage
           key={newPageValues?.templateId}
-          titlePlaceholder='Reward title (required)'
+          titlePlaceholder={`${getFeatureTitle('Reward')} title (required)`}
           values={newPageValues}
           onChange={updateNewPageValues}
         >
@@ -296,6 +318,7 @@ export function ProposalRewards({
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward
+            readOnly={readOnly}
             isTemplate={false}
             expandedByDefault
             forcedApplicationType='assigned'

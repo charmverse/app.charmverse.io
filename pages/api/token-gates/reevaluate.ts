@@ -1,7 +1,7 @@
-import type { AuthSig } from '@lit-protocol/types';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { AuthSig } from 'lib/blockchain/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { reevaluateRoles } from 'lib/tokenGates/reevaluateRoles';
@@ -13,9 +13,10 @@ handler.use(requireUser).post(reevaluateTokenGatesHandler);
 async function reevaluateTokenGatesHandler(req: NextApiRequest, res: NextApiResponse<string[]>) {
   const { user, isRemote } = req.session;
 
-  const { spaceId, authSig } = req.body as { spaceId: string; authSig: AuthSig };
+  const { spaceId } = req.body as { spaceId: string };
 
-  const newRoles = !isRemote ? await reevaluateRoles({ authSig, userId: user.id, spaceId }) : [];
+  const newRoles = !isRemote ? await reevaluateRoles({ userId: user.id, spaceId }) : [];
+
   res.status(200).send(newRoles);
 }
 

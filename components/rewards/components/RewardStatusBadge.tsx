@@ -11,13 +11,13 @@ import millify from 'millify';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { fancyTrim } from 'lib/utilities/strings';
-import { isTruthy } from 'lib/utilities/types';
+import { fancyTrim } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 
 import { RewardStatusChip } from './RewardChip';
 
 export interface IRewardBadgeProps {
-  reward: Reward;
+  reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'status'>>;
   truncate?: boolean;
   hideStatus?: boolean;
   showEmptyStatus?: boolean;
@@ -52,7 +52,7 @@ export function RewardAmount({
   truncatePrecision = 4,
   typographyProps
 }: {
-  reward: Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>;
+  reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>>;
   truncate?: boolean;
   truncatePrecision?: number;
   typographyProps?: TypographyProps;

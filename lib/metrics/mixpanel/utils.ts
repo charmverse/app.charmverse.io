@@ -1,6 +1,6 @@
 import { capitalize } from 'lodash';
 
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
 import type { MixpanelEventName, MixpanelTrackBase } from './interfaces';
 

@@ -54,10 +54,10 @@ export function NewProposalButton() {
   const canCreateProposal = spacePermissions?.createProposals;
 
   const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
-    id: proposal.page.id,
-    title: proposal.page.title,
-    proposalId: proposal.id,
-    isStructuredProposal: !!proposal.formId,
+    id: proposal.pageId,
+    title: proposal.title,
+    proposalId: proposal.proposalId,
+    isStructuredProposal: proposal.contentType === 'structured',
     archived: !!proposal.archived
   }));
 

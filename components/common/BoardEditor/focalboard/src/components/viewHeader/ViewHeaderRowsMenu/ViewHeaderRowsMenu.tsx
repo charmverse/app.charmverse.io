@@ -1,10 +1,14 @@
 import styled from '@emotion/styled';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { Stack, Tooltip, Typography } from '@mui/material';
+import PaidIcon from '@mui/icons-material/Paid';
+import type { SxProps } from '@mui/material';
+import { ListItemText, Stack, Tooltip, Typography } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -14,11 +18,20 @@ import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/boar
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
+import {
+  APPLICANT_BLOCK_ID,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK,
+  REWARD_STATUS_BLOCK_ID
+} from 'lib/rewards/blocks/constants';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import mutator from '../../../mutator';
 
 import { ArchiveProposals } from './components/ArchiveProposals';
+import { BatchPaymentRewards } from './components/BatchPaymentRewards';
 import { StyledMenuItem } from './components/PropertyMenu';
 import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
@@ -53,8 +66,20 @@ const validPropertyTypes = [
   'proposalAuthor',
   'proposalReviewer',
   'proposalStep',
-  'proposalStatus'
+  'proposalStatus',
+  'relation',
+  'tokenAmount',
+  'tokenChain'
 ] as PropertyType[];
+
+const invalidPropertyIds = [
+  REWARD_APPLICANTS_COUNT,
+  REWARD_PROPOSAL_LINK,
+  REWARDS_APPLICANTS_BLOCK_ID,
+  APPLICANT_BLOCK_ID,
+  REWARD_STATUS_BLOCK_ID,
+  REWARDS_AVAILABLE_BLOCK_ID
+];
 
 export type ViewHeaderRowsMenuProps = {
   board: Board;
@@ -67,12 +92,23 @@ export type ViewHeaderRowsMenuProps = {
   isStepDisabled?: boolean;
   isStatusDisabled?: boolean;
   isReviewersDisabled?: boolean;
+  isMarkPaidDisabled?: boolean;
+  isMarkCompleteDisabled?: boolean;
   onArchiveProposals?: (archived: boolean) => void;
   onChange?: VoidFunction;
   onChangeProposalsAuthors?: PropertyTemplateMenuProps['onChangeProposalsAuthors'];
   onChangeProposalsReviewers?: PropertyTemplateMenuProps['onChangeProposalsReviewers'];
   onChangeProposalsStatuses?: PropertyTemplateMenuProps['onChangeProposalsStatuses'];
   onChangeProposalsSteps?: PropertyTemplateMenuProps['onChangeProposalsSteps'];
+  onChangeRewardsDueDate?: PropertyTemplateMenuProps['onChangeRewardsDueDate'];
+  onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
+  onChangeRewardsToken?: PropertyTemplateMenuProps['onChangeRewardsToken'];
+  onChangeCustomRewardsValue?: PropertyTemplateMenuProps['onChangeCustomRewardsValue'];
+  showRewardsPaymentButton?: boolean;
+  showTrashIcon?: boolean;
+  onMarkRewardsAsPaid?: () => Promise<void>;
+  onMarkRewardsAsComplete?: () => Promise<void>;
+  sx?: SxProps;
 };
 
 export function ViewHeaderRowsMenu({
@@ -85,12 +121,23 @@ export function ViewHeaderRowsMenu({
   isStepDisabled,
   isStatusDisabled,
   isReviewersDisabled,
+  isMarkPaidDisabled,
+  isMarkCompleteDisabled,
+  onChangeCustomRewardsValue,
   onArchiveProposals,
   onChange,
   onChangeProposalsAuthors,
   onChangeProposalsReviewers,
   onChangeProposalsStatuses,
-  onChangeProposalsSteps
+  onChangeProposalsSteps,
+  onChangeRewardsDueDate,
+  onChangeRewardsReviewers,
+  showRewardsPaymentButton,
+  showTrashIcon = !board.fields.sourceType,
+  onMarkRewardsAsComplete,
+  onMarkRewardsAsPaid,
+  onChangeRewardsToken,
+  sx
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
@@ -98,8 +145,7 @@ export function ViewHeaderRowsMenu({
   const { trigger: trashPages } = useTrashPages();
   const { showConfirmation } = useConfirmationModal();
   const { showError } = useSnackbar();
-
-  const showTrashIcon = !board.fields.sourceType; // dont allow deleting cards for proposals-as-a-source
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   async function deleteCheckedCards() {
     if (checkedIds.length > 1) {
@@ -136,7 +182,7 @@ export function ViewHeaderRowsMenu({
     try {
       await mutator.changePropertyValues(checkedCards, propertyTemplate.id, userIds);
     } catch (error) {
-      showError(error, 'There was an error updating properties');
+      showError(error, 'There was an error updating person property');
     }
     const previousValue = propertyValue
       ? typeof propertyValue === 'string'
@@ -165,12 +211,36 @@ export function ViewHeaderRowsMenu({
     });
   }
 
+  const onRelationPropertyChange = async ({
+    checkedCards,
+    pageListItemIds,
+    propertyTemplate
+  }: {
+    checkedCards: Card[];
+    pageListItemIds: string[];
+    propertyTemplate: IPropertyTemplate;
+  }) => {
+    try {
+      for (const card of checkedCards) {
+        await syncRelationPropertyValue({
+          cardId: card.id,
+          templateId: propertyTemplate.id,
+          boardId: board.id,
+          pageIds: pageListItemIds
+        });
+      }
+    } catch (err) {
+      showError(err, 'There was an error updating relation property');
+    }
+  };
+
   const filteredPropertyTemplates = useMemo(() => {
     return propertyTemplates.filter(
       (propertyTemplate) =>
         !propertyTemplate.formFieldId &&
         validPropertyTypes.includes(propertyTemplate.type) &&
-        propertyTemplate.id !== Constants.titleColumnId
+        propertyTemplate.id !== Constants.titleColumnId &&
+        !invalidPropertyIds.includes(propertyTemplate.id)
     );
   }, [propertyTemplates]);
 
@@ -179,7 +249,7 @@ export function ViewHeaderRowsMenu({
   }
 
   return (
-    <StyledStack className='disable-drag-selection'>
+    <StyledStack className='disable-drag-selection' sx={sx}>
       <StyledMenuItem firstChild lastChild={!showTrashIcon && filteredPropertyTemplates.length === 0}>
         <Typography onClick={() => setCheckedIds([])} color='primary' variant='body2'>
           {checkedIds.length} selected
@@ -191,6 +261,7 @@ export function ViewHeaderRowsMenu({
             <PropertyTemplateMenu
               isAdmin={isAdmin}
               board={board}
+              onRelationPropertyChange={onRelationPropertyChange}
               checkedIds={checkedIds}
               cards={cards}
               propertyTemplate={propertyTemplate}
@@ -201,7 +272,11 @@ export function ViewHeaderRowsMenu({
               onChangeProposalsReviewers={onChangeProposalsReviewers}
               onChangeProposalsStatuses={onChangeProposalsStatuses}
               onChangeProposalsSteps={onChangeProposalsSteps}
+              onChangeRewardsDueDate={onChangeRewardsDueDate}
+              onChangeRewardsReviewers={onChangeRewardsReviewers}
               onPersonPropertyChange={onPersonPropertyChange}
+              onChangeRewardsToken={onChangeRewardsToken}
+              onChangeCustomRewardsValue={onChangeCustomRewardsValue}
               lastChild={!showTrashIcon && index === filteredPropertyTemplates.length - 1}
               disabledTooltip={
                 propertyTemplate.type === 'proposalStep' && isStepDisabled
@@ -216,6 +291,47 @@ export function ViewHeaderRowsMenu({
           ))
         : null}
       {onArchiveProposals && <ArchiveProposals onChange={onArchiveProposals} />}
+      {onMarkRewardsAsPaid && (
+        <Tooltip
+          title={
+            isMarkPaidDisabled
+              ? 'Selected rewards are already paid or have applications that are not in paid or complete status'
+              : 'Mark selected rewards as paid'
+          }
+        >
+          <div>
+            <StyledMenuItem onClick={onMarkRewardsAsPaid} disabled={isDeleting || isMarkPaidDisabled}>
+              <PaidIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Mark paid' />
+            </StyledMenuItem>
+          </div>
+        </Tooltip>
+      )}
+      {onMarkRewardsAsComplete && (
+        <Tooltip
+          title={
+            isMarkCompleteDisabled ? `Selected rewards are already completed` : 'Mark selected rewards as complete'
+          }
+        >
+          <div>
+            <StyledMenuItem onClick={onMarkRewardsAsComplete} disabled={isDeleting || isMarkCompleteDisabled}>
+              <CheckCircleOutlinedIcon
+                fontSize='small'
+                sx={{
+                  mr: 1
+                }}
+              />
+              <ListItemText primary='Mark complete' />
+            </StyledMenuItem>
+          </div>
+        </Tooltip>
+      )}
+      {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
           <Tooltip title='Delete'>

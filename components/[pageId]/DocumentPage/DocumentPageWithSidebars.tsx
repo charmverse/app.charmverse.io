@@ -6,7 +6,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
@@ -31,7 +31,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow } = useProposal({
+  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
 
@@ -133,6 +133,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeEvaluation={onChangeEvaluation}
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
+          onChangeRewardSettings={onChangeRewardSettings}
         />
       )}
     </DocumentColumnLayout>

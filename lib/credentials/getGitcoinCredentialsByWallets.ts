@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import * as http from 'adapters/http';
-import { lowerCaseEqual } from 'lib/utilities/strings';
-import { isTruthy } from 'lib/utilities/types';
+import { lowerCaseEqual } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 
 import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 
@@ -35,49 +35,48 @@ type ScoreItem = {
 
 const cachedTime = 60 * 60 * 1000; // 1 hour
 
-async function getGitcoinPassportScores(wallets: string[]) {
-  const scoreItems = await Promise.all(
-    wallets.map(async (wallet) => {
-      const registryScore = await http
-        .GET<ScoreItem>(`${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`, undefined, {
-          credentials: 'omit',
-          headers: GITCOIN_API_HEADERS
-        })
-        .catch(() => {
-          log.error('Error getting Gitcoin Passport scores from score registry', {
-            wallet
-          });
-          return null;
-        });
-
-      const currentTime = new Date().getTime();
-
-      if (registryScore && currentTime - new Date(registryScore.last_score_timestamp).getTime() < cachedTime) {
-        return registryScore;
-      }
-
-      const passportScore = await http
-        .POST<ScoreItem>(
-          `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
-          {
-            address: wallet,
-            scorer_id: GITCOIN_SCORER_ID
-          },
-          {
-            credentials: 'omit',
-            headers: GITCOIN_API_HEADERS
-          }
-        )
-        .catch(() => {
-          log.error('Error submitting wallet for passport score', {
-            wallet
-          });
-          return null;
-        });
-      return passportScore;
+export async function getGitcoinPassportScore(wallet: string) {
+  const registryScore = await http
+    .GET<ScoreItem>(`${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`, undefined, {
+      credentials: 'omit',
+      headers: GITCOIN_API_HEADERS
     })
-  );
+    .catch(() => {
+      log.error('Error getting Gitcoin Passport scores from score registry', {
+        wallet
+      });
+      return null;
+    });
 
+  const currentTime = new Date().getTime();
+
+  if (registryScore && currentTime - new Date(registryScore.last_score_timestamp).getTime() < cachedTime) {
+    return registryScore;
+  }
+
+  const passportScore = await http
+    .POST<ScoreItem>(
+      `${GITCOIN_SCORER_BASE_URL}/registry/submit-passport`,
+      {
+        address: wallet,
+        scorer_id: GITCOIN_SCORER_ID
+      },
+      {
+        credentials: 'omit',
+        headers: GITCOIN_API_HEADERS
+      }
+    )
+    .catch(() => {
+      log.error('Error submitting wallet for passport score', {
+        wallet
+      });
+      return null;
+    });
+  return passportScore;
+}
+
+async function getGitcoinPassportScores(wallets: string[]) {
+  const scoreItems = await Promise.all(wallets.map(getGitcoinPassportScore));
   return scoreItems.filter(isTruthy);
 }
 

@@ -90,12 +90,13 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, proposal, card, subPages, isStructuredProposal }) => (
+      {cardPages.map(({ page, proposal, card, subPages, isStructuredProposal, reward }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
           activeView={activeView}
           card={card}
+          reward={reward}
           proposal={proposal}
           isStructuredProposal={isStructuredProposal}
           hasContent={page.hasContent}

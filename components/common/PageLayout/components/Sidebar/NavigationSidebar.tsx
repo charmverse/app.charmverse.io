@@ -4,7 +4,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from '@mui/icons-material/SettingsOutlined';
 import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -232,11 +232,7 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   return (
     <SidebarContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-        <SidebarSubmenu
-          closeSidebar={closeSidebar}
-          logoutCurrentUser={logoutCurrentUser}
-          openProfileModal={() => handleModalClick('profile')}
-        />
+        <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
         {space && (
           <>
             <Box mb={2}>

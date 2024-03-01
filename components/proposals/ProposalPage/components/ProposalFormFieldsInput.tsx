@@ -5,7 +5,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { FormFieldsInput } from 'components/common/form/FormFieldsInput';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 export function ProposalFormFieldsInput({
   proposalId,
@@ -55,7 +55,7 @@ export function ProposalFormFieldsInput({
           const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
             (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
           );
-          if (!proposalFormFieldAnswer) {
+          if (!proposalFormFieldAnswer && formField.type !== 'label') {
             return null;
           }
           return {

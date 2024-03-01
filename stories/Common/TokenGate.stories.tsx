@@ -9,7 +9,6 @@ import { TokenGate as TokenGateComponent } from 'components/common/SpaceAccessGa
 import { TokenGateModalProvider } from 'components/common/TokenGateModal/hooks/useTokenGateModalContext';
 import TokenGateModal from 'components/common/TokenGateModal/TokenGateModal';
 import type { TokenGate } from 'lib/tokenGates/interfaces';
-import { LIT_CHAINS } from 'lib/tokenGates/utils';
 import { TokenGateContainer } from 'pages/join';
 
 export default {
@@ -46,23 +45,15 @@ Modal.parameters = {
       tokenGateVerification: rest.post(`/api/token-gates/review`, async (req, res, ctx) => {
         const data: TokenGate = await req.json();
 
-        const unifiedAccessControlConditions =
-          data.type === 'lit'
-            ? {
-                unifiedAccessControlConditions: data.conditions.unifiedAccessControlConditions?.map((cond) => ({
-                  ...cond,
-                  ...('chain' in cond && { image: getChainById(LIT_CHAINS[cond.chain].chainId)?.iconUrl })
-                }))
-              }
-            : undefined;
-        const lock = data.type === 'unlock' ? data.conditions : undefined;
-
-        const hyper =
-          data.type === 'hypersub' ? { ...data.conditions, image: '/images/logos/fabric-xyz.svg' } : undefined;
+        const accessControlConditions = {
+          accessControlConditions: data.conditions.accessControlConditions.map((cond) => ({
+            ...cond,
+            image: getChainById(cond.chain)?.iconUrl
+          }))
+        };
 
         const dataWithMeta = {
-          type: data.type,
-          conditions: unifiedAccessControlConditions || lock || hyper
+          conditions: { accessControlConditions }
         };
         return res(ctx.json([dataWithMeta]));
       }),

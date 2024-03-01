@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
-import { isMac } from 'lib/utilities/browser';
+import { isMac } from 'lib/utils/browser';
 
 type KeyConfig = {
   key?: string;

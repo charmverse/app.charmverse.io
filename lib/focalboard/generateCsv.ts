@@ -7,7 +7,7 @@ import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtil
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { formatDate, formatDateTime } from 'lib/utilities/dates';
+import { formatDate, formatDateTime } from 'lib/utils/dates';
 
 import type { Board, BoardFields, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView, BoardViewFields } from './boardView';

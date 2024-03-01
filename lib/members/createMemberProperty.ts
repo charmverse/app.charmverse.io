@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { DEFAULT_MEMBER_PROPERTIES, READONLY_MEMBER_PROPERTIES } from './constants';
 

@@ -1,4 +1,4 @@
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { getClient } from './client';
 import type { SupportedChainId } from './config';

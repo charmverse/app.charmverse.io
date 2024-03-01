@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsUser, testUtilsBounties } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { addComment } from 'lib/comments/addComment';
@@ -10,11 +10,10 @@ import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import { createReward } from 'lib/rewards/createReward';
 import { work } from 'lib/rewards/work';
 import { assignRole } from 'lib/roles';
 import { createThread } from 'lib/threads';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import {
   getApplicationCommentEntity,
   getCommentEntity,
@@ -26,7 +25,7 @@ import {
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { builders as _ } from 'testing/prosemirror/builders';
-import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { createRole } from 'testing/utils/roles';
 
@@ -34,7 +33,7 @@ import { createDocumentNotifications } from '../createDocumentNotifications';
 
 describe(`Test document events and notifications`, () => {
   it(`Should create document notifications for mention.created event in a page`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace({ isAdmin: true });
     const user2 = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
@@ -204,7 +203,7 @@ describe(`Test document events and notifications`, () => {
   });
 
   it(`Should create document notifications for mention.created event in a post`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace({ isAdmin: true });
     const user2 = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
@@ -385,7 +384,7 @@ describe(`Test document events and notifications`, () => {
   });
 
   it(`Should create document notifications for inline_comment.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace({ isAdmin: true });
     const user2 = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
@@ -535,7 +534,7 @@ describe(`Test document events and notifications`, () => {
   });
 
   it(`Should create document notifications for application_comment.created event`, async () => {
-    const { space, user: rewardAuthor } = await generateUserAndSpaceWithApiToken();
+    const { space, user: rewardAuthor } = await generateUserAndSpace({ isAdmin: true });
     const rewardApplicant = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
@@ -560,23 +559,28 @@ describe(`Test document events and notifications`, () => {
       userId: rewardReviewer1.id
     });
 
-    const { reward, createdPageId } = await createReward({
+    const reward = await testUtilsBounties.generateBounty({
       spaceId: space.id,
-      userId: rewardAuthor.id,
-      reviewers: [
-        {
-          group: 'role',
-          id: role.id
-        },
-        {
-          group: 'user',
-          id: rewardReviewer2.id
-        },
-        {
-          group: 'user',
-          id: rewardReviewer3.id
-        }
-      ]
+      createdBy: rewardAuthor.id,
+      status: 'open',
+      approveSubmitters: false,
+      bountyPermissions: {
+        reviewer: [
+          {
+            group: 'role',
+            id: role.id
+          },
+          {
+            group: 'user',
+            id: rewardReviewer2.id
+          },
+          {
+            group: 'user',
+            id: rewardReviewer3.id
+          }
+        ]
+      },
+      pagePermissions: [{ permissionLevel: 'full_access', assignee: { group: 'space', id: space.id } }]
     });
 
     const submission = await work({
@@ -596,7 +600,7 @@ describe(`Test document events and notifications`, () => {
       }
     });
 
-    const document = await getDocumentEntity(createdPageId!);
+    const document = await getDocumentEntity(reward.page.id);
     const spaceEntity = await getSpaceEntity(space.id);
 
     await createDocumentNotifications({
@@ -613,7 +617,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationComment1Reviewer1Notification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.created',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: applicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -625,7 +629,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationComment1Reviewer2Notification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.created',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: applicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -637,7 +641,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationComment1Reviewer3Notification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.created',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: applicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -649,7 +653,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationComment1RewardAuthorNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.created',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: applicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -661,7 +665,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationComment1RewardApplicantNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.created',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: applicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -710,7 +714,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationCommentReplyReviewer1Notification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.replied',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: replyApplicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -722,7 +726,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationCommentReplyReviewer2Notification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.replied',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: replyApplicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -734,7 +738,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationCommentReplyReviewer3Notification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.replied',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: replyApplicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -746,7 +750,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationCommentReplyRewardAuthorNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.replied',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: replyApplicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -758,7 +762,7 @@ describe(`Test document events and notifications`, () => {
     const rewardApplicationCommentReplyRewardApplicantNotification = await prisma.documentNotification.findFirst({
       where: {
         type: 'application_comment.replied',
-        pageId: createdPageId!,
+        pageId: reward.page.id,
         applicationCommentId: replyApplicationComment.id,
         notificationMetadata: {
           spaceId: space.id,
@@ -771,7 +775,7 @@ describe(`Test document events and notifications`, () => {
       {
         where: {
           type: 'application_comment.mention.created',
-          pageId: createdPageId!,
+          pageId: reward.page.id,
           applicationCommentId: replyApplicationComment.id,
           notificationMetadata: {
             spaceId: space.id,
@@ -790,7 +794,7 @@ describe(`Test document events and notifications`, () => {
   });
 
   it(`Should create document notifications for page.comment.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace({ isAdmin: true });
     const user2 = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });
@@ -942,7 +946,7 @@ describe(`Test document events and notifications`, () => {
   });
 
   it(`Should create document notifications for post.comment.created event`, async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken();
+    const { space, user } = await generateUserAndSpace({ isAdmin: true });
     const user2 = await testUtilsUser.generateSpaceUser({
       spaceId: space.id
     });

@@ -24,7 +24,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       mutate(
         (templates) => {
-          return templates?.filter((p) => !value.some((val) => val.id === p.id));
+          return templates?.filter((template) => !value.some((val) => val.id === template.pageId));
         },
         {
           revalidate: false
@@ -43,7 +43,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
         (list) => {
           if (!list) return list;
           return list.map((proposal) => {
-            if (payload.proposalIds.includes(proposal.id)) {
+            if (payload.proposalIds.includes(proposal.proposalId)) {
               return {
                 ...proposal,
                 archived: payload.archived
@@ -67,13 +67,6 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
 
   return {
     proposalTemplates: usableTemplates,
-    proposalTemplatePages: usableTemplates?.map((t) => t.page),
     isLoadingTemplates
   };
-}
-
-// TODO:  add an endpoint for a single template or return it along with the proposal??
-export function useProposalTemplateById(id: undefined | string | null) {
-  const { proposalTemplates } = useProposalTemplates({ load: !!id });
-  return proposalTemplates?.find((template) => template.page.id === id);
 }

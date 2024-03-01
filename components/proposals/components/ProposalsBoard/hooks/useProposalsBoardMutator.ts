@@ -8,7 +8,7 @@ import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard'
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposal/blocks/interfaces';
+import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposals/blocks/interfaces';
 
 export function useProposalsBoardMutator() {
   const { updateBlock, createBlock, getBlock, updateBlocks } = useProposalBlocks();

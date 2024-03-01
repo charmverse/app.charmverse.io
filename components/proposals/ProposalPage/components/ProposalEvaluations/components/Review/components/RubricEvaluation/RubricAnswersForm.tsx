@@ -14,7 +14,8 @@ import { TextInput } from 'components/common/BoardEditor/components/properties/T
 import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { getNumberFromString } from 'lib/utilities/numbers';
+import { getNumberFromString } from 'lib/utils/numbers';
+import type { NestedDataTest } from 'testing/e2eType';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
@@ -147,7 +148,6 @@ export function RubricAnswersForm({
     defaultValues: {
       answers: showDraftAnswers ? mapAnswersToFormValues(draftAnswers) : mapAnswersToFormValues(answers)
     }
-    // resolver: yupResolver(schema(hasCustomReward))
   });
 
   const { fields } = useFieldArray({ control, name: 'answers' });
@@ -291,6 +291,7 @@ export function RubricAnswersForm({
         <Box display='flex' gap={2}>
           <Stack direction='row' gap={2}>
             <Button
+              data-test='save-rubric-answers'
               sx={{ alignSelf: 'start' }}
               disabled={disabled || (!isDirty && !showDraftAnswers)}
               disabledTooltip={
@@ -401,6 +402,7 @@ function CriteriaInput({
                     </Typography>
                   </FormLabel>
                   <IntegerInput
+                    dataTest='rubric-criteria-score-input'
                     onChange={(score) => {
                       _field.onChange(score);
                     }}
@@ -426,6 +428,7 @@ function CriteriaInput({
           />
         </Box>
         <TextField
+          data-test='rubric-criteria-score-comment'
           disabled={disabled}
           multiline
           placeholder='Add comments'
@@ -452,16 +455,18 @@ function IntegerInput({
   onChange,
   inputProps,
   disabled,
-  error
+  error,
+  dataTest
 }: {
   value?: number | string | null;
   onChange: (num: number | null) => void;
   error?: string;
   inputProps?: any;
   disabled?: boolean;
-}) {
+} & NestedDataTest) {
   return (
     <NumberInputField
+      dataTest={dataTest}
       disableArrows
       inline
       error={error}

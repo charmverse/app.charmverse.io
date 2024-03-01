@@ -1,62 +1,37 @@
-import { ALL_LIT_CHAINS as ALL_LIT_CHAINS_ORIGINAL, LIT_CHAINS as LIT_CHAINS_ORIGINAL } from '@lit-protocol/constants';
-import type { AccsDefaultParams } from '@lit-protocol/types';
-import { base, zora } from 'viem/chains';
+import type { AccessControlCondition, TokenGateAccessType } from 'lib/tokenGates/interfaces';
 
-import type { TokenGateAccessType } from 'lib/tokenGates/interfaces';
+/**
+ * Used for creating analytics events
+ * @param condition AccessControlCondition
+ * @returns TokenGateAccessType
+ */
+export function getAccessType(condition: AccessControlCondition): TokenGateAccessType {
+  const { type } = condition;
 
-export function getAccessType(condition: AccsDefaultParams): TokenGateAccessType {
-  const { method, parameters } = condition;
-
-  if (!method && parameters.includes(':userAddress')) {
-    return 'individual_wallet';
-  }
-
-  switch (method) {
-    case 'ownerOf':
+  switch (type) {
+    case 'Wallet':
+      return 'individual_wallet';
+    case 'ERC721':
       return 'individual_nft';
-
-    case 'eventId':
+    case 'POAP':
       return 'poap_collectors';
-
-    case 'members':
+    case 'MolochDAOv2.1':
+    case 'Builder':
       return 'dao_members';
-
-    case 'balanceOf':
-    case 'eth_getBalance':
-      return 'group_token_or_nft';
-
+    case 'Hypersub':
+    case 'Unlock':
+      return 'nft_subscriber';
+    case 'GitcoinPassport':
+      return 'gitcoin_passport';
+    case 'Guildxyz':
+      return 'guild';
+    case 'ERC1155':
+    case 'ERC20':
     default:
       return 'group_token_or_nft';
   }
 }
 
-export function getAccessTypes(conditions: AccsDefaultParams[]): TokenGateAccessType[] {
+export function getAccessTypes(conditions: AccessControlCondition[]): TokenGateAccessType[] {
   return conditions.map((c) => getAccessType(c));
 }
-
-const baseChain = {
-  contractAddress: null,
-  chainId: base.id,
-  name: base.name,
-  symbol: 'ETH',
-  decimals: 18,
-  rpcUrls: base.rpcUrls.default.http.slice(),
-  blockExplorerUrls: [base.blockExplorers.default.url],
-  type: null,
-  vmType: 'EVM'
-};
-
-const zoraChain = {
-  contractAddress: null,
-  chainId: zora.id,
-  name: zora.name,
-  symbol: zora.nativeCurrency.symbol,
-  decimals: zora.nativeCurrency.decimals,
-  rpcUrls: zora.rpcUrls.default.http.slice(),
-  blockExplorerUrls: [zora.blockExplorers.default.url],
-  type: null,
-  vmType: 'EVM'
-};
-
-export const ALL_LIT_CHAINS = Object.assign(ALL_LIT_CHAINS_ORIGINAL, { base: baseChain, zora: zoraChain });
-export const LIT_CHAINS = Object.assign(LIT_CHAINS_ORIGINAL, { base: baseChain, zora: zoraChain });

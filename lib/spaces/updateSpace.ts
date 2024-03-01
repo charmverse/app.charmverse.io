@@ -1,12 +1,12 @@
 import { log } from '@charmverse/core/log';
-import type { MemberPropertyType, Space } from '@charmverse/core/prisma';
+import type { MemberPropertyType, Prisma, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { getSpaceDomainFromName } from 'lib/spaces/utils';
 import { updateCustomerStripeInfo } from 'lib/subscription/updateCustomerStripeInfo';
-import { DataNotFoundError, DuplicateDataError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, DuplicateDataError, InvalidInputError } from 'lib/utils/errors';
 
 import { updateSnapshotDomain } from './updateSnapshotDomain';
 import { updateSpaceCustomDomain } from './updateSpaceCustomDomain';
@@ -43,7 +43,8 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
     select: {
       domain: true,
       customDomain: true,
-      snapshotDomain: true
+      snapshotDomain: true,
+      primaryMemberIdentity: true
     }
   });
 
@@ -72,9 +73,23 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
   }
 
   const primaryMemberIdentity = updates?.primaryMemberIdentity?.toLocaleLowerCase() ?? '';
+  const existingPrimaryMemberIdentity = existingSpace.primaryMemberIdentity?.toLocaleLowerCase() ?? '';
+  const prismaPromises: Prisma.PrismaPromise<Prisma.BatchPayload>[] = existingPrimaryMemberIdentity
+    ? [
+        prisma.memberProperty.updateMany({
+          where: {
+            spaceId,
+            type: existingPrimaryMemberIdentity as MemberPropertyType
+          },
+          data: {
+            required: false
+          }
+        })
+      ]
+    : [];
 
   if (['google', 'wallet', 'telegram', 'discord'].includes(primaryMemberIdentity)) {
-    await prisma.$transaction([
+    prismaPromises.push(
       prisma.memberProperty.updateMany({
         where: {
           spaceId,
@@ -84,7 +99,11 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
           required: true
         }
       })
-    ]);
+    );
+  }
+
+  if (prismaPromises.length) {
+    await prisma.$transaction(prismaPromises);
   }
 
   const updatedSpace = await prisma.space.update({

@@ -1,6 +1,10 @@
+import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
+import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
+import { debounce } from 'lodash';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
+import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
@@ -9,6 +13,10 @@ import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSo
 import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
 import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
+import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import { Button } from 'components/common/Button';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
+import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -24,6 +32,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { createBoard } from 'lib/focalboard/board';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
@@ -44,6 +54,37 @@ export function ProposalsPage({ title }: { title: string }) {
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
+
+  const onShowDescription = useCallback(() => {
+    const oldBlocks = [activeBoard];
+    const newBoard = createBoard({
+      block: activeBoard
+    });
+    newBoard.fields.showDescription = true;
+    mutator.updateBlocks([newBoard], oldBlocks, 'Show description');
+  }, [activeBoard]);
+
+  const onHideDescription = useCallback(() => {
+    const oldBlocks = [activeBoard];
+    const newBoard = createBoard({
+      block: activeBoard
+    });
+    newBoard.fields.showDescription = false;
+    mutator.updateBlocks([newBoard], oldBlocks, 'Hide description');
+  }, [activeBoard]);
+
+  const onDescriptionChange = useMemo(
+    () =>
+      debounce((content: PageContent) => {
+        const oldBlocks = [activeBoard];
+        const newBoard = createBoard({
+          block: activeBoard
+        });
+        newBoard.fields.description = content;
+        mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
+      }, 250),
+    [activeBoard]
+  );
 
   const { trigger: trashPages } = useTrashPages();
   const groupByProperty = useMemo(() => {
@@ -91,6 +132,50 @@ export function ProposalsPage({ title }: { title: string }) {
     <DatabaseContainer>
       <DatabaseStickyHeader>
         <DatabaseTitle>
+          {isAdmin && (
+            <Button
+              variant='text'
+              color='secondary'
+              size='small'
+              sx={{
+                opacity: 0,
+                transition: 'opacity 0.25s',
+                '&:hover': {
+                  opacity: 1,
+                  transition: 'opacity 0.25s'
+                }
+              }}
+              onClick={() => {
+                if (activeBoard.fields.showDescription) {
+                  onHideDescription();
+                } else {
+                  onShowDescription();
+                }
+              }}
+            >
+              {activeBoard.fields.showDescription ? (
+                <>
+                  <VisibilityOffOutlinedIcon
+                    fontSize='small'
+                    sx={{
+                      mr: 0.5
+                    }}
+                  />
+                  <FormattedMessage id='ViewTitle.hide-description' defaultMessage='Hide description' />
+                </>
+              ) : (
+                <>
+                  <VisibilityOutlinedIcon
+                    fontSize='small'
+                    sx={{
+                      mr: 0.5
+                    }}
+                  />
+                  <FormattedMessage id='ViewTitle.show-description' defaultMessage='Show description' />
+                </>
+              )}
+            </Button>
+          )}
           <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
             <Typography variant='h1' gutterBottom>
               {title}
@@ -110,7 +195,23 @@ export function ProposalsPage({ title }: { title: string }) {
               </Box>
             </Box>
           </Box>
+
+          {activeBoard.fields.showDescription && (
+            <div className='description'>
+              <CharmEditor
+                disablePageSpecificFeatures
+                isContentControlled
+                content={activeBoard.fields.description}
+                onContentChange={(content: ICharmEditorOutput) => {
+                  onDescriptionChange(content.doc);
+                }}
+                disableNestedPages
+                readOnly={!isAdmin}
+              />
+            </div>
+          )}
         </DatabaseTitle>
+
         <Stack gap={0.75}>
           <div className={`ViewHeader ${showViewHeaderRowsMenu ? 'view-header-rows-menu-visible' : ''}`}>
             {showViewHeaderRowsMenu && (
@@ -120,9 +221,7 @@ export function ProposalsPage({ title }: { title: string }) {
                 cards={cards}
                 checkedIds={checkedIds}
                 setCheckedIds={setCheckedIds}
-                onChange={() => {
-                  refreshProposals();
-                }}
+                onChange={refreshProposals}
                 refreshProposals={refreshProposals}
               />
             )}
@@ -160,6 +259,7 @@ export function ProposalsPage({ title }: { title: string }) {
             {cardPages.length > 0 ? (
               <Box width='100%'>
                 <Table
+                  boardType='proposals'
                   setSelectedPropertyId={(_setSelectedPropertyId) => {
                     setSelectedPropertyId(_setSelectedPropertyId);
                     setShowSidebar(true);
@@ -186,7 +286,7 @@ export function ProposalsPage({ title }: { title: string }) {
             ) : (
               <Box sx={{ mt: 3 }}>
                 <EmptyStateVideo
-                  description='Getting started with proposals'
+                  description='Getting started'
                   videoTitle='Proposals | Getting started with CharmVerse'
                   videoUrl='https://tiny.charmverse.io/proposal-builder'
                 />

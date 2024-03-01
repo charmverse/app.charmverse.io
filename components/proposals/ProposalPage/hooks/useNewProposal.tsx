@@ -5,7 +5,7 @@ import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { getProposalErrors } from 'lib/proposal/getProposalErrors';
+import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -60,7 +60,7 @@ export function useNewProposal({ newProposal }: Props) {
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
-        workflowId: formInputs.workflowId || undefined,
+        workflowId: formInputs.workflowId!,
         isDraft,
         selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
         sourcePageId: formInputs.sourcePageId,
@@ -75,7 +75,14 @@ export function useNewProposal({ newProposal }: Props) {
   }
 
   const disabledTooltip = getProposalErrors({
+    page: {
+      title: formInputs.title,
+      type: formInputs.type,
+      content: formInputs.content
+    },
+    proposalType: formInputs.proposalType,
     proposal: formInputs,
+    isDraft: false,
     requireTemplates: !!currentSpace?.requireProposalTemplate
   }).join('\n');
 
@@ -95,6 +102,7 @@ function emptyState({
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
   return {
+    createdAt: new Date().toISOString(),
     proposalType: 'free_form',
     content: null,
     contentText: '',

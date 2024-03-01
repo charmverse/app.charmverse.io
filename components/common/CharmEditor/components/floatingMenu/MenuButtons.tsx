@@ -1,4 +1,4 @@
-import { blockquote, bold, code, history, italic, link, strike, underline } from '@bangle.dev/base-components';
+import { blockquote, bold, code, history, italic, strike, underline } from '@bangle.dev/base-components';
 import type { Command, EditorState, PluginKey } from '@bangle.dev/pm';
 import { filter, rafCommandExec } from '@bangle.dev/utils';
 import { KeyboardArrowDown } from '@mui/icons-material';
@@ -11,6 +11,7 @@ import { useEditorViewContext } from 'components/common/CharmEditor/components/@
 
 import * as heading from '../heading';
 import { createInlineComment } from '../inlineComment';
+import * as link from '../link/link';
 import { defaultKeys as paragraphKeys, queryIsTopLevelParagraph, convertToParagraph } from '../paragraph/paragraph';
 import { getCSSColor, queryActiveColor } from '../textColor/textColorUtils';
 

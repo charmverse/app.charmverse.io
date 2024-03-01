@@ -1,4 +1,4 @@
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 
 import type { SignupCookieType } from '../userAcquisition/interfaces';
 
@@ -35,12 +35,14 @@ export function extractSignupAnalytics(data: Record<SignupCookieType, string>): 
   const signupAnalytics: SignupAnalytics = {
     signupCampaign: '',
     signupLandingUrl: '',
-    signupSource: ''
+    signupSource: '',
+    referrerCode: ''
   };
 
   signupAnalytics.signupCampaign = data.marketingCampaign ?? data.appCampaign ?? '';
   signupAnalytics.signupSource = extractSignupSource(data.marketingReferrer ?? data.appReferrer);
   signupAnalytics.signupLandingUrl = decodeURIComponent(data.marketingLandingPage ?? data.appLandingPage);
+  signupAnalytics.referrerCode = data.userReferrerCode ?? '';
 
   return signupAnalytics;
 }

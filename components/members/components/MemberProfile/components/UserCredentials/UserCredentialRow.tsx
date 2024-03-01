@@ -12,7 +12,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { ProposalCredential } from 'lib/credentials/schemas';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 export function UserCredentialRow({
   credential,
@@ -48,6 +49,7 @@ export function UserCredentialRow({
     }
   }
 
+  const charmCredential = credential.content as ProposalCredential;
   const credentialInfo: {
     title: string;
     subtitle: string;
@@ -56,16 +58,16 @@ export function UserCredentialRow({
   } =
     credential.type === 'charmverse'
       ? {
-          title: credential.content.name,
-          subtitle: credential.content.organization,
+          title: charmCredential.Name,
+          subtitle: charmCredential.Organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
-          attestationContent: [{ name: 'status', value: credential.content.status }]
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
       : credential.type === 'gitcoin'
       ? {
           title: 'Gitcoin Passport Score',
           subtitle: 'Gitcoin',
-          iconUrl: '/images/logos/Gitcoin_Passport_Logomark_SeaFoam.svg',
+          iconUrl: '/images/logos/gitcoin_passport.svg',
           attestationContent: [{ name: 'Passport Score', value: credential.content.passport_score?.toFixed(2) }]
         }
       : {

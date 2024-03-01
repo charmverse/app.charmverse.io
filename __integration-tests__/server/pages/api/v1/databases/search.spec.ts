@@ -13,7 +13,7 @@ import type {
 } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { uniqueValues } from 'lib/utilities/array';
+import { uniqueValues } from 'lib/utils/array';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

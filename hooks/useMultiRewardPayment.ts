@@ -3,18 +3,11 @@ import { Interface } from '@ethersproject/abi';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
-import { useCallback, useState } from 'react';
-import useSWR from 'swr';
+import { useCallback } from 'react';
 import { getAddress, parseUnits } from 'viem';
 
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { SafeData } from 'lib/gnosis';
-import { getSafesForAddress } from 'lib/gnosis';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import { eToNumber } from 'lib/utilities/numbers';
-import { isTruthy } from 'lib/utilities/types';
+import { eToNumber } from 'lib/utils/numbers';
 
 import { usePages } from './usePages';
 
@@ -28,33 +21,9 @@ export interface TransactionWithMetadata
   title: string;
 }
 
-export function useMultiRewardPayment({
-  rewards
-}: {
-  rewards: Pick<RewardWithUsers, 'applications' | 'chainId' | 'id' | 'rewardAmount' | 'rewardToken'>[];
-  selectedApplicationIds?: string[];
-}) {
-  const [gnosisSafeData, setGnosisSafeData] = useState<SafeData | null>(null);
-  const { account, chainId } = useWeb3Account();
-
+export function useMultiRewardPayment() {
   const { pages } = usePages();
-
   const [paymentMethods] = usePaymentMethods();
-  const { data: gnosisSafes } = useSWR(
-    account && chainId ? `/connected-gnosis-safes/${account}` : null,
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    () => getSafesForAddress({ chainId: chainId!, address: account! })
-  );
-
-  const bountiesToPay = rewards.filter((reward) => {
-    return (
-      gnosisSafes?.some((safe) => reward.chainId === safe.chainId) &&
-      isTruthy(reward.rewardAmount) &&
-      isTruthy(reward.rewardToken) &&
-      isTruthy(reward.chainId)
-    );
-  });
-
   const prepareGnosisSafeRewardPayment = useCallback(
     ({
       recipientAddress,
@@ -115,13 +84,7 @@ export function useMultiRewardPayment({
     []
   );
 
-  const isDisabled = bountiesToPay.length === 0;
-
   return {
-    isDisabled,
-    prepareGnosisSafeRewardPayment,
-    gnosisSafes,
-    gnosisSafeData,
-    setGnosisSafeData
+    prepareGnosisSafeRewardPayment
   };
 }

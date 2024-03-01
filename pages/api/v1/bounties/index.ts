@@ -4,9 +4,9 @@ import { ethers } from 'ethers';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { resolveENSName } from 'lib/blockchain';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { apiHandler } from 'lib/public-api/handler';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 const handler = apiHandler();
 

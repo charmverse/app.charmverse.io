@@ -7,8 +7,8 @@ import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 type ProposalsContextType = {

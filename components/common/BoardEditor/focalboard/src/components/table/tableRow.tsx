@@ -23,8 +23,8 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { isTouchScreen } from 'lib/utilities/browser';
-import { mergeRefs } from 'lib/utilities/react';
+import { isTouchScreen } from 'lib/utils/browser';
+import { mergeRefs } from 'lib/utils/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
 import { Utils } from '../../utils';
@@ -69,6 +69,7 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -124,7 +125,8 @@ function TableRow(props: Props) {
     subRowsEmptyValueContent,
     isChecked,
     setCheckedIds,
-    proposal
+    proposal,
+    reward
   } = props;
   const { showError } = useSnackbar();
 
@@ -132,10 +134,8 @@ function TableRow(props: Props) {
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
-  const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-
-  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+  const enabled = !isTouchScreen() && !props.readOnly;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
@@ -219,6 +219,7 @@ function TableRow(props: Props) {
     readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
+
   return (
     <div
       data-test={`database-row-${card.id}`}
@@ -226,29 +227,31 @@ function TableRow(props: Props) {
       onClick={(e) => props.onClick?.(e, card)}
       ref={mergeRefs([cardRef, preview, drop])}
       style={{
-        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
-        ...(isChecked && {
-          background: 'rgba(35, 131, 226, 0.14)',
-          zIndex: 85
-        }),
+        backgroundColor:
+          isSelected || isChecked ? 'rgba(35, 131, 226, 0.14)' : isNested ? 'var(--input-bg)' : 'transparent',
+        zIndex: 85,
         ...style
       }}
     >
       {!props.readOnly && (
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <div
-            className='icons row-actions'
-            onClick={handleClick}
-            ref={drag}
-            style={{
-              padding: 0
-            }}
-          >
-            <Box className='charm-drag-handle disable-drag-selection'>
-              <DragIndicatorIcon color='secondary' />
-            </Box>
-          </div>
-          {setCheckedIds && (
+          {!isNested && (
+            <div
+              className='icons row-actions'
+              onClick={handleClick}
+              ref={drag}
+              style={{
+                padding: 0
+              }}
+            >
+              <Box className='charm-drag-handle disable-drag-selection'>
+                <DragIndicatorIcon color='secondary' />
+              </Box>
+            </div>
+          )}
+          {isNested ? (
+            <div style={{ marginLeft: 24 }} />
+          ) : setCheckedIds ? (
             <StyledCheckbox
               className='table-row-checkbox disable-drag-selection'
               checked={isChecked}
@@ -267,7 +270,7 @@ function TableRow(props: Props) {
               disableRipple
               disableTouchRipple
             />
-          )}
+          ) : null}
         </Stack>
       )}
 
@@ -352,14 +355,17 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
               overflowX: 'hidden'
             }}
+            data-test={`database-card-${card.id}-column-${template.id}`}
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
-              readOnly={props.readOnly}
+              showCard={(cardId) => cardId && props.showCard(cardId)}
+              readOnly={props.readOnly || Boolean(isNested)}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               proposal={proposal}
+              reward={reward}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}
@@ -388,7 +394,7 @@ function TableRow(props: Props) {
   );
 }
 
-export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
+function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
   return (
     <>
       <TableRow
@@ -411,6 +417,8 @@ export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages
                 subPages={subPage.subPages}
                 indentTitle={30}
                 isNested
+                // Don't allow subrows to be selected
+                setCheckedIds={() => {}}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}
               />
             )))}

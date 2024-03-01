@@ -3,10 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { isTruthy } from 'lib/utils/types';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -39,6 +41,26 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
       OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
     }
   });
+
+  const boardBlocks = blocks.filter((b) => b.type === 'board');
+  const connectedBoardIds = boardBlocks
+    .map((boardBlock) =>
+      (boardBlock.fields as unknown as BoardFields).cardProperties
+        .filter((cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData)
+        .map((cardProperty) => cardProperty.relationData?.boardId)
+    )
+    .flat()
+    .filter(isTruthy);
+  const connectedBoards = await prisma.block.findMany({
+    where: {
+      type: 'board',
+      id: {
+        in: connectedBoardIds
+      }
+    }
+  });
+
+  blocks.push(...connectedBoards);
 
   const viewsWithLinkedSource = blocks.filter((b) => b.type === 'view' && (b.fields as BoardViewFields).linkedSourceId);
 

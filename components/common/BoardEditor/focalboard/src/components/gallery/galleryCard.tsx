@@ -13,7 +13,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import PropertyValueElement from '../propertyValueElement';
@@ -30,7 +30,6 @@ type Props = {
   visibleTitle: boolean;
   isSelected: boolean;
   readOnly: boolean;
-  isManualSort: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
 };
 
@@ -39,12 +38,7 @@ const GalleryCard = React.memo((props: Props) => {
   const { pages } = usePages();
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
-  const [isDragging, isOver, cardRef] = useSortable(
-    'card',
-    card,
-    props.isManualSort && !props.readOnly && !isTouchScreen(),
-    props.onDrop
-  );
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const cardPage = pages[card.id];
 
   const visiblePropertyTemplates = (props.visiblePropertyTemplates || []).filter(

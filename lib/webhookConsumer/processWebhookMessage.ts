@@ -5,7 +5,7 @@ import { removeSpaceMemberDiscord } from 'lib/discord/removeSpaceMemberDiscord';
 import { unassignRolesDiscord } from 'lib/discord/unassignRolesDiscord';
 import { getRequestApiKey } from 'lib/middleware/getRequestApiKey';
 import { verifyApiKeyForSpace } from 'lib/middleware/verifyApiKeyForSpace';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type {
   MemberUpdateWebhookMessageData,
   MessageType,

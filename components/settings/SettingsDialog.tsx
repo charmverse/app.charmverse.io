@@ -1,8 +1,6 @@
-import type { BoxProps } from '@mui/material/Box';
 import Dialog from '@mui/material/Dialog';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import type { ReactNode } from 'react';
 
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';

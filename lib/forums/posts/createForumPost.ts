@@ -1,4 +1,5 @@
-import type { Post, Prisma } from '@charmverse/core/prisma';
+import { Prisma } from '@charmverse/core/prisma';
+import type { Post } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { findChildren } from 'prosemirror-utils';
 import { v4 } from 'uuid';
@@ -7,7 +8,7 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { extractPollIds } from 'lib/prosemirror/extractPollIds';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { InsecureOperationError } from 'lib/utilities/errors';
+import { InsecureOperationError } from 'lib/utils/errors';
 
 import { getPostPath } from './getPostPath';
 
@@ -49,7 +50,7 @@ export async function createForumPost({
     data: {
       id: postId,
       title,
-      content: (content ?? undefined) as Prisma.InputJsonObject,
+      content: content ?? Prisma.JsonNull,
       contentText,
       category: {
         connect: {

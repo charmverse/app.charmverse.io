@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';

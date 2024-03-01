@@ -14,7 +14,7 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { LensChain } from 'lib/lens/lensClient';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
 async function switchNetwork() {
   return switchActiveNetwork(LensChain);

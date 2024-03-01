@@ -36,14 +36,7 @@ export function ProposalArchivedBanner({ proposalId, disabled }: { proposalId: s
       }
     >
       <Box display='flex' gap={1} alignItems='center' data-test='archived-page-banner'>
-        <div
-          style={{
-            color: 'white',
-            fontWeight: 600
-          }}
-        >
-          Archived
-        </div>
+        <div>Archived</div>
       </Box>
     </AlertBanner>
   );

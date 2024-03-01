@@ -7,7 +7,7 @@ import type { IChainDetails } from 'connectors/chains';
 import { RPCList, getChainById } from 'connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
   onChange?: (chainId: number) => void;
@@ -70,12 +70,13 @@ export function InputSearchBlockchain({
       }}
       sx={{ minWidth: 150, ...sx }}
       options={options}
+      data-test='chain-options'
       disableClearable
       autoHighlight
       size='small'
       getOptionLabel={(option) => `${option.chainName}`}
       renderOption={(props, option) => (
-        <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+        <Box data-test={`select-chain-${option.chainId}`} component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
           <IconLogo src={option.iconUrl} />
           <Box component='span'>{option.chainName}</Box>
         </Box>

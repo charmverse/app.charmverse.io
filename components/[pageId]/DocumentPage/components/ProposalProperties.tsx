@@ -1,13 +1,12 @@
 import { Box } from '@mui/material';
 
-import { useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
+import { useUpdateProposal, useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -27,7 +26,7 @@ export function ProposalProperties({
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { showError } = useSnackbar();
-  const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
+  const { data: sourceTemplate } = useGetProposalTemplate(proposal?.page?.sourceTemplateId);
 
   const isAdmin = useIsAdmin();
 
@@ -50,6 +49,7 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
+    createdAt: proposalPage.createdAt.toString(),
     archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],

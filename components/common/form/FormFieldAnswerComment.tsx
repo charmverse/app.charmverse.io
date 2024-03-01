@@ -10,8 +10,8 @@ import { InlineCommentInput } from 'components/[pageId]/DocumentPage/components/
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useThreads } from 'hooks/useThreads';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
-import { highlightDomElement } from 'lib/utilities/browser';
-import { isTruthy } from 'lib/utilities/types';
+import { highlightDomElement } from 'lib/utils/browser';
+import { isTruthy } from 'lib/utils/types';
 
 import { ThreadContainer } from '../CharmEditor/components/inlineComment/components/InlineCommentSubMenu';
 import PageThread from '../CharmEditor/components/thread/PageThread';

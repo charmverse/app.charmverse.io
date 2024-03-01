@@ -6,12 +6,18 @@ import type {
   ProposalEvaluationResultExtended,
   ProposalEvaluationStatus,
   ProposalEvaluationStep
-} from 'lib/proposal/interface';
+} from 'lib/proposals/interfaces';
 import type { BrandColor } from 'theme/colors';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
 } = {
+  proposalReviewerNotes: (id?: string, name?: string) => ({
+    id: id || uuid(),
+    name: name || 'Reviewer Notes',
+    options: [],
+    type: 'proposalReviewerNotes'
+  }),
   proposalStatus: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Proposal Status',

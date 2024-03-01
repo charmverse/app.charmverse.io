@@ -21,6 +21,7 @@ import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { getRewardType } from 'lib/rewards/getRewardType';
 
 import { ApplicationComments } from './components/ApplicationComments';
 import { ApplicationInput } from './components/RewardApplicationInput';
@@ -105,6 +106,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
     return null;
   }
 
+  const rewardType = getRewardType(reward);
   const submitter = members.find((m) => m.id === application?.createdBy);
 
   const readonlySubmission =
@@ -177,7 +179,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                         rewardPermissions={rewardPermissions}
                         refreshApplication={refreshApplication}
                         reviewApplication={reviewApplication}
-                        hasCustomReward={!!reward.customReward}
+                        rewardType={rewardType}
                       />
                     </Box>
                   )}
@@ -223,7 +225,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                       }
                       bountyId={currentRewardId}
                       permissions={applicationRewardPermissions}
-                      hasCustomReward={!!reward.customReward}
+                      rewardType={rewardType}
                       isSaving={isSaving}
                     />
                   )}

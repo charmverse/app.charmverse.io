@@ -7,8 +7,8 @@ import { lensClient } from 'lib/lens/lensClient';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
-import { createProposal } from 'lib/proposal/createProposal';
-import { updateProposalLensProperties } from 'lib/proposal/updateProposalLensProperties';
+import { createProposal } from 'lib/proposals/createProposal';
+import { updateProposalLensProperties } from 'lib/proposals/updateProposalLensProperties';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 jest.mock('lib/lens/lensClient', () => ({

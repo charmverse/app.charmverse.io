@@ -11,7 +11,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
  */
 export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const { trigger: archiveProposal } = useArchiveProposal({ proposalId });
-  const { proposal } = useProposal({
+  const { proposal, refreshProposal } = useProposal({
     proposalId
   });
   const { showError } = useSnackbar();
@@ -30,6 +30,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
           onClick={async () => {
             try {
               await archiveProposal({ archived: !proposal?.archived });
+              refreshProposal();
             } catch (error) {
               showError(error);
             }

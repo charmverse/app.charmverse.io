@@ -13,7 +13,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 type Props = {
   page: PageWithContent;

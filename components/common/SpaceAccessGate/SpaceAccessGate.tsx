@@ -11,7 +11,7 @@ import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { AuthSig } from 'lib/blockchain/interfaces';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
@@ -75,7 +75,7 @@ export function SpaceAccessGate({
         return;
       }
     }
-    await tokenGate.evaluateEligibility(authSig);
+    await tokenGate.evaluateEligibility();
   }
 
   function onError(error: any) {
@@ -105,13 +105,11 @@ export function SpaceAccessGate({
   const noGateConditions =
     !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
-  const hasRoles = tokenGate.tokenGateResult?.eligibleGates
-    ?.map((gate) => gate.tokenGateId)
-    .some((id) =>
-      tokenGate.tokenGates?.find((tk) => {
-        return tk.id === id && tk.tokenGateToRoles.length > 0;
-      })
-    );
+  const hasRoles = tokenGate.tokenGateResult?.eligibleGates.some((id) =>
+    tokenGate.tokenGates?.find((tk) => {
+      return tk.id === id && tk.tokenGateToRoles.length > 0;
+    })
+  );
 
   return (
     <>

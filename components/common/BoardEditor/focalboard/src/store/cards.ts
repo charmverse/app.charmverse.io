@@ -11,7 +11,7 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { Member } from 'lib/members/interfaces';
-import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { Utils } from '../utils';
 
@@ -157,7 +157,7 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 
 export function sortCards(
   cardPages: CardPage[],
-  board: Board,
+  board: Pick<Board, 'fields'>,
   activeView: BoardView,
   members: Record<string, Member>,
   relationPropertiesCardsRecord: PageListItemsRecord,

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
 export interface MarkNotifications {
   ids: string[];

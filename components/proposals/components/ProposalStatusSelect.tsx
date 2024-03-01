@@ -9,8 +9,9 @@ import {
   EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep, ProposalWithUsersLite } from 'lib/proposal/interface';
+import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 

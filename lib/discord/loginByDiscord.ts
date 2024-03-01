@@ -7,12 +7,12 @@ import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
-import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { logSignupViaDiscord } from 'lib/metrics/postToDiscord';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
-import { DisabledAccountError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { postUserCreate } from 'lib/users/postUserCreate';
+import { DisabledAccountError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 
 type LoginWithDiscord = {
   code: string;
@@ -95,8 +95,7 @@ export async function loginByDiscord({
       include: sessionUserRelations
     });
 
-    updateTrackUserProfile(newUser);
-    trackUserAction('sign_up', { userId: newUser.id, identityType: 'Discord', ...signupAnalytics });
+    postUserCreate({ user: newUser, identityType: 'Discord', signupAnalytics });
     logSignupViaDiscord();
 
     return newUser;

@@ -12,7 +12,7 @@ import type {
 } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
-import type { ProposalBoardBlockFields, ProposalPropertiesField } from 'lib/proposal/blocks/interfaces';
+import type { ProposalBoardBlockFields, ProposalPropertiesField } from 'lib/proposals/blocks/interfaces';
 
 export interface BlockChange {
   block: Block;

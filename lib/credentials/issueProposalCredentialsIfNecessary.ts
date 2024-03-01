@@ -6,10 +6,11 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attest';
-import { credentialLabelMap } from './constants';
+import { credentialEventLabels } from './constants';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
@@ -21,15 +22,12 @@ export async function issueProposalCredentialsIfNecessary({
   event: CredentialEventType;
 }): Promise<void> {
   if (disablePublishedCredentials) {
-    log.info('Published credentials are disabled');
+    log.warn('Published credentials are disabled');
     return;
   }
   const baseProposal = await prisma.proposal.findFirstOrThrow({
     where: {
-      id: proposalId,
-      page: {
-        type: 'proposal'
-      }
+      id: proposalId
     },
     select: {
       selectedCredentialTemplates: true,
@@ -112,11 +110,12 @@ export async function issueProposalCredentialsIfNecessary({
 
   for (const author of proposalWithSpaceConfig.authors) {
     proposalWithSpaceConfig.selectedCredentialTemplates.forEach((credentialTemplateId) => {
+      const userHasNotReceivedCredential = !issuedCredentials.some(
+        (issuedCredential) =>
+          issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
+      );
       if (
-        !issuedCredentials.some(
-          (issuedCredential) =>
-            issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
-        ) &&
+        userHasNotReceivedCredential &&
         // Only credentials which match the event will have been returned by the query
         proposalWithSpaceConfig.space.credentialTemplates.some((t) => t.id === credentialTemplateId)
       ) {
@@ -148,7 +147,8 @@ export async function issueProposalCredentialsIfNecessary({
     const targetWallet = author.primaryWallet ?? author.wallets[0];
 
     if (!targetWallet) {
-      log.error(`User ${authorUserId} has no wallet to issue credentials to`, {
+      log.debug(`User has no wallet to issue credentials to`, {
+        pageId: proposalWithSpaceConfig.page.id,
         userId: authorUserId,
         proposalId,
         credentialsToIssue
@@ -156,11 +156,11 @@ export async function issueProposalCredentialsIfNecessary({
     } else {
       try {
         for (const credentialTemplate of credentialsToGiveUser) {
-          const getStatusLabel = credentialLabelMap[event];
-          if (!getStatusLabel) {
+          const getEventLabel = credentialEventLabels[event];
+          if (!getEventLabel) {
             throw new Error(`No label mapper found for event: ${event}`);
           }
-          const statusLabel = getStatusLabel((value) =>
+          const eventLabel = getEventLabel((value) =>
             getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
           );
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
@@ -170,11 +170,11 @@ export async function issueProposalCredentialsIfNecessary({
             credential: {
               type: 'proposal',
               data: {
-                name: credentialTemplate.name,
-                description: credentialTemplate.description ?? '',
-                organization: credentialTemplate.organization,
-                status: statusLabel,
-                url: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+                Name: credentialTemplate.name,
+                Description: credentialTemplate.description ?? '',
+                Organization: credentialTemplate.organization,
+                Event: eventLabel,
+                URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
               }
             }
           });
@@ -188,9 +188,30 @@ export async function issueProposalCredentialsIfNecessary({
               user: { connect: { id: authorUserId } }
             }
           });
+
+          trackUserAction('credential_issued', {
+            userId: authorUserId,
+            spaceId: credentialTemplate.spaceId,
+            trigger: event,
+            credentialTemplateId: credentialTemplate.id
+          });
+
+          log.info('Issued credential', {
+            pageId: proposalWithSpaceConfig.page.id,
+            event,
+            proposalId,
+            userId: authorUserId,
+            credentialTemplateId: credentialTemplate.id
+          });
         }
       } catch (e) {
-        log.error('Failed to issue credential', { proposalId, authorUserId, credentialsToGiveUser, error: e });
+        log.error('Failed to issue credential', {
+          pageId: proposalWithSpaceConfig.page.id,
+          proposalId,
+          userId: authorUserId,
+          credentialsToGiveUser,
+          error: e
+        });
       }
     }
   }

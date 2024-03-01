@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
-const spaceDomain = 'myosinxyz';
-const pagePath = 'page-5896376256522182';
+const spaceDomain = 'binding-amaranth-manatee';
+const pagePath = 'test-5942304006288427';
 const maxContentSize = 750;
 const maxRows = 300;
 const minVersion = 0;
@@ -45,11 +45,16 @@ async function exec() {
       diffs: true
     }
   });
+
+  // calculate the offests to show the last diffs instead of the first ones
+  const totalRows = page.diffs.length;
+  const rowStart = totalRows - maxRows > 0 ? totalRows - maxRows : 0;
   console.log(page);
   const sortedDiffs = page.diffs
     .filter((diff) => diff.createdAt >= startDate && diff.createdAt <= endDate && diff.version >= minVersion)
     .sort((a, b) => a.version - b.version)
     .slice(0, maxRows);
+  //.slice(rowStart, totalRows);
   const dateRange = `${page.diffs[0].createdAt.toLocaleString()} to ${page.diffs[
     page.diffs.length - 1
   ].createdAt.toLocaleString()}`;

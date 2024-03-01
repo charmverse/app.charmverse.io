@@ -16,7 +16,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
@@ -39,6 +39,7 @@ type Props = {
   mutator?: Mutator;
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function CardDetailProperties(props: Props) {
@@ -54,6 +55,7 @@ function CardDetailProperties(props: Props) {
     mutator = defaultMutator,
     disableEditPropertyOption
   } = props;
+
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
@@ -242,32 +244,31 @@ function CardDetailProperties(props: Props) {
   }
 
   const propertyTypes = useMemo(
-    () =>
-      activeView && (
-        <PropertyTypes
-          isMobile={isSmallScreen}
-          onClick={async ({ type, relationData, name }) => {
-            const template: IPropertyTemplate = {
-              id: Utils.createGuid(IDType.BlockID),
-              name: name ?? typeDisplayName(intl, type),
-              type,
-              options: [],
-              relationData
-            };
-            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-            if (relationData?.showOnRelatedBoard) {
-              syncRelationProperty({
-                boardId: board.id,
-                created: true,
-                templateId
-              });
-            }
-            setNewTemplateId(templateId);
-            addPropertyPopupState.close();
-          }}
-        />
-      ),
-    [mutator, board, activeView, isSmallScreen]
+    () => (
+      <PropertyTypes
+        boardType={props.boardType}
+        isMobile={isSmallScreen}
+        onClick={async ({ type, relationData, name }) => {
+          const template: IPropertyTemplate = {
+            id: Utils.createGuid(IDType.BlockID),
+            name: name ?? typeDisplayName(intl, type),
+            type,
+            options: [],
+            relationData
+          };
+          const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+          if (relationData?.showOnRelatedBoard) {
+            syncRelationProperty({
+              boardId: board.id,
+              templateId
+            });
+          }
+          setNewTemplateId(templateId);
+          addPropertyPopupState.close();
+        }}
+      />
+    ),
+    [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
   return (
@@ -321,7 +322,7 @@ function CardDetailProperties(props: Props) {
         />
       )}
 
-      {!props.readOnly && !disableEditPropertyOption && activeView && (
+      {!props.readOnly && !disableEditPropertyOption && (
         <>
           <div className='octo-propertyname add-property'>
             <Button {...bindTrigger(addPropertyPopupState)} dataTest='add-custom-property'>

@@ -15,16 +15,16 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { RPCList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
-import type { DateTime } from 'luxon';
+import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { RelationPageListItemsContainer } from 'components/common/BoardEditor/components/properties/PagesAutocomplete';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { DatePicker } from 'components/common/DatePicker';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
@@ -37,9 +37,9 @@ import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { createFilterGroup } from 'lib/focalboard/filterGroup';
 import { getPropertyName } from 'lib/focalboard/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
-import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposal/interface';
-import { isTruthy } from 'lib/utilities/types';
+import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import { isTruthy } from 'lib/utils/types';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -422,20 +422,16 @@ function FilterPropertyValue({
   } else if (propertyDataType === 'date') {
     return (
       <DatePicker
-        value={new Date(Number(filter.values[0]))}
+        value={DateTime.fromMillis(parseInt(filter.values[0]))}
         onChange={updateDateValue}
-        renderInput={(props) => (
-          <TextField
-            {...props}
-            inputProps={{
-              ...props.inputProps,
-              sx: { fontSize: 'small' },
-              readOnly: true,
-              placeholder: 'Select a date'
-            }}
-            disabled
-          />
-        )}
+        slotProps={{
+          textField: {
+            placeholder: 'Select a date',
+            inputProps: {
+              sx: { fontSize: 'small' }
+            }
+          }
+        }}
       />
     );
   }
@@ -447,17 +443,19 @@ function FilterEntry(props: Props) {
   const deleteFilterClausePopupState = usePopupState({ variant: 'popover' });
   const { properties: viewProperties, filter, changeViewFilter, currentFilter } = props;
   const containsTitleProperty = viewProperties.find((property) => property.id === Constants.titleColumnId);
-  const properties: IPropertyTemplate[] = containsTitleProperty
-    ? viewProperties
-    : [
-        {
-          id: Constants.titleColumnId,
-          name: 'Title',
-          type: 'text',
-          options: []
-        },
-        ...viewProperties
-      ];
+  const properties: IPropertyTemplate[] = (
+    containsTitleProperty
+      ? viewProperties
+      : [
+          {
+            id: Constants.titleColumnId,
+            name: 'Title',
+            type: 'text',
+            options: []
+          },
+          ...viewProperties
+        ]
+  ).filter((prop) => prop.type !== 'proposalReviewerNotes') as IPropertyTemplate[];
 
   const template = properties.find((o: IPropertyTemplate) => o.id === filter.propertyId);
 

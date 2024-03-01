@@ -1,6 +1,6 @@
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 export function filterPropertyTemplates(visiblePropertyIds: string[], cardProperties: IPropertyTemplate[]) {
   const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };

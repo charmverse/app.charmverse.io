@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 import { refreshPaymentStatus } from 'lib/rewards/refreshPaymentStatus';
 import { work } from 'lib/rewards/work';
 import { createTransaction } from 'lib/transactions/createTransaction';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

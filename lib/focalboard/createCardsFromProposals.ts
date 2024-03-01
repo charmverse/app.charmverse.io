@@ -5,14 +5,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
-import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import type { ProposalFields } from 'lib/proposal/interface';
+import { permissionsApiClient } from 'lib/permissions/api/client';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
   ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
+} from 'lib/proposals/rubric/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
@@ -278,13 +278,12 @@ export async function createCardsFromProposals({
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
     const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
-    const accessPrivateFields = await canAccessPrivateFields({
-      userId,
-      proposal: pageProposal.proposal ?? undefined,
-      proposalId: pageProposal.proposal!.id
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: pageProposal.proposal!.id,
+      userId
     });
-
-    const formFieldProperties = await updateCardFormFieldPropertiesValue({
+    const accessPrivateFields = permissions.view_private_fields;
+    const formFieldProperties = updateCardFormFieldPropertiesValue({
       accessPrivateFields,
       cardProperties: boardBlockCardProperties,
       formFields,

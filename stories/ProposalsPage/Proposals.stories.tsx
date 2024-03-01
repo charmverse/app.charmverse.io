@@ -6,14 +6,14 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
-import type { PopulatedEvaluation } from 'lib/proposal/interface';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-import { ProposalStoryProviders, ProposalsPageStory, withProposalProviders } from './ProposalsPageStory';
+import { ProposalsPageStory, withProposalProviders } from './components/ProposalsPageStory';
 
 export default {
   title: 'Proposals/Views',

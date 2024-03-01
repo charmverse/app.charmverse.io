@@ -1,10 +1,10 @@
 import type { Page } from '@charmverse/core/prisma';
 import type { Theme } from '@mui/material';
-import { Box, Tab, Tabs, Typography, useMediaQuery } from '@mui/material';
+import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { useElementSize } from 'usehooks-ts';
+import { useResizeObserver } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
 import AddBountyButton from 'components/common/BoardEditor/focalboard/src/components/cardDetail/AddBountyButton';
@@ -20,7 +20,7 @@ import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
-import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
+import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -29,18 +29,17 @@ import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
 
 import { AlertContainer } from './components/AlertContainer';
 import { PageComments } from './components/CommentsFooter/PageComments';
+import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
 import PageBanner from './components/PageBanner';
-import { PageConnectionBanner } from './components/PageConnectionBanner';
 import PageDeleteBanner from './components/PageDeleteBanner';
 import { PageEditorContainer } from './components/PageEditorContainer';
 import PageHeader, { getPageTop } from './components/PageHeader';
@@ -48,6 +47,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
 import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
+import { ProposalNotesBaner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
@@ -80,14 +80,12 @@ function DocumentPageComponent({
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
-  const { getFeatureTitle } = useSpaceFeatures();
   const { editMode, setPageProps, printRef: _printRef } = useCharmEditor();
   const { setView: setCharmEditorView } = useCharmEditorView();
   const [connectionError, setConnectionError] = useState<Error | null>(null);
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const [containerRef, { width: containerWidth }] = useElementSize();
   const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
@@ -133,7 +131,8 @@ function DocumentPageComponent({
 
   const activeBoardView = boardViews[0];
 
-  const showPageBanner = page.type !== 'proposal' && page.type !== 'proposal_template';
+  const showPageBanner =
+    page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, currentPageId: threadsPageId } = useThreads();
@@ -150,8 +149,14 @@ function DocumentPageComponent({
 
   const enableComments = !isSharedPage && !enableSuggestingMode && !isPageTemplate && !!pagePermissions?.comment;
 
-  const isStructuredProposal = Boolean(proposal && proposal.formId);
+  const isStructuredProposal = Boolean(proposal?.formId);
   const isUnpublishedProposal = proposal?.status === 'draft' || page.type === 'proposal_template';
+  const readOnlyTitle =
+    readOnly ||
+    !!enableSuggestingMode ||
+    !!page.syncWithPageId ||
+    !!proposal?.archived ||
+    page.type === 'proposal_notes';
 
   // create a key that updates when edit mode changes - default to 'editing' so we dont close sockets immediately
   const editorKey = page.id + (editMode || 'editing') + pagePermissions.edit_content + !!proposal?.archived;
@@ -207,6 +212,8 @@ function DocumentPageComponent({
     }
   }, [printRef, _printRef]);
 
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -216,7 +223,7 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
-    <Box ref={containerRef} id='file-drop-container' display='flex' flexDirection='column' height='100%'>
+    <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
       <Box
         ref={printRef}
         className={`document-print-container ${fontClassName} drag-area-container`}
@@ -230,8 +237,10 @@ function DocumentPageComponent({
           parentElementId: 'file-drop-container'
         })}
       >
+        {/** we need a reference for width to handle inline dbs */}
+        <Box ref={containerWidthRef} width='100%' />
         {/* show either deleted banner or archived, but not both */}
-        {page?.deletedAt ? (
+        {page.deletedAt ? (
           <AlertContainer>
             <PageDeleteBanner pageType={page.type} pageId={page.id} />
           </AlertContainer>
@@ -244,10 +253,10 @@ function DocumentPageComponent({
         )}
         {connectionError && (
           <AlertContainer>
-            <PageConnectionBanner />
+            <ConnectionErrorBanner />
           </AlertContainer>
         )}
-        {page?.convertedProposalId && (
+        {page.convertedProposalId && (
           <AlertContainer>
             <ProposalBanner type='page' proposalId={page.convertedProposalId} />
           </AlertContainer>
@@ -255,6 +264,11 @@ function DocumentPageComponent({
         {board?.fields.sourceType && (
           <AlertContainer>
             <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
+          </AlertContainer>
+        )}
+        {page.type === 'proposal_notes' && (
+          <AlertContainer>
+            <ProposalNotesBaner />
           </AlertContainer>
         )}
         <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
@@ -292,7 +306,7 @@ function DocumentPageComponent({
               focusDocumentEditor={focusDocumentEditor}
               updatedAt={page.updatedAt.toString()}
               onChange={(updates) => savePage(updates as { title: string; updatedAt: any })}
-              readOnly={readOnly || !!enableSuggestingMode || !!page.syncWithPageId || !!proposal?.archived}
+              readOnly={readOnlyTitle}
             />
           )}
           {proposalId && !isMdScreen && (
@@ -382,25 +396,23 @@ function DocumentPageComponent({
                 {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
               </CardPropertiesWrapper>
               {proposal && proposal.formId ? (
-                <Box mb={10}>
-                  {page.type === 'proposal_template' ? (
-                    <FormFieldsEditor
-                      readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                    />
-                  ) : (
-                    <ProposalFormFieldsInput
-                      pageId={page.id}
-                      enableComments={proposal.permissions.comment}
-                      proposalId={proposal.id}
-                      formFields={proposal.form?.formFields ?? []}
-                      readOnly={!proposal.permissions.edit}
-                      threads={threads}
-                      isDraft={proposal?.status === 'draft'}
-                    />
-                  )}
-                </Box>
+                page.type === 'proposal_template' ? (
+                  <FormFieldsEditor
+                    readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
+                    proposalId={proposal.id}
+                    formFields={proposal.form?.formFields ?? []}
+                  />
+                ) : (
+                  <ProposalFormFieldsInput
+                    pageId={page.id}
+                    enableComments={proposal.permissions.comment}
+                    proposalId={proposal.id}
+                    formFields={proposal.form?.formFields ?? []}
+                    readOnly={!proposal.permissions.edit}
+                    threads={threads}
+                    isDraft={proposal?.status === 'draft'}
+                  />
+                )
               ) : (
                 <CharmEditor
                   placeholderText={
@@ -436,50 +448,50 @@ function DocumentPageComponent({
                 />
               )}
 
-              {isStructuredProposal && proposal?.fields?.enableRewards && (
-                <>
-                  <Box my={1}>
-                    <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-                  </Box>
-                  <ProposalRewards
-                    pendingRewards={proposal.fields.pendingRewards || []}
-                    requiredTemplateId={proposal.fields.rewardsTemplateId}
-                    reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                    assignedSubmitters={proposal.authors.map((a) => a.userId)}
-                    variant='solid_button'
-                    readOnly={!proposal.permissions.edit}
-                    rewardIds={proposal.rewardIds || []}
-                    onSave={(pendingReward) => {
-                      const isExisting = proposal.fields?.pendingRewards?.find(
-                        (r) => r.draftId === pendingReward.draftId
-                      );
-                      if (!isExisting) {
+              {isStructuredProposal &&
+                proposal?.fields?.enableRewards &&
+                (!!proposal.fields.pendingRewards?.length || !readOnly) && (
+                  <Box mt={1}>
+                    <ProposalRewardsTable
+                      containerWidth={containerWidth}
+                      pendingRewards={proposal.fields.pendingRewards || []}
+                      requiredTemplateId={proposal.fields.rewardsTemplateId}
+                      reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
+                      assignedSubmitters={proposal.authors.map((a) => a.userId)}
+                      variant='solid_button'
+                      readOnly={!proposal.permissions.edit}
+                      rewardIds={proposal.rewardIds || []}
+                      onSave={(pendingReward) => {
+                        const isExisting = proposal.fields?.pendingRewards?.find(
+                          (r) => r.draftId === pendingReward.draftId
+                        );
+                        if (!isExisting) {
+                          onChangeRewardSettings({
+                            pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                          });
+
+                          return;
+                        }
+
                         onChangeRewardSettings({
-                          pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                          pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                            if (draft.draftId === pendingReward.draftId) {
+                              return pendingReward;
+                            }
+                            return draft;
+                          })
                         });
-
-                        return;
-                      }
-
-                      onChangeRewardSettings({
-                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                          if (draft.draftId === pendingReward.draftId) {
-                            return pendingReward;
-                          }
-                          return draft;
-                        })
-                      });
-                    }}
-                    onDelete={(draftId: string) => {
-                      onChangeRewardSettings({
-                        pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
-                          (draft) => draft.draftId !== draftId
-                        )
-                      });
-                    }}
-                  />
-                </>
-              )}
+                      }}
+                      onDelete={(draftId: string) => {
+                        onChangeRewardSettings({
+                          pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                            (draft) => draft.draftId !== draftId
+                          )
+                        });
+                      }}
+                    />
+                  </Box>
+                )}
 
               {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                 <Box>

@@ -50,7 +50,7 @@ export const authorSystemRole = {
   label: 'Author'
 } as const;
 
-const currentReviewerSystemRole = {
+export const currentReviewerSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Reviewers selected for this evaluation'>
@@ -67,19 +67,21 @@ const currentVoterSystemRole = {
   label: 'Voters (Current Step)'
 };
 
+export const allReviewersSystemRole = {
+  group: 'system_role',
+  icon: (
+    <Tooltip title='Reviewers of any step in this workflow'>
+      <ProposalIcon color='secondary' fontSize='small' />
+    </Tooltip>
+  ),
+  id: ProposalSystemRole.all_reviewers,
+  label: 'All Reviewers'
+} as SystemRoleOptionPopulated<ProposalSystemRole>;
+
 export const extraEvaluationRoles: SystemRoleOptionPopulated<ProposalSystemRole>[] = [
   authorSystemRole,
   currentReviewerSystemRole,
-  {
-    group: 'system_role',
-    icon: (
-      <Tooltip title='Reviewers of any step in this workflow'>
-        <ProposalIcon color='secondary' fontSize='small' />
-      </Tooltip>
-    ),
-    id: ProposalSystemRole.all_reviewers,
-    label: 'All Reviewers'
-  },
+  allReviewersSystemRole,
   allMembersSystemRole
 ];
 
@@ -96,11 +98,13 @@ export function EvaluationPermissionsRow({
   onDuplicate,
   onRename,
   onChange,
-  readOnly
+  readOnly,
+  isFirstEvaluation
 }: {
   evaluation: WorkflowEvaluationJson;
   onChange: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
+  isFirstEvaluation: boolean;
 } & ContextMenuProps) {
   return (
     <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
@@ -120,7 +124,12 @@ export function EvaluationPermissionsRow({
         </Box>
 
         <Stack flex={1} className='CardDetail content'>
-          <EvaluationPermissions evaluation={evaluation} onChange={onChange} readOnly={readOnly} />
+          <EvaluationPermissions
+            isFirstEvaluation={isFirstEvaluation}
+            evaluation={evaluation}
+            onChange={onChange}
+            readOnly={readOnly}
+          />
         </Stack>
       </Box>
     </Card>
@@ -129,10 +138,12 @@ export function EvaluationPermissionsRow({
 
 export function EvaluationPermissions<T extends EvaluationTemplateFormItem | WorkflowEvaluationJson>({
   evaluation,
+  isFirstEvaluation,
   onChange,
   readOnly
 }: {
   evaluation: T;
+  isFirstEvaluation: boolean; // use a default Move permission for the first evaluation in a workflow
   onChange: (evaluation: T) => void;
   readOnly?: boolean;
 }) {
@@ -170,22 +181,36 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
       {proposalOperations.map((operation) => (
         <Box key={operation} className='octo-propertyrow'>
           <PropertyLabel readOnly>{operation === 'move' ? 'Move Backward' : capitalize(operation)}</PropertyLabel>
-          <UserAndRoleSelect
-            readOnly={readOnly}
-            variant='outlined'
-            wrapColumn
-            // required values cannot be removed
-            isRequiredValue={(option) => {
-              if (operation === 'view') {
-                return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
-              }
-              return false;
-            }}
-            value={valuesByOperation[operation] || []}
-            systemRoles={extraEvaluationRoles}
-            inputPlaceholder={permissionOperationPlaceholders[operation]}
-            onChange={async (options) => updatePermissionOperation(operation, options)}
-          />
+          {isFirstEvaluation && operation === 'move' ? (
+            <Tooltip title='Only authors can move back to Draft'>
+              <span>
+                <UserAndRoleSelect
+                  readOnly
+                  wrapColumn
+                  value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+                  systemRoles={[authorSystemRole]}
+                  onChange={() => {}}
+                />
+              </span>
+            </Tooltip>
+          ) : (
+            <UserAndRoleSelect
+              readOnly={readOnly}
+              variant='outlined'
+              wrapColumn
+              // required values cannot be removed
+              isRequiredValue={(option) => {
+                if (operation === 'view') {
+                  return option.id === ProposalSystemRole.author || option.id === ProposalSystemRole.current_reviewer;
+                }
+                return false;
+              }}
+              value={valuesByOperation[operation] || []}
+              systemRoles={extraEvaluationRoles}
+              inputPlaceholder={permissionOperationPlaceholders[operation]}
+              onChange={async (options) => updatePermissionOperation(operation, options)}
+            />
+          )}
         </Box>
       ))}
 

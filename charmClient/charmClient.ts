@@ -6,12 +6,9 @@ import type {
   InviteLink,
   Page,
   PaymentMethod,
-  Space,
   TelegramUser,
-  TokenGateToRole,
   User,
-  UserDetails,
-  UserWallet
+  UserDetails
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
@@ -22,17 +19,15 @@ import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
-import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
-import type { SyncRelationPropertyPayload } from 'pages/api/blocks/sync-relation-property';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -369,10 +364,6 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
-  }
-
-  syncRelationProperty(payload: SyncRelationPropertyPayload) {
-    return http.PUT<void>('/api/blocks/sync-relation-property', payload);
   }
 }
 
