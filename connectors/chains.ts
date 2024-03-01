@@ -534,6 +534,12 @@ export const daoChains = RPCList.filter((chain) =>
   ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
 );
 
+export const hatsProtocolChains = RPCList.filter((chain) =>
+  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis', 'ethereum - sepolia', 'celo'].includes(
+    chain.chainName.toLowerCase()
+  )
+);
+
 export const builderDaoChains = RPCList.filter((chain) =>
   ['ethereum', 'base', 'optimism', 'zora'].includes(chain.chainName.toLowerCase())
 );

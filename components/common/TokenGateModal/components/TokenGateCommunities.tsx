@@ -1,8 +1,9 @@
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { builderDaoChains, daoChains } from 'connectors/chains';
+import { builderDaoChains, daoChains, hatsProtocolChains } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
+import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
 import type { FormValues } from '../hooks/useCommunitiesForm';
@@ -38,7 +39,7 @@ export function TokenGateCommunities() {
     reset();
   };
 
-  const chains = check === 'builder' ? builderDaoChains : daoChains;
+  const chains = check === 'builder' ? builderDaoChains : check === 'moloch' ? daoChains : hatsProtocolChains;
 
   return (
     <>
@@ -83,6 +84,16 @@ export function TokenGateCommunities() {
           />
         </>
       ) : null}
+      {check === 'hats' && (
+        <NumberInputField
+          label='Token id'
+          error={errors.tokenId?.message}
+          helperText={errors.tokenId?.message}
+          disableArrows
+          fullWidth
+          {...register('tokenId')}
+        />
+      )}
 
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </>

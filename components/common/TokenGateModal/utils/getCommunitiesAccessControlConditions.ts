@@ -3,7 +3,7 @@ import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 import type { FormValues } from '../hooks/useCommunitiesForm';
 
 export function getCommunitiesAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
-  const { chain = '1', contract = '', check, guild = '' } = values;
+  const { chain = '1', contract = '', check, guild = '', tokenId } = values;
   const chainId = Number(chain);
 
   if (check === 'guild') {
@@ -39,6 +39,18 @@ export function getCommunitiesAccessControlConditions(values: FormValues): Acces
         chain: chainId,
         method: 'balanceOf',
         tokenIds: [],
+        quantity: '1'
+      }
+    ];
+  } else if (check === 'hats' && tokenId) {
+    return [
+      {
+        condition: 'evm' as const,
+        contractAddress: contract,
+        type: 'Hats',
+        chain: chainId,
+        method: 'balanceOf',
+        tokenIds: [tokenId],
         quantity: '1'
       }
     ];

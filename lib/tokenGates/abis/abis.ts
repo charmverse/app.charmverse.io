@@ -97,3 +97,49 @@ export const molochDaoAbi = [
     type: 'function'
   }
 ] as const;
+
+export const hatsProtocolAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_hatId',
+        type: 'uint256'
+      }
+    ],
+    name: 'hatSupply',
+    outputs: [
+      {
+        internalType: 'uint32',
+        name: 'supply',
+        type: 'uint32'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_wearer',
+        type: 'address'
+      },
+      {
+        internalType: 'uint256',
+        name: '_hatId',
+        type: 'uint256'
+      }
+    ],
+    name: 'balanceOf',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: 'balance',
+        type: 'uint256'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  }
+] as const;
