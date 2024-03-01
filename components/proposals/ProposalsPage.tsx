@@ -1,6 +1,7 @@
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
+import { debounce } from 'lodash';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -72,15 +73,16 @@ export function ProposalsPage({ title }: { title: string }) {
     mutator.updateBlocks([newBoard], oldBlocks, 'Hide description');
   }, [activeBoard]);
 
-  const onDescriptionChange = useCallback(
-    (content: PageContent) => {
-      const oldBlocks = [activeBoard];
-      const newBoard = createBoard({
-        block: activeBoard
-      });
-      newBoard.fields.description = content;
-      mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
-    },
+  const onDescriptionChange = useMemo(
+    () =>
+      debounce((content: PageContent) => {
+        const oldBlocks = [activeBoard];
+        const newBoard = createBoard({
+          block: activeBoard
+        });
+        newBoard.fields.description = content;
+        mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
+      }, 250),
     [activeBoard]
   );
 
