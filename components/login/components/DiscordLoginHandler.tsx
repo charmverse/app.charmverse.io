@@ -14,7 +14,7 @@ export function DiscordLoginHandler({ redirectUrl }: Props) {
   const { popupLogin } = useDiscordConnection();
 
   return (
-    <Box onClick={() => popupLogin(redirectUrl ?? '/', 'login')}>
+    <Box onClick={() => popupLogin(redirectUrl ?? '/', 'login')} data-test='connect-discord-button'>
       <ListItem>
         <ConnectorButton
           name='Connect with Discord'

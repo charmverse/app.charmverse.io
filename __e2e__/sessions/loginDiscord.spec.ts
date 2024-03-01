@@ -31,10 +31,15 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   await createDiscordUser({ userId: user.id, discordUserId });
 
   await loginPage.goto();
+  await loginPage.universalConnectButton.click();
+  await loginPage.page.locator('data-test=connect-discord-button').click();
+  const newTab = await loginPage.page.waitForEvent('popup');
+
+  await newTab.goto(
+    'http://127.0.0.1:3335/authenticate/discord?code=kDr74C3ZTCCSkeWDhxJ7E9UuObq0kG&state=%7B%22redirect%22%3A%22http%3A%2F%2Flocalhost%3A3335%2F%22%2C%22type%22%3A%22login%22%7D'
+  );
 
   const discordApiUrl = discordServer.host;
-  const discordWebsiteUrl = await loginPage.getDiscordUrl();
-  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
 
   // should auto redirect to workspace
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
