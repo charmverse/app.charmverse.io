@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { loadAndGenerateCsv } from 'lib/focalboard/generateCsv';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
@@ -18,10 +19,20 @@ export type ZippedDataRequest = Pick<ContentToCompress, 'csv'> & { pageIds: stri
 
 async function requestZip(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
+  const customFilter = req.query.filter as string;
+  let filter = null;
+  if (customFilter) {
+    try {
+      filter = JSON.parse(customFilter) as FilterGroup;
+    } catch (err) {
+      //
+    }
+  }
 
   const csvData = await loadAndGenerateCsv({
     userId: req.session.user.id,
-    databaseId: pageId
+    databaseId: pageId,
+    customFilter: filter
   });
 
   const markdownPages = await paginatedPrismaTask({
