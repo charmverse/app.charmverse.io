@@ -144,7 +144,7 @@ export function UserIdentities() {
   return (
     <>
       <Typography mb={2}>Select which integration you want to show as your username</Typography>
-      <Box mb={2}>
+      <Box mb={1}>
         {identityTypes.map((item) => {
           const usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
           const wallet = user?.wallets.find((w) => shortWalletAddress(w.address) === item.secondaryUserName);
