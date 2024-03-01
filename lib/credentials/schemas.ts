@@ -43,12 +43,17 @@ export function decodeProposalCredential(rawData: string): ProposalCredential {
   return values as ProposalCredential;
 }
 export const credentialLabels: Record<AttestationType, string> = {
-  proposal: 'Proposal'
+  proposal: 'Proposal',
+  reward: 'Reward'
 };
 
 export const attestationSchemaIds: Record<AttestationType, { [key in EasSchemaChain]: string }> = {
   proposal: {
     [optimism.id]: '0x3d1afc69090e3133e65385364bd88f230d8df3e5e2c660fdc9206c0ce3e2e012'
+  },
+  // TODO: Temporary fix for type checking
+  reward: {
+    [optimism.id]: ''
   }
 };
 
@@ -67,9 +72,9 @@ export function getAttestationSchemaId({
   return attestationSchemaIds[credentialType][chainId];
 }
 
-export function encodeAttestion<T extends AttestationType = AttestationType>({ type, data }: CredentialData<T>) {
+export function encodeAttestation<T extends AttestationType = AttestationType>({ type, data }: CredentialData<T>) {
   if (type === 'proposal') {
     return encodeProposalCredential(data as ProposalCredential);
   }
-  throw new Error('Invalid Attestation Type:', type);
+  throw new Error(`Invalid Attestation Type: ${type}`);
 }
