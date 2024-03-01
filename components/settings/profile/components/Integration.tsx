@@ -60,6 +60,15 @@ function Integration(props: IntegrationProps) {
         </Stack>
 
         <Stack flexDirection='row' gap={1} alignItems='center'>
+          {menuActions && menuActions.length !== 0 && (
+            <IconButton
+              size='small'
+              aria-label={`Open ${identityType.toLowerCase()} identity options`}
+              {...bindTrigger(identityMenuState)}
+            >
+              <MoreHoriz fontSize='small' />
+            </IconButton>
+          )}
           {isInUse ? (
             <Stack flexDirection='row'>
               <CheckIcon fontSize='small' />
@@ -76,15 +85,6 @@ function Integration(props: IntegrationProps) {
             >
               Select
             </Button>
-          )}
-          {menuActions && menuActions.length !== 0 && (
-            <IconButton
-              size='small'
-              aria-label={`Open ${identityType.toLowerCase()} identity options`}
-              {...bindTrigger(identityMenuState)}
-            >
-              <MoreHoriz fontSize='small' />
-            </IconButton>
           )}
 
           <Menu
