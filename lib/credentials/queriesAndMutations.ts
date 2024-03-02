@@ -2,7 +2,6 @@ import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
-import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint, isStagingEnv } from 'config/constants';

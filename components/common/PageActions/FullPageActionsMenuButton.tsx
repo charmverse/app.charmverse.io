@@ -13,6 +13,7 @@ import { DatabasePageActionList } from 'components/common/PageActions/components
 import type { PageActionMeta } from 'components/common/PageActions/components/DocumentPageActionList';
 import { DocumentPageActionList, documentTypes } from 'components/common/PageActions/components/DocumentPageActionList';
 import { ForumPostActionList } from 'components/common/PageActions/components/ForumPostActionList';
+import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
@@ -131,7 +132,7 @@ export function FullPageActionsMenuButton({
             horizontal: 'left'
           }}
         >
-          {pageOptionsList}
+          <DbViewSettingsProvider>{pageOptionsList}</DbViewSettingsProvider>
         </Popover>
       </Box>
     );
