@@ -7,6 +7,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 
 const IntegrationName = styled(Typography)`
   background-color: ${({ theme }) => theme.palette.background.dark};
@@ -28,6 +29,10 @@ type IntegrationProps = {
   selectIntegration: (id: string, type: IdentityType) => void;
 };
 
+const StyledStack = styled(Stack)`
+  ${hoverIconsStyle()}
+`;
+
 function Integration(props: IntegrationProps) {
   const {
     isInUse,
@@ -41,8 +46,10 @@ function Integration(props: IntegrationProps) {
     secondaryUserName
   } = props;
   const identityMenuState = usePopupState({ variant: 'popover', popupId: `identity-menu-${identityType}` });
+  const hasActionsMenu = menuActions && menuActions.length !== 0;
+
   return (
-    <Stack>
+    <StyledStack>
       <Stack flexDirection='row' justifyContent='space-between' width='100%' alignItems='center'>
         <Stack>
           <Stack display='flex' flexDirection='row' gap={1} alignItems='center' mb={0.5}>
@@ -61,7 +68,7 @@ function Integration(props: IntegrationProps) {
 
         <Stack flexDirection='row' gap={1} alignItems='center'>
           {isInUse ? (
-            <Stack flexDirection='row'>
+            <Stack flexDirection='row' mr={!hasActionsMenu ? 4.5 : 0}>
               <CheckIcon fontSize='small' />
               <Typography ml={1} variant='body2'>
                 Selected
@@ -73,13 +80,18 @@ function Integration(props: IntegrationProps) {
               color='secondary'
               variant='outlined'
               onClick={() => selectIntegration(username, identityType)}
+              sx={{
+                mr: !hasActionsMenu ? 4.5 : 0
+              }}
             >
               Select
             </Button>
           )}
-          {menuActions && menuActions.length !== 0 && (
+
+          {hasActionsMenu && (
             <IconButton
               size='small'
+              className='icons'
               aria-label={`Open ${identityType.toLowerCase()} identity options`}
               {...bindTrigger(identityMenuState)}
             >
@@ -108,7 +120,7 @@ function Integration(props: IntegrationProps) {
           my: 2
         }}
       />
-    </Stack>
+    </StyledStack>
   );
 }
 
