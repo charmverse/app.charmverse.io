@@ -66,10 +66,10 @@ export function SpaceAccessGate({
     }
   }
 
-  async function evaluateUserWallet(payload: SignatureVerificationPayload) {
+  async function evaluateUserWallet() {
     if (!user) {
       try {
-        await loginFromWeb3Account(payload);
+        await loginFromWeb3Account();
       } catch (err: any) {
         showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
         return;
@@ -100,6 +100,7 @@ export function SpaceAccessGate({
 
   const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
   const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
+  const isVerifying = summonGate.isVerifying || tokenGate.isVerifying || discordGate.isVerifying;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
   const noGateConditions =
@@ -161,11 +162,9 @@ export function SpaceAccessGate({
 
       {walletGateEnabled && !isVerified && (
         <Box mb={2}>
-          <WalletSign
-            loading={summonGate.isVerifying || tokenGate.isVerifying}
-            signSuccess={evaluateUserWallet}
-            buttonStyle={{ width: '100%' }}
-          />
+          <PrimaryButton fullWidth loading={isVerifying} disabled={isVerifying} onClick={evaluateUserWallet}>
+            Verify
+          </PrimaryButton>
         </Box>
       )}
       {walletGateEnabled &&
