@@ -2,6 +2,7 @@ import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
+import { useDrag } from 'react-dnd';
 
 import { useGetPage } from 'charmClient/hooks/pages';
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
@@ -13,11 +14,12 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
+import { mergeRefs } from 'lib/utilities/react';
 
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
-export const StyledLink = styled(Link)`
+export const StyledLink = styled.a`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -25,19 +27,13 @@ export const StyledLink = styled(Link)`
   position: relative;
   transition: background 20ms ease-in 0s;
   margin: ${({ theme }) => `${theme.spacing(0.5)} 0px`};
+  color: inherit;
+  text-decoration: none;
 
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
-    .actions-menu {
-      opacity: 0;
-    }
-
     &:hover {
       background-color: ${({ theme }) => theme.palette.background.light};
-
-      .actions-menu {
-        opacity: 1;
-      }
     }
   }
 `;
@@ -62,7 +58,6 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const { pages, loadingPages } = usePages();
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
-
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const isDocumentPath = !forumCategoryPage && !staticPage;
@@ -73,6 +68,10 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
 
   const documentPage = sourcePage || pages[node.attrs.id];
   const isLoading = isPageLoading && loadingPages;
+  const [_, drag, dragPreview] = useDrag(() => ({
+    type: 'item',
+    item: documentPage
+  }));
 
   let pageTitle = '';
   if (staticPage) {
@@ -114,6 +113,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
           enableDragAndDrop(view, pos);
         }
       }}
+      ref={mergeRefs([drag, dragPreview])}
       data-type={node.attrs.type}
       // Only works for firefox
       onDragExitCapture={() => {
