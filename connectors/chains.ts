@@ -530,19 +530,13 @@ export const ercSupportedChains = RPCList.filter((chain) => !!chain.alchemyUrl |
   sortChainList
 );
 
-export const daoChains = RPCList.filter((chain) =>
-  ['ethereum', 'arbitrum one', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
-);
+export const daoChains = RPCList.filter((chain) => ['eth', 'arb1', 'oeth', 'matic', 'gno'].includes(chain.shortName));
 
 export const hatsProtocolChains = RPCList.filter((chain) =>
-  ['ethereum', 'arbitrum one', 'optimism', 'polygon', 'gnosis', 'ethereum - sepolia', 'celo', 'base'].includes(
-    chain.chainName.toLowerCase()
-  )
+  ['eth', 'arb1', 'oeth', 'matic', 'gno', 'sep', 'celo', 'base'].includes(chain.shortName)
 );
 
-export const builderDaoChains = RPCList.filter((chain) =>
-  ['ethereum', 'base', 'optimism', 'zora'].includes(chain.chainName.toLowerCase())
-);
+export const builderDaoChains = RPCList.filter((chain) => ['eth', 'base', 'oeth', 'zora'].includes(chain.shortName));
 
 export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
 
