@@ -5,7 +5,7 @@ import { getPublicClient } from 'lib/blockchain/publicClient';
 import { getGitcoinPassportScore } from 'lib/credentials/getGitcoinCredentialsByWallets';
 import { getUserMemberships } from 'lib/guild-xyz/getUserMemberships';
 
-import { erc1155Abi, ercAbi, molochDaoAbi } from './abis/abis';
+import { erc1155Abi, ercAbi, hatsProtocolAbi, molochDaoAbi } from './abis/abis';
 import { subscriptionTokenV1ABI } from './hypersub/abi';
 import type { AccessControlCondition } from './interfaces';
 import { PublicLockV13 } from './unlock/abi';
@@ -32,6 +32,18 @@ export async function validateTokenGateCondition(
       });
 
       return balance >= minimumQuantity;
+    }
+    // Hats Protocol
+    case condition.type === 'Hats' && contractAddress && !!condition.tokenIds[0]: {
+      const tokenId = BigInt(condition.tokenIds[0] || 1);
+      const balance = await publicClient.readContract({
+        abi: hatsProtocolAbi,
+        address: contractAddress,
+        functionName: 'balanceOf',
+        args: [userAddress, tokenId]
+      });
+
+      return balance >= 1;
     }
     // ERC20 Token
     case condition.type === 'ERC20': {
