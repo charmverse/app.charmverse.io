@@ -20,7 +20,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
 import Legend from 'components/settings/Legend';
-import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -36,10 +35,12 @@ import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
 import { isTruthy } from 'lib/utils/types';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
+import { BlockchainSettings } from './components/BlockchainSettings';
 import { ConnectCollabland } from './components/ConnectCollabland';
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { SettingsItem } from './components/SettingsItem';
+import { SetupCustomDomain } from './components/SetupCustomDomain';
 import { SpacePrimaryIdentity } from './components/SpacePrimaryIdentity';
 import { TwoFactorAuth } from './components/TwoFactorAuth';
 
@@ -48,6 +49,7 @@ export type FormValues = {
   spaceImage?: string | null;
   spaceArtwork?: string | null;
   domain: string;
+  enableTestnets: boolean;
   notificationToggles: NotificationToggles;
   requireMembersTwoFactorAuth: boolean;
   primaryMemberIdentity?: IdentityType | null;
@@ -61,6 +63,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
   requireMembersTwoFactorAuth: yup.boolean().required(),
+  enableTestnets: yup.boolean().required(),
   primaryMemberIdentity: yup.string<IdentityType>().nullable(),
   domain: yup
     .string()
@@ -162,6 +165,7 @@ export function SpaceSettings({
         primaryMemberIdentity: values.primaryMemberIdentity || null,
         spaceImage: values.spaceImage,
         spaceArtwork: values.spaceArtwork,
+        enableTestnets: values.enableTestnets,
         requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
         customDomain: values.customDomain || null,
         snapshotDomain: values.snapshotDomain
@@ -502,6 +506,10 @@ export function SpaceSettings({
             <ConnectCollabland />
           </Grid>
           <Grid item>
+            <Legend>Blockchain settings</Legend>
+            <BlockchainSettings isAdmin={isAdmin} control={control} />
+          </Grid>
+          <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
             {isAdmin ? (
               <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
@@ -600,6 +608,7 @@ function _getFormValues(space: Space): FormValues {
     spaceImage: space.spaceImage,
     spaceArtwork: space.spaceArtwork,
     domain: space.domain,
+    enableTestnets: !!space.enableTestnets,
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
     notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
     customDomain: space.customDomain,
