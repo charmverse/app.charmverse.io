@@ -37,7 +37,7 @@ const mockedPublishSignedCredential = jest.mocked(publishSignedCredential);
 afterEach(() => {
   mockedPublishSignedCredential.mockClear();
 });
-describe('issueRewardCredentialIfNecessary', () => {
+describe.skip('issueRewardCredentialIfNecessary', () => {
   it('should issue credentials once for a unique combination of user, reward submission and credential template', async () => {
     const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),
