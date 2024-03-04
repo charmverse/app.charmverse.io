@@ -66,7 +66,7 @@ export function SpaceAccessGate({
     }
   }
 
-  async function onWalletSignature(payload: SignatureVerificationPayload) {
+  async function evaluateUserWallet(payload: SignatureVerificationPayload) {
     if (!user) {
       try {
         await loginFromWeb3Account(payload);
@@ -162,8 +162,8 @@ export function SpaceAccessGate({
       {walletGateEnabled && !isVerified && (
         <Box mb={2}>
           <WalletSign
-            loading={summonGate.isVerifying}
-            signSuccess={onWalletSignature}
+            loading={summonGate.isVerifying || tokenGate.isVerifying}
+            signSuccess={evaluateUserWallet}
             buttonStyle={{ width: '100%' }}
           />
         </Box>
