@@ -1,5 +1,6 @@
-import { ProposalOperation, ProposalSystemRole, ProposalEvaluationType } from '@charmverse/core/prisma';
+import { ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
@@ -9,7 +10,7 @@ import {
   type SelectOption,
   type SystemRoleOptionPopulated
 } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { MembersIcon, ProposalIcon } from 'components/common/PageIcon';
+import { MembersIcon } from 'components/common/PageIcon';
 
 import { evaluationIcons } from '../constants';
 
@@ -43,7 +44,7 @@ export const authorSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Author'>
-      <ProposalIcon color='secondary' fontSize='small' />
+      <PersonIcon color='secondary' fontSize='small' />
     </Tooltip>
   ),
   id: ProposalSystemRole.author,
@@ -54,7 +55,7 @@ export const currentReviewerSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Reviewers selected for this evaluation'>
-      <ProposalIcon color='secondary' fontSize='small' />
+      <PersonIcon color='secondary' fontSize='small' />
     </Tooltip>
   ),
   id: ProposalSystemRole.current_reviewer,
@@ -71,7 +72,7 @@ export const allReviewersSystemRole = {
   group: 'system_role',
   icon: (
     <Tooltip title='Reviewers of any step in this workflow'>
-      <ProposalIcon color='secondary' fontSize='small' />
+      <PersonIcon color='secondary' fontSize='small' />
     </Tooltip>
   ),
   id: ProposalSystemRole.all_reviewers,
