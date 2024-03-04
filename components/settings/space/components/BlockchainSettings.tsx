@@ -16,7 +16,7 @@ export function BlockchainSettings({ isAdmin, control }: { isAdmin: boolean; con
         render={({ field }) => (
           <FormControlLabel
             control={<Switch {...field} checked={field.value} />}
-            disabled={isAdmin}
+            disabled={!isAdmin}
             sx={{ alignItems: 'flex-start' }}
             label={
               <Box>

@@ -8,10 +8,6 @@ import type { Control } from 'react-hook-form';
 import type { FormValues } from '../SpaceSettings';
 
 export function TwoFactorAuth({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
-  if (!isAdmin) {
-    return null;
-  }
-
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column'>
       <Controller
@@ -20,6 +16,7 @@ export function TwoFactorAuth({ isAdmin, control }: { isAdmin: boolean; control:
         render={({ field }) => (
           <FormControlLabel
             control={<Switch {...field} checked={field.value} />}
+            disabled={!isAdmin}
             sx={{ alignItems: 'flex-start' }}
             label={
               <Box>
