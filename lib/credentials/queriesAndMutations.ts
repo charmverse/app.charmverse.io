@@ -10,14 +10,14 @@ import { ApolloClientWithRedisCache } from './apolloClientWithRedisCache';
 import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
+import type { CredentialData } from './schemas';
 import { attestationSchemaIds } from './schemas';
-import type { ProposalCredential } from './schemas';
 
 const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
   // Allows us to bypass native
   persistForSeconds: isStagingEnv ? 5 : 300,
-  skipRedisCache: isStagingEnv,
+  skipRedisCache: true,
   cacheKeyPrefix: 'ceramic'
 });
 
@@ -31,19 +31,23 @@ type CredentialFromCeramic = {
   verificationUrl: string;
   chainId: ExternalCredentialChain | EasSchemaChain;
   schemaId: string;
+  charmverseId?: string;
   timestamp: Date;
 };
 
 /**
  * @content - The actual keymap values of the credential created using EAS
  */
-export type PublishedSignedCredential = Omit<CredentialFromCeramic, 'content'> & {
-  content: ProposalCredential;
+export type PublishedSignedCredential<T extends AttestationType = AttestationType> = Omit<
+  CredentialFromCeramic,
+  'content'
+> & {
+  content: CredentialData<T>['data'];
 };
 
 const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
-  mutation CreateCredentials($i: CreateCharmVerseCredentialInput!) {
-    createCharmVerseCredential(input: $i) {
+  mutation CreateCredentials($i: CreateCharmverseCredentialInput!) {
+    createCharmverseCredential(input: $i) {
       document {
         id
         sig
@@ -55,6 +59,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
         recipient
         verificationUrl
         timestamp
+        charmverseId
       }
     }
   }
@@ -97,13 +102,14 @@ export async function publishSignedCredential(input: CredentialToPublish): Promi
         }
       }
     })
-    .then((doc) => getParsedCredential(doc.data.createCharmVerseCredential.document));
+    .then((doc) => getParsedCredential(doc.data.createCharmverseCredential.document));
+
   return record;
 }
 
 const GET_CREDENTIALS = gql`
-  query GetCredentials($filter: CharmVerseCredentialFiltersInput!) {
-    charmVerseCredentialIndex(filters: $filter, first: 1000) {
+  query GetCredentials($filter: CharmverseCredentialFiltersInput!) {
+    charmverseCredentialIndex(filters: $filter, first: 1000) {
       edges {
         node {
           id
@@ -116,6 +122,7 @@ const GET_CREDENTIALS = gql`
           chainId
           schemaId
           timestamp
+          charmverseId
         }
       }
     }
@@ -141,7 +148,7 @@ export async function getCharmverseCredentialsByWallets({
       variables: {
         filter: {
           where: {
-            schemaId: { equalTo: attestationSchemaIds.proposal[optimism.id] },
+            schemaId: { in: [attestationSchemaIds.proposal[optimism.id], attestationSchemaIds.reward[optimism.id]] },
             recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
@@ -150,7 +157,7 @@ export async function getCharmverseCredentialsByWallets({
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
     })
-    .then(({ data }) => data.charmVerseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
+    .then(({ data }) => data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
 
   const credentialIds = charmverseCredentials.map((c) => c.id);
 
@@ -163,6 +170,20 @@ export async function getCharmverseCredentialsByWallets({
     select: {
       id: true,
       ceramicId: true,
+      rewardApplication: {
+        select: {
+          bounty: {
+            select: {
+              space: {
+                select: {
+                  spaceArtwork: true,
+                  credentialLogo: true
+                }
+              }
+            }
+          }
+        }
+      },
       proposal: {
         select: {
           space: {
@@ -192,7 +213,9 @@ export async function getCharmverseCredentialsByWallets({
   return charmverseCredentials.map((credential) => {
     const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
     const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
-    const iconUrl = issuedCredential?.proposal?.space.credentialLogo ?? issuedCredential?.proposal?.space.spaceArtwork;
+    const iconUrl =
+      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
+      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
 
     if (favoriteCredential) {
       return {

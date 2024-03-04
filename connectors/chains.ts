@@ -190,7 +190,6 @@ const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
-    alchemyUrl: 'https://polygon-mainnet.g.alchemy.com',
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
@@ -203,13 +202,12 @@ const RPC: Record<string, IChainDetails> = {
     viem: polygonZkEvm,
     chainName: polygonZkEvm.name,
     nativeCurrency: {
-      name: 'Polygon',
-      symbol: 'MATIC',
-      decimals: 18,
+      name: polygonZkEvm.nativeCurrency.name,
+      symbol: polygonZkEvm.nativeCurrency.symbol,
+      decimals: polygonZkEvm.nativeCurrency.decimals,
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/asset_platforms/images/122/small/polygonzkevm.jpg'
     },
-    alchemyUrl: 'https://polygonzkevm-mainnet.g.alchemy.com',
     rpcUrls: polygonZkEvm.rpcUrls.public.http,
     blockExplorerUrls: [polygonZkEvm.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zkevm.safe.global/',

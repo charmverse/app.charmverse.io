@@ -12,7 +12,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
-import type { ProposalCredential } from 'lib/credentials/schemas';
+import type { CredentialData } from 'lib/credentials/schemas';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 export function UserCredentialRow({
@@ -49,7 +49,7 @@ export function UserCredentialRow({
     }
   }
 
-  const charmCredential = credential.content as ProposalCredential;
+  const charmCredential = credential.content as CredentialData['data'];
   const credentialInfo: {
     title: string;
     subtitle: string;

@@ -81,9 +81,10 @@ export function useRewardsBoardAdapter() {
   const queryViewType =
     viewTypeToBlockId[query?.viewId?.toString() as IViewType] || query?.viewId?.toString() || DEFAULT_VIEW_BLOCK_ID;
 
-  const activeViewId = board?.fields.viewIds?.find((vid) => vid === queryViewType)
-    ? queryViewType
-    : board?.fields.viewIds?.[0];
+  const activeViewId =
+    (board?.fields.viewIds?.find((vid) => vid === queryViewType) ? queryViewType : board?.fields.viewIds?.[0]) ??
+    // Ideally this should never occur, there must be atleast a single view id, but if it does, we should default to the first view
+    DEFAULT_VIEW_BLOCK_ID;
 
   const localViewSettings = useLocalDbViewSettings(`rewards-${space?.id}-${activeViewId}`);
 
