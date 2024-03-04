@@ -74,7 +74,7 @@ export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promis
     log.warn('Ankr API Key is missing to retrive NFT');
     return null;
   }
-  if (supportedChainIds.includes(chainId)) {
+  if (chainId === 5000) {
     return getTokenInfoOnMantle({ address, chainId, tokenId });
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
@@ -83,7 +83,7 @@ export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promis
   await rateLimiter();
   const nft = await provider.getNFTMetadata({
     blockchain: blockchain as AnkrBlockchain,
-    tokenId: toInt(tokenId).toString(),
+    tokenId: BigInt(tokenId).toString(),
     contractAddress: address,
     forceFetch: false
   });

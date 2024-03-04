@@ -30,7 +30,7 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
     case 'Hats':
     case 'ERC721':
     case 'ERC1155': {
-      const tokenId = condition.tokenIds.at(0) || '1';
+      const tokenId = BigInt(condition.tokenIds.at(0) || '1').toString();
       const nft = await getNFT({
         address: condition.contractAddress,
         tokenId,
