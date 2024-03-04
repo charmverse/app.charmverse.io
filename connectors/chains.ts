@@ -451,6 +451,21 @@ export const RPC: Record<string, IChainDetails> = {
   }
 } as const;
 
+export const daoChains: IChainDetails['shortName'][] = ['eth', 'arb1', 'oeth', 'matic', 'gno'];
+
+export const hatsProtocolChains: IChainDetails['shortName'][] = [
+  'eth',
+  'arb1',
+  'oeth',
+  'matic',
+  'gno',
+  'sep',
+  'celo',
+  'base'
+];
+
+export const builderDaoChains: IChainDetails['shortName'][] = ['eth', 'base', 'oeth', 'zora'];
+
 export type Blockchain = keyof typeof RPC;
 
 export function getChainList(options: { enableTestnets?: boolean } = {}) {
@@ -527,24 +542,7 @@ export function getChainExplorerLink(
   return '';
 }
 
-export const daoChains: IChainDetails['shortName'][] = ['eth', 'arb1', 'oeth', 'matic', 'gno'];
-
-export const hatsProtocolChains: IChainDetails['shortName'][] = [
-  'eth',
-  'arb1',
-  'oeth',
-  'matic',
-  'gno',
-  'sep',
-  'celo',
-  'base'
-];
-
-export const builderDaoChains: IChainDetails['shortName'][] = ['eth', 'base', 'oeth', 'zora'];
-
-// export const hypersubChains = allChains.filter((chain) => !!chain.hypersubNetwork).sort(sortChainList);
-
-export function sortChainList<T extends IChainDetails>(a: T, b: T) {
+function sortChainList<T extends IChainDetails>(a: T, b: T) {
   const isMainnet = (chain: T) => !chain.testnet;
   if (isMainnet(a) && !isMainnet(b)) {
     return -1;

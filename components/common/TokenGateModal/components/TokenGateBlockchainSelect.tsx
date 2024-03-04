@@ -1,6 +1,6 @@
 import { FormHelperText, ListItemIcon, ListItemText, MenuItem, Select } from '@mui/material';
 import type { SelectProps } from '@mui/material/Select';
-import { getChainById, getChainList, sortChainList } from 'connectors/chains';
+import { getChainById, getChainList } from 'connectors/chains';
 import type { IChainDetails } from 'connectors/chains';
 import { forwardRef } from 'react';
 import type { Ref, ReactNode } from 'react';
@@ -19,9 +19,9 @@ function SelectField(
   const { space } = useCurrentSpace();
   const chainList =
     chainsProp ||
-    getChainList({ enableTestnets: !!space?.enableTestnets })
-      .filter((chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId))
-      .sort(sortChainList);
+    getChainList({ enableTestnets: !!space?.enableTestnets }).filter(
+      (chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId)
+    );
 
   return (
     <FieldWrapper label='Blockchain'>
