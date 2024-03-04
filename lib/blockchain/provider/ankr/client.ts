@@ -1,12 +1,12 @@
 import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types';
+import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
 
-import { GET } from 'adapters/http';
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { isMantleChain } from 'lib/gnosis/mantleClient';
 import { paginatedCall } from 'lib/utils/async';
@@ -173,7 +173,7 @@ export async function getTokenInfoOnMantle({
 
   const [tokenUri] = await Promise.all([contract.tokenURI(tokenId)]);
   const tokenUriDNSVersion = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
-  const metadata = await GET<TokenMetadata>(tokenUriDNSVersion);
+  const metadata = await GET<TokenMetadata>(tokenUriDNSVersion, null);
   const imageUrl = metadata.image?.replace('ipfs://', 'https://ipfs.io/ipfs/');
   return {
     id: `${address}:${tokenId}`,
