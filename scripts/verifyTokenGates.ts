@@ -13,7 +13,7 @@ async function init() {
     }
   });
   for (const gate of tokenGates) {
-    const result = await validateTokenGate(gate as TokenGate, walletAddress);
+    const result = await validateTokenGate(gate as unknown as TokenGate, walletAddress);
     console.log(result);
   }
 }
