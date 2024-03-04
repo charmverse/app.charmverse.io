@@ -423,7 +423,7 @@ export function SpaceSettings({
             )}
           </Grid>
           <Grid item>
-            <FieldLabel>Collab.land</FieldLabel>
+            <FieldLabel>Collab.Land</FieldLabel>
             <ConnectCollabland />
           </Grid>
           <Grid item>

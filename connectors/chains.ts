@@ -29,7 +29,6 @@ import {
 } from 'viem/chains';
 
 import { isDevEnv } from 'config/constants';
-import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
 import { uniqueValues } from 'lib/utils/array';
 
 export interface IChainDetails {
@@ -462,6 +461,7 @@ export function getChainList(options: { enableTestnets?: boolean } = {}) {
       .filter(
         (chain) => enableTestNets || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id
       )
+      .sort(sortChainList)
   );
 }
 
@@ -527,23 +527,24 @@ export function getChainExplorerLink(
   return '';
 }
 
-export const ercSupportedChains = allChains
-  .filter((chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId))
-  .sort(sortChainList);
+export const daoChains: IChainDetails['shortName'][] = ['eth', 'arb1', 'oeth', 'matic', 'gno'];
 
-export const daoChains = allChains.filter((chain) => ['eth', 'arb1', 'oeth', 'matic', 'gno'].includes(chain.shortName));
+export const hatsProtocolChains: IChainDetails['shortName'][] = [
+  'eth',
+  'arb1',
+  'oeth',
+  'matic',
+  'gno',
+  'sep',
+  'celo',
+  'base'
+];
 
-export const hatsProtocolChains = allChains.filter((chain) =>
-  ['eth', 'arb1', 'oeth', 'matic', 'gno', 'sep', 'celo', 'base'].includes(chain.shortName)
-);
+export const builderDaoChains: IChainDetails['shortName'][] = ['eth', 'base', 'oeth', 'zora'];
 
-export const builderDaoChains = allChains.filter((chain) => ['eth', 'base', 'oeth', 'zora'].includes(chain.shortName));
+// export const hypersubChains = allChains.filter((chain) => !!chain.hypersubNetwork).sort(sortChainList);
 
-export const unlockChains = allChains.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
-
-export const hypersubChains = allChains.filter((chain) => !!chain.hypersubNetwork).sort(sortChainList);
-
-function sortChainList<T extends IChainDetails>(a: T, b: T) {
+export function sortChainList<T extends IChainDetails>(a: T, b: T) {
   const isMainnet = (chain: T) => !chain.testnet;
   if (isMainnet(a) && !isMainnet(b)) {
     return -1;
