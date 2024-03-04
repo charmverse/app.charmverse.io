@@ -57,7 +57,6 @@ type Props = {
   rewardStatus?: BountyStatus | null;
   isProposalTemplate?: boolean;
 };
-
 export function RewardPropertiesForm({
   onChange,
   values,

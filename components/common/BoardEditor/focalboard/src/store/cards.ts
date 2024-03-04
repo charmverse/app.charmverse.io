@@ -1,9 +1,9 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { getChainList } from 'connectors/chains';
 
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
-import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -18,6 +18,8 @@ import { Utils } from '../utils';
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
+
+const allChains = getChainList({ enableTestnets: true });
 
 type CardsState = {
   current: string;
@@ -281,8 +283,12 @@ export function sortCards(
           }
 
           if (template.type === 'tokenChain') {
-            aValue = tokenChainOptions.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
-            bValue = tokenChainOptions.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
+            aValue =
+              allChains.find((o) => o.chainId.toString() === (Array.isArray(aValue) ? aValue[0] : aValue))?.chainName ||
+              '';
+            bValue =
+              allChains.find((o) => o.chainId.toString() === (Array.isArray(bValue) ? bValue[0] : bValue))?.chainName ||
+              '';
           }
 
           if (result === 0) {

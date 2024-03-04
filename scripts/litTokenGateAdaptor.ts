@@ -3,7 +3,7 @@ import { writeFile } from 'node:fs';
 
 import { TokenGate, prisma } from '@charmverse/core/prisma-client';
 import type { JsonAccsRequest } from '@lit-protocol/types';
-import { RPCList } from 'connectors/chains';
+import { getChainList } from 'connectors/chains';
 
 import type { Operator, TokenGateConditions } from 'lib/tokenGates/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -38,7 +38,8 @@ export function transformToTokenGateCondition(conditions: JsonAccsRequest): Toke
       ) {
         return null;
       }
-      const chainId = RPCList.find((chain) => chain.litNetwork === condition.chain)?.chainId || 1;
+      const chainId =
+        getChainList({ enableTestnets: true }).find((chain) => chain.litNetwork === condition.chain)?.chainId || 1;
 
       if (
         condition.standardContractType === 'ERC1155' &&
