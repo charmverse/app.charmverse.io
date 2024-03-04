@@ -5,15 +5,16 @@ import type { Signer } from 'ethers';
 import { SiweMessage } from 'lit-siwe';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
-import { useCallback, createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { mutate } from 'swr';
-import { recoverMessageAddress, getAddress } from 'viem';
+import { getAddress, recoverMessageAddress } from 'viem';
 import type { ConnectorData } from 'wagmi';
 import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { AuthSig } from 'lib/blockchain/interfaces';
+import { verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
 import type { SystemError } from 'lib/utils/errors';
 import { MissingWeb3AccountError } from 'lib/utils/errors';
 import { lowerCaseEqual } from 'lib/utils/strings';
@@ -64,7 +65,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { chain } = useNetwork();
   const chainId = chain?.id;
-  const { signMessageAsync } = useSignMessage();
+  const { signMessageAsync } = useSignMessage({});
 
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account;
@@ -120,9 +121,20 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const newSignature = await signMessageAsync({
         message: body
       });
-      const signatureAddress = await recoverMessageAddress({ message: body, signature: newSignature });
 
-      if (!lowerCaseEqual(signatureAddress, account)) {
+      const [signatureAddress, isValidGnosisSafeSignature] = await Promise.all([
+        recoverMessageAddress({
+          message: body,
+          signature: newSignature
+        }),
+        verifyEIP1271Signature({
+          message: body,
+          safeAddress: account,
+          signature: newSignature
+        })
+      ]);
+
+      if (!lowerCaseEqual(signatureAddress, account) && !isValidGnosisSafeSignature) {
         throw new Error('Signature address does not match account');
       }
 
@@ -130,7 +142,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         sig: newSignature,
         derivedVia: 'charmverse.sign',
         signedMessage: body,
-        address: signatureAddress
+        // Signature address is not reliable if coming from Gnosis, so we should use the detected account address
+        address: account
       };
 
       setSignature(account, generated, true);
@@ -141,7 +154,8 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       setIsSigning(false);
       throw err;
     }
-  }, [account, chainId, setSignature, signMessageAsync]);
+    // activeConnector is not directly referenced, but is important so that WalletConnect issues a request on the correct chain
+  }, [account, chainId, activeConnector, setSignature, signMessageAsync]);
 
   const loginFromWeb3Account = useCallback(
     async (authSig?: AuthSig) => {
