@@ -531,11 +531,11 @@ export const ercSupportedChains = RPCList.filter((chain) => !!chain.alchemyUrl |
 );
 
 export const daoChains = RPCList.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
+  ['ethereum', 'arbitrum one', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
 );
 
 export const hatsProtocolChains = RPCList.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis', 'ethereum - sepolia', 'celo'].includes(
+  ['ethereum', 'arbitrum one', 'optimism', 'polygon', 'gnosis', 'ethereum - sepolia', 'celo', 'base'].includes(
     chain.chainName.toLowerCase()
   )
 );
