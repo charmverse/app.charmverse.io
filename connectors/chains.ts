@@ -531,19 +531,13 @@ export const ercSupportedChains = allChains
   .filter((chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId))
   .sort(sortChainList);
 
-export const daoChains = allChains.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis'].includes(chain.chainName.toLowerCase())
-);
+export const daoChains = allChains.filter((chain) => ['eth', 'arb1', 'oeth', 'matic', 'gno'].includes(chain.shortName));
 
 export const hatsProtocolChains = allChains.filter((chain) =>
-  ['ethereum', 'arbitrum', 'optimism', 'polygon', 'gnosis', 'ethereum - sepolia', 'celo'].includes(
-    chain.chainName.toLowerCase()
-  )
+  ['eth', 'arb1', 'oeth', 'matic', 'gno', 'sep', 'celo', 'base'].includes(chain.shortName)
 );
 
-export const builderDaoChains = allChains.filter((chain) =>
-  ['ethereum', 'base', 'optimism', 'zora'].includes(chain.chainName.toLowerCase())
-);
+export const builderDaoChains = allChains.filter((chain) => ['eth', 'base', 'oeth', 'zora'].includes(chain.shortName));
 
 export const unlockChains = allChains.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
 
