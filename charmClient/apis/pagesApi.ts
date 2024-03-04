@@ -3,6 +3,7 @@ import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -66,7 +67,17 @@ export class PagesApi {
     return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
 
-  exportZippedDatabasePage({ databaseId }: { databaseId: string }) {
-    return http.GET(`/api/pages/${databaseId}/export-database`);
+  exportZippedDatabasePage({ databaseId, filter }: { databaseId: string; filter?: FilterGroup | null }) {
+    let customFilter = '';
+    try {
+      customFilter = JSON.stringify(filter);
+    } catch (err) {
+      //
+    }
+
+    return http.GET(
+      `/api/pages/${databaseId}/export-database`,
+      filter && customFilter ? { filter: customFilter } : undefined
+    );
   }
 }
