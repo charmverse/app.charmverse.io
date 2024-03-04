@@ -351,3 +351,33 @@ export function getNodeForRowPosition({
     nodeStart
   };
 }
+
+export function deleteRowNode({
+  view,
+  rowPosition,
+  rowNodeOffset
+}: {
+  view: EditorView;
+  rowPosition?: number;
+  rowNodeOffset?: number;
+}) {
+  const node = getNodeForRowPosition({ view, rowPosition, rowNodeOffset });
+  if (node) {
+    let start = node.nodeStart;
+    let end = node.nodeEnd;
+    // fix for toggles, but also assuming that pos 1 or 0 is always the first line anyway
+    if (start === 1) {
+      start = 0;
+      end -= 1;
+    } else if (node.node.type.name === 'disclosureDetails' || node.node.type.name === 'blockquote') {
+      // This removes disclosureSummary node
+      start -= 2;
+    }
+
+    view.dispatch(view.state.tr.deleteRange(start, end));
+
+    return node;
+  }
+
+  return null;
+}
