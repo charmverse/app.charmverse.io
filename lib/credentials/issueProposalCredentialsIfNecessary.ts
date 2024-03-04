@@ -1,4 +1,4 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
+import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -6,8 +6,8 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
+import { prettyPrint } from 'lib/utils/strings';
 
 import { signAndPublishCharmverseCredential } from './attest';
 import { credentialEventLabels } from './constants';
@@ -19,13 +19,18 @@ export async function issueProposalCredentialsIfNecessary({
   event
 }: {
   proposalId: string;
-  event: CredentialEventType;
+  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
 }): Promise<void> {
   if (disablePublishedCredentials) {
     log.warn('Published credentials are disabled');
     return;
   }
-  const baseProposal = await prisma.proposal.findFirstOrThrow({
+
+  if (event !== 'proposal_approved' && event !== 'proposal_created') {
+    throw new InvalidInputError(`Invalid event type: ${event} for proposal credentials`);
+  }
+
+  const baseProposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
     },
@@ -163,6 +168,7 @@ export async function issueProposalCredentialsIfNecessary({
           const eventLabel = getEventLabel((value) =>
             getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
           );
+
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
           const publishedCredential = await signAndPublishCharmverseCredential({
             chainId: optimism.id,
@@ -176,32 +182,12 @@ export async function issueProposalCredentialsIfNecessary({
                 Event: eventLabel,
                 URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
               }
-            }
-          });
-
-          await prisma.issuedCredential.create({
-            data: {
-              ceramicId: publishedCredential.id,
-              credentialEvent: event,
-              credentialTemplate: { connect: { id: credentialTemplate.id } },
-              proposal: { connect: { id: proposalId } },
-              user: { connect: { id: authorUserId } }
-            }
-          });
-
-          trackUserAction('credential_issued', {
-            userId: authorUserId,
-            spaceId: credentialTemplate.spaceId,
-            trigger: event,
-            credentialTemplateId: credentialTemplate.id
-          });
-
-          log.info('Issued credential', {
-            pageId: proposalWithSpaceConfig.page.id,
+            },
+            credentialTemplateId: credentialTemplate.id,
             event,
+            recipientUserId: authorUserId,
             proposalId,
-            userId: authorUserId,
-            credentialTemplateId: credentialTemplate.id
+            pageId: proposalWithSpaceConfig.page.id
           });
         }
       } catch (e) {
@@ -212,6 +198,8 @@ export async function issueProposalCredentialsIfNecessary({
           credentialsToGiveUser,
           error: e
         });
+
+        prettyPrint(e);
       }
     }
   }

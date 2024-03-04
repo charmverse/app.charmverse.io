@@ -3,17 +3,19 @@ import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { ercAbi } from 'lib/tokenGates/abis/abis';
+import { ercAbi, hatsProtocolAbi } from 'lib/tokenGates/abis/abis';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 import { daoCheck } from '../utils/utils';
+
+export const hatsProtocolContractAddress = '0x3bc1A0Ad72417f2d411118085256fC53CBdDd137';
 
 const daoCheckIds = daoCheck.map((d) => d.id);
 type DaoCheck = (typeof daoCheckIds)[number];
 
 const schema = yup.object({
   chain: yup.string().when('check', {
-    is: (val: DaoCheck) => val === 'builder' || val === 'moloch',
+    is: (val: DaoCheck) => val === 'builder' || val === 'moloch' || val === 'hats',
     then: () => yup.string().required('Chain is required'),
     otherwise: () => yup.string()
   }),
@@ -45,6 +47,29 @@ const schema = yup.object({
   guild: yup.string().when('check', {
     is: (val: DaoCheck) => val === 'guild',
     then: () => yup.string().required('Guild url or id is required'),
+    otherwise: () => yup.string()
+  }),
+  tokenId: yup.string().when('check', {
+    is: (val: DaoCheck) => val === 'hats',
+    then: () =>
+      yup
+        .string<`0x${string}`>()
+        .required('Hat id is required')
+        .test('isHat', 'Invalid hat id', async (value, context) => {
+          try {
+            const hatId = BigInt(value);
+            const supply = await readContract({
+              address: hatsProtocolContractAddress,
+              chainId: Number(context.parent.chain),
+              abi: hatsProtocolAbi,
+              functionName: 'hatSupply',
+              args: [hatId]
+            });
+            return supply >= 1;
+          } catch (err) {
+            return false;
+          }
+        }),
     otherwise: () => yup.string()
   })
 });

@@ -9,7 +9,6 @@ import { UserSelect } from 'components/common/BoardEditor/components/properties/
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -63,9 +62,8 @@ export function ProposalPropertiesBase({
 }: ProposalPropertiesProps) {
   const { mappedFeatures } = useSpaceFeatures();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-  const { space } = useCurrentSpace();
 
-  const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
+  const { credentialTemplates } = useGetCredentialTemplates();
 
   const showCredentialSelect = !!credentialTemplates?.length;
 
@@ -128,6 +126,7 @@ export function ProposalPropertiesBase({
               />
               {showCredentialSelect && (
                 <CredentialSelect
+                  templateType='proposal'
                   readOnly={readOnlySelectedCredentialTemplates}
                   selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
                   onChange={(selectedCredentialTemplates) =>

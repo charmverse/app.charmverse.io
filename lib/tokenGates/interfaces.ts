@@ -16,7 +16,8 @@ export type AccessType =
   | 'Unlock'
   | 'Hypersub'
   | 'GitcoinPassport'
-  | 'Guildxyz';
+  | 'Guildxyz'
+  | 'Hats';
 export type Operator = 'AND' | 'OR';
 export type Method =
   | 'ownerOf'

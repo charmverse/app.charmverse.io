@@ -1,6 +1,6 @@
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { builderDaoChains, daoChains } from 'connectors/chains';
+import { builderDaoChains, daoChains, hatsProtocolChains } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
@@ -38,7 +38,7 @@ export function TokenGateCommunities() {
     reset();
   };
 
-  const chains = check === 'builder' ? builderDaoChains : daoChains;
+  const chains = check === 'builder' ? builderDaoChains : check === 'moloch' ? daoChains : hatsProtocolChains;
 
   return (
     <>
@@ -58,31 +58,41 @@ export function TokenGateCommunities() {
           ))}
         </Select>
       </FieldWrapper>
-      {check === 'guild' ? (
+      {check === 'guild' && (
         <TextInputField
           label='Guild Id or Url'
           error={errors.guild?.message}
           helperText={errors.guild?.message}
           {...register('guild')}
         />
-      ) : check ? (
-        <>
-          <TokenGateBlockchainSelect
-            error={!!errors.chain?.message}
-            helperMessage={errors.chain?.message}
-            chains={chains}
-            {...register('chain', {
-              deps: ['check']
-            })}
-          />
-          <TextInputField
-            label='Contract Address'
-            error={errors.contract?.message}
-            helperText={errors.contract?.message}
-            {...register('contract')}
-          />
-        </>
-      ) : null}
+      )}
+      {['builder', 'moloch', 'hats'].includes(check) && (
+        <TokenGateBlockchainSelect
+          error={!!errors.chain?.message}
+          helperMessage={errors.chain?.message}
+          chains={chains}
+          {...register('chain', {
+            deps: ['check']
+          })}
+        />
+      )}
+      {['builder', 'moloch'].includes(check) && (
+        <TextInputField
+          label='Contract Address'
+          error={errors.contract?.message}
+          helperText={errors.contract?.message}
+          {...register('contract')}
+        />
+      )}
+      {check === 'hats' && (
+        <TextInputField
+          label='Hats id'
+          placeholder='0x000000000000000000000000000000000000000000000000000000000000000'
+          error={errors.tokenId?.message}
+          helperText={errors.tokenId?.message}
+          {...register('tokenId')}
+        />
+      )}
 
       <TokenGateFooter onSubmit={onSubmit} onCancel={onCancel} isValid={isValid} />
     </>

@@ -1,4 +1,4 @@
-import type { CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
+import type { AttestationType, CredentialEventType, CredentialTemplate } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { InputLabel } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -30,18 +30,24 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-function CredentialTemplateForm({
-  credentialTemplate,
-  refreshTemplates,
-  close
-}: {
+type Props = {
   credentialTemplate?: CredentialTemplate | null;
   refreshTemplates: VoidFunction;
-  close: () => void;
-}) {
+  newCredentialTemplateType?: AttestationType | null;
+  onClose: () => void;
+};
+
+const defaultEventValues: Record<AttestationType, CredentialEventType[]> = {
+  proposal: ['proposal_created', 'proposal_approved'],
+  reward: ['reward_submission_approved']
+};
+
+function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCredentialTemplateType, onClose }: Props) {
   const { space } = useCurrentSpace();
   const [isSaving, setIsSaving] = useState(false);
   const { showMessage } = useSnackbar();
+
+  const templateType = credentialTemplate?.schemaType ?? (newCredentialTemplateType as AttestationType);
 
   const {
     register,
@@ -56,11 +62,13 @@ function CredentialTemplateForm({
       organization: credentialTemplate?.organization ?? space?.name,
       name: credentialTemplate?.name,
       description: credentialTemplate?.description,
-      credentialEvents: credentialTemplate?.credentialEvents ?? []
+      credentialEvents: credentialTemplate?.credentialEvents ?? defaultEventValues[templateType]
     },
     // mode: 'onChange',
     resolver: yupResolver(schema)
   });
+
+  const selectedCredentialEvents = watch('credentialEvents');
 
   const onChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
@@ -76,7 +84,7 @@ function CredentialTemplateForm({
         await charmClient.credentials.createCredentialTemplate({
           ...formValues,
           description: formValues.description ?? '',
-          schemaType: 'proposal',
+          schemaType: newCredentialTemplateType as AttestationType,
           spaceId: space?.id as string,
           schemaAddress: schemaId,
           credentialEvents: formValues.credentialEvents as CredentialEventType[]
@@ -88,14 +96,12 @@ function CredentialTemplateForm({
         });
       }
       refreshTemplates();
-      close?.();
+      onClose?.();
     } catch (err: any) {
       showMessage(err.message ?? 'Error saving credential template');
     }
     setIsSaving(false);
   }
-
-  const selectedCredentialEvents = watch('credentialEvents');
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -140,9 +146,13 @@ function CredentialTemplateForm({
             <CredentialEventsSelector
               selectedCredentialEvents={selectedCredentialEvents as CredentialEventType[]}
               onChange={(events) => setValue('credentialEvents', events)}
+              credentialTemplateType={templateType}
             />
           </Box>
-          <ProposalCredentialPreview credential={getValues() as ProposalCredentialToPreview} />
+          <ProposalCredentialPreview
+            credentialTemplateType={templateType}
+            credential={getValues() as ProposalCredentialToPreview}
+          />
           <Stack flexDirection='row' gap={1} justifyContent='flex-end'>
             <Button loading={isSaving} size='large' type='submit' disabled={Object.keys(errors).length !== 0}>
               Save
@@ -155,26 +165,17 @@ function CredentialTemplateForm({
 }
 export function CredentialTemplateDialog({
   isOpen,
-  onClose,
-  credentialTemplate,
-  refreshTemplates
-}: {
+  ...props
+}: Props & {
   isOpen: boolean;
-  onClose: () => void;
-  credentialTemplate?: CredentialTemplate | null;
-  refreshTemplates: VoidFunction;
 }) {
   return (
     <Dialog
       open={isOpen}
-      onClose={onClose}
-      title={!credentialTemplate ? 'Create a Credential' : 'Update an existing credential'}
+      onClose={props.onClose}
+      title={!props.credentialTemplate ? 'Create a Credential' : 'Update an existing credential'}
     >
-      <CredentialTemplateForm
-        close={onClose}
-        credentialTemplate={credentialTemplate}
-        refreshTemplates={refreshTemplates}
-      />
+      <CredentialTemplateForm {...props} />
     </Dialog>
   );
 }

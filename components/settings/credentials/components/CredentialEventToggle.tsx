@@ -22,7 +22,8 @@ type LabelFn = (getFeatureTitle: (featureWord: FeatureTitleVariation) => string)
 
 const credentialDescriptionMap: Partial<Record<CredentialEventType, LabelFn>> = {
   proposal_created: (map) => `Issue when a ${map('proposal')} is published`,
-  proposal_approved: (map) => `Issue when a ${map('proposal')} is approved`
+  proposal_approved: (map) => `Issue when a ${map('proposal')} is approved`,
+  reward_submission_approved: (map) => `Issue when a ${map('reward')} is approved`
 };
 
 export function CredentialEventToggle({ checked, onChange, disabled, credentialEvent }: ToggleProps) {

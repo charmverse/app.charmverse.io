@@ -21,11 +21,13 @@ import { SummonProfileWidget } from './components/SummonProfileWidget';
 export function ProfileWidgets({
   userId,
   readOnly,
-  setActiveTab
+  setActiveTab,
+  showAllProfileTypes = false
 }: {
   setActiveTab?: Dispatch<SetStateAction<number>>;
   userId: string;
   readOnly?: boolean;
+  showAllProfileTypes?: boolean;
 }) {
   const { space } = useCurrentSpace();
   const {
@@ -70,9 +72,8 @@ export function ProfileWidgets({
 
   return (
     <Grid container spacing={4}>
-      {memberProfileTypes
-        ?.filter(({ isHidden }) => !isHidden)
-        .map(({ id }) => {
+      {(showAllProfileTypes ? memberProfileTypes : memberProfileTypes?.filter(({ isHidden }) => !isHidden))?.map(
+        ({ id }) => {
           switch (id) {
             case 'ens':
               return (
@@ -142,7 +143,8 @@ export function ProfileWidgets({
             default:
               return null;
           }
-        })}
+        }
+      )}
     </Grid>
   );
 }
