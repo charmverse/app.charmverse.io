@@ -3,7 +3,6 @@ import Select from '@mui/material/Select';
 import { builderDaoChains, daoChains, hatsProtocolChains } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
 import type { FormValues } from '../hooks/useCommunitiesForm';
@@ -59,38 +58,38 @@ export function TokenGateCommunities() {
           ))}
         </Select>
       </FieldWrapper>
-      {check === 'guild' ? (
+      {check === 'guild' && (
         <TextInputField
           label='Guild Id or Url'
           error={errors.guild?.message}
           helperText={errors.guild?.message}
           {...register('guild')}
         />
-      ) : check ? (
-        <>
-          <TokenGateBlockchainSelect
-            error={!!errors.chain?.message}
-            helperMessage={errors.chain?.message}
-            chains={chains}
-            {...register('chain', {
-              deps: ['check']
-            })}
-          />
-          <TextInputField
-            label='Contract Address'
-            error={errors.contract?.message}
-            helperText={errors.contract?.message}
-            {...register('contract')}
-          />
-        </>
-      ) : null}
+      )}
+      {['builder', 'moloch', 'hats'].includes(check) && (
+        <TokenGateBlockchainSelect
+          error={!!errors.chain?.message}
+          helperMessage={errors.chain?.message}
+          chains={chains}
+          {...register('chain', {
+            deps: ['check']
+          })}
+        />
+      )}
+      {['builder', 'moloch'].includes(check) && (
+        <TextInputField
+          label='Contract Address'
+          error={errors.contract?.message}
+          helperText={errors.contract?.message}
+          {...register('contract')}
+        />
+      )}
       {check === 'hats' && (
-        <NumberInputField
-          label='Token id'
+        <TextInputField
+          label='Hats id'
+          placeholder='0x000000000000000000000000000000000000000000000000000000000000000'
           error={errors.tokenId?.message}
           helperText={errors.tokenId?.message}
-          disableArrows
-          fullWidth
           {...register('tokenId')}
         />
       )}

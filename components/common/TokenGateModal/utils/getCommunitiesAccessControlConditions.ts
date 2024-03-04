@@ -1,6 +1,6 @@
 import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
 
-import type { FormValues } from '../hooks/useCommunitiesForm';
+import { hatsProtocolContractAddress, type FormValues } from '../hooks/useCommunitiesForm';
 
 export function getCommunitiesAccessControlConditions(values: FormValues): AccessControlCondition[] | undefined {
   const { chain = '1', contract = '', check, guild = '', tokenId } = values;
@@ -46,7 +46,7 @@ export function getCommunitiesAccessControlConditions(values: FormValues): Acces
     return [
       {
         condition: 'evm' as const,
-        contractAddress: contract,
+        contractAddress: hatsProtocolContractAddress,
         type: 'Hats',
         chain: chainId,
         method: 'balanceOf',
