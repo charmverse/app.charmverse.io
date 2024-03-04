@@ -29,7 +29,8 @@ export const nftCheck = [
 export const daoCheck = [
   { id: 'moloch', name: 'MolochDAOv2.1' },
   { id: 'builder', name: 'Builder Protocol' },
-  { id: 'guild', name: 'Guild.xyz' }
+  { id: 'guild', name: 'Guild.xyz' },
+  { id: 'hats', name: 'Hats Protocol' }
 ] as const;
 
 export const gitcoinPassportCheck = [

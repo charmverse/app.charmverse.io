@@ -27,6 +27,7 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
 
   switch (condition.type) {
     case 'Builder':
+    case 'Hats':
     case 'ERC721':
     case 'ERC1155': {
       const tokenId = condition.tokenIds.at(0) || '1';

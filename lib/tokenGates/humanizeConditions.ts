@@ -223,6 +223,20 @@ export function humanizeConditionsData(conditions: TokenGate['conditions']): Hum
           ]
         };
       }
+      case 'Hats': {
+        return {
+          image,
+          type: acc.type,
+          content: [
+            { type: 'text', content: 'Hats Protocol Id' },
+            {
+              type: 'text',
+              content: acc.tokenIds.at(0) || '',
+              props: { fontWeight: 600 }
+            }
+          ]
+        };
+      }
       default: {
         log.error('Unsupported token gate conditions', { conditions: acc });
 
