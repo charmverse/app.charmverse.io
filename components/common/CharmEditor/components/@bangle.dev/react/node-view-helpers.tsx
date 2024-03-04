@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { useEffect, useState } from 'react';
 import type { RefObject } from 'react';
 import { flushSync } from 'react-dom';
@@ -11,7 +10,7 @@ export const nodeViewUpdateStore = new WeakMap();
 type NodeViewsUpdater = (nodeViewUpdateStore: NodeView[]) => NodeView[];
 type UpdateNodeViewsFunction = (updater: NodeViewsUpdater) => void;
 
-const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
+export const nodeViewRenderHandlers = (updateNodeViews: UpdateNodeViewsFunction): RenderHandlers => ({
   create: (nodeView, _nodeViewProps) => {
     // log.debug('create', objectUid.get(nodeView), new Error().stack);
     updateNodeViews((nodeViews) => [...nodeViews, nodeView]);
