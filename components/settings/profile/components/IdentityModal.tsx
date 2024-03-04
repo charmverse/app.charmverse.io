@@ -168,7 +168,7 @@ export function UserIdentities() {
                   item.type === 'Wallet' && wallet
                     ? [
                         verifiableWalletDetected && !account ? (
-                          <MenuItem key='verify' onClick={generateWalletAuth}>
+                          <MenuItem key='verify' onClick={generateWalletAuth} disabled={isVerifyingWallet}>
                             Verify Wallet
                           </MenuItem>
                         ) : null,
