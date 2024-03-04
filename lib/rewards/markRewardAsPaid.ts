@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
 import { InvalidInputError } from 'lib/utils/errors';
 
 import { paidRewardStatuses } from './constants';
@@ -28,7 +29,7 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
     }
   });
 
-  return prisma.bounty
+  const updatedReward = await prisma.bounty
     .update({
       where: {
         id: reward.id
@@ -39,4 +40,11 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
       include: rewardWithUsersInclude()
     })
     .then(mapDbRewardToReward);
+
+  await issueRewardCredentialsIfNecessary({
+    event: 'reward_submission_approved',
+    rewardId
+  });
+
+  return updatedReward;
 }

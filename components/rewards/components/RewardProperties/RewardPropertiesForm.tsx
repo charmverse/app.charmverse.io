@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import type { ChangeEvent } from 'react';
 import { useCallback, useState } from 'react';
 
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import type { RoleOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
@@ -13,6 +14,7 @@ import { UserAndRoleSelect } from 'components/common/BoardEditor/components/prop
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
 import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
 import { DateTimePicker } from 'components/common/DateTimePicker';
+import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import {
@@ -78,6 +80,7 @@ export function RewardPropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
+  const { rewardCredentialTemplates } = useGetCredentialTemplates();
 
   const allowedSubmittersValue: RoleOption[] = (values.allowedSubmitterRoles ?? []).map((id) => ({
     id,
@@ -93,6 +96,7 @@ export function RewardPropertiesForm({
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
+  const readOnlySelectedCredentials = !isAdmin && (readOnly || !!template?.reward.selectedCredentialTemplates?.length);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -176,6 +180,12 @@ export function RewardPropertiesForm({
   const updateRewardDueDate = useCallback((date: DateTime | null) => {
     applyUpdates({
       dueDate: date?.toJSDate() || undefined
+    });
+  }, []);
+
+  const updateSelectedCredentialTemplates = useCallback((credentialTemplateIds: string[]) => {
+    applyUpdates({
+      selectedCredentialTemplates: credentialTemplateIds
     });
   }, []);
 
@@ -373,6 +383,22 @@ export function RewardPropertiesForm({
                   />
                 </Box>
               </>
+            )}
+
+            {!!rewardCredentialTemplates?.length && (
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+                <PropertyLabel readOnly highlighted>
+                  Submitter Credentials
+                </PropertyLabel>
+                <Box display='flex' flex={1}>
+                  <CredentialSelect
+                    templateType='reward'
+                    onChange={updateSelectedCredentialTemplates}
+                    readOnly={readOnlySelectedCredentials}
+                    selectedCredentialTemplates={values.selectedCredentialTemplates}
+                  />
+                </Box>
+              </Box>
             )}
 
             {/* Select authors */}
