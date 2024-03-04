@@ -36,6 +36,7 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -85,6 +86,7 @@ export function NewProposalPage({
   sourcePageId?: string;
   sourcePostId?: string;
 }) {
+  const spacePermissions = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { data: sourcePage } = useGetPage(sourcePageId);
@@ -117,6 +119,7 @@ export function NewProposalPage({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const isAdmin = useIsAdmin();
 
+  const canCreateProposal = !spacePermissions || !!spacePermissions[0]?.createProposals;
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const pendingRewards = formInputs.fields?.pendingRewards || [];
   const proposalFormFields = isStructured
@@ -147,6 +150,9 @@ export function NewProposalPage({
   let disabledTooltip = _disabledTooltip;
   if (!disabledTooltip && !isProposalFormFieldsValid) {
     disabledTooltip = 'Please provide correct values for all proposal form fields';
+  }
+  if (!canCreateProposal) {
+    disabledTooltip = 'You do not have permission to create proposal';
   }
 
   function toggleCollapse(fieldId: string) {
@@ -385,7 +391,11 @@ export function NewProposalPage({
               flexGrow={1}
             >
               <Box ref={containerWidthRef} width='100%' />
-              <PageTemplateBanner pageType={formInputs.type} isNewPage />
+              <PageTemplateBanner
+                pageType={formInputs.type}
+                isNewPage
+                customTitle={canCreateProposal ? undefined : 'Creating new proposal is disabled'}
+              />
               {formInputs.headerImage && <PageBanner headerImage={formInputs.headerImage} setPage={setFormInputs} />}
               <StyledContainer data-test='page-charmeditor' top={defaultPageTop} fullWidth={isSmallScreen}>
                 <Box minHeight={450}>
