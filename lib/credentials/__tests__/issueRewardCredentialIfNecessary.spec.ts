@@ -34,11 +34,9 @@ jest.mock('lib/credentials/queriesAndMutations', () => ({
 
 const mockedPublishSignedCredential = jest.mocked(publishSignedCredential);
 
-afterAll(() => {
-  jest.resetModules();
-  jest.resetAllMocks();
+afterEach(() => {
+  mockedPublishSignedCredential.mockClear();
 });
-
 describe('issueRewardCredentialIfNecessary', () => {
   it('should issue credentials once for a unique combination of user, reward submission and credential template', async () => {
     const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({

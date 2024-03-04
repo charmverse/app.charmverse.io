@@ -32,9 +32,8 @@ jest.mock('lib/credentials/queriesAndMutations', () => ({
 
 const mockedPublishSignedCredential = jest.mocked(publishSignedCredential);
 
-afterAll(() => {
-  jest.resetModules();
-  jest.resetAllMocks();
+afterEach(() => {
+  mockedPublishSignedCredential.mockClear();
 });
 
 describe('issueProposalCredentialIfNecessary', () => {
