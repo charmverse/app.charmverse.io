@@ -7,11 +7,11 @@ import type { Control } from 'react-hook-form';
 
 import type { FormValues } from '../SpaceSettings';
 
-export function TwoFactorAuth({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
+export function BlockchainSettings({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column'>
       <Controller
-        name='requireMembersTwoFactorAuth'
+        name='enableTestnets'
         control={control}
         render={({ field }) => (
           <FormControlLabel
@@ -20,10 +20,7 @@ export function TwoFactorAuth({ isAdmin, control }: { isAdmin: boolean; control:
             sx={{ alignItems: 'flex-start' }}
             label={
               <Box>
-                <Typography mt={1}>Require two-factor authentication</Typography>
-                <Typography variant='caption'>
-                  Require Members of this space to use a two-factor authentication app to log in.
-                </Typography>
+                <Typography mt={1}>Enable testnets</Typography>
               </Box>
             }
           />

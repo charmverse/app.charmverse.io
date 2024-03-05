@@ -62,12 +62,12 @@ export function SetupCustomDomain({
   return (
     <Stack>
       <Stack direction='row' gap={1}>
-        <FieldLabel>Custom space URL domain</FieldLabel>
+        <FieldLabel>Custom Domain</FieldLabel>
         <Stack>
           <UpgradeChip upgradeContext='custom_domain' />
         </Stack>
       </Stack>
-      <Typography variant='caption' color='text.secondary' mb={2}>
+      <Typography variant='caption' mb={2}>
         Add a custom domain you own to access your app through it. You will be prompted with further instructions after
         saving.
       </Typography>

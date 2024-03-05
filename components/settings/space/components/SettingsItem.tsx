@@ -26,7 +26,13 @@ export function SettingsItem({
 
   return (
     <ListItem
-      sx={{ justifyContent: 'space-between', gap: 1, opacity: disabled ? 0.5 : 1, ...sx }}
+      sx={{
+        justifyContent: 'space-between',
+        gap: 1,
+        cursor: disabled ? '' : 'grab',
+        opacity: disabled ? 0.5 : 1,
+        ...sx
+      }}
       disablePadding
       disableGutters
       secondaryAction={

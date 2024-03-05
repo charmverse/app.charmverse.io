@@ -84,7 +84,7 @@ export function ConnectCollabland() {
 
   if (!isAdmin) {
     return (
-      <Typography variant='body2'>Collabland is not connected yet. Only space admins can configure this.</Typography>
+      <Typography variant='body2'>Collab.Land is not connected yet. Only space admins can configure this.</Typography>
     );
   }
 
@@ -92,7 +92,7 @@ export function ConnectCollabland() {
     <Stack>
       <Stack direction='row' gap={2} justifyContent='space-between' alignItems='center'>
         <Typography variant='body2'>
-          To connect your space with collabland you will need to install mini app in Collabland's marketplace
+          To connect your space with Collab.Land, you will need to install our mini-app in their marketplace
         </Typography>
 
         <Stack>

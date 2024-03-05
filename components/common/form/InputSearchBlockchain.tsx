@@ -4,9 +4,10 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import type { IChainDetails } from 'connectors/chains';
-import { RPCList, getChainById } from 'connectors/chains';
+import { getChainList, getChainById } from 'connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isTruthy } from 'lib/utils/types';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
@@ -18,7 +19,6 @@ interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, tru
   chains?: number[];
   fullWidth?: boolean;
 }
-
 export function InputSearchBlockchain({
   defaultChainId,
   chainId,
@@ -31,10 +31,13 @@ export function InputSearchBlockchain({
   fullWidth
 }: Props) {
   const [value, setValue] = useState<IChainDetails | null>(null);
+  const { space } = useCurrentSpace();
 
   const options = useMemo(() => {
-    return chains ? chains.map((chain) => getChainById(chain)).filter(isTruthy) : RPCList;
-  }, [chains]);
+    return chains
+      ? chains.map((chain) => getChainById(chain)).filter(isTruthy)
+      : getChainList({ enableTestnets: !!space?.enableTestnets });
+  }, [chains, space?.enableTestnets]);
 
   useEffect(() => {
     if (defaultChainId && !value) {

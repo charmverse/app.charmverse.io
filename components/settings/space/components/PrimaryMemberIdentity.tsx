@@ -14,7 +14,7 @@ type Props = {
   primaryIdentity?: IdentityType;
 };
 
-export function SpacePrimaryIdentity({ primaryIdentity, register, disabled }: Props) {
+export function PrimaryMemberIdentity({ primaryIdentity, register, disabled }: Props) {
   return (
     <>
       <FieldLabel>Primary Identity</FieldLabel>

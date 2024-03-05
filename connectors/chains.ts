@@ -17,6 +17,7 @@ import {
   mantle,
   mantleTestnet,
   optimism,
+  optimismSepolia,
   polygon,
   polygonZkEvm,
   polygonMumbai,
@@ -27,8 +28,7 @@ import {
   taikoTestnetSepolia
 } from 'viem/chains';
 
-import { isProdEnv } from 'config/constants';
-import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
+import { isDevEnv } from 'config/constants';
 import { uniqueValues } from 'lib/utils/array';
 
 export interface IChainDetails {
@@ -71,7 +71,7 @@ const EVM_DEFAULT = {
  * EIP-155 specifies developer and transaction shortnames for each network. You can find the list here
  * https://github.com/ethereum-lists/chains/tree/master/_data/chains
  */
-const RPC: Record<string, IChainDetails> = {
+export const RPC: Record<string, IChainDetails> = {
   ETHEREUM: {
     ...EVM_DEFAULT,
     chainId: mainnet.id,
@@ -126,6 +126,18 @@ const RPC: Record<string, IChainDetails> = {
     shortName: 'oeth',
     unlockNetwork: true,
     hypersubNetwork: true
+  },
+  OPTIMISM_SEPOLIA: {
+    ...EVM_DEFAULT,
+    chainId: optimismSepolia.id,
+    viem: optimismSepolia,
+    chainName: 'Optimism - Sepolia',
+    alchemyUrl: 'https://opt-sepolia.g.alchemy.com',
+    rpcUrls: optimismSepolia.rpcUrls.default.http,
+    blockExplorerUrls: [optimismSepolia.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/optimism.svg',
+    shortName: 'oeth-sepolia',
+    testnet: true
   },
   // https://docs.base.org/network-information/
   BASE: {
@@ -438,21 +450,46 @@ const RPC: Record<string, IChainDetails> = {
   }
 } as const;
 
+export const daoChains: IChainDetails['shortName'][] = ['eth', 'arb1', 'oeth', 'matic', 'gno'];
+
+export const hatsProtocolChains: IChainDetails['shortName'][] = [
+  'eth',
+  'arb1',
+  'oeth',
+  'matic',
+  'gno',
+  'sep',
+  'celo',
+  'base'
+];
+
+export const builderDaoChains: IChainDetails['shortName'][] = ['eth', 'base', 'oeth', 'zora'];
+
 export type Blockchain = keyof typeof RPC;
 
-export const RPCList = Object.values(RPC)
-  // filter out testnets in prod, except for Goerli and Sepolia
-  .filter((chain) => !isProdEnv || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id);
+export function getChainList(options: { enableTestnets?: boolean } = {}) {
+  const enableTestNets = isDevEnv || options.enableTestnets;
+  return (
+    Object.values(RPC)
+      // filter out testnets in prod, except for Goerli and Sepolia
+      .filter(
+        (chain) => enableTestNets || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id
+      )
+      .sort(sortChainList)
+  );
+}
+
+const allChains = getChainList({ enableTestnets: true });
 
 export function getChainShortname(chainId: string | number): string {
   const parsedChainId = parseInt(chainId.toString());
-  return RPCList.find((chain) => chain.chainId === parsedChainId)?.shortName ?? '';
+  return allChains.find((chain) => chain.chainId === parsedChainId)?.shortName ?? '';
 }
 
 export type CryptoCurrency = (typeof RPC)[Blockchain]['nativeCurrency']['symbol'];
 
 export const CryptoCurrencies = uniqueValues<CryptoCurrency>(
-  RPCList.map((chain) => {
+  allChains.map((chain) => {
     return chain.nativeCurrency.symbol as CryptoCurrency;
   })
 );
@@ -480,11 +517,11 @@ export interface IPairQuote extends ICurrencyPair {
 }
 
 export function getChainById(chainId: number): IChainDetails | undefined {
-  return RPCList.find((rpc) => rpc.chainId.toString() === chainId.toString());
+  return allChains.find((rpc) => rpc.chainId.toString() === chainId.toString());
 }
 
 export function getChainBySymbol(tokenSymbol: string): IChainDetails | undefined {
-  return RPCList.find((rpc) => rpc.nativeCurrency.symbol === tokenSymbol);
+  return allChains.find((rpc) => rpc.nativeCurrency.symbol === tokenSymbol);
 }
 
 export function getChainExplorerLink(
@@ -503,22 +540,6 @@ export function getChainExplorerLink(
   log.warn('Mising chain explorer link for network', { chainId, endpoint });
   return '';
 }
-
-export const ercSupportedChains = RPCList.filter((chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId)).sort(
-  sortChainList
-);
-
-export const daoChains = RPCList.filter((chain) => ['eth', 'arb1', 'oeth', 'matic', 'gno'].includes(chain.shortName));
-
-export const hatsProtocolChains = RPCList.filter((chain) =>
-  ['eth', 'arb1', 'oeth', 'matic', 'gno', 'sep', 'celo', 'base'].includes(chain.shortName)
-);
-
-export const builderDaoChains = RPCList.filter((chain) => ['eth', 'base', 'oeth', 'zora'].includes(chain.shortName));
-
-export const unlockChains = RPCList.filter((chain) => !!chain.unlockNetwork).sort(sortChainList);
-
-export const hypersubChains = RPCList.filter((chain) => !!chain.hypersubNetwork).sort(sortChainList);
 
 function sortChainList<T extends IChainDetails>(a: T, b: T) {
   const isMainnet = (chain: T) => !chain.testnet;

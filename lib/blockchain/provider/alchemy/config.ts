@@ -1,7 +1,9 @@
-import { RPCList } from 'connectors/chains';
+import { getChainList } from 'connectors/chains';
 
-export const supportedChains = RPCList.filter((chain) => chain.alchemyUrl);
-export const supportedChainIds = RPCList.map((chain) => chain.chainId);
+const chainList = getChainList({ enableTestnets: true });
+
+export const supportedChains = chainList.filter((chain) => chain.alchemyUrl);
+export const supportedChainIds = chainList.map((chain) => chain.chainId);
 export type SupportedChainId = (typeof supportedChainIds)[number];
 export const supportedMainnets: SupportedChainId[] = supportedChains
   .filter((chain) => !chain.testnet)

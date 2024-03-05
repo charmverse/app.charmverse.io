@@ -4,6 +4,7 @@ import type { Signer } from 'ethers';
 import { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSafesForAddresses } from 'lib/gnosis/gnosis';
 
 import useMultiWalletSigs from './useMultiWalletSigs';
@@ -13,6 +14,7 @@ import { useUser } from './useUser';
 export function useImportSafes() {
   const { data, mutate } = useMultiWalletSigs();
   const { user } = useUser();
+  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const [isLoadingSafes, setIsLoadingSafes] = useState(false);
 
@@ -29,6 +31,7 @@ export function useImportSafes() {
       try {
         await importSafesFromWallet({
           addresses: user.wallets.map((w) => w.address),
+          enableTestnets: space?.enableTestnets ?? false,
           getWalletDetails
         });
         await mutate();
@@ -46,11 +49,12 @@ export function useImportSafes() {
 
 type ImportSafeProps = {
   addresses: string[];
+  enableTestnets: boolean;
   getWalletDetails: (address: string) => UserGnosisSafe | null | undefined;
 };
 
-async function importSafesFromWallet({ addresses, getWalletDetails }: ImportSafeProps) {
-  const safes = await getSafesForAddresses(addresses);
+async function importSafesFromWallet({ addresses, enableTestnets, getWalletDetails }: ImportSafeProps) {
+  const safes = await getSafesForAddresses(addresses, enableTestnets);
 
   const safesData = safes.map((safe) => ({
     address: safe.address,
