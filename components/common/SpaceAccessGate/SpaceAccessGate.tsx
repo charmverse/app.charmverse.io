@@ -9,7 +9,7 @@ import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 import { getSpaceUrl } from 'lib/utils/browser';
 
@@ -66,10 +66,10 @@ export function SpaceAccessGate({
     }
   }
 
-  async function onWalletSignature(authSig: AuthSig) {
+  async function evaluateUserWallet() {
     if (!user) {
       try {
-        await loginFromWeb3Account(authSig);
+        await loginFromWeb3Account();
       } catch (err: any) {
         showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
         return;
@@ -100,6 +100,7 @@ export function SpaceAccessGate({
 
   const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
   const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
+  const isVerifying = summonGate.isVerifying || tokenGate.isVerifying || discordGate.isVerifying;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
   const noGateConditions =
@@ -161,11 +162,9 @@ export function SpaceAccessGate({
 
       {walletGateEnabled && !isVerified && (
         <Box mb={2}>
-          <WalletSign
-            loading={summonGate.isVerifying}
-            signSuccess={onWalletSignature}
-            buttonStyle={{ width: '100%' }}
-          />
+          <PrimaryButton fullWidth loading={isVerifying} disabled={isVerifying} onClick={evaluateUserWallet}>
+            Verify
+          </PrimaryButton>
         </Box>
       )}
       {walletGateEnabled &&

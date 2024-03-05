@@ -7,12 +7,11 @@ import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { isTouchScreen } from 'lib/utils/browser';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 interface Props {
-  signSuccess: (authSig: AuthSig) => void | Promise<any>;
+  signSuccess: (data: SignatureVerificationPayload) => Promise<any>;
   buttonStyle?: SxProps<Theme>;
   ButtonComponent?: typeof Button;
   buttonSize?: 'small' | 'medium' | 'large';
@@ -40,7 +39,7 @@ export function WalletSign({
   children
 }: Props) {
   const { connectWallet, isWalletSelectorModalOpen } = useWeb3ConnectionManager();
-  const { account, requestSignature, isSigning, walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
+  const { isSigning, requestSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isVerifyingWallet, setIsVerifyingWallet] = useState(false);
   const showLoadingState = loading || isSigning || isVerifyingWallet;
@@ -55,21 +54,16 @@ export function WalletSign({
   async function generateWalletAuth() {
     onClick?.();
     setIsVerifyingWallet(true);
-    if (account && walletAuthSignature && lowerCaseEqual(walletAuthSignature.address, account)) {
-      await signSuccess(walletAuthSignature);
-      setIsVerifyingWallet(false);
-    } else {
-      requestSignature()
-        .then(signSuccess)
-        .catch((error) => {
-          log.error('Error requesting wallet signature in login page', { error });
-          showMessage(error?.message || 'Wallet signature cancelled', 'info');
-          onError?.(error);
-        })
-        .finally(() => {
-          setIsVerifyingWallet(false);
-        });
-    }
+    requestSignature()
+      .then(signSuccess)
+      .catch((error) => {
+        log.error('Error requesting wallet signature in login page', { error });
+        showMessage(error?.message || 'Wallet signature cancelled', 'info');
+        onError?.(error);
+      })
+      .finally(() => {
+        setIsVerifyingWallet(false);
+      });
   }
 
   if (!verifiableWalletDetected) {

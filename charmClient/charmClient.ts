@@ -14,7 +14,7 @@ import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
-import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
@@ -114,7 +114,7 @@ class CharmClient {
     return http.GET<SocketAuthResponse>('/api/socket');
   }
 
-  updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
+  updateUser(data: Partial<User>) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
@@ -128,10 +128,6 @@ class CharmClient {
 
   updateUserDetails(data: Partial<UserDetails>) {
     return http.PUT<UserDetails>('/api/profile/details', data);
-  }
-
-  addUserWallets(data: AuthSig[]) {
-    return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
   }
 
   getPublicPageByViewId(viewId: string) {

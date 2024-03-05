@@ -101,7 +101,7 @@ export function InputSearchBlockchain({
 function IconLogo({ src, ...props }: { src?: string } & BoxProps) {
   return (
     <Box width='1em' height='1em' display='flex' justifyContent='center' {...props}>
-      <img src={src} style={{ height: '1em', marginRight: '0.5em' }} className='lsm-chain-selector-options-icons' />
+      <img src={src} style={{ height: '1em', marginRight: '0.5em' }} />
     </Box>
   );
 }
