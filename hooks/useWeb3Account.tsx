@@ -7,13 +7,12 @@ import type { ReactNode } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { SiweMessage } from 'siwe';
 import { mutate } from 'swr';
-import { getAddress, recoverMessageAddress } from 'viem';
+import { getAddress } from 'viem';
 import type { ConnectorData } from 'wagmi';
 import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
-import { verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
 import type {
   SignatureVerificationPayload,
   SignatureVerificationPayloadWithAddress
@@ -102,21 +101,6 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
         message: body
       });
 
-      const [signatureAddress, isValidGnosisSafeSignature] = await Promise.all([
-        recoverMessageAddress({
-          message: body,
-          signature
-        }),
-        verifyEIP1271Signature({
-          message,
-          signature,
-          address: account
-        })
-      ]);
-
-      if (!lowerCaseEqual(signatureAddress, account) && !isValidGnosisSafeSignature) {
-        throw new Error('Signature address does not match account');
-      }
       setIsSigning(false);
 
       return { message, signature, address: account } as SignatureVerificationPayloadWithAddress;
