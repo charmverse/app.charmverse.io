@@ -17,10 +17,5 @@ export function useFarcasterFrameAction() {
 }
 
 export function useCreateFarcasterSigner() {
-  return usePOST<
-    {
-      publicKey: `0x${string}`;
-    },
-    FarcasterSignerResponse
-  >('/api/farcaster/signer');
+  return usePOST<{ publicKey: `0x${string}` } | undefined, FarcasterSignerResponse>('/api/farcaster/signer');
 }
