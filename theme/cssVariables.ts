@@ -80,11 +80,6 @@ const globalCSS = css`
     --button-danger-bg-rgb: 210, 75, 78;
   }
 
-  /* lit protocol */
-  .lsm-light-theme {
-    --lsm-accent-color: ${colors.blueColor};
-  }
-
   /* dark theme */
   [data-theme='dark'] {
     ${Object.entries(colors.colors).map(

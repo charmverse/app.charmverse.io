@@ -2,11 +2,13 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { InvalidInputError } from 'lib/utils/errors';
 
 import type { RewardCreationData } from '../createReward';
 import { createReward } from '../createReward';
+import type { Reward, RewardWithUsers } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -34,6 +36,8 @@ describe('createReward', () => {
       { id: reviewerRole.id, group: 'role' }
     ];
 
+    const credentialTemplateId = uuid();
+
     const rewardData: RewardCreationData = {
       spaceId: space.id,
       userId: user.id,
@@ -49,12 +53,13 @@ describe('createReward', () => {
         title: 'reward page'
       },
       reviewers,
-      allowedSubmitterRoles: [submitterRole.id]
+      allowedSubmitterRoles: [submitterRole.id],
+      selectedCredentialTemplates: [credentialTemplateId]
     };
 
     const { reward } = await createReward(rewardData);
 
-    expect(reward).toMatchObject({
+    expect(reward).toMatchObject<Partial<RewardWithUsers>>({
       chainId: 2,
       rewardAmount: 100,
       rewardToken: 'ETH',
@@ -65,7 +70,8 @@ describe('createReward', () => {
       fields: { fieldName: 'sampleField', type: 'text' },
       reviewers: expect.arrayContaining(reviewers),
       allowedSubmitterRoles: [submitterRole.id],
-      assignedSubmitters: null
+      assignedSubmitters: null,
+      selectedCredentialTemplates: [credentialTemplateId]
     });
   });
 

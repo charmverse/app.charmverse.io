@@ -1,6 +1,7 @@
+import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
+
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { IPropertyOption } from 'lib/focalboard/board';
 
 // import { EmptyPlaceholder } from './EmptyPlaceholder';
@@ -9,12 +10,16 @@ type CredentialsSelectProps = {
   onChange: (selectedCredentialTemplates: string[]) => void;
   selectedCredentialTemplates?: string[] | null;
   readOnly?: boolean;
+  templateType: AttestationType;
 };
 
-export function CredentialSelect({ onChange, selectedCredentialTemplates, readOnly }: CredentialsSelectProps) {
-  const { space } = useCurrentSpace();
-
-  const { data: credentialTemplates } = useGetCredentialTemplates({ spaceId: space?.id });
+export function CredentialSelect({
+  onChange,
+  selectedCredentialTemplates,
+  readOnly,
+  templateType
+}: CredentialsSelectProps) {
+  const { credentialTemplates, proposalCredentialTemplates, rewardCredentialTemplates } = useGetCredentialTemplates();
 
   function _onChange(val: string | string[]) {
     if (Array.isArray(val)) {
@@ -32,6 +37,14 @@ export function CredentialSelect({ onChange, selectedCredentialTemplates, readOn
     return null;
   }
 
+  const options = (
+    templateType === 'proposal'
+      ? proposalCredentialTemplates
+      : templateType === 'reward'
+      ? rewardCredentialTemplates
+      : []
+  ) as CredentialTemplate[];
+
   return (
     <TagSelect
       onChange={_onChange}
@@ -42,9 +55,7 @@ export function CredentialSelect({ onChange, selectedCredentialTemplates, readOn
       readOnly={readOnly}
       readOnlyMessage='You cannot add a credential'
       noOptionsText='No credentials found'
-      options={credentialTemplates?.map(
-        (template) => ({ id: template.id, color: 'gray', value: template.name } as IPropertyOption)
-      )}
+      options={options.map((template) => ({ id: template.id, color: 'gray', value: template.name } as IPropertyOption))}
       emptyMessage='+ Add a credential'
     />
   );

@@ -6,14 +6,12 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import { useCreateUser } from 'charmClient/hooks/profile';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { SpaceBanModal } from 'components/common/SpaceAccessGate/SpaceBanModal';
 import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import { getSpaceUrl } from 'lib/utils/browser';
 
 import { CenteredBox } from './components/CenteredBox';
@@ -25,18 +23,10 @@ export type Props = {
 
 export default function InvitationPage({ invite, space }: Props) {
   const { user } = useUser();
-  const { walletAuthSignature, verifiableWalletDetected } = useWeb3Account();
   const { showMessage } = useSnackbar();
   const [isBannedFromSpace, setIsBannedFromSpace] = useState(false);
-  const { trigger: createUser } = useCreateUser();
   async function joinSpace() {
     try {
-      if (!user && verifiableWalletDetected && walletAuthSignature) {
-        await createUser({
-          address: walletAuthSignature.address,
-          walletSignature: walletAuthSignature
-        });
-      }
       await charmClient.acceptInvite({ id: invite.id });
 
       let redirectUrl = getSpaceUrl(space);

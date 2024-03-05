@@ -44,6 +44,7 @@ export async function createReward({
   fields,
   reviewers,
   pageProps,
+  selectedCredentialTemplates,
   allowMultipleApplications,
   proposalId
 }: RewardCreationData) {
@@ -95,6 +96,7 @@ export async function createReward({
     rewardAmount,
     rewardToken,
     customReward,
+    selectedCredentialTemplates,
     allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications,
     proposal: proposalId
       ? {

@@ -200,13 +200,13 @@ export function humanizeConditionsData(conditions: TokenGate['conditions']): Hum
         };
       }
       case 'Guildxyz': {
-        // Guild - ${guildIdOrUrl}
+        // Guild.xyz ${guildIdOrUrl}
         return {
           image,
           type: acc.type,
           content: [
             { type: 'text', content: 'Guild.xyz' },
-            { type: 'text', content: acc.tokenIds.at(0) || '', props: { fontWeight: 600 } }
+            { type: 'text', content: acc.name || acc.tokenIds.at(0) || '', props: { fontWeight: 600 } }
           ]
         };
       }
@@ -219,6 +219,20 @@ export function humanizeConditionsData(conditions: TokenGate['conditions']): Hum
             {
               type: 'text',
               content: tokenNameOrEtherscanUrl.type === 'text' ? tokenNameOrEtherscanUrl.content : 'Membership'
+            }
+          ]
+        };
+      }
+      case 'Hats': {
+        return {
+          image,
+          type: acc.type,
+          content: [
+            { type: 'text', content: 'Hats Protocol Id' },
+            {
+              type: 'text',
+              content: acc.tokenIds.at(0) || '',
+              props: { fontWeight: 600 }
             }
           ]
         };

@@ -5,7 +5,7 @@ import { createPublicClient, http } from 'viem';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
 
 import { getAnkrBaseUrl } from './provider/ankr/client';
-import { isAnkrChain, supportedChainIds as supportedAnkrChainIds, type SupportedChainId } from './provider/ankr/config';
+import { isAnkrChain } from './provider/ankr/config';
 
 /**
  * Create a viem public client for a given chain.
@@ -20,7 +20,7 @@ export const getPublicClient = (chainId: number) => {
   const chainDetails = getChainById(chainId);
 
   if (!chainDetails) {
-    throw new InvalidInputError('Chain not supported');
+    throw new InvalidInputError(`Chain id ${chainId} not supported`);
   }
 
   const provider = chainDetails.alchemyUrl

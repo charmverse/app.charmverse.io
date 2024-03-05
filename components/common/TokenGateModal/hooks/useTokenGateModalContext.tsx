@@ -105,10 +105,6 @@ export function TokenGateModalProvider({
     onSuccess();
   };
 
-  const onSubmit = async () => {
-    await createAccessControlConditions();
-  };
-
   /**
    * Use this function to delete conditions
    */
@@ -132,7 +128,7 @@ export function TokenGateModalProvider({
 
   const value: IContext = useMemo(
     () => ({
-      onSubmit,
+      onSubmit: createAccessControlConditions,
       onDelete,
       resetModal,
       setDisplayedPage,

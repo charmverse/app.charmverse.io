@@ -5,7 +5,12 @@ import type { EditorView } from 'prosemirror-view';
 
 import { BangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import { BangleEditorState } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';
+import {
+  resetRenderHandlersCache,
+  saveRenderHandlers
+} from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import { nodeViewRenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/react/node-view-helpers';
 
 const mountedEditors = new Set<BangleEditor>();
 if (typeof afterEach === 'function') {
@@ -14,6 +19,7 @@ if (typeof afterEach === 'function') {
       editor.destroy();
       mountedEditors.delete(editor);
     });
+    resetRenderHandlersCache();
   });
 }
 
@@ -46,6 +52,10 @@ export function renderTestEditor(
 
     const view = editor.view;
     mountedEditors.add(editor);
+    saveRenderHandlers(
+      view.dom.parentNode as HTMLElement,
+      nodeViewRenderHandlers(() => {})
+    );
 
     if (testDoc) {
       updateDoc(testDoc);

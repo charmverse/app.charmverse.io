@@ -6,6 +6,8 @@ import type { Formatters, PropertyContext } from 'components/common/BoardEditor/
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import { CardFilter } from 'lib/focalboard/cardFilter';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utils/dates';
 
@@ -17,10 +19,12 @@ import { getRelationPropertiesCardsRecord } from './getRelationPropertiesCardsRe
 
 export async function loadAndGenerateCsv({
   databaseId,
-  userId
+  userId,
+  customFilter
 }: {
   databaseId?: string;
   userId: string;
+  customFilter?: FilterGroup | null;
 }): Promise<{ csvData: string; childPageIds: string[] }> {
   if (!databaseId) {
     throw new InvalidInputError('databaseId is required');
@@ -99,9 +103,15 @@ export async function loadAndGenerateCsv({
   });
 
   const boardBlock = boardBlocks.find((block) => block.type === 'board');
-  const viewBlock =
-    boardBlocks.find((block) => block.type === 'view' && (block.fields as BoardViewFields).viewType === 'table') ??
-    boardBlocks[0];
+
+  const viewBlocks = boardBlocks.filter((block) => block.type === 'view');
+  const viewBlock: BoardView = (viewBlocks.find((block) => (block.fields as BoardViewFields).viewType === 'table') ||
+    viewBlocks[0] ||
+    boardBlocks[0]) as unknown as BoardView;
+
+  if (customFilter && viewBlock?.fields) {
+    viewBlock.fields.filter = customFilter;
+  }
 
   const spaceMembers = await prisma.user
     .findMany({
@@ -241,6 +251,9 @@ export function generateTableArray(
   const rows: string[][] = [];
   const cardProperties = board.fields.cardProperties as IPropertyTemplate[];
 
+  const filterGroup = viewToExport.fields.filter || { filters: [] };
+  const filteredCards = CardFilter.applyFilterGroup(filterGroup, cardProperties, cards) || [];
+
   if (
     viewToExport.fields.viewType === 'calendar' &&
     viewToExport.fields.dateDisplayPropertyId &&
@@ -262,7 +275,7 @@ export function generateTableArray(
   });
   rows.push(row);
 
-  cards.forEach((card) => {
+  filteredCards.forEach((card) => {
     const rowColumns = getCSVColumns({
       card,
       context,
