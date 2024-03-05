@@ -34,8 +34,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       spaceId,
       id: {
         in: accessiblePageIds
-      },
-      type: filter === 'not_card' ? { not: 'card' } : undefined
+      }
     },
     select: {
       id: true,
