@@ -23,15 +23,26 @@ export const getPublicClient = (chainId: number) => {
     throw new InvalidInputError('Chain not supported');
   }
 
-  const provider = chainDetails.alchemyUrl
-    ? getAlchemyBaseUrl(chainDetails.chainId)
-    : isAnkrChain(chainId)
-    ? getAnkrBaseUrl(chainId)
-    : chainDetails.rpcUrls[0];
+  let providerUrl: string | null = null;
+
+  try {
+    providerUrl = chainDetails.alchemyUrl
+      ? getAlchemyBaseUrl(chainDetails.chainId)
+      : isAnkrChain(chainId)
+      ? getAnkrBaseUrl(chainId)
+      : chainDetails.rpcUrls[0];
+  } catch (err) {
+    if (!providerUrl && !chainDetails.rpcUrls.length) {
+      throw new InvalidInputError('No RPC url available for the chain');
+    } else {
+      providerUrl = chainDetails.rpcUrls[0];
+    }
+  }
+
   const chain = chainDetails.viem;
 
   return createPublicClient({
     chain,
-    transport: http(provider)
+    transport: http(providerUrl)
   });
 };
