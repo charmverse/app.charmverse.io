@@ -14,7 +14,7 @@ export function TokenGateUnlockProtocol() {
     formState: { errors }
   } = useFormContext<FormValues>();
   const { space } = useCurrentSpace();
-  const chains = getChainList({ enableTestnets: !!space?.enableTestnets }).filter((chain) => !!chain.hypersubNetwork);
+  const chains = getChainList({ enableTestnets: !!space?.enableTestnets }).filter((chain) => !!chain.unlockNetwork);
 
   return (
     <>
