@@ -5,7 +5,6 @@ import type { KeyedMutator } from 'swr';
 import charmClient from 'charmClient';
 import { useGetProposalsBySpace } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
@@ -22,7 +21,6 @@ type ProposalsContextType = {
 export const ProposalsContext = createContext<ProposalsContextType | null>(null);
 
 export function ProposalsProvider({ children }: { children: ReactNode }) {
-  const { loadingPages } = usePages();
   const { space } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
 
@@ -75,11 +73,11 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
     () => ({
       proposals,
       mutateProposals,
-      isLoading: isLoading || loadingPages,
+      isLoading,
       updateProposal,
       proposalsMap
     }),
-    [isLoading, loadingPages, mutateProposals, proposals, updateProposal]
+    [isLoading, mutateProposals, proposals, proposalsMap, updateProposal]
   );
 
   return <ProposalsContext.Provider value={value}>{children}</ProposalsContext.Provider>;

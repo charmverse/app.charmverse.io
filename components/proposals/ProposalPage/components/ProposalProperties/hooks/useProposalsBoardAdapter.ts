@@ -1,7 +1,6 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
@@ -10,7 +9,6 @@ import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockTypes } from 'lib/focalboard/block';
 import type { Board } from 'lib/focalboard/board';
@@ -32,40 +30,14 @@ import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 
-export type BoardProposal = { createdAt: string; spaceId?: string; id?: string; fields: ProposalFields | null };
-
 export function useProposalsBoardAdapter() {
-  const [boardProposal, setBoardProposal] = useState<BoardProposal | null>(null);
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
-  const { proposals, mutateProposals, isLoading: isProposalsLoading } = useProposals();
-  const { pages, loadingPages: isPagesLoading } = usePages();
+  const { proposals, proposalsMap, mutateProposals, isLoading: isProposalsLoading } = useProposals();
+  // const { pages, loadingPages: isPagesLoading } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
-  const proposalPage = pages[boardProposal?.id || ''];
-  const proposalData = proposals?.find((p) => p.id === boardProposal?.id);
 
-  const proposal: ProposalWithUsersLite = {
-    authors: [],
-    currentStep: { title: '', step: 'draft', id: '', index: 0, result: 'in_progress' },
-    reviewers: [],
-    evaluations: [],
-    id: '',
-    createdAt: '',
-    createdBy: '',
-    status: 'draft',
-    spaceId: '',
-    ...boardProposal,
-    ...proposalData,
-    fields: {
-      ...proposalData?.fields,
-      properties: {
-        ...proposalData?.fields?.properties,
-        ...boardProposal?.fields?.properties
-      }
-    },
-    rewardIds: []
-  };
-  const isLoading = isProposalsLoading || isPagesLoading;
+  const isLoading = isProposalsLoading;
 
   const localViewSettings = useLocalDbViewSettings(`proposals-${space?.id}-${DEFAULT_VIEW_BLOCK_ID}`);
 
@@ -110,15 +82,9 @@ export function useProposalsBoardAdapter() {
     let cards =
       proposals
         ?.map((p) => {
-          const page = pages[p?.id];
           const isStructuredProposal = !!p.formId;
           return {
-            ...mapProposalToCardPage({
-              proposal: p,
-              proposalPage: page,
-              spaceId: space?.id,
-              createdAt: page?.createdAt.toString()
-            }),
+            ...mapProposalToCardPage({ proposal: p, spaceId: space?.id }),
             isStructuredProposal,
             proposal: {
               archived: p.archived,
@@ -126,7 +92,7 @@ export function useProposalsBoardAdapter() {
               id: p.id,
               status: p.status,
               currentStep: p.currentStep,
-              sourceTemplateId: page?.sourceTemplateId,
+              sourceTemplateId: p.templateId,
               evaluations: p.evaluations,
               hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
             }
@@ -170,7 +136,6 @@ export function useProposalsBoardAdapter() {
     localViewSettings?.localFilters,
     localViewSettings?.localSort,
     membersRecord,
-    pages,
     proposals,
     space?.id
   ]);
@@ -181,14 +146,6 @@ export function useProposalsBoardAdapter() {
     evaluationStepTitles
   });
 
-  // card from current proposal
-  const { card } = mapProposalToCardPage({
-    proposal,
-    proposalPage,
-    createdAt: proposalPage?.createdAt?.toString() || boardProposal?.createdAt,
-    spaceId: space?.id || ''
-  });
-
   // each proposal with fields reflects a card
   const cards: Card[] = cardPages.map((cp) => cp.card);
 
@@ -197,41 +154,34 @@ export function useProposalsBoardAdapter() {
   return {
     board,
     boardCustomProperties,
-    card,
     cards,
     cardPages,
+    proposalsMap,
     activeView,
     isLoading,
     refreshProposals: mutateProposals,
-    views,
-    proposalPage,
-    boardProposal,
-    setBoardProposal
+    views
   };
 }
 
 // build mock card from proposal and page data
-function mapProposalToCardPage({
+export function mapProposalToCardPage({
   proposal,
-  proposalPage,
-  createdAt = new Date().toString(),
   spaceId
 }: {
-  proposal: ProposalWithUsersLite | null;
-  proposalPage?: PageMeta;
-  createdAt?: string;
+  proposal: ProposalWithUsersLite;
   spaceId?: string;
-}) {
-  const proposalFields: ProposalFields = proposal?.fields || { properties: {} };
-  const proposalSpaceId = proposal?.spaceId || spaceId || '';
+}): CardPage<ProposalPropertyValue> {
+  const proposalFields: ProposalFields = proposal.fields || { properties: {} };
+  const proposalSpaceId = spaceId || '';
   proposalFields.properties = {
     ...proposalFields.properties,
-    [Constants.titleColumnId]: proposalPage?.title || '',
+    [Constants.titleColumnId]: proposal.title,
     // add default field values on the fly
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal?.archived ? 'archived' : proposal?.currentStep?.result ?? 'in_progress',
+    [PROPOSAL_STATUS_BLOCK_ID]: proposal.archived ? 'archived' : proposal.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    [PROPOSAL_STEP_BLOCK_ID]: proposal?.currentStep?.title ?? 'Draft',
-    [PROPOSAL_EVALUATION_TYPE_ID]: proposal?.currentStep?.step ?? 'draft',
+    [PROPOSAL_STEP_BLOCK_ID]: proposal.currentStep?.title ?? 'Draft',
+    [PROPOSAL_EVALUATION_TYPE_ID]: proposal.currentStep?.step ?? 'draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
         ? proposal.reviewers.map(
@@ -244,20 +194,35 @@ function mapProposalToCardPage({
         : []
   };
   const card: Card<ProposalPropertyValue> = {
-    id: proposal?.id || '',
-    spaceId: '',
+    id: proposal.id,
+    spaceId: proposalSpaceId,
     parentId: '',
     schema: 1,
-    title: proposalPage?.title || '',
+    title: proposal.title,
     rootId: proposalSpaceId,
     type: 'card' as BlockTypes,
-    updatedBy: proposalPage?.updatedBy || '',
-    createdBy: proposalPage?.createdBy || '',
-    createdAt: new Date(createdAt).getTime(),
-    updatedAt: proposalPage?.updatedAt ? new Date(proposalPage?.updatedAt).getTime() : 0,
+    updatedBy: proposal.updatedBy,
+    createdBy: proposal.createdBy,
+    createdAt: new Date(proposal.createdAt).getTime(),
+    updatedAt: new Date(proposal.updatedAt).getTime(),
     deletedAt: null,
     fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };
 
-  return { card, page: proposalPage };
+  return {
+    card,
+    page: {
+      id: proposal.id,
+      title: proposal.title,
+      updatedAt: new Date(proposal.updatedAt),
+      updatedBy: proposal.updatedBy,
+      bountyId: null,
+      hasContent: true,
+      icon: null,
+      type: 'bounty',
+      syncWithPageId: null,
+      path: '',
+      proposalId: null
+    }
+  };
 }

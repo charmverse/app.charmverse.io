@@ -15,18 +15,7 @@ import { getCurrentStep } from './getCurrentStep';
 import type { ProposalStep } from './getCurrentStep';
 import type { ProposalFields } from './interfaces';
 
-export type ProposalWithUsersLite = Omit<
-  Proposal,
-  | 'fields'
-  | 'archived'
-  | 'reviewedBy'
-  | 'formId'
-  | 'reviewedAt'
-  | 'publishToLens'
-  | 'lensPostLink'
-  | 'selectedCredentialTemplates'
-  | 'workflowId'
-> & {
+export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'status'> & {
   archived?: boolean;
   authors: ProposalAuthor[];
   fields: ProposalFields | null;
@@ -43,6 +32,12 @@ export type ProposalWithUsersLite = Omit<
     index: number;
   }[];
   currentStep: ProposalStep;
+  templateId?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  updatedBy: string;
+  // pageId: string;
+  title: string;
 };
 
 export async function getProposals({ ids }: { ids: string[] }): Promise<ProposalWithUsersLite[]> {
@@ -60,6 +55,14 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
     include: {
       authors: true,
       rewards: true,
+      page: {
+        select: {
+          title: true,
+          createdAt: true,
+          updatedAt: true,
+          updatedBy: true
+        }
+      },
       evaluations: {
         orderBy: {
           index: 'asc'
@@ -76,12 +79,6 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
             }
           }
         }
-      }
-    },
-    // TODO: allow admins to sort by an index
-    orderBy: {
-      page: {
-        title: 'asc'
       }
     }
   });
@@ -100,6 +97,7 @@ function mapDbProposalToProposalLite({
     authors: ProposalAuthor[];
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
+    page: { title: string; updatedAt: Date; createdAt: Date; updatedBy: string } | null;
   };
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersLite {
@@ -109,11 +107,12 @@ function mapDbProposalToProposalLite({
 
   const proposalWithUsers: ProposalWithUsersLite = {
     id: rest.id,
+    createdAt: (proposal.page?.createdAt || new Date()).toISOString(),
     createdBy: rest.createdBy,
     authors: proposal.authors,
     archived: proposal.archived || undefined,
     formId: rest.formId || undefined,
-    spaceId: rest.spaceId,
+    // spaceId: rest.spaceId,
     evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
       title: e.title,
       index: e.index,
@@ -130,6 +129,9 @@ function mapDbProposalToProposalLite({
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
+    title: proposal.page?.title || '',
+    updatedAt: (proposal.page?.updatedAt || new Date()).toISOString(),
+    updatedBy: proposal.page?.updatedBy || '',
     reviewers: (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [],
     rewardIds: rewards.map((r) => r.id),
     fields

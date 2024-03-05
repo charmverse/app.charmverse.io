@@ -7,7 +7,6 @@ import type { SelectOption } from 'components/common/BoardEditor/components/prop
 import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
@@ -29,7 +28,6 @@ export function ProposalsHeaderRowsMenu({
   refreshProposals
 }: Props) {
   const { showError } = useSnackbar();
-  const { pages } = usePages();
   const { showConfirmation } = useConfirmationModal();
   const { proposalsMap } = useProposals();
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
@@ -48,11 +46,9 @@ export function ProposalsHeaderRowsMenu({
     propertyTemplates = [...board.fields.cardProperties];
   }
 
-  async function onChangeProposalsReviewers(pageIds: string[], reviewers: SelectOption[]) {
+  async function onChangeProposalsReviewers(proposalIds: string[], reviewers: SelectOption[]) {
     let proposalReviewersChanged = false;
-    for (const pageId of pageIds) {
-      const page = pages[pageId];
-      const proposalId = page?.proposalId;
+    for (const proposalId of proposalIds) {
       const proposal = proposalId ? proposalsMap[proposalId] : null;
       const proposalWithEvaluationId = proposal?.currentEvaluationId;
       if (proposal && proposalWithEvaluationId && !proposal.archived) {
@@ -77,12 +73,12 @@ export function ProposalsHeaderRowsMenu({
     }
   }
 
-  async function onChangeProposalsStatuses(pageIds: string[], result: ProposalEvaluationResult | null) {
-    if (pageIds.length === 0) {
+  async function onChangeProposalsStatuses(proposalIds: string[], result: ProposalEvaluationResult | null) {
+    if (proposalIds.length === 0) {
       return;
     }
 
-    const firstProposal = proposalsMap[pages[pageIds[0]]?.proposalId ?? ''];
+    const firstProposal = proposalsMap[proposalIds[0]];
 
     if (!firstProposal) {
       return;
@@ -93,8 +89,8 @@ export function ProposalsHeaderRowsMenu({
       evaluationId?: string;
     }[] = [];
 
-    pageIds.forEach((pageId) => {
-      const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
+    proposalIds.forEach((proposalId) => {
+      const proposal = proposalsMap[proposalId];
       if (proposal?.currentStep.step === firstProposal.currentStep.step && !proposal.archived) {
         proposalsData.push({
           proposalId: proposal.id,
@@ -116,12 +112,12 @@ export function ProposalsHeaderRowsMenu({
     }
   }
 
-  async function onChangeProposalsSteps(pageIds: string[], evaluationId: string, moveForward: boolean) {
-    if (pageIds.length === 0) {
+  async function onChangeProposalsSteps(proposalIds: string[], evaluationId: string, moveForward: boolean) {
+    if (proposalIds.length === 0) {
       return;
     }
 
-    const firstProposal = proposalsMap[pages[pageIds[0]]?.proposalId ?? ''];
+    const firstProposal = proposalsMap[proposalIds[0]];
 
     if (!firstProposal) {
       return;
@@ -135,8 +131,8 @@ export function ProposalsHeaderRowsMenu({
       currentEvaluationStep: ProposalEvaluationStep;
     }[] = [];
 
-    pageIds.forEach((pageId) => {
-      const proposal = proposalsMap[pages[pageId]?.proposalId ?? ''];
+    proposalIds.forEach((proposalId) => {
+      const proposal = proposalsMap[proposalId];
       if (proposal && !proposal.archived) {
         if (
           (evaluationId === 'rewards' &&
@@ -161,9 +157,8 @@ export function ProposalsHeaderRowsMenu({
     }
   }
 
-  async function onChangeProposalsAuthors(pageIds: string[], authorIds: string[]) {
-    for (const pageId of pageIds) {
-      const proposalId = pages[pageId]?.proposalId;
+  async function onChangeProposalsAuthors(proposalIds: string[], authorIds: string[]) {
+    for (const proposalId of proposalIds) {
       const proposal = proposalId ? proposalsMap[proposalId] : null;
       if (proposalId && !proposal?.archived) {
         try {
@@ -180,26 +175,22 @@ export function ProposalsHeaderRowsMenu({
   }
 
   const { isStepDisabled, isStatusDisabled, isReviewersDisabled } = useMemo(() => {
-    const checkedPages = checkedIds.map((id) => pages[id]).filter(isTruthy);
-    const firstProposal = proposalsMap[checkedPages[0]?.proposalId ?? ''];
-    const _isReviewerDisabled = checkedPages.some((checkedPage) => {
-      const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-      return !proposal || proposal.archived || proposal.currentStep.step === 'draft';
+    const checkedProposals = checkedIds.map((id) => proposalsMap[id]).filter(isTruthy);
+    const firstProposal = checkedProposals[0];
+    const _isReviewerDisabled = checkedProposals.some((proposal) => {
+      return proposal.archived || proposal.currentStep.step === 'draft';
     });
 
     const _isStatusDisabled =
       !firstProposal ||
-      checkedPages.some((checkedPage) => {
-        const proposal = proposalsMap[checkedPage.proposalId ?? ''];
-        return !proposal || proposal.archived || proposal.currentStep.step !== firstProposal.currentStep.step;
+      checkedProposals.some((proposal) => {
+        return proposal.archived || proposal.currentStep.step !== firstProposal.currentStep.step;
       });
 
     const _isStepDisabled =
       !firstProposal ||
-      checkedPages.some((checkedPage) => {
-        const proposal = proposalsMap[checkedPage.proposalId ?? ''];
+      checkedProposals.some((proposal) => {
         return (
-          !proposal ||
           proposal.archived ||
           proposal.evaluations.length !== firstProposal.evaluations.length ||
           // Check if all evaluations are in the same workflow
@@ -217,7 +208,7 @@ export function ProposalsHeaderRowsMenu({
       isStatusDisabled: _isStatusDisabled,
       isReviewersDisabled: _isReviewerDisabled
     };
-  }, [pages, checkedIds, proposalsMap]);
+  }, [checkedIds, proposalsMap]);
 
   async function onArchiveProposals(archived: boolean) {
     if (archived) {
@@ -235,15 +226,14 @@ export function ProposalsHeaderRowsMenu({
 
   const firstCheckedProposal = useMemo(() => {
     let firstCheckedProposalId;
-    for (const checkedId of checkedIds) {
-      const proposalId = pages[checkedId]?.proposalId;
+    for (const proposalId of checkedIds) {
       if (proposalId) {
         firstCheckedProposalId = proposalId;
         break;
       }
     }
     return firstCheckedProposalId ? proposalsMap[firstCheckedProposalId] : undefined;
-  }, [checkedIds, pages, proposalsMap]);
+  }, [checkedIds, proposalsMap]);
 
   return (
     <ViewHeaderRowsMenu
