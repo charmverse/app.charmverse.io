@@ -9,7 +9,7 @@ export function useTrashPages() {
   return usePUT<{ pageIds: string[]; trash: boolean }, ModifyChildPagesResponse>('/api/pages/trash');
 }
 
-export function useGetPage(pageId?: string) {
+export function useGetPage(pageId?: string | null) {
   return useGET<PageWithContent>(pageId ? `/api/pages/${pageId}` : null);
 }
 
