@@ -41,7 +41,7 @@ export function TokenGateReview() {
         onError: () => showMessage('Something went wrong. Please review your conditions.', 'error')
       });
     }
-  }, []);
+  }, [tokenGate?.conditions]);
 
   useEffect(() => {
     if (error) {
