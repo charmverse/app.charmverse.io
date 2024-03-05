@@ -132,50 +132,54 @@ export function ProposalsPage({ title }: { title: string }) {
     <DatabaseContainer>
       <DatabaseStickyHeader>
         <DatabaseTitle>
-          {isAdmin && (
-            <Button
-              variant='text'
-              color='secondary'
-              size='small'
-              sx={{
-                opacity: 0,
-                transition: 'opacity 0.25s',
-                '&:hover': {
-                  opacity: 1,
-                  transition: 'opacity 0.25s'
-                }
-              }}
-              onClick={() => {
-                if (activeBoard.fields.showDescription) {
-                  onHideDescription();
-                } else {
-                  onShowDescription();
-                }
-              }}
-            >
-              {activeBoard.fields.showDescription ? (
-                <>
-                  <VisibilityOffOutlinedIcon
-                    fontSize='small'
-                    sx={{
-                      mr: 0.5
-                    }}
-                  />
-                  <FormattedMessage id='ViewTitle.hide-description' defaultMessage='Hide description' />
-                </>
-              ) : (
-                <>
-                  <VisibilityOutlinedIcon
-                    fontSize='small'
-                    sx={{
-                      mr: 0.5
-                    }}
-                  />
-                  <FormattedMessage id='ViewTitle.show-description' defaultMessage='Show description' />
-                </>
-              )}
-            </Button>
-          )}
+          <Box position='relative'>
+            {isAdmin && (
+              <Button
+                variant='text'
+                color='secondary'
+                size='small'
+                sx={{
+                  position: 'absolute',
+                  top: -30,
+                  opacity: 0,
+                  transition: 'opacity 0.25s',
+                  '&:hover': {
+                    opacity: 1,
+                    transition: 'opacity 0.25s'
+                  }
+                }}
+                onClick={() => {
+                  if (activeBoard.fields.showDescription) {
+                    onHideDescription();
+                  } else {
+                    onShowDescription();
+                  }
+                }}
+              >
+                {activeBoard.fields.showDescription ? (
+                  <>
+                    <VisibilityOffOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 0.5
+                      }}
+                    />
+                    <FormattedMessage id='ViewTitle.hide-description' defaultMessage='Hide description' />
+                  </>
+                ) : (
+                  <>
+                    <VisibilityOutlinedIcon
+                      fontSize='small'
+                      sx={{
+                        mr: 0.5
+                      }}
+                    />
+                    <FormattedMessage id='ViewTitle.show-description' defaultMessage='Show description' />
+                  </>
+                )}
+              </Button>
+            )}
+          </Box>
           <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
             <Typography variant='h1' gutterBottom>
               {title}
@@ -205,6 +209,10 @@ export function ProposalsPage({ title }: { title: string }) {
                 onContentChange={(content: ICharmEditorOutput) => {
                   onDescriptionChange(content.doc);
                 }}
+                style={{
+                  marginLeft: 35
+                }}
+                disableRowHandles
                 disableNestedPages
                 readOnly={!isAdmin}
               />
