@@ -5,7 +5,6 @@ import { useGetOrCreateProposalNotesId } from 'charmClient/hooks/proposals';
 import { StyledTypography } from 'components/common/CharmEditor/components/nestedPage/components/NestedPage';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { PageIcon } from 'components/common/PageIcon';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 const StyledPageLink = styled.div`
@@ -26,14 +25,12 @@ const Typography = styled(StyledTypography)`
 export function ProposalNotesLink({ pageId }: { pageId: string }) {
   const { showPage } = usePageDialog();
   const { showError } = useSnackbar();
-  const { pages } = usePages();
-  const syncedPageId = pages[pageId]?.syncWithPageId;
 
   const { trigger: getNotesPageId } = useGetOrCreateProposalNotesId();
 
   async function onClickInternalLink(e: MouseEvent) {
     try {
-      const result = await getNotesPageId({ pageId: syncedPageId });
+      const result = await getNotesPageId({ pageId });
       if (result?.pageId) {
         showPage({ pageId: result.pageId });
         e.preventDefault();

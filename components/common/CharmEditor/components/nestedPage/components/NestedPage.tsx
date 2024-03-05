@@ -67,11 +67,14 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const isDocumentPath = !forumCategoryPage && !staticPage;
   const isProposalTemplate = node.attrs.type === 'proposal_template';
+  const pageFromPagesContext = pages[node.attrs.id];
 
   // retrieve the page directly if we are waiting for pages to load
-  const { data: sourcePage, isLoading: isPageLoading } = useGetPage(loadingPages && isDocumentPath && node.attrs.id);
+  const { data: sourcePage, isLoading: isPageLoading } = useGetPage(
+    !pageFromPagesContext && isDocumentPath && node.attrs.id
+  );
 
-  const documentPage = sourcePage || pages[node.attrs.id];
+  const documentPage = sourcePage || pageFromPagesContext;
   const isLoading = isPageLoading && loadingPages;
 
   let pageTitle = '';

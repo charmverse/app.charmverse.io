@@ -11,7 +11,6 @@ import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/sto
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 
@@ -19,7 +18,6 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
   const [isMutating, setIsMutating] = useState(false);
   const { space } = useCurrentSpace();
   const { navigateToSpacePath } = useCharmRouter();
-  const { pages } = usePages();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
   const { showMessage } = useSnackbar();
@@ -57,10 +55,7 @@ export default function PageDeleteBanner({ pageType, pageId }: { pageType: PageT
     try {
       setIsMutating(true);
       await charmClient.deletePageForever(pageId);
-      const path = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      if (path) {
-        await navigateToSpacePath(`/${path}`);
-      }
+      await navigateToSpacePath(`/`);
     } catch (err) {
       showMessage((err as any).message ?? 'Could not delete page', 'error');
     } finally {
