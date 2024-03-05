@@ -66,15 +66,12 @@ export function TokenGateModalProvider({
   const spaceId = space?.id || '';
 
   const handleTokenGate = (_tokenGate: Pick<TokenGate, 'conditions'>) => {
-    const accessControlConditions = _tokenGate.conditions.accessControlConditions.map(
-      ({ name, image, ...rest }) => rest
-    );
     setTokenGate((prevState) => {
       return {
         conditions: {
           accessControlConditions: [
             ...(prevState?.conditions.accessControlConditions || []),
-            ...accessControlConditions
+            ..._tokenGate.conditions.accessControlConditions
           ],
           operator: _tokenGate.conditions.operator || prevState?.conditions.operator || 'OR'
         }

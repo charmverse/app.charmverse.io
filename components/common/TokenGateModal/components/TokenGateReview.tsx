@@ -38,15 +38,10 @@ export function TokenGateReview() {
   useEffect(() => {
     if (tokenGate?.conditions) {
       reviewTokenGate(tokenGate, {
-        onSuccess: (tk) => {
-          // In case the API returns different information, we update the token gate
-          handleTokenGate(tk);
-          setDisplayedPage('review');
-        },
         onError: () => showMessage('Something went wrong. Please review your conditions.', 'error')
       });
     }
-  }, [tokenGate?.conditions]);
+  }, []);
 
   useEffect(() => {
     if (error) {
