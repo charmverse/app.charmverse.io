@@ -1,79 +1,49 @@
+import { log } from '@charmverse/core/log';
 import { SiweMessage } from 'lit-siwe';
-import { getAddress, hashMessage, parseAbi, recoverMessageAddress } from 'viem';
+import { hashMessage, parseAbi } from 'viem';
 
 import { InvalidInputError } from '../utils/errors';
-import { lowerCaseEqual } from '../utils/strings';
 
-import type { AuthSig } from './interfaces';
 import { getPublicClient } from './publicClient';
 
 /**
- * @host - Domain prefixed with protocol ie. http://localhost:3000
+ * @domain - Domain prefixed with protocol ie. http://localhost:3000
  */
-export type SignatureToGenerate = {
-  address: string;
-  chainId: number;
-  host: string;
+export type SignatureVerificationPayload = {
+  message: SiweMessage;
+  signature: `0x${string}`;
 };
 
-export type SignaturePayload = {
-  domain: string;
-  address: string; // convert to EIP-55 format or else SIWE complains
-  uri: string;
-  version: '1';
-  chainId: number;
-  nonce?: string;
-  issuedAt?: string;
-};
+export async function getSiweFields({ message, signature, domain }: SignatureVerificationPayload & { domain: string }) {
+  const siweMessage = new SiweMessage(message);
+  const fields = await siweMessage.verify({ signature, domain });
 
-export function generateSignaturePayload({ address, chainId, host }: SignatureToGenerate): SignaturePayload {
-  const domain = host.match('https') ? host.split('https://')[1] : host.split('http://')[1];
-  const uri = host;
-
-  return {
-    domain,
-    address: getAddress(address), // convert to EIP-55 format or else SIWE complains
-    uri,
-    version: '1',
-    chainId
-  };
+  return fields;
 }
-
-export type SignatureVerification = {
-  address: string;
-  host: string;
-  signature: AuthSig;
-};
 
 /**
  * Use this for validating wallet signatures
  */
-export async function isValidWalletSignature({ address, host, signature }: SignatureVerification): Promise<boolean> {
-  if (!address || !host || !signature) {
+export async function isValidWalletSignature({
+  message,
+  signature,
+  domain
+}: SignatureVerificationPayload & { domain: string }): Promise<boolean> {
+  if (!message || !signature || !domain) {
     throw new InvalidInputError('A wallet address, host and signature are required');
   }
 
-  const chainId = signature.signedMessage.split('Chain ID:')[1]?.split('\n')[0]?.trim();
-  const nonce = signature.signedMessage.split('Nonce:')[1]?.split('\n')[0]?.trim();
-  const issuedAt = signature.signedMessage.split('Issued At:')[1]?.split('\n')[0]?.trim();
+  const fields = await getSiweFields({ message, signature, domain });
 
-  const payload = {
-    ...generateSignaturePayload({ address, chainId: parseInt(chainId), host }),
-    nonce,
-    issuedAt
-  };
-
-  const message = new SiweMessage(payload);
-
-  const body = message.prepareMessage();
-
-  const signatureAddress = await recoverMessageAddress({ message: body, signature: signature.sig });
-
-  if (!lowerCaseEqual(signatureAddress, address)) {
-    return false;
+  if (fields.success) {
+    return true;
   }
 
-  return true;
+  if (fields.error) {
+    log.error('Error validating wallet signature', { error: fields.error });
+  }
+
+  return false;
 }
 
 const EIP1271_MAGIC_VALUE = '0x1626ba7e';

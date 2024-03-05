@@ -15,7 +15,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { RPCList, getChainById } from 'connectors/chains';
+import { getChainList, getChainById } from 'connectors/chains';
 import { debounce } from 'lodash';
 import { DateTime } from 'luxon';
 import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
@@ -28,6 +28,7 @@ import { DatePicker } from 'components/common/DatePicker';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import type { IPropertyTemplate } from 'lib/focalboard/board';
 import { Constants } from 'lib/focalboard/constants';
@@ -93,6 +94,7 @@ function FilterPropertyValue({
   relationPropertiesCardsRecord: PageListItemsRecord;
 }) {
   const [filter, setFilter] = useState(initialFilter);
+  const { space } = useCurrentSpace();
 
   const propertyRecord = properties.reduce<Record<string, IPropertyTemplate>>((acc, property) => {
     acc[property.id] = property;
@@ -235,6 +237,7 @@ function FilterPropertyValue({
         </Select>
       );
     } else if (isPropertyTypeTokenChain) {
+      const chainOptions = getChainList({ enableTestnets: !!space?.enableTestnets });
       return (
         <Select<string[]>
           size='small'
@@ -257,7 +260,7 @@ function FilterPropertyValue({
             );
           }}
         >
-          {RPCList.map((chain) => {
+          {chainOptions.map((chain) => {
             return (
               <MenuItem value={chain.chainId.toString()} key={chain.chainId}>
                 <Chip size='small' label={chain.chainName} />

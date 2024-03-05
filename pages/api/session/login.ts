@@ -3,10 +3,10 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
-import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { sessionUserRelations } from 'lib/session/config';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -18,13 +18,15 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireWalletSignature).post(login);
 
 async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { otpRequired: true }>) {
-  const { address } = req.body as Web3LoginRequest;
+  const { message } = req.body as SignatureVerificationPayload;
+  // Address from the message is validated in requireWalletSignature middleware so we know the user address is valid
+  const address = message.address.toLowerCase();
 
   const user = await prisma.user.findFirst({
     where: {
       wallets: {
         some: {
-          address: address.toLowerCase()
+          address
         }
       }
     },

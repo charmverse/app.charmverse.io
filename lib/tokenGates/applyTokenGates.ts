@@ -2,7 +2,6 @@ import type { Role, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { applyDiscordGate } from 'lib/discord/collabland/applyDiscordGate';
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';

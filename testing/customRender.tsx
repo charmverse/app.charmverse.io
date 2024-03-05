@@ -34,9 +34,9 @@ export function MockDataProvider({ children, userContext }: { children: ReactNod
         <UserContext.Provider
           value={{
             user: createMockUser(),
-            setUser: () => {},
-            updateUser: () => {},
-            refreshUser: async () => {},
+            setUser: () => Promise.resolve(undefined),
+            updateUser: () => Promise.resolve(undefined),
+            refreshUser: async () => Promise.resolve(undefined),
             logoutUser: async () => {},
             isLoaded: true,
             ...userContext

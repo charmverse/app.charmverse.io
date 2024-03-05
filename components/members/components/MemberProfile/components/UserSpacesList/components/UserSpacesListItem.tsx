@@ -331,7 +331,7 @@ function BountyEventsPanel({ events }: { events: ProfileBountyEvent[] }) {
                   <strong>{event.bountyTitle || 'Untitled'}</strong>
                 </Link>
                 {event.hasCredential && (
-                  <Tooltip color='success' title='Verified with Collab.land'>
+                  <Tooltip color='success' title='Verified with Collab.Land'>
                     <CheckIcon fontSize='small' />
                   </Tooltip>
                 )}

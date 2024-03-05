@@ -58,6 +58,10 @@ export async function createCredentialTemplate({
   spaceId,
   credentialEvents
 }: CreateCredentialTemplateInput): Promise<CredentialTemplate> {
+  if (!schemaType) {
+    throw new InvalidInputError(`schemaType is required: ${schemaType}`);
+  }
+
   return prisma.credentialTemplate.create({
     data: {
       name,

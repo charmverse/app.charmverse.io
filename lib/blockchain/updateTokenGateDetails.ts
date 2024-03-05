@@ -30,7 +30,7 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
     case 'Hats':
     case 'ERC721':
     case 'ERC1155': {
-      const tokenId = condition.tokenIds.at(0) || '1';
+      const tokenId = BigInt(condition.tokenIds.at(0) || '1').toString();
       const nft = await getNFT({
         address: condition.contractAddress,
         tokenId,
@@ -77,9 +77,12 @@ async function getAccessControlMetaData(condition: AccessControlCondition) {
       return { ...condition, name: poapDetails?.name, image: poapDetails?.image_url || '/images/logos/poap_logo.svg' };
     }
     case 'Guildxyz': {
-      const guildDetails = await getGuildDetails(condition.tokenIds.at(0) || '').catch((_err) => null);
+      const tokenIdOrUrl = condition.tokenIds.at(0) || '';
+      const guildDetails = await getGuildDetails(tokenIdOrUrl).catch((_err) => null);
+      const guildId = guildDetails?.id ? String(guildDetails?.id) : tokenIdOrUrl;
       return {
         ...condition,
+        tokenIds: [guildId],
         name: guildDetails?.name,
         image: guildDetails?.imageUrl || '/images/logos/guild_logo.svg'
       };

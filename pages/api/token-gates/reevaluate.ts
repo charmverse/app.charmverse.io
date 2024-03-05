@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { AuthSig } from 'lib/blockchain/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { reevaluateRoles } from 'lib/tokenGates/reevaluateRoles';

@@ -1,19 +1,11 @@
 import type { Block } from '@charmverse/core/prisma';
-import { RPCList } from 'connectors/chains';
 
 import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
 import type { Block as FBBlock } from 'lib/focalboard/block';
 import { createBoard } from 'lib/focalboard/board';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { DEFAULT_CALENDAR_VIEW_BLOCK_ID, DEFAULT_TABLE_VIEW_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
-
-export const tokenChainOptions: IPropertyTemplate['options'] = RPCList.map((rpc) => ({
-  id: rpc.chainId.toString(),
-  value: rpc.chainName,
-  color: ''
-}));
+import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
 export function getDefaultBoard({
   storedBoard,
@@ -29,7 +21,7 @@ export function getDefaultBoard({
           id: DEFAULT_BOARD_BLOCK_ID,
           fields: {
             cardProperties: [],
-            viewIds: [DEFAULT_TABLE_VIEW_BLOCK_ID, DEFAULT_BOARD_BLOCK_ID, DEFAULT_CALENDAR_VIEW_BLOCK_ID]
+            viewIds: defaultRewardViews
           }
         }
       });

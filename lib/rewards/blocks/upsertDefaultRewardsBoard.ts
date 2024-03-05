@@ -22,7 +22,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
   }
 
   if (!updateUserId) {
-    throw new Error('User id not found, cannot craete default rewards board');
+    throw new Error('User id not found, cannot create default rewards board');
   }
 
   // safety check - if default board exists, do not override existing fields

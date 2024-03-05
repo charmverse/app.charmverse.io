@@ -1,9 +1,11 @@
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import { builderDaoChains, daoChains, hatsProtocolChains } from 'connectors/chains';
+import { builderDaoChains, daoChains, hatsProtocolChains, getChainList } from 'connectors/chains';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { guild } from 'lib/guild-xyz/client';
 
 import type { FormValues } from '../hooks/useCommunitiesForm';
 import { useCommunitiesForm } from '../hooks/useCommunitiesForm';
@@ -22,12 +24,23 @@ export function TokenGateCommunities() {
     formState: { errors, isValid },
     reset
   } = useCommunitiesForm();
-  const check = watch('check');
-
+  const { space } = useCurrentSpace();
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
+  const check = watch('check');
+  const communityChains = check === 'builder' ? builderDaoChains : check === 'moloch' ? daoChains : hatsProtocolChains;
+  const chains = getChainList({ enableTestnets: !!space?.enableTestnets }).filter((chain) =>
+    communityChains.includes(chain.shortName)
+  );
 
   const onSubmit = async () => {
-    const values = getValues();
+    let values = getValues();
+    if (values.guild) {
+      const guildId = await guild
+        .get(values.guild)
+        .then((data) => data?.id?.toString() || values.guild)
+        .catch(() => null);
+      values = { ...values, guild: guildId || values.guild };
+    }
     const valueProps = getCommunitiesAccessControlConditions(values) || [];
     handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
@@ -37,8 +50,6 @@ export function TokenGateCommunities() {
     setDisplayedPage('home');
     reset();
   };
-
-  const chains = check === 'builder' ? builderDaoChains : check === 'moloch' ? daoChains : hatsProtocolChains;
 
   return (
     <>

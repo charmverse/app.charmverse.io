@@ -100,7 +100,7 @@ function DocumentPageComponent({
   const readonlyProposalProperties = !page.proposalId || readOnly || !!proposal?.archived;
 
   const card = useAppSelector((state) => {
-    if (page?.type !== 'card' && page?.type !== 'card_template') {
+    if (page?.type !== 'card' && page?.type !== 'card_template' && page?.type !== 'card_synced') {
       return null;
     }
     return state.cards.cards[page.id] ?? state.cards.templates[page.id];

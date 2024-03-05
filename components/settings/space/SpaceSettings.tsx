@@ -1,6 +1,6 @@
 import type { Space, IdentityType } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, FormHelperText, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Box, FormHelperText, Grid, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import isEqual from 'lodash/isEqual';
 import PopupState from 'material-ui-popup-state';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -20,7 +20,6 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { PageIcon } from 'components/common/PageIcon';
 import Legend from 'components/settings/Legend';
-import { SetupCustomDomain } from 'components/settings/space/components/SetupCustomDomain';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
 import { usePreventReload } from 'hooks/usePreventReload';
@@ -36,11 +35,13 @@ import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
 import { isTruthy } from 'lib/utils/types';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
+import { BlockchainSettings } from './components/BlockchainSettings';
 import { ConnectCollabland } from './components/ConnectCollabland';
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
+import { PrimaryMemberIdentity } from './components/PrimaryMemberIdentity';
 import { SettingsItem } from './components/SettingsItem';
-import { SpacePrimaryIdentity } from './components/SpacePrimaryIdentity';
+import { SetupCustomDomain } from './components/SetupCustomDomain';
 import { TwoFactorAuth } from './components/TwoFactorAuth';
 
 export type FormValues = {
@@ -48,6 +49,7 @@ export type FormValues = {
   spaceImage?: string | null;
   spaceArtwork?: string | null;
   domain: string;
+  enableTestnets: boolean;
   notificationToggles: NotificationToggles;
   requireMembersTwoFactorAuth: boolean;
   primaryMemberIdentity?: IdentityType | null;
@@ -61,6 +63,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   spaceArtwork: yup.string().nullable(),
   notificationToggles: yup.object(),
   requireMembersTwoFactorAuth: yup.boolean().required(),
+  enableTestnets: yup.boolean().required(),
   primaryMemberIdentity: yup.string<IdentityType>().nullable(),
   domain: yup
     .string()
@@ -162,6 +165,7 @@ export function SpaceSettings({
         primaryMemberIdentity: values.primaryMemberIdentity || null,
         spaceImage: values.spaceImage,
         spaceArtwork: values.spaceArtwork,
+        enableTestnets: values.enableTestnets,
         requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
         customDomain: values.customDomain || null,
         snapshotDomain: values.snapshotDomain
@@ -279,6 +283,9 @@ export function SpaceSettings({
                   <TextField
                     {...register('domain')}
                     disabled={!isAdmin}
+                    InputProps={{
+                      startAdornment: <InputAdornment position='start'>https://app.charmverse.io/</InputAdornment>
+                    }}
                     fullWidth
                     error={!!errors.domain}
                     helperText={errors.domain?.message}
@@ -291,43 +298,6 @@ export function SpaceSettings({
                 </Stack>
               </Stack>
             </Stack>
-          </Grid>
-          <Grid item>
-            <TwoFactorAuth control={control} isAdmin={isAdmin} />
-          </Grid>
-          <Grid item>
-            <FieldLabel>Notifications</FieldLabel>
-            <Typography variant='caption' mb={1} component='p'>
-              Control notifications for your members.
-            </Typography>
-            <NotificationTogglesInput
-              control={control}
-              isAdmin={isAdmin}
-              register={register}
-              watch={watch}
-              setValue={setValue}
-            />
-          </Grid>
-          <Grid item>
-            <SpacePrimaryIdentity
-              primaryIdentity={watchPrimaryMemberIdentity}
-              register={register}
-              disabled={!isAdmin}
-            />
-          </Grid>
-          <Grid item>
-            <FieldLabel>Custom Artwork</FieldLabel>
-            <Typography variant='caption' mb={2} component='p'>
-              Show your artwork for onboarding users.
-            </Typography>
-            <Avatar
-              name={watchName}
-              variant='rounded'
-              image={watchSpaceArtwork}
-              updateImage={(url: string) => setValue('spaceArtwork', url, { shouldDirty: true })}
-              editable={isAdmin}
-            />
-            <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
           <Grid item>
             <FieldLabel>Sidebar Options</FieldLabel>
@@ -414,6 +384,52 @@ export function SpaceSettings({
             </Stack>
           </Grid>
           <Grid item>
+            <FieldLabel>Blockchain settings</FieldLabel>
+            <BlockchainSettings isAdmin={isAdmin} control={control} />
+          </Grid>
+          <Grid item>
+            <SetupCustomDomain space={space} errorMessage={errors.customDomain?.message} register={register} />
+          </Grid>
+          <Grid item>
+            <FieldLabel>Login Page Artwork</FieldLabel>
+            <Typography variant='caption' mb={2} component='p'>
+              Customize the artwork when using a custom domain.
+            </Typography>
+            <Avatar
+              name={watchName}
+              variant='rounded'
+              image={watchSpaceArtwork}
+              updateImage={(url: string) => setValue('spaceArtwork', url, { shouldDirty: true })}
+              editable={isAdmin}
+            />
+            <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
+          </Grid>
+          <Grid item>
+            <Legend>Integrations</Legend>
+            <FieldLabel>Snapshot.org domain</FieldLabel>
+            {!space?.snapshotDomain && !isAdmin ? (
+              <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
+            ) : (
+              <TextField
+                {...register('snapshotDomain')}
+                InputProps={{
+                  startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
+                }}
+                disabled={!isAdmin}
+                fullWidth
+                error={!!errors.snapshotDomain}
+                helperText={errors.snapshotDomain?.message}
+              />
+            )}
+          </Grid>
+          <Grid item>
+            <FieldLabel>Collab.Land</FieldLabel>
+            <ConnectCollabland />
+          </Grid>
+          <Grid item>
+            <Legend>Members</Legend>
+          </Grid>
+          <Grid item>
             <FieldLabel>Member Profiles</FieldLabel>
             <Typography mb={1} variant='caption' component='p'>
               Set the order and turn on and off the visibility of certain onchain profiles for your members.
@@ -480,26 +496,27 @@ export function SpaceSettings({
             )}
           </Grid>
           <Grid item>
-            <SetupCustomDomain space={space} errorMessage={errors.customDomain?.message} register={register} />
+            <PrimaryMemberIdentity
+              primaryIdentity={watchPrimaryMemberIdentity}
+              register={register}
+              disabled={!isAdmin}
+            />
           </Grid>
           <Grid item>
-            <Legend>Snapshot.org Integration</Legend>
-            <FieldLabel>Snapshot domain</FieldLabel>
-            {!space?.snapshotDomain && !isAdmin ? (
-              <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
-            ) : (
-              <TextField
-                {...register('snapshotDomain')}
-                disabled={!isAdmin}
-                fullWidth
-                error={!!errors.snapshotDomain}
-                helperText={errors.snapshotDomain?.message}
-              />
-            )}
+            <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
-            <Legend>Collab.land Integration</Legend>
-            <ConnectCollabland />
+            <FieldLabel>Notifications</FieldLabel>
+            <Typography variant='caption' mb={1} component='p'>
+              Control notifications for your members.
+            </Typography>
+            <NotificationTogglesInput
+              control={control}
+              isAdmin={isAdmin}
+              register={register}
+              watch={watch}
+              setValue={setValue}
+            />
           </Grid>
           <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
@@ -600,6 +617,7 @@ function _getFormValues(space: Space): FormValues {
     spaceImage: space.spaceImage,
     spaceArtwork: space.spaceArtwork,
     domain: space.domain,
+    enableTestnets: !!space.enableTestnets,
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
     notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
     customDomain: space.customDomain,

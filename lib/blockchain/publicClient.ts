@@ -20,7 +20,7 @@ export const getPublicClient = (chainId: number) => {
   const chainDetails = getChainById(chainId);
 
   if (!chainDetails) {
-    throw new InvalidInputError('Chain not supported');
+    throw new InvalidInputError(`Chain id ${chainId} not supported`);
   }
 
   let providerUrl: string | null = null;
