@@ -1,5 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import { type ReactNode } from 'react';
+import { useAccount } from 'wagmi';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
@@ -11,6 +12,7 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { shortenHex } from 'lib/utils/blockchain';
@@ -93,13 +95,17 @@ function WalletConnect({
 }) {
   const { updateUser } = useUser();
   const { trigger: signSuccessTrigger, isMutating: isVerifyingWallet } = useAddUserWallets();
+  const { address } = useAccount();
 
   const signSuccess = async (payload: SignatureVerificationPayload) => {
-    await signSuccessTrigger(payload, {
-      onSuccess(data) {
-        updateUser(data);
+    await signSuccessTrigger(
+      { ...payload, address: address as string },
+      {
+        onSuccess(data) {
+          updateUser(data);
+        }
       }
-    });
+    );
   };
 
   return connectedWallet ? (

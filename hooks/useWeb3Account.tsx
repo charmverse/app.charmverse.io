@@ -14,7 +14,10 @@ import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import { verifyEIP1271Signature } from 'lib/blockchain/signAndVerify';
-import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
+import type {
+  SignatureVerificationPayload,
+  SignatureVerificationPayloadWithAddress
+} from 'lib/blockchain/signAndVerify';
 import type { SystemError } from 'lib/utils/errors';
 import { MissingWeb3AccountError } from 'lib/utils/errors';
 import { lowerCaseEqual } from 'lib/utils/strings';
@@ -27,7 +30,7 @@ type IContext = {
   // Web3 account belonging to the current logged in user
   account?: string | null;
   chainId: any;
-  requestSignature: () => Promise<SignatureVerificationPayload>;
+  requestSignature: () => Promise<SignatureVerificationPayloadWithAddress>;
   disconnectWallet: (address: UserWallet['address']) => Promise<void>;
   // A wallet is currently connected and can be used to generate signatures. This is different from a user being connected
   verifiableWalletDetected: boolean;
@@ -105,9 +108,9 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           signature
         }),
         verifyEIP1271Signature({
-          message: body,
-          safeAddress: account,
-          signature
+          message,
+          signature,
+          address: account
         })
       ]);
 
@@ -116,7 +119,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       }
       setIsSigning(false);
 
-      return { message, signature } as any as SignatureVerificationPayload;
+      return { message, signature, address: account } as SignatureVerificationPayloadWithAddress;
     } catch (err) {
       setIsSigning(false);
       throw err;
@@ -132,17 +135,20 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
       const payload = siwePayload || (await requestSignature());
 
       try {
-        const resp = await login(payload, {
-          onSuccess: async (_resp) => {
-            if ('id' in _resp) {
-              // User is returned
-              updateUser(_resp);
-            } else {
-              // Open the otp modal for verification
-              openVerifyOtpModal();
+        const resp = await login(
+          { ...payload, address: account },
+          {
+            onSuccess: async (_resp) => {
+              if ('id' in _resp) {
+                // User is returned
+                updateUser(_resp);
+              } else {
+                // Open the otp modal for verification
+                openVerifyOtpModal();
+              }
             }
           }
-        });
+        );
 
         return resp && 'id' in resp ? resp : undefined;
       } catch (err) {
@@ -150,7 +156,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           throw err;
         }
 
-        const newProfile = await createUser(payload);
+        const newProfile = await createUser({ ...payload, address: account });
 
         if (newProfile) {
           updateUser(newProfile);
