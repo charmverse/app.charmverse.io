@@ -5,6 +5,7 @@ import { builderDaoChains, daoChains, hatsProtocolChains, getChainList } from 'c
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { guild } from 'lib/guild-xyz/client';
 
 import type { FormValues } from '../hooks/useCommunitiesForm';
 import { useCommunitiesForm } from '../hooks/useCommunitiesForm';
@@ -32,7 +33,14 @@ export function TokenGateCommunities() {
   );
 
   const onSubmit = async () => {
-    const values = getValues();
+    let values = getValues();
+    if (values.guild) {
+      const guildId = await guild
+        .get(values.guild)
+        .then((data) => data?.id?.toString() || values.guild)
+        .catch(() => null);
+      values = { ...values, guild: guildId || values.guild };
+    }
     const valueProps = getCommunitiesAccessControlConditions(values) || [];
     handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');

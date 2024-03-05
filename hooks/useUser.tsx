@@ -6,19 +6,19 @@ import type { LoggedInUser } from 'models';
 
 export type IContext = {
   user: LoggedInUser | null;
-  setUser: (user: Partial<LoggedInUser>) => void;
-  updateUser: (user: Partial<LoggedInUser>) => void;
+  setUser: (user: Partial<LoggedInUser>) => Promise<LoggedInUser | null | undefined>;
+  updateUser: (user: Partial<LoggedInUser>) => Promise<LoggedInUser | null | undefined>;
   isLoaded: boolean;
-  refreshUser: () => Promise<void>;
+  refreshUser: () => Promise<LoggedInUser | null | undefined>;
   logoutUser: () => Promise<void>;
 };
 
 export const UserContext = createContext<Readonly<IContext>>({
   user: null,
-  setUser: () => undefined,
-  updateUser: () => undefined,
+  setUser: () => Promise.resolve(undefined),
+  updateUser: () => Promise.resolve(undefined),
   isLoaded: false,
-  refreshUser: () => Promise.resolve(),
+  refreshUser: () => Promise.resolve(undefined),
   logoutUser: () => Promise.resolve()
 });
 
@@ -33,7 +33,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }
 
   async function refreshUser(updates: Partial<LoggedInUser> = {}) {
-    await getUser(undefined, {
+    return getUser(undefined, {
       optimisticData: (_user) => {
         return _user ? { ..._user, ...updates } : null;
       },
@@ -49,8 +49,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
     refreshUser();
   }, []);
 
-  const updateUser = (updatedUser: Partial<LoggedInUser>) => refreshUser(updatedUser);
-  const setUser = (updatedUser: Partial<LoggedInUser>) => refreshUser(updatedUser);
+  const updateUser = async (updatedUser: Partial<LoggedInUser>) => refreshUser(updatedUser);
+  const setUser = async (updatedUser: Partial<LoggedInUser>) => refreshUser(updatedUser);
 
   const value = useMemo<IContext>(() => {
     return {

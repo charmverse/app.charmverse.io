@@ -1,8 +1,7 @@
 import { Stack, Typography } from '@mui/material';
 import { type ReactNode } from 'react';
-import useSWRMutation from 'swr/mutation';
 
-import charmClient from 'charmClient';
+import { useAddUserWallets } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { WalletSign } from 'components/login/components/WalletSign';
@@ -12,7 +11,7 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { shortenHex } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
@@ -93,16 +92,15 @@ function WalletConnect({
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { updateUser } = useUser();
+  const { trigger: signSuccessTrigger, isMutating: isVerifyingWallet } = useAddUserWallets();
 
-  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
+  const signSuccess = async (payload: SignatureVerificationPayload) => {
+    await signSuccessTrigger(payload, {
       onSuccess(data) {
         updateUser(data);
       }
-    }
-  );
+    });
+  };
 
   return connectedWallet ? (
     <ConnectedAccount

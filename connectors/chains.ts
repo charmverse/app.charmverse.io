@@ -56,7 +56,6 @@ export interface IChainDetails {
 
 // Gnosis endpoints: https://docs.safe.global/safe-core-api/available-services
 // Alchemy endpoints: https://docs.alchemy.com/reference/nft-api-endpoints
-// Lit networks: https://developer.litprotocol.com/v2/resources/supportedChains
 
 const EVM_DEFAULT = {
   nativeCurrency: {

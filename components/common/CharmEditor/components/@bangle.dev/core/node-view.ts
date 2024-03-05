@@ -9,7 +9,11 @@ import { createElement } from './createElement';
 
 const log = isDevEnv ? _log.debug : () => {};
 
-const renderHandlersCache: WeakMap<HTMLElement, RenderHandlers> = new WeakMap();
+let renderHandlersCache: WeakMap<HTMLElement, RenderHandlers> = new WeakMap();
+
+export function resetRenderHandlersCache() {
+  renderHandlersCache = new WeakMap();
+}
 
 type GetPosFunction = () => number | undefined;
 
