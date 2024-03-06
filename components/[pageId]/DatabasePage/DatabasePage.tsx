@@ -172,6 +172,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             />
             {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
               <PageDialog
+                showCard={showCard}
                 key={shownCardId}
                 pageId={shownCardId}
                 onClose={() => {

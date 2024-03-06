@@ -67,6 +67,7 @@ export type DocumentPageProps = {
   setEditorState?: (state: EditorState) => void;
   sidebarView?: IPageSidebarContext['activeView'];
   setSidebarView?: IPageSidebarContext['setActiveView'];
+  showCard?: (cardId: string | null) => void;
 };
 
 function DocumentPageComponent({
@@ -76,7 +77,8 @@ function DocumentPageComponent({
   readOnly = false,
   setEditorState,
   sidebarView,
-  setSidebarView
+  setSidebarView,
+  showCard
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -166,20 +168,24 @@ function DocumentPageComponent({
     setPageProps({ participants });
   }
 
-  const showCard = useCallback(
+  const _showCard = useCallback(
     async (cardId: string | null) => {
-      if (cardId === null) {
-        updateURLQuery({ cardId: null });
-        return;
-      }
-
-      if (insideModal) {
-        updateURLQuery({ viewId: router.query.viewId as string, cardId });
+      if (showCard) {
+        showCard(cardId);
       } else {
-        navigateToSpacePath(`/${cardId}`);
+        if (cardId === null) {
+          updateURLQuery({ cardId: null });
+          return;
+        }
+
+        if (insideModal) {
+          updateURLQuery({ viewId: router.query.viewId as string, cardId });
+        } else {
+          navigateToSpacePath(`/${cardId}`);
+        }
       }
     },
-    [router.query]
+    [router.query, showCard]
   );
 
   function onConnectionEvent(event: ConnectionEvent) {
@@ -378,7 +384,7 @@ function DocumentPageComponent({
                       syncWithPageId={page.syncWithPageId}
                       board={board}
                       card={card}
-                      showCard={showCard}
+                      showCard={_showCard}
                       cards={cards}
                       activeView={activeBoardView}
                       views={boardViews}

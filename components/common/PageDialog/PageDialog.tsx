@@ -37,10 +37,11 @@ interface Props {
   readOnly?: boolean;
   hideToolsMenu?: boolean;
   applicationContext?: PageDialogContext;
+  showCard?: (cardId: string | null) => void;
 }
 
 function PageDialogBase(props: Props) {
-  const { hideToolsMenu = false, pageId, readOnly, applicationContext } = props;
+  const { hideToolsMenu = false, pageId, readOnly, showCard, applicationContext } = props;
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
@@ -174,7 +175,7 @@ function PageDialogBase(props: Props) {
       onClose={close}
     >
       {page && contentType === 'page' && (
-        <DocumentPage insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
+        <DocumentPage showCard={showCard} insideModal page={page} savePage={savePage} readOnly={readOnlyPage} />
       )}
       {contentType === 'application' && applicationContext && (
         <RewardApplicationPage
