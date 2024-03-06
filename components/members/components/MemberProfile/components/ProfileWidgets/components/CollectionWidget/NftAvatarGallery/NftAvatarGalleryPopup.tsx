@@ -3,7 +3,7 @@ import { Dialog, DialogContent, TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { DialogTitle } from 'components/common/Modal';
-import { useMyNfts } from 'hooks/useMyNfts';
+import { useMemberCollections } from 'components/members/hooks/useMemberCollections';
 import { useUser } from 'hooks/useUser';
 import type { NFTData } from 'lib/blockchain/getNFTs';
 
@@ -27,7 +27,10 @@ export function NftAvatarGalleryPopup({
   hiddenNfts = []
 }: Props) {
   const { user } = useUser();
-  const { nfts = [], isLoading } = useMyNfts(user?.id || '');
+  const { isFetchingNfts: isLoading, nfts } = useMemberCollections({
+    memberId: user?.id || ''
+  });
+
   const [searchedTerm, setSearchedTerm] = useState('');
 
   const filteredNfts = useMemo(() => {
