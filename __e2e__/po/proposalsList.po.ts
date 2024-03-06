@@ -21,8 +21,8 @@ export class ProposalsListPage extends GlobalPage {
     return this.page.goto(`${baseUrl}/${domain}/proposals`);
   }
 
-  goToNewProposalForm(domain: string) {
-    return this.page.goto(`${baseUrl}/${domain}/proposals/new`);
+  goToNewProposalForm(domain: string, queryString: string = '') {
+    return this.page.goto(`${baseUrl}/${domain}/proposals/new${queryString}`);
   }
 
   waitForProposalsList() {
