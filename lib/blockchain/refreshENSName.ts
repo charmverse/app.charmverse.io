@@ -29,13 +29,11 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
     throw new MissingDataError('No user wallet found with this address');
   }
 
-  const walletAddress = wallet.address;
-
-  const ensName = await getENSName(walletAddress);
+  const ensName = await getENSName(lowerCaseAddress);
 
   await prisma.userWallet.update({
     where: {
-      address,
+      address: lowerCaseAddress,
       NOT: {
         ensname: ensName
       }
@@ -46,7 +44,7 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
       user: {
         update: {
           where: {
-            OR: [{ username: shortWalletAddress(address) }, { username: wallet.ensname || '' }]
+            OR: [{ username: shortWalletAddress(lowerCaseAddress) }, { username: wallet.ensname || '' }]
           },
           data: {
             username: ensName || undefined
