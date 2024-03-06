@@ -16,7 +16,7 @@ export function AccountSettings() {
   return (
     <>
       <Legend>My Account</Legend>
-      <DialogTitle>Select a public identity</DialogTitle>
+      <DialogTitle>Select your identity</DialogTitle>
       <UserIdentities />
       <Box sx={{ mb: 2 }} />
       <AccountPreferences />
