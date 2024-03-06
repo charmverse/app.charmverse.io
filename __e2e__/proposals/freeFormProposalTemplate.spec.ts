@@ -226,7 +226,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // Give React some time to set form values before we save
     await page.waitForTimeout(200);
 
-    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
+    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.publishNewProposalButton.click()]);
 
     // Check the actual data
     savedProposalTemplate = (await prisma.page.findFirstOrThrow({
@@ -431,7 +431,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
 
-    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
+    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.publishNewProposalButton.click()]);
 
     const savedUserProposalFromTemplate = await prisma.page.findFirstOrThrow({
       where: {
