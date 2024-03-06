@@ -52,7 +52,6 @@ export function TemplatesMenu({
   boardTitle,
   enableNewTemplates,
   isLoading,
-  pageActions,
   ...itemProps
 }: Props) {
   const theme = useTheme();

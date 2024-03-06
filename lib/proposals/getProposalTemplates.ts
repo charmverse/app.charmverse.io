@@ -61,7 +61,7 @@ export async function getProposalTemplates({
   }));
 
   if (!isAdmin) {
-    return res.filter((template) => !template.archived);
+    return res.filter((template) => !template.archived && !template.draft);
   }
 
   return res;
