@@ -51,7 +51,7 @@ export function PublishProposalAction({ proposalId }: { proposalId: string }) {
   return (
     <Tooltip title={disabledTooltip}>
       <div>
-        <MenuItem data-test='header--archive-current-proposal' disabled={!!disabledTooltip} onClick={onClick}>
+        <MenuItem data-test='context-menu-publish-proposal' disabled={!!disabledTooltip} onClick={onClick}>
           <ListItemIcon>
             <RiDraftLine />
           </ListItemIcon>
