@@ -5,10 +5,7 @@ import { v4 as uuid } from 'uuid';
 
 import { getAnswersTable } from 'lib/proposals/rubric/getAnswersTable';
 
-import type {
-  ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from '../interfaces';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from '../interfaces';
 import { upsertRubricAnswers } from '../upsertRubricAnswers';
 import { upsertRubricCriteria } from '../upsertRubricCriteria';
 
@@ -17,8 +14,8 @@ describe('upsertRubricAnswers', () => {
   let space: Space;
   let proposal: Awaited<ReturnType<typeof testUtilsProposals.generateProposal>>;
 
-  let vibeCriteria: ProposalRubricCriteriaWithTypedParams<'range'>;
-  let scoreCriteria: ProposalRubricCriteriaWithTypedParams<'range'>;
+  let vibeCriteria: RubricCriteriaTyped<'range'>;
+  let scoreCriteria: RubricCriteriaTyped<'range'>;
 
   beforeAll(async () => {
     const generated = await testUtilsUser.generateUserAndSpace({});
@@ -38,8 +35,8 @@ describe('upsertRubricAnswers', () => {
       actorId: user.id
     });
 
-    vibeCriteria = criteria.find((c) => c.title === 'vibe') as ProposalRubricCriteriaWithTypedParams;
-    scoreCriteria = criteria.find((c) => c.title === 'score') as ProposalRubricCriteriaWithTypedParams;
+    vibeCriteria = criteria.find((c) => c.title === 'vibe') as RubricCriteriaTyped;
+    scoreCriteria = criteria.find((c) => c.title === 'score') as RubricCriteriaTyped;
   });
 
   it('should update existing answers and return them, removing non-referenced answers', async () => {
