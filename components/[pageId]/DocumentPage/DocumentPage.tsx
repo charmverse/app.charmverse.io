@@ -503,15 +503,14 @@ function DocumentPageComponent({
           )}
         </PageEditorContainer>
       </Box>
-      {page.type === 'proposal' ||
-        (page.type === 'proposal_template' && proposal?.status === 'draft' && (
-          <ProposalStickyFooter
-            page={page}
-            proposal={proposal}
-            isStructuredProposal={isStructuredProposal}
-            refreshProposal={refreshProposal}
-          />
-        ))}
+      {page.type === 'proposal' && proposal?.status === 'draft' && (
+        <ProposalStickyFooter
+          page={page}
+          proposal={proposal}
+          isStructuredProposal={isStructuredProposal}
+          refreshProposal={refreshProposal}
+        />
+      )}
     </Box>
   );
 }
