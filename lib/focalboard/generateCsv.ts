@@ -207,7 +207,7 @@ export async function loadAndGenerateCsv({
   };
 }
 
-export function generateCSV(
+function generateCSV(
   board: Pick<Board, 'fields'>,
   view: BoardView,
   cards: Card[],
