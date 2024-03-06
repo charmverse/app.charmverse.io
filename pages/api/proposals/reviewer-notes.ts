@@ -18,15 +18,31 @@ async function getOrCreateReviewerNotesId(req: NextApiRequest, res: NextApiRespo
   let proposalId = queryProposalId as string;
   const userId = req.session.user.id;
   if (pageId && !proposalId) {
-    const { proposalId: pageProposalId } = await prisma.page.findUniqueOrThrow({
+    const { proposalId: pageProposalId, syncWithPageId } = await prisma.page.findUniqueOrThrow({
       where: {
         id: pageId
       },
       select: {
-        proposalId: true
+        proposalId: true,
+        syncWithPageId: true
       }
     });
-    proposalId = pageProposalId!;
+    if (proposalId) {
+      proposalId = pageProposalId!;
+    } else if (syncWithPageId) {
+      const { proposalId: syncedPageProposalId } = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: syncWithPageId
+        },
+        select: {
+          proposalId: true,
+          syncWithPageId: true
+        }
+      });
+      if (syncedPageProposalId) {
+        proposalId = syncedPageProposalId;
+      }
+    }
   } else if (!proposalId) {
     throw new InvalidInputError('Missing pageId or proposalId');
   }

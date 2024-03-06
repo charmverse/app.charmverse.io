@@ -87,6 +87,7 @@ export function ProposalsPage({ title }: { title: string }) {
   );
 
   const { trigger: trashPages } = useTrashPages();
+
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 

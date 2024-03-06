@@ -342,25 +342,15 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
       } as BoardReward,
       rewardPage: {
         // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-        boardId: null,
         bountyId: null,
         createdAt: new Date(),
         createdBy: '',
-        deletedAt: null,
-        deletedBy: null,
-        hasContent: false,
-        headerImage: '',
         icon: null,
         type: 'bounty',
-        galleryImage: '',
         syncWithPageId: null,
-        index: 0,
-        cardId: null,
         path: '',
-        parentId: null,
-        sourceTemplateId: null,
         proposalId: null,
-        spaceId: '',
+        hasContent: true,
         title: '',
         updatedAt: new Date(),
         updatedBy: '',
@@ -390,6 +380,6 @@ function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMa
         });
       })
       .filter(isTruthy)
-      .sort((a, b) => (b.page.createdAt > a.page.updatedAt ? 1 : -1))
+      .sort((a, b) => (b.page.updatedAt > a.page.updatedAt ? 1 : -1))
   );
 }

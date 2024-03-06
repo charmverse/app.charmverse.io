@@ -14,7 +14,7 @@ export interface UpdateProfileItemRequest {
 
 export class PagesApi {
   getPages({ spaceId }: { spaceId: string }) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { filter: 'sidebar_view' });
   }
 
   getArchivedPages(spaceId: string) {
