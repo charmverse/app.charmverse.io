@@ -270,7 +270,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
         } as any,
         proposal: expect.objectContaining({
           ...(savedProposalTemplate.proposal as Proposal),
-          status: 'draft',
+          status: 'published',
           fields: {
             ...(savedProposalTemplate.proposal.fields as any),
             pendingRewards: [
@@ -556,7 +556,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
             ] as ProposalPendingReward[]
           },
           authors: [{ proposalId: savedUserProposalFromTemplate.proposal?.id, userId: member.id }],
-          status: 'draft',
+          status: 'published',
           evaluations: [
             {
               ...userProposalEvaluations?.[0],

@@ -176,7 +176,7 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
-    proposalPage.saveDraftButton.click();
+    proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
