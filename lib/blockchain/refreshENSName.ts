@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getUserProfile } from 'lib/users/getUser';
-import { matchWalletAddress } from 'lib/utils/blockchain';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
@@ -19,9 +19,11 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   const lowerCaseAddress = address.toLowerCase();
 
-  const user = await getUserProfile('id', userId);
-
-  const wallet = user.wallets.find((w) => matchWalletAddress(lowerCaseAddress, w));
+  const wallet = await prisma.userWallet.findUnique({
+    where: {
+      address: lowerCaseAddress
+    }
+  });
 
   if (!wallet) {
     throw new MissingDataError('No user wallet found with this address');
@@ -31,24 +33,39 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   const ensName = await getENSName(walletAddress);
 
-  if (ensName) {
-    await prisma.userWallet.update({
-      where: {
-        address: walletAddress
-      },
-      data: {
-        ensname: ensName,
-        // Also update the username if it currently matches the wallet address for this ENS name
-        user: matchWalletAddress(user.username, walletAddress)
-          ? {
-              update: {
-                username: ensName
-              }
-            }
-          : undefined
+  await prisma.userWallet.update({
+    where: {
+      address,
+      NOT: {
+        ensname: ensName
       }
-    });
-  }
+    },
+    data: {
+      ensname: ensName,
+      // Also update the username
+      user: {
+        update: {
+          where: {
+            OR: [{ username: shortWalletAddress(address) }, { username: wallet.ensname || '' }]
+          },
+          data: {
+            username: ensName || undefined
+          }
+        }
+      }
+    }
+  });
 
+  return getUserProfile('id', userId);
+}
+
+export async function refreshENSNames({
+  userId,
+  addresses
+}: {
+  userId: string;
+  addresses: string[];
+}): Promise<LoggedInUser> {
+  await Promise.all(addresses.map((address) => refreshENSName({ userId, address })));
   return getUserProfile('id', userId);
 }

@@ -10,7 +10,6 @@ import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProf
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getUserProfile } from 'lib/users/getUser';
 import { shortenHex } from 'lib/utils/blockchain';
 import { InvalidInputError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
@@ -49,22 +48,18 @@ async function addWalletsController(req: NextApiRequest, res: NextApiResponse<Lo
   }
 
   try {
-    await prisma.userWallet.createMany({
-      data: [
-        {
-          userId: req.session.user.id,
-          address: walletAddress
-        }
-      ]
+    await prisma.userWallet.create({
+      data: {
+        userId: req.session.user.id,
+        address: walletAddress
+      }
     });
   } catch (e) {
     log.error('Error adding wallet', e, { userId, address: shortenHex(walletAddress) });
     throw new InvalidInputError('Wallet is already connected with another account');
   }
 
-  await refreshENSName({ userId, address: walletAddress });
-
-  const updatedProfile = await getUserProfile('id', userId);
+  const updatedProfile = await refreshENSName({ userId, address: walletAddress });
 
   updateTrackUserProfile(updatedProfile);
 
