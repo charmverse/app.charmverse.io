@@ -44,7 +44,7 @@ export async function goBackToStep({
   }
 
   if (proposal.rewards.length > 0) {
-    throw new InvalidInputError('Cannot clear the results of a proposal with rewards');
+    throw new InvalidInputError('Cannot clear the results of a proposal with published rewards');
   }
 
   let evaluationIndex = 0;

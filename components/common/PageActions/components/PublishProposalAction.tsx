@@ -32,7 +32,7 @@ export function PublishProposalAction({ proposalId }: { proposalId: string }) {
       if (proposal?.status === 'published') {
         if (proposal.evaluations.some((e) => e.result)) {
           const { confirmed } = await showConfirmation(
-            'Unpublishing a proposal will reset evaluation results. Are you sure you want to continue?'
+            'Unpublishing a proposal will clear evaluation results. Are you sure you want to continue?'
           );
           if (!confirmed) {
             return;
