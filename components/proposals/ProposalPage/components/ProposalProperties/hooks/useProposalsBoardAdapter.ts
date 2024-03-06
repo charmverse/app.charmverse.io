@@ -222,7 +222,7 @@ export function mapProposalToCardPage({
       type: 'bounty',
       syncWithPageId: null,
       path: '',
-      proposalId: null
+      proposalId: proposal.id
     }
   };
 }

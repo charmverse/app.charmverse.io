@@ -6,9 +6,6 @@ import { useArchiveProposal } from 'charmClient/hooks/proposals';
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-/**
- * We only want to refresh individual page data if user is currently on the page
- */
 export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const { trigger: archiveProposal } = useArchiveProposal({ proposalId });
   const { proposal, refreshProposal } = useProposal({
