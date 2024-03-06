@@ -271,7 +271,13 @@ export function UserIdentities() {
                 action={
                   item.type === 'RandomName' ? (
                     <Tooltip key='RandomName' arrow placement='top' title='Generate a new name'>
-                      <IconButton onClick={() => setGeneratedName(randomName())}>
+                      <IconButton
+                        size='small'
+                        sx={{
+                          p: 0.5
+                        }}
+                        onClick={() => setGeneratedName(randomName())}
+                      >
                         <RefreshIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>
