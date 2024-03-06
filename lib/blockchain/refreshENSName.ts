@@ -58,14 +58,3 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   return getUserProfile('id', userId);
 }
-
-export async function refreshENSNames({
-  userId,
-  addresses
-}: {
-  userId: string;
-  addresses: string[];
-}): Promise<LoggedInUser> {
-  await Promise.all(addresses.map((address) => refreshENSName({ userId, address })));
-  return getUserProfile('id', userId);
-}

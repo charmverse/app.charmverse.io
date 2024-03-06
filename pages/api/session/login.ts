@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { refreshENSNames } from 'lib/blockchain/refreshENSName';
+import { refreshENSName } from 'lib/blockchain/refreshENSName';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -47,7 +47,7 @@ async function login(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { 
     user.spaceRoles
   );
 
-  const updatedUser = await refreshENSNames({ userId: user.id, addresses: user.wallets.map((w) => w.address) });
+  const updatedUser = await refreshENSName({ userId: user.id, address });
 
   if (user.otp?.activatedAt && !req.session.user?.id) {
     req.session.otpUser = { id: user.id, method: 'Wallet' };
