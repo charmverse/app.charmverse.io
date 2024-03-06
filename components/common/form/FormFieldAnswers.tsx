@@ -20,12 +20,12 @@ import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
 import type { FormFieldValue } from './interfaces';
 
-const FormFieldsInputContainer = styled(Stack)`
+const FormFieldAnswersContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
   flex-direction: column;
 `;
 
-type FormFieldsInputProps = {
+type FormFieldAnswersProps = {
   formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
@@ -48,17 +48,17 @@ type FormFieldsInputProps = {
   threads?: Record<string, ThreadWithComments | undefined>;
 };
 
-export function ControlledFormFieldsInput(props: Omit<FormFieldsInputProps, 'onSave'>) {
-  return <FormFieldsInputBase {...props} />;
+export function ControlledFormFieldAnswers(props: Omit<FormFieldAnswersProps, 'onSave'>) {
+  return <FormFieldAnswersBase {...props} />;
 }
 
-export function FormFieldsInput(props: Omit<FormFieldsInputProps, 'control' | 'errors' | 'onFormChange'>) {
+export function FormFieldAnswers(props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange'>) {
   const { control, errors, onFormChange, values } = useFormFields({
     fields: props.formFields
   });
 
   return (
-    <FormFieldsInputBase {...props} control={control} errors={errors} onFormChange={onFormChange} values={values} />
+    <FormFieldAnswersBase {...props} control={control} errors={errors} onFormChange={onFormChange} values={values} />
   );
 }
 
@@ -70,7 +70,7 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-function FormFieldsInputBase({
+function FormFieldAnswersBase({
   onSave,
   formFields,
   values,
@@ -81,7 +81,7 @@ function FormFieldsInputBase({
   onFormChange,
   pageId,
   threads = {}
-}: FormFieldsInputProps & {
+}: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
   const { user } = useUser();
@@ -143,7 +143,7 @@ function FormFieldsInputBase({
   }, [debouncedValues]);
 
   return (
-    <FormFieldsInputContainer>
+    <FormFieldAnswersContainer>
       {formFields.map((formField) => {
         const fieldAnswerThreads =
           (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
@@ -216,6 +216,6 @@ function FormFieldsInputBase({
           </StyledStack>
         );
       })}
-    </FormFieldsInputContainer>
+    </FormFieldAnswersContainer>
   );
 }
