@@ -40,7 +40,7 @@ type Props = {
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
   boardType?: 'proposals' | 'rewards';
-  showCard: (cardId: string | null) => void;
+  showCard?: (cardId: string | null) => void;
 };
 
 function CardDetailProperties(props: Props) {
