@@ -108,7 +108,10 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
 
-    await Promise.all([proposalPage.page.waitForResponse('**/api/proposals'), proposalPage.saveDraftButton.click()]);
+    await Promise.all([
+      proposalPage.page.waitForResponse('**/api/proposals'),
+      proposalPage.publishNewProposalButton.click()
+    ]);
 
     // Test proposal data at the database level to ensure correct persistence
     const proposalTemplate = await prisma.proposal.findFirstOrThrow({
