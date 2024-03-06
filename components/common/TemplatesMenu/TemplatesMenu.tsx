@@ -21,45 +21,44 @@ export type TemplateItem = {
   isStructuredProposal?: boolean;
   proposalId?: string | null;
   archived?: boolean;
+  draft?: boolean;
 };
 
-/**
- * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
- */
-interface Props {
-  templates?: TemplateItem[];
-  createTemplate: () => void;
+type TemplateMenuItemProps = {
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
   addPageFromTemplate: (pageId: string) => void;
+  enableItemOptions?: boolean;
+  pageActions?: ActionMenuProps['pageActions'];
+};
+
+type Props = {
+  templates?: TemplateItem[];
+  createTemplate: () => void;
   anchorEl?: Element;
   popupState: PopupState;
   boardTitle?: string;
-  enableItemOptions?: boolean;
   enableNewTemplates?: boolean;
   isLoading?: boolean;
-  pageActions?: ActionMenuProps['pageActions'];
-}
+} & TemplateMenuItemProps;
+
+const maxTitleLength = 35;
 
 export function TemplatesMenu({
   templates,
   anchorEl,
-  addPageFromTemplate,
   createTemplate,
-  deleteTemplate,
-  editTemplate,
   popupState,
   boardTitle,
-  enableItemOptions,
   enableNewTemplates,
   isLoading,
-  pageActions
+  pageActions,
+  ...itemProps
 }: Props) {
   const theme = useTheme();
 
-  const maxTitleLength = 35;
-
-  const unarchivedTemplates = templates?.filter((tpl) => !tpl.archived);
+  const liveTemplates = templates?.filter((tpl) => !tpl.archived && !tpl.draft);
+  const draftTemplates = templates?.filter((tpl) => !tpl.archived && !!tpl.draft);
   const archivedTemplates = templates?.filter((tpl) => !!tpl.archived);
 
   return (
@@ -94,37 +93,22 @@ export function TemplatesMenu({
         </MenuItem>
       )}
 
-      {unarchivedTemplates?.map((template) => (
-        <MenuItem
-          data-test={`select-option-${template.id}`}
-          key={template.id}
-          dense
-          sx={{ display: 'flex', justifyContent: 'space-between' }}
-          onClick={() => {
-            addPageFromTemplate(template.id);
-            popupState.close();
-          }}
-        >
-          <ListItemIcon>
-            {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
-          </ListItemIcon>
-          <ListItemText>{fancyTrim(template.title || 'Untitled', maxTitleLength)}</ListItemText>
-
-          {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-          <Box ml={1} onClick={(e) => e.stopPropagation()}>
-            {enableItemOptions && (
-              <TemplatePageActionMenu
-                editTemplate={editTemplate}
-                deleteTemplate={deleteTemplate}
-                pageId={template.id}
-                proposalId={template.proposalId}
-                closeParentPopup={popupState.close}
-                pageActions={pageActions}
-              />
-            )}
-          </Box>
-        </MenuItem>
+      {liveTemplates?.map((template) => (
+        <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
       ))}
+      {!!draftTemplates?.length && (
+        <>
+          <Divider />
+          <Box pl={2}>
+            <Typography color='secondary' variant='caption'>
+              Draft
+            </Typography>
+          </Box>
+          {draftTemplates.map((template) => (
+            <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+          ))}
+        </>
+      )}
       {!!archivedTemplates?.length && (
         <>
           <Divider />
@@ -133,39 +117,11 @@ export function TemplatesMenu({
               Archive
             </Typography>
           </Box>
+          {archivedTemplates.map((template) => (
+            <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+          ))}
         </>
       )}
-      {archivedTemplates?.map((template) => (
-        <MenuItem
-          data-test={`select-option-${template.id}`}
-          key={template.id}
-          dense
-          sx={{ display: 'flex', justifyContent: 'space-between' }}
-          onClick={() => {
-            addPageFromTemplate(template.id);
-            popupState.close();
-          }}
-        >
-          <ListItemIcon>
-            {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
-          </ListItemIcon>
-          <ListItemText>{fancyTrim(template.title || 'Untitled', maxTitleLength)}</ListItemText>
-
-          {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-          <Box ml={1} onClick={(e) => e.stopPropagation()}>
-            {enableItemOptions && (
-              <TemplatePageActionMenu
-                editTemplate={editTemplate}
-                deleteTemplate={deleteTemplate}
-                pageId={template.id}
-                proposalId={template.proposalId}
-                closeParentPopup={popupState.close}
-                pageActions={pageActions}
-              />
-            )}
-          </Box>
-        </MenuItem>
-      ))}
       {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
         <MenuItem
@@ -180,5 +136,47 @@ export function TemplatesMenu({
         </MenuItem>
       ]}
     </Menu>
+  );
+}
+
+function TemplateMenuItem({
+  template,
+  addPageFromTemplate,
+  editTemplate,
+  deleteTemplate,
+  closePopup,
+  enableItemOptions,
+  pageActions
+}: TemplateMenuItemProps & { closePopup: VoidFunction; template: TemplateItem }) {
+  return (
+    <MenuItem
+      data-test={`select-option-${template.id}`}
+      key={template.id}
+      dense
+      sx={{ display: 'flex', justifyContent: 'space-between' }}
+      onClick={() => {
+        addPageFromTemplate(template.id);
+        closePopup();
+      }}
+    >
+      <ListItemIcon>
+        {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
+      </ListItemIcon>
+      <ListItemText>{fancyTrim(template.title || 'Untitled', maxTitleLength)}</ListItemText>
+
+      {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
+      <Box ml={1} onClick={(e) => e.stopPropagation()}>
+        {enableItemOptions && (
+          <TemplatePageActionMenu
+            editTemplate={editTemplate}
+            deleteTemplate={deleteTemplate}
+            pageId={template.id}
+            proposalId={template.proposalId}
+            closeParentPopup={closePopup}
+            pageActions={pageActions}
+          />
+        )}
+      </Box>
+    </MenuItem>
   );
 }

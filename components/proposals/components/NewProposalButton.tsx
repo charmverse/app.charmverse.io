@@ -58,7 +58,8 @@ export function NewProposalButton() {
     title: proposal.title,
     proposalId: proposal.proposalId,
     isStructuredProposal: proposal.contentType === 'structured',
-    archived: !!proposal.archived
+    archived: !!proposal.archived,
+    draft: proposal.draft
   }));
 
   function deleteProposalTemplate(pageId: string) {
@@ -126,12 +127,10 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Edit</ListItemText>
             </MenuItem>
-            {isAdmin && (
-              <CopyPageLinkAction
-                path={`/proposals/new?template=${pageId}`}
-                message='Link copied. NOTE: anyone can join your space using this link.'
-              />
-            )}
+            <CopyPageLinkAction
+              path={`/proposals/new?template=${pageId}`}
+              message='Link copied. NOTE: anyone can join your space using this link.'
+            />
 
             <MenuItem
               onClick={() => {

@@ -561,38 +561,26 @@ export function NewProposalPage({
               </StyledContainer>
             </Box>
             <StickyFooterContainer>
-              {isTemplate ? (
+              <>
                 <Button
+                  disabled={isCreatingProposal}
+                  loading={isCreatingProposal && submittedDraft}
                   data-test='create-proposal-button'
+                  variant='outlined'
+                  onClick={() => saveForm({ isDraft: true })}
+                >
+                  Save draft
+                </Button>
+                <Button
+                  data-test='publish-new-proposal-button'
                   disabled={Boolean(disabledTooltip) || isCreatingProposal}
                   disabledTooltip={disabledTooltip}
-                  onClick={() => saveForm({ isDraft: true })}
+                  onClick={() => saveForm()}
                   loading={isCreatingProposal && !submittedDraft}
                 >
-                  Save
+                  Publish
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    disabled={isCreatingProposal}
-                    loading={isCreatingProposal && submittedDraft}
-                    data-test='create-proposal-button'
-                    variant='outlined'
-                    onClick={() => saveForm({ isDraft: true })}
-                  >
-                    Save draft
-                  </Button>
-                  <Button
-                    data-test='publish-new-proposal-button'
-                    disabled={Boolean(disabledTooltip) || isCreatingProposal}
-                    disabledTooltip={disabledTooltip}
-                    onClick={() => saveForm()}
-                    loading={isCreatingProposal && !submittedDraft}
-                  >
-                    Publish
-                  </Button>
-                </>
-              )}
+              </>
             </StickyFooterContainer>
           </Box>
         </DocumentColumn>
