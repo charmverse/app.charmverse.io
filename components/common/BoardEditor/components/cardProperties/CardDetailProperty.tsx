@@ -62,7 +62,7 @@ export function CardDetailProperty({
   mutator: Mutator;
   disableEditPropertyOption?: boolean;
   onDrop: (template: IPropertyTemplate, container: IPropertyTemplate) => void;
-  showCard?: (cardId: string | null) => void;
+  showCard: (cardId: string | null) => void;
 }) {
   const [isDragging, isOver, columnRef] = useSortable('column', property, !readOnly, onDrop);
   const changePropertyPopupState = usePopupState({ variant: 'popover', popupId: 'card-property' });

@@ -3,7 +3,7 @@ import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
@@ -91,6 +91,7 @@ function DocumentPageComponent({
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
 
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
@@ -164,6 +165,22 @@ function DocumentPageComponent({
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
+  const showCard = useCallback(
+    async (cardId: string | null) => {
+      if (cardId === null) {
+        updateURLQuery({ cardId: null });
+        return;
+      }
+
+      if (insideModal) {
+        updateURLQuery({ viewId: router.query.viewId as string, cardId });
+      } else {
+        navigateToSpacePath(`/${cardId}`);
+      }
+    },
+    [router.query]
+  );
 
   function onConnectionEvent(event: ConnectionEvent) {
     if (event.type === 'error') {
@@ -361,6 +378,7 @@ function DocumentPageComponent({
                       syncWithPageId={page.syncWithPageId}
                       board={board}
                       card={card}
+                      showCard={showCard}
                       cards={cards}
                       activeView={activeBoardView}
                       views={boardViews}
