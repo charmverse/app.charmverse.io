@@ -189,7 +189,7 @@ test('Try to create a proposal from a linked proposal template / user from outsi
   await documentPage.goToPage({ domain: space.domain, path: pageReferencingTemplate.path });
 
   // User won't have the proposal template showing
-  await documentPage.getLinkedPage('undefined').click();
+  await documentPage.getLinkedPage(template.id).click();
 
   await page.waitForURL(`${baseUrl}/join?domain=${space.domain}`);
 });
