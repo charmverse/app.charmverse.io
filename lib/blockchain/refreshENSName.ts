@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getUserProfile } from 'lib/users/getUser';
-import { shortWalletAddress } from 'lib/utils/blockchain';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
 import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
@@ -22,6 +22,13 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
   const wallet = await prisma.userWallet.findUnique({
     where: {
       address: lowerCaseAddress
+    },
+    include: {
+      user: {
+        select: {
+          username: true
+        }
+      }
     }
   });
 
@@ -31,28 +38,28 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
 
   const ensName = await getENSName(lowerCaseAddress);
 
-  await prisma.userWallet.update({
-    where: {
-      address: lowerCaseAddress,
-      NOT: {
-        ensname: ensName
+  if (ensName !== wallet.ensname) {
+    const shouldUpdate = matchWalletAddress(wallet.user.username, wallet);
+
+    await prisma.userWallet.update({
+      where: {
+        address: lowerCaseAddress
+      },
+      data: {
+        ensname: ensName,
+        // Also update the username
+        user: shouldUpdate
+          ? {
+              update: {
+                data: {
+                  username: ensName || undefined
+                }
+              }
+            }
+          : undefined
       }
-    },
-    data: {
-      ensname: ensName,
-      // Also update the username
-      user: {
-        update: {
-          where: {
-            OR: [{ username: shortWalletAddress(lowerCaseAddress) }, { username: wallet.ensname || '' }]
-          },
-          data: {
-            username: ensName || undefined
-          }
-        }
-      }
-    }
-  });
+    });
+  }
 
   return getUserProfile('id', userId);
 }
