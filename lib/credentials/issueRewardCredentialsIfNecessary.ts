@@ -8,7 +8,10 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signAndPublishCharmverseCredential } from './attestOffchain';
+import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
+import { requestOnChainCredentialIssuance } from './multiAttestOnchain';
+import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
@@ -56,6 +59,8 @@ export async function issueRewardCredentialsIfNecessary({
       },
       space: {
         select: {
+          id: true,
+          issueCredentialsOnChainId: true,
           features: true,
           credentialTemplates: {
             where: {
@@ -154,26 +159,38 @@ export async function issueRewardCredentialsIfNecessary({
             throw new Error(`No label mapper found for event: ${event}`);
           }
           const eventLabel = getEventLabel((value) => getFeatureTitle(value, baseReward.space.features as any[]));
-          // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-          await signAndPublishCharmverseCredential({
-            chainId: optimism.id,
-            recipient: targetWallet.address,
-            credential: {
-              type: 'reward',
-              data: {
-                Name: credentialTemplate.name,
-                Description: credentialTemplate.description ?? '',
-                Organization: credentialTemplate.organization,
-                Event: eventLabel,
-                rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
-              }
-            },
-            credentialTemplateId: credentialTemplate.id,
-            event,
-            recipientUserId: submitterUserId,
-            rewardApplicationId: credentialTemplate.applicationId,
-            pageId: baseReward.page.id
-          });
+
+          const credentialContent: CredentialDataInput<'reward'> = {
+            Name: credentialTemplate.name,
+            Description: credentialTemplate.description ?? '',
+            Organization: credentialTemplate.organization,
+            Event: eventLabel,
+            rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
+          };
+
+          if (baseReward.space.issueCredentialsOnChainId) {
+            await requestOnChainCredentialIssuance({
+              chainId: baseReward.space.issueCredentialsOnChainId as EasSchemaChain,
+              spaceId: baseReward.space.id,
+              credentialInputs: [{ recipient: targetWallet.address, data: credentialContent }],
+              type: 'reward'
+            });
+          } else {
+            // Iterate through credentials one at a time so we can ensure they're properly created and tracked
+            await signAndPublishCharmverseCredential({
+              chainId: optimism.id,
+              recipient: targetWallet.address,
+              credential: {
+                type: 'reward',
+                data: credentialContent
+              },
+              credentialTemplateId: credentialTemplate.id,
+              event,
+              recipientUserId: submitterUserId,
+              rewardApplicationId: credentialTemplate.applicationId,
+              pageId: baseReward.page.id
+            });
+          }
         }
       } catch (e) {
         log.error('Failed to issue credential', {
