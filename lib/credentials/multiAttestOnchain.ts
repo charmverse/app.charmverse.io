@@ -1,24 +1,25 @@
 import type { AttestationType } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 import { Wallet, providers } from 'ethers';
-import { v4 as uuid } from 'uuid';
-import { optimism, optimismSepolia } from 'viem/chains';
 import { getAddress } from 'viem/utils';
 
-import { credentialsWalletPrivateKey } from 'config/constants';
-import { prettyPrint } from 'lib/utils/strings';
+import { credentialsWalletPrivateKey, isProdEnv } from 'config/constants';
+import { addMessageToSQS } from 'lib/aws/SQS';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
-import { attestationSchemaIds, encodeAttestion, type CredentialData, type CredentialDataInput } from './schemas';
-import type { ProposalCredential } from './schemas/proposal';
+import { attestationSchemaIds, encodeAttestion, type CredentialDataInput } from './schemas';
 
-export type MultiAttestationInput<T extends AttestationType = AttestationType> = {
+export type OnChainMultiAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;
   credentialInputs: { recipient: string; data: CredentialDataInput<T> }[];
   type: T;
 };
 
-export async function multiAttestOnchain({ credentialInputs, type, chainId }: MultiAttestationInput): Promise<any> {
+export async function multiAttestOnchain({
+  credentialInputs,
+  type,
+  chainId
+}: OnChainMultiAttestationInput): Promise<any> {
   const schemaId = attestationSchemaIds[type];
   const rpcUrl = getChainById(chainId)?.rpcUrls[0];
 
@@ -41,6 +42,19 @@ export async function multiAttestOnchain({ credentialInputs, type, chainId }: Mu
   ]);
 
   return attestations;
+}
+
+const CREDENTIALS_SQS_QUEUE_NAME = isProdEnv
+  ? 'https://sqs.us-east-1.amazonaws.com/310849459438/charmverse-credentials-queue-prd.fifo'
+  : 'https://sqs.us-east-1.amazonaws.com/310849459438/charmverse-credentials-queue-stg.fifo';
+
+export type OnChainMultiAttestationInputPayload<T extends AttestationType = AttestationType> =
+  OnChainMultiAttestationInput<T> & {
+    spaceId: string;
+  };
+
+export async function requestOnChainCredentialIssuance(payload: OnChainMultiAttestationInputPayload): Promise<void> {
+  await addMessageToSQS(CREDENTIALS_SQS_QUEUE_NAME, JSON.stringify(payload));
 }
 
 // const recipient = '0x9b56c451f593e1BF5E458A3ecaDfD3Ef17A36998';
