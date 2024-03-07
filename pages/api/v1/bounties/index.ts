@@ -181,24 +181,22 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
     return bounty.applications
       .filter((application) => application.status === 'paid' && application.walletAddress)
       .map(async (application) => {
-        if (
+        if (!application.walletAddress) {
+          return null;
+        } else if (
           application.walletAddress &&
           application.walletAddress.endsWith('.eth') &&
           ethers.utils.isValidName(application.walletAddress)
         ) {
-          const walletAddress = await resolveENSName(application.walletAddress);
+          const resolvedWalletAddress = await resolveENSName(application.walletAddress);
 
-          if (!walletAddress) {
+          if (!resolvedWalletAddress) {
             return null;
           }
 
           return {
-            address: walletAddress
+            address: resolvedWalletAddress
           };
-        }
-
-        if (!application.walletAddress) {
-          return null;
         }
 
         return {
