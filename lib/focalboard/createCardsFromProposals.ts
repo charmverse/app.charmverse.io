@@ -11,7 +11,7 @@ import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
+  RubricCriteriaTyped
 } from 'lib/proposals/rubric/interfaces';
 import { relay } from 'lib/websockets/relay';
 
@@ -300,8 +300,7 @@ export async function createCardsFromProposals({
             (mappedRubricAnswersByProposal[
               pageProposal.proposal!.id
             ] as ProposalRubricCriteriaAnswerWithTypedResponse[]) ?? [],
-          rubricCriteria:
-            (mappedRubricCriteriaByProposal[pageProposal.proposal!.id] as ProposalRubricCriteriaWithTypedParams[]) ?? []
+          rubricCriteria: (mappedRubricCriteriaByProposal[pageProposal.proposal!.id] as RubricCriteriaTyped[]) ?? []
         });
       }
     });
