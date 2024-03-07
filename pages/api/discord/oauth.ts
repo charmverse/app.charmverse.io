@@ -9,7 +9,8 @@ import type { AuthType, OauthFlowType } from 'lib/oauth/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
-const discordUrl = `https://discord.com/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
+const discordHost = isTestEnv ? 'http://localhost:9000' : 'https://discord.com';
+const discordUrl = `${discordHost}/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
 
 const handler = nc({
   onError,
@@ -47,13 +48,6 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
   const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(
     callbackUrl
   )}`;
-
-  if (isTestEnv) {
-    const testUrl =
-      'http://127.0.0.1:3335/authenticate/discord?code=1234&state={"redirect":"http://127.0.0.1:3335/","type":"login"}';
-
-    res.redirect(testUrl);
-  }
 
   res.redirect(oauthUrl);
 }

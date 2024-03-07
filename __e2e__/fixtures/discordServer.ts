@@ -35,6 +35,12 @@ export const discordServer: DiscordServer = async ({}, use, workerInfo) => {
     };
   });
 
+  router.get('/api/oauth2/authorize', (ctx) => {
+    ctx.redirect(
+      'http://127.0.0.1:3335/authenticate/discord?code=1234&state={"redirect":"http://127.0.0.1:3335/","type":"login"}'
+    );
+  });
+
   const server = await listen(9000 + workerInfo.workerIndex);
 
   // Use the server in the tests.
