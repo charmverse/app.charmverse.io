@@ -5,7 +5,7 @@ import { Box, Typography, CircularProgress } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
-import { useGetPage } from 'charmClient/hooks/pages';
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import { useGetApplication, useGetReward } from 'charmClient/hooks/rewards';
 import Link from 'components/common/Link';
 import { usePostByPath } from 'components/forum/hooks/usePostByPath';
@@ -167,7 +167,7 @@ function ReviewerNotesPageTitle({
   sectionName: string;
 }) {
   const [pageTitle] = usePageTitle();
-  const { data: proposalPage } = useGetPage(parentId);
+  const { data: proposalPage } = useGetPageMeta(parentId);
   return (
     <Box display='flex'>
       <BreadCrumb>

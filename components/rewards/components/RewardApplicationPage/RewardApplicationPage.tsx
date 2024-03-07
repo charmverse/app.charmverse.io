@@ -4,6 +4,7 @@ import { ArrowBack } from '@mui/icons-material';
 import { Box, Grid, Divider, FormLabel } from '@mui/material';
 import { useState } from 'react';
 
+import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
@@ -17,7 +18,6 @@ import { useNewWork } from 'components/rewards/hooks/useNewApplication';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -55,7 +55,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
   const currentRewardId = rewardId || reward?.id;
 
-  const { page: rewardPageContent } = usePage({ pageIdOrPath: currentRewardId });
+  const { data: rewardPageContent } = useGetPage(currentRewardId);
 
   const { space } = useCurrentSpace();
 
