@@ -1,6 +1,6 @@
 import type { UserWallet } from '@charmverse/core/prisma-client';
 
-import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
+import type { SignatureVerificationPayloadWithAddress } from 'lib/blockchain/signAndVerify';
 import type { LoggedInUser } from 'models';
 import type { EmailPreferences } from 'pages/api/profile/onboarding-email';
 
@@ -49,7 +49,7 @@ export function useGetTriggerUser() {
 }
 
 export function useLogin() {
-  return usePOST<SignatureVerificationPayload, LoggedInUser | { otpRequired: true }>('/api/session/login');
+  return usePOST<SignatureVerificationPayloadWithAddress, LoggedInUser | { otpRequired: true }>('/api/session/login');
 }
 
 export function useLogout() {
@@ -57,7 +57,7 @@ export function useLogout() {
 }
 
 export function useCreateUser() {
-  return usePOST<SignatureVerificationPayload, LoggedInUser>('/api/profile');
+  return usePOST<SignatureVerificationPayloadWithAddress, LoggedInUser>('/api/profile');
 }
 
 export function useRemoveWallet() {
@@ -65,5 +65,5 @@ export function useRemoveWallet() {
 }
 
 export function useAddUserWallets() {
-  return usePOST<SignatureVerificationPayload, LoggedInUser>('/api/profile/add-wallets');
+  return usePOST<SignatureVerificationPayloadWithAddress, LoggedInUser>('/api/profile/add-wallets');
 }

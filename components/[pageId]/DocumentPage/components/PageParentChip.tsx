@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { useMemo } from 'react';
 
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import Link from 'components/common/Link';
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -24,8 +25,9 @@ export function PageParentChip({ pageId, parentId, insideModal }: Props) {
   const page = pageId ? pages[pageId] : null;
   const parentPage = parentId ? pages[parentId] : null;
 
-  const parentProposalId = page?.type === 'bounty' && page.bountyId && getRewardById(page.bountyId)?.proposalId;
-  const parentProposal = parentProposalId ? pages[parentProposalId] : undefined;
+  const parentProposalId =
+    (page?.type === 'bounty' && page.bountyId && getRewardById(page.bountyId)?.proposalId) || undefined;
+  const { data: parentProposal } = useGetPageMeta(parentProposalId);
 
   const title = parentPage?.title || parentProposal?.title || 'Untitled';
   const path = parentPage?.path || parentProposal?.path || '/';

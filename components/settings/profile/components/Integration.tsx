@@ -2,19 +2,12 @@ import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
-import { Divider, IconButton, Menu, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, Divider, IconButton, Menu, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
-
-const IntegrationName = styled(Typography)`
-  background-color: ${({ theme }) => theme.palette.background.dark};
-  display: inline-block;
-  border-radius: 7px;
-  padding: 3px 7px;
-`;
 
 type IntegrationProps = {
   isInUse: boolean;
@@ -51,22 +44,66 @@ function Integration(props: IntegrationProps) {
   return (
     <StyledStack>
       <Stack flexDirection='row' justifyContent='space-between' width='100%' alignItems='center'>
-        <Stack>
-          <Stack display='flex' flexDirection='row' gap={1} alignItems='center' mb={0.5}>
-            {icon}
-            <Tooltip title={secondaryUserName ?? ''}>
-              <Typography component='span' fontSize='1.25em' fontWeight={700}>
+        <Stack
+          display='flex'
+          flexDirection={{
+            xs: 'column',
+            md: 'row'
+          }}
+          gap={{
+            xs: 0.5
+          }}
+          alignItems={{
+            xs: 'flex-start',
+            md: 'center'
+          }}
+        >
+          <Box
+            sx={{
+              minWidth: {
+                xs: 'fit-content',
+                md: 400
+              }
+            }}
+          >
+            <Tooltip title={secondaryUserName}>
+              <Typography
+                component='span'
+                fontSize={{
+                  xs: '1em',
+                  md: '1.15em'
+                }}
+                fontWeight={700}
+              >
                 {username}
                 {action}
               </Typography>
             </Tooltip>
-          </Stack>
-          <IntegrationName width='fit-content' variant='caption'>
-            {name}
-          </IntegrationName>
+          </Box>
+
+          <Chip
+            variant='outlined'
+            size='medium'
+            label={
+              <Stack gap={0.75} alignItems='center' flexDirection='row'>
+                {icon}
+                <Typography variant='subtitle1'>{name}</Typography>
+              </Stack>
+            }
+            sx={{
+              width: 'fit-content'
+            }}
+          />
         </Stack>
 
-        <Stack flexDirection='row' gap={1} alignItems='center'>
+        <Stack
+          flexDirection='row'
+          gap={{
+            xs: 0.5,
+            md: 1
+          }}
+          alignItems='center'
+        >
           {isInUse ? (
             <Stack flexDirection='row' mr={!hasActionsMenu ? 4.5 : 0}>
               <CheckIcon fontSize='small' />
@@ -81,7 +118,12 @@ function Integration(props: IntegrationProps) {
               variant='outlined'
               onClick={() => selectIntegration(username, identityType)}
               sx={{
-                mr: !hasActionsMenu ? 4.5 : 0
+                mr: !hasActionsMenu
+                  ? {
+                      xs: 4.25,
+                      md: 4.5
+                    }
+                  : 0
               }}
             >
               Select
@@ -117,7 +159,7 @@ function Integration(props: IntegrationProps) {
       </Stack>
       <Divider
         sx={{
-          my: 2
+          my: 1.5
         }}
       />
     </StyledStack>

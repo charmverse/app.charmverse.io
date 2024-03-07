@@ -126,6 +126,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
               const view = activeView ?? (await onCreateDatabase());
               await addNewCards({
                 board: rootBoard,
+                boardPageId: pageId,
                 members: membersRecord,
                 results,
                 spaceId: space?.id,

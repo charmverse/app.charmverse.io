@@ -49,7 +49,7 @@ type IdentityModalProps = {
 function IdentityModal(props: IdentityModalProps) {
   const { close, isOpen } = props;
   return (
-    <Modal open={isOpen} onClose={close} size='large' title='Select a public identity'>
+    <Modal open={isOpen} onClose={close} size='large' title='Select your identity'>
       <UserIdentities />
     </Modal>
   );
@@ -59,7 +59,7 @@ export function UserIdentities() {
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
   const { updateUser, user } = useUser();
   const identityTypes = useIdentityTypes({
-    size: 'small'
+    size: 18
   });
   const identityType = user?.identityType ?? 'Wallet';
   const [generatedName, setGeneratedName] = useState(
@@ -138,7 +138,6 @@ export function UserIdentities() {
 
   return (
     <>
-      <Typography mb={2}>Select which integration you want to show as your username</Typography>
       <Box mb={1}>
         {identityTypes.map((item) => {
           const usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
@@ -272,7 +271,13 @@ export function UserIdentities() {
                 action={
                   item.type === 'RandomName' ? (
                     <Tooltip key='RandomName' arrow placement='top' title='Generate a new name'>
-                      <IconButton onClick={() => setGeneratedName(randomName())}>
+                      <IconButton
+                        size='small'
+                        sx={{
+                          p: 0.5
+                        }}
+                        onClick={() => setGeneratedName(randomName())}
+                      >
                         <RefreshIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>

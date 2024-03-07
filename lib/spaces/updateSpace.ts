@@ -28,6 +28,7 @@ export type UpdateableSpaceFields = Partial<
     | 'credentialLogo'
     | 'customDomain'
     | 'snapshotDomain'
+    | 'enableTestnets'
   >
 >;
 
@@ -121,6 +122,7 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       features: updates.features as any,
       memberProfiles: updates.memberProfiles as any,
       primaryMemberIdentity: updates.primaryMemberIdentity,
+      enableTestnets: updates.enableTestnets,
       requireMembersTwoFactorAuth: updates.requireMembersTwoFactorAuth,
       credentialLogo: updates.credentialLogo
     }

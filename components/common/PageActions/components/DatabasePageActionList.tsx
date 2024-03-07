@@ -27,7 +27,6 @@ import { AddToFavoritesAction } from 'components/common/PageActions/components/A
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
 import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
-import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
@@ -59,7 +58,6 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
-  const { keys } = useApiPageKeys(pageId);
   const localViewSettings = useLocalDbViewSettings(view?.id);
 
   useEffect(() => {
@@ -179,12 +177,12 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
             try {
               await addNewCards({
                 board,
+                boardPageId: pageId,
                 members: membersRecord,
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,
-                views: boardViews,
-                apiPageKeys: keys
+                views: boardViews
               });
 
               const spaceId = currentSpace?.id;

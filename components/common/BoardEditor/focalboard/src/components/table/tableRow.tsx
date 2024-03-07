@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
@@ -11,6 +10,7 @@ import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+import type { PageActionMeta } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
@@ -42,6 +42,7 @@ type Props = {
   board: Board;
   activeView: BoardView;
   card: Card;
+  cardPage: PageActionMeta;
   pageIcon?: string | null;
   pageTitle: string;
   isSelected: boolean;
@@ -57,7 +58,6 @@ type Props = {
   onDeleteCard?: (cardId: string) => Promise<void>;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
-  cardPage: PageMeta;
   readOnlyTitle?: boolean;
   isExpanded?: boolean | null;
   setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;

@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
@@ -34,7 +35,6 @@ import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
@@ -118,7 +118,7 @@ function CenterPanel(props: Props) {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
 
-  const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
+  const { data: activePage } = useGetPageMeta(activeBoardId);
 
   const { keys } = useApiPageKeys(props.page?.id);
   const selectBoard = useMemo(makeSelectBoard, []);

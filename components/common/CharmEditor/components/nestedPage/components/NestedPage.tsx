@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
 
-import { useGetPage } from 'charmClient/hooks/pages';
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
@@ -13,6 +13,7 @@ import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
+import type { PageMetaLite } from 'lib/pages/interfaces';
 
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
@@ -67,11 +68,14 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const isDocumentPath = !forumCategoryPage && !staticPage;
   const isProposalTemplate = node.attrs.type === 'proposal_template';
+  const pageFromPagesContext = pages[node.attrs.id];
 
   // retrieve the page directly if we are waiting for pages to load
-  const { data: sourcePage, isLoading: isPageLoading } = useGetPage(loadingPages && isDocumentPath && node.attrs.id);
+  const { data: sourcePage, isLoading: isPageLoading } = useGetPageMeta(
+    !pageFromPagesContext && isDocumentPath && node.attrs.id
+  );
 
-  const documentPage = sourcePage || pages[node.attrs.id];
+  const documentPage = sourcePage || pageFromPagesContext;
   const isLoading = isPageLoading && loadingPages;
 
   let pageTitle = '';
@@ -87,7 +91,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
     pageTitle = 'No access';
   }
 
-  const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
+  const pageId = node.attrs.id || staticPage?.path || forumCategoryPage?.id;
   const pagePath = isProposalTemplate
     ? `/proposals/new?template=${node.attrs.id}`
     : documentPage
@@ -149,7 +153,7 @@ function LinkIcon({
   isCategoryPage
 }: {
   isLinkedPage: boolean;
-  documentPage?: PageMeta;
+  documentPage?: PageMetaLite;
   staticPage?: StaticPage;
   isCategoryPage: boolean;
 }) {

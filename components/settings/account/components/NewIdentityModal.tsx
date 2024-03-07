@@ -81,16 +81,19 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   }
 
   async function onSignSuccess(payload: SignatureVerificationPayload) {
-    await signSuccess(payload, {
-      onSuccess: async (data) => {
-        await updateUser(data);
-        onClose();
-      },
-      onError: (e) => {
-        onClose();
-        showMessage(e.message || 'Something went wrong', 'error');
+    await signSuccess(
+      { ...payload, address: account as string },
+      {
+        onSuccess: async (data) => {
+          await updateUser(data);
+          onClose();
+        },
+        onError: (e) => {
+          onClose();
+          showMessage(e.message || 'Something went wrong', 'error');
+        }
       }
-    });
+    );
   }
 
   useEffect(() => {

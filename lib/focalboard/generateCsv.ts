@@ -203,11 +203,11 @@ export async function loadAndGenerateCsv({
 
   return {
     csvData: csvData.csvContent,
-    childPageIds: accessibleCardIds
+    childPageIds: csvData.rowIds
   };
 }
 
-export function generateCSV(
+function generateCSV(
   board: Pick<Board, 'fields'>,
   view: BoardView,
   cards: Card[],
@@ -215,7 +215,7 @@ export function generateCSV(
   context: PropertyContext,
   relationPropertiesCardsRecord: PageListItemsRecord
 ) {
-  const rows = generateTableArray(board, cards, view, formatters, context, relationPropertiesCardsRecord);
+  const { rows, rowIds } = generateTableArray(board, cards, view, formatters, context, relationPropertiesCardsRecord);
   let csvContent = '';
 
   rows.forEach((row) => {
@@ -232,7 +232,8 @@ export function generateCSV(
 
   return {
     filename,
-    csvContent
+    csvContent,
+    rowIds
   };
 }
 
@@ -240,14 +241,14 @@ function encodeText(text: string): string {
   return text.replace(/"/g, '""');
 }
 
-export function generateTableArray(
+function generateTableArray(
   board: Pick<Board, 'fields'>,
   cards: Card[],
   viewToExport: BoardView,
   formatters: Formatters,
   context: PropertyContext,
   relationPropertiesCardsRecord: PageListItemsRecord
-): string[][] {
+): { rows: string[][]; rowIds: string[] } {
   const rows: string[][] = [];
   const cardProperties = board.fields.cardProperties as IPropertyTemplate[];
 
@@ -287,7 +288,7 @@ export function generateTableArray(
     rows.push(rowColumns);
   });
 
-  return rows;
+  return { rows, rowIds: filteredCards.map(({ id }) => id) };
 }
 
 export function getCSVColumns({

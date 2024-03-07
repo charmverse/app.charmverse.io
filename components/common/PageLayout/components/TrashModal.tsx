@@ -86,7 +86,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const [searchText, setSearchText] = useState('');
   const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
-  const { mutatePagesRemove, pages, getPageByPath } = usePages();
+  const { mutatePagesRemove, getPageByPath } = usePages();
   const { navigateToSpacePath } = useCharmRouter();
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
@@ -159,8 +159,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
 
     // If the current page has been deleted permanently route to the first alive page
     if (currentPage && deletePageIds.includes(currentPage.id)) {
-      const firstPage = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      navigateToSpacePath(`/${firstPage}`);
+      navigateToSpacePath(`/`);
     }
   }
 

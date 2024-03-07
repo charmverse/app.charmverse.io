@@ -15,11 +15,20 @@ import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
 
+export type PageActionMeta = {
+  proposalId: string | null;
+  type?: PageType;
+  id: string;
+  updatedAt: Date;
+  updatedBy: string;
+  path: string;
+  syncWithPageId?: string | null;
+};
+
 export function PageActionsMenu({
   children,
   onClickDelete,
   onClickEdit,
-  hideDuplicateAction,
   anchorEl,
   page,
   setAnchorEl,
@@ -28,25 +37,14 @@ export function PageActionsMenu({
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
-  hideDuplicateAction?: boolean;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
-  page: {
-    parentId?: string | null;
-    proposalId: string | null;
-    createdBy: string;
-    type?: PageType;
-    id: string;
-    updatedAt: Date;
-    path: string;
-    deletedAt: Date | null;
-    syncWithPageId?: string | null;
-  };
+  page: PageActionMeta;
   readOnly?: boolean;
 }) {
   const { getMemberById } = useMembers();
   const router = useRouter();
-  const member = getMemberById(page.createdBy);
+  const member = getMemberById(page.updatedBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
@@ -100,7 +98,7 @@ export function PageActionsMenu({
         <ListItemText>Delete</ListItemText>
       </MenuItem>
       {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
-      {!hideDuplicateAction && page.type && (
+      {page.type && (
         <DuplicatePageAction
           onComplete={handleClose}
           pageId={page.id}

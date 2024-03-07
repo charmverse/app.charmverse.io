@@ -40,6 +40,7 @@ type Props = {
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
   boardType?: 'proposals' | 'rewards';
+  showCard?: (cardId: string | null) => void;
 };
 
 function CardDetailProperties(props: Props) {
@@ -296,6 +297,7 @@ function CardDetailProperties(props: Props) {
             key={propertyTemplate.id}
             board={board}
             card={card}
+            showCard={props.showCard}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
             onTypeAndNameChanged={(newType: PropertyType, newName: string, relationData?: RelationPropertyData) => {

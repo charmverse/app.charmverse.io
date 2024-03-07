@@ -39,7 +39,20 @@ export type CardPageReward = {
 export type CardPage<V = CardPropertyValue> = {
   subPages?: CardPage<V>[];
   card: Card<V>;
-  page: PageMeta;
+  page: Pick<
+    PageMeta,
+    | 'hasContent'
+    | 'icon'
+    | 'id'
+    | 'path'
+    | 'title'
+    | 'bountyId'
+    | 'proposalId'
+    | 'syncWithPageId'
+    | 'type'
+    | 'updatedAt'
+    | 'updatedBy'
+  >;
   proposal?: CardPageProposal;
   reward?: CardPageReward;
   isStructuredProposal?: boolean;

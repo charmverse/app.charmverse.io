@@ -174,7 +174,7 @@ export function mapRewardToCardPage({
   members
 }: {
   reward: BoardReward | RewardWithUsers;
-  rewardPage?: PageMeta;
+  rewardPage?: CardPage['page'] & { createdAt: string | Date; createdBy: string };
   spaceId: string;
   members?: Record<string, Member>;
 }): CardPage {
@@ -223,28 +223,16 @@ export function mapRewardToCardPage({
   };
 
   // Create dummy rewardPage for new rewards
-  const _rewardPage = rewardPage || {
+  const _rewardPage: CardPage['page'] = rewardPage || {
     id: '',
     // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-    boardId: null,
     bountyId: null,
-    createdAt: new Date(),
-    createdBy: '',
-    deletedAt: null,
-    deletedBy: null,
     hasContent: false,
-    headerImage: '',
     icon: null,
     type: 'bounty',
-    galleryImage: '',
     syncWithPageId: null,
-    index: 0,
-    cardId: null,
     path: '',
-    parentId: null,
-    sourceTemplateId: null,
     proposalId: null,
-    spaceId: '',
     title: '',
     updatedAt: new Date(),
     updatedBy: ''
@@ -260,8 +248,8 @@ export function mapRewardToCardPage({
     rootId: spaceId,
     type: 'card' as BlockTypes,
     updatedBy: _rewardPage.updatedBy,
-    createdBy: _rewardPage.createdBy,
-    createdAt: _rewardPage.createdAt ? new Date(_rewardPage.createdAt).getTime() : 0,
+    createdBy: rewardPage?.createdBy || '',
+    createdAt: rewardPage?.createdAt ? new Date(rewardPage.createdAt).getTime() : 0,
     updatedAt: _rewardPage.updatedAt ? new Date(_rewardPage.updatedAt).getTime() : 0,
     deletedAt: null,
     fields: { ...rewardFields, contentOrder: [] } as any,
@@ -295,12 +283,12 @@ function mapApplicationToCardPage({
   members
 }: {
   application: ApplicationMeta;
-  rewardPage: PageMeta;
+  rewardPage: CardPage['page'];
   reward: RewardWithUsers;
   members?: Record<string, Member>;
 }) {
   const applicationFields = { properties: {} };
-  const applicationSpaceId = rewardPage.spaceId;
+  const applicationSpaceId = reward.spaceId;
 
   applicationFields.properties = {
     ...applicationFields.properties,
@@ -331,30 +319,18 @@ function mapApplicationToCardPage({
     fields: { ...applicationFields, contentOrder: [] }
   };
   const authorName = members?.[application.createdBy]?.username;
-  const applicationPage: PageMeta = {
+  const applicationPage: CardPage['page'] = {
     id: application.id || '',
-    spaceId: applicationSpaceId,
-    boardId: null,
     bountyId: rewardPage?.id || '',
     title: `Application ${authorName ? `from ${authorName}` : ''}`,
     type: 'bounty',
-    cardId: application.id || '',
-    createdAt: new Date(application.createdAt),
     updatedAt: new Date(application.updatedAt),
-    createdBy: application.createdBy || '',
-    deletedAt: null,
-    deletedBy: null,
-    galleryImage: null,
     hasContent: false,
-    headerImage: null,
     icon: null,
-    index: 0,
-    parentId: rewardPage?.id || '',
     path: application.id,
     proposalId: null,
     syncWithPageId: null,
-    updatedBy: application.createdBy,
-    sourceTemplateId: rewardPage.sourceTemplateId
+    updatedBy: application.createdBy
   };
 
   return { card, page: applicationPage };
