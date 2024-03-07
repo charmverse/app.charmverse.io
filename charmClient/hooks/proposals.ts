@@ -13,6 +13,7 @@ import type { RubricProposalsUserInfo } from 'lib/proposals/getProposalsEvaluate
 import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 import type { GoBackToStepRequest } from 'lib/proposals/goBackToStep';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { RubricTemplate } from 'lib/proposals/rubric/getRubricTemplates';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
@@ -40,6 +41,10 @@ export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
 
 export function useGetProposalTemplate(pageId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(pageId ? `/api/proposals/templates/${pageId}` : null);
+}
+
+export function useGetRubricTemplates(spaceId: MaybeString) {
+  return useGET<RubricTemplate[]>(spaceId ? `/api/proposals/rubric-templates` : null, { spaceId });
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {

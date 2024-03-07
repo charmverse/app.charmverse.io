@@ -28,12 +28,14 @@ export async function getRubricTemplates({ spaceId }: { spaceId: string }): Prom
     }
   });
   return proposals.flatMap((p) => {
-    return (p.proposal?.evaluations || []).map((e) => {
-      return {
-        pageTitle: p.title,
-        evaluationTitle: e.title,
-        rubricCriteria: e.rubricCriteria as RubricCriteriaTyped[]
-      };
-    });
+    return (p.proposal?.evaluations || [])
+      .filter((e) => e.type === 'rubric')
+      .map((e) => {
+        return {
+          pageTitle: p.title,
+          evaluationTitle: e.title,
+          rubricCriteria: e.rubricCriteria as RubricCriteriaTyped[]
+        };
+      });
   });
 }

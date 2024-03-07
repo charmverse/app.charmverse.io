@@ -1,4 +1,3 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,7 +10,7 @@ import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(getRubricTemplatesEndpoint);
+handler.use(requireUser).get(getRubricTemplatesEndpoint);
 
 async function getRubricTemplatesEndpoint(req: NextApiRequest, res: NextApiResponse<RubricTemplate[]>) {
   const spaceId = req.query.spaceId as string | undefined;

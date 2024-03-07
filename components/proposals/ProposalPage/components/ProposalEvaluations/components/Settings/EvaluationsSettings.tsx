@@ -14,6 +14,7 @@ import { EvaluationStepRow } from '../Review/components/EvaluationStepRow';
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';
 import { RewardSettings } from './components/RewardSettings';
+import { RubricTemplatesButton } from './components/RubricTemplatesButton';
 
 export type Props = {
   proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
@@ -66,6 +67,7 @@ export function EvaluationsSettings({
           {proposal?.evaluations?.map((evaluation, index) => {
             // find matching template step, and allow editing if there were no reviewers set
             const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluation.title);
+            const showRubricImport = evaluation.type === 'rubric' && !readOnly && !matchingTemplateStep;
             return (
               <EvaluationStepRow
                 key={evaluation.id}
@@ -74,6 +76,15 @@ export function EvaluationsSettings({
                 result={null}
                 index={index + 1}
                 title={evaluation.title}
+                actions={
+                  showRubricImport && (
+                    <RubricTemplatesButton
+                      onSelect={({ rubricCriteria }) => {
+                        onChangeEvaluation?.(evaluation.id, { rubricCriteria });
+                      }}
+                    />
+                  )
+                }
               >
                 <EvaluationStepSettings
                   evaluation={evaluation}
