@@ -12,11 +12,6 @@ import { generateUser } from 'testing/utils/users';
 import { createNotificationsFromEvent } from '../../createNotificationsFromEvent';
 import { createRewardNotifications } from '../createRewardNotifications';
 
-jest.mock('lib/blockchain/getENSName', () => ({
-  getENSName: () => null,
-  getENSDetails: () => null
-}));
-
 describe(`Test reward events and notifications`, () => {
   it(`Should create reward notifications for reward creator and reviewers application.created event`, async () => {
     const { space, user } = await generateUserAndSpace();

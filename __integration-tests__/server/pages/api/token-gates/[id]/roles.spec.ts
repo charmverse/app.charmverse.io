@@ -18,11 +18,6 @@ let tokenGate: TokenGate;
 let role2: Role;
 let tokenGateToRole: TokenGateToRole;
 
-jest.mock('lib/blockchain/getENSName', () => ({
-  getENSName: () => null,
-  getENSDetails: () => null
-}));
-
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
 
