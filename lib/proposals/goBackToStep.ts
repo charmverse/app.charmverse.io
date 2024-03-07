@@ -2,8 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getDraftStep } from 'lib/proposals/getCurrentStep';
 import { isTruthy } from 'lib/utils/types';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { relay } from 'lib/websockets/relay';
 
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
@@ -105,7 +107,7 @@ export async function goBackToStep({
   }
 
   if (backToDraft) {
-    await prisma.proposal.update({
+    const result = await prisma.proposal.update({
       where: {
         id: proposalId
       },
@@ -113,6 +115,19 @@ export async function goBackToStep({
         status: 'draft'
       }
     });
+
+    relay.broadcast(
+      {
+        type: 'proposals_updated',
+        payload: [
+          {
+            id: proposalId,
+            currentStep: getDraftStep()
+          }
+        ]
+      },
+      result.spaceId
+    );
   } else {
     await publishProposalEvent({
       currentEvaluationId: maybeEvaluationId,

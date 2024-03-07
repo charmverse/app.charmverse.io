@@ -30,13 +30,7 @@ export function getCurrentStep({
   const lastEvaluation = evaluations[evaluations.length - 1];
 
   if (proposalStatus === 'draft' || !currentEvaluation) {
-    return {
-      title: 'Draft',
-      step: 'draft' as ProposalEvaluationStep,
-      result: 'in_progress',
-      id: 'draft',
-      index: 0
-    };
+    return getDraftStep();
   }
 
   if (currentEvaluation.id === lastEvaluation?.id && lastEvaluation?.result === 'pass' && hasRewards) {
@@ -57,5 +51,15 @@ export function getCurrentStep({
     id: currentEvaluation.id,
     // Add 1 with total evaluations so that draft step is also included
     index: currentEvaluation.index + 1
+  };
+}
+
+export function getDraftStep(): ProposalStep {
+  return {
+    title: 'Draft',
+    step: 'draft' as ProposalEvaluationStep,
+    result: 'in_progress',
+    id: 'draft',
+    index: 0
   };
 }

@@ -1,4 +1,4 @@
-import { ListItemIcon, ListItemText, MenuItem, SvgIcon } from '@mui/material';
+import { ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import { RiDraftLine } from 'react-icons/ri';
 
@@ -11,7 +11,7 @@ export function PublishProposalAction({ proposalId }: { proposalId: string }) {
   const { showConfirmation } = useConfirmationModal();
   const { trigger: publishProposal } = usePublishProposal({ proposalId });
   const { trigger: goBackToStep } = useGoBackToStep({ proposalId });
-  const { proposal, refreshProposal } = useProposal({
+  const { proposal } = useProposal({
     proposalId
   });
   const { showError } = useSnackbar();
@@ -42,14 +42,13 @@ export function PublishProposalAction({ proposalId }: { proposalId: string }) {
       } else {
         await publishProposal();
       }
-      refreshProposal();
     } catch (error) {
       showError(error);
     }
   }
 
   return (
-    <Tooltip title={disabledTooltip}>
+    <Tooltip title={disabledTooltip} disableInteractive>
       <div>
         <MenuItem data-test='context-menu-publish-proposal' disabled={!!disabledTooltip} onClick={onClick}>
           <ListItemIcon>

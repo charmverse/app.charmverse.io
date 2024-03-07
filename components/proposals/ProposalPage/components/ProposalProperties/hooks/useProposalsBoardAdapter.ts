@@ -34,7 +34,6 @@ export function useProposalsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { proposals, proposalsMap, mutateProposals, isLoading: isProposalsLoading } = useProposals();
-  // const { pages, loadingPages: isPagesLoading } = usePages();
   const { proposalBoardBlock, proposalBlocks } = useProposalBlocks();
 
   const isLoading = isProposalsLoading;
@@ -90,7 +89,7 @@ export function useProposalsBoardAdapter() {
               archived: p.archived,
               currentEvaluationId: p.currentEvaluationId,
               id: p.id,
-              status: p.status,
+              // status: p.status,
               currentStep: p.currentStep,
               sourceTemplateId: p.templateId,
               evaluations: p.evaluations,

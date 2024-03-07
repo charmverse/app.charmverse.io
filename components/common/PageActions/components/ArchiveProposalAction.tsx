@@ -19,7 +19,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const label = proposal?.archived ? 'Unarchive' : 'Archive';
 
   return (
-    <Tooltip title={disabled ? `You cannot ${label.toLowerCase()} this proposal` : ''}>
+    <Tooltip title={disabled ? `You cannot ${label.toLowerCase()} this proposal` : ''} disableInteractive>
       <div>
         <MenuItem
           data-test='header--archive-current-proposal'
@@ -27,7 +27,7 @@ export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
           onClick={async () => {
             try {
               await archiveProposal({ archived: !proposal?.archived });
-              refreshProposal();
+              // refreshProposal();
             } catch (error) {
               showError(error);
             }

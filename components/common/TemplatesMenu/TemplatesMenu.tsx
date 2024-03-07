@@ -95,32 +95,29 @@ export function TemplatesMenu({
       {liveTemplates?.map((template) => (
         <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
       ))}
-      {!!draftTemplates?.length && (
-        <>
-          <Divider />
-          <Box pl={2}>
-            <Typography color='secondary' variant='caption'>
-              Draft
-            </Typography>
-          </Box>
-          {draftTemplates.map((template) => (
-            <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
-          ))}
-        </>
-      )}
-      {!!archivedTemplates?.length && (
-        <>
-          <Divider />
-          <Box pl={2}>
-            <Typography color='secondary' variant='caption'>
-              Archive
-            </Typography>
-          </Box>
-          {archivedTemplates.map((template) => (
-            <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
-          ))}
-        </>
-      )}
+      {/* Menu cannot have fragments as children, so use array notation instead */}
+      {!!draftTemplates?.length && [
+        <Divider key={0} />,
+        <Box pl={2} key={1}>
+          <Typography color='secondary' variant='caption'>
+            Draft
+          </Typography>
+        </Box>,
+        draftTemplates.map((template) => (
+          <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+        ))
+      ]}
+      {!!archivedTemplates?.length && [
+        <Divider key={0} />,
+        <Box pl={2} key={1}>
+          <Typography color='secondary' variant='caption'>
+            Archive
+          </Typography>
+        </Box>,
+        ...archivedTemplates.map((template) => (
+          <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+        ))
+      ]}
       {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
         <MenuItem

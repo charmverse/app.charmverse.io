@@ -30,7 +30,7 @@ export function ProposalStickyFooter({
     } catch (error) {
       showMessage((error as Error).message, 'error');
     }
-    refreshProposal();
+    // refreshProposal();
   }
   const disabledTooltip = getProposalErrors({
     page: {
