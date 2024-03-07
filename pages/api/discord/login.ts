@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isTestEnv } from 'config/constants';
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
@@ -21,11 +22,13 @@ async function loginDiscordCodeHandler(
 
   try {
     const signupAnalytics = extractSignupAnalytics(req.cookies as any);
+    const discordApiUrl = isTestEnv ? (req.body.discordApiUrl as string) : undefined;
     const user = await loginByDiscord({
       code: tempAuthCode,
       hostName: req.headers.host,
       userId: req.session.anonymousUserId,
       signupAnalytics,
+      discordApiUrl,
       authFlowType: 'popup'
     });
 

@@ -44,6 +44,18 @@ export class LoginPage {
     await this.page.waitForURL('**/');
   }
 
+  async waitForLogin(discordApiUrl: string) {
+    await this.page.route('**/discord/login', async (route) => {
+      const _body = route.request().postData();
+      await route.continue({
+        postData: JSON.stringify({
+          ...(_body ? JSON.parse(_body) : undefined),
+          discordApiUrl
+        })
+      });
+    });
+  }
+
   async waitForWorkspaceLoaded({ domain, page }: { domain: string; page: { path: string; title: string } }) {
     await this.page.waitForURL(`**/${domain}/${page.path}`);
     await this.page.locator(`text=${page.title}`).first().waitFor();

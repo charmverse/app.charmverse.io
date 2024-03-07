@@ -27,7 +27,7 @@ type LoginWithDiscord = {
 export async function loginByDiscord({
   code,
   hostName,
-  discordApiUrl = isTestEnv ? 'http://localhost:9000' : undefined,
+  discordApiUrl,
   userId = v4(),
   signupAnalytics = {},
   authFlowType
