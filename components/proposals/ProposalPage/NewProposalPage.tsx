@@ -27,8 +27,8 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
+import { ControlledFormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { ControlledFormFieldsInput } from 'components/common/form/FormFieldsInput';
 import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -470,7 +470,7 @@ export function NewProposalPage({
                         }}
                       />
                     ) : (
-                      <ControlledFormFieldsInput
+                      <ControlledFormFieldAnswers
                         control={proposalFormFieldControl}
                         enableComments={false}
                         errors={proposalFormFieldErrors}

@@ -19,7 +19,7 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
-import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
+import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -403,7 +403,7 @@ function DocumentPageComponent({
                     formFields={proposal.form?.formFields ?? []}
                   />
                 ) : (
-                  <ProposalFormFieldsInput
+                  <ProposalFormFieldAnswers
                     pageId={page.id}
                     enableComments={proposal.permissions.comment}
                     proposalId={proposal.id}

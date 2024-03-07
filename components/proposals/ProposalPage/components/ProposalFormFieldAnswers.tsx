@@ -2,12 +2,12 @@ import type { FormField } from '@charmverse/core/prisma-client';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { FormFieldsInput } from 'components/common/form/FormFieldsInput';
+import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
-export function ProposalFormFieldsInput({
+export function ProposalFormFieldAnswers({
   proposalId,
   formFields,
   enableComments,
@@ -43,7 +43,7 @@ export function ProposalFormFieldsInput({
   }
 
   return (
-    <FormFieldsInput
+    <FormFieldAnswers
       enableComments={enableComments}
       onSave={onSave}
       pageId={pageId}

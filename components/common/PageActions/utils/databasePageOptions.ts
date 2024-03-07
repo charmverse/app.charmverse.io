@@ -318,21 +318,22 @@ export function transformCsvResults(results: ParseResult<Record<string, string>>
 
 export async function addNewCards({
   board,
+  boardPageId,
   views,
   results,
   spaceId,
   userId,
-  members,
-  apiPageKeys
+  members
 }: {
   board: Board;
+  boardPageId: string;
   views: BoardView[] | null;
   results: ParseResult<Record<string, string>>;
   spaceId: string;
   userId: string;
   members: Record<string, Member>;
-  apiPageKeys?: ApiPageKey[];
 }) {
+  const apiPageKeys = await charmClient.getApiPageKeys({ pageId: boardPageId });
   // We assume that the first column is the title so we rename it accordingly
   const { csvData, headers } = transformCsvResults(results, apiPageKeys ? 'Form Response' : undefined);
 
