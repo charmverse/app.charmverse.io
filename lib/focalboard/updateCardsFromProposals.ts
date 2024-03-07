@@ -17,7 +17,7 @@ import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
+  RubricCriteriaTyped
 } from 'lib/proposals/rubric/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
@@ -494,7 +494,7 @@ export async function updateCardsFromProposals({
                 properties = generateResyncedProposalEvaluationForCard({
                   properties,
                   rubricAnswers: (answers as ProposalRubricCriteriaAnswerWithTypedResponse[]) ?? [],
-                  rubricCriteria: (criteria as ProposalRubricCriteriaWithTypedParams[]) ?? [],
+                  rubricCriteria: (criteria as RubricCriteriaTyped[]) ?? [],
                   step: {
                     id: evaluation.id,
                     title: evaluation.title
@@ -583,7 +583,7 @@ export async function updateCardsFromProposals({
               properties = generateResyncedProposalEvaluationForCard({
                 properties,
                 rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-                rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
+                rubricCriteria: criteria as RubricCriteriaTyped[],
                 step: evaluation,
                 templates: boardBlockCardProperties
               });

@@ -44,7 +44,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
-import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposals/rubric/interfaces';
+import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
@@ -260,7 +260,7 @@ export function NewProposalPage({
           );
           const rubricCriteria = (
             evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
-          ) as ProposalRubricCriteriaWithTypedParams[];
+          ) as RubricCriteriaTyped[];
           // include author as default reviewer for feedback
           const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
           return {
