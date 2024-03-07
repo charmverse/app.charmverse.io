@@ -14,10 +14,14 @@ handler.use(requireUser).get(getRubricTemplatesEndpoint);
 
 async function getRubricTemplatesEndpoint(req: NextApiRequest, res: NextApiResponse<RubricTemplate[]>) {
   const spaceId = req.query.spaceId as string | undefined;
+  const excludeEvaluationId = req.query.excludeEvaluationId as string;
   const userId = req.session.user.id;
 
   if (!spaceId) {
     throw new InvalidInputError('spaceId is required');
+  }
+  if (!excludeEvaluationId) {
+    throw new InvalidInputError('excludeEvaluationId is required');
   }
 
   const { error } = await hasAccessToSpace({
@@ -30,7 +34,7 @@ async function getRubricTemplatesEndpoint(req: NextApiRequest, res: NextApiRespo
     throw error;
   }
 
-  const templates = await getRubricTemplates({ spaceId });
+  const templates = await getRubricTemplates({ excludeEvaluationId, spaceId });
 
   res.status(200).send(templates);
 }

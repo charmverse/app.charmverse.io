@@ -79,6 +79,7 @@ export function EvaluationsSettings({
                 actions={
                   showRubricImport && (
                     <RubricTemplatesButton
+                      excludeEvaluationId={evaluation.id}
                       onSelect={({ rubricCriteria }) => {
                         onChangeEvaluation?.(evaluation.id, { rubricCriteria });
                       }}

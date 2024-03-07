@@ -43,8 +43,14 @@ export function useGetProposalTemplate(pageId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(pageId ? `/api/proposals/templates/${pageId}` : null);
 }
 
-export function useGetRubricTemplates(spaceId: MaybeString) {
-  return useGET<RubricTemplate[]>(spaceId ? `/api/proposals/rubric-templates` : null, { spaceId });
+export function useGetRubricTemplates({
+  spaceId,
+  excludeEvaluationId
+}: {
+  spaceId: MaybeString;
+  excludeEvaluationId: string;
+}) {
+  return useGET<RubricTemplate[]>(spaceId ? `/api/proposals/rubric-templates` : null, { spaceId, excludeEvaluationId });
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {

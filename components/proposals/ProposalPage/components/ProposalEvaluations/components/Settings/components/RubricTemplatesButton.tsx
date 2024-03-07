@@ -1,18 +1,20 @@
 import LayersOutlinedIcon from '@mui/icons-material/LayersOutlined';
-import { Box, Chip, Collapse, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material';
 import { usePopupState, bindMenu } from 'material-ui-popup-state/hooks';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { CiImport } from 'react-icons/ci';
 
 import { useGetRubricTemplates } from 'charmClient/hooks/proposals';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { RubricTemplate } from 'lib/proposals/rubric/getRubricTemplates';
 
 type Props = {
+  excludeEvaluationId: string;
   onSelect: (template: RubricTemplate) => void;
 };
 
-export function RubricTemplatesButton({ onSelect }: Props) {
+export function RubricTemplatesButton({ excludeEvaluationId, onSelect }: Props) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'rubric-templates' });
   return (
     <>
@@ -25,6 +27,7 @@ export function RubricTemplatesButton({ onSelect }: Props) {
       </Tooltip>
       {popupState.isOpen && (
         <TemplatesMenu
+          excludeEvaluationId={excludeEvaluationId}
           popupState={popupState}
           onSelect={(template) => {
             onSelect(template);
@@ -36,14 +39,19 @@ export function RubricTemplatesButton({ onSelect }: Props) {
   );
 }
 
-function TemplatesMenu({ onSelect, popupState }: Props & { popupState: PopupState }) {
+function TemplatesMenu({ excludeEvaluationId, onSelect, popupState }: Props & { popupState: PopupState }) {
   const { space } = useCurrentSpace();
-  const { data: templates } = useGetRubricTemplates(space?.id);
+  const { data: templates, isLoading } = useGetRubricTemplates({ spaceId: space?.id, excludeEvaluationId });
   return (
     <Menu {...bindMenu(popupState)} open>
       <MenuItem dense sx={{ pointerEvents: 'none' }}>
         <ListItemText secondary='Copy rubric from a template' />
       </MenuItem>
+      {isLoading && (
+        <Box my={2}>
+          <LoadingComponent size={20} />
+        </Box>
+      )}
       {templates?.length === 0 && (
         <MenuItem disabled dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <ListItemText>No templates found</ListItemText>

@@ -8,34 +8,48 @@ export type RubricTemplate = {
   rubricCriteria: RubricCriteriaTyped[];
 };
 
-export async function getRubricTemplates({ spaceId }: { spaceId: string }): Promise<RubricTemplate[]> {
-  const proposals = await prisma.page.findMany({
+export async function getRubricTemplates({
+  excludeEvaluationId,
+  spaceId
+}: {
+  excludeEvaluationId: string;
+  spaceId: string;
+}): Promise<RubricTemplate[]> {
+  const evaluations = await prisma.proposalEvaluation.findMany({
     where: {
-      spaceId,
-      type: 'proposal_template'
+      id: {
+        not: excludeEvaluationId
+      },
+      type: 'rubric',
+      proposal: {
+        page: {
+          spaceId,
+          type: 'proposal_template'
+        }
+      }
     },
     include: {
+      rubricCriteria: {
+        orderBy: { index: 'asc' }
+      },
       proposal: {
-        include: {
-          evaluations: {
-            include: {
-              rubricCriteria: true
-            },
-            orderBy: { index: 'asc' }
+        select: {
+          page: {
+            select: {
+              title: true
+            }
           }
         }
       }
     }
   });
-  return proposals.flatMap((p) => {
-    return (p.proposal?.evaluations || [])
-      .filter((e) => e.type === 'rubric')
-      .map((e) => {
-        return {
-          pageTitle: p.title,
-          evaluationTitle: e.title,
-          rubricCriteria: e.rubricCriteria as RubricCriteriaTyped[]
-        };
-      });
-  });
+  return evaluations
+    .map(({ rubricCriteria, proposal, title }) => {
+      return {
+        pageTitle: proposal.page?.title || '',
+        evaluationTitle: title,
+        rubricCriteria: rubricCriteria as RubricCriteriaTyped[]
+      };
+    })
+    .sort((a, b) => a.pageTitle.localeCompare(b.pageTitle));
 }
