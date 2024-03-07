@@ -27,6 +27,7 @@ export function TwoFactorAuthUser() {
     <Box mt={4}>
       <Legend
         noBorder
+        wrap
         helperText='Use a mobile authentication app to get a verification code to enter CharmVerse everytime you login.'
       >
         Two-factor Authentication
