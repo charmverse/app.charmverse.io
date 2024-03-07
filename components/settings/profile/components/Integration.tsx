@@ -2,7 +2,7 @@ import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
 import MoreHoriz from '@mui/icons-material/MoreHoriz';
-import { Chip, Divider, IconButton, Menu, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Chip, Divider, IconButton, Menu, Stack, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
@@ -58,23 +58,28 @@ function Integration(props: IntegrationProps) {
             md: 'center'
           }}
         >
-          <Tooltip title={secondaryUserName ?? ''}>
-            <Typography
-              component='span'
-              fontSize={{
-                xs: '1em',
-                md: '1.15em'
-              }}
-              fontWeight={700}
-              minWidth={{
+          <Box
+            sx={{
+              minWidth: {
                 xs: 'fit-content',
                 md: 400
-              }}
-            >
-              {username}
-              {action}
-            </Typography>
-          </Tooltip>
+              }
+            }}
+          >
+            <Tooltip title={secondaryUserName}>
+              <Typography
+                component='span'
+                fontSize={{
+                  xs: '1em',
+                  md: '1.15em'
+                }}
+                fontWeight={700}
+              >
+                {username}
+                {action}
+              </Typography>
+            </Tooltip>
+          </Box>
 
           <Chip
             variant='outlined'
