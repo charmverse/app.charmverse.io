@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 
 import { useGetPaymentMethods } from 'charmClient/hooks/spaces';
+import { defaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -21,4 +23,25 @@ export function PaymentMethodsProvider({ children }: { children: ReactNode }) {
   return <PaymentMethodsContext.Provider value={value}>{children}</PaymentMethodsContext.Provider>;
 }
 
-export const usePaymentMethods = () => useContext(PaymentMethodsContext);
+export const usePaymentMethods = (
+  {
+    filterDefaultPaymentMethods = false
+  }: {
+    filterDefaultPaymentMethods: boolean;
+  } = {
+    filterDefaultPaymentMethods: false
+  }
+) => {
+  const [paymentMethods, refreshPaymentMethods] = useContext(PaymentMethodsContext);
+
+  const filteredPaymentMethods = useMemo(() => {
+    if (filterDefaultPaymentMethods) {
+      return paymentMethods.filter(
+        (pm) => !defaultPaymentMethods.some((dpm) => lowerCaseEqual(dpm.contractAddress, pm.contractAddress))
+      );
+    }
+    return paymentMethods;
+  }, [paymentMethods, filterDefaultPaymentMethods]);
+
+  return [filteredPaymentMethods, refreshPaymentMethods] as const;
+};
