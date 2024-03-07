@@ -160,6 +160,7 @@ type CreateUserAndSpaceInput = {
   spaceNotificationToggles?: NotificationToggles;
   xpsEngineId?: string;
   snapshotDomain?: string;
+  apiToken?: string;
 };
 
 export async function generateUserAndSpace({
@@ -175,7 +176,8 @@ export async function generateUserAndSpace({
   paidTier,
   spaceNotificationToggles,
   xpsEngineId,
-  snapshotDomain
+  snapshotDomain,
+  apiToken
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -204,6 +206,7 @@ export async function generateUserAndSpace({
               publicBountyBoard,
               notificationToggles: spaceNotificationToggles,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined),
+              ...(apiToken ? { apiToken: { create: { token: apiToken } } } : undefined),
               xpsEngineId,
               snapshotDomain
             }
@@ -223,9 +226,14 @@ export async function generateUserAndSpace({
       ...user
     },
     include: {
+      wallets: true,
       spaceRoles: {
         include: {
-          space: true
+          space: {
+            include: {
+              apiToken: true
+            }
+          }
         }
       }
     }
