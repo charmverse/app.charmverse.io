@@ -10,6 +10,7 @@ import useSWRMutation from 'swr/mutation';
 import { isAddress } from 'viem';
 
 import charmClient from 'charmClient';
+import { useRefreshENSName } from 'charmClient/hooks/blockchain';
 import { useAddUserWallets, useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -119,21 +120,12 @@ export function UserIdentities() {
   );
 
   const { disconnect } = useDiscordConnection();
+  const { trigger: triggerRefreshENSName, isMutating: isRefreshingEns } = useRefreshENSName();
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || (user.wallets.length === 0 && countConnectableIdentities(user) <= 1);
 
-  const [refreshingEns, setRefreshingEns] = useState(false);
-
-  function refreshENSName(address: string) {
-    setRefreshingEns(true);
-    charmClient.blockchain
-      .refreshENSName(address)
-      .then((_user) => {
-        updateUser(_user);
-      })
-      .finally(() => {
-        setRefreshingEns(false);
-      });
+  async function refreshENSName(address: string) {
+    await triggerRefreshENSName({ address }, { onSuccess: updateUser });
   }
 
   return (
@@ -286,15 +278,15 @@ export function UserIdentities() {
                       {wallet && primaryWallet && lowerCaseEqual(wallet.address, primaryWallet.address) && (
                         <Chip size='small' sx={{ ml: 1 }} label='Primary Wallet' variant='outlined' />
                       )}
-                      {isAddress(usernameToDisplay) && (
+                      {wallet?.address && isAddress(wallet.address) && (
                         <Tooltip
                           key='wallet-address'
                           onMouseEnter={(e) => e.stopPropagation()}
                           arrow
-                          placement='top'
-                          title={refreshingEns ? 'Looking up ENS Name' : 'Refresh ENS name'}
+                          placement='right'
+                          title={isRefreshingEns ? 'Looking up ENS Name' : 'Refresh ENS name'}
                         >
-                          {refreshingEns ? (
+                          {isRefreshingEns ? (
                             <IconButton>
                               <LoadingComponent size={20} isLoading />
                             </IconButton>

@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { isTestEnv } from 'config/constants';
 import { getENSName } from 'lib/blockchain/getENSName';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
