@@ -460,7 +460,7 @@ async function generateImportWorkspacePages({
         reviewedBy: undefined,
         spaceId: space.id,
         createdBy: space.createdBy,
-        status: 'draft',
+        status: 'published',
         id: newProposalId,
         workflowId: importingToDifferentSpace
           ? oldNewProposalWorkflowIdHashMap[proposal.workflowId!]

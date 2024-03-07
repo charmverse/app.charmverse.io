@@ -11,6 +11,7 @@ export type ProposalTemplateMeta = {
   contentType: 'free_form' | 'structured';
   title: string;
   archived?: boolean;
+  draft?: boolean;
 };
 
 export async function getProposalTemplates({
@@ -43,7 +44,8 @@ export async function getProposalTemplates({
         select: {
           id: true,
           archived: true,
-          formId: true
+          formId: true,
+          status: true
         }
       }
     }
@@ -54,11 +56,12 @@ export async function getProposalTemplates({
     proposalId: page.proposal!.id,
     contentType: page.proposal!.formId ? 'structured' : 'free_form',
     title: page.title,
-    archived: page.proposal?.archived || undefined
+    archived: page.proposal?.archived || undefined,
+    draft: page.proposal?.status === 'draft'
   }));
 
   if (!isAdmin) {
-    return res.filter((template) => !template.archived);
+    return res.filter((template) => !template.archived && !template.draft);
   }
 
   return res;

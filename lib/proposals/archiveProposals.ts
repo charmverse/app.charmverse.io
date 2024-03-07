@@ -41,11 +41,8 @@ export async function archiveProposals({
 
   relay.broadcast(
     {
-      type: 'proposals_archived',
-      payload: {
-        archived,
-        proposalIds
-      }
+      type: 'proposals_updated',
+      payload: proposalIds.map((id) => ({ id, archived }))
     },
     proposal.spaceId
   );

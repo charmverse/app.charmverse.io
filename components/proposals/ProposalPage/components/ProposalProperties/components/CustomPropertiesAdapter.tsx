@@ -38,7 +38,6 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     createdBy: '',
     updatedAt: proposalForm?.createdAt || '',
     updatedBy: '',
-    status: 'draft',
     ...proposalFromDb,
     fields: {
       ...proposalFromDb?.fields,

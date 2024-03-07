@@ -14,6 +14,7 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
+import { PublishProposalAction } from './PublishProposalAction';
 
 export type PageActionMeta = {
   proposalId: string | null;
@@ -98,6 +99,7 @@ export function PageActionsMenu({
         <ListItemText>Delete</ListItemText>
       </MenuItem>
       {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
+      {page.proposalId && <PublishProposalAction proposalId={page.proposalId} />}
       {page.type && (
         <DuplicatePageAction
           onComplete={handleClose}

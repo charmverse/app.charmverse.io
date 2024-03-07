@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 
 import { usePublishProposal } from 'charmClient/hooks/proposals';
@@ -15,7 +16,7 @@ export function ProposalStickyFooter({
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
-  page: { title: string; content?: any; sourceTemplateId: string | null };
+  page: { title: string; content?: any; sourceTemplateId: string | null; type: PageType };
   refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
@@ -29,14 +30,14 @@ export function ProposalStickyFooter({
     } catch (error) {
       showMessage((error as Error).message, 'error');
     }
-    refreshProposal();
+    // refreshProposal();
   }
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
       content: page.content,
       title: page.title,
-      type: 'proposal'
+      type: page.type
     },
     isDraft: false, // isDraft skips all errors
     proposalType: isStructuredProposal ? 'structured' : 'free_form',

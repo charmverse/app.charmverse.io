@@ -15,7 +15,7 @@ import { getCurrentStep } from './getCurrentStep';
 import type { ProposalStep } from './getCurrentStep';
 import type { ProposalFields } from './interfaces';
 
-export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'status'> & {
+export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id'> & {
   archived?: boolean;
   authors: ProposalAuthor[];
   fields: ProposalFields | null;
@@ -128,7 +128,7 @@ function mapDbProposalToProposalLite({
       hasPublishedRewards: rewards.length > 0
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
-    status: proposal.status,
+    // status: proposal.status,
     title: proposal.page?.title || '',
     updatedAt: (proposal.page?.updatedAt || new Date()).toISOString(),
     updatedBy: proposal.page?.updatedBy || '',

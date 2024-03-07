@@ -7,6 +7,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
@@ -58,7 +59,7 @@ export function ProposalProperties({
     selectedCredentialTemplates: proposal?.selectedCredentialTemplates
   };
 
-  async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
+  async function onChangeProperties(values: Omit<UpdateProposalRequest, 'proposalId'>) {
     try {
       await updateProposal(values);
       refreshProposal();

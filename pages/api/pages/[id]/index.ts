@@ -55,10 +55,6 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
     userId
   });
 
-  // TODO: we can remove this once we stop using "draft" status for all proposal templates
-  if (page.type === 'proposal_template') {
-    permissions.read = true;
-  }
   if (!permissions.read) {
     throw new ActionNotPermittedError('You do not have permissions to view this page');
   }
