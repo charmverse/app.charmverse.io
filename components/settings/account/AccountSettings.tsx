@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, InputLabel, Typography } from '@mui/material';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { DialogTitle } from 'components/common/Modal';
@@ -16,7 +16,7 @@ export function AccountSettings() {
   return (
     <>
       <Legend>My Account</Legend>
-      <DialogTitle>Select a public identity</DialogTitle>
+      <InputLabel sx={{ mb: 1 }}>Select your identity</InputLabel>
       <UserIdentities />
       <Box sx={{ mb: 2 }} />
       <AccountPreferences />

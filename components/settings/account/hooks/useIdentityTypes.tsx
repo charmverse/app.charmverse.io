@@ -16,7 +16,7 @@ export function useIdentityTypes(
   {
     size = 'medium'
   }: {
-    size?: IdentityIconSize;
+    size?: IdentityIconSize | number;
   } = {
     size: 'medium'
   }
