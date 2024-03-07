@@ -8,11 +8,11 @@ import { optimism } from 'viem/chains';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { prettyPrint } from 'lib/utils/strings';
+import { publishCredentialIssuableEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { signAndPublishCharmverseCredential } from './attestOffchain';
 import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
-import { requestOnChainCredentialIssuance } from './multiAttestOnchain';
 import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
@@ -182,15 +182,19 @@ export async function issueProposalCredentialsIfNecessary({
           };
 
           if (proposalWithSpaceConfig.space.issueCredentialsOnChainId) {
-            await requestOnChainCredentialIssuance({
-              chainId: proposalWithSpaceConfig.space.issueCredentialsOnChainId as EasSchemaChain,
+            await publishCredentialIssuableEvent({
               spaceId: proposalWithSpaceConfig.space.id,
-              credentialInputs: [{ recipient: targetWallet.address, data: credentialContent }],
-              type: 'proposal'
+              credential: {
+                chainId: proposalWithSpaceConfig.space.issueCredentialsOnChainId as EasSchemaChain,
+                type: 'proposal',
+                credentialInputs: {
+                  recipient: targetWallet.address,
+                  data: credentialContent
+                }
+              }
             });
           } else {
-            // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-            const publishedCredential = await signAndPublishCharmverseCredential({
+            await signAndPublishCharmverseCredential({
               chainId: optimism.id,
               recipient: targetWallet.address,
               credential: {

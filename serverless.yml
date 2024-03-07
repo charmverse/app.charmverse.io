@@ -51,25 +51,6 @@ constructs:
           # Using predictable queue names, allows us to be consistent across every deployments
           # We can use branch names as stages, so each deployed env can have their own queue
           QueueName: charmverse-serverless-queue-${sls:stage}.fifo
-  credentials-queue:
-    type: queue
-    # Setup the queue as FIFO
-    fifo: true
-    # maxRetries: 5 <-- Adjust retries attempt if the job fails, default to 3
-    worker:
-      # Function responsible for handle messages in the queue
-      handler: serverless/handler.credentialsWorker
-      environment:
-        DATABASE_URL: ${env:DATABASE_URL}
-        DOMAIN: https://app.charmverse.io
-        CREDENTIAL_WALLET_KEY: ${env:CREDENTIAL_WALLET_KEY}
-
-    extensions:
-      queue:
-        Properties:
-          # Using predictable queue names, allows us to be consistent across every deployments
-          # We can use branch names as stages, so each deployed env can have their own queue
-          QueueName: charmverse-credentials-queue-${sls:stage}.fifo
 
 provider:
   name: aws

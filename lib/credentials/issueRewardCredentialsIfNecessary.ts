@@ -6,11 +6,11 @@ import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
+import { publishCredentialIssuableEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { signAndPublishCharmverseCredential } from './attestOffchain';
 import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
-import { requestOnChainCredentialIssuance } from './multiAttestOnchain';
 import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
@@ -169,11 +169,16 @@ export async function issueRewardCredentialsIfNecessary({
           };
 
           if (baseReward.space.issueCredentialsOnChainId) {
-            await requestOnChainCredentialIssuance({
-              chainId: baseReward.space.issueCredentialsOnChainId as EasSchemaChain,
+            await publishCredentialIssuableEvent({
               spaceId: baseReward.space.id,
-              credentialInputs: [{ recipient: targetWallet.address, data: credentialContent }],
-              type: 'reward'
+              credential: {
+                chainId: baseReward.space.issueCredentialsOnChainId as EasSchemaChain,
+                type: 'reward',
+                credentialInputs: {
+                  recipient: targetWallet.address,
+                  data: credentialContent
+                }
+              }
             });
           } else {
             // Iterate through credentials one at a time so we can ensure they're properly created and tracked
