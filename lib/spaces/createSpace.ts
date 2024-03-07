@@ -19,9 +19,7 @@ import { getDefaultWorkflows } from 'lib/proposals/workflows/defaultWorkflows';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
 import { createDefaultReward } from 'lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
-import { getImportData } from 'lib/templates/getImportData';
 import { importSpaceData } from 'lib/templates/importSpaceData';
-import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 import { createSigningSecret, subscribeToAllEvents } from 'lib/webhookPublisher/subscribeToEvents';
 import { gettingStartedPage } from 'seedData/gettingStartedPage';
 
