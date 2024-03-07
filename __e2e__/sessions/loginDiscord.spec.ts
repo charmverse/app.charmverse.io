@@ -34,6 +34,7 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   await loginPage.universalConnectButton.click();
   await loginPage.connectDiscordButton.click();
   await loginPage.page.waitForEvent('popup');
+  await loginPage.waitForLogin(discordServer.host);
 
   // should auto redirect to workspace
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
@@ -67,6 +68,7 @@ test('login - allows user to login and see their workspace even when a wallet is
   await expect(loginPage.connectDiscordButton).toBeVisible();
   await loginPage.connectDiscordButton.click();
   await loginPage.page.waitForEvent('popup');
+  await loginPage.waitForLogin(discordServer.host);
 
   // should auto redirect to workspace
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
