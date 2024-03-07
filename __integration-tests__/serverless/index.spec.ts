@@ -21,6 +21,14 @@ global.fetch = jest.fn().mockResolvedValueOnce({
   status: 200
 });
 
+jest.mock('lib/blockchain/publicClient', () => ({
+  getPublicClient: jest.fn().mockReturnValue({
+    getEnsName: jest.fn().mockResolvedValue(null),
+    getEnsAvatar: jest.fn().mockResolvedValue('https://charmed.eth/avatar'),
+    getEnsText: jest.fn().mockResolvedValue('Description')
+  })
+}));
+
 beforeAll(async () => {
   const first = await generateUserAndSpaceWithApiToken(undefined, false);
 
