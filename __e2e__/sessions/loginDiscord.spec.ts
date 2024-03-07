@@ -25,7 +25,7 @@ const test = base.extend<Fixtures>({
   discordServer: discordServerFixture
 });
 
-test('login - allows user to login and see their workspace', async ({ discordServer, loginPage, context }, use) => {
+test('login - allows user to login and see their workspace', async ({ discordServer, loginPage }) => {
   const discordUserId = discordServer.discordUserId;
   const { user, space, page } = await generateUserAndSpace();
   await createDiscordUser({ userId: user.id, discordUserId });
