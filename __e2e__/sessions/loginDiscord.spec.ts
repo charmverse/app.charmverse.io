@@ -32,7 +32,7 @@ test('login - allows user to login and see their workspace', async ({ discordSer
 
   await loginPage.goto();
   await loginPage.universalConnectButton.click();
-  await loginPage.page.locator('data-test=connect-discord-button').click();
+  await loginPage.connectDiscordButton.click();
   await loginPage.page.waitForEvent('popup');
 
   // should auto redirect to workspace
@@ -63,44 +63,11 @@ test('login - allows user to login and see their workspace even when a wallet is
   await loginPage.goto();
 
   await expect(loginPage.universalConnectButton).toBeVisible();
-
-  const discordApiUrl = discordServer.host;
-  const discordWebsiteUrl = await loginPage.getDiscordUrl();
-  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
+  await loginPage.universalConnectButton.click();
+  await expect(loginPage.connectDiscordButton).toBeVisible();
+  await loginPage.connectDiscordButton.click();
+  await loginPage.page.waitForEvent('popup');
 
   // should auto redirect to workspace
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });
-
-// test('login - allows user to login and see their workspace even when a wallet is connected (regression check)', async ({
-//   discordServer,
-//   loginPage
-// }) => {
-//   const discordUserId = discordServer.discordUserId;
-//   const { address, user, space, page } = await generateUserAndSpace();
-//   await createDiscordUser({ userId: user.id, discordUserId });
-
-//   await mockWeb3({
-//     page: loginPage.page,
-//     context: { address, privateKey: false },
-//     init: ({ Web3Mock, context }) => {
-//       Web3Mock.mock({
-//         blockchain: 'ethereum',
-//         accounts: {
-//           return: [context.address]
-//         }
-//       });
-//     }
-//   });
-
-//   await loginPage.goto();
-
-//   await expect(loginPage.universalConnectButton).toBeVisible();
-
-//   const discordApiUrl = discordServer.host;
-//   const discordWebsiteUrl = await loginPage.getDiscordUrl();
-//   await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
-
-//   // should auto redirect to workspace
-//   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
-// });

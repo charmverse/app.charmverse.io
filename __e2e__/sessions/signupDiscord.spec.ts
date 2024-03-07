@@ -30,10 +30,9 @@ test('signup - allows user to sign up and create a workspace using Discord', asy
   signupPage
 }) => {
   await loginPage.goto();
-
-  const discordApiUrl = discordServer.host;
-  const discordWebsiteUrl = await loginPage.getDiscordUrl();
-  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
+  await loginPage.universalConnectButton.click();
+  await loginPage.connectDiscordButton.click();
+  await loginPage.page.waitForEvent('popup');
 
   await signupPage.waitForCreateSpacePage();
 });
