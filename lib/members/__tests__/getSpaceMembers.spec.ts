@@ -7,6 +7,11 @@ import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';
 import { createMemberProperty } from '../createMemberProperty';
 import { getSpaceMembers } from '../getSpaceMembers';
 
+jest.mock('lib/blockchain/getENSName', () => ({
+  getENSName: () => null,
+  getENSDetails: () => null
+}));
+
 describe('getSpaceMembers', () => {
   it(`Should get space members based on custom member property value`, async () => {
     const user1 = await createUserFromWallet();

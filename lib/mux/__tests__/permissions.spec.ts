@@ -8,6 +8,11 @@ const users: Record<string, string> = {};
 let pageId: string;
 let spaceId: string;
 
+jest.mock('lib/blockchain/getENSName', () => ({
+  getENSName: () => null,
+  getENSDetails: () => null
+}));
+
 beforeAll(async () => {
   const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
   const page = await generateForumPost({ spaceId: space.id, userId: user.id });

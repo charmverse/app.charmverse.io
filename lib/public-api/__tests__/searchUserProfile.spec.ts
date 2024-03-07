@@ -18,6 +18,11 @@ let user3Wallet: string;
 
 let space: Space;
 
+jest.mock('lib/blockchain/getENSName', () => ({
+  getENSName: () => null,
+  getENSDetails: () => null
+}));
+
 beforeAll(async () => {
   user1Wallet = randomETHWalletAddress();
   const generated = await generateUserAndSpaceWithApiToken({ walletAddress: user1Wallet });
