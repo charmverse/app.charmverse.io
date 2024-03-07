@@ -7,7 +7,7 @@ import { optimism } from 'viem/chains';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
 
-import { signAndPublishCharmverseCredential } from './attest';
+import { signAndPublishCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels } from './constants';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';

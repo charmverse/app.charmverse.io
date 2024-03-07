@@ -9,7 +9,7 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { prettyPrint } from 'lib/utils/strings';
 
-import { signAndPublishCharmverseCredential } from './attest';
+import { signAndPublishCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels } from './constants';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
