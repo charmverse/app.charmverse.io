@@ -100,7 +100,14 @@ export function AccountPreferences() {
           <InputLabel>
             Your email address
             <br />
-            <Typography variant='caption'>This is kept private and only used for Notifications and Updates</Typography>
+            <Typography
+              sx={{
+                whiteSpace: 'normal'
+              }}
+              variant='caption'
+            >
+              This is kept private and only used for notifications and updates
+            </Typography>
           </InputLabel>
           <TextField
             {...register('email')}
