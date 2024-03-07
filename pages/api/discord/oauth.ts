@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { isTestEnv } from 'config/constants';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
 import { getDiscordRedirectUrl } from 'lib/discord/getDiscordRedirectUrl';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -46,6 +47,13 @@ async function oauth(req: NextApiRequest, res: NextApiResponse) {
   const oauthUrl = `${discordUrl}&${discordQueryParams.join('&')}&state=${state}&redirect_uri=${encodeURIComponent(
     callbackUrl
   )}`;
+
+  if (isTestEnv) {
+    const testUrl =
+      'http://127.0.0.1:3335/authenticate/discord?code=1234&state={"redirect":"http://127.0.0.1:3335/","type":"login"}';
+
+    res.redirect(testUrl);
+  }
 
   res.redirect(oauthUrl);
 }
