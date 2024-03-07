@@ -186,19 +186,23 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
           application.walletAddress.endsWith('.eth') &&
           ethers.utils.isValidName(application.walletAddress)
         ) {
-          const walletAddress = await resolveENSName(application.walletAddress as string);
+          const walletAddress = await resolveENSName(application.walletAddress);
 
-          if (walletAddress) {
+          if (!walletAddress) {
             return null;
           }
 
           return {
-            address: walletAddress as string
+            address: walletAddress
           };
         }
 
+        if (!application.walletAddress) {
+          return null;
+        }
+
         return {
-          address: application.walletAddress as string
+          address: application.walletAddress
         };
       });
   }
