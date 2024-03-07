@@ -23,10 +23,10 @@ const test = base.extend<Fixtures>({
   databasePage: ({ page }, use) => use(new DatabasePage(page))
 });
 
-test.beforeAll(async () => {
-  // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch({});
+test.beforeAll(async ({ browser: _browser }) => {
+  browser = _browser;
 });
+
 test.describe.serial('Make a page public and visit it', async () => {
   // Will be set by the first test
   let shareUrl = '';
