@@ -2,7 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import type { ProposalRubricCriteriaWithTypedParams } from '../interfaces';
+import type { RubricCriteriaTyped } from '../interfaces';
 import { upsertRubricCriteria } from '../upsertRubricCriteria';
 
 describe('upsertRubricCriteria', () => {
@@ -28,7 +28,7 @@ describe('upsertRubricCriteria', () => {
       actorId: user.id
     });
 
-    expect(rubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
+    expect(rubrics).toEqual<RubricCriteriaTyped<'range'>[]>([
       expect.objectContaining({
         id: expect.any(String),
         index: 0,
@@ -50,7 +50,7 @@ describe('upsertRubricCriteria', () => {
       actorId: user.id
     });
 
-    expect(newRubrics).toEqual<ProposalRubricCriteriaWithTypedParams<'range'>[]>([
+    expect(newRubrics).toEqual<RubricCriteriaTyped<'range'>[]>([
       rubrics[0],
       expect.objectContaining({
         id: expect.any(String),

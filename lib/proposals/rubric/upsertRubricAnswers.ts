@@ -6,10 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { setPageUpdatedAt } from '../setPageUpdatedAt';
 
 import { getAnswersTable } from './getAnswersTable';
-import type {
-  ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from './interfaces';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './interfaces';
 
 type RubricAnswerData<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> = Pick<
   ProposalRubricCriteriaAnswerWithTypedResponse<T>,
@@ -39,7 +36,7 @@ export async function upsertRubricAnswers({ answers, userId, proposalId, evaluat
         in: answers.map((a) => a.rubricCriteriaId)
       }
     }
-  })) as ProposalRubricCriteriaWithTypedParams[];
+  })) as RubricCriteriaTyped[];
 
   for (const answer of answers) {
     const answerCriteria = criteria.find((c) => c.id === answer.rubricCriteriaId);
