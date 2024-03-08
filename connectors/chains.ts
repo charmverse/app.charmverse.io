@@ -472,9 +472,7 @@ export function getChainList(options: { enableTestnets?: boolean } = {}) {
   return (
     Object.values(RPC)
       // filter out testnets in prod, except for Goerli and Sepolia
-      .filter(
-        (chain) => enableTestNets || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id
-      )
+      .filter((chain) => enableTestNets || !chain.testnet || chain.chainId === sepolia.id)
       .sort(sortChainList)
   );
 }
