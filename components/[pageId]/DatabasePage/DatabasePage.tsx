@@ -52,6 +52,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   const { pages } = usePages();
+  const shownCardPage = Object.values(pages).find((_page) => _page?.cardId === shownCardId);
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -178,6 +179,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
                 onClose={() => {
                   showCard(null);
                 }}
+                showParentChip={shownCardPage?.parentId !== page.id}
                 readOnly={readOnly}
               />
             )}
