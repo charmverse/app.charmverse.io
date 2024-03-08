@@ -13,6 +13,8 @@ import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialData, CredentialDataInput } from 'lib/credentials/schemas';
+import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
+import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 export function UserCredentialRow({
@@ -74,7 +76,9 @@ export function UserCredentialRow({
         }
       : {
           title: schemaInfo?.title ?? '',
-          subtitle: schemaInfo?.organization ?? '',
+          subtitle: [proposalCredentialSchemaId, rewardCredentialSchemaId].includes(credential.schemaId)
+            ? credential.content.Organization
+            : schemaInfo?.organization ?? '',
           iconUrl: schemaInfo?.iconUrl ?? '',
           attestationContent: (schemaInfo?.fields ?? []).map((fieldDef) => ({
             name: fieldDef.name,

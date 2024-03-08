@@ -61,12 +61,7 @@ const optimismCharmverseProposalSchema: TrackedSchemaParams = {
   title: 'Proposal',
   organization: 'CharmVerse',
   iconUrl: charmverseLogo,
-  fields: [
-    { name: 'proposalId', mapper: (val) => `Proposal ${val}` },
-    {
-      name: 'proposalTitle'
-    }
-  ]
+  fields: [{ name: 'Event' }]
 };
 
 const optimismCharmverseRewardSchema: TrackedSchemaParams = {
