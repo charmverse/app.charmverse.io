@@ -35,14 +35,14 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
   }
 
   const allCredentials = await Promise.all([
-    // getCharmverseCredentialsByWallets({ wallets }).catch((error) => {
-    //   log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
-    //   return [];
-    // }),
-    // getGitcoinCredentialsByWallets({ wallets }).catch((error) => {
-    //   log.error(`Error loading Gitcoin Ceramic credentials for user ${userId}`, { error, userId });
-    //   return [];
-    // }),
+    getCharmverseCredentialsByWallets({ wallets }).catch((error) => {
+      log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
+      return [];
+    }),
+    getGitcoinCredentialsByWallets({ wallets }).catch((error) => {
+      log.error(`Error loading Gitcoin Ceramic credentials for user ${userId}`, { error, userId });
+      return [];
+    }),
     getAllOnChainAttestations({ wallets })
   ]).then((data) => data.flat());
 
