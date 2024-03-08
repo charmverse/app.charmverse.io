@@ -8,7 +8,6 @@ import { getAddress } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
 
 import { isProdEnv, isStagingEnv } from 'config/constants';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
@@ -249,12 +248,6 @@ export async function getAllOnChainAttestations({
     acc[val.id] = iconUrl;
     return acc;
   }, {} as Record<string, string | null>);
-
-  prettyPrint({
-    proposalCredentials,
-    rewardCredentials,
-    proposalCredentialIconUrls
-  });
 
   return [...proposalCredentials, ...rewardCredentials, ...otherCredentials].map((attestation) => {
     const favoriteCredential = favoriteCredentials.find((f) => f.attestationId === attestation.id);
