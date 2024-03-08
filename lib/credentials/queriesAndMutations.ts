@@ -2,7 +2,6 @@ import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
-import { optimism } from 'viem/chains';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint, isStagingEnv } from 'config/constants';
 
@@ -11,7 +10,8 @@ import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { CredentialData } from './schemas';
-import { attestationSchemaIds } from './schemas';
+import { proposalCredentialSchemaId } from './schemas/proposal';
+import { rewardCredentialSchemaId } from './schemas/reward';
 
 const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
@@ -148,7 +148,7 @@ export async function getCharmverseCredentialsByWallets({
       variables: {
         filter: {
           where: {
-            schemaId: { in: [attestationSchemaIds.proposal[optimism.id], attestationSchemaIds.reward[optimism.id]] },
+            schemaId: { in: [proposalCredentialSchemaId, rewardCredentialSchemaId] },
             recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
