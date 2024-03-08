@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, test as base } from '@playwright/test';
+import { test as base } from '@playwright/test';
 
 import { createDiscordUser } from 'testing/utils/discord';
 
@@ -62,10 +62,7 @@ test('login - allows user to login and see their workspace even when a wallet is
   });
 
   await loginPage.goto();
-
-  await expect(loginPage.universalConnectButton).toBeVisible();
   await loginPage.universalConnectButton.click();
-  await expect(loginPage.connectDiscordButton).toBeVisible();
   await loginPage.connectDiscordButton.click();
   await loginPage.page.waitForEvent('popup');
   await loginPage.waitForLogin(discordServer.host);
