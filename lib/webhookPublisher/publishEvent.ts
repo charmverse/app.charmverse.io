@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { OnChainAttestationInput, OnChainMultiAttestationInput } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -403,4 +404,18 @@ export async function publishCardEvent(context: CardEventContext) {
       return null;
     }
   }
+}
+
+export type CredentialIssuableContext = {
+  spaceId: string;
+  credential: OnChainAttestationInput;
+};
+
+export async function publishCredentialIssuableEvent(context: CredentialIssuableContext) {
+  const space = await getSpaceEntity(context.spaceId);
+  return publishWebhookEvent(context.spaceId, {
+    scope: WebhookEventNames.CredentialIssuable,
+    space,
+    credential: context.credential
+  });
 }
