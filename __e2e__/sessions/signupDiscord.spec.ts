@@ -32,8 +32,9 @@ test('signup - allows user to sign up and create a workspace using Discord', asy
   await loginPage.goto();
   await loginPage.universalConnectButton.click();
   await loginPage.connectDiscordButton.click();
-  await loginPage.page.waitForEvent('popup');
-
-  await loginPage.waitForLogin(discordServer.host);
-  await signupPage.waitForCreateSpacePage();
+  await Promise.all([
+    loginPage.page.waitForEvent('popup'),
+    loginPage.waitForLogin(discordServer.host),
+    signupPage.waitForCreateSpacePage()
+  ]);
 });
