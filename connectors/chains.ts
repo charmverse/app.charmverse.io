@@ -5,7 +5,6 @@ import {
   arbitrum,
   avalanche,
   base,
-  baseGoerli,
   baseSepolia,
   bsc,
   celo,
@@ -166,19 +165,6 @@ export const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/base-logo.svg',
     shortName: 'base-sepolia',
     testnet: true
-  },
-  BASE_TESTNET: {
-    ...EVM_DEFAULT,
-    chainId: baseGoerli.id,
-    viem: baseGoerli,
-    chainName: 'Base - Goerli Testnet',
-    rpcUrls: ['https://goerli.base.org'],
-    gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
-    blockExplorerUrls: ['https://goerli.basescan.org'],
-    iconUrl: '/images/cryptoLogos/base-logo.svg',
-    shortName: 'base-testnet',
-    testnet: true,
-    unlockNetwork: true
   },
   // https://docs.zora.co/docs/zora-network/network
   ZORA: {
@@ -471,8 +457,8 @@ export function getChainList(options: { enableTestnets?: boolean } = {}) {
   const enableTestNets = isDevEnv || options.enableTestnets;
   return (
     Object.values(RPC)
-      // filter out testnets in prod, except for Goerli and Sepolia
-      .filter((chain) => enableTestNets || !chain.testnet || chain.chainId === sepolia.id)
+      // filter out testnets in prod, except for Sepolia
+      .filter((chain) => (enableTestNets && chain.chainId !== 5) || !chain.testnet || chain.chainId === sepolia.id)
       .sort(sortChainList)
   );
 }
