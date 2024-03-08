@@ -1,42 +1,31 @@
 // 1. Loan Officer Schema used by Financial Institution for verifying a loan officer
 import type { AttestationType } from '@charmverse/core/prisma';
-import { optimism } from 'viem/chains';
-
-import type { EasSchemaChain } from '../connectors';
 
 import type { ProposalCredential } from './proposal';
-import { encodeProposalCredential, optimismProposalCredentialSchemaId } from './proposal';
+import { encodeProposalCredential, proposalCredentialSchemaId } from './proposal';
 import type { RewardCredential } from './reward';
-import { encodeRewardCredential, optimismRewardCredentialSchemaId } from './reward';
+import { encodeRewardCredential, rewardCredentialSchemaId } from './reward';
 
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
   reward: 'Reward'
 };
 
-export const attestationSchemaIds: Record<AttestationType, { [key in EasSchemaChain]: string }> = {
-  proposal: {
-    [optimism.id]: optimismProposalCredentialSchemaId
-  },
-  reward: {
-    [optimism.id]: optimismRewardCredentialSchemaId
-  }
+export const attestationSchemaIds: Record<AttestationType, string> = {
+  proposal: proposalCredentialSchemaId,
+  reward: rewardCredentialSchemaId
 };
+
+export type CredentialDataInput<T extends AttestationType = AttestationType> = T extends 'proposal'
+  ? ProposalCredential
+  : T extends 'reward'
+  ? RewardCredential
+  : never;
 
 export type CredentialData<T extends AttestationType = AttestationType> = {
   type: T;
-  data: T extends 'proposal' ? ProposalCredential : T extends 'reward' ? RewardCredential : never;
+  data: CredentialDataInput<T>;
 };
-
-export function getAttestationSchemaId({
-  chainId,
-  credentialType
-}: {
-  chainId: EasSchemaChain;
-  credentialType: AttestationType;
-}) {
-  return attestationSchemaIds[credentialType][chainId];
-}
 
 export function encodeAttestion<T extends AttestationType = AttestationType>({ type, data }: CredentialData<T>) {
   if (type === 'proposal') {

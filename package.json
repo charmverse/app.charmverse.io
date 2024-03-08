@@ -192,7 +192,7 @@
     "html-to-text": "^8.2.0",
     "immutable": "^4.0.0",
     "iron-session": "^6.0.5",
-    "jose": "^4.11.2",
+    "jose": "^4.15.5",
     "jszip": "^3.10.1",
     "key-did-provider-ed25519": "^3.0.2",
     "key-did-resolver": "^3.0.0",

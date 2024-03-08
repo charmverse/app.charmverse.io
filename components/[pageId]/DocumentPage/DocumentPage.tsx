@@ -3,7 +3,7 @@ import type { Theme } from '@mui/material';
 import { Box, Tab, Tabs, useMediaQuery } from '@mui/material';
 import dynamic from 'next/dynamic';
 import type { EditorState } from 'prosemirror-state';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
 import { useGetReward } from 'charmClient/hooks/rewards';
@@ -19,7 +19,7 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
-import { ProposalFormFieldsInput } from 'components/proposals/ProposalPage/components/ProposalFormFieldsInput';
+import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
@@ -67,6 +67,8 @@ export type DocumentPageProps = {
   setEditorState?: (state: EditorState) => void;
   sidebarView?: IPageSidebarContext['activeView'];
   setSidebarView?: IPageSidebarContext['setActiveView'];
+  showCard?: (cardId: string | null) => void;
+  showParentChip?: boolean;
 };
 
 function DocumentPageComponent({
@@ -76,7 +78,9 @@ function DocumentPageComponent({
   readOnly = false,
   setEditorState,
   sidebarView,
-  setSidebarView
+  setSidebarView,
+  showCard,
+  showParentChip
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -91,6 +95,7 @@ function DocumentPageComponent({
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
 
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
@@ -139,7 +144,8 @@ function DocumentPageComponent({
   const isSharedPage = router.pathname.startsWith('/share');
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
-  const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
+  const _showParentChip =
+    showParentChip ?? !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
   const hideCardDetails = isRewardsPage && page.bountyId;
@@ -164,6 +170,26 @@ function DocumentPageComponent({
   function onParticipantUpdate(participants: FrontendParticipant[]) {
     setPageProps({ participants });
   }
+
+  const _showCard = useCallback(
+    async (cardId: string | null) => {
+      if (showCard) {
+        showCard(cardId);
+      } else {
+        if (cardId === null) {
+          updateURLQuery({ cardId: null });
+          return;
+        }
+
+        if (insideModal) {
+          updateURLQuery({ viewId: router.query.viewId as string, cardId });
+        } else {
+          navigateToSpacePath(`/${cardId}`);
+        }
+      }
+    },
+    [router.query, showCard]
+  );
 
   function onConnectionEvent(event: ConnectionEvent) {
     if (event.type === 'error') {
@@ -294,7 +320,7 @@ function DocumentPageComponent({
               readOnly={readOnly || !!enableSuggestingMode}
               setPage={savePage}
               readOnlyTitle={!!page.syncWithPageId}
-              parentId={showParentChip ? card.parentId : null}
+              parentId={_showParentChip && card ? card.parentId : null}
               insideModal={insideModal}
               pageId={page.id}
               focusDocumentEditor={focusDocumentEditor}
@@ -361,6 +387,7 @@ function DocumentPageComponent({
                       syncWithPageId={page.syncWithPageId}
                       board={board}
                       card={card}
+                      showCard={_showCard}
                       cards={cards}
                       activeView={activeBoardView}
                       views={boardViews}
@@ -403,7 +430,7 @@ function DocumentPageComponent({
                     formFields={proposal.form?.formFields ?? []}
                   />
                 ) : (
-                  <ProposalFormFieldsInput
+                  <ProposalFormFieldAnswers
                     pageId={page.id}
                     enableComments={proposal.permissions.comment}
                     proposalId={proposal.id}
@@ -503,7 +530,7 @@ function DocumentPageComponent({
           )}
         </PageEditorContainer>
       </Box>
-      {page.type === 'proposal' && proposal?.status === 'draft' && (
+      {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
         <ProposalStickyFooter
           page={page}
           proposal={proposal}

@@ -17,10 +17,7 @@ import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPag
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
-import type {
-  ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from './rubric/interfaces';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
 
 export type ProposalEvaluationStatus =
   | 'in_progress'
@@ -55,7 +52,7 @@ export type ProposalFields = {
 export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings'> & {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
-  rubricCriteria: ProposalRubricCriteriaWithTypedParams[];
+  rubricCriteria: RubricCriteriaTyped[];
   permissions: ProposalEvaluationPermission[];
   reviewers: ProposalReviewer[];
   voteSettings: VoteSettings | null;

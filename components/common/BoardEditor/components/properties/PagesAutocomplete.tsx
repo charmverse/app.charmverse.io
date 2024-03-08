@@ -40,35 +40,58 @@ const StyledAutocomplete = styled(Autocomplete<PageListItem & { selected: boolea
 
 const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 
+const StyledStack = styled(Stack)`
+  flex-direction: row;
+  align-items: center;
+  overflow-x: hidden;
+  cursor: pointer;
+  gap: ${({ theme }) => theme.spacing(0.25)};
+`;
+
+const StyledRelatedPage = styled(Stack)`
+  flex-direction: row;
+  padding-left: ${({ theme }) => theme.spacing(0.5)};
+  padding-right: ${({ theme }) => theme.spacing(0.5)};
+  align-items: center;
+  cursor: pointer;
+  border-radius: ${({ theme }) => theme.spacing(0.25)};
+  transition: ${({ theme }) =>
+    theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
+      duration: theme.transitions.duration.shortest
+    })};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.action.hover};
+    transition: ${({ theme }) =>
+      theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
+        duration: theme.transitions.duration.shortest
+      })};
+  }
+`;
+
 export function RelationPageListItemsContainer({
   readOnly,
   pageListItems,
-  wrapColumn,
-  onRemove
+  onRemove,
+  onClick
 }: {
   readOnly?: boolean;
-  wrapColumn?: boolean;
   pageListItems: PageListItem[];
   onRemove?: (id: string) => void;
+  onClick?: (id: string) => void;
 }) {
   return (
     <>
       {pageListItems.map((pageListItem) => {
         return (
-          <Stack
-            key={pageListItem.id}
-            gap={0.5}
-            flexDirection='row'
-            alignItems='center'
-            sx={wrapColumn ? { overflowX: 'hidden' } : { overflowX: 'hidden' }}
-          >
+          <StyledStack key={pageListItem.id} onClick={() => onClick?.(pageListItem.id)}>
             <PageIcon icon={pageListItem.icon} isEditorEmpty={!pageListItem.hasContent} pageType={pageListItem.type} />
             <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
               {pageListItem.title || 'Untitled'}
             </PageTitle>
 
             {!readOnly && onRemove && (
-              <IconButton size='small' onClick={() => onRemove(pageListItem.id)}>
+              <IconButton sx={{ ml: 1 }} size='small' onClick={() => onRemove(pageListItem.id)}>
                 <CloseIcon
                   sx={{
                     fontSize: 14
@@ -78,7 +101,7 @@ export function RelationPageListItemsContainer({
                 />
               </IconButton>
             )}
-          </Stack>
+          </StyledStack>
         );
       })}
     </>
@@ -152,14 +175,15 @@ function PagesAutocompleteBase({
       readOnly={readOnly}
       onClick={onClickToEdit}
     >
-      <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={0.5}>
+      <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={1}>
         {selectedPageListItems.length === 0 ? (
           showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
         ) : (
           <RelationPageListItemsContainer
             readOnly={readOnly}
-            wrapColumn={wrapColumn}
             pageListItems={selectedPageListItems}
+            // only showCard if its in readOnly mode since we need to open the select field in non readOnly mode
+            onClick={readOnly ? showCard : undefined}
           />
         )}
       </Box>
@@ -195,27 +219,9 @@ function PagesAutocompleteBase({
                   <Typography variant='subtitle1' color='secondary' mr={0.5}>
                     In
                   </Typography>
-                  <Stack
+                  <StyledRelatedPage
                     onClick={() => {
                       navigateToSpacePath(`/${connectedBoard.path}`);
-                    }}
-                    sx={{
-                      flexDirection: 'row',
-                      px: 0.5,
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      borderRadius: (theme) => theme.spacing(0.25),
-                      transition: (theme) =>
-                        theme.transitions.create('background-color', {
-                          duration: theme.transitions.duration.shortest
-                        }),
-                      '&:hover': {
-                        backgroundColor: (theme) => theme.palette.action.hover,
-                        transition: (theme) =>
-                          theme.transitions.create('background-color', {
-                            duration: theme.transitions.duration.shortest
-                          })
-                      }
                     }}
                   >
                     <PageIcon
@@ -224,10 +230,13 @@ function PagesAutocompleteBase({
                       isEditorEmpty={!connectedBoard.hasContent}
                       pageType={connectedBoard.type}
                     />
-                    <PageTitle hasContent={!connectedBoard.title} sx={{ fontWeight: 'bold' }}>
+                    <PageTitle
+                      hasContent={!connectedBoard.title}
+                      sx={{ fontWeight: 'bold', maxWidth: 250, flexGrow: 1 }}
+                    >
                       {connectedBoard.title || 'Untitled'}
                     </PageTitle>
-                  </Stack>
+                  </StyledRelatedPage>
                 </Stack>
               ) : null,
               ...(variant === 'standard' && { disableUnderline: true })

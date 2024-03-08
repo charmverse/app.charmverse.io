@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposals/rubric/interfaces';
+import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from 'lib/proposals/rubric/upsertRubricCriteria';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -16,10 +16,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).put(upsertProposalCriteriaController);
 
-async function upsertProposalCriteriaController(
-  req: NextApiRequest,
-  res: NextApiResponse<ProposalRubricCriteriaWithTypedParams[]>
-) {
+async function upsertProposalCriteriaController(req: NextApiRequest, res: NextApiResponse<RubricCriteriaTyped[]>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 

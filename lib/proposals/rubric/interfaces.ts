@@ -13,13 +13,16 @@ export type ProposalRubricParameterMap = {
   range: RubricRangeParameters;
 };
 
-export type ProposalRubricCriteriaParams<T extends ProposalRubricCriteriaType> = {
+export type RubricCriteriaTypedFields<T extends ProposalRubricCriteriaType = 'range'> = {
   type: T;
   parameters: ProposalRubricParameterMap[T];
 };
 
-export type ProposalRubricCriteriaWithTypedParams<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> =
-  Omit<ProposalRubricCriteria, 'type' | 'parameters'> & ProposalRubricCriteriaParams<T>;
+export type RubricCriteriaTyped<T extends ProposalRubricCriteriaType = ProposalRubricCriteriaType> = Omit<
+  ProposalRubricCriteria,
+  'type' | 'parameters'
+> &
+  RubricCriteriaTypedFields<T>;
 
 // Answer types
 export type RubricRangeAnswer = {

@@ -128,7 +128,13 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
           />
         </InlineDatabaseContainer>
         {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-          <PageDialog key={shownCardId} pageId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
+          <PageDialog
+            showCard={showCard}
+            key={shownCardId}
+            pageId={shownCardId}
+            onClose={() => setShownCardId(null)}
+            readOnly={readOnly}
+          />
         )}
       </DbViewSettingsProvider>
       <FocalBoardPortal />

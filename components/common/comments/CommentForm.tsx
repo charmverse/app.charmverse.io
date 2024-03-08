@@ -64,7 +64,7 @@ export function CommentForm({
       },
       key: editorKey,
       disableRowHandles: true,
-      focusOnInit: true,
+      focusOnInit: false,
       placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,

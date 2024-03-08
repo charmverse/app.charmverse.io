@@ -10,6 +10,7 @@ import useSWRMutation from 'swr/mutation';
 import { isAddress } from 'viem';
 
 import charmClient from 'charmClient';
+import { useRefreshENSName } from 'charmClient/hooks/blockchain';
 import { useAddUserWallets, useSetPrimaryWallet } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -49,7 +50,7 @@ type IdentityModalProps = {
 function IdentityModal(props: IdentityModalProps) {
   const { close, isOpen } = props;
   return (
-    <Modal open={isOpen} onClose={close} size='large' title='Select a public identity'>
+    <Modal open={isOpen} onClose={close} size='large' title='Select your identity'>
       <UserIdentities />
     </Modal>
   );
@@ -59,7 +60,7 @@ export function UserIdentities() {
   const accountsPopupState = usePopupState({ variant: 'popover', popupId: 'accountsModal' });
   const { updateUser, user } = useUser();
   const identityTypes = useIdentityTypes({
-    size: 'small'
+    size: 18
   });
   const identityType = user?.identityType ?? 'Wallet';
   const [generatedName, setGeneratedName] = useState(
@@ -119,26 +120,16 @@ export function UserIdentities() {
   );
 
   const { connect } = useDiscordConnection();
+  const { trigger: triggerRefreshENSName, isMutating: isRefreshingEns } = useRefreshENSName();
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || (user.wallets.length === 0 && countConnectableIdentities(user) <= 1);
 
-  const [refreshingEns, setRefreshingEns] = useState(false);
-
-  function refreshENSName(address: string) {
-    setRefreshingEns(true);
-    charmClient.blockchain
-      .refreshENSName(address)
-      .then((_user) => {
-        updateUser(_user);
-      })
-      .finally(() => {
-        setRefreshingEns(false);
-      });
+  async function refreshENSName(address: string) {
+    await triggerRefreshENSName({ address }, { onSuccess: updateUser });
   }
 
   return (
     <>
-      <Typography mb={2}>Select which integration you want to show as your username</Typography>
       <Box mb={1}>
         {identityTypes.map((item) => {
           const usernameToDisplay = item.type === 'RandomName' ? generatedName : item.username;
@@ -272,7 +263,13 @@ export function UserIdentities() {
                 action={
                   item.type === 'RandomName' ? (
                     <Tooltip key='RandomName' arrow placement='top' title='Generate a new name'>
-                      <IconButton onClick={() => setGeneratedName(randomName())}>
+                      <IconButton
+                        size='small'
+                        sx={{
+                          p: 0.5
+                        }}
+                        onClick={() => setGeneratedName(randomName())}
+                      >
                         <RefreshIcon fontSize='small' />
                       </IconButton>
                     </Tooltip>
@@ -281,15 +278,15 @@ export function UserIdentities() {
                       {wallet && primaryWallet && lowerCaseEqual(wallet.address, primaryWallet.address) && (
                         <Chip size='small' sx={{ ml: 1 }} label='Primary Wallet' variant='outlined' />
                       )}
-                      {isAddress(usernameToDisplay) && (
+                      {wallet?.address && isAddress(wallet.address) && (
                         <Tooltip
                           key='wallet-address'
                           onMouseEnter={(e) => e.stopPropagation()}
                           arrow
-                          placement='top'
-                          title={refreshingEns ? 'Looking up ENS Name' : 'Refresh ENS name'}
+                          placement='right'
+                          title={isRefreshingEns ? 'Looking up ENS Name' : 'Refresh ENS name'}
                         >
-                          {refreshingEns ? (
+                          {isRefreshingEns ? (
                             <IconButton>
                               <LoadingComponent size={20} isLoading />
                             </IconButton>

@@ -252,6 +252,7 @@ describe('importWorkspacePages - proposal content', () => {
 
     sourceProposal = await testUtilsProposals
       .generateProposal({
+        proposalStatus: 'published',
         spaceId: sourceSpace.id,
         userId: sourceSpaceUser.id,
         evaluationInputs: [

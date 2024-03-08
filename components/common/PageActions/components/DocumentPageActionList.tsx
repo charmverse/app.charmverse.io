@@ -34,6 +34,7 @@ import { DocumentHistory } from './DocumentHistory';
 import { DuplicatePageAction } from './DuplicatePageAction';
 import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
+import { PublishProposalAction } from './PublishProposalAction';
 import { RewardActions } from './RewardActions';
 import { UndoAction } from './UndoAction';
 
@@ -315,6 +316,7 @@ export function DocumentPageActionList({
         disabled={!pagePermissions?.delete || page.deletedAt !== null || !!page.syncWithPageId}
       />
       {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
+      {page.proposalId && <PublishProposalAction proposalId={page.proposalId} />}
       {undoEditorChanges && <UndoAction onClick={undoEditorChanges} disabled={!pagePermissions?.edit_content} />}
       <Divider />
       <ExportMarkdownAction disabled={!isExportablePage} onClick={exportMarkdownPage} />

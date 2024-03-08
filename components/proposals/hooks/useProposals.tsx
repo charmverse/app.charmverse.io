@@ -14,7 +14,7 @@ type ProposalsContextType = {
   proposals: ProposalWithUsersLite[] | undefined;
   mutateProposals: KeyedMutator<ProposalWithUsersLite[]>;
   isLoading: boolean;
-  updateProposal: (proposal: UpdateProposalRequest) => Promise<void>;
+  updateProposal: (proposal: Pick<UpdateProposalRequest, 'proposalId' | 'fields'>) => Promise<void>;
   proposalsMap: Record<string, ProposalWithUsersLite | undefined>;
 };
 
@@ -26,13 +26,24 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
 
   const { data: proposals, mutate: mutateProposals, isLoading } = useGetProposalsBySpace({ spaceId: space?.id });
 
-  const updateProposal = useCallback(
-    async (proposal: UpdateProposalRequest) => {
-      if (proposal) {
-        await charmClient.proposals.updateProposal(proposal);
-
-        mutateProposals();
-      }
+  const updateProposal: ProposalsContextType['updateProposal'] = useCallback(
+    async ({ proposalId, ...updates }) => {
+      await charmClient.proposals.updateProposal({ proposalId, ...updates });
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            if (proposal.id === proposalId) {
+              return {
+                ...proposal,
+                ...updates
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
     },
     [mutateProposals]
   );
@@ -46,15 +57,17 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
   }, [proposals]);
 
   useEffect(() => {
-    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+    function handleUpdatedEvent(updated: WebSocketPayload<'proposals_updated'>) {
       mutateProposals(
         (list) => {
           if (!list) return list;
           return list.map((proposal) => {
-            if (payload.proposalIds.includes(proposal.id)) {
+            const updatedMatch = updated.find((p) => p.id === proposal.id);
+            if (updatedMatch) {
               return {
                 ...proposal,
-                archived: payload.archived
+                archived: updatedMatch.archived ?? proposal.archived,
+                currentStep: updatedMatch.currentStep ?? proposal.currentStep
               };
             }
             return proposal;
@@ -63,7 +76,7 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
         { revalidate: false }
       );
     }
-    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleUpdatedEvent);
     return () => {
       unsubscribeFromProposalArchived();
     };

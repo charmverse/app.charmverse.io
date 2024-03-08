@@ -21,18 +21,23 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { subscribe } = useWebSocketClient();
 
   useEffect(() => {
-    function handleArchivedEvent(value: WebSocketPayload<'proposals_archived'>) {
-      if (value.proposalIds.some((id) => id === proposal?.id)) {
+    function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
+      const match = proposals.find(({ id }) => id === proposal?.id);
+      if (match) {
         refreshProposal(
-          (prev) => ({
-            ...prev!,
-            archived: value.archived
-          }),
+          (prev) =>
+            prev
+              ? {
+                  ...prev,
+                  archived: match.archived ?? prev.archived,
+                  status: match.currentStep ? (match.currentStep.step === 'draft' ? 'draft' : 'published') : prev.status
+                }
+              : undefined,
           { revalidate: false }
         );
       }
     }
-    const unsubscribeFromPageRestores = subscribe('proposals_archived', handleArchivedEvent);
+    const unsubscribeFromPageRestores = subscribe('proposals_updated', handleUpdateEvent);
     return () => {
       unsubscribeFromPageRestores();
     };

@@ -25,7 +25,7 @@ async function requestZip(req: NextApiRequest, res: NextApiResponse) {
     try {
       filter = JSON.parse(customFilter) as FilterGroup;
     } catch (err) {
-      //
+      log.warn('Could not parse filter when exporting database', { error: err, filter: customFilter });
     }
   }
 

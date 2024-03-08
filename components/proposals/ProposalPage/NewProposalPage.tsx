@@ -27,8 +27,8 @@ import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
+import { ControlledFormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { ControlledFormFieldsInput } from 'components/common/form/FormFieldsInput';
 import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
@@ -44,7 +44,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
-import type { ProposalRubricCriteriaWithTypedParams } from 'lib/proposals/rubric/interfaces';
+import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
@@ -260,7 +260,7 @@ export function NewProposalPage({
           );
           const rubricCriteria = (
             evaluation.type === 'rubric' ? existingStep?.rubricCriteria || [getNewCriteria()] : []
-          ) as ProposalRubricCriteriaWithTypedParams[];
+          ) as RubricCriteriaTyped[];
           // include author as default reviewer for feedback
           const defaultReviewers = evaluation.type === 'feedback' && user ? [{ systemRole: authorSystemRole.id }] : [];
           return {
@@ -470,7 +470,7 @@ export function NewProposalPage({
                         }}
                       />
                     ) : (
-                      <ControlledFormFieldsInput
+                      <ControlledFormFieldAnswers
                         control={proposalFormFieldControl}
                         enableComments={false}
                         errors={proposalFormFieldErrors}
@@ -561,38 +561,26 @@ export function NewProposalPage({
               </StyledContainer>
             </Box>
             <StickyFooterContainer>
-              {isTemplate ? (
+              <>
                 <Button
+                  disabled={isCreatingProposal}
+                  loading={isCreatingProposal && submittedDraft}
                   data-test='create-proposal-button'
+                  variant='outlined'
+                  onClick={() => saveForm({ isDraft: true })}
+                >
+                  Save draft
+                </Button>
+                <Button
+                  data-test='publish-new-proposal-button'
                   disabled={Boolean(disabledTooltip) || isCreatingProposal}
                   disabledTooltip={disabledTooltip}
-                  onClick={() => saveForm({ isDraft: true })}
+                  onClick={() => saveForm()}
                   loading={isCreatingProposal && !submittedDraft}
                 >
-                  Save
+                  Publish
                 </Button>
-              ) : (
-                <>
-                  <Button
-                    disabled={isCreatingProposal}
-                    loading={isCreatingProposal && submittedDraft}
-                    data-test='create-proposal-button'
-                    variant='outlined'
-                    onClick={() => saveForm({ isDraft: true })}
-                  >
-                    Save draft
-                  </Button>
-                  <Button
-                    data-test='publish-new-proposal-button'
-                    disabled={Boolean(disabledTooltip) || isCreatingProposal}
-                    disabledTooltip={disabledTooltip}
-                    onClick={() => saveForm()}
-                    loading={isCreatingProposal && !submittedDraft}
-                  >
-                    Publish
-                  </Button>
-                </>
-              )}
+              </>
             </StickyFooterContainer>
           </Box>
         </DocumentColumn>
