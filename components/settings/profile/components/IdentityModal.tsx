@@ -291,7 +291,7 @@ export function UserIdentities() {
                               <LoadingComponent size={20} isLoading />
                             </IconButton>
                           ) : (
-                            <IconButton onClick={() => refreshENSName(item.username)}>
+                            <IconButton onClick={() => refreshENSName(wallet.address)}>
                               <RefreshIcon fontSize='small' />
                             </IconButton>
                           )}
