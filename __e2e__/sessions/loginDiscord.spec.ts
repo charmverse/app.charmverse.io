@@ -61,7 +61,6 @@ test('login - allows user to login and see their workspace even when a wallet is
   await loginPage.goto();
   await loginPage.universalConnectButton.click();
   await loginPage.connectDiscordButton.click();
-  await loginPage.page.waitForEvent('popup');
   await loginPage.waitForLogin(discordServer.host);
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });
