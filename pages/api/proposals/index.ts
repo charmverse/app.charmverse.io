@@ -101,14 +101,6 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     ...req.body,
     userId: req.session.user.id
   });
-  const pages = await getPageMetaList([proposalPage.page.id]);
-  relay.broadcast(
-    {
-      type: 'pages_created',
-      payload: pages
-    },
-    proposalPage.page.spaceId
-  );
 
   if (proposalPage.proposal.status === 'published') {
     await issueProposalCredentialsIfNecessary({

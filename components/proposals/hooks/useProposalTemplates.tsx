@@ -38,18 +38,20 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
       }
     }
 
-    function handleArchivedEvent(payload: WebSocketPayload<'proposals_archived'>) {
+    function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
       mutate(
         (list) => {
           if (!list) return list;
-          return list.map((proposal) => {
-            if (payload.proposalIds.includes(proposal.proposalId)) {
+          return list.map((template) => {
+            const match = proposals.find((p) => p.id === template.proposalId);
+            if (match) {
               return {
-                ...proposal,
-                archived: payload.archived
+                ...template,
+                archived: match.archived,
+                draft: match.currentStep ? match.currentStep.step === 'draft' : template.draft
               };
             }
-            return proposal;
+            return template;
           });
         },
         { revalidate: false }
@@ -57,7 +59,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
     }
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
-    const unsubscribeFromProposalArchived = subscribe('proposals_archived', handleArchivedEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleUpdateEvent);
     return () => {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageCreated();

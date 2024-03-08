@@ -14,6 +14,7 @@ import { EditIcon } from 'components/common/Icons/EditIcon';
 import Modal from 'components/common/Modal';
 import { ArchiveProposalAction } from 'components/common/PageActions/components/ArchiveProposalAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
+import { PublishProposalAction } from 'components/common/PageActions/components/PublishProposalAction';
 import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -58,7 +59,8 @@ export function NewProposalButton() {
     title: proposal.title,
     proposalId: proposal.proposalId,
     isStructuredProposal: proposal.contentType === 'structured',
-    archived: !!proposal.archived
+    archived: !!proposal.archived,
+    draft: proposal.draft
   }));
 
   function deleteProposalTemplate(pageId: string) {
@@ -126,12 +128,10 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Edit</ListItemText>
             </MenuItem>
-            {isAdmin && (
-              <CopyPageLinkAction
-                path={`/proposals/new?template=${pageId}`}
-                message='Link copied. NOTE: anyone can join your space using this link.'
-              />
-            )}
+            <CopyPageLinkAction
+              path={`/proposals/new?template=${pageId}`}
+              message='Link copied. NOTE: anyone can join your space using this link.'
+            />
 
             <MenuItem
               onClick={() => {
@@ -155,6 +155,9 @@ export function NewProposalButton() {
             </MenuItem>
             <span onClick={(e) => e.stopPropagation()}>
               <ArchiveProposalAction proposalId={proposalId!} />
+            </span>
+            <span onClick={(e) => e.stopPropagation()}>
+              <PublishProposalAction proposalId={proposalId!} />
             </span>
           </>
         )}

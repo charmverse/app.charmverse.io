@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
 
-test.describe.serial('Archive Proposal', () => {
+test.describe('Archive Proposal', () => {
   test('Archive proposal and assert all actions are disabled, and proposal is not visible in the proposals list', async ({
     proposalListPage,
     documentPage,

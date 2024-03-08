@@ -12,7 +12,15 @@ describe('getProposalTemplates', () => {
 
     await testUtilsProposals.generateProposalTemplate({
       spaceId: space.id,
-      userId: adminUser.id
+      userId: adminUser.id,
+      proposalStatus: 'published'
+    });
+
+    // should be excluded as it is draft
+    await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      userId: adminUser.id,
+      proposalStatus: 'draft'
     });
 
     const spaceMember = await testUtilsUser.generateSpaceUser({
