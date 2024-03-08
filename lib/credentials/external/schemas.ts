@@ -1,4 +1,4 @@
-import { arbitrum, base, optimism } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
 
 import { proposalCredentialSchemaId } from '../schemas/proposal';
 import { rewardCredentialSchemaId } from '../schemas/reward';
@@ -115,13 +115,14 @@ const arbitrumDevfolioOnchainCredentialAttestationSchema: TrackedSchemaParams = 
 //   title: 'Cheer'
 // };
 
-export const trackedSchemas: Record<ExternalCredentialChain, TrackedSchemaParams[]> = {
+export const trackedSchemas: Record<ExternalCredentialChain | (typeof optimismSepolia)['id'], TrackedSchemaParams[]> = {
   [optimism.id]: [
     optimismRetroPgfBadgeHolderSchema,
     optimismRetroPgfContributionSchema,
     optimismCharmverseProposalSchema,
     optimismCharmverseRewardSchema
   ],
+  [optimismSepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
   [base.id]: [baseVerifiedAccountSchema],
   [arbitrum.id]: [arbitrumDevfolioQuadraticVotingAttestationSchema, arbitrumDevfolioOnchainCredentialAttestationSchema]
 };
