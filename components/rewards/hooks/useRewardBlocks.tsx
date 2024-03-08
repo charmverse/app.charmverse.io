@@ -12,8 +12,11 @@ import type {
   RewardBlockInput,
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields,
+  RewardsBoardBlock,
   RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
+
+import { getDefaultBoard } from '../components/RewardsBoard/utils/boardData';
 
 import { useRewardsBoard } from './useRewardsBoard';
 
@@ -41,7 +44,19 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { trigger: deleteRewardBlocks } = useDeleteRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
-  const { boardBlock: rewardsBoardBlock, createProperty, deleteProperty, updateProperty } = useRewardsBoard();
+  const { createProperty, deleteProperty, updateProperty } = useRewardsBoard();
+
+  const boardBlock = rewardBlocks?.find((b): b is RewardsBoardBlock => b.type === 'board');
+
+  const rewardsBoardBlock = useMemo(() => {
+    if (boardBlock && !boardBlock.fields.cardProperties) {
+      boardBlock.fields.cardProperties = [];
+    }
+    const board = getDefaultBoard({
+      storedBoard: boardBlock
+    }) as RewardsBoardFFBlock;
+    return board;
+  }, [boardBlock]);
 
   const getBlock = useCallback(
     async (blockId: string): Promise<RewardBlockWithTypedFields> => {
@@ -58,7 +73,6 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
       mutate(
         (blocks) => {
           if (!blocks) return blocks;
-
           const udpatedCache = [...blocks];
           const updated = Array.isArray(updatedBlocks) ? updatedBlocks : [updatedBlocks];
 
