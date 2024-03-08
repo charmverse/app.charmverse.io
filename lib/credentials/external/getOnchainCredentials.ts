@@ -18,7 +18,7 @@ import { externalCredentialChains, trackedSchemas } from './schemas';
 // For a specific profile, only refresh attestations every half hour
 const defaultEASCacheDuration = 1800;
 
-const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloClient<any>> = {
+const graphQlClients: Record<ExternalCredentialChain | (typeof optimismSepolia)['id'], ApolloClient<any>> = {
   [optimism.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism.easscan.org/graphql',
