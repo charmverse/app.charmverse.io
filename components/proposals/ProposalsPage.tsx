@@ -1,3 +1,4 @@
+import styled from '@emotion/styled';
 import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
@@ -39,6 +40,17 @@ import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
 import { useProposalsBoard } from './hooks/useProposalsBoard';
+
+const StyledButton = styled(Button)`
+  position: absolute;
+  top: -30px;
+  opacity: 0;
+  transition: opacity 0.25s;
+  &:hover {
+    opacity: 1;
+    transition: opacity 0.25s;
+  }
+`;
 
 export function ProposalsPage({ title }: { title: string }) {
   const { space: currentSpace } = useCurrentSpace();
@@ -135,20 +147,10 @@ export function ProposalsPage({ title }: { title: string }) {
         <DatabaseTitle>
           <Box position='relative'>
             {isAdmin && (
-              <Button
+              <StyledButton
                 variant='text'
                 color='secondary'
                 size='small'
-                sx={{
-                  position: 'absolute',
-                  top: -30,
-                  opacity: 0,
-                  transition: 'opacity 0.25s',
-                  '&:hover': {
-                    opacity: 1,
-                    transition: 'opacity 0.25s'
-                  }
-                }}
                 onClick={() => {
                   if (activeBoard.fields.showDescription) {
                     onHideDescription();
@@ -178,7 +180,7 @@ export function ProposalsPage({ title }: { title: string }) {
                     <FormattedMessage id='ViewTitle.show-description' defaultMessage='Show description' />
                   </>
                 )}
-              </Button>
+              </StyledButton>
             )}
           </Box>
           <Box display='flex' alignItems='flex-start' justifyContent='space-between'>
