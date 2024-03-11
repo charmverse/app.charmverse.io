@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
+import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import type { ExtendedVote } from './interfaces';
 
 export async function getVotesByPage({
@@ -36,7 +37,14 @@ export async function getVotesByPage({
     }
   });
 
-  return pageVotes.map((pageVote) => {
+  const votingPowers = userId
+    ? await getVotingPowerForVotes({
+        votes: pageVotes,
+        userId
+      })
+    : [];
+
+  return pageVotes.map((pageVote, index) => {
     const userVotes = pageVote.userVotes?.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
@@ -44,6 +52,7 @@ export async function getVotesByPage({
       voteOptions: pageVote.voteOptions
     });
 
+    const totalVotes = userVotes.reduce((acc, userVote) => (userVote.tokenAmount ?? 1) + acc, 0);
     const voteStatus = calculateVoteStatus(pageVote);
 
     delete (pageVote as any).userVotes;
@@ -53,7 +62,8 @@ export async function getVotesByPage({
       aggregatedResult,
       userChoice,
       status: voteStatus,
-      totalVotes: userVotes.length
+      totalVotes,
+      votingPower: votingPowers[index] ?? 1
     };
   });
 }

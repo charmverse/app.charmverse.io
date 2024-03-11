@@ -20,6 +20,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { getChainById } from 'connectors/chains';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import millify from 'millify';
 import type { EditorView } from 'prosemirror-view';
 import React, { useRef } from 'react';
 import useSWR from 'swr';
@@ -98,7 +99,7 @@ export function VoteDetail({
         gap: 1
       }}
     >
-      <span>Votes</span> <Chip size='small' label={totalVotes} />
+      <span>Votes</span> <Chip size='small' label={millify(totalVotes)} />
     </Box>
   );
 
@@ -202,6 +203,7 @@ export function VoteDetail({
               totalVotes={totalVotes}
               aggregatedResult={aggregatedResult}
               onChange={onVoteChange}
+              showAggregateResult={vote.strategy === 'token'}
             />
           )}
 
@@ -215,12 +217,18 @@ export function VoteDetail({
               onChange={onVoteChange}
               maxChoices={maxChoices}
               hasPassedDeadline={hasPassedDeadline}
+              showAggregateResult={vote.strategy === 'token'}
             />
           )}
         </StyledFormControl>
       </Tooltip>
       {!detailed && (
-        <Box display='flex' justifyContent='flex-end'>
+        <Box
+          alignItems='center'
+          display='flex'
+          justifyContent={vote.strategy === 'token' ? 'space-between' : 'flex-end'}
+        >
+          {vote.strategy === 'token' ? <Typography>Your voting power: {millify(vote.votingPower)}</Typography> : null}
           <Button
             data-test='view-poll-details-button'
             color='secondary'

@@ -5,6 +5,7 @@ import { InvalidInputError, UndesirableOperationError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishUserProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
+import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import { isVotingClosed } from './utils';
 
 export async function castVote(
@@ -39,8 +40,12 @@ export async function castVote(
     }
   }));
 
-  // TODO - delete user vote when choices.length === 0
+  const votingPowers = await getVotingPowerForVotes({
+    userId,
+    votes: [vote]
+  });
 
+  // TODO - delete user vote when choices.length === 0
   const userVote = await prisma.userVote.upsert({
     where: {
       voteId_userId: {
@@ -51,11 +56,13 @@ export async function castVote(
     create: {
       userId,
       voteId,
-      choices
+      choices,
+      tokenAmount: votingPowers[0] ?? 1
     },
     update: {
       choices,
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      tokenAmount: votingPowers[0] ?? 1
     },
     include: {
       vote: true
