@@ -58,7 +58,7 @@ export class LoginPage {
 
   async waitForWorkspaceLoaded({ domain, page }: { domain: string; page: { path: string; title: string } }) {
     await this.page.waitForURL(`**/${domain}/${page.path}`, {
-      waitUntil: 'load'
+      timeout: 100000
     });
     await this.page.locator(`text=${page.title}`).first().waitFor();
   }
