@@ -28,25 +28,25 @@ const graphQlClients: Record<ExternalCredentialChain | (typeof optimismSepolia)[
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !!isStagingEnv
+    skipRedisCache: !isProdEnv
   }),
   [optimismSepolia.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism-sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !!isStagingEnv
+    skipRedisCache: !isProdEnv
   }),
   [base.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'base-easscan',
     uri: 'https://base.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !!isStagingEnv
+    skipRedisCache: !isProdEnv
   }),
   [arbitrum.id]: new ApolloClientWithRedisCache({
     uri: 'https://arbitrum.easscan.org/graphql',
     cacheKeyPrefix: 'arbitrum-easscan',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !!isStagingEnv
+    skipRedisCache: !isProdEnv
   })
 };
 
@@ -174,17 +174,17 @@ export async function getAllOnChainAttestations({
         if (submissionId && stringUtils.isUUID(submissionId)) {
           acc.rewardCredentials.push({ ...val, submissionId });
         } else {
-          otherCredentials.push(val);
+          acc.otherCredentials.push(val);
         }
       } else if (val.schemaId === proposalCredentialSchemaId) {
         const proposalPageId = (val.content as ProposalCredential).URL.split('/').pop()?.trim();
         if (proposalPageId && stringUtils.isUUID(proposalPageId)) {
           acc.proposalCredentials.push({ ...val, proposalPageId });
         } else {
-          otherCredentials.push(val);
+          acc.otherCredentials.push(val);
         }
       } else {
-        otherCredentials.push(val);
+        acc.otherCredentials.push(val);
       }
       return acc;
     },
