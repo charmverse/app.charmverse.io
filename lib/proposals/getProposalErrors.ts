@@ -84,6 +84,12 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
         ? `Voters are required for the "${evaluation.title}" step`
         : !evaluation.voteSettings
         ? `Vote details are required for the "${evaluation.title}" step`
+        : evaluation.voteSettings.strategy === 'token'
+        ? !evaluation.voteSettings.chainId
+          ? `Chain is required for the "${evaluation.title}" step`
+          : !evaluation.voteSettings.tokenAddress
+          ? `Token address is required for the "${evaluation.title}" step`
+          : false
         : false;
     default:
       return false;

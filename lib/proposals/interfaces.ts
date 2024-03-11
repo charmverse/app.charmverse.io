@@ -32,7 +32,7 @@ export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_pr
 
 export type VoteSettings = Pick<
   Vote,
-  'type' | 'threshold' | 'maxChoices' | 'blockNumber' | 'tokenAddress' | 'chainId'
+  'type' | 'threshold' | 'maxChoices' | 'blockNumber' | 'tokenAddress' | 'chainId' | 'strategy'
 > & {
   durationDays: number;
   options: string[];

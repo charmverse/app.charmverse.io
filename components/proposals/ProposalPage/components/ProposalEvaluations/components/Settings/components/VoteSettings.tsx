@@ -1,4 +1,4 @@
-import type { PaymentMethod } from '@charmverse/core/prisma';
+import type { PaymentMethod, VoteStrategy } from '@charmverse/core/prisma';
 import { VoteType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
@@ -76,14 +76,12 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
   const [isAdvancedSectionVisible, setIsAdvancedSectionVisible] = useState(false);
-  const [voteStrategy, setVoteStrategy] = useState<'snapshot' | 'regular_vote' | 'token_vote'>(
-    value?.chainId ? 'token_vote' : value?.publishToSnapshot ? 'snapshot' : 'regular_vote'
-  );
+  const [voteStrategy, setVoteStrategy] = useState<VoteStrategy>(value?.strategy ?? 'regular');
   const [voteToken, setVoteToken] = useState<null | {
     chainId: number;
     tokenAddress: string;
   }>(
-    value?.chainId && value?.tokenAddress
+    value?.chainId && value?.tokenAddress && value?.strategy === 'token'
       ? {
           chainId: value.chainId,
           tokenAddress: value.tokenAddress
@@ -164,7 +162,8 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             durationDays,
             blockNumber,
             chainId: voteToken?.chainId ?? null,
-            tokenAddress: voteToken?.tokenAddress ?? null
+            tokenAddress: voteToken?.tokenAddress ?? null,
+            strategy: voteStrategy
           });
         }
       }
@@ -208,20 +207,20 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             <FormControlLabel
               disabled={readOnly}
               control={<Radio size='small' />}
-              value='regular_vote'
+              value='regular'
               label='One account one vote'
               onChange={() => {
-                setVoteStrategy('regular_vote');
+                setVoteStrategy('regular');
                 setVoteToken(null);
               }}
             />
             <FormControlLabel
               disabled={readOnly}
               control={<Radio size='small' />}
-              value='token_vote'
+              value='token'
               label='Token voting'
               onChange={() => {
-                setVoteStrategy('token_vote');
+                setVoteStrategy('token');
               }}
             />
             <FormControlLabel
@@ -231,13 +230,14 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
               label='Publish to Snapshot'
               onChange={() => {
                 setVoteStrategy('snapshot');
+                setVoteToken(null);
               }}
             />
           </RadioGroup>
           <Divider sx={{ mt: 1, mb: 2 }} />
-          {voteStrategy === 'token_vote' || voteStrategy === 'regular_vote' ? (
+          {voteStrategy === 'token' || voteStrategy === 'regular' ? (
             <>
-              {voteStrategy === 'token_vote' ? (
+              {voteStrategy === 'token' ? (
                 <>
                   <Typography component='span' variant='subtitle1'>
                     Token
