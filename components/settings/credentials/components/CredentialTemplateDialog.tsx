@@ -15,7 +15,7 @@ import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getAttestationSchemaId } from 'lib/credentials/schemas';
+import { attestationSchemaIds } from 'lib/credentials/schemas';
 
 import { CredentialEventsSelector } from './CredentialEventsForm';
 import type { ProposalCredentialToPreview } from './ProposalCredentialPreview';
@@ -80,7 +80,7 @@ function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCrede
     setIsSaving(true);
     try {
       if (!credentialTemplate) {
-        const schemaId = getAttestationSchemaId({ chainId: optimism.id, credentialType: 'proposal' });
+        const schemaId = attestationSchemaIds[templateType];
         await charmClient.credentials.createCredentialTemplate({
           ...formValues,
           description: formValues.description ?? '',
