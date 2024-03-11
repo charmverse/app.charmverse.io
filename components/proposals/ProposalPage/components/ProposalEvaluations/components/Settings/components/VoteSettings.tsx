@@ -206,7 +206,7 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
         <AccordionDetails>
           <RadioGroup value={voteStrategy}>
             <FormControlLabel
-              disabled={readOnly}
+              disabled={readOnly || isPublishedProposal}
               control={<Radio size='small' />}
               value={VoteStrategy.regular}
               label='One account one vote'
@@ -216,7 +216,7 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
               }}
             />
             <FormControlLabel
-              disabled={readOnly}
+              disabled={readOnly || isPublishedProposal}
               control={<Radio size='small' />}
               value={VoteStrategy.token}
               label='Token voting'
@@ -225,7 +225,7 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
               }}
             />
             <FormControlLabel
-              disabled={readOnly}
+              disabled={readOnly || isPublishedProposal}
               control={<Radio size='small' />}
               value={VoteStrategy.snapshot}
               label='Publish to Snapshot'
@@ -244,7 +244,7 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
                     Token
                   </Typography>
                   <InputSearchCrypto
-                    disabled={readOnly}
+                    disabled={readOnly || isPublishedProposal}
                     readOnly={readOnly}
                     cryptoList={availableCryptos}
                     chainId={voteToken?.chainId}
