@@ -5,7 +5,6 @@ import { getDefaultBoard } from 'components/rewards/components/RewardsBoard/util
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { prismaToBlock } from 'lib/focalboard/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type {
@@ -36,24 +35,18 @@ export function useRewardsBoard() {
 
   const { subscribe } = useWebSocketClient();
 
-  const handleBlockUpdates = useCallback((updatedRewardBlocks: WebSocketPayload<'reward_blocks_updated'>) => {
+  const handleRewardBlockUpdates = useCallback((updatedRewardBlocks: WebSocketPayload<'reward_blocks_updated'>) => {
     const updatedRewardBoardBlock = updatedRewardBlocks.find((b) => b.id === DEFAULT_BOARD_BLOCK_ID);
     if (updatedRewardBoardBlock) {
-      mutate((rewardBlocks) => {
-        if (!rewardBlocks) {
-          return rewardBlocks;
-        }
-
-        return [updatedRewardBoardBlock];
-      });
+      mutate();
     }
   }, []);
 
   useEffect(() => {
-    const unsubscribeFromBlockUpdates = subscribe('reward_blocks_updated', handleBlockUpdates);
+    const unsubscribeFromRewardBlockUpdates = subscribe('reward_blocks_updated', handleRewardBlockUpdates);
 
     return () => {
-      unsubscribeFromBlockUpdates();
+      unsubscribeFromRewardBlockUpdates();
     };
   }, []);
 
