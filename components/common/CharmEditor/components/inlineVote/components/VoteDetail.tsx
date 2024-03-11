@@ -2,8 +2,22 @@ import { VoteType } from '@charmverse/core/prisma';
 import type { UserVote } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import HowToVoteOutlinedIcon from '@mui/icons-material/HowToVoteOutlined';
-import { Box, Button, Card, Chip, Divider, FormControl, List, ListItem, ListItemText, Typography } from '@mui/material';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import {
+  Box,
+  Button,
+  Card,
+  Chip,
+  Divider,
+  FormControl,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography
+} from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
+import { getChainById } from 'connectors/chains';
 import { DateTime } from 'luxon';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { EditorView } from 'prosemirror-view';
@@ -15,6 +29,7 @@ import Avatar from 'components/common/Avatar';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { MultiChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/MultiChoiceForm';
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
+import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
@@ -133,6 +148,9 @@ export function VoteDetail({
     }
   }
 
+  const [blockExplorerUrl] =
+    (vote.strategy === 'token' && vote.chainId ? getChainById(vote.chainId)?.blockExplorerUrls : []) ?? [];
+
   return (
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
       <Box ref={anchorRef} display='flex' justifyContent='space-between' alignItems='center'>
@@ -161,7 +179,16 @@ export function VoteDetail({
         </Box>
       )}
       {!detailed && voteCountLabel}
-
+      {vote.strategy === 'token' && vote.blockNumber && blockExplorerUrl ? (
+        <Stack flexDirection='row' alignItems='center' gap={1} my={1}>
+          <Link href={`${blockExplorerUrl}/block/${vote.blockNumber}`} target='_blank' rel='noreferrer'>
+            <Typography color='secondary' fontWeight={600}>
+              Snapshot #{vote.blockNumber}
+            </Typography>
+          </Link>
+          <OpenInNewIcon fontSize='small' color='secondary' />
+        </Stack>
+      ) : null}
       <Tooltip
         placement='top-start'
         title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
