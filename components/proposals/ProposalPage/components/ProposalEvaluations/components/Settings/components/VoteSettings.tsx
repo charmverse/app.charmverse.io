@@ -1,5 +1,5 @@
-import type { PaymentMethod, VoteStrategy } from '@charmverse/core/prisma';
-import { VoteType } from '@charmverse/core/prisma';
+import type { PaymentMethod } from '@charmverse/core/prisma';
+import { VoteStrategy, VoteType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
@@ -36,6 +36,7 @@ type CreateVoteModalProps = {
   readOnly?: boolean;
   onChange?: (vote: ProposalEvaluationInput['voteSettings']) => void;
   value: ProposalEvaluationInput['voteSettings'];
+  isPublishedProposal?: boolean;
 };
 
 const StyledVoteSettings = styled.div`
@@ -68,14 +69,14 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps) {
+export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
   // Default values for approval type vote
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
   const [options, setOptions] = useState<string[]>(value?.options ?? ['Yes', 'No', 'Abstain']);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
-  const [isAdvancedSectionVisible, setIsAdvancedSectionVisible] = useState(false);
+  const [isAdvancedSectionVisible, setIsAdvancedSectionVisible] = useState(isPublishedProposal ?? false);
   const [voteStrategy, setVoteStrategy] = useState<VoteStrategy>(value?.strategy ?? 'regular');
   const [voteToken, setVoteToken] = useState<null | {
     chainId: number;
@@ -207,7 +208,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             <FormControlLabel
               disabled={readOnly}
               control={<Radio size='small' />}
-              value='regular'
+              value={VoteStrategy.regular}
               label='One account one vote'
               onChange={() => {
                 setVoteStrategy('regular');
@@ -217,7 +218,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             <FormControlLabel
               disabled={readOnly}
               control={<Radio size='small' />}
-              value='token'
+              value={VoteStrategy.token}
               label='Token voting'
               onChange={() => {
                 setVoteStrategy('token');
@@ -226,7 +227,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             <FormControlLabel
               disabled={readOnly}
               control={<Radio size='small' />}
-              value='snapshot'
+              value={VoteStrategy.snapshot}
               label='Publish to Snapshot'
               onChange={() => {
                 setVoteStrategy('snapshot');
@@ -248,14 +249,9 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
                     cryptoList={availableCryptos}
                     chainId={voteToken?.chainId}
                     placeholder='Empty'
-                    value={voteToken?.tokenAddress}
-                    defaultValue={voteToken?.tokenAddress}
-                    onChange={(crypto) => {
-                      setVoteToken({
-                        tokenAddress: crypto,
-                        chainId: voteToken?.chainId ?? 1
-                      });
-                    }}
+                    value={voteToken ?? undefined}
+                    defaultValue={voteToken ?? undefined}
+                    onChange={setVoteToken}
                     showChain
                     onNewPaymentMethod={onNewPaymentMethod}
                     sx={{

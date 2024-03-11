@@ -14,14 +14,16 @@ import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
-export interface IInputSearchCryptoProps
-  extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
-  onChange?: (value: CryptoCurrency) => void;
+type CryptoValue = string | CryptoCurrency | { chainId: number; tokenAddress: string };
+
+export interface IInputSearchCryptoProps<Value extends CryptoValue>
+  extends Omit<Partial<AutocompleteProps<Value, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
+  onChange?: (value: Value) => void;
   onNewPaymentMethod?: (method: PaymentMethod) => void;
-  defaultValue?: CryptoCurrency | string;
-  value?: CryptoCurrency | string; // allow parent to override value
+  defaultValue?: Value;
+  value?: Value; // allow parent to override value
   hideBackdrop?: boolean; // hide backdrop when modal is open
-  cryptoList?: (string | CryptoCurrency | { chainId: number; tokenAddress: string })[];
+  cryptoList?: Value[];
   chainId?: number; // allow passing this down to the 'new custom token' form
   sx?: SxProps<Theme>;
   variant?: 'standard' | 'outlined';
@@ -31,13 +33,13 @@ export interface IInputSearchCryptoProps
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
 
-export function InputSearchCrypto({
+export function InputSearchCrypto<Value extends CryptoValue>({
   hideBackdrop,
   onNewPaymentMethod: _onNewPaymentMethod,
   onChange = () => {},
-  defaultValue = '',
+  defaultValue,
   value: parentValue,
-  cryptoList = CryptoCurrencies,
+  cryptoList = CryptoCurrencies as Value[],
   chainId,
   sx = {},
   disabled,
@@ -45,7 +47,7 @@ export function InputSearchCrypto({
   variant,
   placeholder,
   showChain
-}: IInputSearchCryptoProps) {
+}: IInputSearchCryptoProps<Value>) {
   const [inputValue, setInputValue] = useState('');
 
   const [value, setValue] = useState(defaultValue);
@@ -64,10 +66,10 @@ export function InputSearchCrypto({
     }
   }, [cryptoList, parentValue]);
 
-  function emitValue(received: string) {
-    if (received && cryptoList.includes(received as CryptoCurrency)) {
+  function emitValue(received: Value) {
+    if (received && cryptoList.includes(received)) {
       setValue(received);
-      onChange(received as CryptoCurrency);
+      onChange(received);
     }
   }
 
@@ -82,7 +84,7 @@ export function InputSearchCrypto({
 
   return (
     <>
-      <Autocomplete
+      <Autocomplete<Value, false, true, true>
         sx={{ minWidth: 150, ...sx }}
         forcePopupIcon={variant !== 'standard'}
         onChange={(_, _value, reason) => {
@@ -102,8 +104,8 @@ export function InputSearchCrypto({
             setInputValue(newInputValue);
           }
         }}
-        options={cryptoOptions}
-        disableClearable={true}
+        options={cryptoOptions as Value[]}
+        disableClearable
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
