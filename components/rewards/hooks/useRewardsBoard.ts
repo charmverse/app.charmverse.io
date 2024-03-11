@@ -1,9 +1,11 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rewards';
 import { getDefaultBoard } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import { prismaToBlock } from 'lib/focalboard/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type {
@@ -13,13 +15,14 @@ import type {
   RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
 import { defaultRewardViews } from 'lib/rewards/blocks/views';
+import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useRewardsBoard() {
   const { space } = useCurrentSpace();
   const { data: blocksFromDB, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id, type: 'board' });
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showError } = useSnackbar();
-
+  const spaceId = space?.id;
   const dbBlock = blocksFromDB?.find((b): b is RewardsBoardBlock => b.type === 'board');
 
   const boardBlock = useMemo(() => {
@@ -31,6 +34,42 @@ export function useRewardsBoard() {
     }) as RewardsBoardFFBlock;
     return board;
   }, [dbBlock]);
+
+  const { subscribe } = useWebSocketClient();
+
+  const handleBlockUpdates = useCallback(
+    (updatedRewardBlocks: WebSocketPayload<'reward_blocks_updated'>) => {
+      const updatedRewardBoardBlock = updatedRewardBlocks.find(
+        (b) => b.id === DEFAULT_BOARD_BLOCK_ID && b.spaceId === spaceId
+      );
+      if (updatedRewardBoardBlock) {
+        mutate((rewardBlocks) => {
+          const existingRewardBoardBlock = rewardBlocks?.find(
+            (b) => b.id === DEFAULT_BOARD_BLOCK_ID
+          ) as RewardsBoardBlock;
+          if (existingRewardBoardBlock) {
+            return [
+              {
+                ...existingRewardBoardBlock,
+                fields: Object.assign(existingRewardBoardBlock.fields, updatedRewardBoardBlock.fields)
+              }
+            ];
+          }
+
+          return rewardBlocks;
+        });
+      }
+    },
+    [spaceId]
+  );
+
+  useEffect(() => {
+    const unsubscribeFromBlockUpdates = subscribe('reward_blocks_updated', handleBlockUpdates);
+
+    return () => {
+      unsubscribeFromBlockUpdates();
+    };
+  }, []);
 
   const createProperty = useCallback(
     async (propertyTemplate: IPropertyTemplate) => {

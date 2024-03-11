@@ -44,19 +44,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { trigger: deleteRewardBlocks } = useDeleteRewardBlocks(space?.id || '');
   const { showMessage } = useSnackbar();
-  const { createProperty, deleteProperty, updateProperty } = useRewardsBoard();
-
-  const boardBlock = rewardBlocks?.find((b): b is RewardsBoardBlock => b.type === 'board');
-
-  const rewardsBoardBlock = useMemo(() => {
-    if (boardBlock && !boardBlock.fields.cardProperties) {
-      boardBlock.fields.cardProperties = [];
-    }
-    const board = getDefaultBoard({
-      storedBoard: boardBlock
-    }) as RewardsBoardFFBlock;
-    return board;
-  }, [boardBlock]);
+  const { boardBlock: rewardsBoardBlock, createProperty, deleteProperty, updateProperty } = useRewardsBoard();
 
   const getBlock = useCallback(
     async (blockId: string): Promise<RewardBlockWithTypedFields> => {
@@ -73,19 +61,19 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
       mutate(
         (blocks) => {
           if (!blocks) return blocks;
-          const udpatedCache = [...blocks];
+          const updatedCache = [...blocks];
           const updated = Array.isArray(updatedBlocks) ? updatedBlocks : [updatedBlocks];
 
           updated.forEach((updatedBlock) => {
-            const index = udpatedCache.findIndex((b) => b.id === updatedBlock.id);
+            const index = updatedCache.findIndex((b) => b.id === updatedBlock.id);
             if (index !== -1) {
-              udpatedCache[index] = updatedBlock;
+              updatedCache[index] = updatedBlock;
             } else {
-              udpatedCache.push(updatedBlock);
+              updatedCache.push(updatedBlock);
             }
           });
 
-          return udpatedCache;
+          return updatedCache;
         },
         { revalidate: false }
       );
