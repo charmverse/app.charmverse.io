@@ -29,7 +29,7 @@ type BlocksUpdated = {
 
 type RewardBlocksUpdated = {
   type: 'reward_blocks_updated';
-  payload: (Partial<RewardBlockWithTypedFields> & ResourceWithSpaceId)[];
+  payload: RewardBlockWithTypedFields[];
 };
 
 type BlocksCreated = {

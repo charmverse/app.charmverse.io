@@ -22,7 +22,6 @@ export function useRewardsBoard() {
   const { data: blocksFromDB, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id, type: 'board' });
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showError } = useSnackbar();
-  const spaceId = space?.id;
   const dbBlock = blocksFromDB?.find((b): b is RewardsBoardBlock => b.type === 'board');
 
   const boardBlock = useMemo(() => {
@@ -37,31 +36,18 @@ export function useRewardsBoard() {
 
   const { subscribe } = useWebSocketClient();
 
-  const handleBlockUpdates = useCallback(
-    (updatedRewardBlocks: WebSocketPayload<'reward_blocks_updated'>) => {
-      const updatedRewardBoardBlock = updatedRewardBlocks.find(
-        (b) => b.id === DEFAULT_BOARD_BLOCK_ID && b.spaceId === spaceId
-      );
-      if (updatedRewardBoardBlock) {
-        mutate((rewardBlocks) => {
-          const existingRewardBoardBlock = rewardBlocks?.find(
-            (b) => b.id === DEFAULT_BOARD_BLOCK_ID
-          ) as RewardsBoardBlock;
-          if (existingRewardBoardBlock) {
-            return [
-              {
-                ...existingRewardBoardBlock,
-                fields: Object.assign(existingRewardBoardBlock.fields, updatedRewardBoardBlock.fields)
-              }
-            ];
-          }
-
+  const handleBlockUpdates = useCallback((updatedRewardBlocks: WebSocketPayload<'reward_blocks_updated'>) => {
+    const updatedRewardBoardBlock = updatedRewardBlocks.find((b) => b.id === DEFAULT_BOARD_BLOCK_ID);
+    if (updatedRewardBoardBlock) {
+      mutate((rewardBlocks) => {
+        if (!rewardBlocks) {
           return rewardBlocks;
-        });
-      }
-    },
-    [spaceId]
-  );
+        }
+
+        return [updatedRewardBoardBlock];
+      });
+    }
+  }, []);
 
   useEffect(() => {
     const unsubscribeFromBlockUpdates = subscribe('reward_blocks_updated', handleBlockUpdates);
