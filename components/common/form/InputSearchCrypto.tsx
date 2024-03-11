@@ -3,7 +3,7 @@ import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
 import { Autocomplete, Box, TextField, Typography } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
-import { CryptoCurrencies } from 'connectors/chains';
+import { CryptoCurrencies, getChainById } from 'connectors/chains';
 import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -26,6 +26,7 @@ export interface IInputSearchCryptoProps
   sx?: SxProps<Theme>;
   variant?: 'standard' | 'outlined';
   placeholder?: string;
+  showChain?: boolean;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -42,7 +43,8 @@ export function InputSearchCrypto({
   disabled,
   readOnly,
   variant,
-  placeholder
+  placeholder,
+  showChain
 }: IInputSearchCryptoProps) {
   const [inputValue, setInputValue] = useState('');
 
@@ -112,6 +114,10 @@ export function InputSearchCrypto({
             methods: paymentMethods,
             symbolOrAddress: option
           });
+          const chain = showChain && chainId ? getChainById(chainId) : null;
+          if (chain) {
+            return `${tokenInfo.tokenSymbol} on ${chain.chainName}`;
+          }
           return tokenInfo.tokenSymbol;
         }}
         renderOption={(props, option) => {
@@ -123,6 +129,7 @@ export function InputSearchCrypto({
               </Box>
             );
           }
+          const chain = showChain && chainId ? getChainById(chainId) : null;
           const tokenInfo = getTokenInfo({
             methods: paymentMethods,
             symbolOrAddress: option
@@ -140,6 +147,15 @@ export function InputSearchCrypto({
               </Box>
               <Box component='span'>{tokenInfo.tokenSymbol}</Box>
               <Box component='span'>{tokenInfo.tokenName}</Box>
+              {chain ? (
+                <>
+                  <Typography>on</Typography>
+                  <Box display='inline-block' width={20}>
+                    <TokenLogo height={20} src={chain.iconUrl} />
+                  </Box>
+                  <Box component='span'>{chain.chainName}</Box>
+                </>
+              ) : null}
             </Box>
           );
         }}

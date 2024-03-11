@@ -256,6 +256,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
                         chainId: voteToken?.chainId ?? 1
                       });
                     }}
+                    showChain
                     onNewPaymentMethod={onNewPaymentMethod}
                     sx={{
                       width: '100%',
