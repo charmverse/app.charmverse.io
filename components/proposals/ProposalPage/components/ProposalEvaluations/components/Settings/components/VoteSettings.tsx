@@ -245,7 +245,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
                   <InputSearchCrypto
                     disabled={readOnly}
                     readOnly={readOnly}
-                    cryptoList={availableCryptos.map((crypto) => crypto.tokenAddress)}
+                    cryptoList={availableCryptos}
                     chainId={voteToken?.chainId}
                     placeholder='Empty'
                     value={voteToken?.tokenAddress}

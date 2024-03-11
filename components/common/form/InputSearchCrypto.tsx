@@ -21,7 +21,7 @@ export interface IInputSearchCryptoProps
   defaultValue?: CryptoCurrency | string;
   value?: CryptoCurrency | string; // allow parent to override value
   hideBackdrop?: boolean; // hide backdrop when modal is open
-  cryptoList?: (string | CryptoCurrency)[];
+  cryptoList?: (string | CryptoCurrency | { chainId: number; tokenAddress: string })[];
   chainId?: number; // allow passing this down to the 'new custom token' form
   sx?: SxProps<Theme>;
   variant?: 'standard' | 'outlined';
@@ -112,9 +112,10 @@ export function InputSearchCrypto({
           }
           const tokenInfo = getTokenInfo({
             methods: paymentMethods,
-            symbolOrAddress: option
+            symbolOrAddress: typeof option === 'object' ? option.tokenAddress : option
           });
-          const chain = showChain && chainId ? getChainById(chainId) : null;
+
+          const chain = tokenInfo.chain;
           if (chain) {
             return `${tokenInfo.tokenSymbol} on ${chain.chainName}`;
           }
@@ -129,10 +130,10 @@ export function InputSearchCrypto({
               </Box>
             );
           }
-          const chain = showChain && chainId ? getChainById(chainId) : null;
+          const chain = showChain && typeof option === 'object' ? getChainById(option.chainId) : null;
           const tokenInfo = getTokenInfo({
             methods: paymentMethods,
-            symbolOrAddress: option
+            symbolOrAddress: typeof option === 'object' ? option.tokenAddress : option
           });
 
           return (
