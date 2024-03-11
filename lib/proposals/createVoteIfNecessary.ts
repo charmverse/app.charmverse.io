@@ -37,7 +37,11 @@ export async function createVoteIfNecessary({ createdBy, proposalId }: { created
         title: '',
         content: null,
         contentText: '',
-        context: 'proposal'
+        context: 'proposal',
+        strategy: settings.strategy,
+        blockNumber: settings.blockNumber ?? undefined,
+        chainId: settings.chainId ?? undefined,
+        tokenAddress: settings.tokenAddress ?? undefined
       };
       await createVoteService(newVote);
       log.info('Initiated vote for proposal', { proposalId, spaceId: page.spaceId, pageId: page.id });

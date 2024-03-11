@@ -19,7 +19,11 @@ const vote: Vote = {
   context: 'proposal',
   content: null,
   contentText: '',
-  maxChoices: 1
+  maxChoices: 1,
+  strategy: 'regular',
+  blockNumber: null,
+  chainId: null,
+  tokenAddress: null
 };
 
 describe('voting status', () => {

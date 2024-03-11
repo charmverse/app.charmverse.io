@@ -161,6 +161,7 @@ export function VoteDetail({
         </Box>
       )}
       {!detailed && voteCountLabel}
+
       <Tooltip
         placement='top-start'
         title={disableVote ? 'You do not have the permissions to participate in this vote' : ''}
