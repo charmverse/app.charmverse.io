@@ -76,11 +76,20 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
   const [isAdvancedSectionVisible, setIsAdvancedSectionVisible] = useState(false);
-  const [voteStrategy, setVoteStrategy] = useState<'snapshot' | 'regular_vote' | 'token_vote'>('regular_vote');
+  const [voteStrategy, setVoteStrategy] = useState<'snapshot' | 'regular_vote' | 'token_vote'>(
+    value?.chainId ? 'token_vote' : value?.publishToSnapshot ? 'snapshot' : 'regular_vote'
+  );
   const [voteToken, setVoteToken] = useState<null | {
     chainId: number;
     tokenAddress: string;
-  }>(null);
+  }>(
+    value?.chainId && value?.tokenAddress
+      ? {
+          chainId: value.chainId,
+          tokenAddress: value.tokenAddress
+        }
+      : null
+  );
   const [paymentMethods] = usePaymentMethods({
     filterDefaultPaymentMethods: true
   });
@@ -133,24 +142,36 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
 
   // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
-    if (onChange) {
-      const hasError =
-        passThreshold > 100 ||
-        (voteType === VoteType.SingleChoice && options.some((option) => option.length === 0)) ||
-        new Set(options).size !== options.length;
-
-      if (!hasError) {
-        onChange({
-          threshold: passThreshold,
-          type: voteType,
-          options,
-          maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
-          publishToSnapshot: voteStrategy === 'snapshot',
-          durationDays
-        });
+    async function main() {
+      if (onChange) {
+        const hasError =
+          passThreshold > 100 ||
+          (voteType === VoteType.SingleChoice && options.some((option) => option.length === 0)) ||
+          new Set(options).size !== options.length;
+        let blockNumber: null | number = null;
+        if (voteToken) {
+          const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
+          const provider = await snapshot.utils.getProvider(voteToken.chainId);
+          blockNumber = await provider.getBlockNumber();
+        }
+        if (!hasError) {
+          onChange({
+            threshold: passThreshold,
+            type: voteType,
+            options,
+            maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
+            publishToSnapshot: voteStrategy === 'snapshot',
+            durationDays,
+            blockNumber,
+            chainId: voteToken?.chainId ?? null,
+            tokenAddress: voteToken?.tokenAddress ?? null
+          });
+        }
       }
     }
-  }, [voteType, options, maxChoices, durationDays, passThreshold, voteStrategy]);
+
+    main();
+  }, [voteType, options, maxChoices, durationDays, voteToken, passThreshold, voteStrategy]);
 
   function handleVoteTypeChange(_voteType: VoteType) {
     if (_voteType !== value?.type) {
@@ -191,6 +212,7 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
               label='One account one vote'
               onChange={() => {
                 setVoteStrategy('regular_vote');
+                setVoteToken(null);
               }}
             />
             <FormControlLabel
@@ -213,8 +235,35 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
             />
           </RadioGroup>
           <Divider sx={{ mt: 1, mb: 2 }} />
-          {voteStrategy === 'regular_vote' ? (
+          {voteStrategy === 'token_vote' || voteStrategy === 'regular_vote' ? (
             <>
+              {voteStrategy === 'token_vote' ? (
+                <>
+                  <Typography component='span' variant='subtitle1'>
+                    Token
+                  </Typography>
+                  <InputSearchCrypto
+                    disabled={readOnly}
+                    readOnly={readOnly}
+                    cryptoList={availableCryptos.map((crypto) => crypto.tokenAddress)}
+                    chainId={voteToken?.chainId}
+                    placeholder='Empty'
+                    value={voteToken?.tokenAddress}
+                    defaultValue={voteToken?.tokenAddress}
+                    onChange={(crypto) => {
+                      setVoteToken({
+                        tokenAddress: crypto,
+                        chainId: voteToken?.chainId ?? 1
+                      });
+                    }}
+                    onNewPaymentMethod={onNewPaymentMethod}
+                    sx={{
+                      width: '100%',
+                      mb: 2
+                    }}
+                  />
+                </>
+              ) : null}
               <Stack
                 data-test='vote-duration'
                 direction='row'
@@ -303,31 +352,6 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
                   />
                 </Stack>
               )}
-            </>
-          ) : voteStrategy === 'token_vote' ? (
-            <>
-              <Typography component='span' variant='subtitle1'>
-                Token
-              </Typography>
-              <InputSearchCrypto
-                disabled={readOnly}
-                readOnly={readOnly}
-                cryptoList={availableCryptos.map((crypto) => crypto.tokenAddress)}
-                chainId={voteToken?.chainId}
-                placeholder='Empty'
-                value={voteToken?.tokenAddress}
-                defaultValue={voteToken?.tokenAddress}
-                onChange={(crypto) => {
-                  setVoteToken({
-                    tokenAddress: crypto,
-                    chainId: voteToken?.chainId ?? 1
-                  });
-                }}
-                onNewPaymentMethod={onNewPaymentMethod}
-                sx={{
-                  width: '100%'
-                }}
-              />
             </>
           ) : null}
         </AccordionDetails>

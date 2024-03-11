@@ -30,7 +30,10 @@ export type ProposalEvaluationStatus =
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
-export type VoteSettings = Pick<Vote, 'type' | 'threshold' | 'maxChoices'> & {
+export type VoteSettings = Pick<
+  Vote,
+  'type' | 'threshold' | 'maxChoices' | 'blockNumber' | 'tokenAddress' | 'chainId'
+> & {
   durationDays: number;
   options: string[];
   publishToSnapshot: boolean;
