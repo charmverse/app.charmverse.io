@@ -9,6 +9,7 @@ import { useRouter } from 'next/router';
 import { Button } from 'components/common/Button';
 import WorkspaceAvatar from 'components/common/PageLayout/components/Sidebar/components/WorkspaceAvatar';
 import UserDisplay from 'components/common/UserDisplay';
+import IdentityModal from 'components/settings/profile/components/IdentityModal';
 import { useBaseCurrentDomain } from 'hooks/useBaseCurrentDomain';
 import { useUser } from 'hooks/useUser';
 import darkLogoImage from 'public/images/charmverse_logo_sm_black.png';
@@ -51,6 +52,7 @@ function UserMenu() {
   const router = useRouter();
   const menuPopupState = usePopupState({ variant: 'popover', popupId: 'menu-dropdown' });
   const isLoginPage = router.pathname === '/';
+  const identityPopupState = usePopupState({ variant: 'popover', popupId: 'identity-popup' });
 
   async function logout() {
     await logoutUser();
@@ -72,10 +74,14 @@ function UserMenu() {
         )}
       </div>
       <Menu onClick={menuPopupState.close} {...bindMenu(menuPopupState)}>
+        <MenuItem sx={{ minWidth: '100px' }} {...bindTrigger(identityPopupState)}>
+          Manage Identities
+        </MenuItem>
         <MenuItem sx={{ minWidth: '100px' }} onClick={logout}>
           Log out
         </MenuItem>
       </Menu>
+      {user && <IdentityModal isOpen={identityPopupState.isOpen} close={identityPopupState.close} />}
     </div>
   );
 }
