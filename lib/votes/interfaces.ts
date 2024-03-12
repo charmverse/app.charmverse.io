@@ -32,6 +32,7 @@ export interface ExtendedVote extends Vote {
   userChoice: null | string[];
   totalVotes: number;
   votingPower: number;
+  totalVotingPower?: number;
 }
 
 export type VoteTask = Omit<ExtendedVote, 'createdBy'> & {

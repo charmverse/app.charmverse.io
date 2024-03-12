@@ -1,5 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getTokenSupplyAmount } from 'lib/blockchain/getTokenSupplyAmount';
+import { isTruthy } from 'lib/utils/types';
+
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
 import { getVotingPowerForVotes } from './getVotingPowerForVotes';
@@ -44,7 +47,23 @@ export async function getVotesByPage({
       })
     : [];
 
+  const votingTokenTotalSupplies = await Promise.all(
+    pageVotes
+      .map((pageVote) => {
+        if (pageVote.strategy === 'token' && pageVote.tokenAddress && pageVote.chainId) {
+          return getTokenSupplyAmount({
+            chainId: pageVote.chainId,
+            tokenContractAddress: pageVote.tokenAddress
+          }).then((supply) => ({ supply, voteId: pageVote.id }));
+        }
+        return null;
+      })
+      .filter(isTruthy)
+  );
+
   return pageVotes.map((pageVote, index) => {
+    const votingTokenTotalSupply = votingTokenTotalSupplies.find((v) => v.voteId === pageVote.id)?.supply;
+
     const userVotes = pageVote.userVotes?.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
@@ -63,7 +82,8 @@ export async function getVotesByPage({
       userChoice,
       status: voteStatus,
       totalVotes,
-      votingPower: votingPowers[index] ?? 1
+      votingPower: votingPowers[index] ?? 1,
+      totalVotingPower: votingTokenTotalSupply
     };
   });
 }

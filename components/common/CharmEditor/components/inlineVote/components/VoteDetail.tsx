@@ -228,7 +228,14 @@ export function VoteDetail({
           display='flex'
           justifyContent={vote.strategy === 'token' ? 'space-between' : 'flex-end'}
         >
-          {vote.strategy === 'token' ? <Typography>Your voting power: {millify(vote.votingPower)}</Typography> : null}
+          {vote.strategy === 'token' && (
+            <Stack gap={0.5}>
+              <Typography variant='subtitle1'>Your voting power: {millify(vote.votingPower)}</Typography>
+              {vote.totalVotingPower && (
+                <Typography variant='subtitle1'>Total voting power: {millify(vote.totalVotingPower)}</Typography>
+              )}
+            </Stack>
+          )}
           <Button
             data-test='view-poll-details-button'
             color='secondary'
