@@ -62,7 +62,7 @@ export async function getVotesByPage({
   );
 
   return pageVotes.map((pageVote, index) => {
-    const votingTokenTotalSupply = votingTokenTotalSupplies.find((v) => v.voteId === pageVote.id)?.supply;
+    const votingTokenTotalSupply = votingTokenTotalSupplies.find((v) => v.voteId === pageVote.id)?.supply ?? undefined;
 
     const userVotes = pageVote.userVotes?.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({

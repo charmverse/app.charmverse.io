@@ -153,7 +153,6 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
           type: voteType,
           options,
           maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
-          publishToSnapshot: voteStrategy === 'snapshot',
           durationDays,
           blockNumber: null,
           chainId: voteToken?.chainId ?? null,

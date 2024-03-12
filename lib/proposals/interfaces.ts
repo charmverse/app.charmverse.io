@@ -36,7 +36,6 @@ export type VoteSettings = Pick<
 > & {
   durationDays: number;
   options: string[];
-  publishToSnapshot: boolean;
 };
 
 export type TypedFormField = Omit<FormField, 'options'> & {

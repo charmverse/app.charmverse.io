@@ -18,7 +18,6 @@ export const voteSettings: VoteSettings = {
   type: 'Approval',
   options: ['Yes', 'No', 'Abstain'],
   maxChoices: 1,
-  publishToSnapshot: false,
   durationDays: 5,
   strategy: 'regular',
   blockNumber: null,

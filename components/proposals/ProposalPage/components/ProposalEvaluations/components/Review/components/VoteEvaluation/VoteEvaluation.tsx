@@ -68,7 +68,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
   if (!vote) {
     if (evaluation.snapshotId) {
       return <SnapshotVoteDetails snapshotProposalId={evaluation.snapshotId} />;
-    } else if (evaluation.voteSettings?.publishToSnapshot) {
+    } else if (evaluation.voteSettings?.strategy === 'snapshot') {
       return (
         <Tooltip
           title={!canCreateVote ? 'Only proposal authors and space admins can publish this proposal to snapshot' : ''}
@@ -110,7 +110,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
 
   vote.title = evaluation.title;
 
-  if (evaluation.voteSettings?.publishToSnapshot) {
+  if (evaluation.voteSettings?.strategy === 'token') {
     return evaluation.snapshotId ? null : (
       <NoCommentsMessage
         icon={
