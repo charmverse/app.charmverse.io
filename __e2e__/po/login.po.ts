@@ -45,7 +45,15 @@ export class LoginPage {
   }
 
   async waitForLogin(discordApiUrl: string) {
-    await this.page.route('**/discord/login', async (route) => {
+    await this.page.route('**/api/discord/oauth', async (route) => {
+      await route.fulfill({
+        status: 301,
+        headers: {
+          location: `${discordApiUrl}/api/oauth2/authorize?prompt=consent&client_id=1234&response_type=code`
+        }
+      });
+    });
+    await this.page.route('**/api/discord/login', async (route) => {
       const _body = route.request().postData();
       await route.continue({
         postData: JSON.stringify({

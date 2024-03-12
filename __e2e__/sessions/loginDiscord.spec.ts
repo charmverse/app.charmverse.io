@@ -29,6 +29,7 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   const discordUserId = discordServer.discordUserId;
   const { user, space, page } = await generateUserAndSpace();
   await createDiscordUser({ userId: user.id, discordUserId });
+  await loginPage.waitForLogin(discordServer.host);
 
   await loginPage.goto();
   await loginPage.universalConnectButton.click();
