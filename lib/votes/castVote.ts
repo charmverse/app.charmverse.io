@@ -45,6 +45,10 @@ export async function castVote(
     votes: [vote]
   });
 
+  if (vote.strategy === 'token' && votingPowers[0] === 0) {
+    throw new InvalidInputError('User has no voting power.');
+  }
+
   // TODO - delete user vote when choices.length === 0
   const userVote = await prisma.userVote.upsert({
     where: {
@@ -57,12 +61,12 @@ export async function castVote(
       userId,
       voteId,
       choices,
-      tokenAmount: votingPowers[0] ?? 1
+      tokenAmount: votingPowers[0]
     },
     update: {
       choices,
       updatedAt: new Date(),
-      tokenAmount: votingPowers[0] ?? 1
+      tokenAmount: votingPowers[0]
     },
     include: {
       vote: true

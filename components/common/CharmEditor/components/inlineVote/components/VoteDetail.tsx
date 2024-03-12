@@ -199,7 +199,7 @@ export function VoteDetail({
             <SingleChoiceForm
               value={userVoteChoice?.[0]}
               voteOptions={voteOptions}
-              disabled={isVotingClosed(vote) || !user || !!disableVote}
+              disabled={vote.votingPower === 0 || isVotingClosed(vote) || !user || !!disableVote}
               totalVotes={totalVotes}
               aggregatedResult={aggregatedResult}
               onChange={onVoteChange}
@@ -211,7 +211,7 @@ export function VoteDetail({
             <MultiChoiceForm
               value={userVoteChoice}
               voteOptions={voteOptions}
-              disabled={isVotingClosed(vote) || !user || !!disableVote}
+              disabled={vote.votingPower === 0 || isVotingClosed(vote) || !user || !!disableVote}
               totalVotes={totalVotes}
               aggregatedResult={aggregatedResult}
               onChange={onVoteChange}
