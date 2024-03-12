@@ -8,7 +8,9 @@ export function aggregateVoteResult({
   voteOptions
 }: {
   voteOptions: Pick<VoteOptions, 'name'>[];
-  userVotes: Pick<UserVote, 'choices' | 'userId' | 'tokenAmount'>[];
+  userVotes: (Pick<UserVote, 'choices' | 'userId'> & {
+    tokenAmount?: number | null;
+  })[];
   userId?: string;
 }) {
   const aggregatedResult: ExtendedVote['aggregatedResult'] = {};
