@@ -32,14 +32,17 @@ import { MultiChoiceForm } from 'components/common/CharmEditor/components/inline
 import { SingleChoiceForm } from 'components/common/CharmEditor/components/inlineVote/components/SingleChoiceForm';
 import Link from 'components/common/Link';
 import Modal from 'components/common/Modal';
+import TokenLogo from 'components/common/TokenLogo';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
 import { VoteActionsMenu } from 'components/votes/components/VoteActionsMenu';
 import VoteStatusChip from 'components/votes/components/VoteStatusChip';
 import { useMembers } from 'hooks/useMembers';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { useUser } from 'hooks/useUser';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
+import { getTokenInfo } from 'lib/tokens/tokenData';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 
@@ -86,6 +89,7 @@ export function VoteDetail({
   const { mutate: refetchNotifications } = useNotifications();
   const { getMemberById } = useMembers();
   const showPageContent = content && !checkIsContentEmpty(content as PageContent);
+  const [paymentMethods] = usePaymentMethods();
 
   const voteDetailsPopup = usePopupState({ variant: 'popover', popupId: 'inline-votes-detail' });
 
@@ -152,6 +156,15 @@ export function VoteDetail({
   const [blockExplorerUrl] =
     (vote.strategy === 'token' && vote.chainId ? getChainById(vote.chainId)?.blockExplorerUrls : []) ?? [];
 
+  const tokenInfo = vote.tokenAddress
+    ? getTokenInfo({
+        methods: paymentMethods,
+        symbolOrAddress: vote.tokenAddress
+      })
+    : null;
+
+  const chain = vote.chainId ? getChainById(vote.chainId) : null;
+
   return (
     <VotesWrapper data-test='vote-container' detailed={detailed} id={`vote.${vote.id}`}>
       <Box ref={anchorRef} display='flex' justifyContent='space-between' alignItems='center'>
@@ -179,7 +192,16 @@ export function VoteDetail({
           <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
         </Box>
       )}
-      {!detailed && voteCountLabel}
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        {!detailed && voteCountLabel}
+        {tokenInfo && chain && (
+          <Stack my={1} flexDirection='row' gap={0.75} alignItems='center'>
+            <TokenLogo src={tokenInfo.canonicalLogo} height={20} />
+            <Box component='span'>{tokenInfo.tokenSymbol}</Box>
+            <Box component='span'>on {chain.chainName}</Box>
+          </Stack>
+        )}
+      </Stack>
       {vote.strategy === 'token' && vote.blockNumber && blockExplorerUrl ? (
         <Stack flexDirection='row' alignItems='center' gap={1} my={1}>
           <Link href={`${blockExplorerUrl}/block/${vote.blockNumber}`} target='_blank' rel='noreferrer'>
