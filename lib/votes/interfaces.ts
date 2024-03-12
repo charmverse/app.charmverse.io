@@ -16,7 +16,7 @@ export interface VoteDTO
   voteOptions: string[];
   spaceId: string;
   evaluationId?: string;
-  blockNumber?: number;
+  blockNumber?: string;
   tokenAddress?: string;
   chainId?: number;
 }
