@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
 import { useUserPreferences } from 'hooks/useUserPreferences';
-import type { DateFormatConfig } from 'lib/utilities/dates';
-import { formatDate, formatDateTime, getFormattedDateTime } from 'lib/utilities/dates';
+import type { DateFormatConfig } from 'lib/utils/dates';
+import { formatDate, formatDateTime, getFormattedDateTime } from 'lib/utils/dates';
 
 export function useDateFormatter(locale?: string) {
   const { userPreferences } = useUserPreferences();

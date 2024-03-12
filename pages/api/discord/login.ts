@@ -5,15 +5,18 @@ import nc from 'next-connect';
 import { loginByDiscord } from 'lib/discord/loginByDiscord';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
-import { InvalidStateError, onError, onNoMatch } from 'lib/middleware';
+import { InvalidStateError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { LoggedInUser } from 'models';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.post(loginDiscordCodeHandler);
+handler.use(requireKeys(['code'], 'body')).post(loginDiscordCodeHandler);
 
-async function loginDiscordCodeHandler(req: NextApiRequest, res: NextApiResponse<LoggedInUser>) {
+async function loginDiscordCodeHandler(
+  req: NextApiRequest,
+  res: NextApiResponse<LoggedInUser | { otpRequired: true }>
+) {
   const tempAuthCode = req.body.code as string;
 
   try {
@@ -26,17 +29,24 @@ async function loginDiscordCodeHandler(req: NextApiRequest, res: NextApiResponse
       authFlowType: 'popup'
     });
 
-    req.session.anonymousUserId = undefined;
-    req.session.user = { id: user.id };
-
     await updateGuildRolesForUser(
       user.wallets.map((w) => w.address),
       user.spaceRoles
     );
 
-    log.info(`User ${user.id} logged in with Discord`, { userId: user.id, method: 'discord' });
+    req.session.anonymousUserId = undefined;
 
+    if (user.otp?.activatedAt) {
+      req.session.otpUser = { id: user.id, method: 'Discord' };
+      await req.session.save();
+
+      return res.status(200).json({ otpRequired: true });
+    }
+
+    req.session.user = { id: user.id };
     await req.session.save();
+
+    log.info(`User ${user.id} logged in with Discord`, { userId: user.id, method: 'discord' });
 
     return res.status(200).json(user);
   } catch (error) {

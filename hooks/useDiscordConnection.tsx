@@ -7,8 +7,9 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
-import { getCookie, deleteCookie } from 'lib/utilities/browser';
-import type { LoggedInUser } from 'models';
+import { getCookie, deleteCookie } from 'lib/utils/browser';
+
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 interface Props {
   children: JSX.Element;
@@ -31,7 +32,7 @@ export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectio
 });
 
 export function DiscordProvider({ children }: Props) {
-  const { user, setUser } = useUser();
+  const { user, updateUser } = useUser();
   const { showMessage } = useSnackbar();
   const authCode = getCookie(AUTH_CODE_COOKIE);
   const authError = getCookie(AUTH_ERROR_COOKIE);
@@ -41,6 +42,7 @@ export function DiscordProvider({ children }: Props) {
 
   const connectedWithDiscord = Boolean(user?.discordUser);
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   async function connect() {
     if (!isConnectDiscordLoading) {
@@ -64,7 +66,7 @@ export function DiscordProvider({ children }: Props) {
     return charmClient.discord
       .disconnectDiscord()
       .then(() => {
-        setUser((_user: LoggedInUser) => ({ ..._user, discordUser: null }));
+        updateUser({ discordUser: null });
       })
       .catch((error) => {
         log.warn('Error disconnecting from discord', error);
@@ -88,21 +90,18 @@ export function DiscordProvider({ children }: Props) {
 
       try {
         if (type === 'connect') {
-          const updatedUser = await charmClient.discord
-            .connectDiscord(
-              {
-                code
-              },
-              'popup'
-            )
-            .catch((err) => {
-              setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
-            });
+          const updatedUser = await charmClient.discord.connectDiscord({ code }, 'popup').catch((err) => {
+            setDiscordError(err.message || err.error || 'Something went wrong. Please try again');
+          });
 
-          setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUser }));
+          updateUser({ ...updatedUser });
         } else {
-          const loggedInUser = await charmClient.discord.loginWithDiscordCode(code);
-          setUser(loggedInUser);
+          const resp = await charmClient.discord.loginWithDiscordCode(code);
+          if ('id' in resp) {
+            updateUser(resp);
+          } else {
+            openVerifyOtpModal();
+          }
         }
       } catch (e: any) {
         showMessage(e.message || 'Failed to login with discord', 'error');
@@ -139,7 +138,7 @@ export function DiscordProvider({ children }: Props) {
             code: authCode
           })
           .then((updatedUserFields) => {
-            setUser((_user: LoggedInUser) => ({ ..._user, ...updatedUserFields }));
+            updateUser({ ...updatedUserFields });
           })
           .catch((err) => {
             setDiscordError(err.message || err.error || 'Something went wrong. Please try again');

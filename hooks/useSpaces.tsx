@@ -31,7 +31,7 @@ export const SpacesContext = createContext<Readonly<IContext>>({
 });
 
 export function SpacesProvider({ children }: { children: ReactNode }) {
-  const { user, isLoaded: isUserLoaded, setUser } = useUser();
+  const { user, isLoaded: isUserLoaded, refreshUser } = useUser();
   const [spaces, setSpaces] = useState<Space[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isCreatingSpace, setIsCreatingSpace] = useState(false);
@@ -58,8 +58,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
       const space = await charmClient.spaces.createSpace(newSpace);
       setSpaces((s) => [...s, space]);
       // refresh user permissions
-      const _user = await charmClient.getUser();
-      setUser(_user);
+      await refreshUser();
       setIsCreatingSpace(false);
       return space;
     } catch (e) {

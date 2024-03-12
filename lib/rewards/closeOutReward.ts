@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
+
 import { submissionIsComplete } from './countRemainingSubmissionSlots';
 import { getRewardOrThrow } from './getReward';
 import type { RewardWithUsers } from './interfaces';
@@ -29,6 +31,11 @@ export async function closeOutReward(rewardId: string): Promise<RewardWithUsers>
       }
     })
   ]);
+
+  await issueRewardCredentialsIfNecessary({
+    event: 'reward_submission_approved',
+    rewardId
+  });
 
   return getRewardOrThrow({ rewardId });
 }

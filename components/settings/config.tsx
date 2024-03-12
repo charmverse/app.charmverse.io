@@ -1,3 +1,4 @@
+import { DiamondOutlined } from '@mui/icons-material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
@@ -6,8 +7,11 @@ import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
+import MedalIcon from '@mui/icons-material/WorkspacePremium';
+import { SvgIcon } from '@mui/material';
 
 import { ProposalIcon } from 'components/common/PageIcon';
+import CharmsLogo from 'public/images/charm.svg';
 
 export const premiumSettingSections = ['roles', 'api'] as const;
 
@@ -18,18 +22,25 @@ export const SPACE_SETTINGS_TABS = [
   { icon: <FileDownloadOutlinedIcon fontSize='small' />, path: 'import', label: 'Import' },
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' },
+  { icon: <MedalIcon fontSize='small' />, path: 'credentials', label: 'Credentials' },
   { icon: <ProposalIcon fontSize='small' />, path: 'proposals', label: 'Proposals' }
 ] as const;
 
 export type SpaceSettingsTab = (typeof SPACE_SETTINGS_TABS)[number];
 export type SpaceSettingsSection = SpaceSettingsTab['path'];
-export const accountSettingsSections = ['account', 'profile'] as const;
+export const accountSettingsSections = ['account', 'profile', 'charms'] as const;
 
 export type UserSettingsSection = (typeof accountSettingsSections)[number];
 
 export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
-  { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' }
+  { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
+  {
+    icon: <SvgIcon component={CharmsLogo} sx={{ height: 20 }} inheritViewBox color='inherit' />,
+    path: 'charms',
+    label: 'Charms'
+  }
 ] as const;
 
 export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];
+export type AccountSettingsSection = UserSettingsTab['path'];

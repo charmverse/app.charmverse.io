@@ -118,7 +118,7 @@ beforeAll(async () => {
 });
 
 it('Should correctly update guild roles for space', async () => {
-  jest.mock('@guildxyz/sdk', () => ({
+  jest.mock('lib/guild-xyz/client', () => ({
     user: {
       getMemberships: (address: string) => {
         if (address === user1.wallets[0].address) {

@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import charmClient from 'charmClient';
 import { useNotifications } from 'components/nexus/hooks/useNotifications';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 export function useMarkNotificationFromUrl() {
   const router = useRouter();

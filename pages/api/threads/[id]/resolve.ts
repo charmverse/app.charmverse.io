@@ -8,7 +8,8 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { ThreadWithComments } from 'lib/threads';
 import { toggleThreadStatus } from 'lib/threads';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { threadIncludeClause } from 'lib/threads/utils';
+import { DataNotFoundError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -26,13 +27,7 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
     where: {
       id: threadId
     },
-    include: {
-      comments: {
-        include: {
-          user: true
-        }
-      }
-    }
+    include: threadIncludeClause()
   });
 
   if (!thread) {
@@ -75,7 +70,7 @@ async function resolveThread(req: NextApiRequest, res: NextApiResponse<ThreadWit
   }
   // Empty update for now as we are only updating the resolved status
   else {
-    return res.status(200).json(thread);
+    return res.status(200).json(thread as unknown as ThreadWithComments);
   }
 }
 

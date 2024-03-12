@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import { randomBoardColor } from 'lib/focalboard/constants';
 import type { PageProperty } from 'lib/public-api';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { BodyFormResponse } from './interfaces';
 

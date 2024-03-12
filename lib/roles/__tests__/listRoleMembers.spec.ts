@@ -2,7 +2,7 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { assignRole, listRoleMembers } from 'lib/roles';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 import { ExpectedAnError } from 'testing/errors';
 import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

@@ -1,25 +1,25 @@
 import type { Nft } from '@ankr.com/ankr.js';
 import { AnkrProvider } from '@ankr.com/ankr.js';
 import type { Blockchain as AnkrBlockchain } from '@ankr.com/ankr.js/dist/types';
-import { GET } from '@charmverse/core/http';
 import { log } from '@charmverse/core/log';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { ethers } from 'ethers';
 
+import { GET } from 'adapters/http';
 import { getNFTUrl } from 'components/common/CharmEditor/components/nft/utils';
 import { isMantleChain } from 'lib/gnosis/mantleClient';
-import { paginatedCall } from 'lib/utilities/async';
+import { paginatedCall } from 'lib/utils/async';
 
 import type { NFTData } from '../../getNFTs';
 
 import type { SupportedChainId } from './config';
-import { advancedAPIEndpoint, ankrAdvancedApis, rpcApis } from './config';
+import { advancedAPIEndpoint, ankrAdvancedApis, supportedChainIds } from './config';
 
 // 50 requests/minute for Public tier - https://www.ankr.com/docs/rpc-service/service-plans/#rate-limits
 const rateLimiter = RateLimit(0.8);
 
-function getRPCEndpoint(chainId: SupportedChainId) {
+export function getAnkrBaseUrl(chainId: SupportedChainId) {
   const chainPath = ankrAdvancedApis[chainId];
   if (!chainPath) throw new Error(`Chain id "${chainId}" not supported by Ankr`);
   return `https://rpc.ankr.com/${chainPath}/${process.env.ANKR_API_ID}`;
@@ -74,7 +74,7 @@ export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promis
     log.warn('Ankr API Key is missing to retrive NFT');
     return null;
   }
-  if (rpcApis.includes(chainId)) {
+  if (chainId === 5000) {
     return getTokenInfoOnMantle({ address, chainId, tokenId });
   }
   const provider = new AnkrProvider(advancedAPIEndpoint);
@@ -83,7 +83,7 @@ export async function getNFT({ address, tokenId, chainId }: GetNFTInput): Promis
   await rateLimiter();
   const nft = await provider.getNFTMetadata({
     blockchain: blockchain as AnkrBlockchain,
-    tokenId: toInt(tokenId).toString(),
+    tokenId: BigInt(tokenId).toString(),
     contractAddress: address,
     forceFetch: false
   });
@@ -168,12 +168,12 @@ export async function getTokenInfoOnMantle({
   walletId = null,
   tokenId
 }: RPCTokenInput): Promise<NFTData> {
-  const provider = new ethers.providers.JsonRpcProvider(getRPCEndpoint(chainId));
+  const provider = new ethers.providers.JsonRpcProvider(getAnkrBaseUrl(chainId));
   const contract = new ethers.Contract(address, ERC721_ABI, provider);
 
   const [tokenUri] = await Promise.all([contract.tokenURI(tokenId)]);
   const tokenUriDNSVersion = tokenUri.replace('ipfs://', 'https://ipfs.io/ipfs/');
-  const metadata = await GET<TokenMetadata>(tokenUriDNSVersion, null);
+  const metadata = await GET<TokenMetadata>(tokenUriDNSVersion);
   const imageUrl = metadata.image?.replace('ipfs://', 'https://ipfs.io/ipfs/');
   return {
     id: `${address}:${tokenId}`,

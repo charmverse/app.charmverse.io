@@ -1,10 +1,10 @@
-import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createPage, createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { getVotesByPage } from '../getVotesByPage';
 
 describe('getVotesByPage', () => {
   it('should get votes for a page along with user choice and aggregated result', async () => {
-    const { space, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { space, user } = await generateUserAndSpace();
     const page1 = await createPage({
       createdBy: user.id,
       spaceId: space.id

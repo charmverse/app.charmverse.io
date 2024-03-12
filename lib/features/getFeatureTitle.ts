@@ -1,5 +1,8 @@
-import type { Feature, MappedFeatures } from './constants';
+import { capitalize } from 'lodash';
+
+import type { FeatureJson, Feature } from './constants';
 import { STATIC_PAGES } from './constants';
+import { constructFeaturesRecord } from './constructFeaturesRecord';
 
 export type FeatureTitleVariation =
   | 'reward'
@@ -30,23 +33,33 @@ const featureTitleRecord: Record<FeatureTitleVariation, Feature> = {
   member_directory: 'member_directory'
 };
 
-export const getFeatureTitle = ({
-  featureTitle,
-  mappedFeatures
-}: {
-  featureTitle: FeatureTitleVariation;
-  mappedFeatures: MappedFeatures;
-}) => {
-  const isCapitalized = featureTitle.charAt(0) === featureTitle.charAt(0).toUpperCase();
+export const getFeatureTitle = (featureTitle: FeatureTitleVariation, features: FeatureJson[] = []) => {
+  const { mappedFeatures } = constructFeaturesRecord(features);
   const feature = featureTitleRecord[featureTitle];
-  const featureCurrentTitle = mappedFeatures[feature].title;
+  const featureCurrentTitle = mappedFeatures[feature]?.title;
   const staticPageFeature = STATIC_PAGES.find((page) => page.feature === feature)!;
+
+  let result: string = featureTitle;
   // Keep the current title without any modifications if its has been changed
-  if (featureCurrentTitle !== staticPageFeature.title) {
-    return isCapitalized
-      ? featureCurrentTitle.charAt(0).toUpperCase() + featureCurrentTitle.slice(1)
-      : featureCurrentTitle.toLowerCase();
+  if (featureCurrentTitle && featureCurrentTitle !== staticPageFeature.title) {
+    const isCapitalized = featureTitle.charAt(0) === featureTitle.charAt(0).toUpperCase();
+    const isPlural = featureTitle.charAt(featureTitle.length - 1) === 's';
+    result = featureCurrentTitle.toLocaleLowerCase();
+    if (isCapitalized) {
+      result = capitalize(featureCurrentTitle);
+    }
+    if (!isPlural) {
+      result = singular(result);
+    }
   }
 
-  return featureTitle;
+  return result;
 };
+
+// Handles only s and ies word. A more thorough solution can be found on Stackoverflow: https://stackoverflow.com/a/57129703/1304395
+function singular(word: string) {
+  if (word.endsWith('ies')) {
+    return word.replace(/ies$/, 'y');
+  }
+  return word.replace(/s$/, '');
+}

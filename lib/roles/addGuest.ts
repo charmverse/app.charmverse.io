@@ -2,8 +2,8 @@ import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/pr
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
-import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
-import { isUUID, isValidEmail, uid } from 'lib/utilities/strings';
+import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
+import { isUUID, isValidEmail, uid } from 'lib/utils/strings';
 
 type GuestToAdd = {
   userIdOrEmail: string;

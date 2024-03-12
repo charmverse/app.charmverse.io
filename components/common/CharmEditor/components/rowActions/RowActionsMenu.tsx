@@ -20,11 +20,11 @@ import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/sto
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { isMac } from 'lib/utilities/browser';
+import { isMac } from 'lib/utils/browser';
 
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
-import { getNodeForRowPosition, type PluginState } from './rowActions';
+import { deleteRowNode, getNodeForRowPosition, type PluginState } from './rowActions';
 
 const menuPosition: Partial<MenuProps> = {
   anchorOrigin: {
@@ -45,23 +45,17 @@ function Component({ menuState }: { menuState: PluginState }) {
   const boards = useAppSelector(getSortedBoards);
 
   function deleteRow() {
-    const node = getNodeForRowPosition({ view, rowPosition: menuState.rowPos, rowNodeOffset: menuState.rowNodeOffset });
-    if (node) {
-      let start = node.nodeStart;
-      let end = node.nodeEnd;
-      // fix for toggles, but also assuming that pos 1 or 0 is always the first line anyway
-      if (start === 1) {
-        start = 0;
-        end -= 1;
-      } else if (node.node.type.name === 'disclosureDetails' || node.node.type.name === 'blockquote') {
-        // This removes disclosureSummary node
-        start -= 2;
-      }
-      view.dispatch(view.state.tr.deleteRange(start, end));
+    const deletedNode = deleteRowNode({
+      view,
+      rowPosition: menuState.rowPos,
+      rowNodeOffset: menuState.rowNodeOffset
+    });
+
+    if (deletedNode) {
       popupState.close();
 
       // If its an embedded inline database delete the board page
-      const page = pages[node.node.attrs.pageId];
+      const page = pages[deletedNode.node.attrs.pageId];
       if (page?.type === 'inline_board' || page?.type === 'inline_linked_board') {
         const board = boards.find((b) => b.id === page.id);
         deletePage({

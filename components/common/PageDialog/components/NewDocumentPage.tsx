@@ -1,7 +1,8 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, useMediaQuery } from '@mui/material';
-import { useElementSize } from 'usehooks-ts';
+import { useRef } from 'react';
+import { useResizeObserver } from 'usehooks-ts';
 
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
@@ -18,7 +19,6 @@ import type { NewPageValues } from '../hooks/useNewPage';
 const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
-
 type Props = {
   children: React.ReactNode;
   placeholder?: string;
@@ -26,6 +26,7 @@ type Props = {
   values: NewPageValues | null;
   onChange: (values: Partial<NewPageValues | null>) => void;
   headerBannerTitle?: string;
+  readOnly?: boolean; // TODO: Dont use NewDocumentPage for editing proposal rewards. It's not really "New" in that sense... or rename this component
 };
 
 // Note: this component is only used before a page is saved to the DB
@@ -35,10 +36,12 @@ export function NewDocumentPage({
   titlePlaceholder,
   values: newPageValues,
   onChange,
-  headerBannerTitle
+  headerBannerTitle,
+  readOnly
 }: Props) {
   newPageValues ||= EMPTY_PAGE_VALUES;
-  const [, { width: containerWidth }] = useElementSize();
+  const containerWidthRef = useRef<HTMLDivElement>(null);
+  const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
   function focusDocumentEditor() {
@@ -49,15 +52,30 @@ export function NewDocumentPage({
 
   return (
     <div className={`document-print-container ${fontClassName}`}>
-      <Box display='flex' flexDirection='column'>
+      <Box ref={containerWidthRef} display='flex' flexDirection='column'>
         <PageTemplateBanner pageType={newPageValues.type} isNewPage customTitle={headerBannerTitle} />
         {newPageValues.headerImage && <PageBanner headerImage={newPageValues.headerImage} setPage={onChange} />}
         <StyledContainer data-test='page-charmeditor' top={getPageTop(newPageValues)} fullWidth={isSmallScreen}>
           <Box minHeight={450}>
+            {/* temporary? disable editing of page title when in suggestion mode */}
+            <PageHeader
+              headerImage={newPageValues.headerImage || null}
+              icon={newPageValues.icon || null}
+              updatedAt={new Date().toString()}
+              title={newPageValues.title || ''}
+              readOnly={!!readOnly}
+              setPage={onChange}
+              placeholder={titlePlaceholder}
+              focusDocumentEditor={focusDocumentEditor}
+            />
+            <div className='focalboard-body font-family-default'>
+              <div className='CardDetail content'>{children}</div>
+            </div>
             <CharmEditor
               placeholderText={placeholder}
               content={newPageValues.content as PageContent}
               autoFocus={false}
+              readOnly={readOnly}
               enableVoting={false}
               containerWidth={containerWidth}
               pageType={newPageValues.type}
@@ -65,22 +83,7 @@ export function NewDocumentPage({
               onContentChange={({ rawText, doc }) => onChange({ content: doc, contentText: rawText })}
               focusOnInit
               isContentControlled
-            >
-              {/* temporary? disable editing of page title when in suggestion mode */}
-              <PageHeader
-                headerImage={newPageValues.headerImage || null}
-                icon={newPageValues.icon || null}
-                updatedAt={new Date().toString()}
-                title={newPageValues.title || ''}
-                readOnly={false}
-                setPage={onChange}
-                placeholder={titlePlaceholder}
-                focusDocumentEditor={focusDocumentEditor}
-              />
-              <div className='focalboard-body font-family-default'>
-                <div className='CardDetail content'>{children}</div>
-              </div>
-            </CharmEditor>
+            />
           </Box>
         </StyledContainer>
       </Box>

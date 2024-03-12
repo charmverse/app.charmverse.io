@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 
 export function useRewardsNavigation(idKey = 'id') {
   const { showPage, hidePage } = usePageDialog();

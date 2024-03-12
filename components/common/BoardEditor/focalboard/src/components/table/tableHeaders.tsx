@@ -9,6 +9,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import React, { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
@@ -41,6 +42,8 @@ type Props = {
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
 };
 
 function TableHeaders(props: Props): JSX.Element {
@@ -59,6 +62,8 @@ function TableHeaders(props: Props): JSX.Element {
   const intl = useIntl();
   const { formatDateTime, formatDate } = useDateFormatter();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
+  const { trigger: syncRelationProperty } = useSyncRelationProperty();
+
   const isSmallScreen = useSmallScreen();
   const theme = useTheme();
   const sortOptions = useViewSortOptions(activeView);
@@ -172,30 +177,32 @@ function TableHeaders(props: Props): JSX.Element {
     );
   };
 
-  const titleSortOption = sortOptions?.find((o) => o.propertyId === Constants.titleColumnId);
-  let titleSorted: 'up' | 'down' | 'none' = 'none';
-  if (titleSortOption) {
-    titleSorted = titleSortOption.reversed ? 'down' : 'up';
-  }
-
   const propertyTypes = useMemo(
     () =>
       activeView && (
         <PropertyTypes
+          boardType={props.boardType}
           isMobile={isSmallScreen}
-          onClick={async (type) => {
+          onClick={async ({ type, relationData, name }) => {
             addPropertyPopupState.close();
             const template: IPropertyTemplate = {
               id: Utils.createGuid(IDType.BlockID),
-              name: typeDisplayName(intl, type),
+              name: name ?? typeDisplayName(intl, type),
               type,
-              options: []
+              options: [],
+              relationData
             };
             await mutator.insertPropertyTemplate(board, activeView, -1, template);
+            if (relationData?.showOnRelatedBoard) {
+              syncRelationProperty({
+                boardId: board.id,
+                templateId: template.id
+              });
+            }
           }}
         />
       ),
-    [mutator, board, activeView, isSmallScreen]
+    [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
   return (
@@ -203,6 +210,7 @@ function TableHeaders(props: Props): JSX.Element {
       {setCheckedIds && !readOnly && cards.length !== 0 && (
         <StyledCheckbox
           checked={checkedIds.length === cards.length}
+          className='disable-drag-selection'
           onChange={() => {
             if (checkedIds.length === cards.length) {
               setCheckedIds([]);
@@ -239,8 +247,6 @@ function TableHeaders(props: Props): JSX.Element {
         return (
           <TableHeader
             data-test={`table-property-${template.type}`}
-            type={template.type}
-            name={template.name}
             sorted={sorted}
             readOnly={props.readOnly}
             board={board}
@@ -252,11 +258,15 @@ function TableHeaders(props: Props): JSX.Element {
             offset={resizingColumn === template.id ? offset : 0}
             onDrop={onDropToColumn}
             onAutoSizeColumn={onAutoSizeColumn}
+            setSelectedPropertyId={props.setSelectedPropertyId}
           />
         );
       })}
       {/* empty column for actions */}
-      <div className='octo-table-cell header-cell' style={{ flexGrow: 1, borderRight: '0 none' }}>
+      <div
+        className='octo-table-cell header-cell disable-drag-selection'
+        style={{ flexGrow: 1, borderRight: '0 none' }}
+      >
         {!props.readOnly && (
           <>
             <Button {...bindTrigger(addPropertyPopupState)}>

@@ -1,7 +1,7 @@
 import type { Role, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 export type RoleWithMembers = Role & { users: User[] };
 

@@ -1,9 +1,10 @@
-import { customRenderWithContext } from 'testing/customRender';
+import { MockDataProvider, render } from 'testing/customRender';
 
 import { CommentForm } from '../CommentForm';
 
 jest.mock('components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase', () => ({}));
 jest.mock('components/common/CharmEditor/components/poll/PollComponent', () => ({}));
+jest.mock('components/common/CharmEditor/components/farcasterFrame/components/FarcasterFrameNodeView', () => ({}));
 
 jest.mock('next/router', () => ({
   useRouter: () => ({
@@ -16,8 +17,12 @@ jest.mock('next/router', () => ({
 }));
 
 describe('<CommentForm />', () => {
-  test('NameConsumer shows value from provider', () => {
-    const { container } = customRenderWithContext(<CommentForm handleCreateComment={async () => {}} />, {});
+  test('shows a placeholder', () => {
+    const { container } = render(
+      <MockDataProvider>
+        <CommentForm handleCreateComment={async () => {}} />
+      </MockDataProvider>
+    );
     const placeholder = container.querySelector('[data-placeholder="What are your thoughts?"');
     expect(placeholder).toBeInTheDocument();
   });

@@ -1,11 +1,12 @@
 import { v4 as uuid } from 'uuid';
 
-import { deterministicRandomName } from 'lib/utilities/randomName';
+import { deterministicRandomName } from 'lib/utils/randomName';
 import type { LoggedInUser } from 'models';
 
 export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
   const id = user?.id ?? uuid();
   return {
+    primaryWalletId: null,
     publishToLensDefault: false,
     id: uuid(),
     avatar: null,
@@ -23,7 +24,6 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
     username: deterministicRandomName(id),
     path: uuid(),
     spacesOrder: [],
-    xpsEngineId: null,
     wallets: [
       {
         ensname: null,
@@ -32,10 +32,9 @@ export function createMockUser(user?: Partial<LoggedInUser>): LoggedInUser {
       }
     ],
     spaceRoles: [],
-    unstoppableDomains: [],
     favorites: [],
     googleAccounts: [],
     verifiedEmails: [],
     ...user
-  };
+  } as LoggedInUser;
 }

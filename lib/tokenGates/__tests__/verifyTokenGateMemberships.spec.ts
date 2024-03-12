@@ -1,14 +1,11 @@
-import type { Space, User } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { walletAddress } from 'stories/lib/mockTokenGataData';
 
 import { applyTokenGates } from 'lib/tokenGates/applyTokenGates';
 import { verifyTokenGateMemberships } from 'lib/tokenGates/verifyTokenGateMemberships';
 import { generateUserAndSpace } from 'testing/setupDatabase';
-import { verifiedJWTResponse } from 'testing/utils/litProtocol';
 import { clearTokenGateData, deleteTokenGate, generateTokenGate } from 'testing/utils/tokenGates';
-
-// @ts-ignore
-let mockedLitJsSdk: jest.Mocked;
 
 async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: string }) {
   return prisma.spaceRole.findUnique({
@@ -21,6 +18,10 @@ async function getSpaceUser({ spaceId, userId }: { spaceId: string; userId: stri
   });
 }
 
+jest.mock('lib/tokenGates/validateTokenGateCondition', () => ({
+  validateTokenGateCondition: jest.fn().mockResolvedValue(true)
+}));
+
 describe('verifyTokenGateMemberships', () => {
   let user: User;
   let user2: User;
@@ -28,12 +29,10 @@ describe('verifyTokenGateMemberships', () => {
   let space2: Space;
 
   beforeEach(async () => {
-    // must be mocked here since we import using await import()
-    jest.mock('@lit-protocol/lit-node-client');
-    mockedLitJsSdk = await import('@lit-protocol/lit-node-client');
-    await clearTokenGateData();
-    const { user: u, space: s } = await generateUserAndSpace(undefined);
-    const { user: u2, space: s2 } = await generateUserAndSpace(undefined);
+    const { user: u, space: s } = await generateUserAndSpace({ walletAddress });
+    const { user: u2, space: s2 } = await generateUserAndSpace({
+      walletAddress: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'
+    });
     user = u;
     space = s;
     user2 = u2;
@@ -41,7 +40,14 @@ describe('verifyTokenGateMemberships', () => {
   });
 
   afterEach(async () => {
-    mockedLitJsSdk.verifyJwt.mockClear();
+    await clearTokenGateData();
+    await prisma.user.deleteMany({
+      where: {
+        id: {
+          in: [user.id, user2.id]
+        }
+      }
+    });
     jest.resetModules();
   });
 
@@ -59,43 +65,21 @@ describe('verifyTokenGateMemberships', () => {
   it('should not verify and remove user connected via deleted token gate', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitJsSdk.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate.id}" }`
-        }
-      })
-    );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate.id]
     });
     await deleteTokenGate(tokenGate.id);
 
     const tokenGate2 = await generateTokenGate({ userId: user2.id, spaceId: space2.id });
 
-    mockedLitJsSdk.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space2.id,
-          extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-        }
-      })
-    );
-
     await applyTokenGates({
       spaceId: space2.id,
       userId: user2.id,
       commit: true,
-      tokens: [{ tokenGateId: tokenGate2.id, signedToken: 'jwt2' }],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate2.id]
     });
 
     const res = await verifyTokenGateMemberships();
@@ -111,53 +95,22 @@ describe('verifyTokenGateMemberships', () => {
   it('should remove multi-space user from a proper space', async () => {
     const tokenGate = await generateTokenGate({ userId: user.id, spaceId: space.id });
 
-    mockedLitJsSdk.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space.id,
-          extraData: `{ "tokenGateId": "${tokenGate.id}" }`
-        }
-      })
-    );
-
     await applyTokenGates({
       spaceId: space.id,
       userId: user.id,
       commit: true,
-      tokens: [{ tokenGateId: tokenGate.id, signedToken: 'jwt1' }],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate.id]
     });
     await deleteTokenGate(tokenGate.id);
 
     const tokenGate2 = await generateTokenGate({ userId: user.id, spaceId: space2.id });
-    mockedLitJsSdk.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space2.id,
-          extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-        }
-      })
-    );
 
     await applyTokenGates({
       spaceId: space2.id,
       userId: user.id,
       commit: true,
-      tokens: [{ tokenGateId: tokenGate2.id, signedToken: 'jwt2' }],
-      walletAddress: '0x123'
+      tokenGateIds: [tokenGate2.id]
     });
-
-    mockedLitJsSdk.verifyJwt.mockReturnValue(
-      verifiedJWTResponse({
-        verified: true,
-        payload: {
-          orgId: space2.id,
-          extraData: `{ "tokenGateId": "${tokenGate2.id}" }`
-        }
-      })
-    );
 
     const res = await verifyTokenGateMemberships();
 

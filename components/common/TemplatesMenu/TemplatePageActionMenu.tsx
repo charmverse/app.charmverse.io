@@ -2,7 +2,6 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { IconButton, ListItemIcon, ListItemText } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
 import type { ReactNode } from 'react';
@@ -14,19 +13,20 @@ export type Props = {
   deleteTemplate: (pageId: string) => void;
   editTemplate: (showPage: string) => void;
   pageId: string;
+  proposalId?: string | null;
   closeParentPopup: () => void;
-  pageActions?: (props: { pageId: string }) => ReactNode;
+  pageActions?: (props: { pageId: string; proposalId?: string | null }) => ReactNode;
 };
 
 export function TemplatePageActionMenu(props: Props) {
-  const { pageId, closeParentPopup, pageActions } = props;
+  const { pageId, proposalId, closeParentPopup, pageActions } = props;
   const popupState = usePopupState({ variant: 'popover', popupId: `template-context-${pageId}` });
-  const pageActionsMemo = useMemo(() => pageActions?.({ pageId }), [pageId]);
+  const pageActionsMemo = useMemo(() => pageActions?.({ pageId, proposalId }), [pageId, proposalId]);
 
   return (
     <>
       <IconButton size='small' {...bindTrigger(popupState)} data-test={`template-menu-${pageId}`}>
-        <MoreHorizIcon />
+        <MoreHorizIcon fontSize='small' />
       </IconButton>
 
       <Menu
@@ -38,7 +38,8 @@ export function TemplatePageActionMenu(props: Props) {
           closeParentPopup();
         }}
       >
-        {pageActionsMemo || <TemplatePageMenuActionsDefaultContent {...props} />}
+        {/** Wrapping in div so that warning "Menu doesn't accept fragment as a child doesn't appear" */}
+        <div>{pageActionsMemo || <TemplatePageMenuActionsDefaultContent {...props} />}</div>
       </Menu>
     </>
   );

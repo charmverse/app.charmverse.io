@@ -3,6 +3,7 @@ import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
+import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -13,7 +14,7 @@ export interface UpdateProfileItemRequest {
 
 export class PagesApi {
   getPages({ spaceId }: { spaceId: string }) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`);
+    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { filter: 'sidebar_view' });
   }
 
   getArchivedPages(spaceId: string) {
@@ -30,10 +31,6 @@ export class PagesApi {
 
   updatePage(pageOpts: Partial<Page>) {
     return http.PUT<void>(`/api/pages/${pageOpts.id}`, pageOpts);
-  }
-
-  convertToProposal({ pageId }: { pageId: string }) {
-    return http.POST<PageMeta>(`/api/pages/${pageId}/convert-to-proposal`);
   }
 
   duplicatePage({ pageId }: { pageId: string }) {
@@ -70,7 +67,17 @@ export class PagesApi {
     return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
 
-  exportZippedDatabasePage({ databaseId }: { databaseId: string }) {
-    return http.GET(`/api/pages/${databaseId}/export-database`);
+  exportZippedDatabasePage({ databaseId, filter }: { databaseId: string; filter?: FilterGroup | null }) {
+    let customFilter = '';
+    try {
+      customFilter = JSON.stringify(filter);
+    } catch (err) {
+      //
+    }
+
+    return http.GET(
+      `/api/pages/${databaseId}/export-database`,
+      filter && customFilter ? { filter: customFilter } : undefined
+    );
   }
 }

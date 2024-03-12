@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 import { generateBounty, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { getReward, getRewardOrThrow } from '../getReward';

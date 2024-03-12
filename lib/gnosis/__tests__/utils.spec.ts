@@ -1,4 +1,4 @@
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 import { getGnosisSafeUrl, getGnosisTransactionQueueUrl, getGnosisTransactionUrl } from '../utils';
 
@@ -14,7 +14,9 @@ See Gnosis docs for currently supported neworks: https://docs.gnosis-safe.io/con
 describe('getGnosisTransactionQueueUrl', () => {
   it('should return a link to the safe transaction queue inside the Gnosis Safe app on the correct chain', () => {
     expect(getGnosisTransactionQueueUrl(safeAddress, 1)).toBe(`${baseUrl}/eth:${safeAddress}/transactions/queue`);
-    expect(getGnosisTransactionQueueUrl(safeAddress, 5)).toBe(`${baseUrl}/gor:${safeAddress}/transactions/queue`);
+    expect(getGnosisTransactionQueueUrl(safeAddress, 11155111)).toBe(
+      `${baseUrl}/sep:${safeAddress}/transactions/queue`
+    );
     expect(getGnosisTransactionQueueUrl(safeAddress, 100)).toBe(`${baseUrl}/gno:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 42161)).toBe(`${baseUrl}/arb1:${safeAddress}/transactions/queue`);
     expect(getGnosisTransactionQueueUrl(safeAddress, 43114)).toBe(`${baseUrl}/avax:${safeAddress}/transactions/queue`);
@@ -30,8 +32,8 @@ describe('getSafeTransactionUrl', () => {
     expect(getGnosisTransactionUrl(safeAddress, 1, exampleHash)).toBe(
       `${baseUrl}/transactions/tx?safe=eth:${safeAddress}&id=${exampleHash}`
     );
-    expect(getGnosisTransactionUrl(safeAddress, 5, exampleHash)).toBe(
-      `${baseUrl}/transactions/tx?safe=gor:${safeAddress}&id=${exampleHash}`
+    expect(getGnosisTransactionUrl(safeAddress, 11155111, exampleHash)).toBe(
+      `${baseUrl}/transactions/tx?safe=sep:${safeAddress}&id=${exampleHash}`
     );
     expect(getGnosisTransactionUrl(safeAddress, 11155111, exampleHash)).toBe(
       `${baseUrl}/transactions/tx?safe=sep:${safeAddress}&id=${exampleHash}`
@@ -45,7 +47,7 @@ describe('getSafeTransactionUrl', () => {
 describe('getGnosisSafeUrl', () => {
   it('should return a link to the safe transaction queue inside the Gnosis Safe app on the correct chain', () => {
     expect(getGnosisSafeUrl(safeAddress, 1)).toBe(`${baseUrl}/eth:${safeAddress}`);
-    expect(getGnosisSafeUrl(safeAddress, 5)).toBe(`${baseUrl}/gor:${safeAddress}`);
+    expect(getGnosisSafeUrl(safeAddress, 11155111)).toBe(`${baseUrl}/sep:${safeAddress}`);
     expect(getGnosisSafeUrl(safeAddress, 100)).toBe(`${baseUrl}/gno:${safeAddress}`);
     expect(getGnosisSafeUrl(safeAddress, 42161)).toBe(`${baseUrl}/arb1:${safeAddress}`);
     expect(getGnosisSafeUrl(safeAddress, 43114)).toBe(`${baseUrl}/avax:${safeAddress}`);

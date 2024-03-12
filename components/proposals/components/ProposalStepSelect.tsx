@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { IPropertyOption } from 'lib/focalboard/board';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
@@ -12,21 +13,27 @@ type ProposalProp = {
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;
   id: string;
+  archived: boolean;
 };
 
-export function ControlledProposalStepSelect({
-  proposal,
-  onChange,
-  readOnly
-}: {
+export function ControlledProposalStepSelect(props: {
   readOnly?: boolean;
+  displayType?: PropertyValueDisplayType;
   proposal: ProposalProp;
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
-  return <ProposalStepSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} />;
+  return <ProposalStepSelectBase {...props} />;
 }
 
-export function ProposalStepSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly: boolean }) {
+export function ProposalStepSelect({
+  proposal,
+  readOnly,
+  displayType
+}: {
+  proposal: ProposalProp;
+  readOnly: boolean;
+  displayType?: PropertyValueDisplayType;
+}) {
   const { updateSteps } = useBatchUpdateProposalStatusOrStep();
 
   function onValueChange({ evaluationId, moveForward }: { evaluationId: string; moveForward: boolean }) {
@@ -42,16 +49,25 @@ export function ProposalStepSelect({ proposal, readOnly }: { proposal: ProposalP
     );
   }
 
-  return <ProposalStepSelectBase proposal={proposal} onChange={onValueChange} readOnly={readOnly} />;
+  return (
+    <ProposalStepSelectBase
+      proposal={proposal}
+      onChange={onValueChange}
+      readOnly={readOnly}
+      displayType={displayType}
+    />
+  );
 }
 
 export function ProposalStepSelectBase({
   proposal,
   readOnly,
-  onChange
+  onChange,
+  displayType
 }: {
   proposal: ProposalProp;
   readOnly?: boolean;
+  displayType?: PropertyValueDisplayType;
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
   const hasRewards = proposal.hasRewards;
@@ -107,11 +123,15 @@ export function ProposalStepSelectBase({
 
   return (
     <TagSelect
+      displayType={displayType}
       disableClearable
       wrapColumn
       includeSelectedOptions
       readOnly={
-        readOnly || hasPublishedRewards || (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
+        proposal.archived ||
+        readOnly ||
+        hasPublishedRewards ||
+        (currentEvaluationStep === 'vote' && currentEvaluationResult === 'fail')
       }
       options={options}
       propertyValue={

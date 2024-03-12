@@ -2,15 +2,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utils/blockchain';
+import { InsecureOperationError, InvalidInputError, MissingDataError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { updateUsedIdentity } from '../updateUsedIdentity';
 
 describe('updateUsedIdentity', () => {
-  it('should update the user identity type and username to the first connected identity if no identity is provided in this order: [wallet, discord, unstoppable domain, google account]', async () => {
+  it('should update the user identity type and username to the first connected identity if no identity is provided in this order: [wallet, discord, google account]', async () => {
     const userWithWalletAndDiscord = await prisma.user.create({
       data: {
         path: uid(),
@@ -37,7 +37,7 @@ describe('updateUsedIdentity', () => {
     expect(userWithWalletAndDiscordAfterUpdate.identityType).toBe(`Wallet`);
 
     // --------------
-    const userWithDiscordAndUnstoppableDomain = await prisma.user.create({
+    const userWithDiscord = await prisma.user.create({
       data: {
         path: uid(),
         username: 'random-name',
@@ -49,55 +49,15 @@ describe('updateUsedIdentity', () => {
               username: 'Discord Pseudonym'
             }
           }
-        },
-        unstoppableDomains: {
-          create: {
-            domain: `example-${v4()}.nft`
-          }
         }
       },
       include: sessionUserRelations
     });
 
-    const userWithDiscordAndUnstoppableDomainAfterUpdate = await updateUsedIdentity(
-      userWithDiscordAndUnstoppableDomain.id
-    );
+    const userWithDiscordAfterUpdate = await updateUsedIdentity(userWithDiscord.id);
 
-    expect(userWithDiscordAndUnstoppableDomainAfterUpdate.username).toBe(
-      (userWithDiscordAndUnstoppableDomain.discordUser?.account as any).username
-    );
-    expect(userWithDiscordAndUnstoppableDomainAfterUpdate.identityType).toBe(`Discord`);
-
-    // --------------
-    const userWithUnstoppableDomainAndGoogle = await prisma.user.create({
-      data: {
-        path: uid(),
-        username: 'random-name',
-        identityType: 'RandomName',
-        unstoppableDomains: {
-          create: {
-            domain: `example-${v4()}.nft`
-          }
-        },
-        googleAccounts: {
-          create: {
-            email: `test-${v4()}@example.com`,
-            name: 'Test User Google profile',
-            avatarUrl: 'https://example.com/avatar.png'
-          }
-        }
-      },
-      include: sessionUserRelations
-    });
-
-    const userWithUnstoppableDomainAndGoogleAfterUpdate = await updateUsedIdentity(
-      userWithUnstoppableDomainAndGoogle.id
-    );
-
-    expect(userWithUnstoppableDomainAndGoogleAfterUpdate.username).toBe(
-      userWithUnstoppableDomainAndGoogle.unstoppableDomains[0].domain
-    );
-    expect(userWithUnstoppableDomainAndGoogleAfterUpdate.identityType).toBe(`UnstoppableDomain`);
+    expect(userWithDiscordAfterUpdate.username).toBe((userWithDiscord.discordUser?.account as any).username);
+    expect(userWithDiscordAfterUpdate.identityType).toBe(`Discord`);
 
     // --------------
     const userWithGoogle = await prisma.user.create({
@@ -188,30 +148,6 @@ describe('updateUsedIdentity', () => {
 
     expect(userAfterUpdate.username).toBe(ensname);
     expect(userAfterUpdate.identityType).toBe(`Wallet`);
-  });
-
-  it('should update a user identity to their connected Unstoppable Domain', async () => {
-    const user = await prisma.user.create({
-      data: {
-        path: uid(),
-        username: 'random-name',
-        identityType: 'RandomName',
-        unstoppableDomains: {
-          create: {
-            domain: `example-${v4()}.nft`
-          }
-        }
-      },
-      include: sessionUserRelations
-    });
-
-    const userAfterUpdate = await updateUsedIdentity(user.id, {
-      identityType: 'UnstoppableDomain',
-      displayName: user.unstoppableDomains[0].domain
-    });
-
-    expect(userAfterUpdate.username).toBe(user.unstoppableDomains[0].domain);
-    expect(userAfterUpdate.identityType).toBe(`UnstoppableDomain`);
   });
 
   it('should update a user identity to their connected Google Account username', async () => {
@@ -334,13 +270,6 @@ describe('updateUsedIdentity', () => {
       updateUsedIdentity(user.id, {
         identityType: 'Google',
         displayName: 'test@example.com'
-      })
-    ).rejects.toBeInstanceOf(InsecureOperationError);
-
-    await expect(
-      updateUsedIdentity(user.id, {
-        identityType: 'UnstoppableDomain',
-        displayName: 'test.nft'
       })
     ).rejects.toBeInstanceOf(InsecureOperationError);
 

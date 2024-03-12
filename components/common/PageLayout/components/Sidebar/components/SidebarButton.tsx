@@ -1,6 +1,7 @@
 import type { Theme } from '@emotion/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
+import type { SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import type { MouseEvent, ReactNode } from 'react';
 
@@ -27,7 +28,7 @@ export const sidebarItemStyles = ({ theme }: { theme: Theme }) => css`
     color: inherit;
   }
   svg {
-    font-size: 1.2em;
+    font-size: 18px;
     margin-right: ${theme.spacing(1)};
   }
 `;
@@ -71,6 +72,7 @@ export function SidebarLink({
   section?: SpaceSettingsSection;
   children?: ReactNode;
   external?: boolean;
+  sx?: SxProps;
 }) {
   return (
     <StyledSidebarLink {...props}>

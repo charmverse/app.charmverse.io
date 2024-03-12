@@ -2,9 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { shortWalletAddress } from 'lib/utils/blockchain';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { refreshENSName } from '../refreshENSName';
@@ -12,7 +12,7 @@ import { refreshENSName } from '../refreshENSName';
 jest.mock('../getENSName', () => {
   return {
     getENSName: (address: string) => {
-      if (address.match('ignore')) {
+      if (address.match('different')) {
         return null;
       }
       return `testname-${address}.eth`;
@@ -73,7 +73,7 @@ describe('refreshENSName', () => {
 
     expect(checkEnsName(address, userAfterRefresh.username)).toBe(true);
   });
-  it('should support the shortened address as a lookup for the users ENS Name', async () => {
+  it('should  not support the shortened address as a lookup for the users ENS Name', async () => {
     const address = randomETHWalletAddress();
     const user = await prisma.user.create({
       data: {
@@ -87,16 +87,16 @@ describe('refreshENSName', () => {
       }
     });
 
-    const userAfterRefresh = await refreshENSName({
-      userId: user.id,
-      address: shortWalletAddress(address)
-    });
-
-    expect(checkEnsName(address, userAfterRefresh.username)).toBe(true);
+    await expect(
+      refreshENSName({
+        userId: user.id,
+        address: shortWalletAddress(address)
+      })
+    ).rejects.toBeInstanceOf(MissingDataError);
   });
 
-  it('should perform a no-op if no ENS name is found', async () => {
-    const address = `ignore-${randomETHWalletAddress()}`;
+  it('should update the ENS name if different', async () => {
+    const address = `different-${randomETHWalletAddress()}`;
     const user = await prisma.user.create({
       data: {
         path: uid(),
@@ -116,7 +116,7 @@ describe('refreshENSName', () => {
       address
     });
 
-    expect(userAfterRefresh).toMatchObject(expect.objectContaining(user));
+    expect(userAfterRefresh.wallets[0].ensname).not.toBe(user.wallets[0].ensname);
   });
 
   it('should throw an error if userID or wallet address is not provided', async () => {

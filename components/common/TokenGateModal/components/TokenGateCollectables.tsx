@@ -7,7 +7,7 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { FormValues } from '../hooks/useCollectablesForm';
 import { useCollectablesForm } from '../hooks/useCollectablesForm';
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
-import { getCollectablesUnifiedAccessControlConditions } from '../utils/getCollectablesUnifiedAccessControlConditions';
+import { getCollectablesAccessControlConditions } from '../utils/getCollectablesAccessControlConditions';
 import { collectableOptions } from '../utils/utils';
 
 import { TokenGateCollectableFields } from './TokenGateCollectableFields';
@@ -26,26 +26,11 @@ export function TokenGateCollectables() {
 
   const onSubmit = async () => {
     const values = getValues();
+    const valueProps = getCollectablesAccessControlConditions(values) || [];
 
-    if (values.collectableOption === 'UNLOCK' && values.chain && values.contract) {
-      handleTokenGate({
-        type: 'unlock',
-        conditions: { chainId: Number(values.chain), contract: values.contract }
-      });
+    if (valueProps.length > 0) {
+      handleTokenGate({ conditions: { accessControlConditions: valueProps } });
       setDisplayedPage('review');
-    } else if (values.collectableOption === 'HYPERSUB' && values.chain && values.contract) {
-      handleTokenGate({
-        type: 'hypersub',
-        conditions: { chainId: Number(values.chain), contract: values.contract }
-      });
-      setDisplayedPage('review');
-    } else {
-      const valueProps = getCollectablesUnifiedAccessControlConditions(values) || [];
-
-      if (valueProps.length > 0) {
-        handleTokenGate({ type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } });
-        setDisplayedPage('review');
-      }
     }
   };
 
@@ -65,13 +50,11 @@ export function TokenGateCollectables() {
           }
           {...register('collectableOption')}
         >
-          {collectableOptions
-            .filter((col) => !((col.id === 'UNLOCK' || col.id === 'HYPERSUB') && flow !== 'single'))
-            .map((type) => (
-              <MenuItem key={type.id} value={type.id}>
-                {type.name}
-              </MenuItem>
-            ))}
+          {collectableOptions.map((type) => (
+            <MenuItem key={type.id} value={type.id}>
+              {type.name}
+            </MenuItem>
+          ))}
         </Select>
       </FieldWrapper>
       <TokenGateCollectableFields />

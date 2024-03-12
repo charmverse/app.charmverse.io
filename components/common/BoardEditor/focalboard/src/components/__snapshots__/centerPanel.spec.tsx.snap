@@ -6,7 +6,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -30,7 +30,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -88,7 +88,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   viewBox="0 0 24 24"
                 >
                   <path
-                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                   />
                 </svg>
               </button>
@@ -132,7 +132,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                     />
                   </svg>
                 </button>
@@ -165,7 +165,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
+                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"
                     />
                   </svg>
                 </button>
@@ -234,7 +234,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                          d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                         />
                       </svg>
                     </button>
@@ -251,7 +251,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                        d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                       />
                     </svg>
                   </button>
@@ -310,7 +310,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                               viewBox="0 0 24 24"
                             >
                               <path
-                                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                               />
                             </svg>
                           </button>
@@ -320,7 +320,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         >
                           <div>
                             <div
-                              class="css-jm1ma0"
+                              class="css-1s68mph"
                             >
                               <img
                                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -365,7 +365,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                               viewBox="0 0 24 24"
                             >
                               <path
-                                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                               />
                             </svg>
                           </button>
@@ -375,7 +375,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         >
                           <div>
                             <div
-                              class="css-jm1ma0"
+                              class="css-1s68mph"
                             >
                               <img
                                 src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
@@ -409,7 +409,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                           viewBox="0 0 24 24"
                         >
                           <path
-                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                           />
                         </svg>
                       </span>
@@ -465,7 +465,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -514,7 +514,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V7h14v12zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4zm0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2m0 16H5V7h14zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5M12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5"
                         />
                       </svg>
                     </div>
@@ -540,7 +540,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -560,7 +560,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
@@ -586,7 +586,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -606,7 +606,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
                         />
                         <circle
                           cx="8"
@@ -647,7 +647,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -695,7 +695,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -716,7 +716,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -740,7 +740,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -798,7 +798,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   viewBox="0 0 24 24"
                 >
                   <path
-                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                   />
                 </svg>
               </button>
@@ -842,7 +842,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                     />
                   </svg>
                 </button>
@@ -875,7 +875,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
+                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"
                     />
                   </svg>
                 </button>
@@ -914,7 +914,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -963,7 +963,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V7h14v12zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4zm0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2m0 16H5V7h14zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5M12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5"
                         />
                       </svg>
                     </div>
@@ -989,7 +989,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1009,7 +1009,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
@@ -1035,7 +1035,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1083,7 +1083,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1104,7 +1104,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -1128,7 +1128,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -1186,7 +1186,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   viewBox="0 0 24 24"
                 >
                   <path
-                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                   />
                 </svg>
               </button>
@@ -1230,7 +1230,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                     />
                   </svg>
                 </button>
@@ -1263,7 +1263,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
+                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"
                     />
                   </svg>
                 </button>
@@ -1332,7 +1332,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                          d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                         />
                       </svg>
                     </button>
@@ -1349,7 +1349,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                        d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                       />
                     </svg>
                   </button>
@@ -1397,7 +1397,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                           viewBox="0 0 24 24"
                         >
                           <path
-                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                           />
                         </svg>
                       </span>
@@ -1453,7 +1453,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -1502,7 +1502,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V7h14v12zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4zm0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2m0 16H5V7h14zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5M12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5"
                         />
                       </svg>
                     </div>
@@ -1528,7 +1528,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1548,7 +1548,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
@@ -1574,7 +1574,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1594,7 +1594,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
                         />
                         <circle
                           cx="8"
@@ -1635,7 +1635,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1683,7 +1683,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -1704,7 +1704,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
     class="variable variable"
   >
     <div
-      class="BoardComponent "
+      class="BoardComponent drag-area-container "
       data-test="database-container-1"
     >
       <div
@@ -1728,7 +1728,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
                     data-view-id="1"
                     draggable="true"
                     role="tab"
@@ -1786,7 +1786,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   viewBox="0 0 24 24"
                 >
                   <path
-                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                    d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                   />
                 </svg>
               </button>
@@ -1830,7 +1830,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                      d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                     />
                   </svg>
                 </button>
@@ -1863,7 +1863,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     viewBox="0 0 24 24"
                   >
                     <path
-                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
+                      d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"
                     />
                   </svg>
                 </button>
@@ -1892,7 +1892,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   id="mainBoardHeader"
                 >
                   <div
-                    class="octo-table-cell header-cell"
+                    class="octo-table-cell header-cell disable-drag-selection"
                     draggable="true"
                     style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
                   >
@@ -1915,7 +1915,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                                 viewBox="0 0 24 24"
                               >
                                 <path
-                                  d="M14 17H4v2h10v-2zm6-8H4v2h16V9zM4 15h16v-2H4v2zM4 5v2h16V5H4z"
+                                  d="M14 17H4v2h10zm6-8H4v2h16zM4 15h16v-2H4zM4 5v2h16V5z"
                                 />
                               </svg>
                             </div>
@@ -1944,7 +1944,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     />
                   </div>
                   <div
-                    class="octo-table-cell header-cell"
+                    class="octo-table-cell header-cell disable-drag-selection"
                     style="flex-grow: 1;"
                   >
                     <button
@@ -1960,7 +1960,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           viewBox="0 0 24 24"
                         >
                           <path
-                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                           />
                         </svg>
                       </span>
@@ -1995,7 +1995,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             viewBox="0 0 24 24"
                           >
                             <path
-                              d="m7 10 5 5 5-5H7z"
+                              d="m7 10 5 5 5-5z"
                             />
                           </svg>
                         </button>
@@ -2031,7 +2031,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                             viewBox="0 0 24 24"
                           >
                             <path
-                              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                             />
                           </svg>
                         </button>
@@ -2048,7 +2048,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                           viewBox="0 0 24 24"
                         >
                           <path
-                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
                           />
                         </svg>
                       </button>
@@ -2094,7 +2094,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 class="MuiCollapse-wrapperInner MuiCollapse-horizontal css-14vyde3-MuiCollapse-wrapperInner"
               >
                 <div
-                  class="css-1tk713d"
+                  class="disable-drag-selection css-1tk713d"
                   data-test="view-sidebar-content"
                 >
                   <div
@@ -2143,7 +2143,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm0 16H5V7h14v12zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4zm0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                          d="M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.89-2-2-2m0 16H5V7h14zm-5.5-6c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5M12 9c-2.73 0-5.06 1.66-6 4 .94 2.34 3.27 4 6 4s5.06-1.66 6-4c-.94-2.34-3.27-4-6-4m0 6.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5"
                         />
                       </svg>
                     </div>
@@ -2169,7 +2169,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -2189,7 +2189,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"
+                          d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5m0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5m0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5M7 19h14v-2H7zm0-6h14v-2H7zm0-8v2h14V5z"
                         />
                       </svg>
                     </div>
@@ -2215,7 +2215,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -2235,7 +2235,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                         viewBox="0 0 24 24"
                       >
                         <path
-                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"
+                          d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8"
                         />
                         <circle
                           cx="8"
@@ -2276,7 +2276,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>
@@ -2324,7 +2324,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                       viewBox="0 0 24 24"
                     >
                       <path
-                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"
+                        d="M8.59 16.59 13.17 12 8.59 7.41 10 6l6 6-6 6z"
                       />
                     </svg>
                   </li>

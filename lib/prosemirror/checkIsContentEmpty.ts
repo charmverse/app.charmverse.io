@@ -11,7 +11,7 @@ export function checkIsContentEmpty(content: PageContent | null | undefined): bo
 function isEmptyNode(node: BlockNode): boolean {
   return (
     // These nodes dont contain any content so there is no content field
-    !!node.type.match(/(cryptoPrice|columnLayout|image|iframe|mention|page|poll|tableOfContents)/) ||
+    !!node.type.match(/(cryptoPrice|farcasterFrame|columnLayout|image|iframe|mention|page|poll|tableOfContents)/) ||
     (!node.content?.length && !(node as TextContent).text)
   );
 }

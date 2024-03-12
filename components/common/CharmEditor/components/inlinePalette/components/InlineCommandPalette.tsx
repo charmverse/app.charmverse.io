@@ -47,6 +47,18 @@ function getItemsAndHints(
     .filter((item) => queryMatch(item, query) && item.type === PALETTE_ITEM_REGULAR_TYPE)
     .map((item) => ({ ...item, _isItemDisabled: isItemDisabled(item) }));
 
+  if (query) {
+    // Apply the sort based on priority only if the items are in the same group and there is a search query
+    return {
+      items: items.sort((a, b) => {
+        if (a.group === b.group) {
+          return (b.priority ?? 0) - (a.priority ?? 0);
+        }
+        return 0;
+      })
+    };
+  }
+
   return { items };
 }
 

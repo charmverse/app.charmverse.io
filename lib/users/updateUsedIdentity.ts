@@ -3,8 +3,8 @@ import { IdentityType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { matchWalletAddress, shortWalletAddress } from 'lib/utilities/blockchain';
-import { InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
+import { matchWalletAddress, shortWalletAddress } from 'lib/utils/blockchain';
+import { InsecureOperationError, InvalidInputError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';
@@ -39,11 +39,6 @@ export async function updateUsedIdentity(
       throw new InsecureOperationError(`User ${userId} does not have a Google account with name ${displayName}`);
     } else if (identityType === 'Discord' && (user.discordUser?.account as any)?.username !== displayName) {
       throw new InsecureOperationError(`User ${userId} does not have a Discord account with name ${displayName}`);
-    } else if (
-      identityType === 'UnstoppableDomain' &&
-      !user.unstoppableDomains.some((ud) => ud.domain === displayName)
-    ) {
-      throw new InsecureOperationError(`User ${userId} does not have an Unstoppable Domain with name ${displayName}`);
     } else if (identityType === 'Wallet') {
       if (!user.wallets.some((wallet) => matchWalletAddress(displayName, wallet))) {
         throw new InsecureOperationError(`User ${userId} does not have wallet with address or ensname ${displayName}`);
@@ -71,16 +66,13 @@ export async function updateUsedIdentity(
 
   const updateContent: Prisma.UserUpdateInput = {};
 
-  // Priority of identities: [wallet, discord, unstoppable domain, google account]
+  // Priority of identities: [wallet, discord, google account]
   if (user.wallets.length) {
     updateContent.username = shortWalletAddress(user.wallets[0].ensname ?? user.wallets[0].address);
     updateContent.identityType = 'Wallet';
   } else if (user.discordUser) {
     updateContent.username = (user.discordUser.account as any).username;
     updateContent.identityType = 'Discord';
-  } else if (user.unstoppableDomains.length) {
-    updateContent.username = user.unstoppableDomains[0].domain;
-    updateContent.identityType = 'UnstoppableDomain';
   } else if (user.googleAccounts.length) {
     updateContent.username = user.googleAccounts[0].name;
     updateContent.identityType = 'Google';

@@ -1,9 +1,8 @@
+import { log } from '@charmverse/core/log';
 import List from '@mui/material/List';
 import { useEffect, useRef, useState } from 'react';
-import useSWRMutation from 'swr/mutation';
 
-import charmClient from 'charmClient';
-import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
+import { useAddUserWallets } from 'charmClient/hooks/profile';
 import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
@@ -17,8 +16,8 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import { lowerCaseEqual } from 'lib/utilities/strings';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
+import { lowerCaseEqual } from 'lib/utils/strings';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
@@ -37,7 +36,6 @@ const modalTitles: Record<IdentityStepToAdd, string> = {
 };
 
 export function NewIdentityModal({ isOpen, onClose }: Props) {
-  const { isConnectingIdentity } = useWeb3ConnectionManager();
   const { account, isSigning, setAccountUpdatePaused } = useWeb3Account();
   const { user, updateUser } = useUser();
   const { showMessage } = useSnackbar();
@@ -49,17 +47,9 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { isOnCustomDomain } = useCustomDomain();
   const { loginWithGooglePopup, isConnectingGoogle } = useGoogleLogin();
 
-  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
-      onSuccess(data) {
-        updateUser(data);
-      }
-    }
-  );
+  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useAddUserWallets();
 
-  const isConnectingWallet = isConnectingIdentity || isVerifyingWallet || isSigning;
+  const isConnectingWallet = isVerifyingWallet || isSigning;
 
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
 
@@ -68,7 +58,6 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, connectToExistingAccount: true });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
@@ -76,6 +65,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
         setIdentityToAdd(null);
       } catch (err) {
         showMessage((err as any).message ?? 'Something went wrong', 'error');
+        log.error('Error sending magic link in identity modal.', { error: err });
       } finally {
         sendingMagicLink.current = false;
       }
@@ -90,13 +80,20 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
     }
   }
 
-  async function onSignSuccess(authSig: AuthSig) {
-    try {
-      await signSuccess(authSig);
-      onClose();
-    } catch (e: any) {
-      showMessage(e.message || 'Something went wrong', 'error');
-    }
+  async function onSignSuccess(payload: SignatureVerificationPayload) {
+    await signSuccess(
+      { ...payload, address: account as string },
+      {
+        onSuccess: async (data) => {
+          await updateUser(data);
+          onClose();
+        },
+        onError: (e) => {
+          onClose();
+          showMessage(e.message || 'Something went wrong', 'error');
+        }
+      }
+    );
   }
 
   useEffect(() => {

@@ -44,19 +44,19 @@ test.beforeAll(async () => {
   firstProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 
   secondProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 
   thirdProposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: spaceUser.id,
-    proposalStatus: 'discussion'
+    proposalStatus: 'published'
   });
 
   draftProposal = await testUtilsProposals.generateProposal({
@@ -87,7 +87,10 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     await pagesSidebar.pagesSidebarSelectAddDatabaseButton.click();
 
-    await expect(pagesSidebar.databasePage).toBeVisible();
+    await pagesSidebar.databasePage.waitFor({
+      state: 'visible',
+      timeout: 5000
+    });
 
     // Initialise the new database
     await expect(databasePage.selectProposalsAsSource()).toBeVisible();
@@ -163,8 +166,8 @@ test.describe.serial('Database with proposals as datasource', async () => {
 
     // Make sure the UI only displays 3 cards
     const firstRow = databasePage.getTableRowByIndex({ index: 0 });
-    const secondRow = databasePage.getTableRowByIndex({ index: 0 });
-    const thirdRow = databasePage.getTableRowByIndex({ index: 0 });
+    const secondRow = databasePage.getTableRowByIndex({ index: 1 });
+    const thirdRow = databasePage.getTableRowByIndex({ index: 2 });
 
     await expect(firstRow).toBeVisible();
     await expect(secondRow).toBeVisible();

@@ -34,9 +34,12 @@ playwright-report
 
 ./pages/api/script/*
 
+__pycache__
+
 scripts/exportData/exports
 
 jsonoutputs
+exported-knowledge
 
 # cdk
 cdk.out

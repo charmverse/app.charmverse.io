@@ -9,7 +9,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import type { ListForumPostsRequest } from 'lib/forums/posts/listForumPosts';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import { usePostDialog } from '../../PostDialog/hooks/usePostDialog';
 

@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 
-import type { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utils/errors';
 
 import { AdministratorOnlyError, UserIsNotSpaceMemberError } from '../users/errors';
 
@@ -19,8 +19,12 @@ declare module 'http' {
  * Allow an endpoint to be consumed if a user is a space member
  *
  * Also sets isAdmin status on the request
+ *
+ * @location if provided, only parse spaceIds from this location
  */
-export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey?: string } = { adminOnly: false }) {
+export function requireSpaceMembership(
+  options: { adminOnly: boolean; spaceIdKey?: string; location?: 'query' | 'body' } = { adminOnly: false }
+) {
   return async (req: NextApiRequest, res: NextApiResponse<ISystemError>, next: NextHandler) => {
     // Where to find the space ID
     const spaceIdKey = options.spaceIdKey ?? 'spaceId';
@@ -32,9 +36,10 @@ export function requireSpaceMembership(options: { adminOnly: boolean; spaceIdKey
       });
     }
 
-    const querySpaceId = req.query?.[spaceIdKey];
+    const querySpaceId =
+      !options.location || options.location === 'query' ? (req.query?.[spaceIdKey] as string) : undefined;
 
-    const bodySpaceId = req.body?.[spaceIdKey];
+    const bodySpaceId = !options.location || options.location === 'body' ? req.body?.[spaceIdKey] : undefined;
 
     const spaceId = querySpaceId ?? bodySpaceId;
 

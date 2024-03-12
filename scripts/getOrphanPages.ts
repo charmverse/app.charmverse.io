@@ -1,9 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { Page } from '@charmverse/core/prisma';
-import { Node } from 'prosemirror-model';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { findChildren } from '@bangle.dev/utils';
+import { findChildren } from 'prosemirror-utils';
 import { writeFileSync } from 'fs';
 const hostName = 'https://app.charmverse.io';
 //const hostName = 'http://localhost:3000';

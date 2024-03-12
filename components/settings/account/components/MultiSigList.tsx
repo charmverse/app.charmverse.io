@@ -28,7 +28,7 @@ import { useImportSafes } from 'hooks/useImportSafes';
 import useMultiWalletSigs from 'hooks/useMultiWalletSigs';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { shortenHex } from 'lib/utilities/blockchain';
+import { shortenHex } from 'lib/utils/blockchain';
 
 const StyledTableCell = styled(TableCell)`
   font-weight: 700;

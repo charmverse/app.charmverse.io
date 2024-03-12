@@ -90,10 +90,7 @@ export class DatabasePage extends GlobalPage {
         .locator(`data-test=database-row-${cardId}`)
         .locator('data-test=select-preview')
         .first(),
-      openSelect: this.getPageOrBoardLocator({ boardId })
-        .locator(`data-test=database-row-${cardId}`)
-        .locator('data-test=autocomplete')
-        .first()
+      openSelect: this.getPageOrBoardLocator({ boardId }).locator('data-test=active-select-autocomplete').first()
     };
   }
 
@@ -124,5 +121,21 @@ export class DatabasePage extends GlobalPage {
 
   getTemplateMenuEditOption({ pageId }: { pageId: string }) {
     return this.page.locator(`data-test=template-menu-edit-${pageId}`);
+  }
+
+  getShowOnRelatedBoardButton() {
+    return this.page.locator('data-test=show-on-related-board-button');
+  }
+
+  getAddRelationButton() {
+    return this.page.locator('data-test=add-relation-button');
+  }
+
+  getDatabaseTableCell({ templateId, cardId }: { templateId: string; cardId: string }) {
+    return this.page.locator(`data-test=database-card-${cardId}-column-${templateId}`);
+  }
+
+  getCardDetailsTextInput() {
+    return this.page.locator('data-test=card-detail-properties').locator('textarea.octo-propertyvalue').first();
   }
 }

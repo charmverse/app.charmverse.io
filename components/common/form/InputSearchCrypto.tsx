@@ -92,6 +92,7 @@ export function InputSearchCrypto({
             emitValue(_value as any);
           }
         }}
+        data-test='token-list'
         value={value}
         inputValue={inputValue}
         onInputChange={(event, newInputValue) => {
@@ -116,7 +117,7 @@ export function InputSearchCrypto({
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
-              <Box component='li' {...props}>
+              <Box data-test='add-custom-token' component='li' {...props}>
                 <AddIcon color='secondary' sx={{ mr: '5px' }} />
                 <Typography variant='body2'>Add a custom token</Typography>
               </Box>
@@ -132,6 +133,7 @@ export function InputSearchCrypto({
               component='li'
               sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }}
               {...props}
+              data-test={`select-crypto-${option}`}
             >
               <Box display='inline-block' width={20}>
                 <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
@@ -157,6 +159,7 @@ export function InputSearchCrypto({
       />
 
       <Modal
+        data-test='custom-token-modal'
         title='Add a custom ERC20 token'
         hideBackdrop={hideBackdrop}
         open={ERC20PopupState.isOpen}

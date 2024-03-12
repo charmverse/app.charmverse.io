@@ -8,7 +8,7 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { markSubmissionAsPaid } from 'lib/rewards/markSubmissionAsPaid';
 import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 

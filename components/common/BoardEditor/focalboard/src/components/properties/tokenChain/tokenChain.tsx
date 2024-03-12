@@ -4,7 +4,7 @@ import { isAddress } from 'viem';
 
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
-import { shortWalletAddress } from 'lib/utilities/blockchain';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 
 type Props = {
   chainId: string; // values are strings in focalboard

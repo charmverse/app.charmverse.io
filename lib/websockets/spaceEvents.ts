@@ -8,14 +8,14 @@ import type { Socket } from 'socket.io';
 
 import { STATIC_PAGES } from 'lib/features/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
-import { archivePages } from 'lib/pages/archivePages';
 import { createPage } from 'lib/pages/server/createPage';
+import { trashPages } from 'lib/pages/trashPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { authSecret } from 'lib/session/config';
+import { authSecret } from 'lib/session/authSecret';
 import type { ClientMessage, SealedUserId } from 'lib/websockets/interfaces';
 
 import type { DocumentRoom } from './documentEvents/docRooms';
@@ -100,11 +100,11 @@ export class SpaceEventHandler {
           event: 'page_deleted'
         });
       } else {
-        await archivePages({
+        await trashPages({
           pageIds: [pageId],
           userId: this.userId,
           spaceId: this.spaceId,
-          archive: true,
+          trash: true,
           relay: this.relay
         });
       }
@@ -159,17 +159,17 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: page.parentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId, pos: lastValidPos })
             });
           }
         }
 
         if (!unarchivedPage) {
-          await archivePages({
+          await trashPages({
             pageIds: [pageId],
             userId: this.userId,
             spaceId: this.spaceId,
-            archive: false,
+            trash: false,
             relay: this.relay
           });
         }
@@ -224,7 +224,7 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: createdPage.parentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos })
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: createdPage.id, pos: lastValidPos })
             });
           }
         }
@@ -256,6 +256,63 @@ export class SpaceEventHandler {
           message
         });
         this.sendError(errorMessage);
+      }
+    } else if (message.type === 'page_duplicated') {
+      const duplicatedPage = await prisma.page.findUniqueOrThrow({
+        where: {
+          id: message.payload.pageId
+        },
+        select: {
+          id: true,
+          parentId: true,
+          type: true,
+          path: true
+        }
+      });
+
+      if (
+        duplicatedPage.parentId &&
+        (duplicatedPage.type === 'board' || duplicatedPage.type === 'page' || duplicatedPage.type === 'linked_board')
+      ) {
+        const pageDetails = await this.getPageDetails({
+          childPageId: duplicatedPage.id,
+          pageId: duplicatedPage.parentId
+        });
+
+        const { documentNode, documentRoom, participant, content } = pageDetails;
+        const lastValidPos = documentNode.content.size;
+        try {
+          if (documentRoom && participant) {
+            await participant.handleDiff(
+              {
+                type: 'diff',
+                ds: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: duplicatedPage.id, pos: lastValidPos }),
+                doc: documentRoom.doc.content,
+                c: participant.messages.client,
+                s: participant.messages.server,
+                v: documentRoom.doc.version,
+                rid: 0,
+                cid: -1
+              },
+              {
+                socketEvent: 'page_created'
+              }
+            );
+          } else {
+            await this.applyDiffAndSaveDocument({
+              content,
+              pageId: duplicatedPage.parentId,
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({ pageId: duplicatedPage.id, pos: lastValidPos })
+            });
+          }
+        } catch (err) {
+          log.error(`Error duplicating a page and adding it to parent page content`, {
+            error: err,
+            pageId: duplicatedPage.id,
+            userId: this.userId,
+            message
+          });
+        }
       }
     } else if (message.type === 'page_reordered_sidebar_to_sidebar' && this.userId && this.spaceId) {
       const { pageId, newParentId } = message.payload;
@@ -342,7 +399,7 @@ export class SpaceEventHandler {
               await this.applyDiffAndSaveDocument({
                 content,
                 pageId: newParentId,
-                diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
+                steps: SpaceEventHandler.generateInsertNestedPageDiffs({
                   pageId,
                   pos: lastValidPos,
                   path: pagePath,
@@ -450,7 +507,7 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: newParentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 path: pagePath,
@@ -580,7 +637,7 @@ export class SpaceEventHandler {
             await this.applyDiffAndSaveDocument({
               content,
               pageId: newParentId,
-              diffs: SpaceEventHandler.generateInsertNestedPageDiffs({
+              steps: SpaceEventHandler.generateInsertNestedPageDiffs({
                 pageId,
                 pos: lastValidPos,
                 isLinkedPage,
@@ -730,7 +787,7 @@ export class SpaceEventHandler {
           await this.applyDiffAndSaveDocument({
             content,
             pageId,
-            diffs: [
+            steps: [
               {
                 from: position,
                 to: position + 1,
@@ -742,11 +799,11 @@ export class SpaceEventHandler {
 
         // If the user is not in the document or the position of the page node is not found (present in sidebar)
         if (event === 'page_deleted') {
-          await archivePages({
+          await trashPages({
             pageIds: [childPageId],
             userId: this.userId!,
             spaceId: this.spaceId!,
-            archive: true,
+            trash: true,
             relay: this.relay
           });
         }
@@ -787,24 +844,50 @@ export class SpaceEventHandler {
   async applyDiffAndSaveDocument({
     content,
     pageId,
-    diffs
+    steps
   }: {
     content: PageContent;
     pageId: string;
-    diffs: ProsemirrorJSONStep[];
+    steps: ProsemirrorJSONStep[];
   }) {
     const pageNode = getNodeFromJson(content);
-    const updatedNode = applyStepsToNode(diffs, pageNode);
-    await prisma.page.update({
-      where: { id: pageId },
-      data: {
-        content: updatedNode.toJSON(),
-        contentText: updatedNode.textContent,
-        hasContent: updatedNode.textContent.length > 0,
-        updatedAt: new Date(),
-        updatedBy: this.userId!
+    const updatedNode = applyStepsToNode(steps, pageNode);
+    const page = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: pageId
+      },
+      select: {
+        version: true
       }
     });
+    await prisma.$transaction([
+      prisma.pageDiff.create({
+        data: {
+          createdBy: this.userId!,
+          data: {
+            rid: 0,
+            cid: 0,
+            type: 'diff',
+            ds: steps,
+            v: page.version
+          },
+          version: page.version,
+          createdAt: new Date(),
+          pageId
+        }
+      }),
+      prisma.page.update({
+        where: { id: pageId },
+        data: {
+          content: updatedNode.toJSON(),
+          contentText: updatedNode.textContent,
+          hasContent: updatedNode.textContent.length > 0,
+          updatedAt: new Date(),
+          updatedBy: this.userId!,
+          version: page.version + 1
+        }
+      })
+    ]);
   }
 
   static generateInsertNestedPageDiffs({

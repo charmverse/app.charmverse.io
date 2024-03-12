@@ -1,84 +1,79 @@
-import type { PageType, ProposalEvaluationType, ProposalStatus } from '@charmverse/core/prisma';
+import type { PageType, ProposalStatus } from '@charmverse/core/prisma';
 import { KeyboardArrowDown } from '@mui/icons-material';
-import { Box, Collapse, Divider, IconButton, Stack, Switch, Typography } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import Link from 'components/common/Link';
-import { LoadingIcon } from 'components/common/LoadingComponent';
-import { ProposalRewards } from 'components/proposals/components/ProposalRewards/ProposalRewards';
-import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/CustomPropertiesAdapter';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
-import { isProdEnv } from 'config/constants';
-import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { ProposalFields, ProposalReviewerInput } from 'lib/proposal/interface';
+import { CredentialSelect } from 'components/credentials/CredentialsSelect';
+import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
+import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ProposalEvaluationValues } from '../EvaluationSettingsSidebar/components/EvaluationStepSettings';
+import type { ProposalEvaluationValues } from '../ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 
 export type ProposalPropertiesInput = {
+  createdAt: string; // this is necessary for Created Time custom property
   content?: PageContent | null;
   contentText?: string; // required to know if we can overwrite content when selecting a template
   authors: string[];
-  reviewers: ProposalReviewerInput[];
   workflowId?: string | null;
   proposalTemplateId?: string | null;
-  evaluationType: ProposalEvaluationType;
   evaluations: ProposalEvaluationValues[];
-  publishToLens?: boolean;
   fields: ProposalFields | null;
   type: PageType;
+  selectedCredentialTemplates?: string[];
+  archived?: boolean;
+  sourcePageId?: string;
+  sourcePostId?: string;
 };
 
 type ProposalPropertiesProps = {
-  isPublishingToLens?: boolean;
-  proposalLensLink?: string;
   pageId?: string;
   proposalFormInputs: ProposalPropertiesInput;
   proposalStatus?: ProposalStatus;
   readOnlyAuthors?: boolean;
+  readOnlyRewards?: boolean;
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   readOnlyCustomProperties?: string[];
-  isReviewer?: boolean;
+  readOnlySelectedCredentialTemplates?: boolean;
   rewardIds?: string[] | null;
   proposalId?: string;
+  isStructuredProposal: boolean;
+  isProposalTemplate: boolean;
 };
 
 export function ProposalPropertiesBase({
-  proposalLensLink,
   proposalFormInputs,
   pageId,
   proposalStatus,
   readOnlyAuthors,
   setProposalFormInputs,
-  isPublishingToLens,
   readOnlyCustomProperties,
-  isReviewer,
+  readOnlySelectedCredentialTemplates,
+  readOnlyRewards,
   rewardIds,
-  proposalId
+  proposalId,
+  isStructuredProposal,
+  isProposalTemplate
 }: ProposalPropertiesProps) {
-  const { user } = useUser();
+  const { mappedFeatures } = useSpaceFeatures();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-  const { lensProfile } = useLensProfile();
-  const { account } = useWeb3Account();
 
-  const isAuthor = proposalFormInputs.authors.includes(user?.id ?? '');
+  const { credentialTemplates } = useGetCredentialTemplates();
+
+  const showCredentialSelect = !!credentialTemplates?.length;
+
   const proposalAuthorIds = proposalFormInputs.authors;
-  const proposalReviewers = proposalFormInputs.reviewers;
+  const proposalReviewers = proposalFormInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat();
   const isNewProposal = !pageId;
   const pendingRewards = proposalFormInputs.fields?.pendingRewards || [];
   useEffect(() => {
     setDetailsExpanded(proposalStatus === 'draft');
   }, [setDetailsExpanded, proposalStatus]);
-
-  let lensProposalPropertyState: 'hide' | 'show_link' | 'show_toggle' = 'hide';
-  if (proposalLensLink) {
-    lensProposalPropertyState = 'show_link';
-  } else {
-    lensProposalPropertyState = lensProfile && account ? 'show_toggle' : 'hide';
-  }
 
   return (
     <>
@@ -110,7 +105,11 @@ export function ProposalPropertiesBase({
               flexGrow: 1
             }}
           >
-            <PropertyLabel readOnly required={isNewProposal} highlighted>
+            <PropertyLabel
+              readOnly
+              required={isNewProposal && proposalFormInputs.type !== 'proposal_template'}
+              highlighted
+            >
               Author
             </PropertyLabel>
             <Box display='flex' flex={1}>
@@ -125,69 +124,26 @@ export function ProposalPropertiesBase({
                 wrapColumn
                 showEmptyPlaceholder
               />
+              {showCredentialSelect && (
+                <CredentialSelect
+                  templateType='proposal'
+                  readOnly={readOnlySelectedCredentialTemplates}
+                  selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
+                  onChange={(selectedCredentialTemplates) =>
+                    setProposalFormInputs({
+                      selectedCredentialTemplates
+                    })
+                  }
+                />
+              )}
             </Box>
           </div>
         </Box>
 
-        {lensProposalPropertyState !== 'hide' && (
-          <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
-            <Box
-              display='flex'
-              height='fit-content'
-              flex={1}
-              className='octo-propertyrow'
-              // override align-items flex-start with inline style
-              style={{
-                alignItems: 'center'
-              }}
-            >
-              {lensProposalPropertyState === 'show_link' ? (
-                <>
-                  <PropertyLabel readOnly highlighted>
-                    Lens Post
-                  </PropertyLabel>
-                  <Link
-                    href={`https://${!isProdEnv ? 'testnet.' : ''}hey.xyz/posts/${proposalLensLink}`}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                  >
-                    <Typography variant='body2' color='primary'>
-                      View on lens
-                    </Typography>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <PropertyLabel readOnly highlighted>
-                    Publish to Lens
-                  </PropertyLabel>
-                  {isPublishingToLens ? (
-                    <LoadingIcon size={16} />
-                  ) : (
-                    <Switch
-                      disabled={proposalStatus !== 'draft'}
-                      checked={proposalFormInputs.publishToLens ?? false}
-                      onChange={(e) => {
-                        setProposalFormInputs({
-                          publishToLens: e.target.checked
-                        });
-                      }}
-                    />
-                  )}
-                  {proposalFormInputs.publishToLens && proposalStatus !== 'draft' && !isPublishingToLens && (
-                    <Typography variant='body2' color='error'>
-                      Failed publishing to Lens
-                    </Typography>
-                  )}
-                </>
-              )}
-            </Box>
-          </Box>
-        )}
         <CustomPropertiesAdapter
           readOnly={readOnlyAuthors}
           readOnlyProperties={readOnlyCustomProperties}
-          proposal={proposalFormInputs}
+          proposalForm={proposalFormInputs}
           proposalId={proposalId}
           onChange={(properties: ProposalFields['properties']) => {
             setProposalFormInputs({
@@ -195,48 +151,60 @@ export function ProposalPropertiesBase({
             });
           }}
         />
-        <ProposalRewards
-          pendingRewards={pendingRewards}
-          reviewers={proposalReviewers}
-          assignedSubmitters={proposalAuthorIds}
-          rewardIds={rewardIds || []}
-          readOnly={!isReviewer && !isAuthor}
-          onSave={(pendingReward) => {
-            const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
-            if (!isExisting) {
-              setProposalFormInputs({
-                fields: {
-                  ...proposalFormInputs.fields,
-                  pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || []), pendingReward]
+        {!isStructuredProposal && (
+          <Stack flexDirection='row' alignItems='center' height='fit-content' flex={1} className='octo-propertyrow'>
+            {(rewardIds && rewardIds.length > 0) ||
+              (pendingRewards.length > 0 && (
+                <PropertyLabel readOnly highlighted>
+                  {mappedFeatures.rewards.title}
+                </PropertyLabel>
+              ))}
+            <ProposalRewards
+              pendingRewards={pendingRewards}
+              requiredTemplateId={proposalFormInputs.fields?.rewardsTemplateId}
+              reviewers={proposalReviewers}
+              assignedSubmitters={proposalAuthorIds}
+              rewardIds={rewardIds || []}
+              readOnly={readOnlyRewards}
+              isProposalTemplate={isProposalTemplate}
+              onSave={(pendingReward) => {
+                const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
+                if (!isExisting) {
+                  setProposalFormInputs({
+                    fields: {
+                      ...proposalFormInputs.fields,
+                      pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || []), pendingReward]
+                    }
+                  });
+
+                  return;
                 }
-              });
 
-              return;
-            }
-
-            setProposalFormInputs({
-              fields: {
-                ...proposalFormInputs.fields,
-                pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].map((draft) => {
-                  if (draft.draftId === pendingReward.draftId) {
-                    return pendingReward;
+                setProposalFormInputs({
+                  fields: {
+                    ...proposalFormInputs.fields,
+                    pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].map((draft) => {
+                      if (draft.draftId === pendingReward.draftId) {
+                        return pendingReward;
+                      }
+                      return draft;
+                    })
                   }
-                  return draft;
-                })
-              }
-            });
-          }}
-          onDelete={(draftId: string) => {
-            setProposalFormInputs({
-              fields: {
-                ...proposalFormInputs.fields,
-                pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].filter(
-                  (draft) => draft.draftId !== draftId
-                )
-              }
-            });
-          }}
-        />
+                });
+              }}
+              onDelete={(draftId: string) => {
+                setProposalFormInputs({
+                  fields: {
+                    ...proposalFormInputs.fields,
+                    pendingRewards: [...(proposalFormInputs.fields?.pendingRewards || [])].filter(
+                      (draft) => draft.draftId !== draftId
+                    )
+                  }
+                });
+              }}
+            />
+          </Stack>
+        )}
       </Collapse>
       <Divider
         sx={{
@@ -245,10 +213,4 @@ export function ProposalPropertiesBase({
       />
     </>
   );
-}
-
-function templateTooltip(fieldName: string, isAdmin: boolean) {
-  return isAdmin
-    ? `Only admins can override ${fieldName} when using a template`
-    : `Cannot change ${fieldName} when using template`;
 }

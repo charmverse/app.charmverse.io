@@ -1,7 +1,7 @@
 import type { Post, Space, User } from '@charmverse/core/prisma';
 
 import { generateForumPosts } from 'testing/forums';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 
 import { defaultPostsPerResult } from '../constants';
@@ -14,7 +14,7 @@ let spacePosts: Post[];
 
 // Test a space with 16 forum posts
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   space = generated.space;
   user = generated.user;
 
@@ -32,7 +32,7 @@ describe('listForumPosts', () => {
     expect(posts.data).toHaveLength(defaultPostsPerResult);
   });
   it(`should return posts from all categories if no category is provided`, async () => {
-    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpace();
 
     const category = await generatePostCategory({
       spaceId: extraSpace.id,
@@ -90,7 +90,7 @@ describe('listForumPosts', () => {
   });
 
   it(`should support paginated queries for a combination of categories, or only uncategorised posts`, async () => {
-    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpace();
 
     const category1 = await generatePostCategory({ spaceId: space.id, name: 'Test Category 1' });
     const category2 = await generatePostCategory({ spaceId: space.id, name: 'Test Category 2' });
@@ -177,8 +177,8 @@ describe('listForumPosts', () => {
   });
 
   it(`should support sorting`, async () => {
-    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
-    const { user: secondExtraUser } = await generateUserAndSpaceWithApiToken();
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpace();
+    const { user: secondExtraUser } = await generateUserAndSpace();
 
     const forumPosts = await generateForumPosts({
       spaceId: extraSpace.id,
@@ -226,7 +226,7 @@ describe('listForumPosts', () => {
   });
 
   it('should support lookup of posts in multiple categories', async () => {
-    const { space: extraSpace, user: extraUser } = await generateUserAndSpaceWithApiToken();
+    const { space: extraSpace, user: extraUser } = await generateUserAndSpace();
 
     const category1 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 1' });
     const category2 = await generatePostCategory({ spaceId: extraSpace.id, name: 'Test Category 2' });

@@ -5,7 +5,12 @@ import type { EditorView } from 'prosemirror-view';
 
 import { BangleEditor } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor';
 import { BangleEditorState } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';
+import {
+  resetRenderHandlersCache,
+  saveRenderHandlers
+} from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import { nodeViewRenderHandlers } from 'components/common/CharmEditor/components/@bangle.dev/react/node-view-helpers';
 
 const mountedEditors = new Set<BangleEditor>();
 if (typeof afterEach === 'function') {
@@ -14,6 +19,7 @@ if (typeof afterEach === 'function') {
       editor.destroy();
       mountedEditors.delete(editor);
     });
+    resetRenderHandlersCache();
   });
 }
 
@@ -35,7 +41,7 @@ export function renderTestEditor(
   const container = document.body.appendChild(document.createElement('div'));
   container.setAttribute('data-testid', testId);
 
-  return (testDoc: any) => {
+  return (testDoc?: any) => {
     const editorProps = {
       // include bangle-editor-core to support prosemirror-tables fork
       attributes: { class: 'bangle-editor content bangle-editor-core' }
@@ -46,11 +52,13 @@ export function renderTestEditor(
 
     const view = editor.view;
     mountedEditors.add(editor);
-
-    let posLabels;
+    saveRenderHandlers(
+      view.dom.parentNode as HTMLElement,
+      nodeViewRenderHandlers(() => {})
+    );
 
     if (testDoc) {
-      posLabels = updateDoc(testDoc);
+      updateDoc(testDoc);
     }
 
     function updateDoc(doc: Node) {
@@ -75,7 +83,6 @@ export function renderTestEditor(
       editorState: view.state as EditorState,
       schema: view.state.schema,
       selection: view.state.selection as Selection,
-      posLabels,
       updateDoc,
       destroy: () => {
         editor?.destroy();

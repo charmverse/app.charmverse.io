@@ -5,16 +5,12 @@ import nc from 'next-connect';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { upsertProposalFormFields } from 'lib/proposal/form/upsertProposalFormFields';
+import { upsertProposalFormFields } from 'lib/proposals/form/upsertProposalFormFields';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(requireUser)
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(upsertProposalFormController);
+handler.use(requireUser).put(upsertProposalFormController);
 
 async function upsertProposalFormController(req: NextApiRequest, res: NextApiResponse<FormField[]>) {
   const proposalId = req.query.id as string;

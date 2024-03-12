@@ -2,7 +2,7 @@ import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { updateUserProfile } from '../updateUserProfile';
@@ -11,11 +11,12 @@ describe('updateUserProfile', () => {
   it('should only update users identityType, username, path, avatar, avatarTokenId, avatarChain and avatarContract properties', async () => {
     const { user } = await generateUserAndSpaceWithApiToken();
 
-    const domain = `random-domain-${v4()}.nft`;
-
-    const unstoppableDomain = await prisma.unstoppableDomain.create({
+    await prisma.discordUser.create({
       data: {
-        domain,
+        account: {
+          username: user.username
+        },
+        discordId: '1234',
         user: {
           connect: {
             id: user.id
@@ -25,8 +26,8 @@ describe('updateUserProfile', () => {
     });
 
     const update: Partial<User> = {
-      identityType: 'UnstoppableDomain',
-      username: unstoppableDomain.domain,
+      identityType: 'Discord',
+      username: user.username as any,
       avatarChain: 23,
       avatarContract: 'random-contract-address',
       avatarTokenId: `0x123456`,

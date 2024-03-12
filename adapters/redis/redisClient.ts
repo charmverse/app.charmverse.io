@@ -2,13 +2,26 @@ import { log } from '@charmverse/core/log';
 import type { RedisClientType } from 'redis';
 import { createClient } from 'redis';
 
+import { isDevEnv } from 'config/constants';
+
 let redisClientInstance: RedisClientType | null = null;
 
-if (process.env.REDIS_URI) {
+const redisUri = process.env.REDIS_URI;
+
+if (redisUri) {
   try {
     redisClientInstance =
-      ((global as any).redisClient as RedisClientType) ?? createClient({ url: process.env.REDIS_URI });
-    redisClientInstance.on('error', (error) => log.error('Redis Client Error', error));
+      ((global as any).redisClient as RedisClientType) ??
+      createClient({
+        url: redisUri,
+        socket: isDevEnv
+          ? {
+              // Avoid infinite errors on local dev
+              reconnectStrategy: () => 1800000
+            }
+          : undefined
+      });
+    redisClientInstance.on('error', (error) => log.error('Redis error occurred', error));
   } catch (error) {
     log.error('Could not instantiate Redis. Error occurred', error);
   }

@@ -1,28 +1,30 @@
 import type { RewardBlock } from '@charmverse/core/prisma-client';
 
 import type { Block } from 'lib/focalboard/block';
-import type { BoardFields } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, BoardFields } from 'lib/focalboard/board';
 import type { BoardViewFields } from 'lib/focalboard/boardView';
 import type { Card, CardPropertyValue } from 'lib/focalboard/card';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 import type { ApplicationMeta } from '../interfaces';
 
-export type RewardPropertyOption = { id: string; color: string; value: string };
+export type RewardBoardFields = {
+  cardProperties: IPropertyTemplate[];
+};
 
-export type RewardPropertyField = { id: string; name: string; type: string; options: RewardPropertyOption[] };
-
-export type RewardPropertiesBlockFields = {
-  cardProperties: RewardPropertyField[];
+// Properties block with typed fields
+export type RewardsBoardBlock = RewardBlock & {
+  fields: RewardBoardFields & BoardFields;
+  type: 'board';
 };
 // Properties block with typed fields
-export type RewardPropertiesBlock = RewardBlock & {
-  fields: RewardPropertiesBlockFields | BoardFields;
-  type: 'board' | 'view';
+export type RewardsBoardFFBlock = Omit<Board, 'fields' | 'type'> & {
+  fields: RewardBoardFields & BoardFields;
+  type: 'board';
 };
 
 // TODO: Add other block types i.e. view.
-export type RewardBlockWithTypedFields = RewardPropertiesBlock | Block;
+export type RewardBlockWithTypedFields = RewardsBoardBlock | Block;
 
 export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | TargetPermissionGroup<'user' | 'role'>[];
 
@@ -34,15 +36,13 @@ export type RewardFields = RewardPropertyValues & { isAssigned?: boolean };
 
 export type RewardFieldsProp = { fields: RewardFields };
 
-export type RewardCard = Card<RewardPropertyValue>;
-
 export type RewardBlockInput = {
   id?: string;
   type: string;
   spaceId?: string;
   title?: string;
   schema?: number;
-  fields?: RewardPropertiesBlockFields | RewardPropertyValues | BoardFields | BoardViewFields;
+  fields?: RewardBoardFields | RewardPropertyValues | BoardFields | BoardViewFields;
   parentId?: string;
   rootId?: string;
 };

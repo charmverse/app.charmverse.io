@@ -2,7 +2,7 @@ import type { VoteOptions } from '@charmverse/core/prisma-client';
 import { Box, Checkbox, Chip, FormControlLabel, FormGroup, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
-import { percent } from 'lib/utilities/numbers';
+import { percent } from 'lib/utils/numbers';
 
 type Props = {
   value: string[] | undefined | null;

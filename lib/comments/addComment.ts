@@ -1,7 +1,7 @@
 import type { Comment } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 
 import type { CommentCreate } from './interfaces';
 
@@ -14,9 +14,14 @@ export async function addComment({ content, threadId, userId }: CommentCreate): 
     where: {
       id: threadId
     },
-    include: {
-      user: true,
-      page: true
+    select: {
+      spaceId: true,
+      pageId: true,
+      page: {
+        select: {
+          id: true
+        }
+      }
     }
   });
 

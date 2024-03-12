@@ -1,5 +1,4 @@
-import type { GetGuildResponse, GetGuildsResponse } from '@guildxyz/sdk';
-import { guild, user as guildUser } from '@guildxyz/sdk';
+import type { Guild } from '@guildxyz/types';
 import { Box, MenuItem, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { mutate } from 'swr';
@@ -10,13 +9,15 @@ import { ScrollableModal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { guild, user as guildUser } from 'lib/guild-xyz/client';
+import { isTruthy } from 'lib/utils/types';
 import GuildXYZIcon from 'public/images/logos/guild_logo.svg';
 
 import GuildsAutocomplete from './GuildsAutocomplete';
 
 export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => void }) {
   const [showImportedRolesModal, setShowImportedRolesModal] = useState(false);
-  const [guilds, setGuilds] = useState<GetGuildResponse[]>([]);
+  const [guilds, setGuilds] = useState<Guild[]>([]);
   const [fetchingGuilds, setFetchingGuilds] = useState(false);
   const [importingRoles, setImportingRoles] = useState(false);
   const [selectedGuildIds, setSelectedGuildIds] = useState<number[]>([]);
@@ -29,19 +30,19 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
     async function main() {
       if (showImportedRolesModal) {
         setFetchingGuilds(true);
-        const guildMembershipsResponses = await Promise.all(
-          addresses.map((address) => guildUser.getMemberships(address))
-        );
-        const userGuildIds: number[] = [];
 
-        guildMembershipsResponses.forEach((guildMembershipsResponse) => {
-          if (guildMembershipsResponse) {
-            userGuildIds.push(...guildMembershipsResponse.map((guildMembership) => guildMembership.guildId));
-          }
-        });
-        const allGuilds = await Promise.all(userGuildIds.map((id) => guild.get(id)));
+        const guildMembershipsResponses = await Promise.all(
+          addresses.map((address) => guildUser.getMemberships(address).catch(() => null))
+        );
+        const userGuildIds = guildMembershipsResponses
+          .filter(isTruthy)
+          .flat()
+          .map((guildMembership) => guildMembership.guildId);
+
+        const allGuilds = await guild.getMany(userGuildIds).catch(() => null);
+
         setSelectedGuildIds(userGuildIds);
-        setGuilds(allGuilds);
+        setGuilds(allGuilds || []);
         setFetchingGuilds(false);
       }
     }

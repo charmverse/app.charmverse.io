@@ -41,17 +41,13 @@ export async function voteForumComment({
       }
     });
 
-    const category = post.category;
-
-    if (category) {
-      trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
-        resourceId: commentId,
-        spaceId: post.spaceId,
-        userId,
-        categoryName: category.name,
-        postId: post.id
-      });
-    }
+    trackUserAction(upvoted ? 'upvote_comment' : 'downvote_comment', {
+      resourceId: commentId,
+      spaceId: post.spaceId,
+      userId,
+      categoryName: post.category.name,
+      postId: post.id
+    });
 
     const commentVote = await prisma.postCommentUpDownVote.upsert({
       create: {

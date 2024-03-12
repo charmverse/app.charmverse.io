@@ -1,15 +1,17 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { DataNotFoundError, InvalidInputError } from 'lib/utilities/errors';
+import { DataNotFoundError, InvalidInputError } from 'lib/utils/errors';
 
 import type { ThreadCreatePayload, ThreadWithComments } from './interfaces';
+import { threadIncludeClause } from './utils';
 
 export async function createThread({
   comment,
   pageId,
   userId,
   context,
-  accessGroups
+  accessGroups,
+  fieldAnswerId
 }: ThreadCreatePayload): Promise<ThreadWithComments> {
   if (!comment) {
     throw new InvalidInputError('Please provide a valid comment');
@@ -52,6 +54,7 @@ export async function createThread({
           id: userId
         }
       },
+      fieldAnswer: fieldAnswerId ? { connect: { id: fieldAnswerId } } : undefined,
       accessGroups: accessGroups?.map((ag) => ({ ...ag })) ?? [],
       comments: {
         create: {
@@ -74,10 +77,8 @@ export async function createThread({
         }
       }
     },
-    include: {
-      comments: true
-    }
+    include: threadIncludeClause()
   });
 
-  return thread;
+  return thread as unknown as ThreadWithComments;
 }

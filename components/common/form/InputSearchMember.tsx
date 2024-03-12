@@ -9,7 +9,9 @@ import { v4 } from 'uuid';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
 import type { Member } from 'lib/members/interfaces';
-import { isValidEmail } from 'lib/utilities/strings';
+import { isValidEmail } from 'lib/utils/strings';
+
+const renderDiv = (props: any & { children: ReactNode }) => <div>{props.children}</div>;
 
 interface IMembersFilter {
   mode: 'include' | 'exclude';
@@ -43,6 +45,7 @@ interface Props extends Omit<AutocompleteProps<Member, boolean, boolean, boolean
   inputVariant?: 'standard' | 'outlined' | 'filled';
   helperText?: ReactNode;
   error?: boolean;
+  popupField?: boolean;
 }
 
 function InputSearchMemberBase({
@@ -54,6 +57,7 @@ function InputSearchMemberBase({
   allowEmail,
   helperText,
   error,
+  popupField,
   ...props
 }: Props) {
   const inputRef = createRef<HTMLInputElement>();
@@ -61,6 +65,8 @@ function InputSearchMemberBase({
   const filteredOptions = filter ? filterMembers(options, filter) : options;
   return (
     <StyledAutocomplete
+      PopperComponent={popupField ? renderDiv : undefined}
+      PaperComponent={popupField ? renderDiv : undefined}
       disabled={options.length === 0 && !allowEmail}
       loading={options.length === 0}
       options={filteredOptions}
@@ -130,6 +136,7 @@ interface IInputSearchMemberMultipleProps
   inputVariant?: 'standard' | 'outlined' | 'filled';
   helperText?: ReactNode;
   error?: boolean;
+  popupField?: boolean;
 }
 
 export function InputSearchMemberMultiple({

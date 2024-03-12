@@ -6,7 +6,7 @@ exports[`components/properties/lastModifiedAt should match snapshot 1`] = `
     class="variable variable"
   >
     <div
-      class="LastModifiedAt octo-propertyvalue readonly"
+      class="octo-propertyvalue readonly MuiBox-root css-yl62nh"
     >
       Invalid Date
     </div>

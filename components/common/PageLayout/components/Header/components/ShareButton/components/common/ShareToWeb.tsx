@@ -13,11 +13,11 @@ import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { UpgradeChip, UpgradeWrapper } from 'components/settings/subscription/UpgradeWrapper';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePage } from 'hooks/usePage';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 const StyledInput = styled(Input)`
   font-size: 0.8em;
@@ -68,7 +68,7 @@ export default function ShareToWeb({
 }: ShareToWebProps) {
   const [copied, setCopied] = useState<boolean>(false);
 
-  const { page } = usePage({ pageIdOrPath: pageId });
+  const { data: page } = useGetPageMeta(pageId);
 
   const { space } = useCurrentSpace();
   const router = useRouter();

@@ -25,9 +25,9 @@ export const StyledDatabaseIcon = styled(DatabaseIcon)`
 `;
 
 export const StyledPageIcon = styled(EmojiIcon)`
-  height: 24px;
+  height: 22px;
   z-index: 0;
-  width: 24px;
+  width: 22px;
   margin-right: 4px;
   color: ${({ theme }) => theme.palette.secondary.light};
   &::before {
@@ -108,7 +108,7 @@ export function PageIcon({
       iconComponent = <StyledDatabaseIcon />;
     } else if (pageType === 'proposal' || pageType === 'proposals') {
       iconComponent = <ProposalIcon />;
-    } else if (pageType === 'rewards') {
+    } else if (pageType === 'rewards' || pageType === 'bounty') {
       iconComponent = <BountyIcon />;
     } else if (pageType === 'members') {
       iconComponent = <MembersIcon />;

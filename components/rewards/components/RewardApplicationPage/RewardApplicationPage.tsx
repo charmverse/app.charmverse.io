@@ -4,23 +4,24 @@ import { ArrowBack } from '@mui/icons-material';
 import { Box, Grid, Divider, FormLabel } from '@mui/material';
 import { useState } from 'react';
 
+import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetReward, useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { RewardProperties } from 'components/[pageId]/DocumentPage/components/RewardProperties';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import UserDisplay from 'components/common/UserDisplay';
-import { RewardProperties } from 'components/rewards/components/RewardProperties/RewardProperties';
 import type { WorkInput } from 'components/rewards/hooks/useApplication';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useNewWork } from 'components/rewards/hooks/useNewApplication';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+import { getRewardType } from 'lib/rewards/getRewardType';
 
 import { ApplicationComments } from './components/ApplicationComments';
 import { ApplicationInput } from './components/RewardApplicationInput';
@@ -54,7 +55,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
   const currentRewardId = rewardId || reward?.id;
 
-  const { page: rewardPageContent } = usePage({ pageIdOrPath: currentRewardId });
+  const { data: rewardPageContent } = useGetPage(currentRewardId);
 
   const { space } = useCurrentSpace();
 
@@ -105,6 +106,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
     return null;
   }
 
+  const rewardType = getRewardType(reward);
   const submitter = members.find((m) => m.id === application?.createdBy);
 
   const readonlySubmission =
@@ -177,7 +179,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                         rewardPermissions={rewardPermissions}
                         refreshApplication={refreshApplication}
                         reviewApplication={reviewApplication}
-                        hasCustomReward={!!reward.customReward}
+                        rewardType={rewardType}
                       />
                     </Box>
                   )}
@@ -223,7 +225,7 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                       }
                       bountyId={currentRewardId}
                       permissions={applicationRewardPermissions}
-                      hasCustomReward={!!reward.customReward}
+                      rewardType={rewardType}
                       isSaving={isSaving}
                     />
                   )}

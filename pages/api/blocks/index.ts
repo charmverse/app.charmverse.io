@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
 import type { Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -18,14 +19,14 @@ import {
 import { createPage } from 'lib/pages/server/createPage';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { getPagePath } from 'lib/pages/utils';
-import { getPermissionsClient, permissionsApiClient } from 'lib/permissions/api/client';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { UnauthorisedActionError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -256,11 +257,25 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
   const blocks: Block[] = req.body;
+  const dbBlocks = await prisma.block.findMany({
+    where: {
+      id: {
+        in: blocks.map((block) => block.id)
+      }
+    },
+    select: {
+      id: true,
+      spaceId: true,
+      fields: true,
+      title: true
+    }
+  });
 
   // validate access to the space
   await Promise.all(
     blocks.map(async (block) => {
-      const spaceId = block.spaceId ?? (await prisma.block.findUnique({ where: { id: block.id } }))?.spaceId;
+      const dbBlock = dbBlocks.find((b) => b.id === block.id);
+      const spaceId = block.spaceId ?? dbBlock?.spaceId;
       const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
       if (error) {
         throw new UnauthorisedActionError();
@@ -333,6 +348,8 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
       }
     }
   });
+
+  log.info('User deleted blocks', { count: blocks.length, spaceId: spaceIds[0], userId });
 
   return res.status(200).json(blocks);
 }

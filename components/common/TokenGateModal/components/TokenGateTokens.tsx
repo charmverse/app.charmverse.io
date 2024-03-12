@@ -1,10 +1,8 @@
 import { FormProvider } from 'react-hook-form';
 
-import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
-
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { useTokensForm } from '../hooks/useTokensForm';
-import { getTokensUnifiedAccessControlConditions } from '../utils/getTokensUnifiedAccessControlConditions';
+import { getTokensAccessControlConditions } from '../utils/getTokensAccessControlConditions';
 
 import { TokenGateFooter } from './TokenGateFooter';
 import { TokenGateTokenFields } from './TokenGateTokensFields';
@@ -20,9 +18,8 @@ export function TokenGateTokens() {
 
   const onSubmit = async () => {
     const values = getValues();
-    const valueProps = getTokensUnifiedAccessControlConditions(values) || [];
-    const tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
-    handleTokenGate(tokenGate);
+    const valueProps = getTokensAccessControlConditions(values) || [];
+    handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };
 

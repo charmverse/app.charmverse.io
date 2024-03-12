@@ -1,16 +1,14 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import { createForm } from 'lib/form/createForm';
-import { addSpaceOperations } from 'lib/permissions/spaces/addSpaceOperations';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import { createForm } from 'lib/forms/createForm';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateRole } from 'testing/setupDatabase';
 
 let author: User;
 let reviewer: User;
@@ -39,7 +37,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
     });
     const proposal = (
       await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
-    ).body as ProposalWithUsers;
+    ).body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({
@@ -94,7 +92,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
 
     const proposal = (
       await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).set('Cookie', authorCookie).expect(200)
-    ).body as ProposalWithUsers;
+    ).body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({
@@ -197,7 +195,7 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const { page } = await testUtilsProposals.generateProposal({
       userId: proposalAuthor.id,
       spaceId: adminSpace.id,
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const updateContent: Partial<UpdateProposalRequest> = {

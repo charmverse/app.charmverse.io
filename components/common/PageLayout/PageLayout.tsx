@@ -13,14 +13,14 @@ import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal'
 import { AnnouncementBanner } from 'components/common/PageLayout/components/AnnouncementBanner';
 import { BlocksExceededBanner } from 'components/common/PageLayout/components/BlocksExceededBanner';
 import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
-import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoard';
+import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
+import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
 import { useResize } from 'hooks/useResize';
-import { RewardBlocksProvider } from 'hooks/useRewardBlocks';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWindowSize } from 'hooks/useWindowSize';
@@ -186,7 +186,7 @@ function PageLayout({ children }: PageLayoutProps) {
       <Head>
         <CurrentPageFavicon />
       </Head>
-      <LayoutContainer data-test='space-page-layout'>
+      <LayoutContainer data-test='space-page-layout' className='app-content'>
         <FocalboardViewsProvider>
           <ProposalBlocksProvider>
             <RewardBlocksProvider>
@@ -201,7 +201,7 @@ function PageLayout({ children }: PageLayoutProps) {
                           <AnnouncementBanner
                             actionLabel='Check it out'
                             actionHref='https://tiny.charmverse.io/prop2-updates'
-                            expiryDate='2024-01-31'
+                            expiryDate='2024-01-07'
                           >
                             NEW governance & decision-making workflow launched.
                           </AnnouncementBanner>

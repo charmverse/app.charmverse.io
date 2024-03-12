@@ -1,7 +1,9 @@
-import type { Asset as MuxAsset } from '@mux/mux-node';
+import type { Mux } from '@mux/mux-node';
 
 import { getSignedToken } from './getSignedToken';
 import { mux } from './muxClient';
+
+type MuxAsset = Mux.Video.Asset;
 
 export type Asset = {
   id: MuxAsset['id'];
@@ -24,7 +26,7 @@ async function getAsset(assetId: string): Promise<Asset> {
   if (!mux) {
     throw new Error('Mux client not configured');
   }
-  const asset = await mux.Video.Assets.get(assetId);
+  const asset = await mux.video.assets.retrieve(assetId);
   // console.log('retrieved asset', asset.status, asset.playback_ids);
   if (!asset.playback_ids) {
     throw new Error('No playback ids');

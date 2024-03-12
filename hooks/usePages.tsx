@@ -4,15 +4,17 @@ import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
+import { useTrashPages, useInitialPagesForSpace } from 'charmClient/hooks/pages';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import type { Block } from 'lib/focalboard/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -56,7 +58,10 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const dispatch = useAppDispatch();
   const { sendMessage, subscribe } = useWebSocketClient();
+  const { trigger: trashPages } = useTrashPages();
   const pagesDispatched = useRef(false);
+  // temporary optimization: load non-card pages first
+  const { data: initialPages } = useInitialPagesForSpace(currentSpace?.id);
   const {
     data,
     mutate: mutatePagesList,
@@ -79,7 +84,18 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     { refreshInterval, revalidateOnFocus: false }
   );
 
-  const pages = data || {};
+  const pages = useMemo<PagesMap>(() => {
+    if (data) {
+      return data;
+    }
+    if (initialPages) {
+      return initialPages.reduce<PagesMap>((acc, page) => {
+        acc[page.id] = page;
+        return acc;
+      }, {});
+    }
+    return {};
+  }, [data, initialPages]);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
@@ -140,7 +156,11 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           );
         }
       } else {
-        const { pageIds } = await charmClient.archivePage(page.id);
+        const result = await trashPages({ pageIds: [page.id], trash: true });
+        if (!result) {
+          return;
+        }
+        const pageIds = result.pageIds;
         let newPage: null | PageMeta = null;
         if (totalNonArchivedPages - pageIds.length === 0 && pageIds.length !== 0) {
           newPage = await charmClient.createPage(
@@ -150,22 +170,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
             })
           );
         }
-
-        // Delete the page associated with the card
-        _setPages((_pages) => {
-          pageIds.forEach((_pageId) => {
-            _pages[_pageId] = {
-              ..._pages[_pageId],
-              deletedBy: user.id,
-              deletedAt: new Date()
-            } as PageMeta;
-          });
-          // If a new page was created add that to state
-          if (newPage) {
-            _pages[newPage.id] = newPage;
-          }
-          return { ..._pages };
-        });
 
         return newPage;
       }

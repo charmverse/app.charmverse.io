@@ -117,7 +117,10 @@ export async function createCryptoSubscription({
     throw new NotFoundError('Loop item not found');
   }
 
+  // Minimum amount for the user to have in his wallet to be able to pay for the subscription
+  const loopMinimumBalanceRequired = (productPrice.unit_amount || 120) * blockQuota;
+
   return loopItem.url
-    ? `${loopItem.url}?embed=true&cartEnabled=false&email=${encodedEmail}&sub=${newSubscription.id}`
-    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&email=${encodedEmail}&sub=${newSubscription.id}`;
+    ? `${loopItem.url}?embed=true&cartEnabled=false&email=${encodedEmail}&sub=${newSubscription.id}&minimumBalanceRequired=${loopMinimumBalanceRequired}`
+    : `${loopCheckoutUrl}/${loopItem.entityId}/${loopItem.itemId}?embed=true&cartEnabled=false&email=${encodedEmail}&sub=${newSubscription.id}&minimumBalanceRequired=${loopMinimumBalanceRequired}`;
 }

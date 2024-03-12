@@ -22,13 +22,11 @@ import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMemberProperties } from 'hooks/useMemberProperties';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-import type { Social, Member } from 'lib/members/interfaces';
+import type { Member, Social } from 'lib/members/interfaces';
 
-import { useMemberDialog } from '../hooks/useMemberDialog';
+import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';
 
-import { DiscordSocialIcon } from './DiscordSocialIcon';
 import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
@@ -52,8 +50,7 @@ function MemberDirectoryTableRow({
   const twitterHandle = twitterUrl.split('/').at(-1);
   const { space: currentSpace } = useCurrentSpace();
   const { user } = useUser();
-  const { showUserId } = useMemberDialog();
-  const { openSettings } = useSettingsDialog();
+  const { openEditProfile } = useMemberProfileDialog();
   const { formatDate } = useDateFormatter();
 
   if (visibleProperties.length === 0) {
@@ -73,7 +70,7 @@ function MemberDirectoryTableRow({
             className='icons'
             onClick={(e) => {
               e.stopPropagation();
-              openSettings('profile');
+              openEditProfile();
             }}
             style={{
               opacity: 1

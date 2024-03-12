@@ -61,10 +61,22 @@ type LargeAvatarProps = {
   isSaving?: boolean;
   isNft?: boolean;
   alwaysShowEdit?: boolean;
+  hideDelete?: boolean;
 };
 
 export default function LargeAvatar(props: LargeAvatarProps) {
-  const { name, image, updateAvatar, variant, editable, canSetNft, isSaving, updateImage, isNft } = props;
+  const {
+    hideDelete = false,
+    name,
+    image,
+    updateAvatar,
+    variant,
+    editable,
+    canSetNft,
+    isSaving,
+    updateImage,
+    isNft
+  } = props;
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
 
@@ -109,7 +121,11 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   }
 
   if (!editable) {
-    return <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size='2xLarge' />;
+    return (
+      <StyledBox>
+        <Avatar avatar={image} name={name} variant={variant} isNft={isNft} size='2xLarge' />
+      </StyledBox>
+    );
   }
 
   return (
@@ -126,7 +142,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
               <StyledIconButton key='edit-avatar' onClick={onEditClick}>
                 <EditIcon fontSize='small' />
               </StyledIconButton>
-              {image && (
+              {image && !hideDelete && (
                 <StyledIconButton key='delete-avatar' onClick={() => updateImageAvatar({ url: '' })}>
                   <DeleteOutlinedIcon fontSize='small' />
                 </StyledIconButton>

@@ -2,48 +2,47 @@ import type { PageMeta } from '@charmverse/core/pages';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import React from 'react';
+import { memo, useRef, useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/focalboard/card';
 
-import { getCurrentBoardTemplates } from '../../store/cards';
+import { makeSelectBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';
 
 type Props = {
   addCard: () => void;
   addCardFromTemplate: (cardTemplateId: string) => void;
   addCardTemplate: () => void;
-  editCardTemplate: (cardTemplateId: string) => void;
   deleteCardTemplate: (cardTemplateId: string) => void;
   showCard: (cardId: string) => void;
-  boardId: string;
+  templatesBoardId?: string;
 };
 
-const NewCardButton = React.memo(
+const NewCardButton = memo(
   ({
     addCard,
     addCardFromTemplate,
     addCardTemplate,
     deleteCardTemplate,
-    editCardTemplate,
     showCard,
-    boardId
+    templatesBoardId
   }: Props): JSX.Element => {
-    const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
-    const buttonRef = React.useRef<HTMLDivElement>(null);
+    const selectBoardTemplates = useMemo(makeSelectBoardTemplates, []);
+    const cardTemplates: Card[] = useAppSelector((state) => selectBoardTemplates(state, templatesBoardId || ''));
+    const buttonRef = useRef<HTMLDivElement>(null);
     const { pages } = usePages();
 
     const cardTemplatesPages = cardTemplates.map((c) => pages[c.id]).filter((p) => p !== undefined) as PageMeta[];
 
     const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
-    const boardTitle = boardId ? pages[boardId]?.title || 'Untitled' : undefined;
+    const boardTitle = templatesBoardId ? pages[templatesBoardId]?.title || 'Untitled' : undefined;
 
-    const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: boardId });
+    const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: templatesBoardId || null });
 
     return (
       <>
@@ -63,7 +62,7 @@ const NewCardButton = React.memo(
           createTemplate={addCardTemplate}
           editTemplate={showCard}
           deleteTemplate={deleteCardTemplate}
-          pages={cardTemplatesPages}
+          templates={cardTemplatesPages}
           anchorEl={buttonRef.current as Element}
           popupState={popupState}
           boardTitle={boardTitle}

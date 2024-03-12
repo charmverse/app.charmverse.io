@@ -9,9 +9,9 @@ import type { PostResource, PostPermissionFlags, PermissionCompute } from '@char
 import { PostOperation, prisma } from '@charmverse/core/prisma-client';
 
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
-import { isUUID } from 'lib/utilities/strings';
+import { InvalidInputError } from 'lib/utils/errors';
+import { typedKeys } from 'lib/utils/objects';
+import { isUUID } from 'lib/utils/strings';
 
 export async function baseComputePostPermissions({
   resourceId,

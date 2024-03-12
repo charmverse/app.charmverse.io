@@ -9,7 +9,7 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
 import { work } from 'lib/rewards/work';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

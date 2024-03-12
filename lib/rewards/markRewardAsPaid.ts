@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { paidRewardStatuses } from './constants';
 import { getRewardOrThrow, rewardWithUsersInclude } from './getReward';
@@ -14,12 +15,13 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
     throw new InvalidInputError('All applications need to be either completed or paid in order to mark reward as paid');
   }
 
-  const completedApplications = reward.applications.filter((app) => app.status === 'complete');
-
   await prisma.application.updateMany({
     where: {
       id: {
-        in: completedApplications.map((completedApplication) => completedApplication.id)
+        // Keep the status of the rejected applications as is
+        in: reward.applications
+          .filter((application) => application.status !== 'rejected' && application.status !== 'submission_rejected')
+          .map((application) => application.id)
       }
     },
     data: {
@@ -27,7 +29,7 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
     }
   });
 
-  return prisma.bounty
+  const updatedReward = await prisma.bounty
     .update({
       where: {
         id: reward.id
@@ -38,4 +40,11 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
       include: rewardWithUsersInclude()
     })
     .then(mapDbRewardToReward);
+
+  await issueRewardCredentialsIfNecessary({
+    event: 'reward_submission_approved',
+    rewardId
+  });
+
+  return updatedReward;
 }

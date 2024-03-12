@@ -9,11 +9,11 @@ import Stack from '@mui/material/Stack';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import { useCreatePermissions, useDeletePermissions } from 'charmClient/hooks/permissions';
 import Modal from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
-import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 
@@ -62,7 +62,7 @@ interface Props {
 }
 
 export default function PaidPagePermissions({ pageId, pagePermissions, refreshPermissions }: Props) {
-  const { page } = usePage({ pageIdOrPath: pageId });
+  const { data: page } = useGetPageMeta(pageId);
   const { space } = useCurrentSpace();
   const { mutateMembers: refreshMembers } = useMembers();
   const { trigger: deletePermission } = useDeletePermissions();

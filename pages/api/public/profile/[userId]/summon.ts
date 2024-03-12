@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -11,8 +12,12 @@ handler.get(getSummonProfileController);
 
 async function getSummonProfileController(req: NextApiRequest, res: NextApiResponse<SummonUserProfile | null>) {
   const userId = req.query.userId as string;
+  const spaceId = req.query.spaceId as string;
+  if (!spaceId) {
+    throw new InvalidInputError('spaceId is required');
+  }
 
-  const summonProfile = await getSummonProfile({ userId });
+  const summonProfile = await getSummonProfile({ userId, spaceId });
 
   res.status(200).json(summonProfile);
 }

@@ -24,7 +24,6 @@ export function createMockPage(input: Partial<PageWithContent> = {}): PageWithCo
     headerImage: null,
     icon: null,
     id: uuid(),
-    snapshotProposalId: null,
     syncWithPageId: null,
     spaceId: '',
     path: `page-${uuid()}`,

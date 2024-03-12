@@ -1,13 +1,13 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
 import { Autocomplete, IconButton, Popper, Stack, TextField, Typography, Box } from '@mui/material';
-import { debounce } from 'lodash';
+import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
 
 import AvatarWithIcons from '../AvatarWithIcons';
 import FieldLabel from '../form/FieldLabel';
@@ -33,8 +33,8 @@ type Props = {
 export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
   const router = useRouter();
   const [spaceDomain, setSpaceDomain] = useState<string>(defaultValue || '');
-  const [spacesInfo, setSpacesInfo] = useState<SpaceWithGates[]>([]);
-  const [selectedSpace, setSelectedSpace] = useState<null | SpaceWithGates>(null);
+  const [spacesInfo, setSpacesInfo] = useState<Space[]>([]);
+  const [selectedSpace, setSelectedSpace] = useState<null | Space>(null);
 
   async function goToSpace(domain: string) {
     router.push(`/${domain}`);
@@ -76,13 +76,13 @@ export function SpaceAccessGateWithSearch({ defaultValue, goBack }: Props) {
         )}
         Join an existing space
       </FieldLabel>
-      <Autocomplete<SpaceWithGates>
+      <Autocomplete<Space>
         disablePortal
         inputValue={spaceDomain}
         options={spacesInfo}
         placeholder='my-space'
         value={selectedSpace}
-        onChange={(e, _space) => {
+        onChange={(_e, _space) => {
           setSelectedSpace(_space);
         }}
         getOptionLabel={(space) => space.name}

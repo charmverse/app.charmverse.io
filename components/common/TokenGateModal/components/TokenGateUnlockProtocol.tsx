@@ -1,7 +1,8 @@
-import { unlockChains } from 'connectors/chains';
+import { getChainList } from 'connectors/chains';
 import { useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import type { FormValues } from '../hooks/useCollectablesForm';
 
@@ -12,13 +13,15 @@ export function TokenGateUnlockProtocol() {
     register,
     formState: { errors }
   } = useFormContext<FormValues>();
+  const { space } = useCurrentSpace();
+  const chains = getChainList({ enableTestnets: !!space?.enableTestnets }).filter((chain) => !!chain.unlockNetwork);
 
   return (
     <>
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
-        chains={unlockChains}
+        chains={chains}
         {...register('chain', {
           deps: ['contract']
         })}

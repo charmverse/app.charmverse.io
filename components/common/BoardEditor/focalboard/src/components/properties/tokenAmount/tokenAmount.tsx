@@ -5,7 +5,7 @@ import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
 type Props = {
-  amount: string;
+  amount: string | number;
   chainId: string;
   symbolOrAddress: string;
 };

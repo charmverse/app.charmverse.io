@@ -28,7 +28,7 @@ type UserWithDetails = User & {
   googleAccounts: GoogleAccount[];
 };
 
-let proposal: ProposalWithDetails;
+let proposal: ProposalWithDetails & { evaluations: { id: string }[] };
 let draftProposal: ProposalWithDetails;
 let privateDraftProposal: ProposalWithDetails;
 let proposalAuthor: UserWithDetails;
@@ -101,7 +101,7 @@ beforeAll(async () => {
   proposal = (await prisma.proposal.create({
     data: {
       createdBy: proposalAuthor.id,
-      status: 'vote_active',
+      status: 'published',
       space: { connect: { id: space.id } },
       page: {
         create: {
@@ -133,23 +133,34 @@ beforeAll(async () => {
           author: { connect: { id: proposalAuthor.id } }
         }
       },
-      reviewers: {
-        createMany: {
-          data: [
-            {
-              userId: proposalReviewer.id
-            },
-            {
-              roleId: reviewerRole.id
-            }
-          ]
+      evaluations: {
+        create: {
+          type: 'pass_fail',
+          index: 0,
+          title: 'pass/fail'
         }
       }
     },
     include: {
-      page: true
+      page: true,
+      evaluations: true
     }
-  })) as ProposalWithDetails;
+  })) as ProposalWithDetails & { evaluations: { id: string }[] };
+
+  await prisma.proposalReviewer.createMany({
+    data: [
+      {
+        evaluationId: proposal.evaluations[0].id,
+        proposalId: proposal.id,
+        userId: proposalReviewer.id
+      },
+      {
+        evaluationId: proposal.evaluations[0].id,
+        proposalId: proposal.id,
+        roleId: reviewerRole.id
+      }
+    ]
+  });
 
   await prisma.vote.create({
     data: {
@@ -293,7 +304,12 @@ describe('GET /api/v1/proposals', () => {
             id: proposalReviewer.id
           }
         ]),
-
+        currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
+          title: 'pass/fail',
+          type: 'pass_fail',
+          result: 'in_progress'
+        },
         title: proposal.page.title,
         status: proposal.status,
         url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
@@ -331,6 +347,12 @@ describe('GET /api/v1/proposals', () => {
             email: proposalAuthor.googleAccounts[0].email
           }
         ],
+        currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
+          title: 'pass/fail',
+          type: 'pass_fail',
+          result: 'in_progress'
+        },
         reviewers: expect.arrayContaining([
           {
             type: 'role',
@@ -363,7 +385,7 @@ describe('GET /api/v1/proposals', () => {
     const deletedProposal = await prisma.proposal.create({
       data: {
         createdBy: space2User.id,
-        status: 'discussion',
+        status: 'published',
         space: { connect: { id: space2.id } },
         page: {
           create: {
@@ -375,8 +397,7 @@ describe('GET /api/v1/proposals', () => {
             path: `proposal-${v4()}`,
             type: 'proposal',
             updatedBy: space2User.id,
-            contentText: proposalText,
-            content: {}
+            contentText: proposalText
           }
         }
       }
@@ -416,7 +437,7 @@ describe('GET /api/v1/proposals', () => {
       spaceId: secondSpace.id,
       userId: secondSpaceUser.id,
       authors: [secondSpaceUser.id],
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });

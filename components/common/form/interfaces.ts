@@ -1,9 +1,9 @@
-import type { MemberPropertyType, FormFieldType } from '@charmverse/core/prisma';
-import type { FormField, Prisma } from '@charmverse/core/prisma-client';
-import type { SxProps } from '@mui/material';
+import type { FormFieldType, MemberPropertyType } from '@charmverse/core/prisma';
+import type { FormField } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type FieldType = MemberPropertyType | FormFieldType;
@@ -14,11 +14,12 @@ export type FormFieldValue =
   | {
       content: PageContent;
       contentText: string;
-    };
+    }
+  | UploadedFileInfo;
 
-export type ControlFieldProps = {
+export type ControlFieldProps<T extends FormFieldValue = FormFieldValue> = {
   onChange?: (value: any) => void;
-  value?: FormFieldValue;
+  value?: T;
 };
 
 export type SelectFieldProps = {
@@ -39,7 +40,9 @@ export type FieldProps = {
   required?: boolean;
   helperText?: ReactNode;
   description?: PageContent;
-  endAdornment?: ReactNode;
+  labelEndAdornment?: ReactNode;
+  inputEndAdornment?: ReactNode;
+  inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 } & SelectFieldProps;
 
 export type FormFieldInput = Pick<

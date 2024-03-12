@@ -1,57 +1,40 @@
-import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import { Box } from '@mui/material';
-import { useEffect, useState } from 'react';
 
-import { useGetIsReviewer, useUpdateProposal } from 'charmClient/hooks/proposals';
-import { useProposals } from 'components/proposals/hooks/useProposals';
-import { useProposalTemplateById } from 'components/proposals/hooks/useProposalTemplates';
+import { useUpdateProposal, useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMdScreen } from 'hooks/useMediaScreens';
-import { useUser } from 'hooks/useUser';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-
-import { CreateLensPublication } from './CreateLensPublication';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 
 interface ProposalPropertiesProps {
   readOnly?: boolean;
-  enableSidebar?: boolean;
   pageId: string;
   proposalId: string;
-  pagePermissions?: PagePermissionFlags;
-  openEvaluation?: (evaluationId?: string) => void;
   proposalPage: PageWithContent;
   proposal?: ProposalWithUsersAndRubric;
   refreshProposal: VoidFunction;
 }
-
 export function ProposalProperties({
-  enableSidebar,
-  pagePermissions,
   pageId,
   proposalId,
   readOnly,
-  openEvaluation,
   proposalPage,
   proposal,
   refreshProposal
 }: ProposalPropertiesProps) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
-  const { user } = useUser();
-  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
-  const { mutateProposals } = useProposals();
+  const { showError } = useSnackbar();
+  const { data: sourceTemplate } = useGetProposalTemplate(proposal?.page?.sourceTemplateId);
 
-  const isMdScreen = useMdScreen();
-  const sourceTemplate = useProposalTemplateById(proposal?.page?.sourceTemplateId);
-
-  const { data: isReviewer } = useGetIsReviewer(pageId || undefined);
   const isAdmin = useIsAdmin();
 
   // further restrict readOnly if user cannot update proposal properties specifically
-  const readOnlyProperties = readOnly || !(pagePermissions?.edit_content || isAdmin);
+  const readOnlyProperties = readOnly || !proposal?.permissions.edit;
+  const readOnlySelectedCredentialTemplates =
+    readOnly || !proposal?.permissions.edit || (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -67,34 +50,23 @@ export function ProposalProperties({
       : [];
 
   const proposalFormInputs: ProposalPropertiesInput = {
-    evaluationType: proposal?.evaluationType || 'vote',
+    createdAt: proposalPage.createdAt.toString(),
+    archived: proposal?.archived ?? false,
     authors: proposal?.authors.map((author) => author.userId) ?? [],
     evaluations: proposal?.evaluations ?? [],
-    publishToLens: proposal ? proposal.publishToLens ?? false : !!user?.publishToLensDefault,
-    reviewers:
-      proposal?.reviewers.map((reviewer) => ({
-        group: reviewer.roleId ? 'role' : 'user',
-        id: reviewer.roleId ?? (reviewer.userId as string)
-      })) ?? [],
     type: proposalPage.type,
-    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} }
+    fields: typeof proposal?.fields === 'object' && !!proposal?.fields ? proposal.fields : { properties: {} },
+    selectedCredentialTemplates: proposal?.selectedCredentialTemplates
   };
 
-  async function onChangeProperties(values: Partial<ProposalPropertiesInput>) {
-    await updateProposal(values);
-    refreshProposal();
-    mutateProposals();
-  }
-
-  const canSeeEvaluation =
-    (proposal?.status === 'evaluation_active' || proposal?.status === 'evaluation_closed') && isReviewer;
-
-  // open the rubric sidebar by default
-  useEffect(() => {
-    if (enableSidebar && canSeeEvaluation && !isMdScreen) {
-      openEvaluation?.();
+  async function onChangeProperties(values: Omit<UpdateProposalRequest, 'proposalId'>) {
+    try {
+      await updateProposal(values);
+      refreshProposal();
+    } catch (error) {
+      showError(error);
     }
-  }, [canSeeEvaluation]);
+  }
 
   return (
     <Box
@@ -108,34 +80,19 @@ export function ProposalProperties({
     >
       <div className='octo-propertylist'>
         <ProposalPropertiesBase
-          proposalLensLink={proposal?.lensPostLink ?? undefined}
           proposalStatus={proposal?.status}
           pageId={pageId}
           proposalId={proposalId}
-          readOnlyAuthors={readOnlyProperties}
+          readOnlyAuthors={readOnlyProperties ?? !!sourceTemplate?.authors.length}
           proposalFormInputs={proposalFormInputs}
           setProposalFormInputs={onChangeProperties}
-          isPublishingToLens={isPublishingToLens}
           readOnlyCustomProperties={readOnlyCustomProperties}
-          isReviewer={isReviewer}
+          readOnlyRewards={!proposal?.permissions.edit}
           rewardIds={proposal?.rewardIds}
+          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
+          isStructuredProposal={!!proposal?.formId}
+          isProposalTemplate={proposalPage.type === 'proposal_template'}
         />
-        {isPublishingToLens && (
-          <CreateLensPublication
-            onError={() => {
-              setIsPublishingToLens(false);
-            }}
-            publicationType='post'
-            content={proposalPage.content as PageContent}
-            proposalId={proposalId}
-            proposalPath={proposalPage.path}
-            onSuccess={async () => {
-              await refreshProposal();
-              setIsPublishingToLens(false);
-            }}
-            proposalTitle={proposalPage.title}
-          />
-        )}
       </div>
     </Box>
   );

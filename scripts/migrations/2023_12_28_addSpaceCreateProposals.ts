@@ -1,5 +1,6 @@
-import { ProposalCategoryPermissionLevel, SpacePermission, prisma } from "@charmverse/core/prisma-client";
-import { paginatedPrismaTask } from "lib/utilities/paginatedPrismaTask";
+// @ts-nocheck
+import { ProposalCategoryPermissionLevel, SpacePermission, prisma } from '@charmverse/core/prisma-client';
+import { paginatedPrismaTask } from 'lib/utils/paginatedPrismaTask';
 
 const permissionsAllowingCreate: ProposalCategoryPermissionLevel[] = ['full_access', 'create_comment'];
 
@@ -18,16 +19,21 @@ async function addSpaceCreateProposals() {
   });
 
   for (const space of spaces) {
+    const spaceWidePermissions = space.spacePermissions.find((p) => !!p.spaceId) as SpacePermission;
 
-    const spaceWidePermissions = space.spacePermissions.find(p => !!p.spaceId) as SpacePermission;
+    const spaceProposalCategoryPermissions = space.proposalCategories
+      .flatMap((category) => category.proposalCategoryPermissions)
+      .flat();
 
-    const spaceProposalCategoryPermissions = space.proposalCategories.flatMap(category => category.proposalCategoryPermissions).flat();
+    const spaceHasCategoryWithCreatePermission = spaceProposalCategoryPermissions.some(
+      (permission) => permission.spaceId && permissionsAllowingCreate.includes(permission.permissionLevel)
+    );
 
-    const spaceHasCategoryWithCreatePermission = spaceProposalCategoryPermissions.some(permission => permission.spaceId && permissionsAllowingCreate.includes(permission.permissionLevel));
+    const roleIdsWithCreatePermission = spaceProposalCategoryPermissions
+      .filter((permission) => !!permission.roleId && permissionsAllowingCreate.includes(permission.permissionLevel))
+      .map((permission) => permission.roleId as string);
 
-    const roleIdsWithCreatePermission = spaceProposalCategoryPermissions.filter(permission => !!permission.roleId && permissionsAllowingCreate.includes(permission.permissionLevel)).map(permission => permission.roleId as string);
-
-    await prisma.$transaction(async tx => {
+    await prisma.$transaction(async (tx) => {
       if (spaceHasCategoryWithCreatePermission && !spaceWidePermissions.operations.includes('createProposals')) {
         await tx.spacePermission.update({
           where: {
@@ -36,11 +42,11 @@ async function addSpaceCreateProposals() {
           data: {
             operations: [...spaceWidePermissions.operations, 'createProposals']
           }
-        })
+        });
       }
-  
+
       for (const roleId of roleIdsWithCreatePermission) {
-        const roleSpacePermission = space.spacePermissions.find(permission => permission.roleId === roleId);
+        const roleSpacePermission = space.spacePermissions.find((permission) => permission.roleId === roleId);
         if (!roleSpacePermission?.operations.includes('createProposals')) {
           await tx.spacePermission.upsert({
             where: {
@@ -50,8 +56,8 @@ async function addSpaceCreateProposals() {
               }
             },
             create: {
-              forSpace: {connect: {id: space.id}},
-              role: {connect: {id: roleId}},
+              forSpace: { connect: { id: space.id } },
+              role: { connect: { id: roleId } },
               operations: [...spaceWidePermissions.operations, 'createProposals']
             },
             update: {
@@ -59,9 +65,9 @@ async function addSpaceCreateProposals() {
                 push: 'createProposals'
               }
             }
-          })
+          });
         }
       }
-    })
+    });
   }
 }

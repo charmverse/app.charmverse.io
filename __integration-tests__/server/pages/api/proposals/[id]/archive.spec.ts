@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 import type { Proposal, User } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
+import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
@@ -30,28 +30,34 @@ describe('POST /api/proposals/[id]/archive - Archive and unarchive proposal', ()
   it('should allow a user with permissions to archive the proposal and return 200', async () => {
     const authorCookie = await loginUser(author.id);
 
-    const archivedProposal = (
-      await request(baseUrl)
-        .post(`/api/proposals/${proposal.id}/archive`)
-        .set('Cookie', authorCookie)
-        .send({
-          archived: true
-        })
-        .expect(200)
-    ).body as ProposalWithUsers;
+    await request(baseUrl)
+      .post(`/api/proposals/${proposal.id}/archive`)
+      .set('Cookie', authorCookie)
+      .send({
+        archived: true
+      })
+      .expect(200);
+
+    const archivedProposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposal.id
+      }
+    });
 
     expect(archivedProposal.archived).toBe(true);
 
-    const unarchivedProposal = (
-      await request(baseUrl)
-        .post(`/api/proposals/${proposal.id}/archive`)
-        .set('Cookie', authorCookie)
-        .send({
-          archived: false
-        })
-        .expect(200)
-    ).body as ProposalWithUsers;
-
+    await request(baseUrl)
+      .post(`/api/proposals/${proposal.id}/archive`)
+      .set('Cookie', authorCookie)
+      .send({
+        archived: false
+      })
+      .expect(200);
+    const unarchivedProposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposal.id
+      }
+    });
     expect(unarchivedProposal.archived).toBe(false);
   });
   it('should not allow a user without permissions to archive the proposal, responding with 401', async () => {

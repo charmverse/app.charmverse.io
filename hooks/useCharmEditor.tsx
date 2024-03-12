@@ -49,11 +49,7 @@ const defaultProps = {
   printRef: null
 };
 
-const CharmEditorContext = createContext<Readonly<CharmEditorContextWithSetter>>({
-  ...defaultProps,
-  setPageProps: () => {},
-  resetPageProps: () => {}
-});
+const CharmEditorContext = createContext<Readonly<CharmEditorContextWithSetter | null>>(null);
 
 export function CharmEditorProvider({ children }: { children: ReactNode }) {
   const [props, _setPageProps] = useState<CharmEditorContext>(defaultProps);
@@ -78,4 +74,10 @@ export function CharmEditorProvider({ children }: { children: ReactNode }) {
   return <CharmEditorContext.Provider value={value}>{children}</CharmEditorContext.Provider>;
 }
 
-export const useCharmEditor = () => useContext(CharmEditorContext);
+export const useCharmEditor = () => {
+  const context = useContext(CharmEditorContext);
+  if (!context) {
+    throw new Error('useCharmEditor must be used within a CharmEditorProvider');
+  }
+  return context;
+};

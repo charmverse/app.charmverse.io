@@ -3,8 +3,8 @@ import type { SxProps, Theme } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import React from 'react';
 
-import { stringToColor } from 'lib/utilities/strings';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { stringToColor } from 'lib/utils/strings';
+import { replaceS3Domain } from 'lib/utils/url';
 
 export type AvatarSize = 'xSmall' | 'small' | 'medium' | 'large' | 'xLarge' | '2xLarge' | '3xLarge';
 export type AvatarVariant = 'circular' | 'rounded' | 'square';

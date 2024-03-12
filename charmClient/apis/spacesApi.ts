@@ -3,9 +3,10 @@ import type { Space, Prisma } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
-import type { CustomDomainVerification, SpaceWithGates } from 'lib/spaces/interfaces';
+import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
+import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
 import type { UpdateCustomDomainResponse } from 'lib/spaces/updateSpaceCustomDomain';
 import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
@@ -17,12 +18,18 @@ export class SpacesApi {
   }
 
   searchByName(search: string) {
-    return http.GET<SpaceWithGates[]>('/api/spaces/search-name', { search });
+    return http.GET<Space[]>('/api/spaces/search-name', { search });
   }
 
   setPublicProposals({ publicProposals, spaceId }: SpacePublicProposalToggle): Promise<Space> {
     return http.POST<Space>(`/api/spaces/${spaceId}/set-public-proposals`, {
       publicProposals
+    });
+  }
+
+  setPublicProposalTemplates({ publicProposalTemplates, spaceId }: SpacePublicProposalTemplatesToggle): Promise<Space> {
+    return http.POST<Space>(`/api/spaces/${spaceId}/set-public-proposal-templates`, {
+      publicProposalTemplates
     });
   }
 
@@ -58,10 +65,7 @@ export class SpacesApi {
     return http.GET<CheckDomainResponse>('/api/spaces/checkDomain', params);
   }
 
-  updateSnapshotConnection(
-    spaceId: string,
-    data: Pick<Space, 'snapshotDomain' | 'defaultVotingDuration'>
-  ): Promise<Space> {
+  updateSnapshotConnection(spaceId: string, data: Pick<Space, 'snapshotDomain'>): Promise<Space> {
     return http.PUT(`/api/spaces/${spaceId}/snapshot`, data);
   }
 
@@ -86,10 +90,6 @@ export class SpacesApi {
       count: number;
       additionalQuota: number;
     }>(`/api/spaces/${spaceId}/block-count`);
-  }
-
-  updateCustomDomain({ spaceId, customDomain }: { spaceId: string; customDomain: string | null }) {
-    return http.PUT<UpdateCustomDomainResponse>(`/api/spaces/${spaceId}/custom-domain`, { customDomain });
   }
 
   verifyCustomDomain(spaceId: string) {

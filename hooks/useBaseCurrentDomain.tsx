@@ -1,13 +1,13 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 import { useMemo, createContext, useContext, useState, useEffect } from 'react';
 
 import { useSearchByDomain } from 'charmClient/hooks/spaces';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 
 export type IBaseCurrentDomainContext = {
   isSpaceLoading: boolean;
-  spaceFromPath?: SpaceWithGates | null;
+  spaceFromPath?: Space | null;
   customDomain?: string | null;
 };
 

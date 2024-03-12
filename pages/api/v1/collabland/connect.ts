@@ -25,7 +25,7 @@ async function connectSpaceHandler(req: NextApiRequest, res: NextApiResponse<Spa
   const { state, discordServerId } = req.body as { state: string; discordServerId: string };
 
   const connectedSpace = await connectSpace({ state, discordServerId });
-  log.info('Connected space to Collab.land', { spaceId: connectedSpace.id, discordServerId });
+  log.info('Connected space to Collab.Land', { spaceId: connectedSpace.id, discordServerId });
 
   return res.status(201).json(connectedSpace);
 }

@@ -3,7 +3,7 @@ import type { User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { MissingDataError } from 'lib/utilities/errors';
+import { MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from './getUser';

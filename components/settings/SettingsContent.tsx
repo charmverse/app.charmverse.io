@@ -7,27 +7,30 @@ import Box from '@mui/material/Box';
 import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import type { SyntheticEvent, ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/components/SidebarButton';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
+import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import type { SettingsPath } from 'hooks/useSettingsDialog';
+import { useSettingsDialog, type SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
+import { useUser } from 'hooks/useUser';
 import type { Feature } from 'lib/features/constants';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { AccountSettings } from './account/AccountSettings';
 import { ApiSettings } from './api/ApiSettings';
-import type { SpaceSettingsTab, UserSettingsTab } from './config';
+import type { SpaceSettingsTab } from './config';
 import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
+import { SpaceCredentialSettings } from './credentials/SpaceCredentialSettings';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
-import ProfileSettings from './profile/ProfileSettings';
 import { SpaceProposalSettings } from './proposals/SpaceProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
@@ -41,11 +44,6 @@ type TabPanelProps = BoxProps & {
   value: string;
 };
 
-const accountTabs: Record<UserSettingsTab['path'], typeof ProfileSettings> = {
-  account: AccountSettings,
-  profile: ProfileSettings
-};
-
 const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   api: ApiSettings,
   import: ImportSettings,
@@ -53,11 +51,13 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   roles: RoleSettings,
   subscription: SubscriptionSettings,
   space: SpaceSettings,
-  proposals: SpaceProposalSettings
+  proposals: SpaceProposalSettings,
+  credentials: SpaceCredentialSettings
 };
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
+  const spaceStyles = value === 'space' ? { p: 0 } : undefined;
 
   return (
     <Box
@@ -67,7 +67,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`vertical-tab-${index}`}
       {...other}
     >
-      {value === index && <DialogContent>{children}</DialogContent>}
+      {value === index && <DialogContent sx={{ overflowY: 'visible', ...spaceStyles }}>{children}</DialogContent>}
     </Box>
   );
 }
@@ -84,11 +84,14 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const isMobile = useSmallScreen();
   const { memberSpaces } = useSpaces();
   const { mappedFeatures } = useSpaceFeatures();
-
+  const { user } = useUser();
   const isSpaceSettingsVisible = !!memberSpaces.find((s) => s.name === currentSpace?.name);
 
   const { subscriptionEnded, hasPassedBlockQuota } = useSpaceSubscription();
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
+  const { showUserProfile } = useMemberProfileDialog();
+  const { onClose: closeSettingsDialog } = useSettingsDialog();
+
   return (
     <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
@@ -107,9 +110,18 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         {ACCOUNT_TABS.map((tab) => (
           <SidebarLink
             key={tab.path}
+            data-test={`space-settings-tab-${tab.path}`}
             label={tab.label}
             icon={tab.icon}
-            onClick={() => onSelectPath(tab.path)}
+            onClick={() => {
+              if (user && tab.path === 'profile') {
+                closeSettingsDialog();
+                showUserProfile(user.id);
+                return null;
+              } else {
+                onSelectPath(tab.path);
+              }
+            }}
             active={activePath === tab.path}
           />
         ))}
@@ -182,10 +194,9 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
           </Box>
         )}
         {ACCOUNT_TABS.map((tab) => {
-          const TabView = accountTabs[tab.path];
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-              <TabView setUnsavedChanges={setUnsavedChanges} />
+              {tab.path === 'account' ? <AccountSettings /> : tab.path === 'charms' ? <CharmsSettings /> : null}
             </TabPanel>
           );
         })}

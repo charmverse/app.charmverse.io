@@ -242,7 +242,6 @@ export function getNotificationMetadata({
   pageTitle: string;
 } {
   const href = getNotificationUrl(notification);
-  const { mappedFeatures } = constructFeaturesRecord(spaceFeatures);
 
   try {
     switch (notification.group) {
@@ -251,10 +250,7 @@ export function getNotificationMetadata({
           content: getRewardContent({
             notification: notification as BountyNotification,
             authorUsername: actorUsername,
-            rewardTitle: getFeatureTitle({
-              featureTitle: 'reward',
-              mappedFeatures
-            })
+            rewardTitle: getFeatureTitle('reward', spaceFeatures)
           }),
           href,
           pageTitle: notification.pageTitle

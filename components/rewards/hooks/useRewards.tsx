@@ -50,9 +50,19 @@ export function RewardsProvider({ children }: { children: ReactNode }) {
   const updateReward = useCallback(
     async (rewardUpdate: RewardUpdate) => {
       if (rewardUpdate) {
-        await charmClient.rewards.updateReward(rewardUpdate);
+        const updated = await charmClient.rewards.updateReward(rewardUpdate);
 
-        mutateRewards();
+        mutateRewards(
+          (rData) => {
+            return rData?.map((reward) => {
+              if (reward.id === updated.id) {
+                return updated;
+              }
+              return reward;
+            });
+          },
+          { revalidate: false }
+        );
       }
     },
     [mutateRewards]

@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { updateMemberRolesFromDiscord } from 'lib/discord/collabland/updateMemberRolesFromDiscord';
 import { upsertSpaceRolesFromDiscord } from 'lib/discord/collabland/upsertSpaceRolesFromDiscord';
 import { mapSpace } from 'lib/public-api/createWorkspaceApi';
-import { decryptData } from 'lib/utilities/dataEncryption';
+import { decryptData } from 'lib/utils/dataEncryption';
 
 import { createAndAssignCollablandRoles } from './assignRolesCollabland';
 import { getDiscordUserState } from './collablandClient';

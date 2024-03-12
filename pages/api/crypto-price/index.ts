@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { pricingGetter } from 'lib/crypto-price/getters';
 import { onError, onNoMatch } from 'lib/middleware';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

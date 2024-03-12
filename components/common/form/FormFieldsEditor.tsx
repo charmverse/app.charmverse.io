@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Stack } from '@mui/material';
-import { useRef, useEffect, useState } from 'react';
+import { Stack } from '@mui/material';
+import debounce from 'lodash/debounce';
+import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
@@ -14,52 +15,44 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 import type { FormFieldInput } from './interfaces';
 
-export function ControlledFormFieldsEditor({
-  formFields,
-  setFormFields,
-  collapsedFieldIds,
-  toggleCollapse
-}: {
-  formFields: FormFieldInput[];
-  setFormFields: (updatedFormFields: FormFieldInput[]) => void;
-  collapsedFieldIds: string[];
-  toggleCollapse: (fieldId: string) => void;
-}) {
-  return (
-    <FormFieldsEditorBase
-      collapsedFieldIds={collapsedFieldIds}
-      formFields={formFields}
-      setFormFields={setFormFields}
-      toggleCollapse={toggleCollapse}
-    />
-  );
-}
-
 export function FormFieldsEditor({
   proposalId,
   formFields: initialFormFields,
-  readOnly,
-  refreshProposal
+  readOnly
 }: {
   proposalId: string;
   formFields: FormFieldInput[];
   readOnly?: boolean;
-  refreshProposal: VoidFunction;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
   const { trigger } = useUpdateProposalFormFields({ proposalId });
-  const saveFormFields = async () => {
-    await trigger({ formFields });
-    refreshProposal?.();
-  };
+  const { showError } = useSnackbar();
+  const debouncedUpdate = useMemo(() => {
+    return debounce(trigger, 500);
+  }, [trigger]);
+
+  async function updateFormFields(_formFields: FormFieldInput[]) {
+    if (readOnly) {
+      return;
+    }
+    const errors = checkFormFieldErrors(_formFields);
+    setFormFields(_formFields);
+    if (errors) {
+      return;
+    }
+    try {
+      await debouncedUpdate({ formFields: _formFields });
+    } catch (error) {
+      showError(error, 'Error saving form fields');
+    }
+  }
 
   return (
-    <FormFieldsEditorBase
+    <ControlledFormFieldsEditor
       collapsedFieldIds={collapsedFieldIds}
       formFields={formFields}
-      onSave={saveFormFields}
-      setFormFields={setFormFields}
+      setFormFields={updateFormFields}
       toggleCollapse={(fieldId) => {
         if (collapsedFieldIds.includes(fieldId)) {
           setCollapsedFieldIds(collapsedFieldIds.filter((id) => id !== fieldId));
@@ -72,24 +65,19 @@ export function FormFieldsEditor({
   );
 }
 
-function FormFieldsEditorBase({
+export function ControlledFormFieldsEditor({
   formFields,
   setFormFields,
   collapsedFieldIds,
   toggleCollapse,
-  onSave,
   readOnly
 }: {
   formFields: FormFieldInput[];
   setFormFields: (updatedFormFields: FormFieldInput[]) => void;
   collapsedFieldIds: string[];
   toggleCollapse: (fieldId: string) => void;
-  onSave?: VoidFunction | (() => Promise<void>);
   readOnly?: boolean;
 }) {
-  const [isFormDirty, setIsFormDirty] = useState(false);
-  const [isUpdatingFormFields, setIsUpdatingFormFields] = useState(false);
-  const { showMessage } = useSnackbar();
   // Using a ref to keep the formFields state updated, since it becomes stale inside the functions
   const formFieldsRef = useRef(formFields);
   const lastInsertedIndexRef = useRef<number | undefined>(undefined);
@@ -127,20 +115,6 @@ function FormFieldsEditorBase({
         index
       }))
     );
-    setIsFormDirty(true);
-  }
-
-  async function saveFormFields() {
-    setIsUpdatingFormFields(true);
-    try {
-      await onSave?.();
-      showMessage('Form fields saved successfully');
-    } catch (_) {
-      //
-    } finally {
-      setIsFormDirty(false);
-      setIsUpdatingFormFields(false);
-    }
   }
 
   function addNewFormField() {
@@ -186,9 +160,7 @@ function FormFieldsEditorBase({
   }
 
   function deleteFormField(fieldId: string) {
-    const index = formFields.findIndex((f) => f.id === fieldId);
-    const newFormFields = [...formFields];
-    newFormFields.splice(index, 1);
+    const newFormFields = formFields.filter((field) => field.id !== fieldId);
     setFormFields(
       newFormFields.map((formField, i) => ({
         ...formField,
@@ -227,10 +199,6 @@ function FormFieldsEditorBase({
     newFormFields[index].options = newOptions;
     setFormFields(newFormFields);
   }
-
-  const saveButtonDisabledTooltip = !isFormDirty
-    ? 'Please edit the form before saving'
-    : checkFormFieldErrors(formFields);
 
   return (
     <Stack gap={1}>
@@ -274,23 +242,6 @@ function FormFieldsEditorBase({
         >
           Add an input
         </Button>
-      )}
-      {formFields.length !== 0 && onSave && !readOnly && (
-        <Box
-          sx={{
-            width: 'fit-content'
-          }}
-        >
-          <Button
-            data-test='form-fields-save-button'
-            onClick={saveFormFields}
-            disabledTooltip={saveButtonDisabledTooltip}
-            loading={isUpdatingFormFields}
-            disabled={!!saveButtonDisabledTooltip}
-          >
-            Save
-          </Button>
-        </Box>
       )}
     </Stack>
   );

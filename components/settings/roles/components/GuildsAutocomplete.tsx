@@ -1,23 +1,35 @@
 import { stringUtils } from '@charmverse/core/utilities';
-import type { GetGuildResponse } from '@guildxyz/sdk';
+import type { Guild } from '@guildxyz/types';
 import { Avatar, Box, ListItem, ListItemIcon, ListItemText, MenuItem } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
 import * as React from 'react';
 import { VariableSizeList } from 'react-window';
 
+import { guild as guildSDK } from 'lib/guild-xyz/client';
+
 const LISTBOX_PADDING = 8;
 
-type ItemData = [React.HTMLAttributes<HTMLLIElement>, GetGuildResponse];
+type ItemData = [React.HTMLAttributes<HTMLLIElement>, Guild];
 
-function renderRow(props: { data: ItemData[]; index: number; style: React.CSSProperties }) {
+function GuildRow(props: { data: ItemData[]; index: number; style: React.CSSProperties }) {
   const { data, index, style } = props;
   const [itemProps, guild] = data[index];
+  const [roles, setRoles] = useState<number[] | null>(null);
   const inlineStyle = {
     ...style,
     top: Number(style.top) + LISTBOX_PADDING
   };
+
+  useEffect(() => {
+    async function main() {
+      const result = await guildSDK.role.getAll(guild.id);
+      setRoles(result.map((r) => r.id));
+    }
+    main();
+  }, []);
 
   return (
     <ListItem
@@ -63,9 +75,11 @@ function renderRow(props: { data: ItemData[]; index: number; style: React.CSSPro
             </ListItemText>
           </Box>
           <Box display='flex' gap={1}>
-            <Typography variant='subtitle2' color='secondary'>
-              {guild.roles.length} {stringUtils.conditionalPlural({ count: guild.roles.length, word: 'Role' })}
-            </Typography>
+            {roles && (
+              <Typography variant='subtitle2' color='secondary'>
+                {roles.length} {stringUtils.conditionalPlural({ count: roles.length, word: 'Role' })}
+              </Typography>
+            )}
           </Box>
         </MenuItem>
       </Box>
@@ -119,7 +133,7 @@ const ListboxComponent = React.forwardRef<HTMLDivElement, { children: ItemData[]
           overscanCount={5}
           itemCount={itemCount}
         >
-          {renderRow}
+          {(_props) => <GuildRow {..._props} />}
         </VariableSizeList>
       </OuterElementContext.Provider>
     </div>
@@ -135,10 +149,10 @@ export default function GuildsAutocomplete({
   disabled: boolean;
   onChange: (guildIds: number[]) => void;
   selectedGuildIds: number[];
-  guilds: GetGuildResponse[];
+  guilds: Guild[];
 }) {
   const guildRecord = React.useMemo(() => {
-    return guilds.reduce<Record<string, GetGuildResponse>>(
+    return guilds.reduce<Record<string, Guild>>(
       (record, guild) => ({
         ...record,
         [guild.name]: guild,

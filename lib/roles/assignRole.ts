@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { InvalidStateError } from 'lib/middleware';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, InsecureOperationError, UndesirableOperationError } from 'lib/utils/errors';
 
 import type { RoleAssignment } from './interfaces';
 import { listRoleMembers } from './listRoleMembers';

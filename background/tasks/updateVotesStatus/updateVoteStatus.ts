@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { isTruthy } from 'lib/utilities/types';
+import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
+import { isTruthy } from 'lib/utils/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -60,17 +61,6 @@ const updateVoteStatus = async () => {
         status: 'Rejected'
       }
     }),
-    // update proposals
-    prisma.proposal.updateMany({
-      where: {
-        id: {
-          in: proposalPageIds
-        }
-      },
-      data: {
-        status: 'vote_closed'
-      }
-    }),
     prisma.proposalEvaluation.updateMany({
       where: {
         id: {
@@ -109,6 +99,13 @@ const updateVoteStatus = async () => {
       return Promise.resolve();
     })
   ]);
+
+  for (const passedEval of passedEvaluations) {
+    await issueProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: passedEval.proposalId
+    });
+  }
 
   return votesPassedDeadline.length;
 };

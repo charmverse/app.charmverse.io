@@ -1,16 +1,18 @@
 import { Add } from '@mui/icons-material';
-import { Typography, Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { Dispatch, LegacyRef, ReactNode, SetStateAction } from 'react';
-import React, { forwardRef, useCallback, useMemo, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectionContext, useAreaSelection } from 'hooks/useAreaSelection';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
-import type { IPropertyOption, IPropertyTemplate, Board, BoardGroup } from 'lib/focalboard/board';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import { createBoardView } from 'lib/focalboard/boardView';
-import type { CardPage, Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 
 import mutator from '../../mutator';
@@ -45,6 +47,9 @@ type Props = {
   subRowsEmptyValueContent?: React.ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
+  boardType?: 'proposals' | 'rewards';
+  hideCalculations?: boolean;
 };
 
 const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>(({ children }, ref) => {
@@ -78,13 +83,23 @@ function Table(props: Props): JSX.Element {
     rowExpansionLocalStoragePrefix,
     subRowsEmptyValueContent,
     setCheckedIds,
-    checkedIds
+    checkedIds,
+    setSelectedPropertyId,
+    boardType
   } = props;
-  const isManualSort = activeView.fields.sortOptions?.length === 0;
   const dispatch = useAppDispatch();
   const selectContainerRef = useRef<HTMLDivElement | null>(null);
-  const areaSelection = useAreaSelection({ readOnly, container: selectContainerRef });
+  const tableContainerRef = useRef<HTMLDivElement | null>(null);
+  const areaSelection = useAreaSelection({ readOnly, innerContainer: tableContainerRef });
   const { resetState } = areaSelection;
+  const { showConfirmation } = useConfirmationModal();
+  const localViewSettings = useLocalDbViewSettings(activeView.id);
+
+  useEffect(() => {
+    if (!tableContainerRef.current) {
+      tableContainerRef.current = document.querySelector('.drag-area-container');
+    }
+  }, []);
 
   useKeydownPress(
     () => {
@@ -190,79 +205,109 @@ function Table(props: Props): JSX.Element {
     [activeView, visibleGroups]
   );
 
+  const changeCardGroupProperty = async (srcCard: Card, groupID: string) => {
+    const { selectedCardIds } = props;
+    const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
+    const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
+    const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
+      acc[card.card.id] = card.card;
+      return acc;
+    }, {});
+    const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
+
+    const awaits = [];
+    for (const draggedCard of draggedCards) {
+      Utils.log(`draggedCard: ${draggedCard.title}, column: ${draggedCard.fields.properties}`);
+      Utils.log(`droppedColumn:  ${groupID}`);
+      const oldOptionId = draggedCard.fields.properties[groupByProperty!.id];
+      Utils.log(`ondrop. oldValue: ${oldOptionId}`);
+
+      if (groupID !== oldOptionId) {
+        awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, groupID, description));
+      }
+    }
+
+    if (awaits.length) {
+      await Promise.all(awaits);
+    }
+  };
+
   const onDropToGroup = useCallback(
-    (srcCard: Card, groupID: string, dstCardID: string) => {
+    async (srcCard: Card, groupID: string, dstCardID: string) => {
       Utils.log(`onDropToGroup: ${srcCard.title}`);
       const { selectedCardIds } = props;
-
       const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
       const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
-
-      if (activeView.fields.groupById !== undefined) {
-        const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
-          acc[card.card.id] = card.card;
-          return acc;
-        }, {});
-        const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
-
-        mutator.performAsUndoGroup(async () => {
-          // Update properties of dragged cards
-          const awaits = [];
-          for (const draggedCard of draggedCards) {
-            Utils.log(`draggedCard: ${draggedCard.title}, column: ${draggedCard.fields.properties}`);
-            Utils.log(`droppedColumn:  ${groupID}`);
-            const oldOptionId = draggedCard.fields.properties[groupByProperty!.id];
-            Utils.log(`ondrop. oldValue: ${oldOptionId}`);
-
-            if (groupID !== oldOptionId) {
-              awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, groupID, description));
-            }
-          }
-          await Promise.all(awaits);
-        });
+      const hasSort = activeView.fields.sortOptions?.length !== 0;
+      if (activeView.fields.groupById !== undefined && groupByProperty && !hasSort) {
+        await changeCardGroupProperty(srcCard, groupID);
       }
 
-      // Update dstCard order
-      if (isManualSort) {
-        let cardOrder = Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
-        if (dstCardID) {
-          const isDraggingDown = cardOrder.indexOf(srcCard.id) <= cardOrder.indexOf(dstCardID);
-          cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
-          let destIndex = cardOrder.indexOf(dstCardID);
-          if (isDraggingDown) {
-            destIndex += 1;
-          }
-          cardOrder.splice(destIndex, 0, ...draggedCardIds);
-        } else {
-          // Find index of first group item
-          const firstCard = cardPages.find(
-            ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
-          );
-          if (firstCard) {
-            const destIndex = cardOrder.indexOf(firstCard.card.id);
-            cardOrder.splice(destIndex, 0, ...draggedCardIds);
-          } else {
-            // if not found, this is the only item in group.
-            return;
+      let cardOrder = hasSort
+        ? cardPages.map((o) => o.card.id)
+        : Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
+
+      const destIndex = cardOrder.indexOf(dstCardID);
+      cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
+
+      if (hasSort) {
+        const { confirmed, cancelled } = await showConfirmation({
+          message: 'Would you like to remove sorting?'
+        });
+
+        if (confirmed && localViewSettings) {
+          await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
+          localViewSettings.setLocalSort(null);
+          if (activeView.fields.groupById !== undefined && groupByProperty) {
+            await changeCardGroupProperty(srcCard, groupID);
           }
         }
 
-        mutator.performAsUndoGroup(async () => {
-          await mutator.changeViewCardOrder(activeView, cardOrder, description);
-        });
+        if (cancelled) {
+          return;
+        }
       }
+
+      // Update dstCard order
+      if (dstCardID) {
+        cardOrder.splice(destIndex, 0, ...draggedCardIds);
+      } else {
+        // Find index of first group item
+        const firstCard = cardPages.find(
+          ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
+        );
+        if (firstCard) {
+          cardOrder.splice(cardOrder.indexOf(firstCard.card.id), 0, ...draggedCardIds);
+        } else {
+          // if not found, this is the only item in group.
+          return;
+        }
+      }
+
+      await mutator.performAsUndoGroup(async () => {
+        await mutator.changeViewCardOrder(
+          hasSort
+            ? {
+                ...activeView,
+                fields: {
+                  ...activeView.fields,
+                  sortOptions: []
+                }
+              }
+            : activeView,
+          cardOrder,
+          description
+        );
+      });
     },
-    [activeView, cardPages, props.selectedCardIds, groupByProperty]
+    [cardPages, props.selectedCardIds, groupByProperty]
   );
 
-  const onDropToCard = useCallback(
-    (srcCard: Card, dstCard: Card) => {
-      Utils.log(`onDropToCard: ${dstCard.title}`);
-      onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
-      resetState();
-    },
-    [activeView]
-  );
+  const onDropToCard = async (srcCard: Card, dstCard: Card) => {
+    Utils.log(`onDropToCard: ${dstCard.title}`);
+    await onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+    resetState();
+  };
 
   const propertyNameChanged = useCallback(
     async (option: IPropertyOption, text: string): Promise<void> => {
@@ -287,6 +332,8 @@ function Table(props: Props): JSX.Element {
           readOnly={props.readOnly}
           checkedIds={checkedIds}
           setCheckedIds={setCheckedIds}
+          setSelectedPropertyId={setSelectedPropertyId}
+          boardType={boardType}
         />
 
         {/* Table rows */}
@@ -370,14 +417,16 @@ function Table(props: Props): JSX.Element {
           )}
         </div>
 
-        <CalculationRow
-          board={board}
-          cards={cardPages.map((c) => c.card)}
-          activeView={activeView}
-          resizingColumn={resizingColumn}
-          offset={offset}
-          readOnly={props.readOnly}
-        />
+        {!props.hideCalculations && (
+          <CalculationRow
+            board={board}
+            cards={cardPages.map((c) => c.card)}
+            activeView={activeView}
+            resizingColumn={resizingColumn}
+            offset={offset}
+            readOnly={props.readOnly}
+          />
+        )}
       </div>
     </div>
   );

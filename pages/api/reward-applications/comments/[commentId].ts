@@ -17,18 +17,16 @@ handler.use(requireUser).put(updateApplicationCommentController).delete(deleteAp
 async function updateApplicationCommentController(req: NextApiRequest, res: NextApiResponse<ApplicationComment>) {
   const { contentText, content } = req.body as CreateApplicationCommentPayload;
   const { id: userId } = req.session.user;
-  const applicationId = req.query.applicationId as string;
   const commentId = req.query.commentId as string;
-
-  const application = await prisma.application.findFirstOrThrow({
+  const comment = await prisma.applicationComment.findFirstOrThrow({
     where: {
-      id: applicationId
+      id: commentId
     },
     select: {
       createdBy: true
     }
   });
-  if (application.createdBy !== userId) {
+  if (comment.createdBy !== userId) {
     throw new ActionNotPermittedError(`You can only edit comments you created`);
   }
   const updatedComment = await prisma.applicationComment.update({

@@ -3,6 +3,7 @@ import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';

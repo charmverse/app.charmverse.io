@@ -12,7 +12,7 @@ import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import Papa from 'papaparse';
 import type { ChangeEvent } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
@@ -26,8 +26,9 @@ import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
 import { DuplicatePageAction } from 'components/common/PageActions/components/DuplicatePageAction';
-import { useApiPageKeys } from 'hooks/useApiPageKeys';
+import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -57,7 +58,13 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   const { user } = useUser();
   const { space: currentSpace } = useCurrentSpace();
   const importConfirmationPopup = usePopupState({ variant: 'popover', popupId: 'import-confirmation-popup' });
-  const { keys } = useApiPageKeys(pageId);
+  const localViewSettings = useLocalDbViewSettings(view?.id);
+
+  useEffect(() => {
+    if (view?.id && localViewSettings?.viewId !== view?.id) {
+      localViewSettings?.setViewId(view?.id);
+    }
+  }, [localViewSettings, view?.id]);
 
   const activeBoardId = view?.fields.sourceData?.boardId ?? view?.fields.linkedSourceId ?? view?.rootId;
   const board = boards.find((b) => b.id === activeBoardId);
@@ -101,7 +108,8 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
       const exportName = `${boardPage?.title ?? 'Untitled'} database export`;
 
       const generatedZip = await charmClient.pages.exportZippedDatabasePage({
-        databaseId: pageId
+        databaseId: pageId,
+        filter: localViewSettings?.localFilters || null
       });
 
       const zipDataUrl = URL.createObjectURL(generatedZip as any);
@@ -169,12 +177,12 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
             try {
               await addNewCards({
                 board,
+                boardPageId: pageId,
                 members: membersRecord,
                 results,
                 spaceId: currentSpace.id,
                 userId: user.id,
-                views: boardViews,
-                apiPageKeys: keys
+                views: boardViews
               });
 
               const spaceId = currentSpace?.id;
@@ -199,6 +207,7 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
   return (
     <List dense>
       <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
+      <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
       <DuplicatePageAction
         onComplete={onComplete}
         pageId={pageId}

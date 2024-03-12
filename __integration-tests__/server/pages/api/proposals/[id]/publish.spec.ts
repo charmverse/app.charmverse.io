@@ -1,10 +1,12 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { createProposalWithUsers, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 let author: User;
 let reviewer: User;
@@ -30,11 +32,9 @@ beforeAll(async () => {
 
 describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
   it('should allow an admin to update the proposal status and return 200', async () => {
-    const proposal = await createProposalWithUsers({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: author.id,
-      authors: [],
-      reviewers: [reviewer.id]
+      userId: author.id
     });
 
     const adminUser = await generateSpaceUser({ spaceId: space.id, isAdmin: true });
@@ -44,13 +44,6 @@ describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
   });
 
   it("should throw error and return 404 if the proposal doesn't exist", async () => {
-    await createProposalWithUsers({
-      spaceId: space.id,
-      userId: author.id,
-      authors: [],
-      reviewers: [reviewer.id]
-    });
-
     await request(baseUrl).put(`/api/proposals/${v4()}/status`).set('Cookie', authorCookie).send().expect(404);
   });
 
@@ -62,11 +55,9 @@ describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
 
     const spaceMemberCookie = await loginUser(spaceMember.id);
 
-    const proposal = await createProposalWithUsers({
+    const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: author.id,
-      authors: [],
-      reviewers: [reviewer.id]
+      userId: author.id
     });
 
     await request(baseUrl)
@@ -76,13 +67,25 @@ describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
       .expect(401);
   });
 
+  it('should return 400 if proposal is incomplete', async () => {
+    // missing workflowId and authors
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: author.id
+    });
+
+    await request(baseUrl).put(`/api/proposals/${proposal.id}/publish`).set('Cookie', authorCookie).send().expect(400);
+  });
+
   it('should successfully update the status of proposal and return 200', async () => {
-    const proposal = await createProposalWithUsers({
+    const workflow = await generateProposalWorkflow({
+      spaceId: space.id
+    });
+    const proposal = await testUtilsProposals.generateProposal({
+      authors: [author.id],
       spaceId: space.id,
       userId: author.id,
-      proposalStatus: 'draft',
-      authors: [],
-      reviewers: [reviewer.id]
+      workflowId: workflow.id
     });
 
     await request(baseUrl).put(`/api/proposals/${proposal.id}/publish`).set('Cookie', authorCookie).send().expect(200);

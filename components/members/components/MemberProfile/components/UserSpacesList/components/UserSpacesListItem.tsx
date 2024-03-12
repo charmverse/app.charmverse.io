@@ -26,7 +26,7 @@ import type {
   ProfileBountyEvent,
   CommunityDetails
 } from 'lib/profile/interfaces';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 const ProfileItemContainer = styled(({ visible, ...props }: any) => <Stack {...props} />)<{ visible: boolean }>`
   ${!isTouchScreen() && hoverIconsStyle()}
@@ -331,7 +331,7 @@ function BountyEventsPanel({ events }: { events: ProfileBountyEvent[] }) {
                   <strong>{event.bountyTitle || 'Untitled'}</strong>
                 </Link>
                 {event.hasCredential && (
-                  <Tooltip color='success' title='Verified with Collab.land'>
+                  <Tooltip color='success' title='Verified with Collab.Land'>
                     <CheckIcon fontSize='small' />
                   </Tooltip>
                 )}

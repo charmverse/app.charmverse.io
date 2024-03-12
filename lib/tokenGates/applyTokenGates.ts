@@ -12,23 +12,21 @@ import {
   InsecureOperationError,
   InvalidInputError,
   UnauthorisedActionError
-} from 'lib/utilities/errors';
+} from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 
 import type { TokenGateJoinType } from './interfaces';
 import { verifyTokenGates } from './verifyTokenGates';
 
 export type TokenGateVerificationRequest = {
-  userId: string;
   spaceId: string;
-  tokens: { signedToken: string; tokenGateId: string }[];
+  tokenGateIds: string[];
   commit: boolean;
   joinType?: TokenGateJoinType;
   reevaluate?: boolean;
-  walletAddress: string;
 };
 
 type TokenGateVerificationResult = {
-  userId: string;
   space: Space;
   roles: Role[];
 };
@@ -36,11 +34,10 @@ type TokenGateVerificationResult = {
 export async function applyTokenGates({
   spaceId,
   userId,
-  tokens,
+  tokenGateIds,
   commit,
-  reevaluate = false,
-  walletAddress
-}: TokenGateVerificationRequest): Promise<TokenGateVerificationResult> {
+  reevaluate = false
+}: TokenGateVerificationRequest & { userId: string }): Promise<TokenGateVerificationResult> {
   if (!spaceId || !userId) {
     throw new InvalidInputError(`Please provide a valid ${!spaceId ? 'space' : 'user'} id.`);
   }
@@ -97,14 +94,14 @@ export async function applyTokenGates({
     throw new DataNotFoundError('No token gates were found for this space.');
   }
 
-  const verifiedTokenGates = await verifyTokenGates({ spaceId, userId, tokens, walletAddress });
+  const verifiedTokenGates = await verifyTokenGates({ spaceId, userId, tokenGateIds });
 
   if (verifiedTokenGates.length === 0) {
     trackUserAction('token_gate_verification', { result: 'fail', spaceId, userId });
     throw new InsecureOperationError('At least one token gate verification must succeed to grant a space membership.');
   }
 
-  const roleIdsToAssign: string[] = verifiedTokenGates.reduce((roleList, tokenGate) => {
+  const roleIdsToAssign: string[] = verifiedTokenGates.reduce<string[]>((roleList, tokenGate) => {
     tokenGate.tokenGateToRoles.forEach(({ role }) => {
       if (!roleList.includes(role.id) && space.roles.some((_role) => _role.id === role.id)) {
         roleList.push(role.id);
@@ -112,12 +109,13 @@ export async function applyTokenGates({
     });
 
     return roleList;
-  }, [] as string[]);
+  }, []);
 
-  const assignedRoles = roleIdsToAssign.map((roleId) => space.roles.find((role) => role.id === roleId) as Role);
+  const assignedRoles: Role[] = roleIdsToAssign
+    .map((roleId) => space.roles.find((role) => role.id === roleId))
+    .filter(isTruthy);
 
   const returnValue: TokenGateVerificationResult = {
-    userId,
     space,
     roles: assignedRoles
   };

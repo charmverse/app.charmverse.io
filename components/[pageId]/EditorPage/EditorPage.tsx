@@ -11,10 +11,10 @@ import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePageTitle } from 'hooks/usePageTitle';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import { DatabasePage } from '../DatabasePage';
-import DocumentPage from '../DocumentPage';
+import { DocumentPageWithSidebars } from '../DocumentPage/DocumentPageWithSidebars';
 
 export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { setCurrentPageId } = useCurrentPage();
@@ -22,13 +22,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const [, setTitleState] = usePageTitle();
   const { space: currentSpace } = useCurrentSpace();
   useRewardsNavigation();
-
-  const {
-    error: pageWithContentError,
-    page,
-    refreshPage,
-    updatePage
-  } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
+  const { error: pageWithContentError, page, updatePage } = usePage({ pageIdOrPath, spaceId: currentSpace?.id });
 
   const readOnly =
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
@@ -104,6 +98,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     return <ErrorPage message={"Sorry, you don't have access to this page"} />;
   } else if (pageWithContentError === 'page_not_found') {
     return <ErrorPage message={"Sorry, that page doesn't exist"} />;
+  } else if (pageWithContentError === 'system_error') {
+    return <ErrorPage message='Sorry, there was an error loading this page' />;
   }
   // Wait for permission load
   else if (!page) {
@@ -123,8 +119,8 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     } else {
       // Document page is used in a few places, so it is responsible for retrieving its own permissions
       return (
-        <Box flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
-          <DocumentPage page={page} refreshPage={refreshPage} readOnly={readOnly} savePage={savePage} enableSidebar />
+        <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
+          <DocumentPageWithSidebars page={page} readOnly={readOnly} savePage={savePage} />
         </Box>
       );
     }

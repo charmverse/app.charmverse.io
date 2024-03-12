@@ -1,14 +1,14 @@
-import type { AuthSig } from '@lit-protocol/types';
 import { Typography, Stack } from '@mui/material';
 
 import PrimaryButton from 'components/common/PrimaryButton';
 import { WalletSign } from 'components/login/components/WalletSign';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 
 type Props = {
   isConnectingWallet: boolean;
-  onSignSuccess: (authSig: AuthSig) => void;
+  onSignSuccess: (payload: SignatureVerificationPayload) => Promise<void>;
 };
 
 export function AddWalletStep({ isConnectingWallet, onSignSuccess }: Props) {

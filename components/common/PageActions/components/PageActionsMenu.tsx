@@ -2,7 +2,7 @@ import type { PageType } from '@charmverse/core/prisma';
 import { EditOutlined } from '@mui/icons-material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { Divider, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
+import { Divider, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
@@ -14,12 +14,22 @@ import { usePostPermissions } from 'hooks/usePostPermissions';
 import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
 import { DuplicatePageAction } from './DuplicatePageAction';
+import { PublishProposalAction } from './PublishProposalAction';
+
+export type PageActionMeta = {
+  proposalId: string | null;
+  type?: PageType;
+  id: string;
+  updatedAt: Date;
+  updatedBy: string;
+  path: string;
+  syncWithPageId?: string | null;
+};
 
 export function PageActionsMenu({
   children,
   onClickDelete,
   onClickEdit,
-  hideDuplicateAction,
   anchorEl,
   page,
   setAnchorEl,
@@ -28,23 +38,14 @@ export function PageActionsMenu({
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
   children?: ReactNode;
-  hideDuplicateAction?: boolean;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
-  page: {
-    parentId?: string | null;
-    createdBy: string;
-    type?: PageType;
-    id: string;
-    updatedAt: Date;
-    path: string;
-    deletedAt: Date | null;
-  };
+  page: PageActionMeta;
   readOnly?: boolean;
 }) {
   const { getMemberById } = useMembers();
   const router = useRouter();
-  const member = getMemberById(page.createdBy);
+  const member = getMemberById(page.updatedBy);
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
@@ -78,7 +79,9 @@ export function PageActionsMenu({
     >
       {onClickEdit && !readOnly && (
         <MenuItem dense onClick={onClickEdit}>
-          <EditOutlined fontSize='small' sx={{ mr: 1 }} />
+          <ListItemIcon>
+            <EditOutlined fontSize='small' />
+          </ListItemIcon>
           <ListItemText>Edit</ListItemText>
         </MenuItem>
       )}
@@ -86,17 +89,18 @@ export function PageActionsMenu({
         dense
         data-testid='delete-page-action'
         onClick={onClickDelete}
-        disabled={Boolean(readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post))}
+        disabled={Boolean(
+          readOnly || (!pagePermissions?.delete && !postPermissions?.delete_post) || !!page.syncWithPageId
+        )}
       >
-        <DeleteOutlineIcon fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>
+          <DeleteOutlineIcon fontSize='small' />
+        </ListItemIcon>
         <ListItemText>Delete</ListItemText>
       </MenuItem>
-      {page.type === 'proposal' && (
-        <MenuItem>
-          <ArchiveProposalAction proposalId={page.id} containerStyle={{ ml: -2 }} />
-        </MenuItem>
-      )}
-      {!hideDuplicateAction && page.type && (
+      {page.proposalId && <ArchiveProposalAction proposalId={page.proposalId} />}
+      {page.proposalId && <PublishProposalAction proposalId={page.proposalId} />}
+      {page.type && (
         <DuplicatePageAction
           onComplete={handleClose}
           pageId={page.id}
@@ -106,7 +110,9 @@ export function PageActionsMenu({
       )}
       <CopyPageLinkAction path={`/${page.path}`} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
-        <LaunchIcon fontSize='small' sx={{ mr: 1 }} />
+        <ListItemIcon>
+          <LaunchIcon fontSize='small' />
+        </ListItemIcon>
         <ListItemText>Open in new tab</ListItemText>
       </MenuItem>
       {children}

@@ -272,7 +272,7 @@ class RecreateTransform {
     while (oldSteps.length) {
       let step: Step | undefined | null = oldSteps.shift();
       while (oldSteps.length && step?.merge(oldSteps[0])) {
-        const addedStep = oldSteps.shift()!;
+        const addedStep: Step = oldSteps.shift()!;
         if (step instanceof ReplaceStep && addedStep instanceof ReplaceStep) {
           step = getReplaceStep(newTr.doc, addedStep.apply(step.apply(newTr.doc).doc!).doc!) || step.merge(addedStep);
         } else {

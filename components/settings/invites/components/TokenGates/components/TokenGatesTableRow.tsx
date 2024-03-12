@@ -30,9 +30,9 @@ export function TokenGateTableRow({ isAdmin, tokenGate, account, spaceId, testCo
   const { trigger: updateTokenGates, isMutating: isLoadingUpdateTokenGates } = useUpdateTokenGateRoles(tokenGate.id);
 
   const createDescription = () => {
-    const conditionsData = humanizeConditionsData(tokenGate, account || '');
+    const conditionsData = humanizeConditionsData(tokenGate.conditions);
 
-    return humanizeConditions(conditionsData);
+    return humanizeConditions(conditionsData, tokenGate.conditions.operator);
   };
 
   async function updateTokenGateRoles(roleIds: string[]) {

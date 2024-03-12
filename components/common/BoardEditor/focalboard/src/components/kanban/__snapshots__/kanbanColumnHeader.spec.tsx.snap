@@ -55,7 +55,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -72,7 +72,7 @@ exports[`src/components/kanban/kanbanColumnHeader return kanbanColumnHeader and 
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>
@@ -136,7 +136,7 @@ exports[`src/components/kanban/kanbanColumnHeader should match snapshot 1`] = `
             viewBox="0 0 24 24"
           >
             <path
-              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+              d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
             />
           </svg>
         </button>
@@ -153,7 +153,7 @@ exports[`src/components/kanban/kanbanColumnHeader should match snapshot 1`] = `
           viewBox="0 0 24 24"
         >
           <path
-            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
           />
         </svg>
       </button>

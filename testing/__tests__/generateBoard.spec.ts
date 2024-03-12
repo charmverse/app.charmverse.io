@@ -8,7 +8,7 @@ import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
 import type { CardFields } from 'lib/focalboard/card';
 import { generateSchema } from 'testing/publicApi/schemas';
 
-import { createPage, generateBoard } from '../setupDatabase';
+import { createPage, generateBoard, generateRole } from '../setupDatabase';
 
 describe('generateBoard', () => {
   it('should generate a database page with 1 view and 2 nested cards by default', async () => {
@@ -307,5 +307,62 @@ describe('generateBoard', () => {
     });
 
     expect(board.parentId).toBe(page.id);
+  });
+
+  it('should create custom permissions for the boards and cards if this option is provided', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+    const role = await generateRole({
+      createdBy: user.id,
+      spaceId: space.id
+    });
+    const database = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      cardCount: 1,
+      permissions: [
+        {
+          permissionLevel: 'view',
+          userId: user.id
+        },
+        {
+          permissionLevel: 'editor',
+          roleId: role.id
+        }
+      ]
+    });
+
+    const boardPagePermissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: {
+          in: [database.id]
+        }
+      }
+    });
+
+    expect(boardPagePermissions).toHaveLength(2);
+
+    expect(boardPagePermissions).toMatchObject(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: user.id, permissionLevel: 'view' }),
+        expect.objectContaining({ roleId: role.id, permissionLevel: 'editor' })
+      ])
+    );
+
+    const cardPagePermissions = await prisma.pagePermission.findMany({
+      where: {
+        page: {
+          parentId: database.id
+        }
+      }
+    });
+
+    expect(cardPagePermissions).toHaveLength(2);
+
+    expect(cardPagePermissions).toMatchObject(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: user.id, permissionLevel: 'view' }),
+        expect.objectContaining({ roleId: role.id, permissionLevel: 'editor' })
+      ])
+    );
   });
 });

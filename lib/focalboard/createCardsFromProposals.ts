@@ -5,21 +5,21 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { prismaToBlock } from 'lib/focalboard/block';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { canAccessPrivateFields } from 'lib/proposal/form/canAccessPrivateFields';
-import { getCurrentStep } from 'lib/proposal/getCurrentStep';
-import type { ProposalFields } from 'lib/proposal/interface';
+import { permissionsApiClient } from 'lib/permissions/api/client';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import type {
   ProposalRubricCriteriaAnswerWithTypedResponse,
-  ProposalRubricCriteriaWithTypedParams
-} from 'lib/proposal/rubric/interfaces';
-import type { BoardPropertyValue } from 'lib/public-api';
+  RubricCriteriaTyped
+} from 'lib/proposals/rubric/interfaces';
 import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
 import { proposalPropertyTypesList, type BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
+import type { CardPropertyValue } from './card';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
@@ -39,6 +39,15 @@ export async function createCardsFromProposals({
   } else if (!stringUtils.isUUID(boardId)) {
     throw new InvalidInputError('Invalid boardId');
   }
+
+  const rootPagePermissions = await prisma.page.findFirstOrThrow({
+    where: {
+      id: boardId
+    },
+    select: {
+      permissions: true
+    }
+  });
 
   const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
     where: {
@@ -75,10 +84,17 @@ export async function createCardsFromProposals({
       },
       deletedAt: null
     },
-    include: {
+    select: {
+      id: true,
+      path: true,
+      title: true,
+      content: true,
+      contentText: true,
+      hasContent: true,
+      createdAt: true,
+      spaceId: true,
       proposal: {
         select: {
-          evaluationType: true,
           id: true,
           spaceId: true,
           authors: true,
@@ -91,6 +107,9 @@ export async function createCardsFromProposals({
               index: true,
               result: true,
               type: true
+            },
+            orderBy: {
+              index: 'asc'
             }
           },
           rewards: {
@@ -113,6 +132,9 @@ export async function createCardsFromProposals({
                       value: true
                     }
                   }
+                },
+                orderBy: {
+                  index: 'asc'
                 }
               }
             }
@@ -210,14 +232,10 @@ export async function createCardsFromProposals({
 
   const cards: { page: Page; block: Block }[] = [];
 
-  const databaseProposalProps = extractDatabaseProposalProperties({
-    boardBlock
-  });
-
   for (const pageProposal of pageProposals) {
     const createdAt = pageProposal.createdAt;
 
-    let properties: Record<string, BoardPropertyValue> = {};
+    let properties: Record<string, CardPropertyValue> = {};
 
     if (proposalProps.proposalUrl) {
       properties[proposalProps.proposalUrl.id] = pageProposal.path;
@@ -227,7 +245,7 @@ export async function createCardsFromProposals({
       if (!proposalPropertyTypesList.includes(cardProperty.type as any)) {
         const proposalFieldValue = (pageProposal.proposal?.fields as ProposalFields)?.properties?.[cardProperty.id];
         if (proposalFieldValue) {
-          properties[cardProperty.id] = proposalFieldValue as BoardPropertyValue;
+          properties[cardProperty.id] = proposalFieldValue as CardPropertyValue;
         }
       }
     });
@@ -253,36 +271,39 @@ export async function createCardsFromProposals({
       properties[proposalProps.proposalStep.id] = currentStep.title;
     }
 
+    if (proposalProps.proposalAuthor && pageProposal.proposal) {
+      properties[proposalProps.proposalAuthor.id] = pageProposal.proposal.authors.map((author) => author.userId);
+    }
+
     const formFields = pageProposal.proposal?.form?.formFields ?? [];
     const boardBlockCardProperties = boardBlock.fields.cardProperties ?? [];
 
-    const accessPrivateFields = await canAccessPrivateFields({
-      userId,
-      proposal: pageProposal.proposal ?? undefined,
-      proposalId: pageProposal.proposal!.id
+    const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: pageProposal.proposal!.id,
+      userId
     });
-
-    const formFieldProperties = await updateCardFormFieldPropertiesValue({
+    const accessPrivateFields = permissions.view_private_fields;
+    const formFieldProperties = updateCardFormFieldPropertiesValue({
       accessPrivateFields,
       cardProperties: boardBlockCardProperties,
       formFields,
       proposalId: pageProposal.proposal!.id
     });
 
-    if (currentStep?.step === 'rubric') {
-      const criteria = mappedRubricCriteriaByProposal[pageProposal.id] ?? [];
-      const answers = mappedRubricAnswersByProposal[pageProposal.id] ?? [];
-
-      const updatedCardShape = generateResyncedProposalEvaluationForCard({
-        cardProps: { fields: properties },
-        currentStep: { id: currentStep.id, type: currentStep.step },
-        databaseProperties: databaseProposalProps,
-        rubricCriteria: criteria as ProposalRubricCriteriaWithTypedParams[],
-        rubricAnswers: answers as ProposalRubricCriteriaAnswerWithTypedResponse[]
-      });
-
-      properties = updatedCardShape.fields;
-    }
+    pageProposal.proposal?.evaluations.forEach((evaluation) => {
+      if (evaluation.type === 'rubric') {
+        properties = generateResyncedProposalEvaluationForCard({
+          step: evaluation,
+          templates: boardBlock.fields.cardProperties,
+          properties,
+          rubricAnswers:
+            (mappedRubricAnswersByProposal[
+              pageProposal.proposal!.id
+            ] as ProposalRubricCriteriaAnswerWithTypedResponse[]) ?? [],
+          rubricCriteria: (mappedRubricCriteriaByProposal[pageProposal.proposal!.id] as RubricCriteriaTyped[]) ?? []
+        });
+      }
+    });
 
     const _card = await createCardPage({
       title: pageProposal.title,
@@ -297,7 +318,16 @@ export async function createCardsFromProposals({
       hasContent: pageProposal.hasContent,
       content: pageProposal.content,
       contentText: pageProposal.contentText,
-      syncWithPageId: pageProposal.id
+      syncWithPageId: pageProposal.id,
+      permissions: rootPagePermissions.permissions.map((permission) => ({
+        permissionLevel: permission.permissionLevel,
+        allowDiscovery: permission.allowDiscovery,
+        inheritedFromPermission: permission.id,
+        public: permission.public,
+        roleId: permission.roleId,
+        spaceId: permission.spaceId,
+        userId: permission.userId
+      }))
     });
     cards.push(_card);
   }

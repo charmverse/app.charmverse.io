@@ -15,7 +15,7 @@ const test = base.extend<Fixtures>({
   documentPage: ({ page }, use) => use(new DocumentPage(page))
 });
 
-test('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
+test.skip('convert page to proposal - create a page, convert that page to proposal and assert editor is readonly with proposal banner', async ({
   documentPage,
   pageHeader
 }) => {

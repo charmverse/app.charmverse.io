@@ -5,7 +5,7 @@ import fetchMock from 'fetch-mock-jest';
 import { v4 } from 'uuid';
 
 import { connectSpace } from 'lib/collabland/connectSpace';
-import { encryptData } from 'lib/utilities/dataEncryption';
+import { encryptData } from 'lib/utils/dataEncryption';
 import { createDiscordUser } from 'testing/utils/discord';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';

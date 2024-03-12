@@ -1,5 +1,4 @@
 import { VoteType } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import AddCircle from '@mui/icons-material/AddCircle';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import {
@@ -24,7 +23,6 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
-import { PublishToSnapshot } from 'components/proposals/ProposalPage/components/EvaluationSidebar/components/VoteEvaluation/components/PublishToSnapshot/PublishToSnapshot';
 import { useVotes } from 'hooks/useVotes';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -33,25 +31,17 @@ import type { ExtendedVote } from 'lib/votes/interfaces';
 interface CreateVoteModalProps {
   onClose?: () => void;
   onCreateVote?: (vote: ExtendedVote) => void;
-  onPublishToSnapshot?: () => void;
   open?: boolean;
   pageId?: string;
   postId?: string;
-  snapshotProposalId: string | null;
-  proposal?: Pick<ProposalWithUsers, 'status' | 'id'>;
-  readOnly?: boolean;
 }
 
 export function CreateVoteModal({
   open = true,
   onClose = () => null,
   onCreateVote = () => null,
-  onPublishToSnapshot = () => null,
   pageId,
-  postId,
-  snapshotProposalId,
-  proposal,
-  readOnly
+  postId
 }: CreateVoteModalProps) {
   const [voteTitle, setVoteTitle] = useState('');
   const [passThreshold, setPassThreshold] = useState<number>(50);
@@ -109,7 +99,7 @@ export function CreateVoteModal({
       pageId,
       postId,
       threshold: +passThreshold,
-      context: proposal ? 'proposal' : 'inline',
+      context: 'inline',
       type: voteTypeToSave,
       maxChoices: maxChoicesToSave
     });
@@ -121,13 +111,13 @@ export function CreateVoteModal({
 
   const disabledSave =
     passThreshold > 100 ||
-    (!proposal && voteTitle.length === 0) ||
+    voteTitle.length === 0 ||
     (voteType === VoteType.SingleChoice && options.findIndex((option) => option.name.length === 0) !== -1) ||
     new Set(options.map((option) => option.name)).size !== options.length;
 
   return (
     <Dialog
-      title={proposal ? 'Create a vote' : 'Create a poll'}
+      title='Create a poll'
       open={open}
       onClose={onClose ?? (() => {})}
       footerActions={
@@ -142,79 +132,55 @@ export function CreateVoteModal({
           >
             Create
           </Button>
-          {proposal?.status === 'reviewed' && (
-            <>
-              or
-              <Tooltip title={readOnly ? 'You cannot publish this proposal to snapshot' : ''}>
-                <div>
-                  <PublishToSnapshot
-                    renderContent={({ label, onClick, icon }) => (
-                      <Button disabled={readOnly} onClick={onClick}>
-                        {icon}
-                        <Typography>{label}</Typography>
-                      </Button>
-                    )}
-                    onPublish={onPublishToSnapshot}
-                    pageId={proposal.id}
-                    snapshotProposalId={snapshotProposalId}
-                  />
-                </div>
-              </Tooltip>
-            </>
-          )}
         </Stack>
       }
     >
       <Box flexDirection='column' gap={1.5} m={1} display='flex' flex={1}>
-        {!proposal && (
-          <Box flexDirection='column' display='flex'>
-            <FieldLabel>Title</FieldLabel>
-            <TextField
-              autoFocus
-              placeholder="What's the vote?"
-              value={voteTitle}
-              onChange={(e) => {
-                setVoteTitle(e.target.value);
-              }}
-            />
-          </Box>
-        )}
+        <Box flexDirection='column' display='flex'>
+          <FieldLabel>Title</FieldLabel>
+          <TextField
+            autoFocus
+            placeholder="What's the vote?"
+            value={voteTitle}
+            onChange={(e) => {
+              setVoteTitle(e.target.value);
+            }}
+          />
+        </Box>
 
-        {!proposal && (
-          <Box flexDirection='column' display='flex'>
-            <CharmEditor
-              disablePageSpecificFeatures
-              disableRowHandles
-              style={{
-                left: 0,
-                minHeight: 75,
-                backgroundColor: 'var(--input-bg)'
-              }}
-              disableMention
-              colorMode='dark'
-              placeholderText='Details (Optional)'
-              content={voteContent.content as PageContent}
-              enableVoting={false}
-              disableNestedPages
-              isContentControlled
-              onContentChange={(content) => {
-                setVoteContent({
-                  content: content.doc,
-                  contentText: content.rawText
-                });
-              }}
-            />
-          </Box>
-        )}
+        <Box flexDirection='column' display='flex'>
+          <CharmEditor
+            disablePageSpecificFeatures
+            disableRowHandles
+            style={{
+              left: 0,
+              minHeight: 75,
+              backgroundColor: 'var(--input-bg)'
+            }}
+            disableMention
+            colorMode='dark'
+            placeholderText='Details (Optional)'
+            content={voteContent.content as PageContent}
+            enableVoting={false}
+            disableNestedPages
+            isContentControlled
+            onContentChange={(content) => {
+              setVoteContent({
+                content: content.doc,
+                contentText: content.rawText
+              });
+            }}
+          />
+        </Box>
         <Box display='flex' gap={1}>
           <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between' flex={1}>
             <FieldLabel whiteSpace='nowrap'>End date:</FieldLabel>
             {/* This as any statement is to save time. We are providing an official adapter from MUI Library as outlined here https://mui.com/x/react-date-pickers/date-picker/#basic-usage */}
             <Stack>
               <DateTimePicker
+                disablePast
                 minDate={DateTime.fromMillis(Date.now())}
                 value={deadline}
-                disableMaskedInput
                 onAccept={async (value) => {
                   if (value) {
                     setDeadline(value);
@@ -225,19 +191,17 @@ export function CreateVoteModal({
                     setDeadline(value);
                   }
                 }}
-                renderInput={(props) => (
-                  <TextField
-                    {...props}
-                    inputProps={{
-                      ...props.inputProps,
+                slotProps={{
+                  textField: {
+                    inputProps: {
                       readOnly: true
-                    }}
-                    fullWidth
-                    onClick={() => {
+                    },
+                    fullWidth: true,
+                    onClick: () => {
                       setIsDateTimePickerOpen((_isDateTimePickerOpen) => !_isDateTimePickerOpen);
-                    }}
-                  />
-                )}
+                    }
+                  }
+                }}
                 onClose={() => setIsDateTimePickerOpen(false)}
                 open={isDateTimePickerOpen}
               />

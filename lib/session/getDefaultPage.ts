@@ -3,7 +3,7 @@ import type { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { isSpaceDomain } from 'lib/spaces/utils';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 export function getDefaultPage({
   lastViewedSpaceId,

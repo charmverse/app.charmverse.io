@@ -7,10 +7,12 @@ import type { Server, Socket } from 'socket.io';
 
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
-export type Resource = { id: string };
-export type ResourceWithSpaceId = Resource & { spaceId: string };
+export type Resource<T = object> = { id: string } & T;
+export type ResourceWithSpaceId = Resource<{ spaceId: string }>;
 
 export type SealedUserId = {
   userId: string;
@@ -25,6 +27,11 @@ type BlocksUpdated = {
   payload: (Partial<Block> & ResourceWithSpaceId)[];
 };
 
+type RewardBlocksUpdated = {
+  type: 'reward_blocks_updated';
+  payload: RewardBlockWithTypedFields[];
+};
+
 type BlocksCreated = {
   type: 'blocks_created';
   payload: Block[];
@@ -32,7 +39,7 @@ type BlocksCreated = {
 
 type BlocksDeleted = {
   type: 'blocks_deleted';
-  payload: (Resource & Pick<Block, 'type'>)[];
+  payload: Resource<Pick<Block, 'type'>>[];
 };
 
 type PagesMetaUpdated = {
@@ -77,19 +84,15 @@ type PostPublished = {
 
 type PostUpdated = {
   type: 'post_updated';
-  payload: {
-    id: string;
+  payload: Resource<{
     categoryId: string;
     createdBy: string;
-  };
+  }>;
 };
 
 type PostDeleted = {
   type: 'post_deleted';
-  payload: {
-    categoryId: string;
-    id: string;
-  };
+  payload: Resource<{ categoryId: string }>;
 };
 
 type ErrorMessage = {
@@ -154,6 +157,13 @@ type PageReorderedEditorToEditor = {
   };
 };
 
+type PageDuplicated = {
+  type: 'page_duplicated';
+  payload: {
+    pageId: string;
+  };
+};
+
 type SpaceSubscriptionUpdated = {
   type: 'space_subscription';
   payload: {
@@ -184,6 +194,11 @@ type PagesRestored = {
   payload: Resource[];
 };
 
+type ProposalsUpdated = {
+  type: 'proposals_updated';
+  payload: Resource<Partial<Pick<ProposalWithUsersLite, 'archived' | 'currentStep'>>>[];
+};
+
 export type ClientMessage =
   | SubscribeToWorkspace
   | PageDeleted
@@ -191,9 +206,11 @@ export type ClientMessage =
   | PageCreated
   | PageReorderedSidebarToSidebar
   | PageReorderedSidebarToEditor
-  | PageReorderedEditorToEditor;
+  | PageReorderedEditorToEditor
+  | PageDuplicated;
 
 export type ServerMessage =
+  | RewardBlocksUpdated
   | BlocksUpdated
   | BlocksCreated
   | BlocksDeleted
@@ -210,7 +227,8 @@ export type ServerMessage =
   | ThreadsUpdated
   | SpaceSubscriptionUpdated
   | NotionImportCompleted
-  | PagesRestored;
+  | PagesRestored
+  | ProposalsUpdated;
 
 export type WebSocketMessage = ClientMessage | ServerMessage;
 

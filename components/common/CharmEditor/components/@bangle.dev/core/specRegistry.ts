@@ -2,7 +2,7 @@
 import type { MarkSpec, NodeSpec } from '@bangle.dev/pm';
 import { Schema } from '@bangle.dev/pm';
 import type { MarkdownParser, MarkdownSerializer, UnnestObjValue } from '@bangle.dev/shared-types';
-import { bangleWarn } from '@bangle.dev/utils';
+import { log } from '@charmverse/core/log';
 
 import * as doc from '../../doc/doc';
 import * as paragraph from '../../paragraph/paragraph';
@@ -50,7 +50,7 @@ export class SpecRegistry<N extends string = any, M extends string = any> {
     const names = new Set(flattenedSpecs.map((r) => r.name));
 
     if (flattenedSpecs.length !== names.size) {
-      bangleWarn('The specRegistry has one or more specs with the same name', flattenedSpecs);
+      log.warn('The specRegistry has one or more specs with the same name', flattenedSpecs);
       throw new Error('Duplicate spec error, please check your specRegistry');
     }
 
@@ -115,15 +115,15 @@ function createSchema(specRegistry: SpecRegistry['_spec']) {
 
 function validateSpec(spec: BaseSpec) {
   if (!spec.name) {
-    bangleWarn("The spec didn't have a name field", spec);
+    log.warn("The spec didn't have a name field", spec);
     throw new Error('Invalid spec. Spec must have a name');
   }
   if (!['node', 'mark'].includes(spec.type)) {
-    bangleWarn('The spec must be of type node, mark or component ', spec);
+    log.warn('The spec must be of type node, mark or component ', spec);
     throw new Error('Invalid spec type');
   }
   if (['node', 'mark'].includes(spec.type) && !spec.schema) {
-    bangleWarn("The spec of type 'mark' or 'node' must have a schema field", spec);
+    log.warn("The spec of type 'mark' or 'node' must have a schema field", spec);
     throw new Error('Invalid spec schema');
   }
 }

@@ -1,5 +1,5 @@
 import { appSubdomain, isProdEnv, isStagingEnv } from 'config/constants';
-import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
+import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
 
 export function getDiscordRedirectUrl(host: string | undefined, redirectTo: string) {
   const protocol = isProdEnv || isStagingEnv ? `https://` : `http://`;

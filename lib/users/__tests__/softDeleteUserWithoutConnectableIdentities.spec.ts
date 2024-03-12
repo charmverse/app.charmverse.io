@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 
 import { softDeleteUserWithoutConnectableIdentities } from '../softDeleteUserWithoutConnectableIdentities';
 

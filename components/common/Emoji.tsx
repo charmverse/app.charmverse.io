@@ -4,7 +4,7 @@ import type { ComponentProps, ReactNode } from 'react';
 import { memo } from 'react';
 import twemoji from 'twemoji';
 
-import { isMac } from 'lib/utilities/browser';
+import { isMac } from 'lib/utils/browser';
 
 type ImgSize = 'large' | 'small';
 

@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 import type { SQSEvent, SQSRecord } from 'aws-lambda';
 import { webhookWorker } from 'serverless/handler';
 
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import type { LoggedInUser } from 'models';
 import { loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
-let nonAdminUser: LoggedInUser;
+let nonAdminUser: User;
 let nonAdminUserSpace: Space;
 let nonAdminCookie: string;
 
-let adminUser: LoggedInUser;
+let adminUser: User;
 let adminUserSpace: Space;
 let adminCookie: string;
 
@@ -22,13 +21,13 @@ global.fetch = jest.fn().mockResolvedValueOnce({
 });
 
 beforeAll(async () => {
-  const first = await generateUserAndSpaceWithApiToken(undefined, false);
+  const first = await generateUserAndSpace();
 
   nonAdminUser = first.user;
   nonAdminUserSpace = first.space;
   nonAdminCookie = await loginUser(nonAdminUser.id);
 
-  const second = await generateUserAndSpaceWithApiToken();
+  const second = await generateUserAndSpace({ isAdmin: true });
 
   adminUser = second.user;
   adminUserSpace = second.space;

@@ -7,7 +7,7 @@ import { computeBountyPermissions } from 'lib/permissions/bounties';
 import { closeOutReward } from 'lib/rewards/closeOutReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

@@ -1,9 +1,11 @@
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 
 import mutator from '../../mutator';
@@ -24,31 +26,62 @@ type Props = {
 
 function Gallery(props: Props): JSX.Element {
   const { activeView, board, cards } = props;
+  const localViewSettings = useLocalDbViewSettings(activeView.id);
 
   const visiblePropertyTemplates = activeView.fields.visiblePropertyIds
     .map((id) => board.fields.cardProperties.find((t) => t.id === id))
     .filter((i) => i) as IPropertyTemplate[];
-  const isManualSort = activeView.fields.sortOptions.length === 0;
+  const { showConfirmation } = useConfirmationModal();
 
-  const onDropToCard = (srcCard: Card, dstCard: Card) => {
+  const onDropToCard = async (srcCard: Card, dstCard: Card) => {
     Utils.log(`onDropToCard: ${dstCard.title}`);
     const { selectedCardIds } = props;
+    const hasSort = activeView.fields.sortOptions?.length !== 0;
 
     const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
     const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
 
-    // Update dstCard order
     let cardOrder = Array.from(new Set([...activeView.fields.cardOrder, ...cards.map((o) => o.id)]));
     const isDraggingDown = cardOrder.indexOf(srcCard.id) <= cardOrder.indexOf(dstCard.id);
     cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
+
     let destIndex = cardOrder.indexOf(dstCard.id);
+
+    if (hasSort) {
+      const { confirmed, cancelled } = await showConfirmation({
+        message: 'Would you like to remove sorting?'
+      });
+
+      if (confirmed && localViewSettings) {
+        await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
+        localViewSettings.setLocalSort(null);
+      }
+
+      if (cancelled) {
+        return;
+      }
+    }
+
+    // Update dstCard order
     if (isDraggingDown) {
       destIndex += 1;
     }
-    cardOrder.splice(destIndex, 0, ...draggedCardIds);
 
-    mutator.performAsUndoGroup(async () => {
-      await mutator.changeViewCardOrder(activeView, cardOrder, description);
+    cardOrder.splice(destIndex, 0, ...draggedCardIds);
+    await mutator.performAsUndoGroup(async () => {
+      await mutator.changeViewCardOrder(
+        hasSort
+          ? {
+              ...activeView,
+              fields: {
+                ...activeView.fields,
+                sortOptions: []
+              }
+            }
+          : activeView,
+        cardOrder,
+        description
+      );
     });
   };
 
@@ -70,7 +103,6 @@ function Gallery(props: Props): JSX.Element {
               isSelected={props.selectedCardIds.includes(card.id)}
               readOnly={props.readOnly}
               onDrop={onDropToCard}
-              isManualSort={isManualSort}
             />
           );
         })}

@@ -8,4 +8,5 @@ export type SelectOptionType = {
   dropdownName?: string;
   index?: number;
   temp?: boolean;
+  variant?: 'chip' | 'plain';
 };

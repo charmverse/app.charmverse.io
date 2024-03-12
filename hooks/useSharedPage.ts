@@ -105,5 +105,6 @@ export function isForumPagePath(path: string): boolean {
 }
 
 export function isProposalsPagePath(path: string): boolean {
-  return path.startsWith(PROPOSALS_PATH);
+  // exclude new proposals for now. Maybe we should allow a sign-up button on the page?
+  return path.startsWith(PROPOSALS_PATH) && !path.endsWith('/new');
 }

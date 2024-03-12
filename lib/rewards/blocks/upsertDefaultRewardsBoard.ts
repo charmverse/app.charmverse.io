@@ -1,19 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import {
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_BOARD_VIEW_BLOCK_ID,
-  DEFAULT_CALENDAR_VIEW_BLOCK_ID,
-  DEFAULT_TABLE_VIEW_BLOCK_ID
-} from 'lib/focalboard/customBlocks/constants';
-import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
+
+import { upsertBlock } from './upsertBlock';
 import {
   defaultRewardViews,
   generateDefaultBoardView,
   generateDefaultCalendarView,
   generateDefaultTableView
-} from 'lib/rewards/blocks/views';
+} from './views';
 
 export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: string; userId?: string }) {
   let updateUserId = userId;
@@ -26,7 +22,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
   }
 
   if (!updateUserId) {
-    throw new Error('User id not found, cannot craete default rewards board');
+    throw new Error('User id not found, cannot create default rewards board');
   }
 
   // safety check - if default board exists, do not override existing fields

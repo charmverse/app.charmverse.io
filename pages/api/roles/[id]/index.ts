@@ -8,7 +8,7 @@ import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPe
 import { updateRole } from 'lib/roles/updateRole';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

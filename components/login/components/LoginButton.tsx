@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import EmailIcon from '@mui/icons-material/Email';
@@ -8,6 +9,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
+import type { SyntheticEvent } from 'react';
 import { useRef, useState } from 'react';
 
 import { WalletSelector } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal';
@@ -18,8 +20,8 @@ import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { SystemError } from 'lib/utilities/errors';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
+import type { SystemError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models/User';
 
 import { DiscordLoginHandler } from './DiscordLoginHandler';
@@ -62,8 +64,8 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3Account();
 
-  const handleClickOpen = () => {
-    loginDialog.open();
+  const handleClickOpen = (eventOrAnchorEl?: Element | SyntheticEvent<Element, Event> | null | undefined) => {
+    loginDialog.open(eventOrAnchorEl);
   };
 
   const handleClose = () => {
@@ -123,10 +125,11 @@ function LoginHandler(props: DialogProps) {
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const { loginWithGooglePopup } = useGoogleLogin();
 
-  async function handleLogin(loggedInUser: { identityType?: string; displayName?: string; user?: LoggedInUser }) {
+  async function handleLogin(loggedInUser: { identityType?: string }) {
     showMessage(`Logged in with ${loggedInUser?.identityType}. Redirecting you now`, 'success');
     window.location.reload();
   }
+
   async function handleGoogleLogin() {
     const onSuccess = () => handleLogin({ identityType: 'Google' });
     return loginWithGooglePopup({ onSuccess });
@@ -149,14 +152,12 @@ function LoginHandler(props: DialogProps) {
     }
   }
 
-  async function handleWeb3Login(authSig: AuthSig) {
+  async function handleWeb3Login(payload: SignatureVerificationPayload) {
     try {
-      const user = await loginFromWeb3Account(authSig);
-      handleLogin({
-        identityType: 'Wallet',
-        displayName: authSig.address,
-        user
-      });
+      const resp = await loginFromWeb3Account(payload);
+      if (resp?.id) {
+        handleLogin({ identityType: 'Wallet' });
+      }
     } catch (err) {
       handleLoginError(err);
     }
@@ -166,6 +167,7 @@ function LoginHandler(props: DialogProps) {
     if ((err as SystemError)?.errorType === 'Disabled account') {
       setShowLoginError(true);
     }
+    log.error(`Error on login.`, { error: err });
   }
 
   function toggleEmailDialog(position: 'open' | 'close') {
@@ -194,7 +196,7 @@ function LoginHandler(props: DialogProps) {
 
               {/** Web 3 login methods */}
               <ListItem>
-                <WalletSelector loginSuccess={handleLogin} onError={handleLoginError} />
+                <WalletSelector />
               </ListItem>
               {verifiableWalletDetected && (
                 <ListItem>

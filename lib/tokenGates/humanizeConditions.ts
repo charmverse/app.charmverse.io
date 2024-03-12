@@ -1,33 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { TypographyProps } from '@mui/material/Typography';
-import { formatEther, isAddress } from 'viem';
+import { getChainById } from 'connectors/chains';
+import { formatEther } from 'viem';
 
-import { shortWalletAddress } from 'lib/utilities/blockchain';
-import { isTruthy } from 'lib/utilities/types';
+import { shortWalletAddress } from 'lib/utils/blockchain';
 
-import type { TokenGate, TokenGateConditions } from './interfaces';
-import { ALL_LIT_CHAINS } from './utils';
+import type { Operator, TokenGate } from './interfaces';
 
-const humanizeComparator = (comparator: string) => {
-  const list: Record<string, string> = {
-    '>': 'more than',
-    '>=': 'at least',
-    '=': 'exactly',
-    '<': 'less than',
-    '<=': 'at most',
-    contains: 'contains'
-  };
-
-  const selected: string | undefined = list[comparator];
-
-  if (!selected) {
-    return '';
-  }
-
-  return selected;
-};
-
-type HumanizeConditionsContentType = 'text' | 'link' | 'operator';
+type HumanizeConditionsContentType = 'text' | 'link';
 
 export type HumanizeConditionsContent = {
   type: HumanizeConditionsContentType;
@@ -38,302 +18,242 @@ export type HumanizeConditionsContent = {
 
 export type HumanizeCondition = {
   image?: string;
-  standardContractType?: string;
+  type?: string;
   content: HumanizeConditionsContent[];
 };
 
-export function humanizeUnlockConditionsData(conditions: TokenGate<'unlock'>['conditions']): HumanizeCondition[] {
-  return [
-    {
-      image: conditions.image,
-      content: [
-        { type: 'text', content: 'Unlock Protocol -' },
-        { type: 'text', content: conditions.name || 'Lock' }
-      ]
-    }
-  ];
-}
+export function humanizeConditionsData(conditions: TokenGate['conditions']): HumanizeCondition[] {
+  const humanReadableConditions = conditions.accessControlConditions.map<HumanizeCondition>((acc) => {
+    const chainDetails = getChainById(Number(acc.chain));
+    const tokenSymbol = chainDetails?.viem.nativeCurrency.symbol;
+    const quantity = acc.quantity;
+    const balance = Number(quantity) && Number(quantity) % 1 === 0 ? formatEther(BigInt(quantity)) : quantity;
+    const image = acc.image;
+    const tokenNameOrEtherscanUrl: HumanizeConditionsContent = acc.name
+      ? { type: 'text', content: acc.name || '', props: { fontWeight: 'bold' } }
+      : {
+          type: 'link',
+          url: `${chainDetails?.blockExplorerUrls[0]}/address/${acc.contractAddress}`,
+          content: shortWalletAddress(acc.contractAddress),
+          props: { fontWeight: 'bold' }
+        };
+    const chain = chainDetails?.chainName || 'Ethereum';
 
-export function humanizeHypersubConditionsData(conditions: TokenGate<'hypersub'>['conditions']): HumanizeCondition[] {
-  return [
-    {
-      image: conditions.image || '',
-      standardContractType: 'HYPERSUB',
-      content: [
-        { type: 'text', content: 'Hypersub -' },
-        { type: 'text', content: conditions.name || 'Membership' }
-      ]
-    }
-  ];
-}
-
-export function humanizeLitConditionsData(conditions: TokenGate<'lit'>['conditions']): HumanizeCondition[] {
-  const myWalletAddress = conditions.myWalletAddress;
-  const humanReadableConditions = conditions.unifiedAccessControlConditions
-    ?.map<HumanizeCondition | undefined>((acc) => {
-      if ('operator' in acc && !!acc.operator) {
-        // AND | OR
+    switch (acc.type) {
+      case 'MolochDAOv2.1': {
+        // MolochDAOv2.1 membership
+        // Is a member of the DAO at ${shortWalletAddress(acc.contractAddress)}
         return {
-          content: [{ type: 'operator', content: acc.operator }]
+          image,
+          content: [{ type: 'text', content: `Is a member of the DAO at` }, { ...tokenNameOrEtherscanUrl }]
         };
       }
-
-      if ('chain' in acc && !!acc.chain && 'standardContractType' in acc) {
-        const chainDetails = ALL_LIT_CHAINS[acc.chain];
-        const tokenSymbol = chainDetails?.symbol;
-        const value = acc.returnValueTest.value;
-        const balance = Number(value) ? formatEther(BigInt(value)) : value;
-        const comparator = humanizeComparator(acc.returnValueTest.comparator);
-        const isValidValueAddress = isAddress(value);
-        const image = 'image' in acc && typeof acc.image === 'string' && acc.image ? acc.image : undefined;
-        const hasName = 'name' in acc && typeof acc.name === 'string' && acc.name;
-        const tokenName = hasName ? (acc.name as string) : shortWalletAddress(acc.contractAddress);
-        const etherscanUrl: HumanizeConditionsContent = !hasName
-          ? { type: 'link', url: `https://etherscan.io/address/${acc.contractAddress}`, content: '' }
-          : { type: 'text', content: '' };
-        const chain = acc.chain.charAt(0).toUpperCase() + acc.chain.slice(1);
-
-        if (acc.standardContractType === 'timestamp' && acc.method === 'eth_getBlockByNumber') {
-          // Latest mined block must be past the unix timestamp ${value}
-          return {
-            image,
-            content: [
-              { type: 'text', content: `Latest mined block must be past the unix timestamp` },
-              { type: 'text', content: value }
-            ]
-          };
-        } else if (acc.standardContractType === 'MolochDAOv2.1' && acc.method === 'members') {
-          // molochDAOv2.1 membership
-          // Is a member of the DAO at ${shortWalletAddress(acc.contractAddress)}
-          return {
-            image,
-            content: [
-              { type: 'text', content: `Is a member of the DAO at` },
-              { ...etherscanUrl, content: shortWalletAddress(acc.contractAddress), props: { fontWeight: 'bold' } }
-            ]
-          };
-        } else if (acc.standardContractType === 'ERC721' && acc.method === 'ownerOf') {
-          // specific erc721
-          // Owner of ${tokenName} NFT on ${chain}
-          return {
-            image,
-            standardContractType: acc.standardContractType,
-            content: [
-              { type: 'text', content: 'Owner of' },
-              { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
-              { type: 'text', content: 'NFT' },
-              { type: 'text', content: 'with token id' },
-              { type: 'text', content: acc.parameters[0] },
-              { type: 'text', content: 'on' },
-              { type: 'text', content: chain }
-            ]
-          };
-        } else if (
-          acc.standardContractType === 'ERC721' &&
-          acc.method === 'balanceOf' &&
-          acc.contractAddress === '0x22C1f6050E56d2876009903609a2cC3fEf83B415' &&
-          acc.returnValueTest.comparator === '>' &&
-          acc.returnValueTest.value === '0'
-        ) {
-          // for POAP main contract where the user owns at least 1 poap
+      case 'ERC721': {
+        if (acc.contractAddress === '0x22C1f6050E56d2876009903609a2cC3fEf83B415') {
+          // For POAP main contract where the user owns at least 1 poap
           // Owns any POAP
           return {
             image,
-            standardContractType: acc.standardContractType,
             content: [{ type: 'text', content: `Owns any POAP` }]
           };
-        } else if (acc.standardContractType === 'POAP' && acc.method === 'tokenURI') {
-          // owns a POAP
-          // Owner of a ${value} POAP on ${chain}
+        }
+
+        if (acc.tokenIds.at(0)) {
+          // Specific ERC721
+          // Owner of ${tokenName} NFT with token id ${id} on ${chain}
           return {
             image,
-            standardContractType: acc.standardContractType,
             content: [
-              { type: 'text', content: 'Owner of a' },
-              {
-                type: 'text',
-                content: value,
-                props: { fontWeight: 'bold' }
-              },
-              { type: 'text', content: 'POAP on' },
-              { type: 'text', content: chain }
-            ]
-          };
-        } else if (acc.standardContractType === 'POAP' && acc.method === 'eventId') {
-          // owns a POAP
-          // Owner of a POAP from event ID ${value} on ${chain}
-          return {
-            image,
-            standardContractType: acc.standardContractType,
-            content: [
-              { type: 'text', content: 'Owner of a POAP from event ID' },
-              { type: 'text', content: value, props: { fontWeight: 'bold' } },
+              { type: 'text', content: 'Owner of' },
+              { ...tokenNameOrEtherscanUrl },
+              { type: 'text', content: 'NFT' },
+              { type: 'text', content: 'with token id' },
+              { type: 'text', content: acc.tokenIds.at(0) || '' },
               { type: 'text', content: 'on' },
               { type: 'text', content: chain }
             ]
           };
-        } else if (acc.standardContractType === 'CASK' && acc.method === 'getActiveSubscriptionCount') {
-          // Cask powered subscription
-          // Cask subscriber to provider ${acc.parameters[1]} for plan ${acc.parameters[2]} on ${chain}
+        }
+
+        // any erc721 in collection
+        // Owns at least ${quantity} of ${tokenName} NFT on ${chain}
+        return {
+          image,
+          content: [
+            { type: 'text', content: `Owns at least` },
+            { type: 'text', content: acc.quantity },
+            { type: 'text', content: `of` },
+            { ...tokenNameOrEtherscanUrl },
+            { type: 'text', content: `NFT on` },
+            { type: 'text', content: chain }
+          ]
+        };
+      }
+      case 'POAP': {
+        // Owns a specific POAP
+        // Owner of a ${value} POAP on ${chain}
+        return {
+          image,
+          content: [
+            { type: 'text', content: 'Owner of a' },
+            {
+              type: 'text',
+              content: acc.tokenIds.at(0) || '',
+              props: { fontWeight: 'bold' }
+            },
+            { type: 'text', content: 'POAP on' },
+            { type: 'text', content: chain }
+          ]
+        };
+      }
+      case 'ERC1155': {
+        // erc1155 owns an amount of specific tokens
+        // Owns ${value} of ${acc.contractAddress} tokens with token id ${acc.parameters[1]} on ${chain}
+        return {
+          image,
+          content: [
+            { type: 'text', content: `Owns at least` },
+            { type: 'text', content: acc.quantity },
+            { type: 'text', content: `of` },
+            { ...tokenNameOrEtherscanUrl },
+            { type: 'text', content: `tokens with token id` },
+            { type: 'text', content: acc.tokenIds.length > 1 ? acc.tokenIds.join(', ') : acc.tokenIds.at(0) || '' },
+            { type: 'text', content: `on` },
+            { type: 'text', content: chain }
+          ]
+        };
+      }
+      case 'ERC20': {
+        // Owns at least ${balance} of ${tokenName} tokens on ${chain}
+        if (acc.contractAddress) {
           return {
             image,
             content: [
-              { type: 'text', content: `Cask subscriber to provider` },
-              { type: 'text', content: acc.parameters[1], props: { fontWeight: 'bold' } },
-              { type: 'text', content: `for plan` },
-              { type: 'text', content: acc.parameters[2], props: { fontWeight: 'bold' } },
-              { type: 'text', content: `on` },
-              { type: 'text', content: chain }
-            ]
-          };
-        } else if (acc.standardContractType === 'ERC1155' && acc.method === 'balanceOf') {
-          // erc1155 owns an amount of specific tokens
-          // Owns ${comparator} ${value} of ${acc.contractAddress} tokens with token id ${acc.parameters[1]} on ${chain}
-          return {
-            image,
-            content: [
-              { type: 'text', content: `Owns` },
-              { type: 'text', content: comparator },
-              { type: 'text', content: value },
-              { type: 'text', content: `of` },
-              {
-                type: 'text',
-                content: tokenName,
-                props: { fontWeight: 'bold' }
-              },
-              { type: 'text', content: `tokens with token id` },
-              { type: 'text', content: acc.parameters[1] },
-              { type: 'text', content: `on` },
-              { type: 'text', content: chain }
-            ]
-          };
-        } else if (acc.standardContractType === 'ERC1155' && acc.method === 'balanceOfBatch') {
-          // erc1155 owns an amount of specific tokens from a batch of token ids
-          // Owns ${comparator} ${value} of ${acc.contractAddress} tokens with token id ${acc.parameters[1].split(',').join(' or ')} on ${chain}
-          return {
-            image,
-            content: [
-              { type: 'text', content: `Owns` },
-              { type: 'text', content: comparator },
-              { type: 'text', content: value },
-              { type: 'text', content: `of` },
-              {
-                type: 'text',
-                content: tokenName,
-                props: { fontWeight: 'bold' }
-              },
-              { type: 'text', content: `tokens with token id` },
-              {
-                type: 'text',
-                content: `${acc.parameters[1].split(',').join(' or ')}`
-              },
-              { type: 'text', content: `on` },
-              { type: 'text', content: chain }
-            ]
-          };
-        } else if (acc.standardContractType === 'ERC721' && acc.method === 'balanceOf') {
-          // any erc721 in collection
-          // Owns ${comparator} ${value} of ${tokenName} NFT on ${chain}
-          return {
-            image,
-            standardContractType: acc.standardContractType,
-            content: [
-              { type: 'text', content: `Owns` },
-              { type: 'text', content: comparator },
-              { type: 'text', content: value },
-              { type: 'text', content: `of` },
-              { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
-              { type: 'text', content: `NFT on` },
-              { type: 'text', content: chain }
-            ]
-          };
-        } else if (acc.standardContractType === 'ERC20' && acc.method === 'balanceOf') {
-          // Owns ${comparator} ${balance} of ${tokenName} tokens on ${chain}
-          return {
-            image,
-            content: [
-              { type: 'text', content: `Owns` },
-              { type: 'text', content: comparator },
+              { type: 'text', content: `Owns at least` },
               { type: 'text', content: balance },
               { type: 'text', content: `of` },
-              { ...etherscanUrl, content: tokenName, props: { fontWeight: 'bold' } },
+              { ...tokenNameOrEtherscanUrl },
               { type: 'text', content: `tokens on` },
               { type: 'text', content: chain }
             ]
           };
-        } else if (acc.standardContractType === '' && acc.method === 'eth_getBalance') {
-          // Owns ${comparator} ${balance} ${tokenSymbol} on ${chain}
+        } else {
+          // Owns at least ${balance} of ${tokenSymbol} on ${chain}
           return {
             image,
             content: [
-              { type: 'text', content: `Owns` },
-              { type: 'text', content: comparator },
+              { type: 'text', content: `Owns at least` },
               { type: 'text', content: balance },
-              { type: 'text', content: tokenSymbol },
+              { type: 'text', content: tokenSymbol || '' },
               { type: 'text', content: `on` },
               { type: 'text', content: chain }
             ]
           };
-        } else if (acc.standardContractType === '' && acc.method === '' && isValidValueAddress) {
-          if (myWalletAddress && acc.returnValueTest.value.toLowerCase() === myWalletAddress.toLowerCase()) {
-            // Controls your wallet ${shortWalletAddress(myWalletAddress)}
-            return {
-              image,
-              content: [
-                { type: 'text', content: `Controls your wallet` },
-                {
-                  type: 'text',
-                  content: shortWalletAddress(myWalletAddress),
-                  props: { fontWeight: 'bold' }
-                }
-              ]
-            };
-          } else {
-            // Controls wallet with address ${shortWalletAddress(value)}
-            return {
-              image,
-              content: [
-                { type: 'text', content: `Controls wallet with address` },
-                { type: 'text', content: shortWalletAddress(value), props: { fontWeight: 'bold' } }
-              ]
-            };
-          }
         }
-
+      }
+      case 'Wallet': {
+        // Controls wallet with address ${shortWalletAddress}
+        return {
+          image,
+          content: [
+            { type: 'text', content: `Controls wallet with address` },
+            { type: 'text', content: shortWalletAddress(acc.tokenIds.at(0) || ''), props: { fontWeight: 'bold' } }
+          ]
+        };
+      }
+      case 'Unlock': {
+        // Unlock Protocol - ${subscription name}
+        return {
+          image,
+          type: 'Unlock',
+          content: [
+            { type: 'text', content: 'Unlock Protocol -' },
+            {
+              type: 'text',
+              content: tokenNameOrEtherscanUrl.type === 'text' ? tokenNameOrEtherscanUrl.content : 'Lock'
+            }
+          ]
+        };
+      }
+      case 'Hypersub': {
+        return {
+          image,
+          type: acc.type,
+          content: [
+            { type: 'text', content: 'Hypersub -' },
+            {
+              type: 'text',
+              content: tokenNameOrEtherscanUrl.type === 'text' ? tokenNameOrEtherscanUrl.content : 'Membership'
+            }
+          ]
+        };
+      }
+      case 'GitcoinPassport': {
+        // Gitcoin Passport with a minimum score of ${acc.quantity}
+        return {
+          image,
+          type: acc.type,
+          content: [
+            { type: 'text', content: 'Gitcoin Passport with a minimum score of' },
+            { type: 'text', content: acc.quantity, props: { fontWeight: 600 } }
+          ]
+        };
+      }
+      case 'Guildxyz': {
+        // Guild.xyz ${guildIdOrUrl}
+        return {
+          image,
+          type: acc.type,
+          content: [
+            { type: 'text', content: 'Guild.xyz' },
+            { type: 'text', content: acc.name || acc.tokenIds.at(0) || '', props: { fontWeight: 600 } }
+          ]
+        };
+      }
+      case 'Builder': {
+        return {
+          image,
+          type: 'Builder DAO',
+          content: [
+            { type: 'text', content: 'Builder -' },
+            {
+              type: 'text',
+              content: tokenNameOrEtherscanUrl.type === 'text' ? tokenNameOrEtherscanUrl.content : 'Membership'
+            }
+          ]
+        };
+      }
+      case 'Hats': {
+        return {
+          image,
+          type: acc.type,
+          content: [
+            { type: 'text', content: 'Hats Protocol Id' },
+            {
+              type: 'text',
+              content: acc.tokenIds.at(0) || '',
+              props: { fontWeight: 600 }
+            }
+          ]
+        };
+      }
+      default: {
         log.error('Unsupported token gate conditions', { conditions: acc });
 
-        // Show a simple error message
         return {
           content: [{ type: 'text', content: 'Oops. something went wrong!' }]
         };
       }
-
-      return undefined;
-    })
-    .filter(isTruthy);
+    }
+  });
 
   return humanReadableConditions || [];
 }
 
-export function humanizeConditionsData<T extends TokenGateConditions>(tokenGate: T, walletAddress: string) {
-  const { type, conditions } = tokenGate;
-
-  switch (type) {
-    case 'lit':
-      return humanizeLitConditionsData({ ...conditions, myWalletAddress: walletAddress });
-    case 'unlock':
-      return humanizeUnlockConditionsData(conditions);
-    case 'hypersub':
-      return humanizeHypersubConditionsData(conditions);
-    default:
-      return [];
-  }
-}
-
-export function humanizeConditions(conditions: HumanizeCondition[]) {
+export function humanizeConditions(conditions: HumanizeCondition[], operator: Operator = 'OR') {
   return conditions
     .map((c) => {
       return c.content.map((_c) => _c.content).join(' ');
     })
-    .join(' ');
+    .join(` ${operator.toLowerCase()} `);
 }

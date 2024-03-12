@@ -1,10 +1,10 @@
 import type { Space, User } from '@charmverse/core/prisma';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let author: User;
@@ -29,33 +29,33 @@ describe('GET /api/proposals/[id] - Get proposal - public space', () => {
       spaceId: space.id,
       userId: author.id,
       authors: [author.id],
-      reviewers: [{ group: 'user', id: reviewer.id }],
-      proposalStatus: 'discussion'
+      evaluationInputs: [
+        {
+          index: 0,
+          title: 'test',
+          reviewers: [{ group: 'user', id: reviewer.id }],
+          evaluationType: 'pass_fail',
+          permissions: []
+        }
+      ],
+      proposalStatus: 'published'
     });
     // Unauthenticated request
     const proposal = (await request(baseUrl).get(`/api/proposals/${generatedProposal.id}`).expect(200))
-      .body as ProposalWithUsers;
+      .body as ProposalWithUsersAndRubric;
 
     expect(proposal).toMatchObject(
       expect.objectContaining({
         id: expect.any(String),
         spaceId: space.id,
         createdBy: author.id,
-        status: 'discussion',
+        status: 'published',
         authors: expect.arrayContaining([
           expect.objectContaining({
             proposalId: generatedProposal.id,
             userId: author.id
           })
         ])
-        // reviewers: [
-        //   expect.objectContaining({
-        //     id: expect.any(String),
-        //     roleId: null,
-        //     proposalId: generatedProposal.id,
-        //     userId: reviewer.id
-        //   })
-        // ]
       })
     );
   });
@@ -151,10 +151,13 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
     const proposalTemplate = await testUtilsProposals.generateProposalTemplate({
       spaceId: adminSpace.id,
       userId: adminUser.id,
-      reviewers: [
+      evaluationInputs: [
         {
-          group: 'user',
-          id: adminUser.id
+          index: 0,
+          title: 'test',
+          reviewers: [{ group: 'user', id: adminUser.id }],
+          evaluationType: 'pass_fail',
+          permissions: []
         }
       ]
     });

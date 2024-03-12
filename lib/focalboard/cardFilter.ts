@@ -15,9 +15,9 @@ import type {
 } from 'lib/focalboard/filterClause';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
-import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposal/blocks/constants';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
+import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposals/blocks/constants';
+import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
 import { Constants } from './constants';
 
@@ -415,7 +415,7 @@ class CardFilter {
         switch (condition) {
           case 'contains':
           case 'is_not_empty': {
-            if (filterProperty.type === 'person') {
+            if (filterProperty.type === 'person' || filterProperty.type === 'proposalAuthor') {
               return {
                 id: filterClause.propertyId,
                 value: filterClause.values

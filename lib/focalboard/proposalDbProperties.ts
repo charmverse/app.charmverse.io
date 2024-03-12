@@ -6,12 +6,18 @@ import type {
   ProposalEvaluationResultExtended,
   ProposalEvaluationStatus,
   ProposalEvaluationStep
-} from 'lib/proposal/interface';
+} from 'lib/proposals/interfaces';
 import type { BrandColor } from 'theme/colors';
 
 export const proposalDbProperties: {
   [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
 } = {
+  proposalReviewerNotes: (id?: string, name?: string) => ({
+    id: id || uuid(),
+    name: name || 'Reviewer Notes',
+    options: [],
+    type: 'proposalReviewerNotes'
+  }),
   proposalStatus: (id?: string, name?: string) => ({
     id: id || uuid(),
     name: name || 'Proposal Status',
@@ -80,7 +86,8 @@ export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> 
   in_progress: 'In Progress',
   passed: 'Passed',
   published: 'Published',
-  unpublished: 'Unpublished'
+  unpublished: 'Unpublished',
+  archived: 'Archived'
 };
 
 export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
@@ -89,7 +96,8 @@ export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, str
   in_progress: 'In Progress',
   passed: 'Pass',
   published: 'Publish',
-  unpublished: 'Unpublish'
+  unpublished: 'Unpublish',
+  archived: 'Archive'
 };
 
 export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
@@ -122,5 +130,6 @@ export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> 
   in_progress: 'yellow',
   passed: 'green',
   published: 'green',
-  unpublished: 'gray'
+  unpublished: 'gray',
+  archived: 'gray'
 };

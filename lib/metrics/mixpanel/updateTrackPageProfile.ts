@@ -1,23 +1,27 @@
 import { log } from '@charmverse/core/log';
-import type { PageWithPermissions } from '@charmverse/core/pages';
+import type { Page } from '@charmverse/core/prisma';
 
 import { getPage } from 'lib/pages/server';
 
-import { mixpanel } from './mixpanel';
+import { mixpanel, GroupKeys } from './mixpanel';
+
+type PageFields = Pick<Page, 'createdAt' | 'title' | 'type' | 'deletedAt' | 'spaceId' | 'createdBy' | 'updatedAt'> & {
+  permissions: { public: boolean | null }[];
+};
 
 export async function updateTrackPageProfile(pageId: string) {
   try {
     const page = await getPage(pageId);
 
     if (page) {
-      mixpanel?.groups.set('Page Id', page.id, getTrackPageProfile(page));
+      mixpanel?.groups.set(GroupKeys.PageId, page.id, getTrackPageProfile(page));
     }
   } catch (e) {
     log.warn(`Failed to update mixpanel profile for group id ${pageId}`);
   }
 }
 
-export function getTrackPageProfile(page: PageWithPermissions) {
+export function getTrackPageProfile(page: PageFields) {
   const isPublic = page.permissions.some((p) => p.public);
 
   return {

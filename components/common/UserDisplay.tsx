@@ -5,7 +5,7 @@ import { memo } from 'react';
 
 import type { InitialAvatarProps } from 'components/common/Avatar';
 import Avatar from 'components/common/Avatar';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { useENSName } from 'hooks/useENSName';
 import { useMembers } from 'hooks/useMembers';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
@@ -87,7 +87,7 @@ interface UserDisplayProps extends StyleProps {
 }
 
 function UserDisplay({ showMiniProfile = false, user, userId, ...props }: UserDisplayProps) {
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const { membersRecord } = useMembers();
   const member = user ?? (userId ? membersRecord[userId] : null);
 
@@ -110,7 +110,7 @@ function UserDisplay({ showMiniProfile = false, user, userId, ...props }: UserDi
         showMiniProfile
           ? () => {
               if (showMiniProfile && userId) {
-                showUserId(userId);
+                showUserProfile(userId);
               }
             }
           : undefined

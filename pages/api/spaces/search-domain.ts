@@ -1,34 +1,26 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { updateTokenGatesDetails } from 'lib/blockchain/updateTokenGateDetails';
 import { onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getSpaceWithTokenGates } from 'lib/spaces/getSpaceWithTokenGates';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { getSpaceByDomain } from 'lib/spaces/getSpaceByDomain';
+import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(requireKeys([{ key: 'search', valueType: 'truthy' }], 'query'), getSpaceInfoController);
 
-async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<SpaceWithGates | null>) {
+async function getSpaceInfoController(req: NextApiRequest, res: NextApiResponse<Space | null>) {
   const { search } = req.query;
 
-  const publicSpace = await getSpaceWithTokenGates(search as string);
+  const publicSpace = await getSpaceByDomain(search as string);
 
-  // Add identifiable names to token gates
-  const updatedTokenGates = await updateTokenGatesDetails(publicSpace?.tokenGates || []);
-
-  const updatedPublicSpace: SpaceWithGates | null = publicSpace
-    ? { ...publicSpace, tokenGates: updatedTokenGates }
-    : null;
-
-  if (updatedPublicSpace?.spaceImage) {
-    updatedPublicSpace.spaceImage = replaceS3Domain(updatedPublicSpace.spaceImage);
+  if (publicSpace?.spaceImage) {
+    publicSpace.spaceImage = replaceS3Domain(publicSpace.spaceImage);
   }
 
-  return res.status(200).json(updatedPublicSpace);
+  return res.status(200).json(publicSpace);
 }
 
 export default withSessionRoute(handler);

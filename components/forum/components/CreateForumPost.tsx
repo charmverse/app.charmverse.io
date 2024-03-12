@@ -49,7 +49,7 @@ export function CreateForumPost({
                 disabled
               />
               <Button disabled={disabled} component='div' float='right'>
-                Create Post
+                Create
               </Button>
             </Box>
           </CardContent>

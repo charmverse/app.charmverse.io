@@ -10,8 +10,4 @@ export class BlockchainApi {
   listNFTs(userId: string) {
     return http.GET<NFTData[]>(`/api/nft/list/${userId}`);
   }
-
-  refreshENSName(address: string) {
-    return http.POST<LoggedInUser>(`/api/nft/refresh-ensname`, { address });
-  }
 }

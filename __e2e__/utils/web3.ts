@@ -2,11 +2,10 @@ import { readFileSync } from 'fs';
 
 import type { Page as BrowserPage } from '@playwright/test';
 import { getChainById } from 'connectors/chains';
-import { SiweMessage } from 'lit-siwe';
-import { createWalletClient, http } from 'viem';
+import { SiweMessage } from 'siwe';
+import { createWalletClient, getAddress, http } from 'viem';
 import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
 
-import { generateSignaturePayload } from 'lib/blockchain/signAndVerify';
 import { baseUrl } from 'testing/mockApiCall';
 
 type MockOptions = {
@@ -140,4 +139,17 @@ export async function mockWalletSignature({ address, chainId = 1, privateKey }: 
   const sanitizedString = JSON.stringify(authSig).replace(/\\n/g, '\\\\n');
 
   return sanitizedString;
+}
+
+function generateSignaturePayload({ address, chainId, host }: { address: string; chainId: number; host: string }) {
+  const domain = host.match('https') ? host.split('https://')[1] : host.split('http://')[1];
+  const uri = host;
+
+  return {
+    domain,
+    address: getAddress(address), // convert to EIP-55 format or else SIWE complains
+    uri,
+    version: '1',
+    chainId
+  };
 }

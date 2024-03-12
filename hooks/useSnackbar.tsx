@@ -12,6 +12,7 @@ type IContext = {
   setSeverity: Dispatch<SetStateAction<AlertColor>>;
   setActions: Dispatch<SetStateAction<ReactNode[]>>;
   showMessage: (msg: ReactNode, newSeverity?: AlertColor) => void;
+  showError: (error: any, defaultMessage?: string) => void;
   handleClose: SnackbarProps['onClose'];
   autoHideDuration: number | null;
   setAutoHideDuration: Dispatch<SetStateAction<number | null>>;
@@ -27,6 +28,7 @@ export const SnackbarContext = createContext<Readonly<IContext>>({
   setSeverity: () => {},
   severity: 'info',
   showMessage: () => {},
+  showError: () => {},
   setActions: () => {},
   autoHideDuration: 5000,
   setAutoHideDuration: () => {}
@@ -52,18 +54,28 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
     resetState();
   };
 
+  function showMessage(msg: ReactNode, newSeverity?: AlertColor) {
+    newSeverity = newSeverity ?? 'info';
+    setMessage(msg);
+    setSeverity(newSeverity);
+    setIsOpen(true);
+  }
+
+  // error can be a string or instance of Error
+  function showError(error: any, defaultMessage?: string) {
+    // error?.errorType is from our webapp api, ex 404 response
+    const errorMessage = error?.message || error?.errorType || (typeof error === 'string' ? error : defaultMessage);
+    showMessage(errorMessage, 'error');
+  }
+
   const value = useMemo<IContext>(
     () => ({
       autoHideDuration,
       setAutoHideDuration,
       isOpen,
       handleClose,
-      showMessage: (msg: ReactNode, newSeverity?: AlertColor) => {
-        newSeverity = newSeverity ?? 'info';
-        setMessage(msg);
-        setSeverity(newSeverity);
-        setIsOpen(true);
-      },
+      showMessage,
+      showError,
       actions,
       message,
       severity,

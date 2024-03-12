@@ -1,14 +1,11 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
-import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/EvaluationSettingsSidebar/components/EvaluationStepSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { isTruthy } from 'lib/utilities/types';
+import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -25,23 +22,22 @@ export function useNewProposal({ newProposal }: Props) {
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
 
   const [contentUpdated, setContentUpdated] = useState(false);
+  // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
+  const [isFormLoaded, setIsFormLoaded] = useState(false);
   const [formInputs, setFormInputsRaw] = useState<ProposalPageAndPropertiesInput>(
     emptyState({ ...newProposal, userId: user?.id })
   );
 
   const setFormInputs = useCallback(
-    (partialFormInputs: Partial<ProposalPageAndPropertiesInput>) => {
-      setContentUpdated(true);
+    (partialFormInputs: Partial<ProposalPageAndPropertiesInput>, { fromUser = true }: { fromUser?: boolean } = {}) => {
+      if (fromUser) {
+        setContentUpdated(true);
+      }
+      setIsFormLoaded(true); // form is loaded when we first apply templates, workflows, content from templates, etc.
       setFormInputsRaw((existingFormInputs) => ({ ...existingFormInputs, ...partialFormInputs }));
     },
     [setFormInputsRaw]
   );
-
-  useEffect(() => {
-    setFormInputs({
-      publishToLens: !!user?.publishToLensDefault
-    });
-  }, [setFormInputs, user?.publishToLensDefault]);
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     log.info('[user-journey] Create a proposal');
@@ -60,15 +56,15 @@ export function useNewProposal({ newProposal }: Props) {
         },
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
-        evaluationType: formInputs.evaluationType,
-        reviewers: formInputs.reviewers,
         spaceId: currentSpace.id,
-        publishToLens: formInputs.publishToLens,
         fields: formInputs.fields,
         formId: formInputs.formId,
         formAnswers: formInputs.formAnswers,
-        workflowId: formInputs.workflowId || undefined,
-        isDraft
+        workflowId: formInputs.workflowId!,
+        isDraft,
+        selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
+        sourcePageId: formInputs.sourcePageId,
+        sourcePostId: formInputs.sourcePostId
       }).catch((err: any) => {
         showMessage(err.message ?? 'Something went wrong', 'error');
         throw err;
@@ -79,7 +75,14 @@ export function useNewProposal({ newProposal }: Props) {
   }
 
   const disabledTooltip = getProposalErrors({
+    page: {
+      title: formInputs.title,
+      type: formInputs.type,
+      content: formInputs.content
+    },
+    proposalType: formInputs.proposalType,
     proposal: formInputs,
+    isDraft: false,
     requireTemplates: !!currentSpace?.requireProposalTemplate
   }).join('\n');
 
@@ -89,68 +92,9 @@ export function useNewProposal({ newProposal }: Props) {
     createProposal,
     disabledTooltip,
     isCreatingProposal,
-    contentUpdated
+    contentUpdated,
+    isFormLoaded
   };
-}
-
-export function getProposalErrors({
-  proposal,
-  requireTemplates
-}: {
-  proposal: Pick<
-    ProposalPageAndPropertiesInput,
-    'title' | 'type' | 'proposalTemplateId' | 'formFields' | 'content' | 'proposalType' | 'evaluations'
-  >;
-  requireTemplates?: boolean;
-}) {
-  const errors = [];
-  if (!proposal.title) {
-    errors.push('Title is required');
-  }
-
-  if (requireTemplates && proposal.type === 'proposal' && !proposal.proposalTemplateId) {
-    errors.push('Template is required');
-  }
-
-  if (proposal.proposalType === 'structured') {
-    errors.push(checkFormFieldErrors(proposal.formFields ?? []));
-  } else if (
-    proposal.proposalType === 'free_form' &&
-    proposal.type === 'proposal_template' &&
-    checkIsContentEmpty(proposal.content)
-  ) {
-    errors.push('Content is required for free-form proposals');
-  }
-
-  // get the first validation error from the evaluations
-  errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
-
-  return errors.filter(isTruthy);
-}
-
-export function getEvaluationFormError(evaluation: ProposalEvaluationValues): string | false {
-  switch (evaluation.type) {
-    case 'feedback':
-      return false;
-    case 'rubric':
-      return !evaluation.title
-        ? 'Title is required for rubric criteria'
-        : evaluation.reviewers.length === 0
-        ? `Reviewers are required for the "${evaluation.title}" step`
-        : evaluation.rubricCriteria.length === 0
-        ? `At least one rubric criteria is required for the "${evaluation.title}" step`
-        : false;
-    case 'pass_fail':
-      return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
-    case 'vote':
-      return evaluation.reviewers.length === 0
-        ? `Voters are required for the "${evaluation.title}" step`
-        : !evaluation.voteSettings
-        ? `Vote details are required for the "${evaluation.title}" step`
-        : false;
-    default:
-      return false;
-  }
 }
 
 function emptyState({
@@ -158,20 +102,20 @@ function emptyState({
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
   return {
+    createdAt: new Date().toISOString(),
     proposalType: 'free_form',
     content: null,
     contentText: '',
     headerImage: null,
     icon: null,
-    evaluationType: 'vote',
     proposalTemplateId: null,
-    reviewers: [],
     evaluations: [],
     title: '',
     type: 'proposal',
-    publishToLens: false,
-    fields: { properties: {} },
+    selectedCredentialTemplates: [],
+    fields: { properties: {}, enableRewards: true },
     ...inputs,
-    authors: userId ? [userId] : []
+    // leave authors empty for proposals
+    authors: inputs.type !== 'proposal_template' && userId ? [userId] : []
   };
 }

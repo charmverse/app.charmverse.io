@@ -1,5 +1,4 @@
 import type { Page } from '@charmverse/core/prisma';
-import styled from '@emotion/styled';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
@@ -15,73 +14,16 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePage } from 'hooks/usePage';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import type { CharmNodeViewProps } from '../../nodeView/nodeView';
+
+import { InlineDatabaseContainer } from './InlineDatabaseContainer';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
 const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
   ssr: false
 });
-
-const StylesContainer = styled.div<{ containerWidth?: number }>`
-  .BoardComponent {
-    overflow: visible;
-  }
-
-  .top-head {
-    padding: 0;
-  }
-
-  .container-container {
-    min-width: unset;
-    overflow-x: auto;
-    padding: 0;
-    // offset padding around document
-    margin: 0 -24px;
-    padding: 0 24px;
-    ${({ theme }) => theme.breakpoints.up('md')} {
-      --side-margin: ${({ containerWidth }) => `calc((${containerWidth}px - 100%) / 2)`};
-      margin: 0 calc(-1 * var(--side-margin));
-      padding: 0 var(--side-margin);
-    }
-    &.sidebar-visible {
-      padding-right: 0;
-    }
-  }
-
-  // remove extra padding on Table view
-  .Table {
-    margin-top: 0;
-    width: fit-content;
-    min-width: 100%;
-  }
-
-  // remove extra padding on Kanban view
-  .octo-board-header {
-    padding-top: 0;
-  }
-
-  // remove extra margin on calendar view
-  .fc .fc-toolbar.fc-header-toolbar {
-    margin-top: 0;
-  }
-
-  // adjust columns on Gallery view
-  @media screen and (min-width: 600px) {
-    .Gallery {
-      padding-right: 48px; // offset the left padding from .container-container
-      ${({ theme }) => theme.breakpoints.up('md')} {
-        padding-right: 80px;
-      }
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-    }
-    .GalleryCard {
-      width: auto;
-    }
-  }
-`;
 
 interface DatabaseViewProps extends CharmNodeViewProps {
   containerWidth?: number; // pass in the container width so we can extend full width
@@ -160,7 +102,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   return (
     <>
       <DbViewSettingsProvider>
-        <StylesContainer
+        <InlineDatabaseContainer
           className='focalboard-body'
           containerWidth={containerWidth}
           onKeyPress={stopPropagation}
@@ -184,9 +126,15 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
             // Show more tabs on shared inline database as the space gets increased
             maxTabsShown={router.pathname.startsWith('/share') ? 5 : 3}
           />
-        </StylesContainer>
+        </InlineDatabaseContainer>
         {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-          <PageDialog key={shownCardId} pageId={shownCardId} onClose={() => setShownCardId(null)} readOnly={readOnly} />
+          <PageDialog
+            showCard={showCard}
+            key={shownCardId}
+            pageId={shownCardId}
+            onClose={() => setShownCardId(null)}
+            readOnly={readOnly}
+          />
         )}
       </DbViewSettingsProvider>
       <FocalBoardPortal />

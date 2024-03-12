@@ -1,4 +1,4 @@
-import { SystemError } from 'lib/utilities/errors';
+import { SystemError } from 'lib/utils/errors';
 
 /**
  * Used in tests when we should be receiving an error

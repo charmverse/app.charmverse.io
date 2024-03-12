@@ -2,13 +2,12 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { PaginatedResponse } from 'lib/public-api';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { PostSortOption } from './constants';
 import { defaultPostsPerResult, postSortOptions } from './constants';
-import type { PostWithRelations } from './getPostMeta';
 import { getPostMeta } from './getPostMeta';
-import type { ForumPostMeta } from './interfaces';
+import type { PostWithRelations, ForumPostMeta } from './getPostMeta';
 
 export type PaginatedPostList = PaginatedResponse<ForumPostMeta & { totalComments: number }> & { cursor: number };
 
@@ -27,8 +26,11 @@ export async function listForumPosts(
     // Count is the number of posts we want per page
     count = defaultPostsPerResult,
     categoryId,
-    sort
-  }: ListForumPostsRequest,
+    sort,
+    authorSelect
+  }: ListForumPostsRequest & {
+    authorSelect?: Prisma.UserSelect;
+  },
   userId?: string
 ): Promise<PaginatedPostList> {
   // Replicates prisma behaviour, but avoids a database call
@@ -51,7 +53,7 @@ export async function listForumPosts(
     createdAt: 'desc'
   };
 
-  const orderByMostCommmented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
+  const orderByMostCommented: Prisma.PostOrderByWithRelationAndSearchRelevanceInput = {
     comments: {
       _count: 'desc'
     }
@@ -71,7 +73,7 @@ export async function listForumPosts(
     // Return posts ordered from most recent to oldest
     orderBy: {
       ...((sort === 'new' || !sort || !postSortOptions.includes(sort)) && orderByNewest),
-      ...(sort === 'hot' && orderByMostCommmented),
+      ...(sort === 'hot' && orderByMostCommented),
       ...(sort === 'top' && orderByMostVoted)
     }
   };
@@ -96,7 +98,12 @@ export async function listForumPosts(
           upvoted: true,
           createdBy: true
         }
-      }
+      },
+      author: authorSelect
+        ? {
+            select: authorSelect
+          }
+        : undefined
     }
   });
 

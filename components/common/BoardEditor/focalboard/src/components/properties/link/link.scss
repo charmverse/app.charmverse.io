@@ -21,6 +21,10 @@
     margin-left: 8px;
     margin-top: 4px;
 
+    &.table-cell {
+      margin-top: 0;
+    }
+
     &:hover {
       color: rgba(var(--center-channel-color-rgb), 0.72);
       background: rgba(var(--center-channel-color-rgb), 0.08);

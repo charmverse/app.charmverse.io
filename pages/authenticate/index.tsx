@@ -8,12 +8,14 @@ import { getLayout } from 'components/common/BaseLayout/getLayout';
 import { Button } from 'components/common/Button';
 import { EmailAddressFormDialog } from 'components/login/components/EmailAddressForm';
 import { LoginButton } from 'components/login/components/LoginButton';
+import { VerifyLoginOtpModal } from 'components/login/components/VerifyLoginOtpModal';
 import { LoginPageContent } from 'components/login/LoginPageContent';
 import { useFirebaseAuth } from 'hooks/useFirebaseAuth';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { isValidEmail } from 'lib/utilities/strings';
+import { useVerifyLoginOtp } from 'hooks/useVerifyLoginOtp';
+import { isValidEmail } from 'lib/utils/strings';
 
 export default function Authenticate() {
   const [loginError, setLoginError] = useState(false);
@@ -24,6 +26,7 @@ export default function Authenticate() {
   const { showMessage } = useSnackbar();
   const router = useRouter();
   const emailPopup = usePopupState({ variant: 'popover', popupId: 'emailPopup' });
+  const { close: closeVerifyOtp, isOpen: isVerifyOtpOpen, open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   async function redirectLoggedInUser() {
     const redirectPath = typeof router.query.redirectUrl === 'string' ? router.query.redirectUrl : '/';
@@ -42,16 +45,21 @@ export default function Authenticate() {
   }
 
   // Case where existing user is adding an email to their account
-  function loginViaEmail() {
+  async function loginViaEmail() {
     if (!emailForSignIn) {
       return;
     }
 
     setIsAuthenticating(true);
-    validateMagicLink(emailForSignIn)
-      .then(() => {
-        showMessage('Logged in with email. Redirecting you now', 'success');
-        redirectLoggedInUser();
+
+    await validateMagicLink(emailForSignIn)
+      .then((data) => {
+        if ('id' in data) {
+          showMessage('Logged in with email. Redirecting you now', 'success');
+          redirectLoggedInUser();
+        } else if ('otpRequired' in data) {
+          openVerifyOtpModal();
+        }
       })
       .catch((err) => {
         if (user) {
@@ -119,6 +127,7 @@ export default function Authenticate() {
         isOpen={emailPopup.isOpen}
         handleSubmit={submitEmail}
       />
+      <VerifyLoginOtpModal open={isVerifyOtpOpen} onClose={closeVerifyOtp} />
     </Box>
   );
 }

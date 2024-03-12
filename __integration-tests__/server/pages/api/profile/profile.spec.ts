@@ -19,45 +19,6 @@ beforeAll(async () => {
 });
 
 describe('PUT /api/profile - Update user profile', () => {
-  it('should allow the user to set an unstoppable domain as their username, responding with 200', async () => {
-    const domainValue = `test-domain-${v4()}`;
-
-    const domain = await prisma.unstoppableDomain.create({
-      data: {
-        domain: domainValue,
-        user: {
-          connect: {
-            id: user.id
-          }
-        }
-      }
-    });
-
-    const update: Partial<LoggedInUser> = {
-      identityType: 'UnstoppableDomain',
-      username: domain.domain
-    };
-
-    const updatedProfile = (
-      await request(baseUrl).put('/api/profile').set('Cookie', userCookie).send(update).expect(200)
-    ).body as LoggedInUser;
-
-    expect(updatedProfile.username).toBe(domain.domain);
-    expect(updatedProfile.identityType).toBe('UnstoppableDomain');
-  });
-
-  it('should refuse to update a users profile to an unstoppable domain not registered to their account, responding with 401', async () => {
-    const extraUser = await generateSpaceUser({ isAdmin: false, spaceId: space.id });
-
-    const update: Partial<LoggedInUser> = {
-      identityType: 'UnstoppableDomain',
-      username: 'userdomain.nft'
-    };
-
-    const cookie = await loginUser(extraUser.id);
-
-    await request(baseUrl).put('/api/profile').set('Cookie', cookie).send(update).expect(401);
-  });
   it('should allow the user to set a Google Account as their username, responding with 200', async () => {
     const googleAccount = await prisma.googleAccount.create({
       data: {

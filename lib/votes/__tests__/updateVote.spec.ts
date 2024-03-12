@@ -2,7 +2,7 @@ import type { VoteContext, VoteStatus } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
 import { addSpaceOperations } from 'lib/permissions/spaces';
-import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError, UndesirableOperationError } from 'lib/utils/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { updateVote } from '../updateVote';

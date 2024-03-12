@@ -67,7 +67,6 @@ function Menu({ position = 'bottom-start', children, disablePortal = true }: Pro
 
 Menu.Color = ColorOption;
 Menu.SubMenu = SubMenuOption;
-Menu.Switch = CheckboxOption;
 Menu.Separator = SeparatorOption;
 Menu.Text = TextOption;
 Menu.Label = LabelOption;

@@ -51,7 +51,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { setFocalboardViewsRecord } = useFocalboardViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const { pages, refreshPage } = usePages();
+  const { pages } = usePages();
+  const shownCardPage = Object.values(pages).find((_page) => _page?.cardId === shownCardId);
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -172,11 +173,13 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
             />
             {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
               <PageDialog
+                showCard={showCard}
                 key={shownCardId}
                 pageId={shownCardId}
                 onClose={() => {
                   showCard(null);
                 }}
+                showParentChip={shownCardPage?.parentId !== page.id}
                 readOnly={readOnly}
               />
             )}

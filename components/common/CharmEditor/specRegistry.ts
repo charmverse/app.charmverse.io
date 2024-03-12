@@ -8,12 +8,14 @@ import { spec as bookmarkSpec } from './components/bookmark/bookmarkSpec';
 import * as bulletList from './components/bulletList';
 import * as callout from './components/callout/callout';
 import * as columnLayout from './components/columnLayout/columnLayout.schema';
-import { cryptoPriceSpec } from './components/CryptoPrice';
+import { spec as cryptoPriceSpec } from './components/cryptoPrice/cryptoPriceSpec';
 import * as disclosure from './components/disclosure';
 import * as doc from './components/doc/doc';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
+import { spec as farcasterFrameSpec } from './components/farcasterFrame/farcasterFrameSpec';
 import { deletion, formatChange, insertion } from './components/fiduswriter/schema/common/track';
 import { specs as fileSpecs } from './components/file/file.specs';
+import { hardBreakSpec } from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -43,7 +45,6 @@ import { spec as tableOfContentSpec } from './components/tableOfContents/tableOf
 import * as textColor from './components/textColor/textColorSpec';
 import * as tweet from './components/tweet/tweetSpec';
 import * as video from './components/video/videoSpec';
-import { hardBreakSpec } from './specs/hardBreakSpec';
 
 export interface ICharmEditorOutput {
   doc: PageContent;
@@ -84,6 +85,7 @@ export const specRegistry = new SpecRegistry([
   inlinePaletteSpecs(), // Not required
   callout.spec(), // OK
   cryptoPriceSpec(), // NO
+  farcasterFrameSpec(),
   pdfSpec(), // NO
   image.spec(), // OK
   columnLayout.spec(), // NO

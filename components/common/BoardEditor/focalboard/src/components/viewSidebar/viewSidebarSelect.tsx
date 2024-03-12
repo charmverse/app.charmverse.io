@@ -16,7 +16,7 @@ import type { BoardView } from 'lib/focalboard/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 
-export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source';
+export type SidebarView = 'view-options' | 'layout' | 'card-properties' | 'group-by' | 'source' | 'card-property';
 
 function MenuRow({
   icon,

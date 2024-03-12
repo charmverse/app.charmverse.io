@@ -2,7 +2,7 @@
 import type { Post, PostCategory, Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 
-import type { ForumPostMeta } from 'lib/forums/posts/interfaces';
+import type { ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import type { ListForumPostsRequest, PaginatedPostList } from 'lib/forums/posts/listForumPosts';
 import type { SearchForumPostsRequest } from 'lib/forums/posts/searchForumPosts';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';

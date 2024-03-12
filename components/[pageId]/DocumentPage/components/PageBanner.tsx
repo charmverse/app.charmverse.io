@@ -4,7 +4,7 @@ import { ListItem, Typography, Box } from '@mui/material';
 import { memo } from 'react';
 
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
-import { randomIntFromInterval } from 'lib/utilities/random';
+import { randomIntFromInterval } from 'lib/utils/random';
 
 const StyledPageBanner = styled(({ focalBoard, ...props }: any) => <div {...props} />)<{ focalBoard?: boolean }>`
   display: flex;

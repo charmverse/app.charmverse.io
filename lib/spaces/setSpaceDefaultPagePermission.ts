@@ -2,7 +2,7 @@ import type { PagePermissionLevel, Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { SpaceNotFoundError } from 'lib/public-api';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 export async function setSpaceDefaultPagePermission({
   spaceId,

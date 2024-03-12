@@ -11,7 +11,7 @@ import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { verifyMembership } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishMemberEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -32,7 +32,7 @@ async function joinSpaceEndpoint(req: NextApiRequest, res: NextApiResponse) {
     throw new InvalidInputError('You are not a member of this space');
   }
 
-  await addUserToSpace({ spaceId, userId, userXpsEngineId: result.summonUserId });
+  await addUserToSpace({ spaceId, userId, xpsUserId: result.summonUserId });
 
   trackUserAction('join_a_workspace', {
     spaceId,

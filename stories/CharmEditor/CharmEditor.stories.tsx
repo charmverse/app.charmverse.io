@@ -10,7 +10,7 @@ import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { contentWithBlocksAndMarks, contentWithMedia } from 'testing/mocks/charmEditorContent';
 
-import { renderEditorWithContent } from './renderEditor';
+import { renderEditorWithContent, withCharmEditorProviders } from './renderEditor';
 
 // CharmEditore uses boards state, so we need to mock it
 const store = mockStateStore([], {
@@ -23,6 +23,7 @@ export default {
   title: 'common/CharmEditor/Views',
   component: CharmEditorComponent,
   decorators: [
+    withCharmEditorProviders,
     (Story: any) => (
       <Provider store={store}>
         <Paper sx={{ p: 4 }}>
@@ -55,7 +56,6 @@ export function FullPageEditor() {
         pagePermissions={undefined}
         onContentChange={onChange}
         onConnectionEvent={() => {}}
-        snapshotProposalId={null}
         onParticipantUpdate={() => {}}
         style={{
           minHeight: '100px'

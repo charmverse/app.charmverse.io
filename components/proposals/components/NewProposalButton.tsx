@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
@@ -8,19 +7,20 @@ import { Box, ButtonGroup, MenuItem, Stack, Tooltip, Typography, ListItemIcon, L
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef } from 'react';
 
-import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
 import { DeleteIcon } from 'components/common/Icons/DeleteIcon';
 import { EditIcon } from 'components/common/Icons/EditIcon';
 import Modal from 'components/common/Modal';
+import { ArchiveProposalAction } from 'components/common/PageActions/components/ArchiveProposalAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';
-import { TemplatesMenu } from 'components/common/TemplatesMenu';
+import { PublishProposalAction } from 'components/common/PageActions/components/PublishProposalAction';
+import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
+import type { TemplateItem } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { isTruthy } from 'lib/utilities/types';
 
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
@@ -45,26 +45,26 @@ export function NewProposalButton() {
   const { getFeatureTitle } = useSpaceFeatures();
   const [spacePermissions] = useCurrentSpacePermissions();
   const isAdmin = useIsAdmin();
-  const { pages } = usePages();
   const proposalTemplateCreateModalState = usePopupState({ variant: 'dialog' });
   // MUI Menu specific content
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
   const { proposalTemplates, isLoadingTemplates } = useProposalTemplates();
+  const { trigger: trashPages } = useTrashPages();
 
   const canCreateProposal = spacePermissions?.createProposals;
-  // grab page data from context so that title is always up-to-date
-  const proposalTemplatePages = proposalTemplates
-    ?.map(
-      (template) =>
-        ({ ...pages[template.page.id], isStructuredProposal: !!template.formId } as PageMeta & {
-          isStructuredProposal: boolean;
-        })
-    )
-    .filter(isTruthy);
+
+  const proposalTemplatePages: TemplateItem[] = (proposalTemplates || []).map((proposal) => ({
+    id: proposal.pageId,
+    title: proposal.title,
+    proposalId: proposal.proposalId,
+    isStructuredProposal: proposal.contentType === 'structured',
+    archived: !!proposal.archived,
+    draft: proposal.draft
+  }));
 
   function deleteProposalTemplate(pageId: string) {
-    return charmClient.deletePage(pageId);
+    return trashPages({ pageIds: [pageId], trash: true });
   }
 
   function editTemplate(pageId: string) {
@@ -106,7 +106,7 @@ export function NewProposalButton() {
         isLoading={isLoadingTemplates}
         addPageFromTemplate={createFromTemplate}
         editTemplate={editTemplate}
-        pages={proposalTemplatePages}
+        templates={proposalTemplatePages}
         createTemplate={proposalTemplateCreateModalState.open}
         deleteTemplate={deleteProposalTemplate}
         anchorEl={buttonRef.current as Element}
@@ -115,7 +115,7 @@ export function NewProposalButton() {
         enableItemOptions={isAdmin}
         enableNewTemplates={isAdmin}
         // eslint-disable-next-line react/no-unstable-nested-components
-        pageActions={({ pageId }) => (
+        pageActions={({ pageId, proposalId }) => (
           <>
             <MenuItem
               data-test={`template-menu-edit-${pageId}`}
@@ -128,7 +128,10 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Edit</ListItemText>
             </MenuItem>
-            <CopyPageLinkAction path={`/proposals/new?template=${pageId}`} />
+            <CopyPageLinkAction
+              path={`/proposals/new?template=${pageId}`}
+              message='Link copied. NOTE: anyone can join your space using this link.'
+            />
 
             <MenuItem
               onClick={() => {
@@ -150,6 +153,12 @@ export function NewProposalButton() {
               </ListItemIcon>
               <ListItemText>Delete</ListItemText>
             </MenuItem>
+            <span onClick={(e) => e.stopPropagation()}>
+              <ArchiveProposalAction proposalId={proposalId!} />
+            </span>
+            <span onClick={(e) => e.stopPropagation()}>
+              <PublishProposalAction proposalId={proposalId!} />
+            </span>
           </>
         )}
       />

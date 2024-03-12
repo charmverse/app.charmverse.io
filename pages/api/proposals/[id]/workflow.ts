@@ -4,18 +4,15 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
-import { updateProposalWorkflow } from 'lib/proposal/updateProposalWorkflow';
-import type { UpdateWorkflowRequest } from 'lib/proposal/updateProposalWorkflow';
+import { updateProposalWorkflow } from 'lib/proposals/updateProposalWorkflow';
+import type { UpdateWorkflowRequest } from 'lib/proposals/updateProposalWorkflow';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler
-  .use(providePermissionClients({ key: 'id', location: 'query', resourceIdType: 'proposal' }))
-  .put(updateWorkflowEndpoint);
+handler.put(updateWorkflowEndpoint);
 
 async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
@@ -66,7 +63,8 @@ async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse)
 
   await updateProposalWorkflow({
     proposalId: proposal.id,
-    workflowId
+    workflowId,
+    actorId: userId
   });
 
   return res.status(200).end();

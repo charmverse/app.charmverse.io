@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import { useState } from 'react';
 import useSWR from 'swr';
 
@@ -5,13 +6,12 @@ import charmClient from 'charmClient';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { VerificationResponse } from 'lib/summon/verifyMembership';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 
 type Props = {
   joinType?: TokenGateJoinType;
-  space: SpaceWithGates;
+  space: Space;
   onSuccess: () => void;
 };
 

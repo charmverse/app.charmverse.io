@@ -1,7 +1,9 @@
 import styled from '@emotion/styled';
 import { Stack } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 
+import { PopupFieldWrapper } from 'components/common/BoardEditor/components/properties/PopupFieldWrapper';
 import {
   mapPropertyOptionToSelectOption,
   mapSelectOptionToPropertyOption
@@ -25,11 +27,11 @@ export const SelectPreviewContainer = styled(Stack, {
     prop !== 'displayType' && prop !== 'isHidden' && prop !== 'readOnly' && prop !== 'fluidWidth'
 })<ContainerProps>`
   border-radius: ${({ theme }) => theme.spacing(0.5)};
-  display: ${({ isHidden }) => (isHidden ? 'none' : 'initial')};
+  ${({ isHidden }) => (isHidden ? 'display: none;' : '')};
   ${({ fluidWidth }) => (!fluidWidth ? 'width: 100%;' : '')}
   height: 100%;
-  justify-content: center;
-  padding: ${({ theme }) => theme.spacing(0.25, 0)};
+  justify-content: ${({ displayType }) => (displayType === 'table' ? 'flex-start' : 'center')}
+  padding: ${({ theme, displayType }) => theme.spacing(displayType === 'table' ? 0 : 0.25, 0)};
   transition: background-color 0.2s ease-in-out;
 
   ${({ displayType, theme }) => {
@@ -63,15 +65,6 @@ const StyledSelect = styled(SelectField)<ContainerProps>`
   ${({ fluidWidth }) => (!fluidWidth ? 'flex-grow: 1;' : '')}
   .MuiInputBase-root {
     background-color: ${({ theme }) => theme.palette.background.paper};
-
-    ${({ displayType, theme }) =>
-      displayType === 'table'
-        ? `
-        .MuiAutocomplete-input {
-          width: 100%;
-          border-top: 1px solid ${theme.palette.divider};
-        }`
-        : ''}
   }
 
   // override styles from focalboard
@@ -113,6 +106,9 @@ export type TagSelectProps = {
   wrapColumn?: boolean;
   'data-test'?: string;
   fluidWidth?: boolean;
+  emptyMessage?: string;
+  showEmpty?: boolean;
+  dataTestActive?: string;
 };
 
 export function TagSelect({
@@ -133,6 +129,8 @@ export function TagSelect({
   defaultOpened = false,
   disableClearable = false,
   fluidWidth,
+  showEmpty,
+  dataTestActive,
   ...props
 }: TagSelectProps) {
   const [isOpened, setIsOpened] = useState(defaultOpened);
@@ -183,31 +181,11 @@ export function TagSelect({
     return null;
   }
 
-  if (!isOpened) {
-    return (
-      <SelectPreviewContainer
-        data-test={props['data-test']}
-        onClick={onEdit}
-        displayType={displayType}
-        readOnly={readOnly}
-        fluidWidth={fluidWidth}
-      >
-        <SelectPreview
-          readOnly={readOnly}
-          readOnlyMessage={readOnlyMessage}
-          sx={{ height: '100%' }}
-          wrapColumn={wrapColumn}
-          value={selectValue}
-          options={selectOptions}
-          size='small'
-          showEmpty={displayType === 'details'}
-        />
-      </SelectPreviewContainer>
-    );
-  }
+  const showInsidePopup = displayType === 'table';
 
-  return (
+  const activeField = (
     <StyledSelect
+      dataTest={dataTestActive}
       canEditOptions={canEditOptions}
       includeSelectedOptions={includeSelectedOptions}
       placeholder='Search for an option...'
@@ -226,6 +204,39 @@ export function TagSelect({
       forcePopupIcon={false}
       displayType={displayType}
       fluidWidth={fluidWidth}
+      disablePopper={showInsidePopup}
     />
   );
+
+  const previewField = (
+    <SelectPreviewContainer
+      data-test={props['data-test']}
+      onClick={onEdit}
+      displayType={displayType}
+      readOnly={readOnly}
+      fluidWidth={fluidWidth}
+    >
+      <SelectPreview
+        readOnly={readOnly}
+        readOnlyMessage={readOnlyMessage}
+        sx={{ height: '100%' }}
+        wrapColumn={wrapColumn}
+        value={selectValue}
+        options={selectOptions}
+        size='small'
+        emptyMessage={props.emptyMessage}
+        showEmpty={showEmpty || displayType === 'details'}
+      />
+    </SelectPreviewContainer>
+  );
+
+  if (showInsidePopup) {
+    return <PopupFieldWrapper previewField={previewField} activeField={activeField} disabled={readOnly} />;
+  }
+
+  if (!isOpened) {
+    return previewField;
+  }
+
+  return activeField;
 }

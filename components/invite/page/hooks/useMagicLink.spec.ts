@@ -15,6 +15,12 @@ jest.mock('next/router', () => ({
   })
 }));
 
+jest.mock('hooks/useVerifyLoginOtp', () => ({
+  useVerifyLoginOtp: () => ({
+    open: jest.fn()
+  })
+}));
+
 describe('useMagicLink()', () => {
   afterAll(() => {
     jest.restoreAllMocks();
@@ -30,7 +36,7 @@ describe('useMagicLink()', () => {
   test('should request to verify email', async () => {
     (useFirebaseAuth as jest.Mock<any, any>).mockReturnValue({
       emailForSignIn: 'matt@acme.blockchain',
-      validateMagicLink: jest.fn()
+      validateMagicLink: jest.fn().mockReturnValueOnce(Promise.resolve({ id: '123' }))
     });
 
     const { result } = renderHook(() => useMagicLink());

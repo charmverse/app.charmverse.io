@@ -10,7 +10,7 @@ import { rollupRewardStatus } from 'lib/rewards/rollupRewardStatus';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { updateRewardSettings } from 'lib/rewards/updateRewardSettings';
 import { withSessionRoute } from 'lib/session/withSession';
-import { UnauthorisedActionError } from 'lib/utilities/errors';
+import { UnauthorisedActionError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

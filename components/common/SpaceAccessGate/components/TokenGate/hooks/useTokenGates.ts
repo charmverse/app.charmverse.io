@@ -1,21 +1,18 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import { useEffect, useState } from 'react';
 
-import { useEvaluateTokenGateEligibility, useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
+import { useEvaluateTokenGateEligibility, useGetTokenGates, useVerifyTokenGate } from 'charmClient/hooks/tokenGates';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaces } from 'hooks/useSpaces';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
 import type { TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
 import type { TokenGateJoinType, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
-import { lowerCaseEqual } from 'lib/utilities/strings';
 
 type Props = {
   account?: string | null;
   autoVerify?: boolean;
   joinType?: TokenGateJoinType;
-  space: SpaceWithGates;
+  space: Space;
   onSuccess?: () => void;
 };
 
@@ -25,7 +22,7 @@ export type TokenGateState = {
   tokenGateResult?: TokenGateEvaluationResult;
   isVerified: boolean;
   isVerifying: boolean;
-  evaluateEligibility: (sig: AuthSig) => Promise<void>;
+  evaluateEligibility: () => Promise<void>;
   joinSpace: (onError: (error: any) => void) => Promise<void>;
   joiningSpace: boolean;
 };
@@ -39,12 +36,11 @@ export function useTokenGates({
 }: Props): TokenGateState {
   const { showMessage } = useSnackbar();
   const { spaces, setSpaces } = useSpaces();
-  const { getStoredSignature } = useWeb3Account();
   const { refreshUser, user } = useUser();
   const { trigger: verifyTokenGateAndJoin } = useVerifyTokenGate();
 
   const [joiningSpace, setJoiningSpace] = useState(false);
-  const tokenGates = space.tokenGates;
+  const { data: tokenGates = null } = useGetTokenGates(space.id);
   const {
     data: tokenGateResult,
     trigger: evaluateSpaceTokenGates,
@@ -52,21 +48,14 @@ export function useTokenGates({
   } = useEvaluateTokenGateEligibility();
 
   useEffect(() => {
-    if (autoVerify && account) {
-      const signature = getStoredSignature(account);
-
-      if (user && !!signature && user.wallets.some((wallet) => lowerCaseEqual(wallet.address, signature.address))) {
-        evaluateEligibility(signature);
-      }
+    if (autoVerify && account && user?.wallets?.length) {
+      evaluateEligibility();
     }
-  }, [user, account, autoVerify]);
+  }, [user?.wallets.length, account, autoVerify]);
 
-  async function evaluateEligibility(authSig: AuthSig) {
+  async function evaluateEligibility() {
     await evaluateSpaceTokenGates(
-      {
-        authSig,
-        spaceIdOrDomain: space.id
-      },
+      { spaceIdOrDomain: space.id },
       {
         onError: (err: any) => {
           showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
@@ -79,15 +68,12 @@ export function useTokenGates({
     setJoiningSpace(true);
 
     try {
-      if (account) {
-        await verifyTokenGateAndJoin({
-          commit: true,
-          spaceId: space.id,
-          tokens: tokenGateResult?.eligibleGates ?? [],
-          joinType,
-          walletAddress: account
-        });
-      }
+      await verifyTokenGateAndJoin({
+        commit: true,
+        spaceId: space.id,
+        tokenGateIds: tokenGateResult?.eligibleGates ?? [],
+        joinType
+      });
 
       showMessage(`You have joined the ${space.name} space.`, 'success');
 
@@ -107,7 +93,7 @@ export function useTokenGates({
   }
 
   return {
-    isEnabled: tokenGates.length > 0,
+    isEnabled: !!tokenGates && tokenGates.length > 0,
     joinSpace,
     tokenGates,
     isVerifying,

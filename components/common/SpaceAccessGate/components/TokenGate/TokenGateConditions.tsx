@@ -9,8 +9,8 @@ import { v4 as uuid } from 'uuid';
 import Avatar from 'components/common/Avatar';
 import { Button } from 'components/common/Button';
 import type { HumanizeConditionsContent, HumanizeCondition } from 'lib/tokenGates/humanizeConditions';
-import { isTruthy } from 'lib/utilities/types';
-import HypersubIcon from 'public/images/logos/fabric-xyz.svg';
+import type { Operator } from 'lib/tokenGates/interfaces';
+import { isTruthy } from 'lib/utils/types';
 
 const StyledOperator = styled(Box)`
   &:after,
@@ -27,14 +27,6 @@ function generateComponent(condition: HumanizeConditionsContent) {
   const { content, url, props } = condition;
 
   switch (condition.type) {
-    case 'operator':
-      return (
-        <StyledOperator key={content} display='flex' alignItems='center'>
-          <Typography {...props} px={1}>
-            {content.toUpperCase()}{' '}
-          </Typography>
-        </StyledOperator>
-      );
     case 'text':
       return (
         <Typography key={content} {...props} component='span'>
@@ -74,13 +66,12 @@ function Condition({
   const image = condition.image;
   const textConditions = condition.content;
   const text = textConditions.map(generateComponent).filter(isTruthy);
-  const isOperator = condition.content.some((c) => c.type === 'operator');
   const isExternalImage = !!condition.image?.startsWith('http');
   const imageFittingType = isExternalImage ? 'cover' : 'contain!important';
-  const contractType = condition.standardContractType || '';
+  const contractType = condition.type || '';
 
   return (
-    <Box display='flex' alignItems='center' my={isOperator ? 2 : undefined}>
+    <Box display='flex' alignItems='center'>
       {typeof image === 'string' && (
         <Box mr={2}>
           <Avatar
@@ -94,13 +85,11 @@ function Condition({
             }}
             name='Token Gate condition'
             isNft={['POAP', 'ERC721', 'ERC1155'].includes(contractType) && isExternalImage}
-          >
-            {contractType === 'HYPERSUB' ? <HypersubIcon /> : undefined}
-          </Avatar>
+          />
         </Box>
       )}
       <Box width='100%'>{text}</Box>
-      {onDelete && condition.content.some((c) => c.type !== 'operator') && (
+      {onDelete && (
         <Box>
           <IconButton onClick={onDelete} disabled={isLoading} color='default'>
             <DeleteIcon />
@@ -113,22 +102,31 @@ function Condition({
 
 export function ConditionsGroup({
   conditions,
+  operator = 'OR',
   isLoading,
   onDelete
 }: {
   conditions: HumanizeCondition[];
+  operator?: Operator;
   isLoading?: boolean;
   onDelete?: (index: number) => void;
 }) {
   return (
     <Box>
-      {conditions.map((condition, i) => (
-        <Condition
-          key={uuid()}
-          condition={condition}
-          onDelete={onDelete ? () => onDelete?.(i) : undefined}
-          isLoading={isLoading}
-        />
+      {conditions.map((condition, i, arr) => (
+        <>
+          <Condition
+            key={uuid()}
+            condition={condition}
+            onDelete={onDelete ? () => onDelete?.(i) : undefined}
+            isLoading={isLoading}
+          />
+          {arr.length !== i + 1 && (
+            <StyledOperator display='flex' alignItems='center' my={2}>
+              <Typography px={1}>{operator} </Typography>
+            </StyledOperator>
+          )}
+        </>
       ))}
     </Box>
   );

@@ -3,20 +3,22 @@ import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
 
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
-import type { FeatureJson, StaticPage } from 'lib/features/constants';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
+import type { PageMetaLite } from 'lib/pages/interfaces';
 
 import { enableDragAndDrop } from '../../../utils';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
-const NestedPageContainer = styled(Link)`
+export const StyledLink = styled(Link)`
   align-items: center;
   cursor: pointer;
   display: flex;
@@ -41,7 +43,7 @@ const NestedPageContainer = styled(Link)`
   }
 `;
 
-const StyledTypography = styled(Typography)`
+export const StyledTypography = styled(Typography)`
   font-weight: 600;
   border-bottom: 0.05em solid var(--link-underline);
 `;
@@ -56,56 +58,56 @@ function resetPageNodeDropPluginState(view: EditorView) {
   }
 }
 
-export default function NestedPage({
-  isLinkedPage,
-  node,
-  currentPageId,
-  getPos
-}: NodeViewProps & { isLinkedPage?: boolean; currentPageId?: string }) {
-  const { space } = useCurrentSpace();
+export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const view = useEditorViewContext();
   const { pages, loadingPages } = usePages();
+  const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
 
-  const spaceFeatures = (space?.features as FeatureJson[]) ?? [];
-
-  const features = STATIC_PAGES.map(({ feature, ...restFeat }) => ({
-    id: feature,
-    title: spaceFeatures.find((_feature) => _feature.id === feature)?.title ?? restFeat.title
-  }));
-
-  const documentPage = pages[node.attrs.id];
-  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
-  const parentPage = documentPage?.parentId ? pages[documentPage.parentId] : null;
+  const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
+  const isDocumentPath = !forumCategoryPage && !staticPage;
+  const isProposalTemplate = node.attrs.type === 'proposal_template';
+  const pageFromPagesContext = pages[node.attrs.id];
+
+  // retrieve the page directly if we are waiting for pages to load
+  const { data: sourcePage, isLoading: isPageLoading } = useGetPageMeta(
+    !pageFromPagesContext && isDocumentPath && node.attrs.id
+  );
+
+  const documentPage = sourcePage || pageFromPagesContext;
+  const isLoading = isPageLoading && loadingPages;
+
   let pageTitle = '';
-  if (documentPage || staticPage) {
-    pageTitle =
-      (staticPage
-        ? features.find((feat) => feat.id === staticPage.feature)?.title ?? staticPage.title
-        : documentPage?.title) || 'Untitled';
+  if (staticPage) {
+    pageTitle = mappedFeatures[staticPage.feature]?.title;
+  } else if (isProposalTemplate) {
+    pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage?.title || 'Untitled'}`;
+  } else if (documentPage) {
+    pageTitle = documentPage?.title || 'Untitled';
   } else if (forumCategoryPage) {
-    const forumFeatureTitle = features.find((feat) => feat.id === 'forum')?.title ?? 'Forum';
-    pageTitle = `${forumFeatureTitle} > ${forumCategoryPage?.name || 'Untitled'}`;
-  } else if (!loadingPages) {
+    pageTitle = `${getFeatureTitle('Forum')} > ${forumCategoryPage?.name || 'Untitled'}`;
+  } else if (!isLoading) {
     pageTitle = 'No access';
   }
 
-  const pageId = documentPage?.id || staticPage?.path || forumCategoryPage?.id;
-  const pagePath = documentPage ? `${space?.domain}/${documentPage.path}` : '';
-  const staticPath = staticPage ? `${space?.domain}/${staticPage.path}` : '';
-  const categoryPath = forumCategoryPage ? `${space?.domain}/forum/${forumCategoryPage.path}` : '';
+  const pageId = node.attrs.id || staticPage?.path || forumCategoryPage?.id;
+  const pagePath = isProposalTemplate
+    ? `/proposals/new?template=${node.attrs.id}`
+    : documentPage
+    ? `/${documentPage.path}`
+    : '';
+  const staticPath = staticPage ? `/${staticPage.path}` : '';
+  const categoryPath = forumCategoryPage ? `/forum/${forumCategoryPage.path}` : '';
   const appPath = pagePath || staticPath || categoryPath;
 
   const fullPath = `${window.location.origin}/${appPath}`;
 
-  const _isLinkedPage = isLinkedPage ?? (currentPageId ? parentPage?.id !== currentPageId : false);
-
   return (
-    <NestedPageContainer
+    <StyledLink
       data-test={`${isLinkedPage ? 'linked-page' : 'nested-page'}-${pageId}`}
       data-page-type={node.attrs.type ?? documentPage?.type}
-      href={appPath ? `/${appPath}` : undefined}
+      href={appPath}
       color='inherit'
       data-id={pageId}
       data-title={pageTitle}
@@ -130,15 +132,17 @@ export default function NestedPage({
       }}
     >
       <div>
-        <LinkIcon
-          isLinkedPage={_isLinkedPage}
-          documentPage={documentPage}
-          staticPage={staticPage}
-          isCategoryPage={!!forumCategoryPage}
-        />
+        {!isLoading && (
+          <LinkIcon
+            isLinkedPage={isLinkedPage}
+            documentPage={documentPage}
+            staticPage={staticPage}
+            isCategoryPage={!!forumCategoryPage}
+          />
+        )}
       </div>
-      <StyledTypography>{pageTitle}</StyledTypography>
-    </NestedPageContainer>
+      <StyledTypography>{pageTitle || ' '}</StyledTypography>
+    </StyledLink>
   );
 }
 
@@ -149,7 +153,7 @@ function LinkIcon({
   isCategoryPage
 }: {
   isLinkedPage: boolean;
-  documentPage?: PageMeta;
+  documentPage?: PageMetaLite;
   staticPage?: StaticPage;
   isCategoryPage: boolean;
 }) {

@@ -140,9 +140,13 @@ function ViewTitle(props: ViewTitleProps) {
           <CharmEditor
             disablePageSpecificFeatures
             isContentControlled
+            disableRowHandles
             content={board.fields.description}
             onContentChange={(content: ICharmEditorOutput) => {
               onDescriptionChange(content.doc);
+            }}
+            style={{
+              marginLeft: 35
             }}
             disableNestedPages
             pageId={board.id}

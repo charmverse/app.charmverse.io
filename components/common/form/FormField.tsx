@@ -24,7 +24,7 @@ import { useDrag, useDrop } from 'react-dnd';
 
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { mergeRefs } from 'lib/utilities/react';
+import { mergeRefs } from 'lib/utils/react';
 
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
@@ -34,7 +34,7 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
 
-const FormFieldContainer = styled(Stack, {
+export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {
     return propName !== 'dragDirection';
   }
@@ -90,6 +90,7 @@ function ExpandedFormField({
     <>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' pr={4}>
         <Select<FormFieldType>
+          data-test='form-field-type-select'
           value={formField.type}
           onChange={(e) =>
             updateFormField({
@@ -104,7 +105,7 @@ function ExpandedFormField({
         >
           {formFieldTypes.map((fieldType) => {
             return (
-              <MenuItem key={fieldType} value={fieldType}>
+              <MenuItem data-test={`form-field-type-option-${fieldType}`} key={fieldType} value={fieldType}>
                 <Stack flexDirection='row' gap={1} alignItems='center'>
                   {fieldTypeIconRecord[fieldType]}
                   {fieldTypeLabelRecord[fieldType]}
@@ -123,7 +124,7 @@ function ExpandedFormField({
                 </ListItemIcon>
                 <Typography variant='subtitle1'>Duplicate</Typography>
               </MenuItem>
-              <MenuItem onClick={onDelete}>
+              <MenuItem data-test='delete-form-field' onClick={onDelete}>
                 <ListItemIcon>
                   <DeleteOutlinedIcon fontSize='small' />
                 </ListItemIcon>
@@ -132,7 +133,7 @@ function ExpandedFormField({
             </MenuList>
           }
         >
-          <IconButton size='small' sx={{ mt: '-20px' }}>
+          <IconButton data-test='form-field-more-options-popup' size='small' sx={{ mt: '-20px' }}>
             <MoreHoriz fontSize='small' />
           </IconButton>
         </PopperPopup>
@@ -167,6 +168,8 @@ function ExpandedFormField({
         focusOnInit={false}
       />
       <FieldTypeRenderer
+        rows={undefined}
+        maxRows={10}
         type={formField.type as any}
         onCreateOption={onCreateOption}
         onDeleteOption={onDeleteOption}
@@ -292,16 +295,18 @@ export function FormField(
       <FormFieldContainer dragDirection={isAdjacentActive ? ((offset?.y ?? 0) < 0 ? 'top' : 'bottom') : undefined}>
         <Stack gap={1} width='100%' ml={1}>
           {!isOpen || readOnly ? (
-            <FieldTypeRenderer
-              endAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
-              type={formField.type as any}
-              description={formField.description as PageContent}
-              disabled
-              label={formField.name}
-              required={formField.required}
-              options={formField.options}
-              placeholder={fieldTypePlaceholderRecord[formField.type]}
-            />
+            <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
+              <FieldTypeRenderer
+                labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
+                type={formField.type as any}
+                description={formField.description as PageContent}
+                disabled
+                label={formField.name}
+                required={formField.required}
+                options={formField.options}
+                placeholder={fieldTypePlaceholderRecord[formField.type]}
+              />
+            </div>
           ) : (
             <ExpandedFormField {...props} shouldFocus={shouldFocus} />
           )}

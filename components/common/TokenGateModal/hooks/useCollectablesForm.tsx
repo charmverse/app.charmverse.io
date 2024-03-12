@@ -3,6 +3,7 @@ import { readContract } from '@wagmi/core';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { ercAbi } from 'lib/tokenGates/abis/abis';
 import { subscriptionTokenV1ABI } from 'lib/tokenGates/hypersub/abi';
 import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
 import { isValidChainAddress } from 'lib/tokens/validation';
@@ -23,12 +24,12 @@ const schema = yup.object({
     .oneOf(collectableOptionIds, 'Invalid collectable option')
     .test('empty-collectable-option-check', 'Selection is required', (option) => !!option),
   chain: yup.string().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK' || val === 'HYPERSUB',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'Unlock' || val === 'Hypersub',
     then: () => yup.string().required('Chain is required'),
     otherwise: () => yup.string()
   }),
   contract: yup.string<`0x${string}`>().when('collectableOption', {
-    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'UNLOCK' || val === 'HYPERSUB',
+    is: (val: CollectableOptionsId) => val === 'ERC721' || val === 'ERC1155' || val === 'Unlock' || val === 'Hypersub',
     then: () =>
       yup
         .string<`0x${string}`>()
@@ -38,7 +39,7 @@ const schema = yup.object({
           const collectableOption = context.parent.collectableOption;
           const chain = context.parent.chain;
 
-          if (chain && collectableOption === 'UNLOCK') {
+          if (chain && collectableOption === 'Unlock') {
             try {
               await readContract({
                 address: value,
@@ -50,7 +51,7 @@ const schema = yup.object({
             } catch (err) {
               return false;
             }
-          } else if (chain && collectableOption === 'HYPERSUB') {
+          } else if (chain && collectableOption === 'Hypersub') {
             try {
               await readContract({
                 address: value,
@@ -67,21 +68,7 @@ const schema = yup.object({
               await readContract({
                 address: value,
                 chainId: Number(chain),
-                abi: [
-                  {
-                    inputs: [],
-                    name: 'name',
-                    outputs: [
-                      {
-                        internalType: 'string',
-                        name: '',
-                        type: 'string'
-                      }
-                    ],
-                    stateMutability: 'view',
-                    type: 'function'
-                  }
-                ] as const,
+                abi: ercAbi,
                 functionName: 'name'
               });
               return true;
@@ -148,15 +135,15 @@ const schema = yup.object({
 export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
-  collectableOption: undefined,
+  collectableOption: '' as CollectableOptionsId,
   chain: '',
   contract: '' as `0x${string}`,
-  check: undefined,
+  check: '' as NftCheck,
   quantity: '',
   tokenId: '',
   poapType: undefined,
   poapId: '',
-  poapName: undefined,
+  poapName: '',
   poapNameMatch: undefined
 };
 

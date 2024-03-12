@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
-import { useRouter } from 'next/router';
 import { useCallback, useEffect } from 'react';
 import useSWR from 'swr';
 
@@ -9,7 +8,6 @@ import type { PageUpdates } from 'lib/pages';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-import { useCurrentSpace } from './useCurrentSpace';
 import { useWebSocketClient } from './useWebSocketClient';
 
 type Props = {
@@ -21,7 +19,7 @@ type PageResult = {
   page?: PageWithContent;
   refreshPage: () => Promise<PageWithContent | undefined>;
   updatePage: (updates: PageUpdates) => Promise<void>;
-  error?: 'access_denied' | 'page_not_found';
+  error?: 'access_denied' | 'page_not_found' | 'system_error';
   isLoading?: boolean;
 };
 
@@ -64,7 +62,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       if (value.some((page) => page.id === pageWithContent?.id)) {
-        log.debug('Page deleted, invalidating cache', { pageId: pageWithContent?.id });
+        log.debug('Page deleted or restored, invalidating cache', { pageId: pageWithContent?.id });
         mutate(undefined, {
           rollbackOnError: false
         });
@@ -72,10 +70,12 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
     }
     const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdateEvent);
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
+    const unsubscribeFromPageRestores = subscribe('pages_restored', handleDeleteEvent);
 
     return () => {
       unsubscribeFromPageUpdates();
       unsubscribeFromPageDeletes();
+      unsubscribeFromPageRestores();
     };
   }, [mutate, pageWithContent?.id]);
 
@@ -86,6 +86,7 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
       updatePage
     };
   }
+
   if (pageWithContentError) {
     // An error will be thrown if page doesn't exist or if you dont have read permission for the page
     if (pageWithContentError.errorType === 'Access denied') {
@@ -94,10 +95,17 @@ export function usePage({ spaceId, pageIdOrPath }: Props): PageResult {
         refreshPage: noop,
         updatePage: noop
       };
-    } else {
+    } else if (pageWithContentError.errorType === 'Data not found') {
       // If the page doesn't exist an error will be thrown
       return {
         error: 'page_not_found',
+        refreshPage: noop,
+        updatePage: noop
+      };
+    } else {
+      // If the page doesn't exist an error will be thrown
+      return {
+        error: 'system_error',
         refreshPage: noop,
         updatePage: noop
       };

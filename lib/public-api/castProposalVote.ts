@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
 import { castVote as castVoteService } from 'lib/votes/castVote';
 
 export async function castProposalVote({
@@ -15,16 +16,22 @@ export async function castProposalVote({
 }) {
   const vote = await prisma.vote.findFirst({
     where: {
-      pageId: proposalId,
       page: {
-        deletedAt: null
+        deletedAt: null,
+        proposal: {
+          id: proposalId
+        }
       }
     },
     include: {
       voteOptions: true,
       page: {
         select: {
-          proposal: true
+          proposal: {
+            include: {
+              evaluations: true
+            }
+          }
         }
       }
     }
@@ -34,7 +41,9 @@ export async function castProposalVote({
     throw new DataNotFoundError(`A vote for proposal id ${proposalId} was not found.`);
   }
 
-  if (vote.page.proposal.status !== 'vote_active') {
+  const currentEvaluation = getCurrentEvaluation(vote.page.proposal.evaluations);
+  const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
+  if (!isActiveVote) {
     throw new UndesirableOperationError(`Voting for proposal with id: ${proposalId} is not active.`);
   }
 

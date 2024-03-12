@@ -1,12 +1,13 @@
 import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
+import { v4 as uuid } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { recordDatabaseEvent, type EventInput } from 'lib/metrics/recordDatabaseEvent';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -16,6 +17,11 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
   const request = req.body as EventInput;
 
   const { event: eventName, ...eventPayload } = request;
+
+  if (!req.session.anonymousUserId) {
+    req.session.anonymousUserId = uuid();
+    await req.session.save();
+  }
 
   const userId = req.session.user?.id ?? req.session.anonymousUserId;
   // Make sure to use userId from session

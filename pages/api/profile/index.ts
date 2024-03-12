@@ -1,4 +1,3 @@
-import { UnauthorisedActionError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import Cookies from 'cookies';
@@ -8,6 +7,7 @@ import { v4 } from 'uuid';
 
 import { deleteBeehiivSubscription } from 'lib/beehiiv/deleteBeehiivSubscription';
 import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
@@ -17,7 +17,6 @@ import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import { requireWalletSignature } from 'lib/middleware/requireWalletSignature';
 import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -31,32 +30,33 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(requireWalletSignature, createUser).get(getUser).use(requireUser).put(updateUser);
 
 async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
-  const { address } = req.body as Web3LoginRequest;
+  const { message } = req.body as SignatureVerificationPayload;
 
   let user: LoggedInUser;
 
   try {
-    user = await getUserProfile('addresses', address);
+    user = await getUserProfile('addresses', message.address);
   } catch {
     const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
 
     const signupAnalytics = extractSignupAnalytics(cookiesToParse);
 
-    user = await createUserFromWallet({ address, id: req.session.anonymousUserId }, signupAnalytics);
+    user = await createUserFromWallet({ address: message.address, id: req.session.anonymousUserId }, signupAnalytics);
     user.isNew = true;
 
     logSignupViaWallet();
   }
 
   // Null out the anonmyous user id after successful login
-
   req.session.anonymousUserId = undefined;
+  req.session.otpUser = undefined;
   req.session.user = { id: user.id };
+  await req.session.save();
+
   await updateGuildRolesForUser(
     user.wallets.map((w) => w.address),
     user.spaceRoles
   );
-  await req.session.save();
 
   const cookies = new Cookies(req, res);
 
@@ -80,7 +80,7 @@ export async function handleNoProfile(req: NextApiRequest, res: NextApiResponse)
 }
 
 // Endpoint for a user to retrieve their own profile
-async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser | { error: any }>) {
+async function getUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser>) {
   if (!req.session?.user?.id) {
     return handleNoProfile(req, res);
   }

@@ -73,10 +73,7 @@ describe('extractCardProposalProperties', () => {
         fields: {
           properties: {
             [statusProp.id]: statusProp.options[0].id,
-            [urlProp.id]: 'https://example.com',
-            [evaluatedTotalProp.id]: 10,
-            [evaluatedAverageProp.id]: 3,
-            [evaluatedByProp.id]: []
+            [urlProp.id]: 'https://example.com'
           }
         } as any
       },
@@ -92,18 +89,6 @@ describe('extractCardProposalProperties', () => {
       cardProposalUrl: {
         propertyId: urlProp.id,
         value: 'https://example.com'
-      },
-      cardEvaluatedBy: {
-        propertyId: evaluatedByProp.id,
-        value: []
-      },
-      cardEvaluationAverage: {
-        propertyId: evaluatedAverageProp.id,
-        value: 3
-      },
-      cardEvaluationTotal: {
-        propertyId: evaluatedTotalProp.id,
-        value: 10
       }
     });
   });

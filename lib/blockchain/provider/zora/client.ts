@@ -1,6 +1,5 @@
 import { ZDK, ZDKNetwork, ZDKChain } from '@zoralabs/zdk';
 import { RateLimit } from 'async-sema';
-import { zora, zoraTestnet } from 'viem/chains';
 
 import { isTestEnv } from 'config/constants';
 

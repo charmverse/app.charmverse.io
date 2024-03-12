@@ -16,8 +16,8 @@ import { requirePaidPermissionsSubscription } from 'lib/middleware/requirePaidPe
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { addGuest } from 'lib/roles/addGuest';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
-import { isValidEmail } from 'lib/utilities/strings';
+import { DataNotFoundError } from 'lib/utils/errors';
+import { isValidEmail } from 'lib/utils/strings';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

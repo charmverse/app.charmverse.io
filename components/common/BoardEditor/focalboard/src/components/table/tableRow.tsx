@@ -1,33 +1,32 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import CollapseIcon from '@mui/icons-material/ArrowDropDown';
 import ExpandIcon from '@mui/icons-material/ArrowRight';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { Box, Checkbox, Stack } from '@mui/material';
-import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, MouseEvent, ReactElement, ReactNode, SetStateAction } from 'react';
+import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-import { mutate } from 'swr';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
+import type { PageActionMeta } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useDragDrop } from 'hooks/useDragDrop';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { isTouchScreen } from 'lib/utilities/browser';
-import { mergeRefs } from 'lib/utilities/react';
+import { isTouchScreen } from 'lib/utils/browser';
+import { mergeRefs } from 'lib/utils/react';
 
 import { TextInput } from '../../../../components/properties/TextInput';
-import mutator from '../../mutator';
 import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import PropertyValueElement from '../propertyValueElement';
@@ -43,6 +42,7 @@ type Props = {
   board: Board;
   activeView: BoardView;
   card: Card;
+  cardPage: PageActionMeta;
   pageIcon?: string | null;
   pageTitle: string;
   isSelected: boolean;
@@ -58,7 +58,6 @@ type Props = {
   onDeleteCard?: (cardId: string) => Promise<void>;
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
-  cardPage: PageMeta;
   readOnlyTitle?: boolean;
   isExpanded?: boolean | null;
   setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;
@@ -70,9 +69,14 @@ type Props = {
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
 };
 
-export const StyledCheckbox = styled(Checkbox)<{ show?: boolean }>`
+export const StyledCheckbox = styled(Checkbox, {
+  shouldForwardProp(propName) {
+    return propName !== 'show';
+  }
+})<{ show?: boolean }>`
   ${({ show }) => (!show ? `opacity: 0;` : '')}
   transition: opacity 250ms ease-in-out;
 
@@ -121,16 +125,17 @@ function TableRow(props: Props) {
     subRowsEmptyValueContent,
     isChecked,
     setCheckedIds,
-    proposal
+    proposal,
+    reward
   } = props;
-  const { space } = useCurrentSpace();
+  const { showError } = useSnackbar();
+
+  const { trigger: trashPages } = useTrashPages();
   const isMobile = useSmallScreen();
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
-  const isManualSort = activeView.fields.sortOptions.length === 0;
   const isGrouped = Boolean(activeView.fields.groupById);
-
-  const enabled = !isTouchScreen() && !props.readOnly && (isManualSort || isGrouped);
+  const enabled = !isTouchScreen() && !props.readOnly;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
@@ -147,12 +152,15 @@ function TableRow(props: Props) {
       Utils.assertFailure();
       return;
     }
-    if (onDeleteCard) {
-      await onDeleteCard(card.id);
-    } else {
-      await mutator.deleteBlock(card, 'delete card');
+    try {
+      if (onDeleteCard) {
+        await onDeleteCard(card.id);
+      } else {
+        await trashPages({ pageIds: [card.id], trash: true });
+      }
+    } catch (error) {
+      showError(error);
     }
-    mutate(`pages/${space?.id}`);
   };
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -211,6 +219,7 @@ function TableRow(props: Props) {
     readOnly: props.readOnly || props.readOnlyTitle,
     spellCheck: true
   };
+
   return (
     <div
       data-test={`database-row-${card.id}`}
@@ -218,29 +227,31 @@ function TableRow(props: Props) {
       onClick={(e) => props.onClick?.(e, card)}
       ref={mergeRefs([cardRef, preview, drop])}
       style={{
-        backgroundColor: isNested ? 'var(--input-bg)' : 'transparent',
-        ...(isChecked && {
-          background: 'rgba(35, 131, 226, 0.14)',
-          zIndex: 85
-        }),
+        backgroundColor:
+          isSelected || isChecked ? 'rgba(35, 131, 226, 0.14)' : isNested ? 'var(--input-bg)' : 'transparent',
+        zIndex: 85,
         ...style
       }}
     >
       {!props.readOnly && (
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          <div
-            className='icons row-actions'
-            onClick={handleClick}
-            ref={drag}
-            style={{
-              padding: 0
-            }}
-          >
-            <Box className='charm-drag-handle disable-drag-selection'>
-              <DragIndicatorIcon color='secondary' />
-            </Box>
-          </div>
-          {setCheckedIds && (
+          {!isNested && (
+            <div
+              className='icons row-actions'
+              onClick={handleClick}
+              ref={drag}
+              style={{
+                padding: 0
+              }}
+            >
+              <Box className='charm-drag-handle disable-drag-selection'>
+                <DragIndicatorIcon color='secondary' />
+              </Box>
+            </div>
+          )}
+          {isNested ? (
+            <div style={{ marginLeft: 24 }} />
+          ) : setCheckedIds ? (
             <StyledCheckbox
               className='table-row-checkbox disable-drag-selection'
               checked={isChecked}
@@ -259,7 +270,7 @@ function TableRow(props: Props) {
               disableRipple
               disableTouchRipple
             />
-          )}
+          ) : null}
         </Stack>
       )}
 
@@ -344,14 +355,17 @@ function TableRow(props: Props) {
               width: columnWidth(props.resizingColumn, props.activeView.fields.columnWidths, props.offset, template.id),
               overflowX: 'hidden'
             }}
+            data-test={`database-card-${card.id}-column-${template.id}`}
             ref={columnRef}
             onPaste={(e) => e.stopPropagation()}
           >
             <PropertyValueElement
-              readOnly={props.readOnly}
+              showCard={(cardId) => cardId && props.showCard(cardId)}
+              readOnly={props.readOnly || Boolean(isNested)}
               syncWithPageId={cardPage?.syncWithPageId}
               card={card}
               proposal={proposal}
+              reward={reward}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}
@@ -380,7 +394,7 @@ function TableRow(props: Props) {
   );
 }
 
-export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
+function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
   return (
     <>
       <TableRow
@@ -403,6 +417,8 @@ export function ExpandableTableRow(props: Props & { isNested?: boolean; subPages
                 subPages={subPage.subPages}
                 indentTitle={30}
                 isNested
+                // Don't allow subrows to be selected
+                setCheckedIds={() => {}}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}
               />
             )))}

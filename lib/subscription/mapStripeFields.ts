@@ -3,7 +3,7 @@
 import { log } from '@charmverse/core/log';
 import type Stripe from 'stripe';
 
-import { coerceToMilliseconds } from 'lib/utilities/dates';
+import { coerceToMilliseconds } from 'lib/utils/dates';
 
 import { DeprecatedFreeTrial } from './constants';
 import type { SubscriptionPeriod, SubscriptionStatusType } from './constants';

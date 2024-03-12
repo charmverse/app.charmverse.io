@@ -7,7 +7,7 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utils/errors';
 import { deleteVote as deleteVoteService } from 'lib/votes/deleteVote';
 import { getVote as getVoteService } from 'lib/votes/getVote';
 import type { ExtendedVote, UpdateVoteDTO } from 'lib/votes/interfaces';

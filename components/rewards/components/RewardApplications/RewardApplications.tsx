@@ -11,7 +11,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
-import { formatDate, formatDateTime } from 'lib/utilities/dates';
+import { formatDate, formatDateTime } from 'lib/utils/dates';
 import type { LoggedInUser } from 'models';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';

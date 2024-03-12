@@ -11,7 +11,7 @@ import { getSpaceMemberSearchParams } from 'lib/members/getSpaceMemberSearchPara
 import type { Member } from 'lib/members/interfaces';
 import { getPropertiesWithValues } from 'lib/members/utils';
 import { hasNftAvatar } from 'lib/users/hasNftAvatar';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import type { UserIdentities } from './getMemberUsername';

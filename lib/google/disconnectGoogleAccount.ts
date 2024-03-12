@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { sessionUserRelations } from 'lib/session/config';
 import { updateUsedIdentity } from 'lib/users/updateUsedIdentity';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 export type DisconnectGoogleAccountRequest = {

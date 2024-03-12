@@ -78,6 +78,13 @@ export function InputFields() {
         <NumberInputField value={number} onChange={(e) => setNumber(e.target.value)} label='NumberInputField' />
 
         <NumberInputField
+          value={number}
+          onChange={(e) => setNumber(e.target.value)}
+          disableArrows
+          label='NumberInputField - no arrow icons'
+        />
+
+        <NumberInputField
           disabled
           value={number}
           onChange={(e) => setNumber(e.target.value)}

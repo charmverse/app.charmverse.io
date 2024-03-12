@@ -9,7 +9,6 @@ import type { UserProfile } from 'lib/public-api/interfaces';
 import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
-import { SUMMON_BASE_URL } from 'lib/summon/api';
 import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
 import { createUserFromWallet } from 'lib/users/createUser';
 
@@ -61,8 +60,9 @@ type CreateSpaceMemberRequestBody = {
 async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserProfile>) {
   const spaceId = req.query.spaceId as string;
   const payload = req.body as CreateSpaceMemberRequestBody;
+  const summonTestUrl = isTestEnv && typeof req.query.summonTestUrl === 'string' ? req.query.summonTestUrl : undefined; // override for testing
   const spaceIds = req.spaceIdRange;
-  const summonApiUrl = (isTestEnv ? req.query.summonApiUrl ?? SUMMON_BASE_URL : SUMMON_BASE_URL) as string;
+  // For now, allow Api url to override
   if (!spaceIds || !spaceIds.length) {
     throw new UnauthorisedActionError("API key doesn't have access to any spaces");
   }
@@ -84,16 +84,20 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   await addUserToSpace({
     spaceId,
     userId: user.id,
-    userXpsEngineId: payload.summonUserId
+    xpsUserId: payload.summonUserId
   });
 
   await syncSummonSpaceRoles({
     spaceId,
     userId: user.id,
-    summonApiUrl
+    summonTestUrl
   });
 
-  log.debug('[public-api] Added user to space', { spaceId, userId: user.id, summonUserId: payload.summonUserId });
+  log.debug('[public-api] Added user to space', {
+    spaceId,
+    userId: user.id,
+    summonUserId: payload.summonUserId
+  });
 
   return res.status(200).json(user);
 }

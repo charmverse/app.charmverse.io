@@ -441,7 +441,6 @@
       "index": 36,
       "cardId": null,
       "proposalId": "8ab2b315-afcd-44da-9333-f986d67bb077",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -468,7 +467,7 @@
         "id": "8ab2b315-afcd-44da-9333-f986d67bb077",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -1033,9 +1032,7 @@
                       "header": true,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        228
-                      ],
+                      "colwidth": [228],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -1081,9 +1078,7 @@
                       "header": true,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        208
-                      ],
+                      "colwidth": [208],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -1184,9 +1179,7 @@
                       "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        228
-                      ],
+                      "colwidth": [228],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -1215,9 +1208,7 @@
                       "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        208
-                      ],
+                      "colwidth": [208],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -1573,7 +1564,6 @@
       "index": 37,
       "cardId": null,
       "proposalId": "fc1a46d1-bb7a-47d8-b49f-aaa877373e6c",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -1600,7 +1590,7 @@
         "id": "fc1a46d1-bb7a-47d8-b49f-aaa877373e6c",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -1985,7 +1975,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "328cdd93-6f18-4ad9-9d64-b717c89a778f",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -2012,7 +2001,7 @@
         "id": "328cdd93-6f18-4ad9-9d64-b717c89a778f",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -2325,7 +2314,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "6ce4377a-47dd-4d2f-be97-6bd3d7ea632b",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -2352,7 +2340,7 @@
         "id": "6ce4377a-47dd-4d2f-be97-6bd3d7ea632b",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -3007,7 +2995,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "93dbf82e-a548-4e89-b911-405946246b06",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -3034,7 +3021,7 @@
         "id": "93dbf82e-a548-4e89-b911-405946246b06",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -3687,7 +3674,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "abb52f2b-ef9f-4257-a053-376c5dc30ce9",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -3714,7 +3700,7 @@
         "id": "abb52f2b-ef9f-4257-a053-376c5dc30ce9",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -4160,7 +4146,6 @@
       "index": 36,
       "cardId": null,
       "proposalId": "db916af3-6245-4eaf-9355-ebbcaea5df96",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -4187,7 +4172,7 @@
         "id": "db916af3-6245-4eaf-9355-ebbcaea5df96",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -4842,7 +4827,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "485abc9d-bea2-41d6-b492-c1e3c98c73db",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -4869,7 +4853,7 @@
         "id": "485abc9d-bea2-41d6-b492-c1e3c98c73db",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -5434,9 +5418,7 @@
                       "header": true,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        228
-                      ],
+                      "colwidth": [228],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -5482,9 +5464,7 @@
                       "header": true,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        208
-                      ],
+                      "colwidth": [208],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -5585,9 +5565,7 @@
                       "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        228
-                      ],
+                      "colwidth": [228],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -5616,9 +5594,7 @@
                       "header": false,
                       "colspan": 1,
                       "rowspan": 1,
-                      "colwidth": [
-                        208
-                      ],
+                      "colwidth": [208],
                       "background": "transparent",
                       "typesValues": {
                         "date": -1,
@@ -5974,7 +5950,6 @@
       "index": 37,
       "cardId": null,
       "proposalId": "394659e1-9c06-48eb-b476-155dae5f9577",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -6001,7 +5976,7 @@
         "id": "394659e1-9c06-48eb-b476-155dae5f9577",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -6386,7 +6361,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "d90f9ccd-0d04-44f9-9a48-b2d43b93215a",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -6413,7 +6387,7 @@
         "id": "d90f9ccd-0d04-44f9-9a48-b2d43b93215a",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -6726,7 +6700,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "ef5f4c28-8e97-4bb3-8900-8fca19083334",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -6753,7 +6726,7 @@
         "id": "ef5f4c28-8e97-4bb3-8900-8fca19083334",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -7406,7 +7379,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": "3bb225d0-1ffb-4bc8-a54a-2dfb31fb25e9",
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -7433,7 +7405,7 @@
         "id": "3bb225d0-1ffb-4bc8-a54a-2dfb31fb25e9",
         "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
         "spaceId": "0cb2cd02-cb36-4d81-a4bb-fe6db9f3d62c",
-        "status": "draft",
+        "status": "published",
         "reviewedBy": null,
         "reviewedAt": null
       }
@@ -8004,7 +7976,6 @@
       "index": 1,
       "cardId": null,
       "proposalId": null,
-      "snapshotProposalId": null,
       "fullWidth": false,
       "fontFamily": "default",
       "fontSizeSmall": false,
@@ -9259,7 +9230,6 @@
           "index": 0,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -9678,7 +9648,6 @@
           "index": 1,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -9737,7 +9706,6 @@
           "index": 2,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -11582,7 +11550,6 @@
               "index": -1,
               "cardId": "b28b245a-7431-409c-8eac-791320b187af",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": true,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -11818,7 +11785,6 @@
               "index": -1,
               "cardId": "d952d961-e28c-4abd-b0d5-db9401de4c51",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -12149,7 +12115,6 @@
               "index": -1,
               "cardId": "92282c3d-4e08-4885-b995-f98587d15c45",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -13199,7 +13164,6 @@
               "index": -1,
               "cardId": "835a3b20-994c-435f-afc0-b04c43d7bb86",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -13561,7 +13525,6 @@
               "index": -1,
               "cardId": "42967d58-9a7f-430a-b083-df099f23575f",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -13659,7 +13622,6 @@
               "index": -1,
               "cardId": "c0f01fa9-01aa-4252-97a1-936b4d07e792",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -13716,9 +13678,7 @@
                         "eb8322fb-a751-46fd-9794-bea021a33f65",
                         "50f9ac76-6237-4ddb-8134-b673c712393e"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "be227d08-200f-49db-9b5b-d288f1391f8c": "https://kokonut.network/dao",
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
@@ -14199,7 +14159,6 @@
               "index": -1,
               "cardId": "8f4d901c-46c3-44e6-9265-70c3534aab0a",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -14585,7 +14544,6 @@
               "index": -1,
               "cardId": "9dcd6da6-1fda-4ce2-a845-3a8bcebe6871",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -14637,9 +14595,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "651fb707-10e6-4b21-9851-30be77f64061",
                         "6b692a28-0a9c-4d14-9269-4d3af58ae433"
@@ -14857,7 +14813,6 @@
               "index": -1,
               "cardId": "079dfa8e-a7fa-4a75-8ed8-ce7f0f8bf787",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -15152,7 +15107,6 @@
               "index": -1,
               "cardId": "e110f6bc-f01d-4ba0-a9e8-41401af8a30c",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -15202,9 +15156,7 @@
                   "fields": {
                     "isTemplate": false,
                     "properties": {
-                      "d5e4afc6-8cff-4289-a725-70e724347c0f": [
-                        "2045d6c3-69fa-4397-92d1-1e1b0cefd36a"
-                      ],
+                      "d5e4afc6-8cff-4289-a725-70e724347c0f": ["2045d6c3-69fa-4397-92d1-1e1b0cefd36a"],
                       "f659e9af-8d72-4e06-ba1f-c18ee0714d05": "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                     },
                     "contentOrder": []
@@ -15433,7 +15385,6 @@
               "index": -1,
               "cardId": "9e1f3b3e-79c3-4e17-bf52-dbfa71b9fca7",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -15665,7 +15616,6 @@
               "index": -1,
               "cardId": "afdb5576-752b-4ef1-b78c-5ccdf3de618f",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -15942,7 +15892,6 @@
               "index": -1,
               "cardId": "57445317-4e89-498e-99f0-f52c57480759",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16177,7 +16126,6 @@
               "index": -1,
               "cardId": "d16cac1f-e470-4014-9f61-6442df46cb0b",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16229,9 +16177,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "a7126c66-89d2-4f8f-a26b-28c83a7f48ae",
-                      "57b5b010-2d75-407f-b747-556afb311995": [
-                        "39f076f7-b8af-4814-b0de-2f170573751f"
-                      ],
+                      "57b5b010-2d75-407f-b747-556afb311995": ["39f076f7-b8af-4814-b0de-2f170573751f"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -16297,7 +16243,6 @@
               "index": -1,
               "cardId": "022ca384-f459-44e1-afe3-6e89849ea3a6",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16349,9 +16294,7 @@
                     "isTemplate": false,
                     "properties": {
                       "432d6b75-2446-49f0-acde-8b7129c695e3": "b1995dfa-734b-487b-9f97-94b9cdea6592",
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "18c4363d-8d22-40cb-8ee8-3c4054ebdab4",
                         "fb9dc5c3-13d5-47f1-b0bb-7773f5bc0cae"
@@ -16633,7 +16576,6 @@
               "index": -1,
               "cardId": "9a47a7cf-3ed6-4eef-8bbe-973331ffc36b",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -16691,9 +16633,7 @@
                         "50f9ac76-6237-4ddb-8134-b673c712393e",
                         "f0286a21-c9ac-496c-8d5f-cfe0bfb824bd"
                       ],
-                      "89157343-d00a-490b-92ae-263f260b6eb3": [
-                        "b3f5d420-abe6-4c82-9d70-b5294cfcb890"
-                      ],
+                      "89157343-d00a-490b-92ae-263f260b6eb3": ["b3f5d420-abe6-4c82-9d70-b5294cfcb890"],
                       "d5e4afc6-8cff-4289-a725-70e724347c0f": [
                         "2045d6c3-69fa-4397-92d1-1e1b0cefd36a",
                         "557fad80-82bf-43eb-806a-2b8859b38e09",
@@ -17097,9 +17037,7 @@
                   "filter": {
                     "filters": [
                       {
-                        "values": [
-                          "557fad80-82bf-43eb-806a-2b8859b38e09"
-                        ],
+                        "values": ["557fad80-82bf-43eb-806a-2b8859b38e09"],
                         "condition": "includes",
                         "propertyId": "d5e4afc6-8cff-4289-a725-70e724347c0f"
                       }
@@ -17185,9 +17123,7 @@
                     "__title": 280
                   },
                   "linkedSourceId": null,
-                  "hiddenOptionIds": [
-                    ""
-                  ],
+                  "hiddenOptionIds": [""],
                   "visibleOptionIds": [
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64",
                     "72ca2319-e9e7-44c8-90d5-9cddea85adbe",
@@ -17198,10 +17134,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "__title",
-                    "432d6b75-2446-49f0-acde-8b7129c695e3"
-                  ]
+                  "visiblePropertyIds": ["__title", "432d6b75-2446-49f0-acde-8b7129c695e3"]
                 }
               },
               {
@@ -17321,9 +17254,7 @@
                   "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
-                  "visiblePropertyIds": [
-                    "432d6b75-2446-49f0-acde-8b7129c695e3"
-                  ]
+                  "visiblePropertyIds": ["432d6b75-2446-49f0-acde-8b7129c695e3"]
                 }
               }
             ]
@@ -17354,7 +17285,6 @@
           "index": 3,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -17412,7 +17342,6 @@
               "index": -1,
               "cardId": "873383f3-f8df-4db2-b24b-bda1148251ce",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -17502,7 +17431,6 @@
               "index": -1,
               "cardId": "7c2a2321-d177-41c6-ad41-3870119fe716",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -17592,7 +17520,6 @@
               "index": -1,
               "cardId": "02bbeb83-a73a-421a-a9b3-63508c77c091",
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -18213,7 +18140,6 @@
           "index": 4,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": true,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -18271,7 +18197,6 @@
               "index": -1,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -18329,7 +18254,6 @@
                   "index": -1,
                   "cardId": "582b90a1-7753-4c06-ac65-b2b7b4b61557",
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -18486,9 +18410,7 @@
                         "operation": "and"
                       },
                       "viewType": "table",
-                      "cardOrder": [
-                        "028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"
-                      ],
+                      "cardOrder": ["028bcd52-ded9-4bae-bc8e-a27d5be1c9b1"],
                       "sortOptions": [],
                       "columnWidths": {
                         "__title": 128,
@@ -18541,7 +18463,6 @@
               "index": -1,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -18599,7 +18520,6 @@
                   "index": -1,
                   "cardId": "e6b23aba-e8a9-4df7-b609-eb306accb5c5",
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -18743,9 +18663,7 @@
                         "operation": "and"
                       },
                       "viewType": "table",
-                      "cardOrder": [
-                        "a3cdb69f-ea43-4fc2-a557-76e79529a838"
-                      ],
+                      "cardOrder": ["a3cdb69f-ea43-4fc2-a557-76e79529a838"],
                       "sortOptions": [],
                       "columnWidths": {
                         "__title": 172,
@@ -18901,7 +18819,6 @@
           "index": 5,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": true,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -18959,7 +18876,6 @@
               "index": -1,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -19017,7 +18933,6 @@
                   "index": -1,
                   "cardId": "37eb89b3-433a-4dcc-97c4-a4580af1ef23",
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -19831,7 +19746,6 @@
           "index": 6,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "fontFamily": "default",
           "fontSizeSmall": false,
@@ -19929,7 +19843,6 @@
               "index": -1,
               "cardId": null,
               "proposalId": null,
-              "snapshotProposalId": null,
               "fullWidth": false,
               "fontFamily": "default",
               "fontSizeSmall": false,
@@ -21953,7 +21866,6 @@
                   "index": -1,
                   "cardId": null,
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -23310,7 +23222,6 @@
                   "index": -1,
                   "cardId": null,
                   "proposalId": null,
-                  "snapshotProposalId": null,
                   "fullWidth": false,
                   "fontFamily": "default",
                   "fontSizeSmall": false,
@@ -24222,7 +24133,6 @@
           "index": 7,
           "cardId": null,
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": true,
           "fontFamily": "default",
           "fontSizeSmall": false,

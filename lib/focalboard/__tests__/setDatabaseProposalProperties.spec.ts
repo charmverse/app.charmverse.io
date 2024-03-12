@@ -221,7 +221,12 @@ describe('setDatabaseProposalProperties()', () => {
       userId: spaceAdmin.id
     });
 
-    const form = await prisma.form.create({
+    const proposal2 = await generateProposal({
+      spaceId: testSpace.id,
+      userId: spaceAdmin.id
+    });
+
+    const form1 = await prisma.form.create({
       data: {
         proposal: {
           connect: {
@@ -232,12 +237,12 @@ describe('setDatabaseProposalProperties()', () => {
           createMany: {
             data: [
               {
-                name: 'Long Text',
-                type: 'long_text'
-              },
-              {
                 name: 'Short Text',
                 type: 'short_text'
+              },
+              {
+                name: 'Long Text',
+                type: 'long_text'
               },
               {
                 name: 'Options',
@@ -264,7 +269,34 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    const formFields = form.formFields;
+    const form2 = await prisma.form.create({
+      data: {
+        proposal: {
+          connect: {
+            id: proposal2.id
+          }
+        },
+        formFields: {
+          createMany: {
+            data: [
+              {
+                name: 'Email',
+                type: 'email'
+              },
+              {
+                name: 'Date',
+                type: 'date'
+              }
+            ]
+          }
+        }
+      },
+      include: {
+        formFields: true
+      }
+    });
+
+    const form1Fields = form1.formFields;
 
     await prisma.block.create({
       data: {
@@ -297,13 +329,28 @@ describe('setDatabaseProposalProperties()', () => {
 
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
     // Load up the properties
-    const shortTextField = formFields.find((p) => p.type === 'short_text') as FormField;
-    const longTextField = formFields.find((p) => p.type === 'long_text') as FormField;
-    const selectField = formFields.find((p) => p.type === 'select') as FormField;
+    const shortTextField = form1Fields.find((p) => p.type === 'short_text') as FormField;
+    const longTextField = form1Fields.find((p) => p.type === 'long_text') as FormField;
+    const selectField = form1Fields.find((p) => p.type === 'select') as FormField;
+    const emailField = form2.formFields.find((p) => p.type === 'email') as FormField;
+    const dateField = form2.formFields.find((p) => p.type === 'date') as FormField;
 
-    const shortTextProp = properties.find((p) => p.formFieldId === shortTextField.id) as IPropertyTemplate;
-    const longTextProp = properties.find((p) => p.formFieldId === longTextField.id) as IPropertyTemplate;
-    const selectProp = properties.find((p) => p.formFieldId === selectField.id) as IPropertyTemplate;
+    const shortTextPropIndex = properties.findIndex((p) => p.formFieldId === shortTextField.id);
+    const longTextPropIndex = properties.findIndex((p) => p.formFieldId === longTextField.id);
+    const selectPropIndex = properties.findIndex((p) => p.formFieldId === selectField.id);
+    const emailPropIndex = properties.findIndex((p) => p.formFieldId === emailField.id);
+    const datePropIndex = properties.findIndex((p) => p.formFieldId === dateField.id);
+
+    const shortTextProp = properties[shortTextPropIndex] as IPropertyTemplate;
+    const longTextProp = properties[longTextPropIndex] as IPropertyTemplate;
+    const selectProp = properties[selectPropIndex] as IPropertyTemplate;
+    const emailProp = properties[emailPropIndex] as IPropertyTemplate;
+    const dateProp = properties[datePropIndex] as IPropertyTemplate;
+
+    expect(shortTextPropIndex === longTextPropIndex - 1).toBe(true);
+    expect(longTextPropIndex === selectPropIndex - 1).toBe(true);
+    expect(selectPropIndex === emailPropIndex - 1).toBe(true);
+    expect(emailPropIndex === datePropIndex - 1).toBe(true);
 
     expect(shortTextProp).toMatchObject(
       expect.objectContaining({
@@ -330,6 +377,22 @@ describe('setDatabaseProposalProperties()', () => {
           id: option.id,
           value: option.name
         }))
+      })
+    );
+
+    expect(emailProp).toMatchObject(
+      expect.objectContaining({
+        name: emailField.name,
+        type: 'email',
+        options: []
+      })
+    );
+
+    expect(dateProp).toMatchObject(
+      expect.objectContaining({
+        name: dateField.name,
+        type: 'date',
+        options: []
       })
     );
 

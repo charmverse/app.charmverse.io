@@ -5,8 +5,10 @@ import type { PluginKey } from 'prosemirror-state';
 import { createPortal } from 'react-dom';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
-import { isTruthy } from 'lib/utilities/types';
+import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
+import { isTruthy } from 'lib/utils/types';
 
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import PageThread from '../../thread/PageThread';
@@ -40,6 +42,7 @@ export function InlineCommentThread({
   const view = useEditorViewContext();
   const { tooltipContentDOM, show: isVisible, ids } = usePluginState(pluginKey) as InlineCommentPluginState;
   const { threads } = useThreads();
+  const { updateThreadPluginState } = useInlineComment(view);
 
   // Find unresolved threads in the thread ids and sort them based on desc order of createdAt
   const unResolvedThreads = ids
@@ -72,10 +75,24 @@ export function InlineCommentThread({
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread
-                  canCreateComments={permissions?.comment}
+                  enableComments={permissions?.comment}
                   inline={ids.length === 1}
                   key={resolvedThread.id}
                   threadId={resolvedThread?.id}
+                  onDeleteComment={() => {
+                    removeInlineCommentMark(view, resolvedThread.id, true);
+                    updateThreadPluginState({
+                      remove: true,
+                      threadId: resolvedThread.id
+                    });
+                  }}
+                  onToggleResolve={(_, remove) => {
+                    removeInlineCommentMark(view, resolvedThread.id);
+                    updateThreadPluginState({
+                      remove,
+                      threadId: resolvedThread.id
+                    });
+                  }}
                 />
               </ThreadContainer>
             ))}

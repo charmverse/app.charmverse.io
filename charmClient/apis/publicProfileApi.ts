@@ -9,8 +9,8 @@ export class PublicProfileApi {
     return http.GET<EnsProfile | null>(`/api/public/profile/${userId}/ens`);
   }
 
-  getSummonProfile(userId: string) {
-    return http.GET<SummonUserProfile | null>(`/api/public/profile/${userId}/summon`);
+  getSummonProfile(userId: string, spaceId: string) {
+    return http.GET<SummonUserProfile | null>(`/api/public/profile/${userId}/summon`, { spaceId });
   }
 
   getLensProfile(userId: string) {

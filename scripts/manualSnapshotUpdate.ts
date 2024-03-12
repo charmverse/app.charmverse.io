@@ -1,6 +1,8 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 
 export async function updateSnapshot(proposalId: string, snapshotProposalId: string) {
+  throw new Error('script has not been updated for new propsoal flow');
   return prisma.page.update({
     where: {
       id: proposalId

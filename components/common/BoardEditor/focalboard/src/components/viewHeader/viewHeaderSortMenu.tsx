@@ -9,6 +9,7 @@ import type { IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
+import { getPropertyName } from 'lib/focalboard/getPropertyName';
 
 import mutator from '../../mutator';
 
@@ -19,7 +20,9 @@ type Props = {
 };
 const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
-  const sortDisplayOptions = properties?.map((o) => ({ id: o.id, name: o.name }));
+  const sortDisplayOptions = properties
+    ?.filter((o) => o.type !== 'proposalReviewerNotes')
+    ?.map((o) => ({ id: o.id, name: getPropertyName(o) }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
   const localViewSettings = useLocalDbViewSettings();
 

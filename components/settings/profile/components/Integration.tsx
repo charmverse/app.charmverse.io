@@ -1,22 +1,19 @@
 import type { IdentityType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import CheckIcon from '@mui/icons-material/Check';
-import { Box, Divider, Grid, Tooltip, Typography } from '@mui/material';
+import MoreHoriz from '@mui/icons-material/MoreHoriz';
+import { Box, Chip, Divider, IconButton, Menu, Stack, Tooltip, Typography } from '@mui/material';
+import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
-
-const IntegrationName = styled(Typography)`
-  background-color: ${({ theme }) => theme.palette.background.dark};
-  display: inline-block;
-  border-radius: 7px;
-  padding: 3px 7px;
-`;
+import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 
 type IntegrationProps = {
   isInUse: boolean;
   icon: ReactNode;
   action?: ReactNode;
+  menuActions?: ReactNode[];
   identityType: IdentityType;
   name: string;
   username: string;
@@ -25,49 +22,147 @@ type IntegrationProps = {
   selectIntegration: (id: string, type: IdentityType) => void;
 };
 
+const StyledStack = styled(Stack)`
+  ${hoverIconsStyle()}
+`;
+
 function Integration(props: IntegrationProps) {
-  const { isInUse, icon, action, username, name, identityType, selectIntegration, secondaryUserName } = props;
+  const {
+    isInUse,
+    icon,
+    action,
+    menuActions = [],
+    username,
+    name,
+    identityType,
+    selectIntegration,
+    secondaryUserName
+  } = props;
+  const identityMenuState = usePopupState({ variant: 'popover', popupId: `identity-menu-${identityType}` });
+  const hasActionsMenu = menuActions && menuActions.length !== 0;
 
   return (
-    <Grid container>
-      <Grid container item xs={10}>
-        <Box py={2} px={1}>
-          <Box display='flex' gap={1} alignItems='flex-end' mb={1}>
-            {icon}
-            {/* use smaller font size fofr wallet addresses and larger strings */}
-            <Tooltip title={secondaryUserName ?? ''}>
-              <Typography component='span' fontSize={username.length < 40 ? '1.4em' : '.9em'} fontWeight={700}>
+    <StyledStack>
+      <Stack flexDirection='row' justifyContent='space-between' width='100%' alignItems='center'>
+        <Stack
+          display='flex'
+          flexDirection={{
+            xs: 'column',
+            md: 'row'
+          }}
+          gap={{
+            xs: 0.5
+          }}
+          alignItems={{
+            xs: 'flex-start',
+            md: 'center'
+          }}
+        >
+          <Box
+            sx={{
+              minWidth: {
+                xs: 'fit-content',
+                md: 400
+              }
+            }}
+          >
+            <Tooltip title={secondaryUserName}>
+              <Typography
+                component='span'
+                fontSize={{
+                  xs: '1em',
+                  md: '1.15em'
+                }}
+                fontWeight={700}
+              >
                 {username}
                 {action}
               </Typography>
             </Tooltip>
           </Box>
-          <IntegrationName variant='caption'>{name}</IntegrationName>
-        </Box>
 
-        <Grid item></Grid>
-      </Grid>
+          <Chip
+            variant='outlined'
+            size='medium'
+            label={
+              <Stack gap={0.75} alignItems='center' flexDirection='row'>
+                {icon}
+                <Typography variant='subtitle1'>{name}</Typography>
+              </Stack>
+            }
+            sx={{
+              width: 'fit-content'
+            }}
+          />
+        </Stack>
 
-      <Grid item container direction='column' xs={2}>
-        <Box display='flex' alignItems='center' justifyContent='flex-end' height='100%'>
+        <Stack
+          flexDirection='row'
+          gap={{
+            xs: 0.5,
+            md: 1
+          }}
+          alignItems='center'
+        >
           {isInUse ? (
-            <>
+            <Stack flexDirection='row' mr={!hasActionsMenu ? 4.5 : 0}>
               <CheckIcon fontSize='small' />
               <Typography ml={1} variant='body2'>
                 Selected
               </Typography>
-            </>
+            </Stack>
           ) : (
-            <Button size='small' onClick={() => selectIntegration(username, identityType)}>
+            <Button
+              size='small'
+              color='secondary'
+              variant='outlined'
+              onClick={() => selectIntegration(username, identityType)}
+              sx={{
+                mr: !hasActionsMenu
+                  ? {
+                      xs: 4.25,
+                      md: 4.5
+                    }
+                  : 0
+              }}
+            >
               Select
             </Button>
           )}
-        </Box>
-      </Grid>
-      <Grid item xs={12}>
-        <Divider />
-      </Grid>
-    </Grid>
+
+          {hasActionsMenu && (
+            <IconButton
+              size='small'
+              className='icons'
+              aria-label={`Open ${identityType.toLowerCase()} identity options`}
+              {...bindTrigger(identityMenuState)}
+            >
+              <MoreHoriz fontSize='small' />
+            </IconButton>
+          )}
+
+          <Menu
+            {...bindMenu(identityMenuState)}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right'
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+            onClick={identityMenuState.close}
+          >
+            {menuActions}
+          </Menu>
+        </Stack>
+      </Stack>
+      <Divider
+        sx={{
+          my: 1.5
+        }}
+      />
+    </StyledStack>
   );
 }
 

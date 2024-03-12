@@ -217,6 +217,7 @@ export function MemberActions({
                     <StyledListItemText
                       primaryTypographyProps={{ fontWeight: 500, color: 'error' }}
                       primary='Remove from space'
+                      secondary='Remove this member from the current space'
                     />
                   )}
                   {action === 'banFromSpace' && (

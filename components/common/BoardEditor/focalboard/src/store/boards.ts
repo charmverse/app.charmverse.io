@@ -2,7 +2,9 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/focalboard/board';
+import { isTruthy } from 'lib/utils/types';
 
+import { getCards } from './cards';
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
@@ -75,17 +77,12 @@ export const getSortedBoards = createSelector(getBoards, (boards) => {
 
 export const getTemplates = (state: RootState): { [key: string]: Board } => state.boards.templates;
 
-export const getSortedTemplates = createSelector(getTemplates, (templates) => {
-  return Object.values(templates).sort((a, b) => a.title.localeCompare(b.title));
-});
-
 export const makeSelectBoard = () =>
   createSelector(
     getBoards,
-    getTemplates,
     (state: RootState, boardId: string) => boardId,
-    (boards, templates, boardId: string) => {
-      return boards[boardId] || templates[boardId];
+    (boards, boardId: string) => {
+      return boards[boardId];
     }
   );
 

@@ -36,7 +36,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView, IViewType } from 'lib/focalboard/boardView';
 import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -140,6 +140,7 @@ function ViewTab({
   const [isDragging, isOver, columnRef] = useSortable<BoardView, HTMLButtonElement>('view', view, true, onDrop);
   return (
     <TabButton
+      className='disable-drag-selection'
       ref={columnRef as any}
       disableRipple
       href={href}

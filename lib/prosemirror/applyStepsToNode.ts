@@ -17,7 +17,7 @@ export function applyStepsToNode(steps: ProsemirrorJSONStep[], node: Node): Node
         throw new Error('Failed to apply step');
       }
     } catch (err) {
-      log.warn(`An error occurred at step number`, index, 'with step', stepJson);
+      log.warn(`An error occurred when applying prosemirror step:`, stepJson);
       throw err;
     }
   }, node);

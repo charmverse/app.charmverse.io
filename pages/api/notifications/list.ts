@@ -10,7 +10,7 @@ import { getPollNotifications } from 'lib/notifications/polls/getPollNotificatio
 import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
 import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
 import { withSessionRoute } from 'lib/session/withSession';
-import { sortByDate } from 'lib/utilities/dates';
+import { sortByDate } from 'lib/utils/dates';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

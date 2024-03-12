@@ -17,6 +17,7 @@ export function mapPropertyOptionToSelectOption(option: IPropertyOption): Select
   return {
     id: option.id,
     name: option.value,
+    variant: option.variant,
     dropdownName: option.dropdownValue,
     color: convertFocalboardToMUIColor(option.color),
     disabled: option.disabled

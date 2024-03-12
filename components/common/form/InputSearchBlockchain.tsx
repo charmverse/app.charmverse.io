@@ -4,10 +4,11 @@ import Autocomplete from '@mui/material/Autocomplete';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import type { IChainDetails } from 'connectors/chains';
-import { RPCList, getChainById } from 'connectors/chains';
+import { getChainList, getChainById } from 'connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
-import { isTruthy } from 'lib/utilities/types';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { isTruthy } from 'lib/utils/types';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
   onChange?: (chainId: number) => void;
@@ -18,7 +19,6 @@ interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, tru
   chains?: number[];
   fullWidth?: boolean;
 }
-
 export function InputSearchBlockchain({
   defaultChainId,
   chainId,
@@ -31,10 +31,13 @@ export function InputSearchBlockchain({
   fullWidth
 }: Props) {
   const [value, setValue] = useState<IChainDetails | null>(null);
+  const { space } = useCurrentSpace();
 
   const options = useMemo(() => {
-    return chains ? chains.map((chain) => getChainById(chain)).filter(isTruthy) : RPCList;
-  }, [chains]);
+    return chains
+      ? chains.map((chain) => getChainById(chain)).filter(isTruthy)
+      : getChainList({ enableTestnets: !!space?.enableTestnets });
+  }, [chains, space?.enableTestnets]);
 
   useEffect(() => {
     if (defaultChainId && !value) {
@@ -70,12 +73,13 @@ export function InputSearchBlockchain({
       }}
       sx={{ minWidth: 150, ...sx }}
       options={options}
+      data-test='chain-options'
       disableClearable
       autoHighlight
       size='small'
       getOptionLabel={(option) => `${option.chainName}`}
       renderOption={(props, option) => (
-        <Box component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
+        <Box data-test={`select-chain-${option.chainId}`} component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
           <IconLogo src={option.iconUrl} />
           <Box component='span'>{option.chainName}</Box>
         </Box>
@@ -100,7 +104,7 @@ export function InputSearchBlockchain({
 function IconLogo({ src, ...props }: { src?: string } & BoxProps) {
   return (
     <Box width='1em' height='1em' display='flex' justifyContent='center' {...props}>
-      <img src={src} style={{ height: '1em', marginRight: '0.5em' }} className='lsm-chain-selector-options-icons' />
+      <img src={src} style={{ height: '1em', marginRight: '0.5em' }} />
     </Box>
   );
 }

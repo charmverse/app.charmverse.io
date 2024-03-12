@@ -1,51 +1,48 @@
-import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
+import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 
-import type { AnswerData } from 'lib/proposal/rubric/aggregateResults';
-import { aggregateResults } from 'lib/proposal/rubric/aggregateResults';
-
-import type { Block } from './block';
-import type { Card } from './card';
-import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
+import type { IPropertyTemplate } from './board';
+import type { CardPropertyValue } from './card';
 
 export function generateResyncedProposalEvaluationForCard({
-  cardProps,
-  databaseProperties,
+  properties,
+  templates,
   rubricAnswers,
   rubricCriteria,
-  currentStep
+  step
 }: {
-  cardProps: Pick<Block, 'fields'>;
-  databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
+  properties: Record<string, CardPropertyValue>;
+  templates: IPropertyTemplate[];
   rubricCriteria: { id: string }[];
   rubricAnswers: AnswerData[];
-  currentStep: Pick<ProposalEvaluation, 'id' | 'type'>;
-}): Pick<Block, 'fields'> {
-  const cardProperties = { ...(cardProps as Card).fields.properties };
+  step: { id: string; title: string };
+}): Record<string, CardPropertyValue> {
+  const { allScores, reviewersResults } = aggregateResults({
+    answers: rubricAnswers.filter((a) => a.evaluationId === step.id),
+    criteria: rubricCriteria.filter((c) => c.id !== step.id)
+  });
 
-  if (currentStep?.type === 'rubric') {
-    const { allScores, reviewersResults } = aggregateResults({
-      answers: rubricAnswers.filter((a) => a.evaluationId === currentStep.id),
-      criteria: rubricCriteria.filter((c) => c.id !== currentStep.id)
-    });
+  const uniqueReviewers = Object.keys(reviewersResults);
 
-    const uniqueReviewers = Object.keys(reviewersResults);
+  const proposalEvaluatedByProp = templates.find((p) => p.type === 'proposalEvaluatedBy' && p.name === step.title);
+  const proposalEvaluationTotalProp = templates.find(
+    (p) => p.type === 'proposalEvaluationTotal' && p.name === step.title
+  );
+  const proposalEvaluationAverageProp = templates.find(
+    (p) => p.type === 'proposalEvaluationAverage' && p.name === step.title
+  );
 
-    if (databaseProperties.proposalEvaluationAverage) {
-      cardProperties[databaseProperties.proposalEvaluationAverage.id] = allScores.average ?? '';
-    }
-
-    if (databaseProperties.proposalEvaluationTotal) {
-      cardProperties[databaseProperties.proposalEvaluationTotal.id] = allScores.sum ?? '';
-    }
-
-    if (databaseProperties.proposalEvaluatedBy) {
-      cardProperties[databaseProperties.proposalEvaluatedBy.id] = uniqueReviewers;
-    }
+  if (proposalEvaluatedByProp) {
+    properties[proposalEvaluatedByProp.id] = uniqueReviewers;
   }
-  return {
-    fields: {
-      ...cardProps.fields,
-      properties: cardProperties
-    }
-  };
+
+  if (proposalEvaluationTotalProp) {
+    properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
+  }
+
+  if (proposalEvaluationAverageProp) {
+    properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+  }
+
+  return properties;
 }

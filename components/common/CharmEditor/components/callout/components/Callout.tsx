@@ -15,10 +15,6 @@ const StyledCallout = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing(1)};
 
-  ${({ theme }) => theme.breakpoints.down('sm')} {
-    flex-wrap: wrap;
-  }
-
   h1,
   h2,
   h3,
@@ -125,7 +121,10 @@ export default function Callout({
             />
           </Menu>
         </CalloutEmoji>
-        {children}
+        {/** Wrap children in a container  to prevent iframe embeds escaping the parent * */}
+        <Box flexGrow={1} sx={{ overflowX: 'hidden' }}>
+          {children}
+        </Box>
       </StyledCallout>
     </Box>
   );

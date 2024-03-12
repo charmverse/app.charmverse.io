@@ -14,7 +14,7 @@ export function TokenGateContent({ tokenGates, tokenGateResult, isVerifying }: T
           <TokenGateOption
             tokenGate={gate}
             isVerifying={isVerifying}
-            isVerified={tokenGateResult?.eligibleGates.some((g) => g.tokenGateId === gate.id) ?? null}
+            isVerified={tokenGateResult?.eligibleGates.some((tokenGateId) => tokenGateId === gate.id) ?? null}
           />
           {index < list.length - 1 && (
             <Typography color='secondary' align='center'>

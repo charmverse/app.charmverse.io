@@ -5,7 +5,7 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

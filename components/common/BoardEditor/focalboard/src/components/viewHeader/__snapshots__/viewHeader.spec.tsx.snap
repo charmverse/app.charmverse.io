@@ -23,7 +23,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
               role="tablist"
             >
               <button
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
                 data-view-id="view-id-1"
                 draggable="true"
                 role="tab"
@@ -81,7 +81,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
               viewBox="0 0 24 24"
             >
               <path
-                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+                d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"
               />
             </svg>
           </button>
@@ -125,7 +125,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
+                  d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
                 />
               </svg>
             </button>
@@ -158,7 +158,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
+                  d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z"
                 />
               </svg>
             </button>
@@ -193,7 +193,7 @@ exports[`components/viewHeader/viewHeader return viewHeader readonly 1`] = `
               role="tablist"
             >
               <button
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
                 data-view-id="view-id-1"
                 draggable="true"
                 role="tab"

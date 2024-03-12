@@ -10,7 +10,7 @@ import type { MagicLinkResponseStatus } from 'components/invite/page/PageInviteL
 import { PageInviteLink } from 'components/invite/page/PageInviteLink';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionSsr } from 'lib/session/withSession';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
+import { getPagePath } from 'lib/utils/domains/getPagePath';
 
 type Props = { email?: string; error?: Extract<MagicLinkResponseStatus, 'error_invalid_page_id'> };
 

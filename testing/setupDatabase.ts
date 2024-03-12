@@ -10,7 +10,6 @@ import type {
   Page,
   Post,
   PostComment,
-  ProposalEvaluationType,
   ProposalStatus,
   Role,
   RoleSource,
@@ -21,7 +20,7 @@ import type {
   Vote
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
-import type { Application, PageType } from '@charmverse/core/prisma-client';
+import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -34,17 +33,17 @@ import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import type { BountyPermissions } from 'lib/permissions/bounties';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
-import type { ProposalWithUsersAndRubric, ProposalReviewerInput } from 'lib/proposal/interface';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
-import { uniqueValues } from 'lib/utilities/array';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
-import { uid } from 'lib/utilities/strings';
+import { uniqueValues } from 'lib/utils/array';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { InvalidInputError } from 'lib/utils/errors';
+import { typedKeys } from 'lib/utils/objects';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import type { CustomBoardProps } from './generateBoardStub';
@@ -66,7 +65,7 @@ export async function generateSpaceUser({
       username: 'Username',
       wallets: {
         create: {
-          address: randomETHWalletAddress()
+          address: randomETHWalletAddress().toLowerCase()
         }
       },
       spaceRoles: {
@@ -161,6 +160,7 @@ type CreateUserAndSpaceInput = {
   spaceNotificationToggles?: NotificationToggles;
   xpsEngineId?: string;
   snapshotDomain?: string;
+  apiToken?: string;
 };
 
 export async function generateUserAndSpace({
@@ -176,7 +176,8 @@ export async function generateUserAndSpace({
   paidTier,
   spaceNotificationToggles,
   xpsEngineId,
-  snapshotDomain
+  snapshotDomain,
+  apiToken
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
   const newUser = await prisma.user.create({
@@ -205,6 +206,7 @@ export async function generateUserAndSpace({
               publicBountyBoard,
               notificationToggles: spaceNotificationToggles,
               ...(superApiTokenId ? { superApiToken: { connect: { id: superApiTokenId } } } : undefined),
+              ...(apiToken ? { apiToken: { create: { token: apiToken } } } : undefined),
               xpsEngineId,
               snapshotDomain
             }
@@ -224,9 +226,14 @@ export async function generateUserAndSpace({
       ...user
     },
     include: {
+      wallets: true,
       spaceRoles: {
         include: {
-          space: true
+          space: {
+            include: {
+              apiToken: true
+            }
+          }
         }
       }
     }
@@ -258,7 +265,8 @@ export async function generateBounty({
   page = {},
   type = 'bounty',
   id,
-  allowMultipleApplications
+  allowMultipleApplications,
+  selectedCredentialTemplates
 }: Pick<Bounty, 'createdBy' | 'spaceId'> &
   Partial<
     Pick<
@@ -272,6 +280,7 @@ export async function generateBounty({
       | 'status'
       | 'approveSubmitters'
       | 'allowMultipleApplications'
+      | 'selectedCredentialTemplates'
     >
   > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
@@ -318,6 +327,7 @@ export async function generateBounty({
         spaceId,
         approveSubmitters,
         maxSubmissions,
+        selectedCredentialTemplates,
         page: {
           create: {
             id: pageId,
@@ -448,7 +458,8 @@ export async function generateBountyWithSingleApplication({
   bountyTitle = 'Bounty',
   bountyDescription = 'Bounty description',
   customReward,
-  deletedAt
+  deletedAt,
+  selectedCredentialTemplateIds
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -461,6 +472,7 @@ export async function generateBountyWithSingleApplication({
   bountyTitle?: string;
   bountyDescription?: string;
   deletedAt?: Date | null;
+  selectedCredentialTemplateIds?: string[];
 }): Promise<Bounty & { applications: Application[]; page: Page }> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -472,6 +484,7 @@ export async function generateBountyWithSingleApplication({
       status: bountyStatus ?? 'open',
       spaceId,
       approveSubmitters: false,
+      selectedCredentialTemplates: selectedCredentialTemplateIds,
       // Important variable
       maxSubmissions: bountyCap,
       page: {
@@ -776,78 +789,6 @@ export async function createVote({
   });
 }
 
-export async function createProposalWithUsers({
-  proposalStatus = 'draft',
-  authors,
-  reviewers,
-  userId,
-  spaceId,
-  ...pageCreateInput
-}: {
-  authors: string[];
-  reviewers: (string | { type: 'role'; roleId: string })[];
-  spaceId: string;
-  userId: string;
-  proposalStatus?: ProposalStatus;
-} & Partial<Prisma.PageCreateInput>): Promise<{ id: string; pageId: string }> {
-  const proposalId = v4();
-  const proposalPage = await createPageDb({
-    data: {
-      ...pageCreateInput,
-      id: proposalId,
-      author: {
-        connect: {
-          id: userId
-        }
-      },
-      space: {
-        connect: {
-          id: spaceId
-        }
-      },
-      updatedBy: userId,
-      title: 'Page Title',
-      path: 'page-path',
-      contentText: '',
-      type: 'proposal',
-      proposal: {
-        create: {
-          id: proposalId,
-          space: {
-            connect: {
-              id: spaceId
-            }
-          },
-          createdBy: userId,
-          status: proposalStatus,
-          authors: {
-            createMany: {
-              data: [
-                {
-                  userId
-                },
-                ...authors.map((author) => ({ userId: author }))
-              ]
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: reviewers.map((reviewer) =>
-                typeof reviewer === 'string' ? { userId: reviewer } : { roleId: reviewer.roleId }
-              )
-            }
-          }
-        }
-      }
-    }
-  });
-
-  return {
-    id: proposalPage.proposalId!,
-    pageId: proposalPage.id
-  };
-}
-
 export async function generateCommentWithThreadAndPage({
   userId,
   spaceId,
@@ -944,49 +885,28 @@ export function createBlock(options: Partial<Block> & Pick<Block, 'createdBy' | 
 }
 
 type PageWithProposal = Page & { proposal: ProposalWithUsersAndRubric };
+
 /**
  * Creates a proposal with the linked authors and reviewers
  */
 export async function generateProposal({
-  categoryId,
   userId,
   spaceId,
   pageType = 'proposal',
   proposalStatus,
-  evaluationType,
   authors,
-  reviewers,
   deletedAt = null,
   title = 'Proposal'
 }: {
   deletedAt?: Page['deletedAt'];
-  categoryId?: string;
   userId: string;
   spaceId: string;
   authors: string[];
-  reviewers: ProposalReviewerInput[];
   pageType?: PageType;
   proposalStatus: ProposalStatus;
-  evaluationType?: ProposalEvaluationType;
   title?: string;
 }): Promise<PageWithProposal> {
   const proposalId = v4();
-
-  const colors = ['gray', 'orange', 'yellow', 'green', 'teal', 'blue', 'turquoise', 'purple', 'pink', 'red'];
-
-  const randomColor = colors[Math.floor(Math.random() * colors.length)];
-
-  const categoryIdToLink =
-    categoryId ??
-    (
-      await prisma.proposalCategory.create({
-        data: {
-          title: `Category - ${v4()}`,
-          color: randomColor,
-          space: { connect: { id: spaceId } }
-        }
-      })
-    ).id;
 
   const result = await createPageDb({
     data: {
@@ -1015,7 +935,6 @@ export async function generateProposal({
         create: {
           id: proposalId,
           createdBy: userId,
-          evaluationType,
           status: proposalStatus,
           space: {
             connect: {
@@ -1025,16 +944,6 @@ export async function generateProposal({
           authors: {
             createMany: {
               data: authors.map((authorId) => ({ userId: authorId }))
-            }
-          },
-          reviewers: {
-            createMany: {
-              data: (reviewers ?? []).map((r) => {
-                return {
-                  userId: r.group === 'user' ? r.id : undefined,
-                  roleId: r.group === 'role' ? r.id : undefined
-                };
-              })
             }
           }
         }
@@ -1071,7 +980,8 @@ export async function generateBoard({
   boardPageType,
   linkedSourceId,
   customProps,
-  deletedAt
+  deletedAt,
+  permissions
 }: {
   createdBy: string;
   spaceId: string;
@@ -1086,6 +996,8 @@ export async function generateBoard({
   linkedSourceId?: string;
   customProps?: Partial<CustomBoardProps>;
   deletedAt?: null | Date;
+  permissions?: (Pick<PagePermission, 'permissionLevel'> &
+    Partial<Pick<PagePermission, 'roleId' | 'userId' | 'spaceId' | 'public' | 'allowDiscovery'>>)[];
 }): Promise<Page> {
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
@@ -1103,16 +1015,38 @@ export async function generateBoard({
     deletedAt
   });
 
-  const pagePermissions = pageArgs.map((createArg) => ({
-    pageId: createArg.data.id as string,
-    permissionLevel: 'full_access' as const,
-    userId: createdBy
-  }));
-  const permissions = prisma.pagePermission.createMany({
-    data: pagePermissions
+  const permissionCreateArgs: Prisma.PagePermissionCreateManyInput[] = [];
+
+  pageArgs.forEach((createArg) => {
+    if (permissions) {
+      permissionCreateArgs.push(
+        ...permissions.map(
+          (p) =>
+            ({
+              pageId: createArg.data.id as string,
+              permissionLevel: p.permissionLevel,
+              allowDiscovery: p.allowDiscovery,
+              public: p.public,
+              roleId: p.roleId,
+              spaceId: p.spaceId,
+              userId: p.userId
+            } as Prisma.PagePermissionCreateManyInput)
+        )
+      );
+    } else {
+      permissionCreateArgs.push({
+        pageId: createArg.data.id as string,
+        permissionLevel: 'full_access' as const,
+        userId: createdBy
+      });
+    }
+  });
+
+  const permissionsToCreate = prisma.pagePermission.createMany({
+    data: permissionCreateArgs as any
   });
   return prisma
-    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissions])
+    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissionsToCreate])
     .then((result) => result[0] as Page);
 }
 
@@ -1126,7 +1060,7 @@ export async function generateForumComment({
     data: {
       createdAt: new Date(),
       createdBy,
-      content: {},
+      content: Prisma.JsonNull,
       contentText,
       updatedAt: new Date(),
       deletedAt: null,

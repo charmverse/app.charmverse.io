@@ -24,7 +24,7 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
     function handleDeleteEvent(value: WebSocketPayload<'pages_deleted'>) {
       mutate(
         (templates) => {
-          return templates?.filter((p) => !value.some((val) => val.id === p.id));
+          return templates?.filter((template) => !value.some((val) => val.id === template.pageId));
         },
         {
           revalidate: false
@@ -38,23 +38,37 @@ export function useProposalTemplates({ load = true }: { load?: boolean } = {}) {
       }
     }
 
+    function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
+      mutate(
+        (list) => {
+          if (!list) return list;
+          return list.map((template) => {
+            const match = proposals.find((p) => p.id === template.proposalId);
+            if (match) {
+              return {
+                ...template,
+                archived: match.archived,
+                draft: match.currentStep ? match.currentStep.step === 'draft' : template.draft
+              };
+            }
+            return template;
+          });
+        },
+        { revalidate: false }
+      );
+    }
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     const unsubscribeFromPageCreated = subscribe('pages_created', handleCreateEvent);
+    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleUpdateEvent);
     return () => {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageCreated();
+      unsubscribeFromProposalArchived();
     };
   }, [mutate, subscribe]);
 
   return {
     proposalTemplates: usableTemplates,
-    proposalTemplatePages: usableTemplates?.map((t) => t.page),
     isLoadingTemplates
   };
-}
-
-// TODO:  add an endpoint for a single template or return it along with the proposal??
-export function useProposalTemplateById(id: undefined | string | null) {
-  const { proposalTemplates } = useProposalTemplates({ load: !!id });
-  return proposalTemplates?.find((template) => template.page.id === id);
 }

@@ -8,8 +8,6 @@ export function countConnectableIdentities(user: LoggedInUser): number {
     count += 1;
   }
 
-  count += user.unstoppableDomains.length;
-
   count += user.googleAccounts.length;
 
   count += user.verifiedEmails.length;

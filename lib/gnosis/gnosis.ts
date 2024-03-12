@@ -3,7 +3,7 @@ import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
 import SafeServiceClient from '@safe-global/safe-service-client';
 import { RateLimit } from 'async-sema';
-import { RPCList, getChainById } from 'connectors/chains';
+import { getChainList, getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import uniqBy from 'lodash/uniqBy';
 import { getAddress } from 'viem';
@@ -102,12 +102,12 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
   }
 }
 
-export async function getSafesForAddresses(addresses: string[]) {
+export async function getSafesForAddresses(addresses: string[], enableTestnets: boolean) {
   const userSafes: SafeData[] = [];
 
   for (const address of addresses) {
     const safes = await Promise.all(
-      RPCList.map((network) => getSafesForAddress({ chainId: network.chainId, address }))
+      getChainList({ enableTestnets }).map((network) => getSafesForAddress({ chainId: network.chainId, address }))
     ).then((list) => list.flat());
     userSafes.push(...safes);
   }

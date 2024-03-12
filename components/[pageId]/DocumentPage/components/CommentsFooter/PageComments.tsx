@@ -9,28 +9,20 @@ import { Comment } from 'components/common/comments/Comment';
 import { CommentForm } from 'components/common/comments/CommentForm';
 import { CommentSort } from 'components/common/comments/CommentSort';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useUser } from 'hooks/useUser';
 import type { CommentContent, CommentPermissions } from 'lib/comments';
 import type { PageWithContent } from 'lib/pages';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
-import type { PageContent } from 'lib/prosemirror/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-
-import { CreateLensPublication } from '../CreateLensPublication';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 type Props = {
   page: PageWithContent;
-  canCreateComments: boolean;
+  enableComments: boolean;
 };
 
-export function PageComments({ page, canCreateComments }: Props) {
-  const { user } = useUser();
-  const { lensProfile, setupLensProfile } = useLensProfile();
+export function PageComments({ page, enableComments }: Props) {
   const router = useRouter();
   const {
-    nonNestedComments,
     comments,
     commentSort,
     setCommentSort,
@@ -43,26 +35,18 @@ export function PageComments({ page, canCreateComments }: Props) {
   } = usePageComments(page.id);
   const isAdmin = useIsAdmin();
   const isProposal = page.type === 'proposal';
-  const [isPublishingToLens, setIsPublishingToLens] = useState(false);
   const { data: proposal } = useGetProposalDetails(isProposal ? page.id : null);
-  const [createdComment, setCreatedComment] = useState<PageCommentWithVote | null>(null);
-  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
+  const [, setCreatedComment] = useState<PageCommentWithVote | null>(null);
   const commentPermissions: CommentPermissions = {
-    add_comment: canCreateComments ?? false,
-    upvote: canCreateComments ?? false,
-    downvote: canCreateComments ?? false,
+    add_comment: enableComments ?? false,
+    upvote: enableComments ?? false,
+    downvote: enableComments ?? false,
     delete_comments: isAdmin
   };
 
   async function createComment(comment: CommentContent) {
     const _createdComment = await addComment(comment);
     setCreatedComment(_createdComment);
-    if (isProposal && proposal?.lensPostLink && !isPublishingToLens && publishCommentsToLens) {
-      const lensProfileSetup = await setupLensProfile();
-      if (lensProfileSetup) {
-        setIsPublishingToLens(true);
-      }
-    }
   }
 
   useEffect(() => {
@@ -89,10 +73,6 @@ export function PageComments({ page, canCreateComments }: Props) {
   }, [router.query.commentId, isLoadingComments]);
 
   const hideComments = isProposal && (!proposal || proposal.status === 'draft');
-  const lensParentPublicationId =
-    createdComment?.parentId === null
-      ? proposal?.lensPostLink
-      : nonNestedComments.find((comment) => comment.id === createdComment?.parentId)?.lensCommentLink;
 
   if (hideComments) return null;
 
@@ -100,20 +80,7 @@ export function PageComments({ page, canCreateComments }: Props) {
     <>
       <Divider sx={{ my: 3 }} />
 
-      {canCreateComments && (
-        <CommentForm
-          isPublishingCommentsToLens={isPublishingToLens && !!createdComment?.parentId}
-          publishToLens={publishCommentsToLens}
-          setPublishToLens={setPublishCommentsToLens}
-          showPublishToLens={
-            Boolean(page.proposalId) &&
-            page.type === 'proposal' &&
-            Boolean(proposal?.lensPostLink) &&
-            Boolean(lensProfile)
-          }
-          handleCreateComment={createComment}
-        />
-      )}
+      {enableComments && <CommentForm handleCreateComment={createComment} />}
 
       {isLoadingComments ? (
         <Box height={100}>
@@ -147,30 +114,10 @@ export function PageComments({ page, canCreateComments }: Props) {
                 No Comments Yet
               </Typography>
 
-              {canCreateComments && <Typography color='secondary'>Be the first to share what you think!</Typography>}
+              {enableComments && <Typography color='secondary'>Be the first to share what you think!</Typography>}
             </Stack>
           )}
         </>
-      )}
-      {isPublishingToLens && createdComment && proposal?.lensPostLink && page.proposalId && lensParentPublicationId && (
-        <CreateLensPublication
-          publicationType='comment'
-          commentId={createdComment.id}
-          content={createdComment.content as PageContent}
-          parentPublicationId={lensParentPublicationId}
-          onSuccess={async () => {
-            await syncPageCommentsWithLensPost();
-            setIsPublishingToLens(false);
-            setCreatedComment(null);
-          }}
-          onError={() => {
-            setIsPublishingToLens(false);
-            setCreatedComment(null);
-          }}
-          proposalId={page.proposalId}
-          proposalPath={page.path}
-          proposalTitle={page.title}
-        />
       )}
     </>
   );

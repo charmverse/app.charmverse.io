@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import randomName from 'lib/utilities/randomName';
-import { uid } from 'lib/utilities/strings';
+import randomName from 'lib/utils/randomName';
+import { uid } from 'lib/utils/strings';
 
 import type { DiscordAccount } from './client/getDiscordAccount';
 

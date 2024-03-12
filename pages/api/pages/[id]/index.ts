@@ -8,7 +8,7 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ModifyChildPagesResponse, PageWithContent } from 'lib/pages';
+import type { ModifyChildPagesResponse, PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
@@ -16,8 +16,8 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { UndesirableOperationError } from 'lib/utilities/errors';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { UndesirableOperationError } from 'lib/utils/errors';
+import { replaceS3Domain } from 'lib/utils/url';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -29,8 +29,13 @@ handler
   .put(updatePageHandler)
   .delete(deletePage);
 
-async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithContent>) {
-  const { id: pageIdOrPath, spaceId: spaceIdOrDomain } = req.query as { id: string; spaceId: string };
+async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithContent | PageMetaLite>) {
+  const {
+    id: pageIdOrPath,
+    spaceId: spaceIdOrDomain,
+    meta
+  } = req.query as { id: string; spaceId: string; meta?: string };
+  const returnOnlyMeta = meta && meta !== 'false';
   const userId = req.session?.user?.id;
   const searchQuery = generatePageQuery({
     pageIdOrPath,
@@ -49,6 +54,7 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
     resourceId: page.id,
     userId
   });
+
   if (!permissions.read) {
     throw new ActionNotPermittedError('You do not have permissions to view this page');
   }
@@ -67,6 +73,18 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
   result.galleryImage = replaceS3Domain(result.galleryImage);
   result.headerImage = replaceS3Domain(result.headerImage);
   result.icon = replaceS3Domain(result.icon);
+
+  if (returnOnlyMeta) {
+    const pageMeta: PageMetaLite = {
+      id: result.id,
+      title: result.title,
+      hasContent: result.hasContent,
+      type: result.type,
+      icon: result.icon,
+      path: result.path
+    };
+    return res.status(200).json(pageMeta);
+  }
 
   return res.status(200).json(result);
 }

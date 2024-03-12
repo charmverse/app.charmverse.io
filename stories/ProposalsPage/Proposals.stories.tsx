@@ -1,22 +1,24 @@
 import { Box } from '@mui/material';
 import { rest } from 'msw';
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import DocumentPage from 'components/[pageId]/DocumentPage/DocumentPage';
+import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
-import { ProposalsPageStory } from './ProposalsPageStory';
+import { ProposalsPageStory, withProposalProviders } from './components/ProposalsPageStory';
 
 export default {
   title: 'Proposals/Views',
-  component: ProposalPageComponent
+  component: ProposalPageComponent,
+  decorators: [withProposalProviders, withCharmEditorProviders]
 };
 
 export function ProposalsPage() {
@@ -49,7 +51,7 @@ export function ProposalInEvaluation() {
   return (
     <GlobalContext>
       <Box sx={{ overflowY: 'auto' }}>
-        <DocumentPage page={page} refreshPage={async () => {}} readOnly={true} savePage={() => {}} />
+        <DocumentPageWithSidebars page={page} readOnly={true} savePage={() => {}} />
       </Box>
     </GlobalContext>
   );
@@ -59,7 +61,7 @@ ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
       proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
-        const rubricCriteria: ProposalWithUsersAndRubric['rubricCriteria'] = [
+        const rubricCriteria: PopulatedEvaluation['rubricCriteria'] = [
           {
             id: '1',
             index: -1,
@@ -72,7 +74,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 2
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '2',
@@ -86,7 +88,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 10
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '3',
@@ -99,7 +101,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '4',
@@ -112,7 +114,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '5',
@@ -125,7 +127,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '6',
@@ -138,7 +140,7 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           },
           {
             id: '7',
@@ -151,10 +153,10 @@ ProposalInEvaluation.parameters = {
               min: 0,
               max: 4
             },
-            evaluationId: null
+            evaluationId: '1'
           }
         ];
-        const rubricAnswers: ProposalWithUsersAndRubric['rubricAnswers'] = [
+        const rubricAnswers: PopulatedEvaluation['rubricAnswers'] = [
           ...rubricCriteria.map((criteria) => ({
             rubricCriteriaId: criteria.id,
             proposalId: criteria.proposalId,
@@ -176,15 +178,32 @@ ProposalInEvaluation.parameters = {
         ];
         const proposal = createMockProposal({
           authors: [{ proposalId: '', userId: members[0].id }],
-          reviewers: [
-            { evaluationId: null, id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
-            { evaluationId: null, id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
-            { evaluationId: null, id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
-          ],
-          evaluationType: 'rubric',
-          status: 'evaluation_active',
-          rubricCriteria,
-          rubricAnswers
+          status: 'published',
+          evaluations: [
+            {
+              index: 0,
+              draftRubricAnswers: [],
+              result: null,
+              id: '11',
+              title: 'Rubric evaluation',
+              completedAt: null,
+              decidedBy: null,
+              permissions: [],
+              voteSettings: null,
+              proposalId: '',
+              voteId: null,
+              snapshotId: null,
+              snapshotExpiry: null,
+              type: 'rubric',
+              rubricCriteria,
+              rubricAnswers,
+              reviewers: [
+                { evaluationId: '1', id: '1', proposalId: '', roleId: null, userId: userProfile.id, systemRole: null },
+                { evaluationId: '1', id: '2', proposalId: '', roleId: null, userId: members[0].id, systemRole: null },
+                { evaluationId: '1', id: '3', proposalId: '', roleId: null, userId: members[1].id, systemRole: null }
+              ]
+            }
+          ]
         });
         return res(ctx.json(proposal));
       })

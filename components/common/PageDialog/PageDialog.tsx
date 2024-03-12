@@ -6,19 +6,19 @@ import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
+import { useGetPage } from 'charmClient/hooks/pages';
 import { trackPageView } from 'charmClient/hooks/track';
-import DocumentPage from 'components/[pageId]/DocumentPage';
+import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
 import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
 import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
-import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
-import debouncePromise from 'lib/utilities/debouncePromise';
+import debouncePromise from 'lib/utils/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
@@ -37,10 +37,12 @@ interface Props {
   readOnly?: boolean;
   hideToolsMenu?: boolean;
   applicationContext?: PageDialogContext;
+  showCard?: (cardId: string | null) => void;
+  showParentChip?: boolean;
 }
 
 function PageDialogBase(props: Props) {
-  const { hideToolsMenu = false, pageId, readOnly, applicationContext } = props;
+  const { hideToolsMenu = false, showParentChip, pageId, readOnly, showCard, applicationContext } = props;
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
@@ -49,7 +51,7 @@ function PageDialogBase(props: Props) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
   const { updatePage } = usePages();
-  const { page, refreshPage } = usePage({ pageIdOrPath: pageId });
+  const { data: page } = useGetPage(pageId);
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = page?.path
@@ -136,7 +138,6 @@ function PageDialogBase(props: Props) {
     }, 500),
     [page]
   );
-
   if (!popupState.isOpen) {
     return null;
   }
@@ -166,7 +167,7 @@ function PageDialogBase(props: Props) {
             </Button>
             {page && (
               <Box display='flex' alignItems='center' gap={0.5}>
-                <DocumentHeaderElements isInsideDialog headerHeight={0} page={page} />
+                <DocumentHeaderElements headerHeight={0} page={page} />
               </Box>
             )}
           </Box>
@@ -176,12 +177,12 @@ function PageDialogBase(props: Props) {
     >
       {page && contentType === 'page' && (
         <DocumentPage
+          showParentChip={showParentChip}
+          showCard={showCard}
           insideModal
           page={page}
           savePage={savePage}
-          refreshPage={refreshPage}
           readOnly={readOnlyPage}
-          close={close}
         />
       )}
       {contentType === 'application' && applicationContext && (

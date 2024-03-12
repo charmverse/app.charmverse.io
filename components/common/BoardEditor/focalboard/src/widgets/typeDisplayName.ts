@@ -40,6 +40,8 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
       return intl.formatMessage({ id: 'PropertyType.ProposalUrl', defaultMessage: 'Proposal Url' });
     case 'proposalStatus':
       return intl.formatMessage({ id: 'PropertyType.ProposalStatus', defaultMessage: 'Proposal Status' });
+    case 'relation':
+      return intl.formatMessage({ id: 'PropertyType.Relation', defaultMessage: 'Relation' });
     case 'proposalEvaluationAverage':
       return intl.formatMessage({
         id: 'PropertyType.ProposalEvaluationAverage',

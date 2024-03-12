@@ -5,7 +5,7 @@ import { useEffect, useMemo, createContext, useContext, useState } from 'react';
 
 import { SPACE_SETTINGS_TABS } from 'components/settings/config';
 import type { ACCOUNT_TABS } from 'components/settings/config';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 export type SettingsPath = (typeof SPACE_SETTINGS_TABS)[number]['path'] | (typeof ACCOUNT_TABS)[number]['path'];
 
@@ -37,7 +37,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
         const domSection = document.getElementById(_section);
         domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-    }, 300);
+    }, 200);
   }
 
   function onClose() {

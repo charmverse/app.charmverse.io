@@ -1,7 +1,9 @@
 import { Grid } from '@mui/material';
+import type { Dispatch, SetStateAction } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMemberProfileTypes } from 'hooks/useMemberProfileTypes';
@@ -10,12 +12,23 @@ import { useMemberCollections } from '../../../../hooks/useMemberCollections';
 import { useMemberPropertyValues } from '../../../../hooks/useMemberPropertyValues';
 
 import { CollectionWidget } from './components/CollectionWidget/CollectionWidget';
+import { CredentialsWidget } from './components/CredentialsWidget';
 import { EnsWidget } from './components/EnsWidget';
 import { LensProfileWidget } from './components/LensProfileWidget';
 import { MemberPropertiesWidget } from './components/MemberPropertiesWidget/MemberPropertiesWidget';
 import { SummonProfileWidget } from './components/SummonProfileWidget';
 
-export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?: boolean }) {
+export function ProfileWidgets({
+  userId,
+  readOnly,
+  setActiveTab,
+  showAllProfileTypes = false
+}: {
+  setActiveTab?: Dispatch<SetStateAction<number>>;
+  userId: string;
+  readOnly?: boolean;
+  showAllProfileTypes?: boolean;
+}) {
   const { space } = useCurrentSpace();
   const {
     memberPropertyValues = [],
@@ -26,12 +39,14 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
   const { data: lensProfile = null, isLoading: isLoadingLensProfile } = useSWR(`public/profile/${userId}/lens`, () =>
     charmClient.publicProfile.getLensProfile(userId)
   );
+  const { isLoading: isLoadingUserCredentials, data: userCredentials } = useGetUserCredentials({ userId });
   const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
     charmClient.publicProfile.getEnsProfile(userId)
   );
 
-  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(`public/profile/${userId}/summon`, () =>
-    charmClient.publicProfile.getSummonProfile(userId)
+  const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(
+    space && `public/profile/${userId}/summon`,
+    () => charmClient.publicProfile.getSummonProfile(userId, space!.id)
   );
 
   const { isFetchingNfts, isFetchingPoaps, mutateNfts, nfts, nftsError, poaps, poapsError } = useMemberCollections({
@@ -46,7 +61,8 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
     isFetchingPoaps &&
     isFetchingNfts &&
     isLoadingMemberPropertiesValues &&
-    isLoadingLensProfile;
+    isLoadingLensProfile &&
+    isLoadingUserCredentials;
 
   const readOnlyMemberProperties = !space || !canEditSpaceProfile(space.id);
 
@@ -56,15 +72,24 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
 
   return (
     <Grid container spacing={4}>
-      {memberProfileTypes
-        ?.filter(({ isHidden }) => !isHidden)
-        .map(({ id }) => {
+      {(showAllProfileTypes ? memberProfileTypes : memberProfileTypes?.filter(({ isHidden }) => !isHidden))?.map(
+        ({ id }) => {
           switch (id) {
             case 'ens':
               return (
                 ensProfile && (
                   <Grid item xs={12} md={6} alignItems='stretch' key={id}>
                     <EnsWidget ensProfile={ensProfile} />
+                  </Grid>
+                )
+              );
+
+            case 'credentials':
+              return (
+                userCredentials &&
+                userCredentials?.length !== 0 && (
+                  <Grid item xs={12} md={6} alignItems='stretch' key={id}>
+                    <CredentialsWidget setActiveTab={setActiveTab} credentials={userCredentials ?? []} />
                   </Grid>
                 )
               );
@@ -118,7 +143,8 @@ export function ProfileWidgets({ userId, readOnly }: { userId: string; readOnly?
             default:
               return null;
           }
-        })}
+        }
+      )}
     </Grid>
   );
 }

@@ -1,4 +1,4 @@
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 import { createCardNotifications } from './cards/createCardNotifications';

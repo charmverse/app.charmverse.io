@@ -10,7 +10,7 @@ import type { NextHandler } from 'next-connect';
 import { ApiError, InvalidApiKeyError } from 'lib/middleware/errors';
 import { getVerifiedSuperApiToken } from 'lib/middleware/requireSuperApiKey';
 import { getPermissionsClient } from 'lib/permissions/api';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 
 declare module 'http' {
   /**
@@ -149,7 +149,6 @@ export async function setRequestSpaceFromApiKey(req: NextApiRequest): Promise<Sp
 export async function requireApiKey(req: NextApiRequest, res: NextApiResponse, next: NextHandler) {
   try {
     const apiKeyCheck = await setRequestSpaceFromApiKey(req);
-
     if (apiKeyCheck.apiKey.type === 'space') {
       const client = await getPermissionsClient({ resourceId: req.authorizedSpaceId, resourceIdType: 'space' });
 

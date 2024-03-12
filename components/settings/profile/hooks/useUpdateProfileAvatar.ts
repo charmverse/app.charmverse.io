@@ -25,7 +25,7 @@ export function useUpdateProfileAvatar() {
 
       setIsSaving(true);
       try {
-        setUser({ ...user, avatar: updatedAvatar.avatar });
+        setUser({ avatar: updatedAvatar.avatar });
         const updatedUser = await charmClient.profile.setAvatar(updatedAvatar);
         setUser(updatedUser);
         return updatedUser;

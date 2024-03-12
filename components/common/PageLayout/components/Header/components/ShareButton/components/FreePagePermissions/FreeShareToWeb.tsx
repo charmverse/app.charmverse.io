@@ -1,5 +1,5 @@
+import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetProposalDetails } from 'charmClient/hooks/proposals';
-import { usePage } from 'hooks/usePage';
 
 import ShareToWeb from '../common/ShareToWeb';
 
@@ -8,8 +8,7 @@ type Props = {
 };
 
 export default function FreeShareToWeb({ pageId }: Props) {
-  const { page: currentPage } = usePage({ pageIdOrPath: pageId });
-
+  const { data: currentPage } = useGetPage(pageId);
   const { data: proposal } = useGetProposalDetails(currentPage?.proposalId);
 
   const shareAlertMessage =

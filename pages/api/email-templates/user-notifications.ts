@@ -14,7 +14,7 @@ import type {
 } from 'lib/notifications/interfaces';
 import { getPagePath } from 'lib/pages/utils';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
-import randomName from 'lib/utilities/randomName';
+import randomName from 'lib/utils/randomName';
 import type { VoteTask } from 'lib/votes/interfaces';
 
 import { templatesContainer } from './page-invite';
@@ -237,7 +237,7 @@ const templates = {
       notification: createProposalNotification({
         pageTitle: 'Should Uniswap provide Rage Trade with an additional use grant',
         spaceName: 'Uniswap',
-        status: 'discussion'
+        status: 'published'
       }),
       user,
       spaceFeatures: []

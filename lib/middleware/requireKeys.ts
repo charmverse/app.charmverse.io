@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import type { NextHandler } from 'next-connect';
 import { isAddress } from 'viem';
 
-import type { ISystemError } from 'lib/utilities/errors';
+import type { ISystemError } from 'lib/utils/errors';
 
 import { ApiError } from './errors';
 

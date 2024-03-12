@@ -49,7 +49,11 @@ export function usePluginState(pluginKey: PluginKey, throttle = false) {
 }
 
 export function useEditorViewContext(): EditorView {
-  return useContext(EditorViewContext);
+  const context = useContext(EditorViewContext);
+  if (!context) {
+    throw new Error('useEditorViewContext must be used within a EditorViewContext');
+  }
+  return context;
 }
 
 function watcherPlugin(pluginKey: PluginKey, setState: (state: any) => void) {

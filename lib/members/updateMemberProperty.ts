@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { NotFoundError } from 'lib/middleware';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 type NewSelectOptionType = {
   id?: string;

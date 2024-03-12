@@ -12,6 +12,8 @@ import { useUser } from 'hooks/useUser';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { GooglePopupLoginState } from 'lib/oauth/interfaces';
 
+import { useVerifyLoginOtp } from './useVerifyLoginOtp';
+
 export const googleSignInScript = 'https://accounts.google.com/gsi/client';
 
 export function useGoogleLogin() {
@@ -19,6 +21,7 @@ export function useGoogleLogin() {
   const { showMessage } = useSnackbar();
   const { openPopupLogin, isPopupLoginOpen } = usePopupLogin<GooglePopupLoginState>();
   const { setUser, user } = useUser();
+  const { open: openVerifyOtpModal } = useVerifyLoginOtp();
 
   function initClient({ hint, mode }: { hint?: string; mode?: 'redirect' | 'popup' } = {}) {
     if (!googleOAuthClientId) {
@@ -63,8 +66,13 @@ export function useGoogleLogin() {
     const loginCallback = async (state: GooglePopupLoginState) => {
       if ('code' in state) {
         try {
-          const loggedInUser = await charmClient.google.loginWithCode({ code: state.code, type });
-          setUser(loggedInUser);
+          const resp = await charmClient.google.loginWithCode({ code: state.code, type });
+          if ('id' in resp) {
+            setUser(resp);
+          } else if ('otpRequired' in resp) {
+            openVerifyOtpModal();
+            return;
+          }
           const message = type === 'login' ? 'Logged in successfully' : 'Account connected successfully';
           if (onSuccess) {
             onSuccess?.();

@@ -26,6 +26,7 @@ interface LoadingProps {
   size?: number;
   children?: React.ReactNode;
   className?: string;
+  'data-test'?: string;
 }
 
 export default function LoadingComponent({
@@ -36,9 +37,10 @@ export default function LoadingComponent({
   children,
   minHeight,
   size = 40,
-  className
+  className,
+  'data-test': dataTest
 }: LoadingProps): JSX.Element {
-  if (!isLoading) return component || <span>{children}</span>;
+  if (!isLoading) return component || <span data-test={dataTest}>{children}</span>;
   return (
     <LoadingCard height={height} minHeight={minHeight} className={className}>
       <LoadingIcon style={{ height: size, width: size }} />

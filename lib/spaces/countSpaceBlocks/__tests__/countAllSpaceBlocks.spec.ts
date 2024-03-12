@@ -125,13 +125,13 @@ describe('countSpaceBlocks - count blocks', () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const page2 = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const { details, total } = await countSpaceBlocks({ spaceId: space.id });
@@ -148,7 +148,7 @@ describe('countSpaceBlocks - count blocks', () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const { comment: threadComment } = await testUtilsPages.generateCommentWithThreadAndPage({
@@ -200,7 +200,7 @@ describe('countSpaceBlocks - count blocks', () => {
       spaceId: space.id,
       categoryId: postCategory.id,
       // Empty content
-      content: {}
+      content: null
     });
 
     const { total, details } = await countSpaceBlocks({
@@ -225,7 +225,7 @@ describe('countSpaceBlocks - count blocks', () => {
       spaceId: space.id,
       categoryId: postCategory.id,
       // Empty content
-      content: {}
+      content: null
     });
 
     const totalComments = 3;
@@ -320,7 +320,7 @@ describe('countSpaceBlocks - count blocks', () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
-      content: {}
+      content: null
     });
 
     const { total, details } = await countSpaceBlocks({ spaceId: space.id });
@@ -339,31 +339,6 @@ describe('countSpaceBlocks - count blocks', () => {
     expect(details.memberProperties.total).toBe(6);
   });
 
-  // it('should count each proposal category and proposal as 1 block', async () => {
-  //   const { space, user } = await testUtilsUser.generateUserAndSpace();
-
-  //   const proposalCategory = await testUtilsProposals.generateProposalCategory({
-  //     spaceId: space.id
-  //   });
-
-  //   const proposal = await testUtilsProposals.generateProposal({
-  //     spaceId: space.id,
-  //     userId: user.id,
-  //     categoryId: proposalCategory.id,
-  //     content: {}
-  //   });
-
-  //   const { total } = await countSpaceBlocks({
-  //     spaceId: space.id
-  //   });
-
-  //   expect(counts.proposalCategories).toBe(1);
-  //   expect(counts.proposals).toBe(1);
-  //   expect(counts.documentBlocks).toBe(0);
-
-  //   expect(total).toBe(2);
-  // });
-
   it('should count each reward as 1 block', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
@@ -372,7 +347,7 @@ describe('countSpaceBlocks - count blocks', () => {
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
-      content: {}
+      content: null
     });
 
     const { details, total } = await countSpaceBlocks({
@@ -493,29 +468,6 @@ describe('countSpaceBlocks - count content', () => {
     expect(details.editorContent).toBe(0);
   });
 
-  // it('should count the content inside each proposal', async () => {
-  //   const { space, user } = await testUtilsUser.generateUserAndSpace();
-
-  //   const proposalCategory = await testUtilsProposals.generateProposalCategory({
-  //     spaceId: space.id
-  //   });
-
-  //   const proposal = await testUtilsProposals.generateProposal({
-  //     spaceId: space.id,
-  //     userId: user.id,
-  //     categoryId: proposalCategory.id,
-  //     content: pageContent
-  //   });
-
-  //   const { details } = await countSpaceBlocks({
-  //     spaceId: space.id
-  //   });
-
-  //   expect(counts.proposalCategories).toBe(1);
-  //   expect(counts.proposals).toBe(1);
-  //   expect(counts.documentBlocks).toBeGreaterThan(1);
-  // });
-
   it('should count the content inside each reward page', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
 
@@ -544,7 +496,7 @@ describe('countSpaceBlocksAndSave', () => {
       createdBy: user.id,
       spaceId: space.id,
       status: 'open',
-      content: {}
+      content: null
     });
 
     const { count, details } = await countSpaceBlocksAndSave({

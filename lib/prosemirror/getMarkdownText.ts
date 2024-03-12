@@ -1,6 +1,6 @@
 import type { Prisma } from '@charmverse/core/prisma';
 
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
 export async function getMarkdownText(content: Prisma.JsonValue | null) {
   try {

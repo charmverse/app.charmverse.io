@@ -2,12 +2,13 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
-import { PositiveNumbersOnlyError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { RewardCreationData } from '../createReward';
 import { createReward } from '../createReward';
-import type { Reward } from '../interfaces';
+import type { Reward, RewardWithUsers } from '../interfaces';
 
 let user: User;
 let space: Space;
@@ -35,6 +36,8 @@ describe('createReward', () => {
       { id: reviewerRole.id, group: 'role' }
     ];
 
+    const credentialTemplateId = uuid();
+
     const rewardData: RewardCreationData = {
       spaceId: space.id,
       userId: user.id,
@@ -46,13 +49,17 @@ describe('createReward', () => {
       dueDate: new Date(),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'reward page'
+      },
       reviewers,
-      allowedSubmitterRoles: [submitterRole.id]
+      allowedSubmitterRoles: [submitterRole.id],
+      selectedCredentialTemplates: [credentialTemplateId]
     };
 
     const { reward } = await createReward(rewardData);
 
-    expect(reward).toMatchObject({
+    expect(reward).toMatchObject<Partial<RewardWithUsers>>({
       chainId: 2,
       rewardAmount: 100,
       rewardToken: 'ETH',
@@ -63,7 +70,8 @@ describe('createReward', () => {
       fields: { fieldName: 'sampleField', type: 'text' },
       reviewers: expect.arrayContaining(reviewers),
       allowedSubmitterRoles: [submitterRole.id],
-      assignedSubmitters: null
+      assignedSubmitters: null,
+      selectedCredentialTemplates: [credentialTemplateId]
     });
   });
 
@@ -85,6 +93,9 @@ describe('createReward', () => {
       dueDate: new Date(),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'Reward Page'
+      },
       reviewers,
       allowedSubmitterRoles: [submitterRole.id],
       assignedSubmitters: [user.id]
@@ -108,19 +119,13 @@ describe('createReward', () => {
     });
   });
 
-  it('should auto-create a reward with default parameters if just the user and spaceId', async () => {
+  it('should throw an error if missing inputs', async () => {
     const rewardData = {
       spaceId: space.id,
       userId: user.id
     };
 
-    const { reward } = await createReward(rewardData);
-
-    expect(reward).toMatchObject<Partial<Reward>>({
-      chainId: 1,
-      rewardToken: 'ETH',
-      rewardAmount: 0.1
-    });
+    await expect(createReward(rewardData)).rejects.toThrow(InvalidInputError);
   });
 
   it('should successfully add a reward to an existing page and the page should have a page.bountyId equal to reward.id', async () => {
@@ -177,6 +182,9 @@ describe('createReward', () => {
       dueDate: new Date(),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'Reward Page'
+      },
       reviewers: [
         { id: user.id, group: 'user' },
         { id: reviewerRole.id, group: 'role' }
@@ -222,14 +230,14 @@ describe('createReward', () => {
     );
   });
 
-  it('should throw a PositiveNumbersOnlyError if rewardAmount is negative', async () => {
+  it('should throw a InvalidInputError if rewardAmount is negative', async () => {
     const rewardData = {
       spaceId: space.id,
       userId: user.id,
       rewardAmount: -5
     };
 
-    await expect(createReward(rewardData)).rejects.toThrow(PositiveNumbersOnlyError);
+    await expect(createReward(rewardData)).rejects.toThrow(InvalidInputError);
   });
 
   it('should throw a NotFoundError if space is not found', async () => {

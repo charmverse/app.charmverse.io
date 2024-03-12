@@ -15,9 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        function_name: ["webhook-queueWorker", "webhookChecker"]
+        function_name: ['webhook-queueWorker', 'webhookChecker']
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         uses: ./.github/actions/install
       - name: populate env file
@@ -35,7 +35,7 @@ jobs:
                 secret_json_key=${BASH_REMATCH[3]}
                 secret_version=${BASH_REMATCH[4]:-AWSCURRENT}
 
-                if [[ $secret_version =~ ^AWS ]]; then 
+                if [[ $secret_version =~ ^AWS ]]; then
                     secret_version_option=(--version-stage "$secret_version")
                 else
                     secret_version_option=(--version-id "$secret_version")
@@ -56,11 +56,10 @@ jobs:
             fi
           done
       - name: Copy Prisma files
-        run:
-          node copyPrismaFiles.js
+        run: node copyPrismaFiles.js
           ls -lA ./serverless/
       - name: serverless deploy ${{ matrix.function_name }}
-        uses: serverless/github-action@v3.1
+        uses: serverless/github-action@v3.2
         with:
           args: deploy --stage prod --function ${{ matrix.function_name }}
         env:

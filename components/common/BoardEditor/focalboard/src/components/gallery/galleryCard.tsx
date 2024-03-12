@@ -3,17 +3,19 @@ import { Box } from '@mui/material';
 import React from 'react';
 import { FormattedMessage } from 'react-intl';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { isTouchScreen } from 'lib/utilities/browser';
+import { isTouchScreen } from 'lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';
-import mutator from '../../mutator';
 import PropertyValueElement from '../propertyValueElement';
 
 const StyledBox = styled(Box)`
@@ -28,19 +30,15 @@ type Props = {
   visibleTitle: boolean;
   isSelected: boolean;
   readOnly: boolean;
-  isManualSort: boolean;
   onDrop: (srcCard: Card, dstCard: Card) => void;
 };
 
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
   const { pages } = usePages();
-  const [isDragging, isOver, cardRef] = useSortable(
-    'card',
-    card,
-    props.isManualSort && !props.readOnly && !isTouchScreen(),
-    props.onDrop
-  );
+  const { trigger: trashPages } = useTrashPages();
+  const { showError } = useSnackbar();
+  const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
   const cardPage = pages[card.id];
 
   const visiblePropertyTemplates = (props.visiblePropertyTemplates || []).filter(
@@ -54,8 +52,12 @@ const GalleryCard = React.memo((props: Props) => {
 
   const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImage;
 
-  const deleteCard = () => {
-    mutator.deleteBlock(card, 'delete card');
+  const deleteCard = async () => {
+    try {
+      await trashPages({ pageIds: [card.id], trash: true });
+    } catch (error) {
+      showError(error);
+    }
   };
 
   return cardPage ? (

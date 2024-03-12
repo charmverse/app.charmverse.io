@@ -1,29 +1,4 @@
-import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
-
-import { isTruthy } from 'lib/utilities/types';
-
 import type { DisplayedPage } from '../hooks/useTokenGateModalContext';
-
-export const createAuthSigs = (conditions: UnifiedAccessControlConditions) => {
-  const newConditions = conditions
-    .map((condition) => {
-      if ('conditionType' in condition && condition.conditionType === 'evmBasic') {
-        return 'ethereum';
-      }
-      if ('conditionType' in condition && condition.conditionType === 'solRpc') {
-        return 'solana';
-      }
-      return null;
-    })
-    .filter(isTruthy);
-
-  return [...new Set(newConditions)];
-};
-
-export const getAllChains = (conditions: UnifiedAccessControlConditions) => {
-  const newConditions = conditions.map((c) => 'chain' in c && c.chain).filter(isTruthy);
-  return [...new Set(newConditions)];
-};
 
 export function getTitle(page: DisplayedPage) {
   switch (page) {
@@ -37,12 +12,14 @@ export function getTitle(page: DisplayedPage) {
       return 'Review Conditions';
     case 'wallet':
       return 'Wallet Condition';
-    case 'dao':
-      return 'DAO Condition';
+    case 'communities':
+      return 'Communities Condition';
     case 'unlock':
       return 'Unlock Protocol Condition';
     case 'hypersub':
       return 'Hypersub Condition';
+    case 'credentials':
+      return 'Gitcoin Passport Condition';
     default:
       return 'Select Condition';
   }

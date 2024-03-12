@@ -7,7 +7,7 @@ import { mapNFTData } from './getNFT';
 
 export async function getNFTs({ wallets }: { wallets: Pick<UserWallet, 'address' | 'id'>[] }): Promise<NFTData[]> {
   const provider = getClient();
-  if (!provider) {
+  if (!provider || wallets.length === 0) {
     return [];
   }
   // test wallet

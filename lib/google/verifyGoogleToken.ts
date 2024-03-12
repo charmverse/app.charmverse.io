@@ -1,8 +1,8 @@
 import type { TokenPayload } from 'google-auth-library';
 
 import { googleOAuthClientId } from 'config/constants';
-import { coerceToMilliseconds } from 'lib/utilities/dates';
-import { InvalidInputError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { coerceToMilliseconds } from 'lib/utils/dates';
+import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 
 import type { GoogleLoginOauthParams } from './authorization/authClient';
 import { getClient } from './authorization/authClient';

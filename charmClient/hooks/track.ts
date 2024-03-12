@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { PageEventMap } from 'lib/metrics/mixpanel/interfaces/PageEvent';
-import { getBrowserPath } from 'lib/utilities/browser';
+import { getBrowserPath } from 'lib/utils/browser';
 
 import { TrackApi } from '../apis/trackApi';
 

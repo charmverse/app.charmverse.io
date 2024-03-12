@@ -6,6 +6,7 @@ export type SubscriptionPeriod = 'monthly' | 'annual';
 
 // Equivalent to 30k
 export const defaultFreeBlockQuota = 30;
+export const blocksPerCharm = 1000;
 
 export const communityProduct = {
   id: 'community',

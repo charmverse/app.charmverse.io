@@ -4,7 +4,7 @@ import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark';
 import SearchIcon from '@mui/icons-material/Search';
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from '@mui/icons-material/SettingsOutlined';
 import type { BoxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
@@ -27,17 +27,16 @@ import type { SettingsPath } from 'hooks/useSettingsDialog';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
-import { PageIcon } from '../../../PageIcon';
-import NewPageMenu from '../NewPageMenu';
-import PageNavigation from '../PageNavigation';
 import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
+import { FeatureLink } from './components/FeatureLink';
 import { NotificationUpdates } from './components/NotificationsPopover';
+import PageNavigation from './components/PageNavigation';
+import NewPageMenu from './components/PageNavigation/components/NewPageMenu';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';
@@ -129,7 +128,6 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   const [userSpacePermissions] = useCurrentSpacePermissions();
   const [isScrolled, setIsScrolled] = useState(false);
   const [showingTrash, setShowingTrash] = useState(false);
-  const { logoutWallet } = useWeb3Account();
   const isMobile = useSmallScreen();
   const { hasAccess: showMemberFeatures, isLoadingAccess } = useHasMemberLevel('member');
   const { favoritePageIds } = useFavoritePages();
@@ -163,7 +161,6 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   );
 
   async function logoutCurrentUser() {
-    logoutWallet();
     await logoutUser();
     router.push('/');
   }
@@ -179,7 +176,6 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
         )}
         <WorkspaceLabel data-test='page-sidebar-header'>
           <SectionName>SPACE</SectionName>
-          {/** Test component */}
           {userSpacePermissions?.createPage && showMemberFeatures && (
             <div className='add-a-page'>
               <NewPageMenu data-test='sidebar-add-page' tooltip='Add a page' addPage={addPage} />
@@ -233,11 +229,7 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
   return (
     <SidebarContainer>
       <Box display='flex' flexDirection='column' sx={{ height: '100%', flexGrow: 1, width: 'calc(100% - 57px)' }}>
-        <SidebarSubmenu
-          closeSidebar={closeSidebar}
-          logoutCurrentUser={logoutCurrentUser}
-          openProfileModal={() => handleModalClick('profile')}
-        />
+        <SidebarSubmenu closeSidebar={closeSidebar} logoutCurrentUser={logoutCurrentUser} />
         {space && (
           <>
             <Box mb={2}>
@@ -278,24 +270,14 @@ export function NavigationSidebar({ closeSidebar, navAction }: SidebarProps) {
                   <NotificationUpdates closeSidebar={navAction} />
                   <Divider sx={{ mx: 2, my: 1 }} />
                   {features
-                    .filter((feat) => !feat.isHidden)
-                    .map((feat) => {
+                    .filter((feature) => !feature.isHidden)
+                    .map((feature) => {
                       if (
                         showMemberFeatures ||
                         // Always show forum to space members. Show it to guests if they have access to at least 1 category
-                        (feat.path === 'forum' && categories.length > 0)
+                        (feature.path === 'forum' && categories.length > 0)
                       ) {
-                        return (
-                          <SidebarLink
-                            key={feat.path}
-                            href={`/${space.domain}/${feat.path}`}
-                            active={router.pathname.startsWith(`/[domain]/${feat.path}`)}
-                            icon={<PageIcon icon={null} pageType={feat.path} />}
-                            label={feat.title}
-                            onClick={navAction}
-                            data-test={`sidebar-link-${feat.path}`}
-                          />
-                        );
+                        return <FeatureLink key={feature.id} feature={feature} onClick={navAction} />;
                       }
 
                       return null;

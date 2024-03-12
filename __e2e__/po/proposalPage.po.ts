@@ -7,6 +7,7 @@ export class ProposalPage extends DocumentPage {
   constructor(
     page: Page,
     public saveDraftButton = page.locator('data-test=create-proposal-button'),
+    public publishNewProposalButton = page.locator('data-test=publish-new-proposal-button'),
     public categorySelect = page.locator('data-test=proposal-category-select'),
     public reviewerSelect = page.locator('data-test=proposal-reviewer-select'),
     public nextStatusButton = page.locator('data-test=next-status-button'),
@@ -19,12 +20,22 @@ export class ProposalPage extends DocumentPage {
     public completeDraftButton = page.locator('data-test=complete-draft-button'),
     public evaluationSettingsSidebar = page.locator('data-test=evaluation-settings-sidebar'),
     public addRubricCriteriaButton = page.locator('data-test=add-rubric-criteria-button'),
+    // Simple utility for editing the first rubric criteria
     public editRubricCriteriaLabel = page.locator('data-test=edit-rubric-criteria-label >> textarea').first(),
     public editRubricCriteriaDescription = page
       .locator('data-test=edit-rubric-criteria-description >> textarea')
       .first(),
-    public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input'),
-    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input'),
+    public editRubricCriteriaMinScore = page.locator('data-test=edit-rubric-criteria-min-score >> input').first(),
+    public editRubricCriteriaMaxScore = page.locator('data-test=edit-rubric-criteria-max-score >> input').first(),
+    // Edit additional criteria
+    public editNthRubricCriteriaLabel = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-label >> textarea').nth(index),
+    public editNthRubricCriteriaDescription = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-description >> textarea').nth(index),
+    public editNthRubricCriteriaMinScore = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-min-score >> input').nth(index),
+    public editNthRubricCriteriaMaxScore = (index: number) =>
+      page.locator('data-test=edit-rubric-criteria-max-score >> input').nth(index),
     public evaluationVoteDurationInput = page
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-duration')
@@ -32,7 +43,32 @@ export class ProposalPage extends DocumentPage {
     public evaluationVotePassThresholdInput = page
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-pass-threshold')
-      .locator('data-test=numeric-field >> input')
+      .locator('data-test=numeric-field >> input'),
+    public evaluationVoteTypeApproval = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-type-approval'),
+    public evaluationVoteTypeCustomOptions = page
+      .locator('data-test=evaluation-vote-settings')
+      .locator('data-test=vote-type-custom-options'),
+    public voteOption = (index: number) =>
+      page
+        .locator('data-test=evaluation-vote-settings')
+        .locator('data-test=inline-vote-option')
+        .nth(index)
+        .locator('input'),
+    public addVoteOption = page.locator('data-test=evaluation-vote-settings').locator('data-test=add-vote-option'),
+    public deleteVoteOption = (index: number) =>
+      page.locator('data-test=evaluation-vote-settings').locator('data-test=delete-vote-option').nth(index),
+    public pageTopLevelMenu = page.locator('data-test=header--show-page-actions'),
+    public archiveProposalAction = page.locator('data-test=header--archive-current-proposal'),
+    public addReward = page.locator('data-test=add-reward'),
+    public passFeedbackEvaluation = page.locator('data-test=pass-feedback-evaluation'),
+    public failEvaluationButton = page.locator('data-test=evaluation-fail-button'),
+    public passEvaluationButton = page.locator('data-test=evaluation-pass-button'),
+    public goBackButton = page.locator('data-test=evaluation-go-back-button'),
+    public rubricCriteriaScore = page.locator('data-test=rubric-criteria-score-input >> input'),
+    public rubricCriteriaComment = page.locator('data-test=rubric-criteria-score-comment >> textarea').first(),
+    public saveRubricAnswers = page.locator('data-test=save-rubric-answers')
   ) {
     super(page);
   }
@@ -54,6 +90,10 @@ export class ProposalPage extends DocumentPage {
     return this.page.locator(`data-test=proposal-${evaluationType}-select`);
   }
 
+  async getSelectedReviewers() {
+    return this.page.locator('data-test=selected-user-or-role-option');
+  }
+
   /**
    * @param assignee Either a system role, or a user or role id
    */
@@ -63,5 +103,16 @@ export class ProposalPage extends DocumentPage {
     // Close the menu afterwards
     await this.getEvaluationReviewerSelect(evaluationType).click();
     await this.page.keyboard.press('Escape');
+  }
+
+  async toggleArchiveProposal() {
+    await this.pageTopLevelMenu.click();
+    await this.archiveProposalAction.click();
+    // Press escape to close the menu
+    await this.page.keyboard.press('Escape');
+  }
+
+  getVoteOption(optionName: string) {
+    return this.page.locator(`data-test=current-vote-${optionName} >> input`);
   }
 }

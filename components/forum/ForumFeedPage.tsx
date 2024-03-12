@@ -17,7 +17,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePageTitle } from 'hooks/usePageTitle';
 import type { PostSortOption } from 'lib/forums/posts/constants';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import { CategoryMenu } from './components/CategoryMenu';
 import { CategoryNotificationToggle } from './components/CategoryNotificationToggle';
@@ -76,6 +76,7 @@ export function ForumPage() {
       });
     }
   }
+
   useEffect(() => {
     if (!router.isReady) {
       return;
@@ -109,6 +110,13 @@ export function ForumPage() {
   useEffect(() => {
     setCategoryFromPath();
   }, [categories, router.query]);
+
+  useEffect(() => {
+    // show New popup if user navigated to /forum?new=1
+    if (router.query.new && currentSpace) {
+      showNewPostPopup();
+    }
+  }, [router.isReady, !!currentSpace]);
 
   return (
     <CenteredPageContent style={{ width: 1100 }}>

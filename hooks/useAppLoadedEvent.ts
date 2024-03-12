@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
-import { getBrowserPath } from 'lib/utilities/browser';
+import { getBrowserPath } from 'lib/utils/browser';
 
 export function useAppLoadedEvent() {
   const { isLoaded } = useUser();

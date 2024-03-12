@@ -1,3 +1,4 @@
+import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsForum, testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
@@ -16,16 +17,15 @@ describe('countCommentBlocks', () => {
     const post = await testUtilsForum.generateForumPost({
       userId: user.id,
       spaceId: space.id,
-      content: {}, // Assuming the content structure is irrelevant for this test
       contentText: 'Example text'
     });
 
     const postComments = await prisma.postComment.createMany({
       data: [
-        { content: {}, contentText: 'Example text', createdBy: user.id, postId: post.id },
-        { content: {}, contentText: 'Example text', createdBy: user.id, postId: post.id },
-        { content: {}, contentText: 'Example text', createdBy: user.id, postId: post.id },
-        { content: {}, contentText: 'Example text', createdBy: user.id, postId: post.id }
+        { content: Prisma.JsonNull, contentText: 'Example text', createdBy: user.id, postId: post.id },
+        { content: Prisma.JsonNull, contentText: 'Example text', createdBy: user.id, postId: post.id },
+        { content: Prisma.JsonNull, contentText: 'Example text', createdBy: user.id, postId: post.id },
+        { content: Prisma.JsonNull, contentText: 'Example text', createdBy: user.id, postId: post.id }
       ]
     });
 
@@ -41,13 +41,13 @@ describe('countCommentBlocks', () => {
       data: [
         {
           applicationId: reward.applications[0].id,
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id
         },
         {
           applicationId: reward.applications[0].id,
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id
         }
@@ -60,19 +60,19 @@ describe('countCommentBlocks', () => {
     await prisma.pageComment.createMany({
       data: [
         {
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id,
           pageId: proposal.id
         },
         {
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id,
           pageId: proposal.id
         },
         {
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id,
           pageId: proposal.id
@@ -242,13 +242,13 @@ describe('countCommentBlocks', () => {
       data: [
         {
           applicationId: deletedReward.applications[0].id,
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id
         },
         {
           applicationId: deletedReward.applications[0].id,
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id
         }
@@ -266,14 +266,14 @@ describe('countCommentBlocks', () => {
       data: [
         {
           applicationId: reward.applications[0].id,
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id,
           deletedAt: new Date()
         },
         {
           applicationId: reward.applications[0].id,
-          content: {}, // Assuming the content structure is irrelevant for this test,
+          content: Prisma.JsonNull, // Assuming the content structure is irrelevant for this test,
           contentText: 'Example text',
           createdBy: user.id
         }

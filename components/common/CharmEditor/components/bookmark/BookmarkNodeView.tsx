@@ -64,11 +64,7 @@ export function BookmarkNodeView({
   }
 
   if (isLoading) {
-    return (
-      <Box my={5}>
-        <LoadingComponent isLoading />
-      </Box>
-    );
+    return <LoadingComponent isLoading minHeight={80} />;
   }
 
   if (!url) {

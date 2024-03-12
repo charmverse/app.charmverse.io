@@ -13,6 +13,8 @@ export function TokenGatePoapId() {
   return (
     <NumberInputField
       label='POAP ID'
+      fullWidth
+      disableArrows
       error={errors.poapId?.message}
       helperText={errors.poapId?.message}
       {...register('poapId')}

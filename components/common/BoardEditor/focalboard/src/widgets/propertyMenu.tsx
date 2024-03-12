@@ -1,20 +1,23 @@
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import { ListItemIcon, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
+import { ListItemIcon, ListItemText, Divider, Menu, MenuItem, TextField, Typography, Stack } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
+
+import { DeleteRelationPropertyModal } from '../components/properties/relation/DeleteRelationPropertyModal';
 
 import { PropertyTypes } from './propertyTypes';
 import { typeDisplayName } from './typeDisplayName';
 
 type Props = {
-  onTypeAndNameChanged: (newType: PropertyType, newName: string) => void;
+  onTypeAndNameChanged: (newType: PropertyType, newName: string, relationData?: RelationPropertyData) => void;
   onDelete: (id: string) => void;
   deleteDisabled?: boolean;
   property: IPropertyTemplate;
+  board: Board;
 };
 
 const PropertyMenu = React.memo((props: Props) => {
@@ -24,14 +27,13 @@ const PropertyMenu = React.memo((props: Props) => {
   const propertyName = props.property.name;
   const [name, setName] = useState(propertyName);
   const changePropertyTypePopupState = usePopupState({ variant: 'popover', popupId: 'card-property-type' });
+  const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
   const intl = useIntl();
-
   return (
     <Stack gap={1}>
       <TextField
         sx={{
-          mx: 1,
-          my: 1
+          mx: 1
         }}
         inputProps={{
           ref: nameTextbox
@@ -53,12 +55,6 @@ const PropertyMenu = React.memo((props: Props) => {
           }
         }}
       />
-      <MenuItem onClick={() => props.onDelete(propertyId)}>
-        <ListItemIcon>
-          <DeleteOutlinedIcon fontSize='small' />
-        </ListItemIcon>
-        <Typography variant='subtitle1'>Delete</Typography>
-      </MenuItem>
       <MenuItem
         {...bindTrigger(changePropertyTypePopupState)}
         sx={{
@@ -67,8 +63,15 @@ const PropertyMenu = React.memo((props: Props) => {
           justifyContent: 'space-between'
         }}
       >
-        <Typography variant='subtitle1'>Type: {typeDisplayName(intl, propertyType)}</Typography>
+        <ListItemText>Type: {typeDisplayName(intl, propertyType)}</ListItemText>
         <ArrowRightIcon fontSize='small' />
+      </MenuItem>
+      <Divider sx={{ my: '0 !important' }} />
+      <MenuItem onClick={() => props.onDelete(propertyId)}>
+        <ListItemIcon>
+          <DeleteOutlinedIcon fontSize='small' />
+        </ListItemIcon>
+        <ListItemText>Delete property</ListItemText>
       </MenuItem>
       <Menu
         {...bindMenu(changePropertyTypePopupState)}
@@ -82,12 +85,23 @@ const PropertyMenu = React.memo((props: Props) => {
         }}
       >
         <PropertyTypes
-          onClick={(type) => {
-            props.onTypeAndNameChanged(type, name);
-            changePropertyTypePopupState.close();
+          selectedTypes={[propertyType]}
+          onClick={({ type, relationData }) => {
+            if (type !== propertyType) {
+              // only change the type if it's different
+              props.onTypeAndNameChanged(type, name, relationData);
+              changePropertyTypePopupState.close();
+            }
           }}
         />
       </Menu>
+      {showRelationPropertyDeletePopup.isOpen && (
+        <DeleteRelationPropertyModal
+          board={props.board}
+          template={props.property}
+          onClose={showRelationPropertyDeletePopup.close}
+        />
+      )}
     </Stack>
   );
 });

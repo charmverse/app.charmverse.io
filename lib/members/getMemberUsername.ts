@@ -2,7 +2,7 @@ import type { IdentityType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { shortenHex } from 'lib/utilities/blockchain';
+import { shortenHex } from 'lib/utils/blockchain';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 export type UserIdentities = {

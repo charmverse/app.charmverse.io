@@ -1,1 +1,0 @@
-export { TemplatesMenu } from './TemplatesMenu';

@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { InvalidInputError, MissingDataError } from 'lib/utilities/errors';
-import { uid } from 'lib/utilities/strings';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
+import { uid } from 'lib/utils/strings';
 import type { LoggedInUser } from 'models';
 
 import { getUserProfile } from '../getUser';
@@ -28,18 +28,6 @@ beforeAll(async () => {
           avatarUrl: 'https://example.com/avatar.png'
         }
       },
-      unstoppableDomains: {
-        createMany: {
-          data: [
-            {
-              domain: `example-${v4()}.nft`
-            },
-            {
-              domain: `example-${v4()}.nft`
-            }
-          ]
-        }
-      },
       discordUser: {
         create: {
           discordId: `1234567890-${v4()}`,
@@ -50,7 +38,7 @@ beforeAll(async () => {
     include: sessionUserRelations
   });
 
-  if (!user.discordUser || !user.wallets.length || !user.googleAccounts.length || !user.unstoppableDomains.length) {
+  if (!user.discordUser || !user.wallets.length || !user.googleAccounts.length) {
     throw new InvalidInputError('User session relations not retrieved correctly');
   }
 });

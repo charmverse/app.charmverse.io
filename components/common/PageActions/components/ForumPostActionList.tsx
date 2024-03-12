@@ -68,11 +68,7 @@ export function ForumPostActionList({
   }
 
   async function convertToProposal(pageId: string) {
-    onComplete();
-    const { path } = await charmClient.forum.convertToProposal({
-      postId: pageId
-    });
-    navigateToSpacePath(`/${path}`);
+    navigateToSpacePath(`/proposals/new`, { sourcePostId: post?.id });
   }
 
   return (

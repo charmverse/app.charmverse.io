@@ -8,13 +8,14 @@ import AddIcon from '@mui/icons-material/Add';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { usePages } from 'hooks/usePages';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import mutator from '../../mutator';
 import type { DateProperty } from '../properties/dateRange/dateRange';

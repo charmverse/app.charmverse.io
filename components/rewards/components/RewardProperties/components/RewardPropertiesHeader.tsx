@@ -17,7 +17,7 @@ import { RewardStatusBadge } from '../../RewardStatusBadge';
  * Permissions left optional so this component can initialise without them
  */
 interface Props {
-  reward: Reward;
+  reward: Partial<Pick<Reward, 'id' | 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'status'>>;
   pageId: string;
   readOnly?: boolean;
   isExpanded: boolean;
@@ -33,7 +33,7 @@ export function RewardPropertiesHeader({ readOnly = false, reward, isExpanded, p
 
   const { data: editableCheck, mutate: refreshEditable } = useSWR(
     !isFreeSpace && reward.id ? `bounty-editable-${reward.id}` : null,
-    () => charmClient.rewards.isRewardEditable(reward.id)
+    () => charmClient.rewards.isRewardEditable(reward.id!)
   );
   function restrictPermissions() {
     setUpdatingPermissions(true);

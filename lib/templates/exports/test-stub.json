@@ -50,7 +50,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": null,
-      "snapshotProposalId": null,
       "fullWidth": false,
       "bountyId": null,
       "permissions": [
@@ -103,7 +102,6 @@
       "index": -1,
       "cardId": null,
       "proposalId": null,
-      "snapshotProposalId": null,
       "fullWidth": false,
       "bountyId": null,
       "permissions": [
@@ -168,7 +166,6 @@
           "index": -1,
           "cardId": "d6162779-7ed0-4f61-8c6e-ac478bb7fae9",
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "bountyId": null,
           "permissions": [
@@ -696,7 +693,6 @@
           "index": -1,
           "cardId": "ca5364b2-8b74-4d1e-8cce-bc71598c2255",
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "bountyId": null,
           "permissions": [
@@ -836,7 +832,6 @@
           "index": -1,
           "cardId": "c05ad284-6f44-49eb-9c22-18a6baa99313",
           "proposalId": null,
-          "snapshotProposalId": null,
           "fullWidth": false,
           "bountyId": null,
           "permissions": [

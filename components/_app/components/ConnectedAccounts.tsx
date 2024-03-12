@@ -1,8 +1,8 @@
 import { Stack, Typography } from '@mui/material';
 import { type ReactNode } from 'react';
-import useSWRMutation from 'swr/mutation';
+import { useAccount } from 'wagmi';
 
-import charmClient from 'charmClient';
+import { useAddUserWallets } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { WalletSign } from 'components/login/components/WalletSign';
@@ -12,9 +12,10 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
-import type { AuthSig } from 'lib/blockchain/interfaces';
+import { useWeb3Account } from 'hooks/useWeb3Account';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
-import { shortenHex } from 'lib/utilities/blockchain';
+import { shortenHex } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
@@ -93,16 +94,19 @@ function WalletConnect({
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
   const { updateUser } = useUser();
+  const { trigger: signSuccessTrigger, isMutating: isVerifyingWallet } = useAddUserWallets();
+  const { address } = useAccount();
 
-  const { trigger: signSuccess, isMutating: isVerifyingWallet } = useSWRMutation(
-    '/profile/add-wallets',
-    (_url, { arg }: Readonly<{ arg: AuthSig }>) => charmClient.addUserWallets([arg]),
-    {
-      onSuccess(data) {
-        updateUser(data);
+  const signSuccess = async (payload: SignatureVerificationPayload) => {
+    await signSuccessTrigger(
+      { ...payload, address: address as string },
+      {
+        onSuccess(data) {
+          updateUser(data);
+        }
       }
-    }
-  );
+    );
+  };
 
   return connectedWallet ? (
     <ConnectedAccount

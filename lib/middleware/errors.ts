@@ -1,5 +1,5 @@
-import type { ISystemErrorInput } from 'lib/utilities/errors';
-import { SystemError } from 'lib/utilities/errors';
+import type { ISystemErrorInput } from 'lib/utils/errors';
+import { SystemError } from 'lib/utils/errors';
 
 export class SpaceAccessDeniedError extends SystemError {
   constructor() {

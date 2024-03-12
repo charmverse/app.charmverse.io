@@ -14,10 +14,10 @@ import { usePageIdFromPath } from 'hooks/usePageFromPath';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
-import { getPagePath } from 'lib/utilities/domains/getPagePath';
-import { isUUID } from 'lib/utilities/strings';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
+import { getPagePath } from 'lib/utils/domains/getPagePath';
+import { isUUID } from 'lib/utils/strings';
 import type { GlobalPageProps } from 'pages/_app';
 
 export async function getServerSideProps(ctx: GetServerSidePropsContext) {

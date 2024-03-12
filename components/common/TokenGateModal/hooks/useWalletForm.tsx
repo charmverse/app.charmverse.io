@@ -1,11 +1,12 @@
-import type { Web3Provider } from '@ethersproject/providers';
+import type { FetchEnsAddressResult } from '@wagmi/core';
+import { fetchEnsAddress } from '@wagmi/core';
 import { isValidName } from 'ethers/lib/utils';
 import { useCallback } from 'react';
 import type { Resolver } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+import { normalize } from 'viem/ens';
 import * as yup from 'yup';
 
-import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
 const schema = yup.object({
@@ -27,11 +28,11 @@ export type FormValues = yup.InferType<typeof schema>;
 const defaultValues: FormValues = { contract: '', ensWallet: '' };
 
 export function useWalletForm() {
-  const { provider } = useWeb3Account();
+  const resolveEnsAddress = async (ensName: string) => fetchEnsAddress({ chainId: 1, name: normalize(ensName) });
 
   const resolver = useCallback(
-    (validationSchema: typeof schema): Resolver<FormValues> => customResolver(validationSchema, provider),
-    [provider]
+    (validationSchema: typeof schema): Resolver<FormValues> => customResolver(validationSchema, resolveEnsAddress),
+    []
   );
 
   const methods = useForm<FormValues>({
@@ -40,14 +41,17 @@ export function useWalletForm() {
     defaultValues
   });
 
-  return { ...methods, provider };
+  return { ...methods, resolveEnsAddress };
 }
 
-function customResolver(validationSchema: typeof schema, provider?: Web3Provider): Resolver<FormValues> {
+function customResolver(
+  validationSchema: typeof schema,
+  resolveEnsAddress: (ensName: string) => Promise<FetchEnsAddressResult>
+): Resolver<FormValues> {
   return async (data: FormValues) => {
     try {
       if (data.contract.endsWith('.eth') && isValidName(data.contract)) {
-        const address = await provider?.resolveName?.(data.contract);
+        const address = await resolveEnsAddress(data.contract);
 
         if (address) {
           return {

@@ -1,5 +1,5 @@
 import type { PaletteMode, Theme as MaterialUITheme } from '@mui/material';
-import { createTheme, darken } from '@mui/material/styles';
+import { createTheme, darken, lighten } from '@mui/material/styles';
 
 import type { BrandColor } from './colors';
 import {
@@ -55,6 +55,7 @@ declare module '@mui/material/styles/createPalette' {
     blue: PaletteOptions['primary'];
     facebook: PaletteOptions['primary'];
     discord: PaletteOptions['primary'];
+    farcaster: PaletteOptions['primary'];
     textPrimary: PaletteOptions['primary'];
     twitter: PaletteOptions['primary'];
     white: PaletteOptions['primary'];
@@ -66,6 +67,7 @@ declare module '@mui/material/styles/createPalette' {
     blue: Palette['primary'];
     facebook: Palette['primary'];
     discord: Palette['primary'];
+    farcaster: Palette['primary'];
     textPrimary: Palette['primary'];
     twitter: Palette['primary'];
     white: Palette['primary'];
@@ -95,6 +97,10 @@ declare module '@mui/material/IconButton' {
 declare module '@mui/material/SvgIcon' {
   export interface SvgIconPropsColorOverrides extends Record<BrandColor, true> {}
 }
+
+export const farcasterBrandColor = '#7c65c1';
+export const farcasterBrandColorLight = lighten(farcasterBrandColor, 0.9);
+export const farcasterBrandColorDark = '#6944ba';
 
 // Explore all theme options: https://material-ui.com/customization/default-theme/
 export const createThemeLightSensitive = (mode: PaletteMode) => {
@@ -169,6 +175,11 @@ export const createThemeLightSensitive = (mode: PaletteMode) => {
       },
       primary: {
         main: blueColor // '#010101',
+      },
+      farcaster: {
+        main: farcasterBrandColor,
+        light: farcasterBrandColorLight,
+        dark: farcasterBrandColorDark
       },
       secondary: {
         main: mode === 'dark' ? secondaryTextColorDarkMode : secondaryTextColor

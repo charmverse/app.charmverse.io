@@ -6,22 +6,24 @@ import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
   ProposalBlockWithTypedFields
-} from 'lib/proposal/blocks/interfaces';
-import type { CreateProposalInput } from 'lib/proposal/createProposal';
-import type { RubricProposalsUserInfo } from 'lib/proposal/getProposalsEvaluatedByUser';
-import type { ProposalTemplate } from 'lib/proposal/getProposalTemplates';
-import type { GoBackToStepRequest } from 'lib/proposal/goBackToStep';
-import type { ProposalWithUsersAndRubric, ProposalWithUsersLite } from 'lib/proposal/interface';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import type { RubricCriteriaUpsert } from 'lib/proposal/rubric/upsertRubricCriteria';
-import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
-import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
+} from 'lib/proposals/blocks/interfaces';
+import type { CreateProposalInput } from 'lib/proposals/createProposal';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { RubricProposalsUserInfo } from 'lib/proposals/getProposalsEvaluatedByUser';
+import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
+import type { GoBackToStepRequest } from 'lib/proposals/goBackToStep';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { RubricTemplate } from 'lib/proposals/rubric/getRubricTemplates';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
+import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
+import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
+import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
+import type { UpdateProposalLensPropertiesRequest } from 'lib/proposals/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
-import { useDELETE, useGET, usePOST, usePUT } from './helpers';
+import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
 
 // Getters
 
@@ -29,15 +31,26 @@ export function useGetProposalDetails(proposalId: MaybeString) {
   return useGET<ProposalWithUsersAndRubric>(proposalId ? `/api/proposals/${proposalId}` : null);
 }
 
-export function useGetIsReviewer(proposalId: MaybeString) {
-  return useGET<boolean>(proposalId ? `/api/proposals/${proposalId}/is-reviewer` : null);
-}
 export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest>) {
   return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
 export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
-  return useGET<ProposalTemplate[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
+  return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
+}
+
+export function useGetProposalTemplate(pageId: MaybeString) {
+  return useGET<ProposalWithUsersAndRubric>(pageId ? `/api/proposals/templates/${pageId}` : null);
+}
+
+export function useGetRubricTemplates({
+  spaceId,
+  excludeEvaluationId
+}: {
+  spaceId: MaybeString;
+  excludeEvaluationId: string;
+}) {
+  return useGET<RubricTemplate[]>(spaceId ? `/api/proposals/rubric-templates` : null, { spaceId, excludeEvaluationId });
 }
 
 export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {
@@ -46,6 +59,12 @@ export function useGetProposalIdsEvaluatedByUser(spaceId: MaybeString) {
 
 export function useGetProposalBlocks(spaceId?: string) {
   return useGET<ProposalBlockWithTypedFields[]>(spaceId ? `/api/spaces/${spaceId}/proposals/blocks` : null);
+}
+
+export function useGetOrCreateProposalNotesId() {
+  return useGETtrigger<{ proposalId?: MaybeString; pageId?: MaybeString }, { pageId: string }>(
+    `/api/proposals/reviewer-notes`
+  );
 }
 
 // Mutative requests
@@ -88,7 +107,7 @@ export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId
 }
 
 export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useDELETE<{ isDraft: boolean; evaluationId?: string }>(`/api/proposals/${proposalId}/rubric-answers`);
+  return useDELETE<{ isDraft: boolean; evaluationId: string }>(`/api/proposals/${proposalId}/rubric-answers`);
 }
 
 export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {
@@ -131,4 +150,12 @@ export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeStr
 
 export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ workflowId: string }>(`/api/proposals/${proposalId}/workflow`);
+}
+
+export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) {
+  return usePOST<{ archived: boolean }>(`/api/proposals/${proposalId}/archive`);
+}
+
+export function useArchiveProposals() {
+  return usePOST<{ archived: boolean; proposalIds: string[] }>(`/api/proposals/archive`);
 }

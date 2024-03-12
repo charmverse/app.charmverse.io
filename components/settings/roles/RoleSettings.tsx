@@ -12,7 +12,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
-import { scrollIntoView } from 'lib/utilities/browser';
+import { scrollIntoView } from 'lib/utils/browser';
 
 import { UpgradeChip, UpgradeWrapper } from '../subscription/UpgradeWrapper';
 

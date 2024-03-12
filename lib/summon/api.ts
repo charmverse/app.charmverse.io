@@ -1,14 +1,11 @@
 import * as http from '@charmverse/core/http';
 
+import { API_TOKEN } from './constants';
 import type { SummonAchievement, SummonUserInventory, SummonUserProfile } from './interfaces';
 
-const apiToken = process.env.XPS_API_TOKEN as string | undefined;
-
 const headers = {
-  Authorization: apiToken ? `Bearer ${apiToken}` : null
+  Authorization: API_TOKEN ? `Bearer ${API_TOKEN}` : null
 };
-
-export const SUMMON_BASE_URL = 'https://g7p.io/v1/xps';
 
 type ApiResponse<T> = {
   data: T;
@@ -28,9 +25,9 @@ export async function findUserByIdentity(
     discordHandle?: string;
     githubUsername?: string;
   },
-  summonApiUrl: string = SUMMON_BASE_URL
+  summonApiUrl: string
 ): Promise<string | null> {
-  const result = await http.GET<ApiResponse<{ userId: string }>>(`${summonApiUrl}/scan/identity`, query, {
+  const result = await http.GET<ApiResponse<{ userId: string }>>(`${summonApiUrl}/v1/xps/scan/identity`, query, {
     headers
   });
   // Note that an empty Apiresponse looks very similar to positive result: {
@@ -43,9 +40,9 @@ export async function findUserByIdentity(
 
 // ### Read user information about achievements by userId
 // `/v1/xps/scan/inventory/{userId}`
-export async function getUserInventory({ summonApiUrl, xpsEngineId }: { xpsEngineId: string; summonApiUrl: string }) {
+export async function getUserInventory({ summonApiUrl, xpsUserId }: { xpsUserId: string; summonApiUrl: string }) {
   const { data } = await http.GET<ApiResponse<SummonUserInventory | null>>(
-    `${summonApiUrl}/scan/inventory/${xpsEngineId}`,
+    `${summonApiUrl}/v1/xps/scan/inventory/${xpsUserId}`,
     {},
     { headers }
   );
@@ -53,7 +50,7 @@ export async function getUserInventory({ summonApiUrl, xpsEngineId }: { xpsEngin
 }
 
 export async function getUserSummonProfile(props: {
-  xpsEngineId: string;
+  xpsUserId: string;
   summonApiUrl: string;
 }): Promise<SummonUserProfile | null> {
   const inventory = await getUserInventory(props);
@@ -79,7 +76,7 @@ export async function getAchievementById({
 }) {
   try {
     const { data } = await http.GET<ApiResponse<SummonAchievement | null>>(
-      `${summonApiUrl}/achievement/${achievementId}`,
+      `${summonApiUrl}/v1/xps/achievement/${achievementId}`,
       {},
       { headers }
     );

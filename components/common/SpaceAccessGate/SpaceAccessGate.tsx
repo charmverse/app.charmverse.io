@@ -1,3 +1,4 @@
+import type { Space } from '@charmverse/core/prisma-client';
 import { Alert, Box, Card, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -8,10 +9,9 @@ import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { AuthSig } from 'lib/blockchain/interfaces';
-import type { SpaceWithGates } from 'lib/spaces/interfaces';
+import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
-import { getSpaceUrl } from 'lib/utilities/browser';
+import { getSpaceUrl } from 'lib/utils/browser';
 
 import { DiscordGate } from './components/DiscordGate/DiscordGate';
 import { useDiscordGate } from './components/DiscordGate/hooks/useDiscordGate';
@@ -26,7 +26,7 @@ export function SpaceAccessGate({
   onSuccess,
   joinType
 }: {
-  space: SpaceWithGates;
+  space: Space;
   joinType?: TokenGateJoinType;
   onSuccess?: () => void;
 }) {
@@ -66,16 +66,16 @@ export function SpaceAccessGate({
     }
   }
 
-  async function onWalletSignature(authSig: AuthSig) {
+  async function evaluateUserWallet() {
     if (!user) {
       try {
-        await loginFromWeb3Account(authSig);
+        await loginFromWeb3Account();
       } catch (err: any) {
         showMessage(err?.message ?? 'An unknown error occurred', err?.severity ?? 'error');
         return;
       }
     }
-    await tokenGate.evaluateEligibility(authSig);
+    await tokenGate.evaluateEligibility();
   }
 
   function onError(error: any) {
@@ -100,17 +100,17 @@ export function SpaceAccessGate({
 
   const walletGateEnabled = summonGate.isEnabled || tokenGate.isEnabled;
   const isVerified = summonGate.isVerified || tokenGate.isVerified || discordGate.isVerified;
+  const isVerifying = summonGate.isVerifying || tokenGate.isVerifying || discordGate.isVerifying;
   const isJoiningSpace = summonGate.joiningSpace || tokenGate.joiningSpace || discordGate.joiningSpace;
 
-  const noGateConditions = !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled;
+  const noGateConditions =
+    !discordGate.isEnabled && !summonGate.isEnabled && !tokenGate.isEnabled && tokenGate.tokenGates?.length === 0;
 
-  const hasRoles = tokenGate.tokenGateResult?.eligibleGates
-    ?.map((gate) => gate.tokenGateId)
-    .some((id) =>
-      tokenGate.tokenGates?.find((tk) => {
-        return tk.id === id && tk.tokenGateToRoles.length > 0;
-      })
-    );
+  const hasRoles = tokenGate.tokenGateResult?.eligibleGates.some((id) =>
+    tokenGate.tokenGates?.find((tk) => {
+      return tk.id === id && tk.tokenGateToRoles.length > 0;
+    })
+  );
 
   return (
     <>
@@ -162,11 +162,9 @@ export function SpaceAccessGate({
 
       {walletGateEnabled && !isVerified && (
         <Box mb={2}>
-          <WalletSign
-            loading={summonGate.isVerifying}
-            signSuccess={onWalletSignature}
-            buttonStyle={{ width: '100%' }}
-          />
+          <PrimaryButton fullWidth loading={isVerifying} disabled={isVerifying} onClick={evaluateUserWallet}>
+            Verify
+          </PrimaryButton>
         </Box>
       )}
       {walletGateEnabled &&

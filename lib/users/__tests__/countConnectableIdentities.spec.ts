@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { countConnectableIdentities } from '../countConnectableIdentities';
@@ -76,24 +76,12 @@ describe('countConnectableIdentities', () => {
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
           }
-        },
-        unstoppableDomains: {
-          createMany: {
-            data: [
-              {
-                domain: `example4a-${v4()}.nft`
-              },
-              {
-                domain: `example4b-${v4()}.nft`
-              }
-            ]
-          }
         }
       },
       include: sessionUserRelations
     });
     count = countConnectableIdentities(userWithFourIdentities);
-    expect(count).toBe(4);
+    expect(count).toBe(2);
 
     // 5 ID
     const userWithFiveIdentities = await prisma.user.create({
@@ -112,18 +100,6 @@ describe('countConnectableIdentities', () => {
             avatarUrl: 'https://example.com/avatar.png'
           }
         },
-        unstoppableDomains: {
-          createMany: {
-            data: [
-              {
-                domain: `example5a-${v4()}.nft`
-              },
-              {
-                domain: `example5b${v4()}.nft`
-              }
-            ]
-          }
-        },
         discordUser: {
           create: {
             discordId: `1234567890-${Math.random()}`,
@@ -134,7 +110,7 @@ describe('countConnectableIdentities', () => {
       include: sessionUserRelations
     });
     count = countConnectableIdentities(userWithFiveIdentities);
-    expect(count).toBe(5);
+    expect(count).toBe(3);
     // 6 ID
     const userWithSixIdentities = await prisma.user.create({
       data: {
@@ -150,18 +126,6 @@ describe('countConnectableIdentities', () => {
             email: `test6-${v4()}@example.com`,
             name: 'test user',
             avatarUrl: 'https://example.com/avatar.png'
-          }
-        },
-        unstoppableDomains: {
-          createMany: {
-            data: [
-              {
-                domain: `example6a-${v4()}.nft`
-              },
-              {
-                domain: `example6b-${v4()}.nft`
-              }
-            ]
           }
         },
         discordUser: {
@@ -181,7 +145,7 @@ describe('countConnectableIdentities', () => {
       include: sessionUserRelations
     });
     count = countConnectableIdentities(userWithSixIdentities);
-    expect(count).toBe(6);
+    expect(count).toBe(4);
   });
 
   it('should ignore Telegram as we cannot login with this identity', async () => {

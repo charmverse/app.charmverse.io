@@ -7,7 +7,7 @@ import { createServer } from '__e2e__/utils/mockServer';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import { getCurrentDate } from 'lib/utilities/dates';
+import { getCurrentDate } from 'lib/utils/dates';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateSpaceApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
@@ -33,9 +33,17 @@ beforeAll(async () => {
   proposal = await testUtilsProposals.generateProposal({
     spaceId: generated.space.id,
     userId: proposalAuthor.id,
-    proposalStatus: 'vote_active',
+    proposalStatus: 'published',
     authors: [proposalAuthor.id],
-    snapshotProposalId
+    evaluationInputs: [
+      {
+        evaluationType: 'vote',
+        reviewers: [],
+        permissions: [],
+        id: v4(),
+        snapshotId: snapshotProposalId
+      }
+    ]
   });
 });
 
@@ -88,22 +96,7 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
     expect(response.body.message).toBe(`Proposal with id ${proposalId} was not found.`);
   });
 
-  it('should throw 404 error if proposal was not published to snapshot', async () => {
-    const testProposal = await testUtilsProposals.generateProposal({
-      spaceId: space.id,
-      userId: proposalAuthor.id,
-      proposalStatus: 'vote_active',
-      authors: [proposalAuthor.id]
-    });
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${testProposal.id}/snapshot-vote`)
-      .send(payload)
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe(`Proposal with id ${testProposal.id} was not published to snapshot.`);
-  });
-
-  it('should throw 400 error if proposal was not found on snapshot', async () => {
+  it('should throw 404 error if proposal was not found on snapshot', async () => {
     const { listen, router } = createServer();
 
     router.post('/graphql', (ctx) => {
@@ -116,16 +109,19 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
 
     const server = await listen(8501);
 
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
-      .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
-      .send(payload)
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(404);
-    expect(response.body.message).toBe(`Proposal was not found on Snapshot.`);
-    await new Promise((done) => {
-      server.close(done);
-    });
+    try {
+      const response = await request(baseUrl)
+        .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
+        .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
+        .send(payload)
+        .set('Authorization', `Bearer ${apiKey.token}`);
+      expect(response.statusCode).toBe(404);
+      expect(response.body.message).toBe(`Proposal was not found on Snapshot.`);
+    } finally {
+      await new Promise((done) => {
+        server.close(done);
+      });
+    }
   });
 
   it('should throw 400 error if proposal is not active in snapshot', async () => {
@@ -141,16 +137,19 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
 
     const server = await listen(8502);
 
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
-      .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
-      .send(payload)
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(`Voting for proposal with id: ${proposal.id} is not active.`);
-    await new Promise((done) => {
-      server.close(done);
-    });
+    try {
+      const response = await request(baseUrl)
+        .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
+        .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
+        .send(payload)
+        .set('Authorization', `Bearer ${apiKey.token}`);
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(`Voting for proposal with id: ${proposal.id} is not active.`);
+    } finally {
+      await new Promise((done) => {
+        server.close(done);
+      });
+    }
   });
 
   it('should throw 400 error if proposal deadline has passed', async () => {
@@ -171,16 +170,19 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
 
     const server = await listen(8503);
 
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
-      .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
-      .send(payload)
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(400);
-    expect(response.body.message).toBe(`Voting for proposal with id: ${proposal.id} has passed the deadline.`);
-    await new Promise((done) => {
-      server.close(done);
-    });
+    try {
+      const response = await request(baseUrl)
+        .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
+        .query({ snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}` })
+        .send(payload)
+        .set('Authorization', `Bearer ${apiKey.token}`);
+      expect(response.statusCode).toBe(400);
+      expect(response.body.message).toBe(`Voting for proposal with id: ${proposal.id} has passed the deadline.`);
+    } finally {
+      await new Promise((done) => {
+        server.close(done);
+      });
+    }
   });
 
   it('should return vote message response with 200 status code', async () => {
@@ -208,17 +210,20 @@ describe('POST /api/v1/proposals/{proposalId}/snapshot-vote', () => {
 
     const server = await listen(8504);
 
-    const response = await request(baseUrl)
-      .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
-      .query({
-        seqSnapshotUrl: `http://localhost:${(server.address() as AddressInfo).port}`,
-        snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}`
-      })
-      .send(payload)
-      .set('Authorization', `Bearer ${apiKey.token}`);
-    expect(response.statusCode).toBe(200);
-    await new Promise((done) => {
-      server.close(done);
-    });
+    try {
+      const response = await request(baseUrl)
+        .post(`/api/v1/proposals/${proposal.id}/snapshot-vote`)
+        .query({
+          seqSnapshotUrl: `http://localhost:${(server.address() as AddressInfo).port}`,
+          snapshotApiUrl: `http://localhost:${(server.address() as AddressInfo).port}`
+        })
+        .send(payload)
+        .set('Authorization', `Bearer ${apiKey.token}`);
+      expect(response.statusCode).toBe(200);
+    } finally {
+      await new Promise((done) => {
+        server.close(done);
+      });
+    }
   });
 });

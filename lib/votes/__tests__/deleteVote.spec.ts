@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { UndesirableOperationError } from 'lib/utilities/errors';
+import { UndesirableOperationError } from 'lib/utils/errors';
 import { createPage, createVote, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { deleteVote } from '../deleteVote';

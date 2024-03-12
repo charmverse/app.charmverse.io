@@ -1,13 +1,16 @@
-import { hypersubChains } from 'connectors/chains';
+import { getChainList } from 'connectors/chains';
 import { useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 import type { FormValues } from '../hooks/useCollectablesForm';
 
 import { TokenGateBlockchainSelect } from './TokenGateBlockchainSelect';
 
 export function TokenGateHypersub() {
+  const { space } = useCurrentSpace();
+  const chains = getChainList({ enableTestnets: !!space?.enableTestnets }).filter((chain) => !!chain.hypersubNetwork);
   const {
     register,
     formState: { errors }
@@ -18,7 +21,7 @@ export function TokenGateHypersub() {
       <TokenGateBlockchainSelect
         error={!!errors.chain?.message}
         helperMessage={errors.chain?.message}
-        chains={hypersubChains}
+        chains={chains}
         {...register('chain', {
           deps: ['contract']
         })}

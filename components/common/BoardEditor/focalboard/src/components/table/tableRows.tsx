@@ -48,7 +48,6 @@ function TableRows(props: Props): JSX.Element {
     setCheckedIds,
     checkedIds = []
   } = props;
-
   const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
@@ -91,12 +90,13 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, proposal, card, subPages, isStructuredProposal }) => (
+      {cardPages.map(({ page, proposal, card, subPages, isStructuredProposal, reward }) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
           activeView={activeView}
           card={card}
+          reward={reward}
           proposal={proposal}
           isStructuredProposal={isStructuredProposal}
           hasContent={page.hasContent}

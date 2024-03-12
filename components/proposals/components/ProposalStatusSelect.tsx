@@ -2,32 +2,49 @@ import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { useMemo } from 'react';
 
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import type { IPropertyOption } from 'lib/focalboard/board';
 import {
   EVALUATION_STATUS_LABELS,
   EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationStatus, ProposalEvaluationStep, ProposalWithUsersLite } from 'lib/proposal/interface';
+import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
-type ProposalProp = Pick<ProposalWithUsersLite, 'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id'>;
+type ProposalProp = Pick<
+  ProposalWithUsersLite,
+  'currentStep' | 'currentEvaluationId' | 'evaluations' | 'id' | 'archived'
+>;
 
 export function ControlledProposalStatusSelect({
   proposal,
   onChange,
-  readOnly
+  readOnly,
+  displayType
 }: {
   readOnly?: boolean;
   proposal: ProposalProp;
   onChange: (result: ProposalEvaluationResult | null) => void;
+  displayType?: PropertyValueDisplayType;
 }) {
-  return <ProposalStatusSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} />;
+  return (
+    <ProposalStatusSelectBase readOnly={readOnly} proposal={proposal} onChange={onChange} displayType={displayType} />
+  );
 }
 
-export function ProposalStatusSelect({ proposal, readOnly }: { proposal: ProposalProp; readOnly?: boolean }) {
+export function ProposalStatusSelect({
+  proposal,
+  readOnly,
+  displayType
+}: {
+  proposal: ProposalProp;
+  readOnly?: boolean;
+  displayType?: PropertyValueDisplayType;
+}) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationId = proposal.currentStep.id;
   const { updateStatuses } = useBatchUpdateProposalStatusOrStep();
@@ -45,17 +62,21 @@ export function ProposalStatusSelect({ proposal, readOnly }: { proposal: Proposa
     });
   }
 
-  return <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={readOnly} />;
+  return (
+    <ProposalStatusSelectBase proposal={proposal} onChange={onChange} readOnly={readOnly} displayType={displayType} />
+  );
 }
 
 function ProposalStatusSelectBase({
   proposal,
   onChange,
-  readOnly
+  readOnly,
+  displayType
 }: {
   proposal: ProposalProp;
   onChange: (result: ProposalEvaluationResult | null) => void;
   readOnly?: boolean;
+  displayType?: PropertyValueDisplayType;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationResult = proposal.currentStep.result;
@@ -86,11 +107,25 @@ function ProposalStatusSelectBase({
 
   return (
     <TagSelect
+      displayType={displayType}
       wrapColumn
-      readOnly={readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
-      options={options}
+      readOnly={proposal.archived || readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
+      options={
+        proposal.archived
+          ? [
+              {
+                id: 'archived',
+                value: 'Archived',
+                dropdownValue: 'Archived',
+                color: 'gray'
+              }
+            ]
+          : options
+      }
       propertyValue={
-        hasPublishedRewards && lastEvaluation
+        proposal.archived
+          ? 'archived'
+          : hasPublishedRewards && lastEvaluation
           ? getProposalEvaluationStatus({
               result: 'pass',
               step: lastEvaluation.type as ProposalEvaluationStep

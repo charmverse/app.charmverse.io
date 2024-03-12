@@ -20,7 +20,7 @@ export type LinkPluginState = {
   pages: Record<string, string>; // pagePath -> pageId
 };
 
-export function plugins({ key }: { key: PluginKey }) {
+export function plugins({ key, readOnly }: { key: PluginKey; readOnly?: boolean }) {
   const tooltipDOMSpec = createTooltipDOM();
   let tooltipTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -72,6 +72,11 @@ export function plugins({ key }: { key: PluginKey }) {
       },
       props: {
         handleClickOn: (view, _pos, _node, _nodePos, event) => {
+          // let the default link handling happen for read only mode
+          // Otherwise two tabs will open
+          if (readOnly) {
+            return false;
+          }
           const { schema } = view.state;
           const markType = schema.marks.link;
           let marks: Mark[] = [];

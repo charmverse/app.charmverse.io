@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import type { AssignablePermissionGroups } from '../interfaces';
-import { permissionGroupIsValid } from '../utils';
 
 import { AvailableSpacePermissions } from './availableSpacePermissions';
 import type { SpacePermissionFlags } from './interfaces';
@@ -74,4 +73,12 @@ export async function computeGroupSpacePermissions({
 
   // This last return should never be reached, as one of 3 previous
   return permissionsToReturn.operationFlags;
+}
+
+function permissionGroupIsValid(group: AssignablePermissionGroups): boolean {
+  if (group !== 'role' && group !== 'space' && group !== 'user') {
+    return false;
+  }
+
+  return true;
 }

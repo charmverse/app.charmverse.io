@@ -8,7 +8,7 @@ import type { PrismaBlockSortOf } from 'lib/focalboard/block';
 import type { IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
 import { createCard } from 'lib/focalboard/card';
 import { getPagePath } from 'lib/pages';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 type GoogleForm = googlForms.forms_v1.Schema$Form;
 type GoogleFormResponse = googlForms.forms_v1.Schema$FormResponse;

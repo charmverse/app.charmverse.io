@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { DataNotFoundError } from 'lib/utilities/errors';
+import { DataNotFoundError } from 'lib/utils/errors';
 
 export async function deleteComment(commentId: string): Promise<true> {
   try {

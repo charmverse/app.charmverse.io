@@ -26,16 +26,18 @@ export async function importSpaceData(importParams: ImportParams): Promise<Space
 
   const { postCategoryPermissions, spacePermissions } = await importSpacePermissions(importParams);
 
+  // This should be imported before pages because it provides the proposal workflow ids
+  const importedSpaceSettings = await importSpaceSettings({ ...importParams, oldNewRoleIdHashMap });
+
   const { pages, oldNewRecordIdHashMap: oldNewPageIdMap } = await importWorkspacePages({
     ...importParams,
     updateTitle: false,
     resetPaths: true,
     includePermissions: true,
     oldNewRoleIdHashMap,
-    importingToDifferentSpace: true
+    importingToDifferentSpace: true,
+    oldNewProposalWorkflowIdHashMap: importedSpaceSettings.oldNewProposalWorkflowIds
   });
-
-  const importedSpaceSettings = await importSpaceSettings(importParams);
 
   const { posts, postsIdHashmap } = await importForumPosts(importParams);
 

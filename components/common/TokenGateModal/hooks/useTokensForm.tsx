@@ -8,6 +8,7 @@ import { isValidChainAddress } from 'lib/tokens/validation';
 import { tokenCheck } from '../utils/utils';
 
 const tokenIds = tokenCheck.map((t) => t.id);
+type TokenType = (typeof tokenIds)[number];
 
 const schema = yup.object({
   chain: yup.string().required('Chain is required'),
@@ -16,7 +17,7 @@ const schema = yup.object({
     .oneOf(tokenIds)
     .test('empty-check', 'Token selection is required', (option) => !!option),
   contract: yup.string().when('check', {
-    is: (val: 'token' | 'customToken') => val === 'customToken',
+    is: (val: TokenType) => val === 'customToken',
     then: () =>
       yup
         .string<`0x${string}`>()
@@ -52,7 +53,7 @@ export type FormValues = yup.InferType<typeof schema>;
 
 const defaultValues: FormValues = {
   chain: '',
-  check: undefined,
+  check: '' as FormValues['check'],
   contract: '',
   quantity: ''
 };

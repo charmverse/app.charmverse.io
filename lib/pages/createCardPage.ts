@@ -1,5 +1,5 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
-import type { Page, Block } from '@charmverse/core/prisma';
+import type { Page, Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -10,7 +10,9 @@ import type { BoardPropertyValue } from 'lib/public-api';
 export async function createCardPage(
   pageInfo: Record<keyof Pick<Page, 'title' | 'boardId' | 'createdBy' | 'spaceId'>, string> & {
     properties: Record<string, BoardPropertyValue>;
-  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>>
+  } & Partial<Pick<Page, 'content' | 'hasContent' | 'contentText' | 'syncWithPageId' | 'createdAt'>> & {
+      permissions?: Prisma.PagePermissionUncheckedCreateWithoutPageInput[];
+    }
 ): Promise<{ page: Page; block: Block }> {
   const board = await prisma.block.findFirst({
     where: {
@@ -69,7 +71,7 @@ export async function createCardPage(
           id: cardBlock.id
         }
       },
-      content: pageInfo.content || { type: 'doc', content: [] },
+      content: pageInfo.content || undefined,
       hasContent: !!pageInfo.hasContent,
       contentText: pageInfo.contentText || '',
       path: getPagePath(),
@@ -84,7 +86,7 @@ export async function createCardPage(
       },
       syncWithPageId: pageInfo.syncWithPageId,
       permissions: {
-        create: [
+        create: pageInfo.permissions ?? [
           {
             permissionLevel: 'full_access',
             spaceId: pageInfo.spaceId

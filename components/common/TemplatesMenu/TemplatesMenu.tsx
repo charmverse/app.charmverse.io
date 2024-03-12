@@ -1,57 +1,64 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { useTheme } from '@emotion/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, Divider, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, Divider, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import type { PopupState } from 'material-ui-popup-state/hooks';
 import { bindMenu } from 'material-ui-popup-state/hooks';
-import type { ReactNode } from 'react';
 
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 import LoadingComponent from '../LoadingComponent';
 
 import type { Props as ActionMenuProps } from './TemplatePageActionMenu';
 import { TemplatePageActionMenu } from './TemplatePageActionMenu';
 
-/**
- * @enableItemOptions Defaults to true. Adds an external condition to decide if we enable the menu item options.
- */
-interface Props {
-  pages?: (PageMeta & { isStructuredProposal?: boolean })[];
-  createTemplate: () => void;
+export type TemplateItem = {
+  title: string;
+  id: string;
+  isStructuredProposal?: boolean;
+  proposalId?: string | null;
+  archived?: boolean;
+  draft?: boolean;
+};
+
+type TemplateMenuItemProps = {
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
   addPageFromTemplate: (pageId: string) => void;
+  enableItemOptions?: boolean;
+  pageActions?: ActionMenuProps['pageActions'];
+};
+
+type Props = {
+  templates?: TemplateItem[];
+  createTemplate: () => void;
   anchorEl?: Element;
   popupState: PopupState;
   boardTitle?: string;
-  enableItemOptions?: boolean;
   enableNewTemplates?: boolean;
   isLoading?: boolean;
-  pageActions?: ActionMenuProps['pageActions'];
-}
+} & TemplateMenuItemProps;
+
+const maxTitleLength = 35;
 
 export function TemplatesMenu({
-  pages,
+  templates,
   anchorEl,
-  addPageFromTemplate,
   createTemplate,
-  deleteTemplate,
-  editTemplate,
   popupState,
   boardTitle,
-  enableItemOptions,
   enableNewTemplates,
   isLoading,
-  pageActions
+  ...itemProps
 }: Props) {
   const theme = useTheme();
 
-  const maxTitleLength = 35;
+  const liveTemplates = templates?.filter((tpl) => !tpl.archived && !tpl.draft);
+  const draftTemplates = templates?.filter((tpl) => !tpl.archived && !!tpl.draft);
+  const archivedTemplates = templates?.filter((tpl) => !!tpl.archived);
 
   return (
     <Menu
@@ -73,51 +80,44 @@ export function TemplatesMenu({
         )}{' '}
       </MenuItem>
 
-      {isLoading && !pages && (
+      {isLoading && !templates && (
         <Box sx={{ my: 2 }}>
           <LoadingComponent size={20} />
         </Box>
       )}
 
-      {pages?.length === 0 && (
+      {templates?.length === 0 && (
         <MenuItem disabled dense sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <ListItemText>No templates found</ListItemText>
         </MenuItem>
       )}
 
-      {pages &&
-        pages.map((page) => {
-          return (
-            <MenuItem
-              data-test={`select-option-${page.id}`}
-              key={page.id}
-              dense
-              sx={{ display: 'flex', justifyContent: 'space-between' }}
-              onClick={() => {
-                addPageFromTemplate(page.id);
-                popupState.close();
-              }}
-            >
-              <ListItemIcon>
-                {page.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
-              </ListItemIcon>
-              <ListItemText>{fancyTrim(page.title || 'Untitled', maxTitleLength)}</ListItemText>
-
-              {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
-              <Box ml={1} onClick={(e) => e.stopPropagation()}>
-                {enableItemOptions && (
-                  <TemplatePageActionMenu
-                    editTemplate={editTemplate}
-                    deleteTemplate={deleteTemplate}
-                    pageId={page.id}
-                    closeParentPopup={popupState.close}
-                    pageActions={pageActions}
-                  />
-                )}
-              </Box>
-            </MenuItem>
-          );
-        })}
+      {liveTemplates?.map((template) => (
+        <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+      ))}
+      {/* Menu cannot have fragments as children, so use array notation instead */}
+      {!!draftTemplates?.length && [
+        <Divider key={0} />,
+        <Box pl={2} key={1}>
+          <Typography color='secondary' variant='caption'>
+            Draft
+          </Typography>
+        </Box>,
+        draftTemplates.map((template) => (
+          <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+        ))
+      ]}
+      {!!archivedTemplates?.length && [
+        <Divider key={0} />,
+        <Box pl={2} key={1}>
+          <Typography color='secondary' variant='caption'>
+            Archive
+          </Typography>
+        </Box>,
+        ...archivedTemplates.map((template) => (
+          <TemplateMenuItem key={template.id} {...itemProps} closePopup={popupState.close} template={template} />
+        ))
+      ]}
       {enableNewTemplates && [
         <Divider key='templates-menu-divider' />,
         <MenuItem
@@ -132,5 +132,47 @@ export function TemplatesMenu({
         </MenuItem>
       ]}
     </Menu>
+  );
+}
+
+function TemplateMenuItem({
+  template,
+  addPageFromTemplate,
+  editTemplate,
+  deleteTemplate,
+  closePopup,
+  enableItemOptions,
+  pageActions
+}: TemplateMenuItemProps & { closePopup: VoidFunction; template: TemplateItem }) {
+  return (
+    <MenuItem
+      data-test={`select-option-${template.id}`}
+      key={template.id}
+      dense
+      sx={{ display: 'flex', justifyContent: 'space-between' }}
+      onClick={() => {
+        addPageFromTemplate(template.id);
+        closePopup();
+      }}
+    >
+      <ListItemIcon>
+        {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
+      </ListItemIcon>
+      <ListItemText>{fancyTrim(template.title || 'Untitled', maxTitleLength)}</ListItemText>
+
+      {/* TODO - Revisit nested menu using this npm package https://github.com/steviebaa/mui-nested-menu */}
+      <Box ml={1} onClick={(e) => e.stopPropagation()}>
+        {enableItemOptions && (
+          <TemplatePageActionMenu
+            editTemplate={editTemplate}
+            deleteTemplate={deleteTemplate}
+            pageId={template.id}
+            proposalId={template.proposalId}
+            closeParentPopup={closePopup}
+            pageActions={pageActions}
+          />
+        )}
+      </Box>
+    </MenuItem>
   );
 }

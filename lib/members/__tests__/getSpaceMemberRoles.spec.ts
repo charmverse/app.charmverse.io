@@ -1,28 +1,28 @@
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
 
 import { getSpaceMemberMetadata } from 'lib/members/getSpaceMemberMetadata';
 import { assignRole } from 'lib/roles';
 import type { LoggedInUser } from 'models';
-import { generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateRole, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';
 
-let user1: LoggedInUser;
-let user2: LoggedInUser;
+let user1: User;
+let user2: User;
 
 let u1Space1: Space;
 let u1Space2: Space;
 
 beforeAll(async () => {
   // User with 2 spaces
-  const { user: u1, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+  const { user: u1, space } = await generateUserAndSpace({ isAdmin: true });
   user1 = u1;
   u1Space1 = space;
-  u1Space2 = await generateSpaceForUser({ user: user1 });
+  u1Space2 = await generateSpaceForUser({ user: user1 as LoggedInUser });
 
   // User with 2 spaces, 1 common with user 1
-  const { user: u2 } = await generateUserAndSpaceWithApiToken(undefined, true);
+  const { user: u2 } = await generateUserAndSpace();
   user2 = await addUserToSpace({ spaceId: u1Space1.id, userId: u2.id, isAdmin: false });
-  await generateSpaceForUser({ user: user2 });
+  await generateSpaceForUser({ user: user2 as LoggedInUser });
 
   const role1 = await generateRole({ spaceId: u1Space1.id, roleName: 'test role 1', createdBy: u1.id });
   const role2 = await generateRole({ spaceId: u1Space1.id, roleName: 'test role 2', createdBy: u1.id });

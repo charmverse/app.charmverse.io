@@ -1,12 +1,11 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 
 import * as http from 'adapters/http';
-import type { ArchiveProposalRequest } from 'lib/proposal/archiveProposal';
-import type { ProposalWithUsers, ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { ReviewEvaluationRequest } from 'lib/proposal/submitEvaluationResult';
-import type { UpdateProposalRequest } from 'lib/proposal/updateProposal';
-import type { UpdateEvaluationRequest } from 'lib/proposal/updateProposalEvaluation';
-import type { UpdateProposalLensPropertiesRequest } from 'lib/proposal/updateProposalLensProperties';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
+import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
+import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
+import type { UpdateProposalLensPropertiesRequest } from 'lib/proposals/updateProposalLensProperties';
 
 export class ProposalsApi {
   /** @deprecated - use hooks instead */
@@ -17,18 +16,6 @@ export class ProposalsApi {
   /** @deprecated use hooks instead */
   getProposal(proposalId: string) {
     return http.GET<ProposalWithUsersAndRubric>(`/api/proposals/${proposalId}`);
-  }
-
-  updateProposalLensProperties({ proposalId, ...rest }: UpdateProposalLensPropertiesRequest) {
-    return http.PUT(`/api/proposals/${proposalId}/update-lens-properties`, rest);
-  }
-
-  archiveProposal({ archived, proposalId }: ArchiveProposalRequest) {
-    return http.POST<ProposalWithUsers>(`/api/proposals/${proposalId}/archive`, { archived });
-  }
-
-  deleteProposalTemplate({ proposalTemplateId }: { proposalTemplateId: string }): Promise<PageWithPermissions> {
-    return http.DELETE(`/api/proposals/templates/${proposalTemplateId}`);
   }
 
   updateProposalEvaluation({ proposalId, ...payload }: UpdateEvaluationRequest) {
@@ -47,7 +34,7 @@ export class ProposalsApi {
     return http.POST(`/api/proposals/${proposalId}/rewards`);
   }
 
-  goBackToEvaluationStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
+  goBackToStep({ proposalId, ...payload }: { proposalId: string; evaluationId?: string }) {
     return http.PUT(`/api/proposals/${proposalId}/back-to-step`, payload);
   }
 }

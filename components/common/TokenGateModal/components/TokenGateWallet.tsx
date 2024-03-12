@@ -1,11 +1,8 @@
-import { isValidName } from 'ethers/lib/utils';
-
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { TokenGateConditions } from 'lib/tokenGates/interfaces';
 
 import { useTokenGateModal } from '../hooks/useTokenGateModalContext';
 import { useWalletForm, type FormValues } from '../hooks/useWalletForm';
-import { getWalletUnifiedAccessControlConditions } from '../utils/getWalletUnifiedAccessControlConditions';
+import { getWalletAccessControlConditions } from '../utils/getWalletAccessControlConditions';
 
 import { TokenGateFooter } from './TokenGateFooter';
 
@@ -18,7 +15,7 @@ export function TokenGateWallet() {
     setValue,
     register,
     formState: { errors, isValid },
-    provider
+    resolveEnsAddress
   } = useWalletForm();
 
   const onSubmit = async () => {
@@ -26,9 +23,8 @@ export function TokenGateWallet() {
     const values: FormValues = {
       contract: initialValues.ensWallet || initialValues.contract
     };
-    const valueProps = getWalletUnifiedAccessControlConditions(values) || [];
-    const _tokenGate: TokenGateConditions = { type: 'lit', conditions: { unifiedAccessControlConditions: valueProps } };
-    handleTokenGate(_tokenGate);
+    const valueProps = getWalletAccessControlConditions(values) || [];
+    handleTokenGate({ conditions: { accessControlConditions: valueProps } });
     setDisplayedPage('review');
   };
 
@@ -42,8 +38,8 @@ export function TokenGateWallet() {
   const onContractChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e);
     const value = e.target.value;
-    if (value.endsWith('.eth') && isValidName(value)) {
-      const address = await provider?.resolveName(value);
+    if (value.endsWith('.eth')) {
+      const address = await resolveEnsAddress(value);
       if (address) {
         setValue('ensWallet', address);
       } else {

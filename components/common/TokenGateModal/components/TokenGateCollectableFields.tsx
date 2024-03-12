@@ -19,11 +19,11 @@ export function TokenGateCollectableFields() {
     return <TokenGatePoap />;
   }
 
-  if (collectableOption === 'UNLOCK') {
+  if (collectableOption === 'Unlock') {
     return <TokenGateUnlockProtocol />;
   }
 
-  if (collectableOption === 'HYPERSUB') {
+  if (collectableOption === 'Hypersub') {
     return <TokenGateHypersub />;
   }
 

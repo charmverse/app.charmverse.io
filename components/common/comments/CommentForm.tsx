@@ -1,5 +1,4 @@
-import type { PageType } from '@charmverse/core/prisma-client';
-import { Stack, Box, Typography, Switch } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
@@ -11,8 +10,6 @@ import { useUser } from 'hooks/useUser';
 import type { CommentContent } from 'lib/comments';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 
-import { LoadingIcon } from '../LoadingComponent';
-
 const defaultCharmEditorOutput: ICharmEditorOutput = {
   doc: {
     type: 'doc',
@@ -22,20 +19,12 @@ const defaultCharmEditorOutput: ICharmEditorOutput = {
 };
 
 export function CommentForm({
-  showPublishToLens,
   handleCreateComment,
   initialValue,
   inlineCharmEditor,
   disabled,
-  placeholder,
-  setPublishToLens,
-  publishToLens,
-  isPublishingCommentsToLens
+  placeholder
 }: {
-  isPublishingCommentsToLens?: boolean;
-  publishToLens?: boolean;
-  setPublishToLens?: (publishToLens: boolean) => void;
-  showPublishToLens?: boolean;
   inlineCharmEditor?: boolean;
   initialValue?: ICharmEditorOutput;
   handleCreateComment: (comment: CommentContent) => Promise<void>;
@@ -75,7 +64,7 @@ export function CommentForm({
       },
       key: editorKey,
       disableRowHandles: true,
-      focusOnInit: true,
+      focusOnInit: false,
       placeholderText: placeholder ?? 'What are your thoughts?',
       onContentChange: updatePostContent,
       content: postContent.doc,
@@ -100,23 +89,6 @@ export function CommentForm({
       <Stack gap={1} width='100%'>
         {editor}
         <Stack flexDirection='row' justifyContent='flex-end' alignItems='center'>
-          {showPublishToLens && (
-            <>
-              <Typography variant='body2' color='text.secondary'>
-                {isPublishingCommentsToLens ? 'Publishing to Lens...' : 'Publish to Lens'}
-              </Typography>
-              {isPublishingCommentsToLens ? (
-                <LoadingIcon size={16} sx={{ mx: 1 }} />
-              ) : (
-                <Switch
-                  sx={{ mr: 1, top: 2 }}
-                  size='small'
-                  checked={publishToLens}
-                  onChange={(e) => setPublishToLens?.(e.target.checked)}
-                />
-              )}
-            </>
-          )}
           <Button
             data-test='comment-button'
             disabled={checkIsContentEmpty(postContent.doc) || disabled}

@@ -2,9 +2,10 @@ import styled from '@emotion/styled';
 import { TextField } from '@mui/material';
 import { useMemo, useState } from 'react';
 
+import type { PageListItem } from 'components/common/PagesList';
 import { PagesList } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { allowedSourceDatabasePageTypes } from '../useSourceOptions';
 
@@ -16,7 +17,9 @@ const SidebarContent = styled.div`
 
 type Props = {
   currentSourceDatabaseId?: string;
-  onSelectLinkedDatabase: (data: { sourceDatabaseId: string }) => void;
+  onSelectLinkedDatabase: (data: { sourceDatabaseId: string; pageTitle: string }) => void;
+  placeholder?: string;
+  pages?: PageListItem[];
 };
 
 export function LinkCharmVerseDatabase(props: Props) {
@@ -25,21 +28,22 @@ export function LinkCharmVerseDatabase(props: Props) {
 
   const sortedPages = useMemo(() => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
-    return Object.values(pages)
+    return (props.pages ?? Object.values(pages))
       .filter(
         (p) =>
-          allowedSourceDatabasePageTypes.includes(p?.type || '') && p?.title.toLowerCase().includes(lowerCaseSearchTerm)
+          allowedSourceDatabasePageTypes.includes(p?.type || '') &&
+          p?.title?.toLowerCase().includes(lowerCaseSearchTerm)
       )
       .filter(isTruthy)
       .sort((pageA, pageB) => ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1));
-  }, [pages, searchTerm]);
+  }, [pages, props.pages, searchTerm]);
 
   return (
     <SidebarContent data-test='linked-database-options'>
       <TextField
         data-test='linked-database-search'
         autoFocus
-        placeholder='Search pages'
+        placeholder={props.placeholder ?? 'Search pages'}
         value={searchTerm}
         onChange={(e) => {
           setSearchTerm(e.target.value);
@@ -53,7 +57,9 @@ export function LinkCharmVerseDatabase(props: Props) {
         emptyText='No databases found'
         pages={sortedPages}
         activePageId={props.currentSourceDatabaseId}
-        onSelectPage={(pageId) => props.onSelectLinkedDatabase({ sourceDatabaseId: pageId })}
+        onSelectPage={(pageId, _, __, pageTitle) =>
+          props.onSelectLinkedDatabase({ sourceDatabaseId: pageId, pageTitle })
+        }
         style={{
           height: '250px',
           overflow: 'auto'

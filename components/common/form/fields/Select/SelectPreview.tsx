@@ -13,6 +13,7 @@ type Props = {
   wrapColumn?: boolean;
   readOnly?: boolean;
   readOnlyMessage?: string;
+  emptyMessage?: string;
   sx?: SxProps;
 };
 
@@ -25,7 +26,8 @@ export function SelectPreview({
   size,
   readOnly,
   readOnlyMessage,
-  showEmpty
+  showEmpty,
+  emptyMessage
 }: Props) {
   const values: string[] = Array.isArray(value) ? value : [value].filter(Boolean);
   const valueOptions = values
@@ -35,11 +37,16 @@ export function SelectPreview({
   return (
     <Stack data-test='select-preview' sx={sx} gap={name ? 0.5 : 0}>
       {name && (
-        <Typography component='span' fontWeight='bold' variant={size === 'small' ? 'subtitle2' : 'body1'}>
+        <Typography
+          data-test='select-preview-name'
+          component='span'
+          fontWeight='bold'
+          variant={size === 'small' ? 'subtitle2' : 'body1'}
+        >
           {name}
         </Typography>
       )}
-      <Tooltip title={readOnlyMessage ?? null}>
+      <Tooltip title={readOnly ? readOnlyMessage : null}>
         <Stack
           display='inline-flex'
           width='fit-content'
@@ -51,6 +58,7 @@ export function SelectPreview({
           {valueOptions.length !== 0
             ? valueOptions.map((valueOption) => (
                 <Chip
+                  data-test={`select-preview-value-${valueOption.id}`}
                   sx={{ px: 0.5, cursor: readOnly ? 'text' : 'pointer' }}
                   label={valueOption.name}
                   color={valueOption.color}
@@ -58,7 +66,7 @@ export function SelectPreview({
                   size='small'
                 />
               ))
-            : showEmpty && <EmptyPlaceholder>Empty</EmptyPlaceholder>}
+            : showEmpty && <EmptyPlaceholder>{emptyMessage ?? 'Empty'}</EmptyPlaceholder>}
         </Stack>
       </Tooltip>
     </Stack>

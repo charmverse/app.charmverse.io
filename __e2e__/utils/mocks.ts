@@ -1,5 +1,5 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from '@ethersproject/wallet';
 import type { Page as BrowserPage } from '@playwright/test';
@@ -294,6 +294,7 @@ type UserAndSpaceInput = {
   publicBountyBoard?: boolean;
   skipOnboarding?: boolean;
   email?: string;
+  memberSpacePermissions?: SpaceOperation[];
 };
 
 export async function generateUserAndSpace({
@@ -302,7 +303,8 @@ export async function generateUserAndSpace({
   spaceDomain = `domain-${uuid()}`,
   publicBountyBoard,
   skipOnboarding = true,
-  email = `${uuid()}@gmail.com`
+  email = `${uuid()}@gmail.com`,
+  memberSpacePermissions
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -346,7 +348,7 @@ export async function generateUserAndSpace({
         },
         permittedGroups: {
           create: {
-            operations: ['reviewProposals'],
+            operations: memberSpacePermissions ?? ['reviewProposals'],
             spaceId
           }
         }

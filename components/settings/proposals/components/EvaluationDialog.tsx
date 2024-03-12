@@ -50,10 +50,12 @@ type FormValues = yup.InferType<typeof schema>;
 
 export function EvaluationDialog({
   evaluation,
+  isFirstEvaluation,
   onClose,
   onSave
 }: {
   evaluation: EvaluationTemplateFormItem | null;
+  isFirstEvaluation: boolean;
   onClose: VoidFunction;
   onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
@@ -180,7 +182,13 @@ export function EvaluationDialog({
             </div>
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
-              {evaluation && <EvaluationPermissions evaluation={formValues} onChange={updatePermissions} />}
+              {evaluation && (
+                <EvaluationPermissions
+                  evaluation={formValues}
+                  isFirstEvaluation={isFirstEvaluation}
+                  onChange={updatePermissions}
+                />
+              )}
             </Stack>
           </>
         )}

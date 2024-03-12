@@ -41,6 +41,7 @@ export interface PaletteItemTypeNoGroup {
   _isItemDisabled?: boolean;
   showInFloatingMenu?: boolean; // make it appear in the floating menu to convert highlighted text
   icon?: JSX.Element | null | undefined;
+  priority?: number;
 }
 
 export interface PaletteItemType extends PaletteItemTypeNoGroup {
@@ -80,6 +81,8 @@ export class PaletteItem implements PaletteItemType {
 
   keybinding?: string;
 
+  priority?: number;
+
   constructor(obj: PaletteItemType) {
     const {
       uid,
@@ -97,6 +100,7 @@ export class PaletteItem implements PaletteItemType {
       skipFiltering,
       showInFloatingMenu,
       icon,
+      priority,
       ...otherKeys
     } = obj;
 
@@ -122,6 +126,7 @@ export class PaletteItem implements PaletteItemType {
     this.skipFiltering = skipFiltering ?? false;
     this._isItemDisabled = false;
     this.icon = icon;
+    this.priority = priority;
     this.showInFloatingMenu = showInFloatingMenu;
   }
 }

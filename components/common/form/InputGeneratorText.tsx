@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 interface Props {
   onChange: (choices: string[]) => void;

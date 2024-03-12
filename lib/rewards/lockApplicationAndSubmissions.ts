@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
+
 import type { RewardWithUsers } from './interfaces';
 import { rollupRewardStatus } from './rollupRewardStatus';
 
@@ -20,6 +22,11 @@ export async function lockApplicationAndSubmissions({
   });
 
   const rollup = await rollupRewardStatus({ rewardId });
+
+  await issueRewardCredentialsIfNecessary({
+    event: 'reward_submission_approved',
+    rewardId
+  });
 
   return rollup;
 }

@@ -1,5 +1,6 @@
 import { DataNotFoundError, UndesirableOperationError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAddress } from 'viem';
 
@@ -9,7 +10,7 @@ import { requireKeys } from 'lib/middleware';
 import { apiHandler } from 'lib/public-api/handler';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
-import { coerceToMilliseconds, getCurrentDate } from 'lib/utilities/dates';
+import { coerceToMilliseconds, getCurrentDate } from 'lib/utils/dates';
 
 import type { GenerateSnapshotVoteMessageResponseBody } from './generate-vote-message';
 
@@ -70,12 +71,7 @@ async function snapshotVoteHandler(req: NextApiRequest, res: NextApiResponse) {
       id: proposalId
     },
     select: {
-      status: true,
-      page: {
-        select: {
-          snapshotProposalId: true
-        }
-      }
+      evaluations: true
     }
   });
 
@@ -83,7 +79,13 @@ async function snapshotVoteHandler(req: NextApiRequest, res: NextApiResponse) {
     throw new DataNotFoundError(`Proposal with id ${proposalId} was not found.`);
   }
 
-  const snapshotProposalId = proposal?.page?.snapshotProposalId;
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const isActiveVote = currentEvaluation?.result === null && currentEvaluation?.type === 'vote';
+  if (!isActiveVote) {
+    throw new UndesirableOperationError(`Proposal with id ${proposalId} is not in vote_active status.`);
+  }
+
+  const snapshotProposalId = currentEvaluation.snapshotId;
   if (!snapshotProposalId) {
     throw new DataNotFoundError(`Proposal with id ${proposalId} was not published to snapshot.`);
   }

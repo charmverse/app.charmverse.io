@@ -1,3 +1,4 @@
+import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
@@ -7,7 +8,8 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 
 export default {
   title: 'Rewards/Views',
-  component: RewardPropertiesForm
+  component: RewardPropertiesForm,
+  decorators: [withCharmEditorProviders]
 };
 export function RewardsPage() {
   const { newPageValues, updateNewPageValues } = useNewPage();
@@ -15,13 +17,19 @@ export function RewardsPage() {
 
   return (
     <GlobalContext>
-      <NewDocumentPage titlePlaceholder='Title (required)' values={newPageValues} onChange={updateNewPageValues}>
+      <NewDocumentPage
+        key={newPageValues?.templateId}
+        titlePlaceholder='Title (required)'
+        values={newPageValues}
+        onChange={updateNewPageValues}
+      >
         <RewardPropertiesForm
           onChange={setRewardValues}
           values={rewardValues}
           isNewReward
           isTemplate={false}
           expandedByDefault
+          selectTemplate={() => {}}
         />
       </NewDocumentPage>
     </GlobalContext>

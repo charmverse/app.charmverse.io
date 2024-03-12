@@ -3,8 +3,8 @@ import { BountyPermissionLevel } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utilities/errors';
-import { typedKeys } from 'lib/utilities/objects';
+import { DataNotFoundError, InsecureOperationError, InvalidInputError } from 'lib/utils/errors';
+import { typedKeys } from 'lib/utils/objects';
 import { ExpectedAnError } from 'testing/errors';
 import { generateBounty, generateRole, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 

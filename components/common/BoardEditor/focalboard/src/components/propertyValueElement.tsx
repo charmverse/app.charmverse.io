@@ -10,8 +10,11 @@ import { useIntl } from 'react-intl';
 import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
 import { EmptyPlaceholder } from 'components/common/BoardEditor/components/properties/EmptyPlaceholder';
+import { RelationPropertyPagesAutocomplete } from 'components/common/BoardEditor/components/properties/RelationPropertyPagesAutocomplete';
+import { RewardsDueDatePicker } from 'components/common/BoardEditor/components/properties/RewardsDueDatePicker';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
@@ -19,17 +22,18 @@ import type { PropertyValueDisplayType } from 'components/common/BoardEditor/int
 import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
-import { useProposalsWhereUserIsEvaluator } from 'components/proposals/hooks/useProposalsWhereUserIsEvaluator';
 import {
   REWARD_APPLICATION_STATUS_LABELS,
   RewardApplicationStatusChip
 } from 'components/rewards/components/RewardApplicationStatusChip';
 import { RewardStatusChip } from 'components/rewards/components/RewardChip';
-import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
+import { useRewards } from 'components/rewards/hooks/useRewards';
+import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, DatabaseProposalPropertyType, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import {
@@ -37,23 +41,28 @@ import {
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
 } from 'lib/focalboard/proposalDbProperties';
-import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposal/blocks/constants';
-import { getProposalEvaluationStatus } from 'lib/proposal/getProposalEvaluationStatus';
-import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposal/interface';
+import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
+import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import {
+  DUE_DATE_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
+  REWARD_AMOUNT,
   REWARD_APPLICANTS_COUNT,
   REWARD_CHAIN,
+  REWARD_CUSTOM_VALUE,
   REWARD_PROPOSAL_LINK,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
   REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
-import type { RewardStatus } from 'lib/rewards/interfaces';
-import { getAbsolutePath } from 'lib/utilities/browser';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
+import { ProposalNotesLink } from '../../../components/properties/ProposalNotesLink';
 import { TextInput } from '../../../components/properties/TextInput';
 import type { Mutator } from '../mutator';
 import defaultMutator from '../mutator';
@@ -85,6 +94,8 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   proposal?: CardPage['proposal'];
+  reward?: CardPage['reward'];
+  showCard?: (cardId: string | null) => void;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -118,11 +129,6 @@ export const validatePropertyValue = (propType: string, val: string): boolean =>
 /**
  * Hide these values if user is not an evalutor for the proposal
  */
-const hiddenProposalEvaluatorPropertyValues: DatabaseProposalPropertyType[] = [
-  'proposalEvaluationAverage',
-  'proposalEvaluatedBy',
-  'proposalEvaluationTotal'
-];
 
 const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone'];
 
@@ -130,9 +136,10 @@ function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const { formatDateTime, formatDate } = useDateFormatter();
+  const { updateReward } = useRewards();
+  const { showError } = useSnackbar();
   const {
     card,
-    syncWithPageId,
     propertyTemplate,
     showEmptyPlaceholder,
     board,
@@ -141,25 +148,19 @@ function PropertyValueElement(props: Props) {
     displayType,
     mutator = defaultMutator,
     subRowsEmptyValueContent,
-    proposal
+    proposal,
+    reward
   } = props;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
-  const { showMessage } = useSnackbar();
-  const { rubricProposalIdsWhereUserIsEvaluator, rubricProposalIdsWhereUserIsNotEvaluator } =
-    useProposalsWhereUserIsEvaluator({
-      spaceId:
-        !!board && hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)
-          ? board.spaceId
-          : undefined
-    });
+  const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 
   const isAdmin = useIsAdmin();
-
   const intl = useIntl();
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
   const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
-  const readOnly = props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
+  const readOnly =
+    proposal?.archived || props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
@@ -188,17 +189,170 @@ function PropertyValueElement(props: Props) {
 
   let propertyValueElement: ReactNode = null;
 
-  if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
+  if (propertyTemplate.id === DUE_DATE_ID) {
+    const dueDate = (card.fields.properties[DUE_DATE_ID] ?? null) as number | null;
+    propertyValueElement = (
+      <RewardsDueDatePicker
+        value={dueDate}
+        disabled={readOnly || !isAdmin}
+        onChange={(_value) => {
+          if (reward) {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                dueDate: _value?.toJSDate() || undefined
+              }
+            });
+          }
+        }}
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+    const reviewers = (card.fields.properties[REWARD_REVIEWERS_BLOCK_ID] as unknown as RewardReviewer[]) ?? [];
+    propertyValueElement = (
+      <UserAndRoleSelect
+        displayType={displayType}
+        readOnly={readOnly || !isAdmin}
+        onChange={(options) => {
+          if (!reward) {
+            return;
+          }
+          const reviewerOptions = options.filter(
+            (option) => option.group === 'role' || option.group === 'user'
+          ) as RewardReviewer[];
+          updateReward({
+            rewardId: reward.id,
+            updateContent: {
+              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+            }
+          });
+        }}
+        value={reviewers}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+      />
+    );
+  } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
-      return <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
+      propertyValueElement = <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
     }
-    return <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+    propertyValueElement = <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
+  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
+    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
+      return null;
+    }
+
+    propertyValueElement = (
+      <Box sx={{ a: { color: 'inherit' } }}>
+        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
+          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
+        </Link>
+      </Box>
+    );
+  } else if (propertyTemplate.type === 'proposalReviewerNotes') {
+    propertyValueElement = <ProposalNotesLink pageId={props.card.id} />;
+  } else if (propertyTemplate.type === 'tokenAmount' || propertyTemplate.type === 'tokenChain') {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+    propertyValueElement = (
+      <RewardTokenDialog
+        readOnly={
+          readOnly ||
+          !isAdmin ||
+          !reward ||
+          getRewardType({
+            chainId: Number(chainId),
+            rewardAmount,
+            rewardToken: symbolOrAddress
+          }) !== 'token'
+        }
+        currentReward={{
+          chainId: Number(chainId),
+          rewardAmount,
+          rewardToken: symbolOrAddress
+        }}
+        onChange={(rewardToken) => {
+          if (rewardToken && reward) {
+            updateReward({
+              rewardId: reward.id,
+              updateContent: {
+                chainId: rewardToken.chainId,
+                rewardToken: rewardToken.rewardToken,
+                rewardAmount: Number(rewardToken.rewardAmount),
+                customReward: null
+              }
+            });
+          }
+        }}
+      >
+        {propertyTemplate.type === 'tokenAmount' ? (
+          <TokenAmount amount={rewardAmount} chainId={chainId} symbolOrAddress={symbolOrAddress} />
+        ) : (
+          <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />
+        )}
+      </RewardTokenDialog>
+    );
+  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
+    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
+    if (totalApplicants) {
+      propertyValueElement = (
+        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
+          <Box width={20} display='flex' alignItems='center'>
+            <PersonIcon fontSize='small' />
+          </Box>
+          {totalApplicants}
+        </Stack>
+      );
+    }
+  } else if (propertyTemplate.id === REWARD_CUSTOM_VALUE) {
+    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
+    const chainId = card.fields.properties[REWARD_CHAIN] as string;
+    const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+
+    return (
+      <TextInput
+        placeholderText={emptyDisplayValue}
+        value={value.toString()}
+        onChange={setValue}
+        multiline={displayType === 'details' ? true : props.wrapColumn ?? false}
+        onSave={() => {
+          if (reward) {
+            try {
+              updateReward({
+                rewardId: reward.id,
+                updateContent: {
+                  customReward: value as string
+                }
+              });
+            } catch (error) {
+              showError(error);
+            }
+          }
+        }}
+        onCancel={() => setValue(propertyValue || '')}
+        wrapColumn={props.wrapColumn ?? false}
+        columnRef={props.columnRef}
+        readOnly={
+          readOnly ||
+          !isAdmin ||
+          !reward ||
+          getRewardType({
+            chainId: Number(chainId),
+            rewardAmount,
+            customReward: value as string,
+            rewardToken: symbolOrAddress
+          }) !== 'custom'
+        }
+        displayType={displayType}
+      />
+    );
   }
+
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
     if (proposal) {
-      return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} />;
+      return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} displayType={displayType} />;
     }
 
     const evaluationTypeProperty = board.fields.cardProperties.find(
@@ -223,6 +377,7 @@ function PropertyValueElement(props: Props) {
         ]}
         propertyValue={proposalEvaluationStatus}
         onChange={() => {}}
+        displayType={displayType}
       />
     );
   } else if (propertyTemplate.type === 'proposalStep' || propertyTemplate.id === PROPOSAL_STEP_BLOCK_ID) {
@@ -235,10 +390,11 @@ function PropertyValueElement(props: Props) {
           options={propertyTemplate.options}
           propertyValue={(propertyValue as string) ?? ''}
           onChange={() => {}}
+          displayType={displayType}
         />
       );
     }
-    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} />;
+    return <ProposalStepSelect readOnly={!isAdmin} proposal={proposal} displayType={displayType} />;
   } else if (propertyTemplate.type === 'proposalEvaluationType') {
     return (
       <TagSelect
@@ -254,58 +410,73 @@ function PropertyValueElement(props: Props) {
         ]}
         propertyValue={propertyValue as string}
         onChange={() => {}}
+        displayType={displayType}
       />
     );
-  } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
-    if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
-      return null;
-    }
-
+  } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
     return (
-      <Box sx={{ a: { color: 'inherit' } }}>
-        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
-          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
-        </Link>
-      </Box>
-    );
-  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID && propertyTemplate.type !== 'proposalReviewer') {
-    if (Array.isArray(propertyValue) && propertyValue.length === 0 && subRowsEmptyValueContent) {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
-    return (
-      <UserAndRoleSelect
+      <RelationPropertyPagesAutocomplete
+        boardProperties={board.fields.cardProperties}
+        propertyTemplate={propertyTemplate}
+        selectedPageListItemIds={
+          typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
+        }
+        showCard={props.showCard}
         displayType={displayType}
-        data-test='selected-reviewers'
-        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        onChange={() => null}
-        value={propertyValue as any}
+        emptyPlaceholderContent={emptyDisplayValue}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+        onChange={(pageListItemIds) => {
+          syncRelationPropertyValue({
+            templateId: propertyTemplate.id,
+            pageIds: pageListItemIds,
+            boardId: board.id,
+            cardId: card.id
+          }).catch((error) => {
+            showError(error);
+          });
+        }}
+        readOnly={readOnly}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
   } else if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
     propertyValueElement = (
       <TagSelect
         data-test='closed-select-input'
+        dataTestActive='active-select-autocomplete'
         canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
         readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
         propertyValue={propertyValue as string}
         options={propertyTemplate.options}
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onUpdateOption={(option) => {
-          mutator.changePropertyOption(board, propertyTemplate, option);
+        onUpdateOption={async (option) => {
+          try {
+            await mutator.changePropertyOption(board, propertyTemplate, option);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onDeleteOption={(option) => {
-          mutator.deletePropertyOption(board, propertyTemplate, option);
+        onDeleteOption={async (option) => {
+          try {
+            await mutator.deletePropertyOption(board, propertyTemplate, option);
+          } catch (error) {
+            showError(error);
+          }
         }}
-        onCreateOption={(newValue) => {
-          mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+        onCreateOption={async (newValue) => {
+          try {
+            await mutator.insertPropertyOption(board, propertyTemplate, newValue, 'add property option');
+          } catch (error) {
+            showError(error);
+          }
         }}
         displayType={displayType}
       />
@@ -331,32 +502,36 @@ function PropertyValueElement(props: Props) {
           (displayType !== 'details' && displayType !== 'table') ||
           proposalPropertyTypesList.includes(propertyTemplate.type as any)
         }
-        onChange={(newValue) => {
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
-          const previousValue = propertyValue
-            ? typeof propertyValue === 'string'
-              ? [propertyValue]
-              : (propertyValue as string[])
-            : [];
-          const newUserIds = newValue.filter((id) => !previousValue.includes(id));
-          Promise.all(
-            newUserIds.map((userId) =>
-              charmClient.createEvents({
-                spaceId: board.spaceId,
-                payload: [
-                  {
-                    cardId: card.id,
-                    cardProperty: {
-                      id: propertyTemplate.id,
-                      name: propertyTemplate.name,
-                      value: userId
-                    },
-                    scope: WebhookEventNames.CardPersonPropertyAssigned
-                  }
-                ]
-              })
-            )
-          );
+        onChange={async (newValue) => {
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            const previousValue = propertyValue
+              ? typeof propertyValue === 'string'
+                ? [propertyValue]
+                : (propertyValue as string[])
+              : [];
+            const newUserIds = newValue.filter((id) => !previousValue.includes(id));
+            Promise.all(
+              newUserIds.map((userId) =>
+                charmClient.createEvents({
+                  spaceId: board.spaceId,
+                  payload: [
+                    {
+                      cardId: card.id,
+                      cardProperty: {
+                        id: propertyTemplate.id,
+                        name: propertyTemplate.name,
+                        value: userId
+                      },
+                      scope: WebhookEventNames.CardPersonPropertyAssigned
+                    }
+                  ]
+                })
+              )
+            );
+          } catch (error) {
+            showError(error);
+          }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
@@ -370,12 +545,11 @@ function PropertyValueElement(props: Props) {
           readOnly ||
           (displayType !== 'details' && displayType !== 'table') ||
           proposal.currentStep?.step === 'draft' ||
-          proposal.currentStep?.step === 'feedback' ||
           !!proposal.sourceTemplateId
         }
         required
         data-test='selected-reviewers'
-        systemRoles={[allMembersSystemRole]}
+        systemRoles={[allMembersSystemRole, authorSystemRole]}
         onChange={async (reviewers) => {
           const evaluationId = proposal?.currentEvaluationId;
           if (evaluationId) {
@@ -390,12 +564,14 @@ function PropertyValueElement(props: Props) {
               });
               await mutate(`/api/spaces/${card.spaceId}/proposals`);
             } catch (err) {
-              showMessage('Failed to update proposal reviewers', 'error');
+              showError(err, 'Failed to update proposal reviewers');
             }
           }
         }}
         value={propertyValue as any}
         showEmptyPlaceholder={showEmptyPlaceholder}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        displayType={displayType}
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {
@@ -406,11 +582,15 @@ function PropertyValueElement(props: Props) {
         readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={async (newValue) => {
           if (proposal) {
-            await charmClient.proposals.updateProposal({
-              proposalId: proposal.id,
-              authors: newValue
-            });
-            await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            try {
+              await charmClient.proposals.updateProposal({
+                proposalId: proposal.id,
+                authors: newValue
+              });
+              await mutate(`/api/spaces/${board.spaceId}/proposals`);
+            } catch (error) {
+              showError(error);
+            }
           }
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
@@ -420,20 +600,30 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'date') {
     if (readOnly) {
       propertyValueElement = (
-        <div className='octo-propertyvalue readonly'>
+        <Box
+          className='octo-propertyvalue readonly'
+          display='flex'
+          alignItems={displayType !== 'table' ? 'center' : 'flex-start'}
+          sx={{ whiteSpace: displayType !== 'table' || props.wrapColumn ? 'break-spaces' : 'nowrap' }}
+        >
           {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
-        </div>
+        </Box>
       );
     } else {
       propertyValueElement = (
         <DateRange
+          centerContent={displayType !== 'table'}
           wrapColumn={props.wrapColumn}
           className='octo-propertyvalue'
           value={value.toString()}
           key={value.toString()}
           showEmptyPlaceholder={showEmptyPlaceholder}
-          onChange={(newValue) => {
-            mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          onChange={async (newValue) => {
+            try {
+              await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+            } catch (error) {
+              showError(error);
+            }
           }}
         />
       );
@@ -444,9 +634,13 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
         label={propertyTemplate.name}
         isOn={propertyValue === 'true'}
-        onChanged={(newBool) => {
+        onChanged={async (newBool) => {
           const newValue = newBool ? 'true' : '';
-          mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          try {
+            await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
+          } catch (error) {
+            showError(error);
+          }
         }}
         readOnly={readOnly}
       />
@@ -456,34 +650,21 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'updatedBy') {
     propertyValueElement = <LastModifiedBy updatedBy={latestUpdated === 'card' ? card.updatedBy : updatedBy} />;
   } else if (propertyTemplate.type === 'createdTime') {
-    propertyValueElement = <CreatedAt createdAt={card.createdAt} />;
+    propertyValueElement = (
+      <CreatedAt
+        createdAt={card.createdAt}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
+    );
   } else if (propertyTemplate.type === 'updatedTime') {
     propertyValueElement = (
-      <LastModifiedAt updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()} />
+      <LastModifiedAt
+        updatedAt={new Date(latestUpdated === 'card' ? card.updatedAt : updatedAt).toString()}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        centerContent={displayType !== 'table'}
+      />
     );
-  } else if (propertyTemplate.type === 'tokenAmount') {
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = (
-      <TokenAmount amount={displayValue as string} chainId={chainId} symbolOrAddress={symbolOrAddress} />
-    );
-  } else if (propertyTemplate.type === 'tokenChain') {
-    // Note: we wat to display the token symbol, but it should not be part of 'display value' so we pass it in as a prop
-    const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
-    const chainId = card.fields.properties[REWARD_CHAIN] as string;
-    propertyValueElement = <TokenChain chainId={chainId} symbolOrAddress={symbolOrAddress} />;
-  } else if (propertyTemplate.id === REWARD_APPLICANTS_COUNT) {
-    const totalApplicants = card.fields.properties[REWARD_APPLICANTS_COUNT];
-    if (totalApplicants) {
-      return (
-        <Stack flexDirection='row' gap={1} className='octo-propertyvalue readonly'>
-          <Box width={20} display='flex' alignItems='center'>
-            <PersonIcon fontSize='small' />
-          </Box>
-          {totalApplicants}
-        </Stack>
-      );
-    }
   }
 
   const commonProps = {
@@ -495,8 +676,12 @@ function PropertyValueElement(props: Props) {
     onChange: setValue,
     displayType,
     multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-    onSave: () => {
-      mutator.changePropertyValue(card, propertyTemplate.id, value);
+    onSave: async () => {
+      try {
+        await mutator.changePropertyValue(card, propertyTemplate.id, value);
+      } catch (error) {
+        showError(error);
+      }
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
@@ -508,11 +693,18 @@ function PropertyValueElement(props: Props) {
   if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {
       propertyValueElement = <URLProperty {...commonProps} />;
-    } else {
+    } else if (propertyTemplate.id !== REWARD_CUSTOM_VALUE) {
       propertyValueElement = (
         <TextInput
           {...commonProps}
-          readOnly={readOnly || propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID}
+          readOnly={
+            readOnly ||
+            propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ||
+            propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID ||
+            propertyTemplate.id === REWARD_APPLICANTS_COUNT ||
+            propertyTemplate.id === REWARD_PROPOSAL_LINK ||
+            propertyTemplate.id === REWARD_CUSTOM_VALUE
+          }
           displayType={propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID ? 'details' : commonProps.displayType}
         />
       );
@@ -543,21 +735,6 @@ function PropertyValueElement(props: Props) {
     ) : (
       subRowsEmptyValueContent ?? null
     );
-  }
-
-  // Explicitly hide the value for this proposal
-  if (hiddenProposalEvaluatorPropertyValues.includes(propertyTemplate?.type as any)) {
-    if (syncWithPageId && !!rubricProposalIdsWhereUserIsNotEvaluator[syncWithPageId] && !isAdmin) {
-      return <EmptyPlaceholder>Hidden</EmptyPlaceholder>;
-    } else if (syncWithPageId && (!!rubricProposalIdsWhereUserIsEvaluator[syncWithPageId] || isAdmin)) {
-      return propertyValueElement;
-    } else {
-      return typeof subRowsEmptyValueContent === 'string' ? (
-        <span>{subRowsEmptyValueContent}</span>
-      ) : (
-        subRowsEmptyValueContent ?? null
-      );
-    }
   }
 
   if (props.showTooltip) {

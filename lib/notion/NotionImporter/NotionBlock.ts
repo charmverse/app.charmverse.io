@@ -23,7 +23,7 @@ import type {
   TextMark
 } from 'lib/prosemirror/interfaces';
 import { MAX_IMAGE_WIDTH, MIN_IMAGE_WIDTH } from 'lib/prosemirror/plugins/image/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';

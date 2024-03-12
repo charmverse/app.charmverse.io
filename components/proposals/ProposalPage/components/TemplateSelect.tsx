@@ -1,18 +1,28 @@
-import type { PageMeta } from '@charmverse/core/pages';
-
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 const maxTitleLength = 35;
 
-type Props = {
-  disabled?: boolean;
-  options: PageMeta[];
-  value: PageMeta | null;
-  onChange: (value: PageMeta | null) => void;
+type TemplateOption = {
+  id: string;
+  title: string;
 };
 
-export function TemplateSelect({ disabled, options, value, onChange }: Props) {
+type Props<T> = {
+  disabled?: boolean;
+  displayType?: 'details';
+  options: T[];
+  value: { id: string } | null;
+  onChange: (value: T | null) => void;
+};
+
+export function TemplateSelect<T extends TemplateOption>({
+  disabled,
+  displayType,
+  options,
+  value,
+  onChange
+}: Props<T>) {
   const propertyOptions = options.map((option) => ({
     id: option.id,
     color: 'gray',
@@ -34,6 +44,8 @@ export function TemplateSelect({ disabled, options, value, onChange }: Props) {
   return (
     <TagSelect
       wrapColumn
+      showEmpty
+      displayType={displayType}
       readOnly={disabled}
       options={propertyOptions}
       noOptionsText={

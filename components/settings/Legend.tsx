@@ -32,7 +32,17 @@ function Legend({ children, helperText, noBorder, mb = 1, pb = 0.5, wrap, ...pro
         {children}
       </StyledTypography>
       {helperText && (
-        <Typography color='secondary' mt={0.5} variant='caption' component='p' sx={{ hyphens: 'auto' }}>
+        <Typography
+          color='secondary'
+          mt={0.5}
+          variant='caption'
+          component='p'
+          sx={{
+            hyphens: 'auto',
+
+            whiteSpace: 'normal'
+          }}
+        >
           {helperText}
         </Typography>
       )}

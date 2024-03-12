@@ -1,23 +1,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@charmverse/core/prisma';
+import type { Space, User } from '@charmverse/core/prisma';
+import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { LoggedInUser } from 'models';
 import { type PublicRewardToggle } from 'pages/api/spaces/[id]/set-public-bounty-board';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateSpaceUser, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateSpaceUser } from 'testing/setupDatabase';
 
-let nonAdminUser: LoggedInUser;
+let nonAdminUser: User;
 let nonAdminUserCookie: string;
 let adminUser: LoggedInUser;
 let adminUserCookie: string;
 let space: Space;
 
 beforeAll(async () => {
-  const { space: generatedSpace, user } = await generateUserAndSpaceWithApiToken(undefined, false);
+  ({ space, user: nonAdminUser } = await testUtilsUser.generateUserAndSpace());
 
-  space = generatedSpace;
-  nonAdminUser = user;
   adminUser = await generateSpaceUser({
     isAdmin: true,
     spaceId: space.id

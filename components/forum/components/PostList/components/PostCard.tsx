@@ -15,11 +15,11 @@ import { CommentVote } from 'components/common/comments/CommentVote';
 import UserDisplay from 'components/common/UserDisplay';
 import { usePostDialog } from 'components/forum/components/PostDialog/hooks/usePostDialog';
 import { usePostPermissions } from 'hooks/usePostPermissions';
-import type { ForumPostMeta, ForumVotes } from 'lib/forums/posts/interfaces';
+import type { ForumPostMeta } from 'lib/forums/posts/getPostMeta';
 import type { Member } from 'lib/members/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
-import { fancyTrim } from 'lib/utilities/strings';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { PostSummary } from './PostSummary';
 
@@ -48,7 +48,7 @@ export function PostCard({ post, user, category }: ForumPostProps) {
       upvoted: newUpvotedStatus
     });
 
-    const forumPostPageVote: ForumVotes = {
+    const forumPostPageVote: ForumPostMeta['votes'] = {
       downvotes: pagePost.votes.downvotes,
       upvotes: pagePost.votes.upvotes,
       upvoted: newUpvotedStatus

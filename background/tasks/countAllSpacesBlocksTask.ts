@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { countSpaceBlocksAndSave } from 'lib/spaces/countSpaceBlocks/countAllSpaceBlocks';
+import { deleteArchivalBlockCounts } from 'lib/spaces/deleteArchivalBlockCounts';
 
 const perBatch = 1000;
 export async function countAllSpacesBlocks({ offset = 0 }: { offset?: number } = {}): Promise<void> {
@@ -25,6 +26,9 @@ export async function countAllSpacesBlocks({ offset = 0 }: { offset?: number } =
   }
 }
 export async function countAllSpacesBlocksTask(): Promise<void> {
+  // Delete old block count entries
+  await deleteArchivalBlockCounts();
+
   // Wrapped function since Cron will call the method with the date
   await countAllSpacesBlocks();
 }

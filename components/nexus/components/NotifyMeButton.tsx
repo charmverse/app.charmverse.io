@@ -9,7 +9,7 @@ import { useUser } from 'hooks/useUser';
 import NotifyMeModal from './NotifyMeModal';
 
 export default function NotifyMeButton() {
-  const { user, setUser } = useUser();
+  const { user, updateUser } = useUser();
 
   const popupState = usePopupState({
     popupId: 'snooze-transactions-message',
@@ -17,11 +17,8 @@ export default function NotifyMeButton() {
   });
 
   async function saveEmail(email: string | null) {
-    await charmClient.updateUser({
-      email
-    });
-    // @ts-ignore can't get types to work
-    setUser((_user) => ({ ..._user, email }));
+    await charmClient.updateUser({ email });
+    updateUser({ email });
   }
 
   return (

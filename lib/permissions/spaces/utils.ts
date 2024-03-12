@@ -1,6 +1,6 @@
 import type { Prisma, SpacePermission } from '@charmverse/core/prisma';
 
-import { MissingDataError } from 'lib/utilities/errors';
+import { MissingDataError } from 'lib/utils/errors';
 
 export function generateSpacePermissionQuery({
   roleId,

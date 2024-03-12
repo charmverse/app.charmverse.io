@@ -1,17 +1,18 @@
 import { Space } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { uid } from 'lib/utilities/strings';
+import { uid } from 'lib/utils/strings';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
-import { getFilenameWithExtension } from 'lib/utilities/getFilenameWithExtension';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
-import { isTruthy } from 'lib/utilities/types';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getProjectsImportData } from 'scripts/optimisms/getRound3Projects';
 import { DateTime } from 'luxon';
+import { isTruthy } from 'lib/utils/types';
+import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
+
 
 /*****
  * NOTE: This script creates new users and spaces for Optimism grants proposal projects.
@@ -31,7 +32,7 @@ type ProjectData = {
   spaceImageUrl: string | null;
   owner: string;
   website?: string;
-}
+};
 
 export type ProjectInputRow = {
   Title: string;
@@ -232,6 +233,7 @@ function getImportedProjectsData() {
 
 function getImportedProjectNames() {
   const data = getImportedProjectsData();
+
   const names = data
     .map((row) => {
       return row.proposal_title || '';
@@ -305,12 +307,5 @@ function exportDataToCSV(data: ProjectData[]) {
     appendFileSync(FILE_OUTPUT_PATH, csvString);
   }
 }
-
-const isSpaceNameImported = async (spaceName: string) => {
-  const space = await prisma.space.findFirst({ where: { name: spaceName } });
-
-  return !!space;
-}
-
 
 importProjects();

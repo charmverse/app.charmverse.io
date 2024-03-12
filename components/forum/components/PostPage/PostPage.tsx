@@ -36,7 +36,7 @@ import { useUser } from 'hooks/useUser';
 import type { PostCommentWithVoteAndChildren } from 'lib/forums/comments/interface';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 import { fontClassName } from 'theme/fonts';
 
 import type { FormInputs } from '../interfaces';
@@ -193,7 +193,7 @@ export function PostPage({
         isDraft: false
       });
       setIsPublishingDraftPost(false);
-      navigateToSpacePath(`/[domain]/forum/post/${draftPost.path}`);
+      navigateToSpacePath(`/forum/post/${draftPost.path}`);
     }
   }
 

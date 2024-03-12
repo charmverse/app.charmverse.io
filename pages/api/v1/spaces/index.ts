@@ -6,8 +6,8 @@ import { defaultHandler } from 'lib/public-api/handler';
 import type { CreateWorkspaceRequestBody, CreateWorkspaceResponseBody } from 'lib/public-api/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { spaceTemplateApiNames } from 'lib/spaces/config';
-import { InvalidInputError } from 'lib/utilities/errors';
-import { isTruthy } from 'lib/utilities/types';
+import { InvalidInputError } from 'lib/utils/errors';
+import { isTruthy } from 'lib/utils/types';
 
 const handler = defaultHandler();
 

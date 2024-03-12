@@ -43,7 +43,7 @@ services:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=8192 --require dd-trace/init node_modules/.bin/next start --keepAliveTimeout 70000'
       ]
     # environment:
     #   - FORCE_SUBDOMAINS=true
@@ -67,6 +67,24 @@ services:
     profiles:
       - stg-webapp
 
+  stg-ceramic:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    ports:
+      - '5001:5001'
+    profiles:
+      - stg-ceramic
+
+  prd-ceramic:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    ports:
+      - '5001:5001'
+    profiles:
+      - prd-ceramic
+
   prd-sockets:
     extends:
       service: defaults
@@ -84,6 +102,7 @@ services:
       - '3002:3000'
     environment:
       - REACT_APP_APP_ENV=staging
+      - PERMISSIONS_API_URL=http://permissions-api:3001
     profiles:
       - stg-sockets
       - stg-webapp

@@ -18,7 +18,7 @@ import {
   getNFT as getNFTFromAnkr,
   getNFTOwners as getNFTOwnersFromAnkr
 } from './provider/ankr/client';
-import { supportedMainnets as supportedMainnetsByAnkr } from './provider/ankr/config';
+import { supportedChainIds as supportedMainnetsByAnkr } from './provider/ankr/config';
 import type { SupportedChainId as SupportedChainIdByAnkr } from './provider/ankr/config';
 // ZKSync APIs
 import { getClient as getZKSyncClient } from './provider/zksync/client';

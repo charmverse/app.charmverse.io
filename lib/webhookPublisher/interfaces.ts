@@ -1,5 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 
+import type { OnChainAttestationInput, OnChainMultiAttestationInput } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
 export type UserEntity = {
@@ -133,7 +134,9 @@ export enum WebhookEventNames {
   DocumentMentionCreated = 'document.mention.created',
   DocumentApplicationCommentCreated = 'document.application_comment.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned',
-  VoteCreated = 'vote.created'
+  VoteCreated = 'vote.created',
+  // Event specific to credentials
+  CredentialIssuable = 'credential.issuable'
 }
 
 export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
@@ -284,9 +287,13 @@ export type WebhookEvent = WebhookEventSharedProps &
         personProperty: CardPropertyEntity;
         user: UserEntity;
       }
+    | {
+        scope: WebhookEventNames.CredentialIssuable;
+        credential: OnChainAttestationInput;
+      }
   );
 
-// Webhook payload being sent by out API toward theirs
+// Webhook payload being sent by our API toward theirs
 export type WebhookPayload = {
   createdAt: string;
   event: WebhookEvent;

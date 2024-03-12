@@ -1,7 +1,6 @@
 import type { GoogleAccount, Page, Role, Space, SuperApiToken, User, UserWallet } from '@charmverse/core/prisma';
 import type { SpaceApiToken } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWithUsers } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
@@ -13,16 +12,12 @@ import { baseUrl } from 'testing/mockApiCall';
 import { generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 import { stubProsemirrorDoc } from 'testing/stubs/pageContent';
 
-type ProposalWithDetails = ProposalWithUsers & {
-  page: Page;
-};
-
 type UserWithDetails = User & {
   wallets: UserWallet[];
   googleAccounts: GoogleAccount[];
 };
 
-let proposal: ProposalWithDetails;
+let proposal: Awaited<ReturnType<typeof testUtilsProposals.generateProposal>>;
 let proposalAuthor: UserWithDetails;
 let proposalReviewer: UserWithDetails;
 let reviewerRole: Role;
@@ -106,9 +101,15 @@ beforeAll(async () => {
       text: proposalText
     }),
     authors: [proposalAuthor.id],
-    reviewers: [
-      { group: 'role', id: reviewerRole.id },
-      { group: 'user', id: proposalReviewer.id }
+    evaluationInputs: [
+      {
+        evaluationType: 'pass_fail',
+        permissions: [],
+        reviewers: [
+          { group: 'role', id: reviewerRole.id },
+          { group: 'user', id: proposalReviewer.id }
+        ]
+      }
     ]
   });
 
@@ -168,6 +169,12 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
           }
         ]),
         title: proposal.page.title,
+        currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
+          result: 'in_progress',
+          title: 'pass_fail',
+          type: 'pass_fail'
+        },
         status: proposal.status,
         url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`,
         voteOptions: expect.arrayContaining(voteOptions)
@@ -210,7 +217,12 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
             id: proposalReviewer.id
           }
         ]),
-
+        currentStep: {
+          startedAt: proposal.page.createdAt.toISOString(),
+          result: 'in_progress',
+          title: 'pass_fail',
+          type: 'pass_fail'
+        },
         title: proposal.page.title,
         status: proposal.status,
         url: `${baseUrl}/${space?.domain}/${proposal.page?.path}`
@@ -225,7 +237,7 @@ describe('GET /api/v1/proposals/{proposalId}', () => {
       spaceId: secondSpace.id,
       userId: secondSpaceUser.id,
       authors: [secondSpaceUser.id],
-      proposalStatus: 'discussion'
+      proposalStatus: 'published'
     });
 
     const otherSuperApiKey = await generateSuperApiKey({ spaceId: secondSpace.id });

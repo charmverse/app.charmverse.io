@@ -21,9 +21,11 @@ env:
   SELECTED_PERMISSION_API_TAG: latest
 
 jobs:
-  build-test-env:
-    name: Build test env
+  build-app:
+    name: Build app
     runs-on: ubuntu-latest
+    outputs:
+      head-commit-message: ${{ steps.get_head_commit_message.outputs.commit_message }}
     steps:
       - name: Print Triggering event context payload
         env:
@@ -31,7 +33,7 @@ jobs:
         run: |
           echo "$workflow_event_context"
           echo "Workflow and code ref: ${{github.ref}}"
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -46,13 +48,18 @@ jobs:
         uses: ./.github/actions/build
         with:
           save_cache: true
+      # source https://github.com/orgs/community/discussions/28474
+      - name: Print head git commit message
+        id: get_head_commit_message
+        run: echo "commit_message=$(git show -s --format=%s)" >> "$GITHUB_OUTPUT"
 
   test:
     name: Validate code
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -66,10 +73,11 @@ jobs:
       - run: npm run lint
       - run: npm run verifydeps
 
-  integration-test:
+  test-matrix:
     name: Tests
     runs-on: ubuntu-latest
-    needs: build-test-env
+    needs: build-app
+    if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -96,19 +104,15 @@ jobs:
           - test_name: 'Tests for tests'
             test_command: 'npm run test:ci -- --config="./testing/jest.config.ts"'
           - test_name: 'Library tests #1'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 1/4'
+            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 1/3'
           - test_name: 'Library tests #2'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/4'
+            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 2/3'
           - test_name: 'Library tests #3'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/4'
-          - test_name: 'Library tests #4'
-            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 4/4'
+            test_command: 'npm run test:ci -- --config="./lib/jest.config.ts" --shard 3/3'
           - test_name: 'Server integration tests #1'
-            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 1/3'
+            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 1/2'
           - test_name: 'Server integration tests #2'
-            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 2/3'
-          - test_name: 'Server integration tests #3'
-            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 3/3'
+            test_command: 'npm run start:test:ci & npm run test:server:ci -- --shard 2/2'
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser'
           - test_name: 'Browser e2e test #1'
@@ -119,7 +123,7 @@ jobs:
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
@@ -128,7 +132,7 @@ jobs:
         run: npx dotenv -e .env.test.local -- npm run prisma:reset
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -136,7 +140,7 @@ jobs:
           mask-aws-account-id: 'no'
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@v2
         with:
           mask-password: true
       - name: Run permissions api docker image
@@ -178,10 +182,11 @@ jobs:
   deploy:
     name: Deploy to production
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    needs: [test, integration-test]
+    # run whether previous jobs were successful or skipped
+    if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
+    needs: [test, test-matrix]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
       - name: Inject slug/short variables
@@ -228,6 +233,11 @@ jobs:
             yq -I 4 -i '
               with(.option_settings."aws:elasticbeanstalk:application:environment";
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
+              ' .ebextensions_ceramic/00_env_vars.config
+
+            yq -I 4 -i '
+              with(.option_settings."aws:elasticbeanstalk:application:environment";
+                    .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_websockets/00_env_vars.config
 
       - name: Package Webapp and upload web assets to s3
@@ -243,6 +253,11 @@ jobs:
         run: |
           rm -rf .ebextensions && mv .ebextensions_cron .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_cron.zip
+
+      - name: Update and Package ceramic server
+        run: |
+          rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
+          cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
       - name: Update and Package websockets
         id: pkg_websocket
@@ -275,29 +290,6 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github minutes
 
-      - name: Use datadog ci package to upload js maps
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-        run: |
-          npm install -g @datadog/datadog-ci
-          datadog-ci sourcemaps upload .next/static       \
-            --service=webapp                              \
-            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
-            --minified-path-prefix=https://cdn.charmverse.io/_next/static
-
-      - name: Deploy Background to Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
-        with:
-          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          application_name: charmverse-worker
-          environment_name: prd-charmverse-worker
-          version_label: ${{ github.sha }}
-          region: us-east-1
-          deployment_package: deploy_cron.zip
-          use_existing_version_if_available: true # allows triggering re-deploys with same version
-          wait_for_deployment: false # set to false to save sweet Github minutes
-
       - name: Deploy Websockets to Beanstalk
         if: steps.pkg_websocket.outputs.deploy_websocket == 'true'
         uses: einaregilsson/beanstalk-deploy@v21
@@ -312,12 +304,48 @@ jobs:
           use_existing_version_if_available: true # allows triggering re-deploys with same version
           wait_for_deployment: false # set to false to save sweet Github
 
-  #    if: github.ref == 'refs/heads/main' && failure()
+      - name: Deploy Background to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: charmverse-worker
+          environment_name: prd-charmverse-worker
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_cron.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
+
+      - name: Use datadog ci package to upload js maps
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+        run: |
+          npm install -g @datadog/datadog-ci
+          datadog-ci sourcemaps upload .next/static       \
+            --service=webapp                              \
+            --release-version=${{ steps.get_build_id.outputs.build_id }}  \
+            --minified-path-prefix=https://cdn.charmverse.io/_next/static
+
+      - name: Deploy Ceramic to Beanstalk
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: prd-charmverse-ceramic-link
+          environment_name: prd-charmverse-ceramic-link
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: deploy_ceramic.zip
+          use_existing_version_if_available: true # allows triggering re-deploys with same version
+          wait_for_deployment: false # set to false to save sweet Github minutes
+
   discord_alert:
     name: Notify discord of failure
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
-    needs: [build-test-env, test, integration-test, deploy]
+    # pass in all steps so we can check if any failed
+    needs: [build-app, test, test-matrix, deploy]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')

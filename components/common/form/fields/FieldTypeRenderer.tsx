@@ -1,14 +1,23 @@
+import type { SxProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
+import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
+import { FileField } from './FileField';
+import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
 import { PersonInputField } from './PersonInputField';
+
+type TextInputConfig = {
+  rows?: number;
+  maxRows?: number;
+};
 
 type TextProps = {
   type: Exclude<FieldType, 'select' | 'multiselect'>;
@@ -20,7 +29,11 @@ type SelectProps = {
 } & FieldProps &
   Required<ControlFieldProps>;
 
-type Props = TextProps | SelectProps;
+type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
+  sx?: SxProps;
+  type: FieldType;
+  textInputConfig?: TextInputConfig;
+} & TextInputConfig;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
   ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
@@ -31,16 +44,16 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'phone':
       case 'short_text':
       case 'wallet': {
-        return <TextInputField {...fieldProps} ref={ref} />;
+        return <TextInputField rows={1} maxRows={1} {...fieldProps} ref={ref} multiline />;
       }
       case 'long_text': {
         return <CharmEditorInputField {...fieldProps} />;
       }
       case 'text_multiline': {
-        return <TextInputField {...fieldProps} ref={ref} multiline rows={3} />;
+        return <TextInputField rows={3} {...fieldProps} ref={ref} multiline />;
       }
       case 'number': {
-        return <NumberInputField {...fieldProps} ref={ref} />;
+        return <NumberInputField {...fieldProps} fullWidth ref={ref} />;
       }
 
       case 'date': {
@@ -71,6 +84,14 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             onUpdateOption={onUpdateOption}
           />
         );
+      }
+
+      case 'image': {
+        return <ImageField {...fieldProps} />;
+      }
+
+      case 'file': {
+        return <FileField {...fieldProps} value={fieldProps.value as UploadedFileInfo} />;
       }
 
       default: {

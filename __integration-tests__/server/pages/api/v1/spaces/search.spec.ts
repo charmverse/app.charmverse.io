@@ -2,7 +2,7 @@ import type { Space, SuperApiToken } from '@charmverse/core/prisma';
 import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateSuperApiKey } from 'testing/generators/apiKeys';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpace } from 'testing/setupDatabase';

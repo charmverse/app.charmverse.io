@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 import type { Block } from 'lib/focalboard/block';
 import { createBlock } from 'lib/focalboard/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 
 import type { Card, CardPage } from './card';
 
@@ -17,7 +17,8 @@ export const proposalPropertyTypesList = [
   'proposalReviewer',
   'proposalEvaluationType',
   'proposalCreatedAt',
-  'proposalStep'
+  'proposalStep',
+  'proposalReviewerNotes'
 ] as const;
 export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
@@ -39,33 +40,24 @@ export type PropertyType =
   | 'updatedBy'
   | 'tokenAmount'
   | 'tokenChain'
+  | 'relation'
   | DatabaseProposalPropertyType;
-
-export const propertyTypesList: PropertyType[] = [
-  'text',
-  'number',
-  'email',
-  'phone',
-  'url',
-  'select',
-  'multiSelect',
-  'date',
-  'person',
-  'checkbox',
-  'createdTime',
-  'createdBy',
-  'updatedTime',
-  'updatedBy',
-  ...proposalPropertyTypesList
-];
 
 interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
   disabled?: boolean;
+  variant?: 'chip' | 'plain';
   dropdownValue?: string; // the label to show in the dropdown, if its different from the normal value
 }
+
+export type RelationPropertyData = {
+  boardId: string;
+  limit: 'single_page' | 'multiple_page';
+  relatedPropertyId: string | null;
+  showOnRelatedBoard: boolean;
+};
 
 // A template for card properties attached to a board
 export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
@@ -76,6 +68,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
   formFieldId?: string;
   proposalFieldId?: string;
+  relationData?: RelationPropertyData;
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';

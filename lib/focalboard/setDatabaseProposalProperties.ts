@@ -43,12 +43,32 @@ export async function setDatabaseProposalProperties({
       }
     },
     select: {
+      proposal: {
+        orderBy: {
+          page: {
+            createdAt: 'asc'
+          }
+        },
+        select: {
+          page: {
+            select: {
+              createdAt: true
+            }
+          }
+        }
+      },
       id: true,
-      formFields: true
+      formFields: {
+        orderBy: {
+          index: 'asc'
+        }
+      }
     }
   });
 
-  const formFields = forms.flatMap((p) => p.formFields);
+  const formFields = forms
+    .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
+    .flatMap((p) => p.formFields);
   const proposals = await prisma.proposal.findMany({
     where: {
       spaceId: boardBlock.spaceId
@@ -56,17 +76,25 @@ export async function setDatabaseProposalProperties({
     select: {
       evaluations: {
         select: {
+          type: true,
           title: true
+        },
+        orderBy: {
+          index: 'asc'
         }
       }
     }
   });
 
   const evaluationStepTitles: Set<string> = new Set();
+  const rubricStepTitles: Set<string> = new Set();
 
   proposals.forEach((p) => {
     p.evaluations.forEach((e) => {
       evaluationStepTitles.add(e.title);
+      if (e.type === 'rubric') {
+        rubricStepTitles.add(e.title);
+      }
     });
   });
 
@@ -74,7 +102,8 @@ export async function setDatabaseProposalProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
     boardBlock,
-    cardProperties
+    cardProperties,
+    rubricStepTitles: Array.from(rubricStepTitles)
   });
 
   return prisma.block.update({
@@ -94,8 +123,10 @@ export function getBoardProperties({
   boardBlock,
   formFields = [],
   evaluationStepTitles = [],
-  cardProperties = []
+  cardProperties = [],
+  rubricStepTitles = []
 }: {
+  rubricStepTitles?: string[];
   cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   boardBlock: Board;
@@ -107,6 +138,23 @@ export function getBoardProperties({
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
   const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
   const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
+  const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
+  const proposalReviewerNotes = generateUpdatedProposalReviewerNotesProperty({ boardProperties });
+
+  const existingReviewerNotesPropIndex = boardProperties.findIndex((p) => p.type === 'proposalReviewerNotes');
+  if (existingReviewerNotesPropIndex > -1) {
+    boardProperties[existingReviewerNotesPropIndex] = proposalReviewerNotes;
+  } else {
+    boardProperties.push(proposalReviewerNotes);
+  }
+
+  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
+
+  if (existingAuthorPropIndex > -1) {
+    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
+  } else {
+    boardProperties.push(proposalAuthorProp);
+  }
 
   const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
 
@@ -139,9 +187,10 @@ export function getBoardProperties({
     boardProperties.push(stepProp);
   }
 
-  const evaluatedByProp = generateUpdatedProposalEvaluatedByProperty({ boardProperties });
-  const evaluationTotalProp = generateUpdatedProposalEvaluationTotalProperty({ boardProperties });
-  const evaluationAverageProp = generateUpdatedProposalEvaluationAverageProperty({ boardProperties });
+  addProposalEvaluationProperties({
+    boardProperties,
+    rubricStepTitles
+  });
 
   cardProperties.forEach((cardProp) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
@@ -155,30 +204,6 @@ export function getBoardProperties({
       });
     }
   });
-
-  const existingEvaluatedByPropPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluatedBy');
-
-  if (existingEvaluatedByPropPropIndex > -1) {
-    boardProperties[existingEvaluatedByPropPropIndex] = evaluatedByProp;
-  } else {
-    boardProperties.push(evaluatedByProp);
-  }
-
-  const existingEvaluationTotalPropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationTotal');
-
-  if (existingEvaluationTotalPropIndex > -1) {
-    boardProperties[existingEvaluationTotalPropIndex] = evaluationTotalProp;
-  } else {
-    boardProperties.push(evaluationTotalProp);
-  }
-
-  const existingEvaluationAveragePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationAverage');
-
-  if (existingEvaluationAveragePropIndex > -1) {
-    boardProperties[existingEvaluationAveragePropIndex] = evaluationAverageProp;
-  } else {
-    boardProperties.push(evaluationAverageProp);
-  }
 
   formFields.forEach((formField) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.formFieldId === formField.id);
@@ -243,27 +268,97 @@ export function getBoardProperties({
   return boardProperties;
 }
 
+function addProposalEvaluationProperties({
+  rubricStepTitles,
+  boardProperties
+}: {
+  rubricStepTitles: string[];
+  boardProperties: IPropertyTemplate[];
+}) {
+  for (const rubricStepTitle of rubricStepTitles) {
+    const evaluatedByProp = boardProperties.find((p) => p.type === 'proposalEvaluatedBy' && p.name === rubricStepTitle);
+    const evaluationTotalProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluationTotal' && p.name === rubricStepTitle
+    );
+    const evaluationAverageProp = boardProperties.find(
+      (p) => p.type === 'proposalEvaluationAverage' && p.name === rubricStepTitle
+    );
+
+    if (!evaluatedByProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluatedBy',
+        name: rubricStepTitle,
+        options: []
+      });
+    }
+
+    if (!evaluationTotalProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluationTotal',
+        name: rubricStepTitle,
+        options: []
+      });
+    }
+
+    if (!evaluationAverageProp) {
+      boardProperties.push({
+        id: uuid(),
+        type: 'proposalEvaluationAverage',
+        name: rubricStepTitle,
+        options: []
+      });
+    }
+  }
+}
+
+function generateUpdatedProposalReviewerNotesProperty(
+  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
+): IPropertyTemplate {
+  const existingProposalReviewerNotes = boardProperties.find((p) => p.type === 'proposalReviewerNotes');
+
+  return {
+    ...(existingProposalReviewerNotes ?? {
+      ...proposalDbProperties.proposalReviewerNotes(),
+      id: uuid()
+    })
+  };
+}
+
+function generateUpdatedProposalAuthorProperty(
+  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
+): IPropertyTemplate {
+  const existingProposalAuthorProperty = boardProperties.find((p) => p.type === 'proposalAuthor');
+
+  return {
+    ...(existingProposalAuthorProperty ?? {
+      ...proposalDbProperties.proposalAuthor(),
+      id: uuid()
+    })
+  };
+}
+
 function generateUpdatedProposalStepProperty({
   boardProperties,
   evaluationStepTitles
 }: {
   evaluationStepTitles: string[];
   boardProperties: IPropertyTemplate[];
-}) {
-  // We will mutate and return this property
-  const proposalStepProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalStep') ?? {
-      ...proposalDbProperties.proposalStep(),
-      id: uuid(),
-      options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
-        color: 'propColorGray',
-        id: title,
-        value: title
-      }))
-    })
-  };
+}): IPropertyTemplate {
+  const existingProposalStepProperty = boardProperties.find((p) => p.type === 'proposalStep');
 
-  return proposalStepProp;
+  return {
+    ...(existingProposalStepProperty ?? {
+      ...proposalDbProperties.proposalStep(),
+      id: uuid()
+    }),
+    options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
+      color: 'propColorGray',
+      id: title,
+      value: title
+    }))
+  };
 }
 
 function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
@@ -324,46 +419,6 @@ function generateUpdatedProposalUrlProperty({ boardProperties }: { boardProperti
   const proposalStatusProp = {
     ...(boardProperties.find((p) => p.type === 'proposalUrl') ?? {
       ...proposalDbProperties.proposalUrl(),
-      id: uuid()
-    })
-  };
-
-  return proposalStatusProp;
-}
-
-function generateUpdatedProposalEvaluatedByProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluatedBy') ?? {
-      ...proposalDbProperties.proposalEvaluatedBy(),
-      id: uuid()
-    })
-  };
-
-  return proposalStatusProp;
-}
-
-function generateUpdatedProposalEvaluationTotalProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluationTotal') ?? {
-      ...proposalDbProperties.proposalEvaluationTotal(),
-      id: uuid()
-    })
-  };
-
-  return proposalStatusProp;
-}
-
-function generateUpdatedProposalEvaluationAverageProperty({
-  boardProperties
-}: {
-  boardProperties: IPropertyTemplate[];
-}) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluationAverage') ?? {
-      ...proposalDbProperties.proposalEvaluationAverage(),
       id: uuid()
     })
   };

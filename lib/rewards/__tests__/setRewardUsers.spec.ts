@@ -2,7 +2,7 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Space, Role, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 import { generateBounty } from 'testing/setupDatabase';
 
 import { setRewardUsers } from '../setRewardUsers';

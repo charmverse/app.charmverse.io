@@ -3,7 +3,7 @@ import { ACM } from '@aws-sdk/client-acm';
 import { getLogger } from '@charmverse/core/log';
 
 import type { DomainCertificateDetails } from 'lib/aws/interfaces';
-import { isValidDomainName } from 'lib/utilities/domains/isValidDomainName';
+import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
 
 import { AWS_REGION } from './config';
 

@@ -1,8 +1,8 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
+import { getChainList } from 'connectors/chains';
 
-import { tokenChainOptions } from 'components/rewards/components/RewardsBoard/utils/boardData';
+import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import type { Board } from 'lib/focalboard/board';
 import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
@@ -10,13 +10,15 @@ import { CardFilter } from 'lib/focalboard/cardFilter';
 import { Constants } from 'lib/focalboard/constants';
 import type { FilterGroup } from 'lib/focalboard/filterGroup';
 import type { Member } from 'lib/members/interfaces';
-import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposal/blocks/constants';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';
+
+const allChains = getChainList({ enableTestnets: true });
 
 type CardsState = {
   current: string;
@@ -115,40 +117,18 @@ export const getSortedCards = createSelector(getCards, (cards) => {
 
 export const getTemplates = (state: RootState): { [key: string]: Card } => state.cards.templates;
 
-export const getSortedTemplates = createSelector(getTemplates, (templates) => {
-  return Object.values(templates).sort((a, b) => a.title.localeCompare(b.title)) as Card[];
-});
-
 export function getCard(cardId: string): (state: RootState) => Card | undefined {
   return (state: RootState): Card | undefined => {
     return state.cards.cards[cardId] || state.cards.templates[cardId];
   };
 }
 
-export const getCurrentBoardCards = createSelector(
-  (state: RootState) => state.boards.current,
-  getCards,
-  (boardId: string, cards: { [key: string]: Card }) => {
-    return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
-  }
-);
-
-export const getCurrentBoardTemplates = createSelector(
-  (state: RootState) => state.boards.current,
-  getTemplates,
-  (
-    boardId: string,
-    templates: {
-      [key: string]: Card;
-    }
-  ) => {
-    return Object.values(templates).filter((c) => c.parentId === boardId) as Card[];
-  }
-);
-
-function titleOrCreatedOrder(cardA: PageMeta, cardB: PageMeta) {
-  const aValue = cardA.title;
-  const bValue = cardB.title;
+function titleOrCreatedOrder(
+  cardA: { card: { createdAt: number }; page: { title: string } },
+  cardB: { card: { createdAt: number }; page: { title: string } }
+) {
+  const aValue = cardA.page.title;
+  const bValue = cardB.page.title;
 
   if (aValue && bValue && aValue.localeCompare) {
     return aValue.localeCompare(bValue);
@@ -163,7 +143,7 @@ function titleOrCreatedOrder(cardA: PageMeta, cardB: PageMeta) {
   }
 
   // If both cards are untitled, use the create date
-  return new Date(cardA.createdAt).getTime() - new Date(cardB.createdAt).getTime();
+  return new Date(cardA.card.createdAt).getTime() - new Date(cardB.card.createdAt).getTime();
 }
 
 function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
@@ -171,7 +151,7 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
   const indexB = activeView.fields.cardOrder.indexOf(cardB.card.id);
 
   if (indexA < 0 && indexB < 0) {
-    return titleOrCreatedOrder(cardA.page, cardB.page);
+    return titleOrCreatedOrder(cardA, cardB);
   } else if (indexA < 0 && indexB >= 0) {
     // If cardA's order is not defined, put it at the end
     return 1;
@@ -181,9 +161,10 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 
 export function sortCards(
   cardPages: CardPage[],
-  board: Board,
+  board: Pick<Board, 'fields'>,
   activeView: BoardView,
   members: Record<string, Member>,
+  relationPropertiesCardsRecord: PageListItemsRecord,
   localSort?: ISortOption[] | null
 ): CardPage[] {
   if (!activeView) {
@@ -202,7 +183,7 @@ export function sortCards(
     if (sortOption.propertyId === Constants.titleColumnId) {
       Utils.log('Sort by title');
       sortedCards = sortedCards.sort((a, b) => {
-        const result = titleOrCreatedOrder(a.page, b.page);
+        const result = titleOrCreatedOrder(a, b);
         return sortOption.reversed ? -result : result;
       });
     } else {
@@ -217,8 +198,8 @@ export function sortCards(
         let bValue = b.card.fields.properties[sortPropertyId] || '';
 
         if (template.type === 'createdBy') {
-          aValue = members[a.page.createdBy]?.username || '';
-          bValue = members[b.page.createdBy]?.username || '';
+          aValue = members[a.card.createdBy]?.username || '';
+          bValue = members[b.card.createdBy]?.username || '';
         } else if (template.type === 'updatedBy') {
           aValue = members[a.page.updatedBy]?.username || '';
           bValue = members[b.page.updatedBy]?.username || '';
@@ -230,10 +211,26 @@ export function sortCards(
           if (typeof bValue !== 'number') {
             bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
           }
+        } else if (template.type === 'relation') {
+          const pageListItems = relationPropertiesCardsRecord[template.id] ?? [];
+          const aPageListItems = Array.isArray(aValue)
+            ? aValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
+            : [];
+          const bPageListItems = Array.isArray(bValue)
+            ? bValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
+            : [];
+          aValue = aPageListItems.join(', ');
+          bValue = bPageListItems.join(', ');
         }
 
         let result = 0;
-        if (template.type === 'number' || template.type === 'date' || template.type === 'tokenAmount') {
+        if (
+          template.type === 'number' ||
+          template.type === 'date' ||
+          template.type === 'tokenAmount' ||
+          template.type === 'proposalEvaluationAverage' ||
+          template.type === 'proposalEvaluationTotal'
+        ) {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
             return -1;
@@ -242,7 +239,7 @@ export function sortCards(
             return 1;
           }
           if (!aValue && !bValue) {
-            result = titleOrCreatedOrder(a.page, b.page);
+            result = titleOrCreatedOrder(a, b);
           } else {
             result = Number(aValue) - Number(bValue);
           }
@@ -257,7 +254,7 @@ export function sortCards(
           } else if (bValue) {
             result = -1;
           } else {
-            result = titleOrCreatedOrder(a.page, b.page);
+            result = titleOrCreatedOrder(a, b);
           }
         } else if (template.id === PROPOSAL_REVIEWERS_BLOCK_ID) {
           const value1 = (Array.isArray(aValue) ? aValue[0] : aValue) as unknown as Record<string, any>;
@@ -279,7 +276,7 @@ export function sortCards(
             return 1;
           }
           if (aValue.length <= 0 && bValue.length <= 0) {
-            result = titleOrCreatedOrder(a.page, b.page);
+            result = titleOrCreatedOrder(a, b);
           }
 
           if (template.type === 'select' || template.type === 'multiSelect') {
@@ -288,8 +285,12 @@ export function sortCards(
           }
 
           if (template.type === 'tokenChain') {
-            aValue = tokenChainOptions.find((o) => o.id === (Array.isArray(aValue) ? aValue[0] : aValue))?.value || '';
-            bValue = tokenChainOptions.find((o) => o.id === (Array.isArray(bValue) ? bValue[0] : bValue))?.value || '';
+            aValue =
+              allChains.find((o) => o.chainId.toString() === (Array.isArray(aValue) ? aValue[0] : aValue))?.chainName ||
+              '';
+            bValue =
+              allChains.find((o) => o.chainId.toString() === (Array.isArray(bValue) ? bValue[0] : bValue))?.chainName ||
+              '';
           }
 
           if (result === 0) {
@@ -301,7 +302,7 @@ export function sortCards(
 
         if (result === 0) {
           // In case of "ties", use the title order
-          result = titleOrCreatedOrder(a.page, b.page);
+          result = titleOrCreatedOrder(a, b);
         }
 
         return sortOption.reversed ? -result : result;
@@ -378,5 +379,22 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
         return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       return result;
+    }
+  );
+
+export const makeSelectBoardTemplates = () =>
+  createSelector(
+    (state: RootState, boardId: string) => {
+      const cards = getTemplates(state);
+      return {
+        cards,
+        boardId
+      };
+    },
+    ({ cards, boardId }) => {
+      if (!cards) {
+        return [];
+      }
+      return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
     }
   );

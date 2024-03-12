@@ -2,33 +2,31 @@ import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
 import { getAddress } from 'viem';
 
 import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
-import { isNumber } from 'lib/utilities/numbers';
+import { isNumber } from 'lib/utils/numbers';
 
 import { getPublicClient } from '../../blockchain/publicClient';
-import type { Lock } from '../interfaces';
+import type { AccessControlCondition } from '../interfaces';
 
 import { getLockMetadata } from './getLockMetadata';
 
-type GetLockPayload = {
-  chainId: number;
-  contract: string;
+type GetLockPayload = Pick<AccessControlCondition, 'chain' | 'contractAddress'> & {
   walletAddress?: string;
 };
 
 export async function getLockDetails(
   values: GetLockPayload,
   withMetadata?: boolean
-): Promise<Lock & { validKey?: boolean }> {
-  const { chainId: initialChain, contract, walletAddress } = values;
+): Promise<GetLockPayload & { validKey?: boolean }> {
+  const { chain, contractAddress, walletAddress } = values;
 
-  if (!isNumber(Number(initialChain))) {
+  if (!isNumber(Number(chain))) {
     throw new InvalidInputError('Chain must be a number');
   }
 
-  // Validate address and throw an error if it's not
-  const address = getAddress(contract);
+  // Validate address and throw an error if it's not valid
+  const address = getAddress(contractAddress);
 
-  const chainId = Number(initialChain);
+  const chainId = Number(chain);
 
   try {
     const publicClient = getPublicClient(chainId);
@@ -39,28 +37,21 @@ export async function getLockDetails(
       functionName: 'name'
     });
 
-    const locksmithData = withMetadata ? await getLockMetadata({ contract, chainId }) : undefined;
+    const locksmithData = withMetadata ? await getLockMetadata({ contract: contractAddress, chainId }) : undefined;
 
-    const lockMetadata: Lock = {
+    const lockMetadata = {
+      contractAddress,
+      chain,
       name,
-      contract,
-      chainId,
       image: locksmithData?.image
     };
 
     if (walletAddress) {
-      const wallet = getAddress(walletAddress);
-
-      const validKey = await publicClient.readContract({
-        address,
-        abi: PublicLockV13,
-        functionName: 'getHasValidKey',
-        args: [wallet]
-      });
+      const hasValidKey = await validateLock({ contractAddress, chain, walletAddress });
 
       return {
         ...lockMetadata,
-        validKey
+        validKey: hasValidKey
       };
     }
 
@@ -68,4 +59,23 @@ export async function getLockDetails(
   } catch (error: any) {
     throw new DataNotFoundError('Error fetching lock details. Check the contract address and chain.');
   }
+}
+
+export async function validateLock({
+  contractAddress,
+  chain,
+  walletAddress
+}: Pick<AccessControlCondition, 'chain' | 'contractAddress'> & { walletAddress: string }) {
+  const publicClient = getPublicClient(chain);
+  const address = getAddress(contractAddress);
+  const wallet = getAddress(walletAddress);
+
+  const hasValidKey = await publicClient.readContract({
+    address,
+    abi: PublicLockV13,
+    functionName: 'getHasValidKey',
+    args: [wallet]
+  });
+
+  return hasValidKey;
 }

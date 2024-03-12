@@ -16,12 +16,11 @@ export type FeatureJson = {
   title?: string;
 };
 
-export type MappedFeatures = Record<
-  Feature,
-  {
-    id: Feature;
-    isHidden: boolean;
-    title: string;
-    path: StaticPageType;
-  }
->;
+export type MappedFeature = {
+  id: Feature;
+  isHidden: boolean;
+  title: string;
+  path: StaticPageType;
+};
+
+export type FeatureMap = Record<Feature, MappedFeature>;

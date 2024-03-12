@@ -1,10 +1,11 @@
 import type { Space, User, Vote } from '@charmverse/core/prisma';
-import { v4 } from 'uuid';
+import { testUtilsProposals } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { castProposalVote } from 'lib/public-api/castProposalVote';
 import { UserIsNotSpaceMemberError } from 'lib/users/errors';
-import { DataNotFoundError, UndesirableOperationError } from 'lib/utilities/errors';
-import { createProposalWithUsers, createVote, generateUserAndSpace } from 'testing/setupDatabase';
+import { DataNotFoundError, UndesirableOperationError } from 'lib/utils/errors';
+import { createVote, generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
@@ -16,12 +17,19 @@ beforeAll(async () => {
   user = generated.user;
   space = generated.space;
 
-  const proposal = await createProposalWithUsers({
+  const proposal = await testUtilsProposals.generateProposal({
     spaceId: space.id,
     userId: user.id,
     authors: [],
-    reviewers: [user.id],
-    proposalStatus: 'vote_active'
+    proposalStatus: 'published',
+    evaluationInputs: [
+      {
+        evaluationType: 'vote',
+        reviewers: [],
+        permissions: [],
+        id: uuid()
+      }
+    ]
   });
   proposalId = proposal.id;
 
@@ -47,13 +55,26 @@ describe('castProposalVote', () => {
     );
   });
 
-  it('should cast a vote for proposal by proposalId', async () => {
-    const proposal2 = await createProposalWithUsers({
+  it('should not allow casting a vote if the step is inactive', async () => {
+    const proposal2 = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
       authors: [],
-      reviewers: [user.id],
-      proposalStatus: 'vote_closed'
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          reviewers: [],
+          permissions: [],
+          id: uuid()
+        },
+        {
+          evaluationType: 'vote',
+          reviewers: [{ group: 'user', id: user.id }],
+          permissions: [],
+          id: uuid()
+        }
+      ]
     });
 
     await createVote({
@@ -71,13 +92,13 @@ describe('castProposalVote', () => {
   });
 
   it('should throw error if proposal does not exist', async () => {
-    await expect(castProposalVote({ choice: '4', proposalId: v4(), userId: user.id })).rejects.toBeInstanceOf(
+    await expect(castProposalVote({ choice: '4', proposalId: uuid(), userId: user.id })).rejects.toBeInstanceOf(
       DataNotFoundError
     );
   });
 
   it('should throw error if user does not have access to space', async () => {
-    await expect(castProposalVote({ choice: '4', proposalId, userId: v4() })).rejects.toBeInstanceOf(
+    await expect(castProposalVote({ choice: '4', proposalId, userId: uuid() })).rejects.toBeInstanceOf(
       UserIsNotSpaceMemberError
     );
   });

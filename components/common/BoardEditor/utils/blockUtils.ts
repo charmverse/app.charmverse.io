@@ -1,7 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 
 import type { Block as FBBlock } from 'lib/focalboard/block';
-import { replaceS3Domain } from 'lib/utilities/url';
+import { replaceS3Domain } from 'lib/utils/url';
 import type { ServerBlockFields } from 'pages/api/blocks';
 
 export async function fixBlocks(blocks: FBBlock[]): Promise<FBBlock[]> {

@@ -18,6 +18,7 @@ import { connect } from 'react-redux';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { useGetPageMeta } from 'charmClient/hooks/pages';
 import PageBanner, { randomBannerImage } from 'components/[pageId]/DocumentPage/components/PageBanner';
 import PageDeleteBanner from 'components/[pageId]/DocumentPage/components/PageDeleteBanner';
 import { PageWebhookBanner } from 'components/common/BoardEditor/components/PageWebhookBanner';
@@ -26,7 +27,7 @@ import {
   makeSelectViewCardsSortedFilteredAndGrouped,
   sortCards
 } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { webhookEndpoint } from 'config/constants';
@@ -34,7 +35,6 @@ import { useApiPageKeys } from 'hooks/useApiPageKeys';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import type { Block } from 'lib/focalboard/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
@@ -42,9 +42,11 @@ import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card, CardPage } from 'lib/focalboard/card';
 import { createCard } from 'lib/focalboard/card';
 import { CardFilter } from 'lib/focalboard/cardFilter';
+import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
 
 import mutator from '../mutator';
 import { addCard as _addCard, addTemplate } from '../store/cards';
+import { initialDatabaseLoad } from '../store/databaseBlocksLoad';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
@@ -89,6 +91,7 @@ type State = {
 function CenterPanel(props: Props) {
   const { activeView, board, currentRootPageId, pageIcon, showView, views, page: boardPage } = props;
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
 
   const [state, setState] = useState<State>({
     cardIdToFocusOnRender: '',
@@ -96,6 +99,7 @@ function CenterPanel(props: Props) {
     // assume this is a page type 'inline_linked_board' or 'linked_board' if no view exists
     openSettings: null
   });
+
   const [loadingFormResponses, setLoadingFormResponses] = useState(false);
 
   const router = useRouter();
@@ -103,7 +107,7 @@ function CenterPanel(props: Props) {
   const { pages, refreshPage } = usePages();
   const { membersRecord } = useMembers();
   const localViewSettings = useLocalDbViewSettings(activeView?.id);
-
+  const dispatch = useAppDispatch();
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -113,7 +117,8 @@ function CenterPanel(props: Props) {
   } else if (activeView?.fields.sourceType === 'google_form') {
     activeBoardId = activeView?.fields.sourceData?.boardId;
   }
-  const { page: activePage } = usePage({ pageIdOrPath: activeBoardId, spaceId: space?.id });
+
+  const { data: activePage } = useGetPageMeta(activeBoardId);
 
   const { keys } = useApiPageKeys(props.page?.id);
   const selectBoard = useMemo(makeSelectBoard, []);
@@ -122,6 +127,7 @@ function CenterPanel(props: Props) {
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(
     (o) => o.id === activeView?.fields.dateDisplayPropertyId
   );
+
   const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
   const _cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
@@ -136,12 +142,23 @@ function CenterPanel(props: Props) {
     if (!isActiveView) {
       return;
     }
-    if (views.length === 0) {
+    if (selectedPropertyId) {
+      setState((s) => ({ ...s, openSettings: 'view-options' }));
+    } else if (views.length === 0) {
       setState((s) => ({ ...s, openSettings: 'create-linked-view' }));
     } else if (activeView) {
       setState((s) => ({ ...s, openSettings: null }));
     }
-  }, [activeView?.id, views.length, isActiveView]);
+  }, [activeView?.id, views.length, isActiveView, selectedPropertyId]);
+
+  const relationPropertiesCardsRecord = useMemo(
+    () =>
+      getRelationPropertiesCardsRecord({
+        pages: Object.values(pages),
+        properties: activeBoard?.fields.cardProperties ?? []
+      }),
+    [pages, activeBoard]
+  );
 
   // filter cards by whats accessible
   const { cardPages, cardPageIds } = useMemo(() => {
@@ -153,7 +170,15 @@ function CenterPanel(props: Props) {
       .filter(({ page }) => !!page && !page.deletedAt);
 
     const _cardPages = isActiveView
-      ? sortCards(result, activeBoard, activeView, membersRecord, localViewSettings?.localSort)
+      ? sortCards(
+          result,
+          activeBoard,
+          activeView,
+          membersRecord,
+          // Required to sort cards by relation properties
+          relationPropertiesCardsRecord,
+          localViewSettings?.localSort
+        )
       : [];
 
     const _cardPageIds = new Set<string>();
@@ -163,7 +188,7 @@ function CenterPanel(props: Props) {
       cardPages: _cardPages,
       cardPageIds: _cardPageIds
     };
-  }, [isActiveView, _cards, pages, localViewSettings?.localSort]);
+  }, [isActiveView, _cards, pages, localViewSettings?.localSort, relationPropertiesCardsRecord]);
 
   const cards = cardPages.map(({ card }) => card);
 
@@ -322,10 +347,6 @@ function CenterPanel(props: Props) {
     },
     [activeBoard, activeView, __addCard, setState, space, groupByProperty, refreshPage, _updateView, showCard]
   );
-
-  const editCardTemplate = (cardTemplateId: string) => {
-    showCard(cardTemplateId);
-  };
 
   const cardClicked = useCallback(
     (e: React.MouseEvent, card: Card): void => {
@@ -493,10 +514,12 @@ function CenterPanel(props: Props) {
     (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
   );
 
-  // refresh proposals as a source
   useEffect(() => {
     if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
-      updateProposalSource({ pageId: currentRootPageId });
+      updateProposalSource({ pageId: currentRootPageId }).then(() => {
+        // Refetch database after updating proposal source board, otherwise the UI will be out of sync
+        dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
+      });
     }
   }, [currentRootPageId, activeBoard?.id]);
 
@@ -530,7 +553,7 @@ function CenterPanel(props: Props) {
       <div
         data-test={`database-container-${props.board.id}`}
         // remount components between pages
-        className={`BoardComponent ${isEmbedded ? 'embedded-board' : ''}`}
+        className={`BoardComponent drag-area-container ${isEmbedded ? 'embedded-board' : ''}`}
         ref={backgroundRef}
         onClick={(e) => {
           backgroundClicked(e);
@@ -576,7 +599,6 @@ function CenterPanel(props: Props) {
               showCard={showCard}
               // addCardFromTemplate={addCardFromTemplate}
               addCardTemplate={viewHeaderAddCardTemplate}
-              editCardTemplate={editCardTemplate}
               readOnly={props.readOnly}
               embeddedBoardPath={props.embeddedBoardPath}
               checkedIds={checkedIds}
@@ -655,6 +677,7 @@ function CenterPanel(props: Props) {
                 )}
                 {activeBoard && activeView?.fields.viewType === 'table' && (
                   <Table
+                    setSelectedPropertyId={setSelectedPropertyId}
                     board={activeBoard}
                     activeView={activeView}
                     cardPages={cardPages}
@@ -702,6 +725,12 @@ function CenterPanel(props: Props) {
             )}
 
             <ViewSidebar
+              selectedPropertyId={selectedPropertyId}
+              sidebarView={selectedPropertyId ? 'card-property' : undefined}
+              setSelectedPropertyId={(_selectedPropertyId) => {
+                setSelectedPropertyId(_selectedPropertyId);
+              }}
+              cards={cards}
               views={views}
               page={props.page}
               board={activeBoard}

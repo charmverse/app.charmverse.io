@@ -19,6 +19,7 @@ import { memo, useMemo, useState } from 'react';
 import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -30,7 +31,7 @@ import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { PagesMap } from 'lib/pages';
-import { fancyTrim } from 'lib/utilities/strings';
+import { fancyTrim } from 'lib/utils/strings';
 
 import { PageIcon } from '../../PageIcon';
 
@@ -85,11 +86,12 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   const [searchText, setSearchText] = useState('');
   const { space } = useCurrentSpace();
   const currentPagePath = usePageIdFromPath();
-  const { mutatePagesRemove, pages, getPageByPath } = usePages();
+  const { mutatePagesRemove, getPageByPath } = usePages();
   const { navigateToSpacePath } = useCharmRouter();
   const { showMessage } = useSnackbar();
   const { sendMessage } = useWebSocketClient();
   const dispatch = useAppDispatch();
+  const { trigger: trashPages } = useTrashPages();
 
   const { data: archivedPages = {}, mutate: setArchivedPages } = useSWR<PagesMap>(
     !space ? null : `archived-pages-${space?.id}`,
@@ -106,7 +108,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function restorePage(pageId: string) {
     const page = archivedPages[pageId];
     if (page && space) {
-      if (page.type === 'board' || page.type === 'page') {
+      if (page.type === 'board' || page.type === 'page' || page.type === 'linked_board') {
         sendMessage({
           payload: {
             id: pageId
@@ -114,7 +116,11 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           type: 'page_restored'
         });
       } else {
-        const { pageIds: restoredPageIds } = await charmClient.restorePage(pageId);
+        const result = await trashPages({ pageIds: [pageId], trash: false });
+        if (!result) {
+          return;
+        }
+        const restoredPageIds = result.pageIds;
         setArchivedPages((_archivedPages) => {
           if (!_archivedPages) {
             return {};
@@ -136,7 +142,7 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
   async function deletePage(pageId: string) {
     const currentPage = currentPagePath ? getPageByPath(currentPagePath) : null;
 
-    const { pageIds: deletePageIds } = await charmClient.deletePage(pageId);
+    const { pageIds: deletePageIds } = await charmClient.deletePageForever(pageId);
     setArchivedPages((_archivedPages) => {
       if (!_archivedPages) {
         return {};
@@ -153,15 +159,14 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
 
     // If the current page has been deleted permanently route to the first alive page
     if (currentPage && deletePageIds.includes(currentPage.id)) {
-      const firstPage = Object.values(pages).find((page) => page?.type !== 'card' && !page?.deletedAt)?.path;
-      navigateToSpacePath(`/${firstPage}`);
+      navigateToSpacePath(`/`);
     }
   }
 
   const searchTextMatchedPages = useMemo(() => {
     return (
       Object.values(archivedPages ?? {})
-        .filter((archivedPage) => archivedPage!.title.toLowerCase().includes(searchText.toLowerCase()))
+        .filter((archivedPage) => archivedPage!.title?.toLowerCase().includes(searchText.toLowerCase()))
         // sort by deleted date, newest first
         .sort((a, b) => (a!.deletedAt! > b!.deletedAt! ? -1 : 1)) as PageMeta[]
     );

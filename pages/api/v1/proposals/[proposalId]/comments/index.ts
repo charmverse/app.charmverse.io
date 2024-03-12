@@ -3,10 +3,12 @@ import type { PageComment, PageCommentVote } from '@charmverse/core/prisma-clien
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { MixpanelEventName } from 'lib/metrics/mixpanel/interfaces';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError, requireApiKey, requireKeys, requireSuperApiKey } from 'lib/middleware';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
-import { generateMarkdown } from 'lib/prosemirror/plugins/markdown/generateMarkdown';
-import { parseMarkdown } from 'lib/prosemirror/plugins/markdown/parseMarkdown';
+import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 import { defaultHandler, logApiRequest } from 'lib/public-api/handler';
 import type { UserProfile } from 'lib/public-api/interfaces';
 import type { UserInfo } from 'lib/public-api/searchUserProfile';
@@ -339,7 +341,8 @@ async function createProposalComment(req: NextApiRequest, res: NextApiResponse<P
       }
     },
     select: {
-      id: true
+      id: true,
+      spaceId: true
     }
   });
 
@@ -355,6 +358,12 @@ async function createProposalComment(req: NextApiRequest, res: NextApiResponse<P
       user: { connect: { id: userId } },
       content: commentContent
     }
+  });
+
+  trackUserAction('create_proposal_comment', {
+    resourceId: proposal.id,
+    spaceId: proposal.spaceId,
+    userId
   });
 
   const apiComment: PublicApiProposalComment = {

@@ -6,7 +6,7 @@ import { deleteComment, updateComment } from 'lib/comments';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
-import { DataNotFoundError, UnauthorisedActionError } from 'lib/utilities/errors';
+import { DataNotFoundError, UnauthorisedActionError } from 'lib/utils/errors';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

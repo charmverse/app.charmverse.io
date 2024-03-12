@@ -122,7 +122,7 @@ function countUniqueValue(cards: readonly Card[], property: IPropertyTemplate): 
       return;
     }
 
-    if (property.type === 'multiSelect') {
+    if (property.type === 'multiSelect' || property.type === 'relation' || property.type === 'proposalAuthor') {
       (value as string[]).forEach((v) => valueMap.set(v, true));
     } else {
       valueMap.set(String(value), true);

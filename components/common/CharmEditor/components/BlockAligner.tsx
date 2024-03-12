@@ -2,7 +2,7 @@ import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import { ListItemButton } from '@mui/material';
+import { ListItemButton, Tooltip } from '@mui/material';
 import type { ReactNode, MouseEvent } from 'react';
 import { memo, forwardRef } from 'react';
 
@@ -12,6 +12,7 @@ interface BlockAlignerProps {
   onEdit?: () => void;
   readOnly?: boolean;
   onDragStart?: () => void;
+  extraControls?: { showOnReadonly?: boolean; onClick?: VoidFunction; Icon: React.ElementType; tooltip?: string }[];
 }
 
 const StyledBlockAligner = styled.div`
@@ -19,7 +20,6 @@ const StyledBlockAligner = styled.div`
   position: relative;
   max-width: 100%;
   text-align: center;
-  padding: ${({ theme }) => theme.spacing(0.5, 0)}; // add some vertical spacing around block elements
   // disable hover UX on ios which converts first click to a hover event
   @media (pointer: fine) {
     &:hover .controls {
@@ -32,7 +32,6 @@ const StyledBlockAligner = styled.div`
 const Controls = styled.div`
   position: absolute;
   background: ${({ theme }) => theme.palette.background.light};
-  border-radius: ${({ theme }) => theme.spacing(0.5)};
   display: flex;
   right: 0;
   top: 0;
@@ -40,7 +39,25 @@ const Controls = styled.div`
   transition: opacity 250ms ease-in-out;
 `;
 
-const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props) => {
+function BlockItemButton(control: { tooltip?: string; onClick?: VoidFunction; Icon: React.ElementType }) {
+  const theme = useTheme();
+  return (
+    <Tooltip title={control.tooltip}>
+      <ListItemButton
+        onClick={control.onClick}
+        sx={{
+          padding: 1,
+          backgroundColor: 'inherit',
+          color: 'secondary'
+        }}
+      >
+        <control.Icon sx={{ fontSize: 14, color: theme.palette.text.primary }} />
+      </ListItemButton>
+    </Tooltip>
+  );
+}
+
+const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props, ref) => {
   const { children, onDelete, onEdit, readOnly, onDragStart } = props;
   const theme = useTheme();
 
@@ -54,11 +71,31 @@ const BlockAligner = forwardRef<HTMLDivElement, BlockAlignerProps>((props) => {
     onDelete();
   }
 
+  if (readOnly && props.extraControls) {
+    const extraControls = props.extraControls.filter((control) => control.showOnReadonly);
+    if (!extraControls.length) {
+      return null;
+    }
+    return (
+      <StyledBlockAligner onDragStart={onDragStart} ref={ref}>
+        {children}
+        <Controls className='controls'>
+          {extraControls.map((control, index) => (
+            <BlockItemButton {...control} key={`${index.toString()}`} />
+          ))}
+        </Controls>
+      </StyledBlockAligner>
+    );
+  }
+
   return (
-    <StyledBlockAligner onDragStart={onDragStart}>
+    <StyledBlockAligner onDragStart={onDragStart} ref={ref}>
       {children}
       {!readOnly && (
         <Controls className='controls'>
+          {props.extraControls?.map((control, index) => (
+            <BlockItemButton {...control} key={`${index.toString()}`} />
+          ))}
           {onEdit && (
             <ListItemButton
               onClick={handleEdit}

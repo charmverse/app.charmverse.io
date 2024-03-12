@@ -1,13 +1,13 @@
 import type { FormField, Page, Prisma, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsMembers, testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { InvalidStateError } from 'lib/middleware';
-import type { ProposalFields } from 'lib/proposal/interface';
-import { randomETHWalletAddress } from 'lib/utilities/blockchain';
-import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
+import type { ProposalFields } from 'lib/proposals/interfaces';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
@@ -37,7 +37,10 @@ describe('updateCardsFromProposals()', () => {
     await prisma.$transaction([
       prisma.page.deleteMany({
         where: {
-          spaceId: space.id
+          spaceId: space.id,
+          id: {
+            not: board.id
+          }
         }
       }),
       prisma.proposal.deleteMany({
@@ -51,7 +54,7 @@ describe('updateCardsFromProposals()', () => {
   it('should update cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -99,48 +102,396 @@ describe('updateCardsFromProposals()', () => {
   });
 
   it('should create cards from proposals if there are new proposals added', async () => {
-    await testUtilsProposals.generateProposal({
-      authors: [user.id],
-      proposalStatus: 'discussion',
-      reviewers: [
+    const generated = await testUtilsUser.generateUserAndSpace();
+    const admin = generated.user;
+    const proposalReviewer = await testUtilsUser.generateSpaceUser({
+      spaceId: generated.space.id
+    });
+
+    const generatedProposal1 = await testUtilsProposals.generateProposal({
+      authors: [admin.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
         {
-          group: 'user',
-          id: user.id
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 5
+              },
+              title: 'Rubric criteria 1'
+            },
+            {
+              description: 'Rubric criteria 2',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric criteria 2'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 1',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            },
+            {
+              group: 'user',
+              id: admin.id
+            }
+          ],
+          permissions: []
+        },
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 2',
+          reviewers: [
+            {
+              group: 'user',
+              id: admin.id
+            }
+          ],
+          permissions: []
         }
       ],
-      spaceId: space.id,
-      userId: user.id
+      spaceId: generated.space.id,
+      userId: admin.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    const pageProposal2 = await testUtilsProposals.generateProposal({
-      authors: [user.id],
-      proposalStatus: 'discussion',
-      reviewers: [
-        {
-          group: 'user',
-          id: user.id
-        }
-      ],
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    await updateCardsFromProposals({
-      boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
-    });
-
-    const newCreatedCard = await prisma.page.findFirst({
+    const proposal1RubricCriterias = await prisma.proposalRubricCriteria.findMany({
       where: {
-        type: 'card',
-        syncWithPageId: pageProposal2.id
+        proposalId: generatedProposal1.id
+      },
+      select: {
+        id: true,
+        evaluationId: true
       }
     });
 
-    expect(newCreatedCard?.syncWithPageId).toBe(pageProposal2.id);
+    const proposal1EvaluationIdRubricCriteriasRecord: Record<string, string[]> = {};
+    generatedProposal1.evaluations.forEach((Evaluation) => {
+      const rubricCriterias = proposal1RubricCriterias.filter((criteria) => criteria.evaluationId === Evaluation.id);
+      proposal1EvaluationIdRubricCriteriasRecord[Evaluation.id] = rubricCriterias.map((criteria) => criteria.id);
+    });
+
+    // Admin first Evaluation first rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 5 },
+        userId: admin.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][0],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    // Admin first Evaluation 2nd rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 8 },
+        userId: admin.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][1],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    const database = await generateBoard({
+      createdBy: admin.id,
+      spaceId: generated.space.id,
+      views: 1,
+      viewDataSource: 'proposals'
+    });
+
+    // Delete the test card blocks
+    await prisma.block.deleteMany({
+      where: {
+        type: 'card',
+        parentId: database.id
+      }
+    });
+
+    await createCardsFromProposals({
+      boardId: database.id,
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
+    // After creating the initial proposal cards, update the proposal rubric Evaluation by submitting reviews by proposal reviewer
+
+    // Proposal reviewer first Evaluation first rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 3 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][0],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer first Evaluation 2nd rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 7 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[0].id][1],
+        evaluationId: generatedProposal1.evaluations[0].id
+      }
+    });
+
+    // Proposal reviewer second Evaluation 1st rubric criteria answer
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 4 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal1.id,
+        rubricCriteriaId: proposal1EvaluationIdRubricCriteriasRecord[generatedProposal1.evaluations[1].id][0],
+        evaluationId: generatedProposal1.evaluations[1].id
+      }
+    });
+
+    await prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: generatedProposal1.evaluations.map((Evaluation) => Evaluation.id)
+        }
+      },
+      data: {
+        result: 'pass'
+      }
+    });
+
+    const generatedProposal2 = await testUtilsProposals.generateProposal({
+      authors: [proposalReviewer.id],
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric criteria 1',
+              parameters: {
+                min: 0,
+                max: 5
+              },
+              title: 'Rubric criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 1',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        },
+        {
+          rubricCriteria: [
+            {
+              description: 'Rubric evaluation 3 criteria 1',
+              parameters: {
+                min: 0,
+                max: 10
+              },
+              title: 'Rubric evaluation 3 criteria 1'
+            }
+          ],
+          evaluationType: 'rubric',
+          title: 'Rubric Evaluation 3',
+          reviewers: [
+            {
+              group: 'user',
+              id: proposalReviewer.id
+            }
+          ],
+          permissions: []
+        }
+      ],
+      spaceId: generated.space.id,
+      userId: proposalReviewer.id
+    });
+
+    const proposal2RubricCriterias = await prisma.proposalRubricCriteria.findMany({
+      where: {
+        proposalId: generatedProposal2.id
+      },
+      select: {
+        id: true,
+        evaluationId: true
+      }
+    });
+
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 4 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal2.id,
+        rubricCriteriaId: proposal2RubricCriterias[0].id,
+        evaluationId: proposal2RubricCriterias[0].evaluationId
+      }
+    });
+
+    await prisma.proposalRubricCriteriaAnswer.create({
+      data: {
+        response: { score: 9 },
+        userId: proposalReviewer.id,
+        comment: null,
+        proposalId: generatedProposal2.id,
+        rubricCriteriaId: proposal2RubricCriterias[1].id,
+        evaluationId: proposal2RubricCriterias[1].evaluationId
+      }
+    });
+
+    await prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: generatedProposal2.evaluations.map((Evaluation) => Evaluation.id)
+        }
+      },
+      data: {
+        result: 'fail'
+      }
+    });
+
+    await updateCardsFromProposals({
+      boardId: database.id,
+      spaceId: generated.space.id,
+      userId: admin.id
+    });
+
+    const databaseAfterUpdate = await prisma.block.findUnique({
+      where: {
+        id: database.id
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const properties = (databaseAfterUpdate?.fields as any).cardProperties as IPropertyTemplate[];
+    const proposalEvaluationStatusProp = properties.find((prop) => prop.type === 'proposalStatus') as IPropertyTemplate;
+    const proposalEvaluationStepProp = properties.find((prop) => prop.type === 'proposalStep') as IPropertyTemplate;
+    const proposalEvaluationTypeProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationType'
+    ) as IPropertyTemplate;
+    const rubricEvaluation1EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 1'
+    ) as IPropertyTemplate;
+    const rubricEvaluation2EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 2'
+    ) as IPropertyTemplate;
+    const rubricEvaluation1EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 1'
+    ) as IPropertyTemplate;
+    const rubricEvaluation2EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 2'
+    ) as IPropertyTemplate;
+    const rubricEvaluation1EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 1'
+    ) as IPropertyTemplate;
+    const rubricEvaluation2EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 2'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationAverageProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationAverage' && prop.name === 'Rubric Evaluation 3'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationTotalProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluationTotal' && prop.name === 'Rubric Evaluation 3'
+    ) as IPropertyTemplate;
+    const rubricEvaluation3EvaluationEvaluatedByProp = properties.find(
+      (prop) => prop.type === 'proposalEvaluatedBy' && prop.name === 'Rubric Evaluation 3'
+    ) as IPropertyTemplate;
+
+    const cardBlocks = await prisma.block.findMany({
+      where: {
+        parentId: database.id,
+        type: 'card'
+      },
+      orderBy: {
+        createdAt: 'asc'
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const view = await prisma.block.findFirst({
+      where: {
+        type: 'view',
+        parentId: database.id
+      },
+      select: {
+        fields: true
+      }
+    });
+
+    const viewFields = view?.fields as unknown as BoardViewFields;
+
+    const card1Properties = (cardBlocks[0].fields as unknown as CardFields).properties;
+    const card2Properties = (cardBlocks[1].fields as unknown as CardFields).properties;
+
+    expect(card1Properties[rubricEvaluation1EvaluationAverageProp.id]).toStrictEqual(5.75);
+    expect(card1Properties[rubricEvaluation2EvaluationAverageProp.id]).toStrictEqual(4);
+    expect(card1Properties[rubricEvaluation1EvaluationTotalProp.id]).toStrictEqual(23);
+    expect(card1Properties[rubricEvaluation2EvaluationTotalProp.id]).toStrictEqual(4);
+    expect((card1Properties[rubricEvaluation1EvaluationEvaluatedByProp.id] as string[]).sort()).toStrictEqual(
+      [proposalReviewer.id, admin.id].sort()
+    );
+    expect(card1Properties[rubricEvaluation2EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+
+    expect(card2Properties[rubricEvaluation1EvaluationAverageProp.id]).toStrictEqual(4);
+    expect(card2Properties[rubricEvaluation2EvaluationAverageProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation1EvaluationTotalProp.id]).toStrictEqual(4);
+    expect(card2Properties[rubricEvaluation2EvaluationTotalProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation1EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+    expect(card2Properties[rubricEvaluation2EvaluationEvaluatedByProp.id]).toBeUndefined();
+    expect(card2Properties[rubricEvaluation3EvaluationAverageProp.id]).toStrictEqual(9);
+    expect(card2Properties[rubricEvaluation3EvaluationTotalProp.id]).toStrictEqual(9);
+    expect(card2Properties[rubricEvaluation3EvaluationEvaluatedByProp.id]).toStrictEqual([proposalReviewer.id]);
+
+    // Add the new evaluation properties to the view
+    expect(
+      [
+        rubricEvaluation3EvaluationAverageProp,
+        rubricEvaluation3EvaluationTotalProp,
+        rubricEvaluation3EvaluationEvaluatedByProp
+      ].every((prop) => viewFields.visiblePropertyIds.includes(prop.id))
+    ).toBeTruthy();
+
+    expect(card1Properties[proposalEvaluationStatusProp.id]).toBe('pass');
+    expect(card1Properties[proposalEvaluationStepProp.id]).toBe('Rubric Evaluation 2');
+    expect(card1Properties[proposalEvaluationTypeProp.id]).toBe('rubric');
+    expect(card2Properties[proposalEvaluationStatusProp.id]).toBe('fail');
+    expect(card2Properties[proposalEvaluationStepProp.id]).toBe('Rubric Evaluation 1');
+    expect(card2Properties[proposalEvaluationTypeProp.id]).toBe('rubric');
+    // Make sure all the evaluation steps are added to the step property's options
+    expect(
+      ['Rubric Evaluation 1', 'Rubric Evaluation 2', 'Rubric Evaluation 3'].every((stepTitle) =>
+        proposalEvaluationStepProp.options.some((option) => option.value === stepTitle)
+      )
+    ).toBeTruthy();
   });
 
   it('should not create cards from draft proposals', async () => {
@@ -176,7 +527,7 @@ describe('updateCardsFromProposals()', () => {
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [],
       spaceId: space.id,
       userId: user.id,
@@ -206,7 +557,7 @@ describe('updateCardsFromProposals()', () => {
 
     const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -339,7 +690,7 @@ describe('updateCardsFromProposals()', () => {
     // Add a new proposal
     const proposal2 = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -477,9 +828,9 @@ describe('updateCardsFromProposals()', () => {
       userId: spaceMember.id
     });
 
-    const proposal = await generateProposal({
+    const proposal = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -540,9 +891,9 @@ describe('updateCardsFromProposals()', () => {
       userId: proposalAuthor.id
     });
 
-    const proposal2 = await generateProposal({
+    const proposal2 = await testUtilsProposals.generateProposal({
       authors: [proposalAuthor.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -678,7 +1029,7 @@ describe('updateCardsFromProposals()', () => {
   it('should delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -720,7 +1071,7 @@ describe('updateCardsFromProposals()', () => {
   it('should permanently delete cards from proposals', async () => {
     const pageProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
-      proposalStatus: 'discussion',
+      proposalStatus: 'published',
       reviewers: [
         {
           group: 'user',
@@ -785,5 +1136,82 @@ describe('updateCardsFromProposals()', () => {
     await expect(
       updateCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
     ).rejects.toThrowError();
+  });
+
+  it('should create cards with permissions matching the parent', async () => {
+    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
+
+    const role = await testUtilsMembers.generateRole({
+      createdBy: testUser.id,
+      spaceId: testSpace.id
+    });
+
+    const testBoard = await generateBoard({
+      createdBy: testUser.id,
+      spaceId: testSpace.id,
+      viewDataSource: 'proposals',
+      cardCount: 0,
+      permissions: [
+        {
+          permissionLevel: 'editor',
+          userId: testUser.id
+        },
+        {
+          permissionLevel: 'full_access',
+          roleId: role.id
+        }
+      ]
+    });
+
+    const rootBoardPermissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: testBoard.id
+      }
+    });
+
+    expect(rootBoardPermissions).toMatchObject(
+      expect.arrayContaining([
+        expect.objectContaining({ userId: testUser.id, permissionLevel: 'editor' }),
+        expect.objectContaining({ roleId: role.id, permissionLevel: 'full_access' })
+      ])
+    );
+
+    // This sets up the board
+    await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+
+    // This proposal was created after the datasource was created
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'published',
+      reviewers: [],
+      spaceId: testSpace.id,
+      userId: testUser.id
+    });
+
+    // This calls the update method we are testing
+    await updateCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    const pages = await prisma.page.findMany({
+      where: {
+        parentId: testBoard.id
+      },
+      include: {
+        permissions: true
+      }
+    });
+
+    expect(pages).toHaveLength(1);
+
+    const cardPermissions = pages[0].permissions;
+
+    expect(cardPermissions).toMatchObject(
+      expect.arrayContaining(
+        rootBoardPermissions.map((p) => ({
+          ...p,
+          id: expect.any(String),
+          inheritedFromPermission: p.id,
+          pageId: pages[0].id
+        }))
+      )
+    );
   });
 });

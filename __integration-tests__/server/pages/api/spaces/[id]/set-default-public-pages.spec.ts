@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@charmverse/core/prisma';
+import { testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
 
-import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly created root pages in a space should be public by default', () => {
   it('should update the space default if user is admin, and return the space, responding with 200', async () => {
-    const { space, user: adminUser } = await generateUserAndSpaceWithApiToken(undefined, true);
+    const { space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
 
     const userCookie = await loginUser(adminUser.id);
 
@@ -27,7 +26,7 @@ describe('POST /api/spaces/[id]/set-default-public-page - Set whether newly crea
   });
 
   it('should fail if the user is not an admin of the space, and respond 401', async () => {
-    const { space, user: nonAdminUser } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const { space, user: nonAdminUser } = await testUtilsUser.generateUserAndSpace();
 
     const userCookie = await loginUser(nonAdminUser.id);
 

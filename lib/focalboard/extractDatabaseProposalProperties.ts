@@ -20,17 +20,11 @@ export function extractDatabaseProposalProperties({
     proposalStatus: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalStatus'
     ),
-    proposalEvaluatedBy: (boardBlock.fields as BoardFields).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluatedBy'
-    ),
-    proposalEvaluationAverage: (boardBlock.fields as BoardFields).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationAverage'
-    ),
-    proposalEvaluationTotal: (boardBlock.fields as BoardFields).cardProperties.find(
-      (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationTotal'
-    ),
     proposalEvaluationType: (boardBlock.fields as BoardFields).cardProperties.find(
       (prop: IPropertyTemplate) => prop.type === 'proposalEvaluationType'
+    ),
+    proposalAuthor: (boardBlock.fields as BoardFields).cardProperties.find(
+      (prop: IPropertyTemplate) => prop.type === 'proposalAuthor'
     )
   };
 }

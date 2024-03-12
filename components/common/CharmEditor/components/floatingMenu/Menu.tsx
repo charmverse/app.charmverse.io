@@ -10,7 +10,6 @@ const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !==
   inline?: boolean;
 }>`
   display: flex;
-  padding: ${({ theme }) => theme.spacing(0, 0.5)};
   border-radius: 4px;
   ${({ theme, type }) =>
     type && ['defaultMenu', 'inlineCommentSubMenu'].includes(type) && theme.breakpoints.down('sm')} {
@@ -24,15 +23,17 @@ export function Menu({
   children,
   type,
   noScroll,
-  inline
+  inline,
+  'data-test': dataTest
 }: {
   children: React.ReactNode;
   type?: SubMenu;
   noScroll?: boolean;
   inline?: boolean;
+  'data-test'?: string;
 }) {
   return (
-    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline}>
+    <StyledMenu elevation={8} type={type} noScroll={noScroll} inline={inline} data-test={dataTest}>
       {children}
     </StyledMenu>
   );

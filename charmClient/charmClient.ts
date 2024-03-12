@@ -6,30 +6,26 @@ import type {
   InviteLink,
   Page,
   PaymentMethod,
-  Space,
   TelegramUser,
-  TokenGateToRole,
   User,
-  UserDetails,
-  UserWallet
+  UserDetails
 } from '@charmverse/core/prisma';
 import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
-import type { AuthSig, ExtendedPoap } from 'lib/blockchain/interfaces';
+import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
-import type { Web3LoginRequest } from 'lib/middleware/requireWalletSignature';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
-import { encodeFilename } from 'lib/utilities/encodeFilename';
+import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ImportGuildRolesPayload } from 'pages/api/guild-xyz/importRoles';
@@ -37,6 +33,7 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { BlockchainApi } from './apis/blockchainApi';
 import { CommentsApi } from './apis/commentsApi';
+import { CredentialsApi } from './apis/credentialsApi';
 import { DiscordApi } from './apis/discordApi';
 import { FileApi } from './apis/fileApi';
 import { ForumApi } from './apis/forumApi';
@@ -57,7 +54,6 @@ import { SpacesApi } from './apis/spacesApi';
 import { SubscriptionApi } from './apis/subscriptionApi';
 import { SummonApi } from './apis/summonApi';
 import { TrackApi } from './apis/trackApi';
-import { UnstoppableDomainsApi } from './apis/unstoppableApi';
 import { VotesApi } from './apis/votesApi';
 
 type BlockUpdater = (blocks: FBBlock[]) => void;
@@ -104,8 +100,6 @@ class CharmClient {
 
   permissions = new PermissionsApi();
 
-  unstoppableDomains = new UnstoppableDomainsApi();
-
   votes = new VotesApi();
 
   subscription = new SubscriptionApi();
@@ -114,34 +108,13 @@ class CharmClient {
 
   rewards = new RewardsApi();
 
+  credentials = new CredentialsApi();
+
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
   }
 
-  async login({ address, walletSignature }: Web3LoginRequest) {
-    const user = await http.POST<LoggedInUser>('/api/session/login', {
-      address,
-      walletSignature
-    });
-    return user;
-  }
-
-  async logout() {
-    await http.POST('/api/session/logout');
-  }
-
-  getUser() {
-    return http.GET<LoggedInUser>('/api/profile');
-  }
-
-  createUser({ address, walletSignature }: Web3LoginRequest) {
-    return http.POST<LoggedInUser>('/api/profile', {
-      address,
-      walletSignature
-    });
-  }
-
-  updateUser(data: Partial<User> & { addressesToAdd?: AuthSig[] }) {
+  updateUser(data: Partial<User>) {
     return http.PUT<LoggedInUser>('/api/profile', data);
   }
 
@@ -157,14 +130,6 @@ class CharmClient {
     return http.PUT<UserDetails>('/api/profile/details', data);
   }
 
-  addUserWallets(data: AuthSig[]) {
-    return http.POST<User>('/api/profile/add-wallets', { addressesToAdd: data });
-  }
-
-  removeUserWallet(address: Pick<UserWallet, 'address'>) {
-    return http.POST<LoggedInUser>('/api/profile/remove-wallet', address);
-  }
-
   getPublicPageByViewId(viewId: string) {
     return http.GET<Page>(`/api/public/view/${viewId}`);
   }
@@ -177,20 +142,8 @@ class CharmClient {
     return http.POST<PageWithPermissions>('/api/pages', pageOpts);
   }
 
-  archivePage(pageId: string) {
-    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: true });
-  }
-
-  restorePage(pageId: string) {
-    return http.PUT<ModifyChildPagesResponse>(`/api/pages/${pageId}/archive`, { archive: false });
-  }
-
-  deletePage(pageId: string) {
+  deletePageForever(pageId: string) {
     return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
-  }
-
-  deletePages(pageIds: string[]) {
-    return http.DELETE<undefined>(`/api/pages`, { pageIds });
   }
 
   favoritePage(pageId: string) {
@@ -364,10 +317,6 @@ class CharmClient {
 
   restrictPagePermissions({ pageId }: { pageId: string }): Promise<PageWithPermissions> {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
-  }
-
-  updatePageSnapshotData(pageId: string, data: Pick<Page, 'snapshotProposalId'>): Promise<PageWithPermissions> {
-    return http.PUT(`/api/pages/${pageId}/snapshot`, data);
   }
 
   createProposalSource({ pageId }: { pageId: string }) {

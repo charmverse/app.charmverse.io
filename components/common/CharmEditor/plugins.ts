@@ -1,4 +1,4 @@
-import { bold, code, hardBreak, italic, strike, underline } from '@bangle.dev/base-components';
+import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
 import type { EditorState, EditorView } from '@bangle.dev/pm';
 import { PluginKey } from '@bangle.dev/pm';
 import { Plugin } from 'prosemirror-state';
@@ -17,6 +17,7 @@ import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/
 import * as emoji from './components/emojiSuggest/emojiSuggest.plugins';
 import { plugins as filePlugins } from './components/file/file.plugins';
 import * as floatingMenu from './components/floatingMenu';
+import * as hardBreak from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
@@ -99,7 +100,7 @@ export function charmEditorPlugins({
     // this trackPlugin should be called before the one below which calls onSelectionSet().
     // TODO: find a cleaner way to combine this logic?
     trackPlugins({ onSelectionSet, key: suggestionsPluginKey }),
-    linkPlugins({ key: linksPluginKey }),
+    linkPlugins({ key: linksPluginKey, readOnly }),
     pasteChecker.plugins({ onError }),
     new Plugin({
       view: () => {
@@ -184,6 +185,10 @@ export function charmEditorPlugins({
     }),
     NodeView.createPlugin({
       name: 'cryptoPrice',
+      containerDOM: ['div']
+    }),
+    NodeView.createPlugin({
+      name: 'farcasterFrame',
       containerDOM: ['div']
     }),
     NodeView.createPlugin({

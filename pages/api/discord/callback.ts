@@ -10,8 +10,8 @@ import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesFo
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { DisabledAccountError } from 'lib/utilities/errors';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { DisabledAccountError } from 'lib/utils/errors';
 
 const handler = nc({
   onError,
@@ -53,12 +53,25 @@ handler.get(async (req, res) => {
         userId: req.session.anonymousUserId,
         signupAnalytics
       });
-      req.session.anonymousUserId = undefined;
-      req.session.user = { id: user.id };
+
       await updateGuildRolesForUser(
         user.wallets.map((w) => w.address),
         user.spaceRoles
       );
+
+      req.session.anonymousUserId = undefined;
+
+      if (user.otp?.activatedAt) {
+        req.session.otpUser = { id: user.id, method: 'Discord' };
+        await req.session.save();
+
+        return res.redirect('/authenticate/otp');
+      }
+
+      req.session.user = { id: user.id };
+      await req.session.save();
+
+      return res.redirect(redirect);
     } catch (error) {
       log.warn('Error while connecting to Discord', error);
 
@@ -68,8 +81,6 @@ handler.get(async (req, res) => {
 
       return res.redirect(redirectWithError);
     }
-    await req.session.save();
-    return res.redirect(redirect);
   }
 
   const urlSearchParams = new URLSearchParams();

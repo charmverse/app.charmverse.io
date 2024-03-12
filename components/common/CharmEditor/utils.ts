@@ -1,8 +1,9 @@
 import type { EditorView } from '@bangle.dev/pm';
-import { safeInsert, GapCursorSelection } from '@bangle.dev/utils';
+import { GapCursorSelection } from '@bangle.dev/utils';
 import type { Node } from 'prosemirror-model';
 import { NodeSelection } from 'prosemirror-state';
 import type { EditorState, Transaction } from 'prosemirror-state';
+import { safeInsert } from 'prosemirror-utils';
 
 export function insertNode(
   state: EditorState,

@@ -5,27 +5,26 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
-import { mutate } from 'swr';
 
+import { useTrashPages } from 'charmClient/hooks/pages';
 import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
 import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
 import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 
 import { mutator } from '../../mutator';
-import { getCurrentBoardTemplates } from '../../store/cards';
-import { useAppSelector } from '../../store/hooks';
 import IconButton from '../../widgets/buttons/iconButton';
 import AddViewMenu from '../addViewMenu';
 
 import NewCardButton from './newCardButton';
-import ViewHeaderActionsMenu from './viewHeaderActionsMenu';
+import { ToggleViewSidebarButton } from './ToggleViewSidebarButton';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
-import { ViewHeaderRowsMenu } from './viewHeaderRowsMenu/viewHeaderRowsMenu';
+import { ViewHeaderRowsMenu } from './ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import ViewTabs from './viewTabs';
 
 type Props = {
@@ -38,7 +37,6 @@ type Props = {
   showCard: (cardId: string | null) => void;
   // addCardFromTemplate: (cardTemplateId: string) => void
   addCardTemplate: () => void;
-  editCardTemplate: (cardTemplateId: string) => void;
   readOnly: boolean;
   dateDisplayProperty?: IPropertyTemplate;
   disableUpdatingUrl?: boolean;
@@ -56,9 +54,9 @@ type Props = {
 function ViewHeader(props: Props) {
   const router = useRouter();
   const { pages, refreshPage } = usePages();
-  const cardTemplates: Card[] = useAppSelector(getCurrentBoardTemplates);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
-
+  const { trigger: trashPages } = useTrashPages();
+  const { showError } = useSnackbar();
   const views = props.views.filter((view) => !view.fields.inline);
 
   const {
@@ -90,10 +88,10 @@ function ViewHeader(props: Props) {
   }
 
   async function deleteCardTemplate(pageId: string) {
-    const card = cardTemplates.find((c) => c.id === pageId);
-    if (card) {
-      await mutator.deleteBlock(card, 'delete card');
-      mutate(`pages/${card.spaceId}`);
+    try {
+      await trashPages({ pageIds: [pageId], trash: true });
+    } catch (error) {
+      showError(error);
     }
   }
 
@@ -162,6 +160,7 @@ function ViewHeader(props: Props) {
             )}
           </>
         )}
+
         <div className='octo-spacer' />
 
         <Box className='view-actions'>
@@ -214,7 +213,7 @@ function ViewHeader(props: Props) {
 
           {!props.readOnly && activeView && (
             <>
-              <ViewHeaderActionsMenu onClick={() => toggleViewOptions()} />
+              <ToggleViewSidebarButton onClick={() => toggleViewOptions()} />
 
               {/* New card button */}
 
@@ -223,10 +222,9 @@ function ViewHeader(props: Props) {
                   addCard={props.addCard}
                   addCardFromTemplate={addPageFromTemplate}
                   addCardTemplate={props.addCardTemplate}
-                  editCardTemplate={props.editCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}
-                  boardId={viewsBoard.id}
+                  templatesBoardId={activeBoard?.id}
                 />
               )}
             </>

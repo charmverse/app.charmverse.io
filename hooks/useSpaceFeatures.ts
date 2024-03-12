@@ -9,18 +9,17 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 export const useSpaceFeatures = () => {
   const { space, isLoading } = useCurrentSpace();
 
+  const spaceFeatures = useMemo(() => (space?.features ?? []) as FeatureJson[], [space?.features]);
+
   const { features, mappedFeatures } = useMemo(() => {
-    return constructFeaturesRecord((space?.features ?? []) as FeatureJson[]);
-  }, [space?.features]);
+    return constructFeaturesRecord(spaceFeatures);
+  }, [spaceFeatures]);
 
   const _getFeatureTitle = useCallback(
     (featureTitle: FeatureTitleVariation) => {
-      return getFeatureTitle({
-        featureTitle,
-        mappedFeatures
-      });
+      return getFeatureTitle(featureTitle, spaceFeatures);
     },
-    [mappedFeatures]
+    [spaceFeatures]
   );
 
   return { features, mappedFeatures, isLoading, getFeatureTitle: _getFeatureTitle };

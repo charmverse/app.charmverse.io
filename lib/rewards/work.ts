@@ -2,7 +2,7 @@ import type { Application, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utilities/errors';
+import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
 

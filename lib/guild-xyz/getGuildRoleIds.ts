@@ -1,5 +1,6 @@
 import { log } from '@charmverse/core/log';
-import { user } from '@guildxyz/sdk';
+
+import { user } from 'lib/guild-xyz/client';
 
 export async function getGuildRoleIds(addresses: string[]) {
   const guildRoleIds: string[] = [];

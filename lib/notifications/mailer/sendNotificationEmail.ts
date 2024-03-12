@@ -202,7 +202,7 @@ async function sendEmail({
 
   const notificationTargetSpaceRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
-      userId: notification.createdBy.id,
+      userId: user.id,
       spaceId: notificationSpaceId
     },
     select: {

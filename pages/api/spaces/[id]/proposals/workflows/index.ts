@@ -5,18 +5,18 @@ import { requireSpaceMembership } from 'lib/middleware';
 import { defaultHandler } from 'lib/middleware/handler';
 import {
   getWorkflowTemplates,
-  updateWorkflowTemplate,
+  upsertWorkflowTemplate,
   deleteWorkflowTemplate
-} from 'lib/proposal/workflows/controller';
+} from 'lib/proposals/workflows/controller';
 import { withSessionRoute } from 'lib/session/withSession';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 const handler = defaultHandler();
 
 handler
   .get(getWorkflowsController)
   .use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' }))
-  .post(updateWorkflowController)
+  .post(upsertWorkflowController)
   .delete(deleteWorkflowController);
 
 async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<ProposalWorkflowTyped[]>) {
@@ -39,7 +39,7 @@ async function deleteWorkflowController(req: NextApiRequest, res: NextApiRespons
   return res.status(200).end();
 }
 
-async function updateWorkflowController(req: NextApiRequest, res: NextApiResponse<ProposalWorkflowTyped[]>) {
+async function upsertWorkflowController(req: NextApiRequest, res: NextApiResponse<ProposalWorkflowTyped[]>) {
   const workflow = req.body;
   if (typeof workflow?.id !== 'string') {
     throw new InvalidInputError(`workflowId is required`);
@@ -48,7 +48,7 @@ async function updateWorkflowController(req: NextApiRequest, res: NextApiRespons
     throw new InvalidInputError(`spaceId is missing or invalid`);
   }
 
-  await updateWorkflowTemplate(workflow);
+  await upsertWorkflowTemplate(workflow);
 
   return res.status(200).end();
 }

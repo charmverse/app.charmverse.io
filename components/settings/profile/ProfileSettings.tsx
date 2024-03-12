@@ -25,7 +25,7 @@ export default function ProfileSettings({
       <Legend>My Profile</Legend>
       <Stack spacing={2}>
         <UserDetailsFormWithSave user={user} setUnsavedChanges={setUnsavedChanges} />
-        <ProfileTabs user={user} />
+        <ProfileTabs showAllProfileTypes user={user} />
       </Stack>
     </>
   );

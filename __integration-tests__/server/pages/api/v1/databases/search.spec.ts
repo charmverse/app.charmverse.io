@@ -13,7 +13,7 @@ import type {
 } from 'lib/public-api';
 import { createDatabase } from 'lib/public-api/createDatabase';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
-import { uniqueValues } from 'lib/utilities/array';
+import { uniqueValues } from 'lib/utils/array';
 import { baseUrl } from 'testing/mockApiCall';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -174,11 +174,11 @@ describe('POST /databases/{id}/search', () => {
     );
 
     const createdPagesWithMatchingTitle = createdPageList.filter(
-      (item) => item.title.toLowerCase().match('title') !== null
+      (item) => item.title && item.title.toLowerCase().match('title') !== null
     ).length;
 
     const foundPagesWithMatchingTitle = (response.body.data as ApiPage[]).map(
-      (item) => item.title.toLowerCase().match('title') !== null
+      (item) => item.title && item.title.toLowerCase().match('title') !== null
     ).length;
 
     expect(foundPagesWithMatchingTitle).toEqual(createdPagesWithMatchingTitle);

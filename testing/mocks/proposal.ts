@@ -1,34 +1,24 @@
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalWithUsersAndRubric } from 'lib/proposal/interface';
-import type { OptionalNullable } from 'lib/utilities/types';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import type { OptionalNullable } from 'lib/utils/types';
 
-export function createMockProposal(
-  input: Partial<ProposalWithUsersAndRubric> = {}
-): OptionalNullable<ProposalWithUsersAndRubric> {
+type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations'>> & {
+  evaluations?: Partial<ProposalWithUsersAndRubric['evaluations'][number]>[];
+};
+
+export function createMockProposal(input: ProposalInput = {}): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
-    currentStep: {
-      step: 'draft',
-      result: 'in_progress',
-      title: 'Draft',
-      id: 'draft',
-      index: 0
-    },
     lensPostLink: null,
     publishToLens: null,
     archived: false,
     createdBy: '',
+    selectedCredentialTemplates: [],
     id,
     authors: [],
-    evaluationType: 'vote',
-    reviewers: [],
-    evaluations: [],
-    rubricCriteria: [],
     reviewedAt: null,
     reviewedBy: null,
-    draftRubricAnswers: [],
-    rubricAnswers: [],
     spaceId: '',
     status: 'draft',
     fields: null,
@@ -38,8 +28,8 @@ export function createMockProposal(
     },
     permissions: {
       view: true,
-      review: true,
-      vote: true,
+      view_notes: true,
+      view_private_fields: true,
       comment: true,
       edit: true,
       delete: true,
@@ -50,6 +40,20 @@ export function createMockProposal(
       unarchive: true,
       move: true
     },
-    ...input
+    ...input,
+    evaluations: (input.evaluations || []).map((evaluation) => ({
+      id: uuid(),
+      index: 0,
+      proposalId: id,
+      type: 'rubric',
+      title: 'Rubric',
+      result: null,
+      rubricAnswers: [],
+      draftRubricAnswers: [],
+      rubricCriteria: [],
+      reviewers: [],
+      permissions: [],
+      ...evaluation
+    }))
   };
 }

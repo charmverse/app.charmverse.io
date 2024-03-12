@@ -16,15 +16,14 @@ import { CommentReply } from 'components/common/comments/CommentReply';
 import { CommentVote } from 'components/common/comments/CommentVote';
 import type { CreateCommentPayload, UpdateCommentPayload } from 'components/common/comments/interfaces';
 import UserDisplay from 'components/common/UserDisplay';
-import { useMemberDialog } from 'components/members/hooks/useMemberDialog';
-import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
+import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { isProdEnv } from 'config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { CommentPermissions, CommentWithChildren, GenericCommentWithVote } from 'lib/comments';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { getRelativeTimeInThePast } from 'lib/utilities/dates';
+import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 import Link from '../Link';
 
@@ -68,8 +67,6 @@ export function Comment({
   isPublishingComments
 }: CommentProps) {
   const { user } = useUser();
-  const { lensProfile } = useLensProfile();
-  const [publishCommentsToLens, setPublishCommentsToLens] = useState(!!user?.publishToLensDefault);
   const router = useRouter();
   const { updateURLQuery } = useCharmRouter();
   const [showCommentReply, setShowCommentReply] = useState(false);
@@ -83,7 +80,7 @@ export function Comment({
   });
   const commentContainerRef = useRef<HTMLDivElement | null>(null);
   const [commentEditContent, setCommentEditContent] = useState<ICharmEditorOutput>(commentContent);
-  const { showUserId } = useMemberDialog();
+  const { showUserProfile } = useMemberProfileDialog();
   const { commentId } = router.query as { commentId: string | null };
   async function saveCommentContent() {
     await handleUpdateComment({
@@ -179,7 +176,7 @@ export function Comment({
               mr={1}
               onClick={() => {
                 if (commentUser) {
-                  showUserId(commentUser.id);
+                  showUserProfile(commentUser.id);
                 }
               }}
             >
@@ -292,10 +289,6 @@ export function Comment({
           <Box mt={2}>
             {showCommentReply && (
               <CommentReply
-                isPublishingComments={isPublishingComments}
-                publishToLens={publishCommentsToLens}
-                setPublishToLens={setPublishCommentsToLens}
-                showPublishToLens={Boolean(lensPostLink) && Boolean(lensProfile) && Boolean(comment.lensCommentLink)}
                 commentId={comment.id}
                 handleCreateComment={handleCreateComment}
                 onCancelComment={() => setShowCommentReply(false)}

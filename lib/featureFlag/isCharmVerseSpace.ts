@@ -19,7 +19,6 @@ export function isCharmVerseSpace({
   if (allowedDomains.includes(space.domain) || space.domain.startsWith('cvt-')) {
     return true;
   }
-
   // enable in dev mode
   return isDevEnv;
 }

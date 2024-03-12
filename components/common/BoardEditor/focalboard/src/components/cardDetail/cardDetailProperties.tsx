@@ -4,17 +4,19 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
+import { useSyncRelationProperty } from 'charmClient/hooks/blocks';
 import { CardDetailProperty } from 'components/common/BoardEditor/components/cardProperties/CardDetailProperty';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { proposalPropertyTypesList, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
+import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
+import { proposalPropertyTypesList } from 'lib/focalboard/board';
 import type { BoardView } from 'lib/focalboard/boardView';
 import type { Card } from 'lib/focalboard/card';
 import { Constants } from 'lib/focalboard/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
-import { isTruthy } from 'lib/utilities/types';
+import { isTruthy } from 'lib/utils/types';
 
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
@@ -37,6 +39,8 @@ type Props = {
   mutator?: Mutator;
   readOnlyProperties?: string[];
   disableEditPropertyOption?: boolean;
+  boardType?: 'proposals' | 'rewards';
+  showCard?: (cardId: string | null) => void;
 };
 
 function CardDetailProperties(props: Props) {
@@ -52,10 +56,11 @@ function CardDetailProperties(props: Props) {
     mutator = defaultMutator,
     disableEditPropertyOption
   } = props;
+
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });
-
+  const { trigger: syncRelationProperty } = useSyncRelationProperty();
   const { showMessage } = useSnackbar();
   const theme = useTheme();
   const isSmallScreen = useSmallScreen();
@@ -98,7 +103,8 @@ function CardDetailProperties(props: Props) {
   function onPropertyChangeSetAndOpenConfirmationDialog(
     newType: PropertyType,
     newName: string,
-    propertyTemplate: IPropertyTemplate
+    propertyTemplate: IPropertyTemplate,
+    relationPropertyData?: RelationPropertyData
   ) {
     const oldType = propertyTemplate.type;
 
@@ -111,7 +117,7 @@ function CardDetailProperties(props: Props) {
 
     // if no card has this value set delete the property directly without warning
     if (affectsNumOfCards === '0') {
-      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+      mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views, relationPropertyData);
       return;
     }
 
@@ -158,7 +164,15 @@ function CardDetailProperties(props: Props) {
       onConfirm: async () => {
         setShowConfirmationDialog(false);
         try {
-          await mutator.changePropertyTypeAndName(board, cards, propertyTemplate, newType, newName, views);
+          await mutator.changePropertyTypeAndName(
+            board,
+            cards,
+            propertyTemplate,
+            newType,
+            newName,
+            views,
+            relationPropertyData
+          );
         } catch (err: any) {
           Utils.logError(`Error Changing Property And Name:${propertyTemplate.name}: ${err?.toString()}`);
         }
@@ -231,24 +245,31 @@ function CardDetailProperties(props: Props) {
   }
 
   const propertyTypes = useMemo(
-    () =>
-      activeView && (
-        <PropertyTypes
-          isMobile={isSmallScreen}
-          onClick={async (type) => {
-            const template: IPropertyTemplate = {
-              id: Utils.createGuid(IDType.BlockID),
-              name: typeDisplayName(intl, type),
-              type,
-              options: []
-            };
-            const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
-            setNewTemplateId(templateId);
-            addPropertyPopupState.close();
-          }}
-        />
-      ),
-    [mutator, board, activeView, isSmallScreen]
+    () => (
+      <PropertyTypes
+        boardType={props.boardType}
+        isMobile={isSmallScreen}
+        onClick={async ({ type, relationData, name }) => {
+          const template: IPropertyTemplate = {
+            id: Utils.createGuid(IDType.BlockID),
+            name: name ?? typeDisplayName(intl, type),
+            type,
+            options: [],
+            relationData
+          };
+          const templateId = await mutator.insertPropertyTemplate(board, activeView, -1, template);
+          if (relationData?.showOnRelatedBoard) {
+            syncRelationProperty({
+              boardId: board.id,
+              templateId
+            });
+          }
+          setNewTemplateId(templateId);
+          addPropertyPopupState.close();
+        }}
+      />
+    ),
+    [mutator, props.boardType, board, activeView, isSmallScreen]
   );
 
   return (
@@ -276,10 +297,11 @@ function CardDetailProperties(props: Props) {
             key={propertyTemplate.id}
             board={board}
             card={card}
+            showCard={props.showCard}
             deleteDisabledMessage={getDeleteDisabled(propertyTemplate)}
             onDelete={() => onPropertyDeleteSetAndOpenConfirmationDialog(propertyTemplate)}
-            onTypeAndNameChanged={(newType: PropertyType, newName: string) => {
-              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate);
+            onTypeAndNameChanged={(newType: PropertyType, newName: string, relationData?: RelationPropertyData) => {
+              onPropertyChangeSetAndOpenConfirmationDialog(newType, newName, propertyTemplate, relationData);
             }}
             pageUpdatedAt={pageUpdatedAt}
             pageUpdatedBy={pageUpdatedBy}
@@ -302,10 +324,10 @@ function CardDetailProperties(props: Props) {
         />
       )}
 
-      {!props.readOnly && !disableEditPropertyOption && activeView && (
+      {!props.readOnly && !disableEditPropertyOption && (
         <>
           <div className='octo-propertyname add-property'>
-            <Button {...bindTrigger(addPropertyPopupState)} data-dataTest='add-custom-property'>
+            <Button {...bindTrigger(addPropertyPopupState)} dataTest='add-custom-property'>
               <FormattedMessage id='CardDetail.add-property' defaultMessage='+ Add a property' />
             </Button>
             {!isSmallScreen && (

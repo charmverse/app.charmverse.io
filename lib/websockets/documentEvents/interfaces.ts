@@ -73,6 +73,7 @@ export type ClientDiffMessage = {
   // ti?: string; // new title
   doc?: Node;
   v: number;
+  undo?: boolean;
 };
 
 export type ClientSubscribeMessage = {

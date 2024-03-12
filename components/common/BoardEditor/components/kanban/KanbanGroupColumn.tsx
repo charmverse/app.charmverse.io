@@ -22,7 +22,6 @@ type Props = {
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDropToCard?: (srcCard: Card, dstCard: Card) => Promise<void>;
   showCard: (cardId: string | null) => void;
-  isManualSort: boolean;
   disableAddingCards?: boolean;
   hideLinkedBounty?: boolean;
 };
@@ -38,7 +37,6 @@ export function KanbanGroupColumn({
   selectedCardIds,
   onDropToCard,
   showCard,
-  isManualSort,
   disableAddingCards,
   hideLinkedBounty
 }: Props) {
@@ -59,7 +57,6 @@ export function KanbanGroupColumn({
           }}
           onDrop={onDropToCard}
           showCard={showCard}
-          isManualSort={isManualSort}
           hideLinkedBounty={hideLinkedBounty}
         />
       ))}

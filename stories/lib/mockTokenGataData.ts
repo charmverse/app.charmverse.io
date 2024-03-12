@@ -1,221 +1,219 @@
-import type { UnifiedAccessControlConditions } from '@lit-protocol/types';
-
 import type { TokenGateEvaluationResult } from 'lib/tokenGates/evaluateEligibility';
-import type { TokenGateWithRoles } from 'lib/tokenGates/interfaces';
+import type { AccessControlCondition, TokenGateWithRoles } from 'lib/tokenGates/interfaces';
 import { createMockTokenGate } from 'testing/mocks/tokenGate';
 
 import { spaces as _spaces, spaceRoles } from '../lib/mockData';
 
-const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
-const ownsWalletCondition = [
+export const walletAddress = '0x1bd0d6edb387114b2fdf20d683366fa9f94a07f4';
+export const ownsWalletCondition: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
-    method: '',
-    parameters: [':userAddress'],
-    conditionType: 'evmBasic' as const,
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [walletAddress],
+    type: 'Wallet',
     contractAddress: '',
-    returnValueTest: {
-      value: walletAddress,
-      comparator: '='
-    },
-    standardContractType: '',
+    quantity: '1',
+    condition: 'evm',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const ownedEVMTokenCondition = [
+export const ownedEVMTokenCondition: AccessControlCondition[] = [
   {
-    chain: 'optimism',
+    chain: 10,
     method: 'eth_getBalance',
-    parameters: [':userAddress', 'latest'],
-    conditionType: 'evmBasic' as const,
+    tokenIds: [],
+    type: 'ERC20',
+    condition: 'evm',
     contractAddress: '',
-    returnValueTest: {
-      value: '1000000000000000000',
-      comparator: '>='
-    },
-    standardContractType: '',
+    quantity: '1000000000000000000',
+    name: 'Optimism',
     image: '/images/cryptoLogos/optimism.svg'
   }
 ];
 
-const ownedTokenSupportedBlockchain = [
+export const ownedTokenSupportedBlockchain: AccessControlCondition[] = [
   {
-    chain: 'bsc',
+    chain: 56,
     method: 'eth_getBalance',
-    parameters: [':userAddress', 'latest'],
-    conditionType: 'evmBasic' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '',
-    returnValueTest: {
-      value: '12000000000000000000',
-      comparator: '>='
-    },
-    standardContractType: '',
+    quantity: '12000000000000000000',
+    type: 'ERC20',
     image: '/images/cryptoLogos/binance-coin-bnb-logo.svg'
   }
 ];
 
-const ownedEth = [
+export const ownedEth: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'eth_getBalance',
-    parameters: [':userAddress', 'latest'],
-    conditionType: 'evmBasic' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '',
-    returnValueTest: {
-      value: '100000000000',
-      comparator: '>='
-    },
-    standardContractType: '',
+    quantity: '100000000000',
+    type: 'ERC20',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const ownedCustomToken = [
+export const ownedCustomToken: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
-    method: 'balanceOf',
-    parameters: [':userAddress'],
-    conditionType: 'evmBasic' as const,
+    chain: 1,
+    method: 'eth_getBalance',
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
-    returnValueTest: {
-      value: '12000000000000000000',
-      comparator: '>='
-    },
-    standardContractType: 'ERC20',
+    quantity: '12000000000000000000',
+    type: 'ERC20',
     name: 'Pepe',
     image: 'https://static.alchemyapi.io/images/assets/24478.png'
   }
 ];
 
-const ownsSpecificPoap = [
+export const ownsSpecificPoap: AccessControlCondition[] = [
   {
-    chain: 'xdai',
-    method: 'tokenURI',
-    parameters: [],
-    conditionType: 'evmBasic' as const,
+    chain: 100,
+    method: 'eventName',
+    tokenIds: ['ETHDenver'],
+    condition: 'evm' as const,
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
-    returnValueTest: {
-      value: 'ETHDenver',
-      comparator: 'contains'
-    },
-    standardContractType: 'POAP',
+    quantity: '1',
+    type: 'POAP',
     image: '/images/cryptoLogos/gnosis-logo.svg'
   },
   {
-    operator: 'or'
-  },
-  {
-    chain: 'ethereum',
-    method: 'tokenURI',
-    parameters: [],
-    conditionType: 'evmBasic' as const,
+    chain: 1,
+    method: 'eventName',
+    tokenIds: ['ETHDenver'],
+    condition: 'evm' as const,
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
-    returnValueTest: {
-      value: 'ETHDenver',
-      comparator: 'contains'
-    },
-    standardContractType: 'POAP',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    quantity: '1',
+    type: 'POAP',
+    image: '/images/cryptoLogos/gnosis-logo.svg'
   }
 ];
 
-const ownsAnyPoap = [
+export const ownsAnyPoap: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'balanceOf',
-    parameters: [],
-    conditionType: 'evmBasic' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
-    returnValueTest: {
-      value: '0',
-      comparator: '>'
-    },
-    standardContractType: 'ERC721',
+    quantity: '1',
+    type: 'ERC721',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const daoMember = [
+export const daoMember: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'members',
-    parameters: [':userAddress'],
-    conditionType: 'evmBasic' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0x38064F40B20347d58b326E767791A6f79cdEddCe',
-    returnValueTest: {
-      value: 'true',
-      comparator: '='
-    },
-    standardContractType: 'MolochDAOv2.1',
+    quantity: '1',
+    type: 'MolochDAOv2.1',
     image: '/images/cryptoLogos/ethereum-eth-logo.svg'
   }
 ];
 
-const nftCollectionOwner = [
+export const nftCollectionOwner: AccessControlCondition[] = [
   {
-    chain: 'optimism',
+    chain: 10,
     method: 'balanceOf',
-    parameters: [':userAddress'],
-    conditionType: 'evmBasic' as const,
+    tokenIds: [],
+    condition: 'evm',
     contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
-    returnValueTest: {
-      value: '1',
-      comparator: '>='
-    },
-    standardContractType: 'ERC721',
+    quantity: '1',
+    type: 'ERC721',
     name: 'Charmed & Optimistic',
     image: 'https://nft-cdn.alchemy.com/opt-mainnet/15fbbfc26e8d7d51b9b7031faff07333'
   }
 ];
 
-const specificNftOwner = [
+export const specificNftOwner: AccessControlCondition[] = [
   {
-    chain: 'optimism',
+    chain: 10,
     method: 'ownerOf',
-    parameters: ['71'],
-    conditionType: 'evmBasic' as const,
+    tokenIds: ['71'],
+    condition: 'evm',
     contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
-    returnValueTest: {
-      value: ':userAddress',
-      comparator: '='
-    },
-    standardContractType: 'ERC721',
+    quantity: '1',
+    type: 'ERC721',
     name: 'Charmed & Optimistic 71',
     image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
   }
 ];
 
-const cask = [
+export const multipleErc: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
-    method: 'getActiveSubscriptionCount',
-    parameters: [':userAddress', 'test', '5467'],
-    conditionType: 'evmBasic' as const,
-    contractAddress: '0xfd22bfe1bc51e21fd5e212680e22fa2503fee6c8',
-    returnValueTest: {
-      value: ':userAddress',
-      comparator: '='
-    },
-    standardContractType: 'CASK',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: ['72'],
+    condition: 'evm',
+    contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
+    quantity: '1',
+    type: 'ERC1155',
+    name: 'Charmed & Optimistic 71',
+    image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
   }
 ];
 
-const multipleErc = [
+export const unlockProtocolCondition: AccessControlCondition[] = [
   {
-    chain: 'ethereum',
+    chain: 1,
     method: 'balanceOf',
-    parameters: [':userAddress', '72'],
-    conditionType: 'evmBasic' as const,
-    contractAddress: '0x6982508145454Ce325dDbE47a25d4ec3d2311933',
-    returnValueTest: {
-      value: '1',
-      comparator: '>='
-    },
-    standardContractType: 'ERC1155',
-    name: 'Pepe',
-    image: 'https://static.alchemyapi.io/images/assets/24478.png'
+    tokenIds: [],
+    condition: 'evm',
+    contractAddress: '0x1f98431c8ad12323631ae4a59f267346ea31f984',
+    quantity: '1',
+    type: 'Unlock',
+    name: 'The Cool One',
+    image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
+  }
+];
+
+export const hypersubCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [],
+    condition: 'evm',
+    contractAddress: '0x1f98431c8ad12323631ae4a59f267346ea31f984',
+    quantity: '1',
+    type: 'Hypersub',
+    name: 'The Cool One',
+    image: 'https://nft-cdn.alchemy.com/opt-mainnet/5bad9b012e2980c9880dbce2e5642167'
+  }
+];
+
+export const guildCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: ['charmverse-guild'],
+    condition: 'evm',
+    contractAddress: '',
+    quantity: '1',
+    type: 'Guildxyz',
+    image: '/images/logos/guild_logo.svg'
+  }
+];
+
+export const gitcoinCondition: AccessControlCondition[] = [
+  {
+    chain: 1,
+    method: 'balanceOf',
+    tokenIds: [],
+    condition: 'evm',
+    contractAddress: '',
+    quantity: '1',
+    type: 'GitcoinPassport',
+    image: '/images/logos/gitcoin_passport.svg'
   }
 ];
 
@@ -230,24 +228,22 @@ export const mockTokenGates: TokenGateWithRoles[] = [
   mockTokenGate(daoMember),
   mockTokenGate(nftCollectionOwner),
   mockTokenGate(specificNftOwner),
-  mockTokenGate(cask),
-  mockTokenGate(multipleErc)
+  mockTokenGate(multipleErc),
+  mockTokenGate(unlockProtocolCondition),
+  mockTokenGate(hypersubCondition),
+  mockTokenGate(guildCondition),
+  mockTokenGate(gitcoinCondition)
 ];
 
 export const mockTokenGateResult: TokenGateEvaluationResult = {
-  walletAddress: '0x1234',
   canJoinSpace: true,
-  eligibleGates: mockTokenGates.map((tokenGate) => ({
-    signedToken: '123',
-    tokenGateId: tokenGate.id
-  }))
+  eligibleGates: mockTokenGates.map((tokenGate) => tokenGate.id)
 };
 
-function mockTokenGate(gate: UnifiedAccessControlConditions) {
+function mockTokenGate(gate: AccessControlCondition[]) {
   return createMockTokenGate({
-    type: 'lit',
     conditions: {
-      unifiedAccessControlConditions: gate
+      accessControlConditions: gate
     },
     tokenGateToRoles: [
       {

@@ -8,34 +8,28 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { usePages } from 'hooks/usePages';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
-import { useRewardTemplates } from '../hooks/useRewardTemplates';
-
 export function NewInlineReward({ pageId }: { pageId: string }) {
   const { clearRewardValues, rewardValues, setRewardValues, createReward, isSavingReward } = useNewReward();
   const { setCreatingInlineReward } = useRewards();
   const { refreshPage } = usePages();
-  const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
-  const { templates } = useRewardTemplates();
-
-  function resetForm() {
-    clearRewardValues();
-  }
+  const [selectedTemplate, setSelectedTemplate] = useState<string | undefined>();
 
   async function saveForm() {
     const success = await createReward({ linkedPageId: pageId });
     if (success) {
-      resetForm();
+      clearRewardValues();
       setCreatingInlineReward(false);
       refreshPage(pageId);
     }
   }
 
-  function addPageFromTemplate(templateId: string) {
-    const template = templates?.find((tpl) => tpl.page.id === templateId) ?? null;
+  function selectTemplate(template: RewardTemplate | null) {
     if (template) {
       setRewardValues(template.reward);
+      setSelectedTemplate(template.page.id);
+    } else {
+      setSelectedTemplate(undefined);
     }
-    setSelectedTemplate(template);
   }
 
   useEffect(() => {
@@ -43,15 +37,14 @@ export function NewInlineReward({ pageId }: { pageId: string }) {
   }, []);
 
   return (
-    <Stack gap={1}>
+    <Stack gap={1} key={selectedTemplate}>
       <RewardPropertiesForm
-        selectedTemplate={selectedTemplate}
-        addPageFromTemplate={addPageFromTemplate}
+        templateId={selectedTemplate}
+        selectTemplate={selectTemplate}
         onChange={setRewardValues}
         values={rewardValues}
         expandedByDefault
         isNewReward
-        resetTemplate={() => setSelectedTemplate(null)}
       />
       <Stack direction='row' alignItems='center' justifyContent='flex-end' flex={1} gap={1}>
         <Button onClick={() => setCreatingInlineReward(false)} variant='outlined' color='secondary'>

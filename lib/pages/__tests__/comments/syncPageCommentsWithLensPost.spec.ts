@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsProposals } from '@charmverse/core/test';
 import { generateSpaceRole } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
@@ -6,8 +7,8 @@ import { lensClient } from 'lib/lens/lensClient';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
-import { createProposal } from 'lib/proposal/createProposal';
-import { updateProposalLensProperties } from 'lib/proposal/updateProposalLensProperties';
+import { createProposal } from 'lib/proposals/createProposal';
+import { updateProposalLensProperties } from 'lib/proposals/updateProposalLensProperties';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 jest.mock('lib/lens/lensClient', () => ({
@@ -166,13 +167,13 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    const space1ProposalPage = await createProposal({
+    const space1ProposalPage = await testUtilsProposals.generateProposal({
       spaceId: space1.id,
       userId: user.id
     });
 
     await updateProposalLensProperties({
-      proposalId: space1ProposalPage.proposal.id,
+      proposalId: space1ProposalPage.id,
       lensPostLink: lensPost1Id
     });
 
@@ -233,13 +234,13 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    const space2ProposalPage = await createProposal({
+    const space2ProposalPage = await testUtilsProposals.generateProposal({
       spaceId: space2.id,
       userId: user.id
     });
 
     await updateProposalLensProperties({
-      proposalId: space2ProposalPage.proposal.id,
+      proposalId: space2ProposalPage.id,
       lensPostLink: lensPost2Id
     });
 

@@ -1,65 +1,36 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-export async function generateTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
+import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
+
+export async function generateTokenGate({
+  userId,
+  spaceId,
+  extraDetails
+}: {
+  spaceId: string;
+  userId: string;
+  extraDetails?: Partial<AccessControlCondition>;
+}) {
   return prisma.tokenGate.create({
     data: {
       conditions: {
-        unifiedAccessControlConditions: [
+        accessControlConditions: [
           {
-            conditionType: 'evmBasic',
+            ...extraDetails,
+            chain: 1,
+            method: 'balanceOf',
+            tokenIds: ['0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'],
+            type: 'Wallet',
             contractAddress: '',
-            standardContractType: '',
-            chain: 'ethereum',
-            method: '',
-            parameters: [':userAddress'],
-            returnValueTest: {
-              comparator: '=',
-              value: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2'
-            }
+            quantity: '1',
+            condition: 'evm',
+            image: '/images/cryptoLogos/ethereum-eth-logo.svg'
           }
-        ]
+        ],
+        operator: 'OR'
       },
       createdBy: userId,
       resourceId: {},
-      type: 'lit',
-      space: {
-        connect: {
-          id: spaceId
-        }
-      }
-    }
-  });
-}
-
-export async function generateUnlockTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
-  return prisma.tokenGate.create({
-    data: {
-      conditions: {
-        contract: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-        chainId: 1
-      },
-      createdBy: userId,
-      resourceId: {},
-      type: 'unlock',
-      space: {
-        connect: {
-          id: spaceId
-        }
-      }
-    }
-  });
-}
-
-export async function generateHypersubTokenGate({ userId, spaceId }: { spaceId: string; userId: string }) {
-  return prisma.tokenGate.create({
-    data: {
-      conditions: {
-        contract: '0x66525057AC951a0DB5C9fa7fAC6E056D6b8997E2',
-        chainId: 1
-      },
-      createdBy: userId,
-      resourceId: {},
-      type: 'hypersub',
       space: {
         connect: {
           id: spaceId
@@ -105,18 +76,15 @@ export function addUserTokenGate({
   tokenGateId,
   grantedRoles,
   spaceId,
-  userId,
-  jwt
+  userId
 }: {
   tokenGateId: string;
   spaceId: string;
   userId: string;
   grantedRoles: string[];
-  jwt: string;
 }) {
   return prisma.userTokenGate.create({
     data: {
-      jwt,
       tokenGateConnectedDate: new Date(),
       space: {
         connect: { id: spaceId }

@@ -3,21 +3,16 @@ import type { NextRequest } from 'next/server';
 
 import { isDevEnv, isTestEnv } from 'config/constants';
 import { DOMAIN_BLACKLIST } from 'lib/spaces/config';
-import { getAppApexDomain } from 'lib/utilities/domains/getAppApexDomain';
-import { getCustomDomainFromHost } from 'lib/utilities/domains/getCustomDomainFromHost';
-import { getSpaceDomainFromHost } from 'lib/utilities/domains/getSpaceDomainFromHost';
-import { getSpaceDomainFromUrlPath } from 'lib/utilities/domains/getSpaceDomainFromUrlPath';
+import { getAppApexDomain } from 'lib/utils/domains/getAppApexDomain';
+import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
+import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
+import { getSpaceDomainFromUrlPath } from 'lib/utils/domains/getSpaceDomainFromUrlPath';
 // RegExp for public files
 const PUBLIC_FILE = /\.(.*)$/; // Files
 
 const FORCE_SUBDOMAINS = process.env.FORCE_SUBDOMAINS === 'true';
 
-export async function middleware(req: NextRequest) {
-  if (isTestEnv) {
-    // Skip middleware in tests
-    return;
-  }
-
+export function middleware(req: NextRequest) {
   // Clone the URL
   const url = req.nextUrl.clone();
 
@@ -26,7 +21,8 @@ export async function middleware(req: NextRequest) {
   // Skip api routes
   if (url.pathname.includes('/api/')) return;
   // Skip public pages
-  const isPublicPage = DOMAIN_BLACKLIST.some((page) => url.pathname.startsWith(`/${page}`));
+  const firstPart = url.pathname.split('/')[1]; // url.pathname starts with a "/", so grab the second element
+  const isPublicPage = DOMAIN_BLACKLIST.includes(firstPart);
 
   if (isPublicPage) return;
 
@@ -45,7 +41,6 @@ export async function middleware(req: NextRequest) {
 
     return NextResponse.redirect(redirectUrl);
   }
-
   if (subdomain && spaceDomainFromPath && spaceDomainFromPath === subdomain) {
     // We are on url with subdomain AND domain in path - redirect to url without domain in path
     const pathWithoutSpaceDomain = url.pathname.replace(`/${spaceDomainFromPath}`, '') || '/';
@@ -59,7 +54,6 @@ export async function middleware(req: NextRequest) {
   if (rewriteDomain) {
     // Subdomain available, rewriting
     url.pathname = `/${rewriteDomain}${url.pathname}`;
-
     return NextResponse.rewrite(url);
   }
 }

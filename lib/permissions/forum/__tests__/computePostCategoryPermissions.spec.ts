@@ -5,7 +5,7 @@ import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { PostCategoryNotFoundError } from 'lib/forums/categories/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { computePostCategoryPermissions } from '../computePostCategoryPermissions';
 

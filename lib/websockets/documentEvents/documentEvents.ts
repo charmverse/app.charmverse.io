@@ -5,7 +5,7 @@ import type { Socket } from 'socket.io';
 import { validate } from 'uuid';
 
 import { STATIC_PAGES } from 'lib/features/constants';
-import { archivePages } from 'lib/pages/archivePages';
+import { trashPages } from 'lib/pages/trashPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyStepsToNode } from 'lib/prosemirror/applyStepsToNode';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -14,7 +14,7 @@ import { extractMentions } from 'lib/prosemirror/extractMentions';
 import { extractPreviewImage } from 'lib/prosemirror/extractPreviewImage';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { isUUID } from 'lib/utilities/strings';
+import { isUUID } from 'lib/utils/strings';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishDocumentEvent } from 'lib/webhookPublisher/publishEvent';
 
@@ -443,18 +443,20 @@ export class DocumentEventHandler {
 
         // Go through the diffs and see if any of them are for deleting a page.
         try {
-          // If its 2 then its drag and drop within the editor
           const ds = message.ds[0];
-          if (message.ds.length === 1 && ds.stepType === 'replace') {
-            // if from and to are equal then it was triggered by a undo action or it was triggered by restore page action, add it to the restoredPageIds
-            // We don't need to restore the page if it was created by the user manually
-            if (ds.slice?.content && ds.from === ds.to && socketEvent !== 'page_created') {
-              ds.slice.content.forEach((node) => {
-                if (isValidPageNode(node)) {
-                  restoredPageIds.push(node.attrs.id);
-                }
-              });
-            } else if (ds.from + 1 === ds.to) {
+
+          if (message.undo && socketEvent !== 'page_created') {
+            message.ds.forEach((_ds) => {
+              if (_ds.stepType === 'replace' && _ds.slice?.content) {
+                _ds.slice.content.forEach((node) => {
+                  if (isValidPageNode(node)) {
+                    restoredPageIds.push(node.attrs.id);
+                  }
+                });
+              }
+            });
+          } else if (message.ds.length === 1 && ds.stepType === 'replace') {
+            if (ds.from + 1 === ds.to) {
               // deleted using row action menu
               const node = room.node.resolve(ds.from).nodeAfter?.toJSON() as PageContent;
               if (isValidPageNode(node)) {
@@ -504,21 +506,21 @@ export class DocumentEventHandler {
         }
 
         if (deletedPageIds.length && socketEvent !== 'page_reordered') {
-          await archivePages({
+          await trashPages({
             pageIds: deletedPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: true,
+            trash: true,
             relay: this.relay
           });
         }
 
         if (restoredPageIds.length && socketEvent !== 'page_reordered') {
-          await archivePages({
+          await trashPages({
             pageIds: restoredPageIds,
             userId: session.user.id,
             spaceId: room.doc.spaceId,
-            archive: false,
+            trash: false,
             relay: this.relay
           });
         }

@@ -5,8 +5,8 @@ import { RiChatCheckLine } from 'react-icons/ri';
 export const SIDEBAR_VIEWS = {
   proposal_evaluation: {
     icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
-    tooltip: 'View evaluation',
-    title: 'Evaluation'
+    tooltip: 'View evaluations',
+    title: 'Evaluations'
   },
   comments: {
     icon: <MessageOutlined fontSize='small' />,

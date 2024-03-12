@@ -31,6 +31,6 @@ export class DiscordApi {
   }
 
   loginWithDiscordCode(code: string) {
-    return http.POST<LoggedInUser>(`/api/discord/login`, { code });
+    return http.POST<LoggedInUser | { otpRequired: true }>(`/api/discord/login`, { code });
   }
 }

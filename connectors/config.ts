@@ -1,10 +1,9 @@
 import env from '@beam-australia/react-env';
-import { RPCList } from 'connectors/chains';
+import { getChainList } from 'connectors/chains';
 import type { Address } from 'viem';
 import { createPublicClient, custom, createWalletClient, http } from 'viem';
 import type { Connector } from 'wagmi';
 import { createConfig, configureChains, mainnet } from 'wagmi';
-import * as wagmiChains from 'wagmi/chains';
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet';
 import { InjectedConnector } from 'wagmi/connectors/injected';
 import { MockConnector } from 'wagmi/connectors/mock';
@@ -13,13 +12,13 @@ import { publicProvider } from 'wagmi/providers/public';
 
 import 'viem/window';
 import { isTestEnv } from 'config/constants';
-import { isTruthy } from 'lib/utilities/types';
 
-const wagmiChainList = Object.values(wagmiChains);
+const allChains = getChainList({ enableTestnets: true });
+
 // map our RPC list to the wagmi chain list
-const supportedChains = RPCList.map((rpc) => wagmiChainList.find((ch) => ch.id === rpc.chainId)).filter(isTruthy);
+const viemChains = allChains.map((rpc) => rpc.viem);
 
-const { chains, publicClient } = configureChains(supportedChains, [publicProvider()]);
+const { chains, publicClient } = configureChains(viemChains, [publicProvider()]);
 
 const connectors: Connector[] = [
   new InjectedConnector({

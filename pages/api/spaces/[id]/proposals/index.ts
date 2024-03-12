@@ -5,65 +5,29 @@ import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import type { ProposalWithUsersLite } from 'lib/proposal/interface';
-import { mapDbProposalToProposalLite } from 'lib/proposal/mapDbProposalToProposal';
+import { getProposals } from 'lib/proposals/getProposals';
+import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getProposals);
+handler.get(getProposalsEndpoint);
 
-async function getProposals(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersLite[]>) {
+async function getProposalsEndpoint(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersLite[]>) {
   const userId = req.session.user?.id;
 
   const spaceId = req.query.id as string;
 
   const { onlyAssigned } = req.query as any as ListProposalsRequest;
-  const proposalIds = await permissionsApiClient.proposals.getAccessibleProposalIds({
+  const ids = await permissionsApiClient.proposals.getAccessibleProposalIds({
     onlyAssigned,
     userId,
     spaceId
   });
 
-  const proposals = await prisma.proposal.findMany({
-    where: {
-      id: {
-        in: proposalIds
-      },
-      page: {
-        // Ignore proposal templates
-        type: 'proposal'
-      }
-    },
-    include: {
-      authors: true,
-      reviewers: true,
-      rewards: true,
-      evaluations: {
-        orderBy: {
-          index: 'asc'
-        },
-        include: {
-          reviewers: true
-        }
-      },
-      form: {
-        include: {
-          formFields: {
-            orderBy: {
-              index: 'asc'
-            }
-          }
-        }
-      }
-    }
-  });
+  const proposals = await getProposals({ ids });
 
-  const proposalsWithUsers = proposals.map((proposal) => {
-    return mapDbProposalToProposalLite({ proposal });
-  });
-
-  return res.status(200).json(proposalsWithUsers);
+  return res.status(200).json(proposals);
 }
 
 export default withSessionRoute(handler);

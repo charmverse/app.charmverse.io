@@ -43,7 +43,6 @@ export type PageWithContent = PageMeta &
     | 'icon'
     | 'parentId'
     | 'proposalId'
-    | 'snapshotProposalId'
     | 'spaceId'
     | 'title'
     | 'type'
@@ -73,3 +72,6 @@ export interface PublicPageResponse {
   views: BoardView[];
   bounty: RewardWithUsersAndPageMeta | null;
 }
+
+// This type, for the most part, is used for showing links to pages in the UI
+export type PageMetaLite = Pick<Page, 'id' | 'title' | 'icon' | 'path' | 'type' | 'hasContent'>;

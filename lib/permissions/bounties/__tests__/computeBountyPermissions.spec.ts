@@ -3,7 +3,7 @@ import { testUtilsMembers } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { assignRole } from 'lib/roles';
-import { typedKeys } from 'lib/utilities/objects';
+import { typedKeys } from 'lib/utils/objects';
 import { generateBounty, generateRole, generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { addBountyPermissionGroup } from '../addBountyPermissionGroup';

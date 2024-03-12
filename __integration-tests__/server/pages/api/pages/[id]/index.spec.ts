@@ -5,7 +5,6 @@ import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/c
 import request from 'supertest';
 
 import { getPage } from 'lib/pages/server';
-import { createProposal } from 'lib/proposal/createProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 describe('PUT /api/pages/{id} - update page', () => {
@@ -99,12 +98,11 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should update proposal template page content if the user is an admin and respond 200', async () => {
-    const template = await createProposal({
+    const template = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      pageProps: {
-        type: 'proposal_template'
-      }
+      authors: [adminUser.id],
+      pageType: 'proposal_template'
     });
 
     const adminCookie = await loginUser(adminUser.id);
@@ -119,12 +117,11 @@ describe('PUT /api/pages/{id} - update page', () => {
   });
 
   it('should to fail update proposal template page content if the user is not a space admin and respond 401', async () => {
-    const template = await createProposal({
+    const template = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: adminUser.id,
-      pageProps: {
-        type: 'proposal_template'
-      }
+      authors: [adminUser.id],
+      pageType: 'proposal_template'
     });
 
     const memberCookie = await loginUser(normalMember.id);

@@ -176,7 +176,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
     const proposal = await generateProposal({
       spaceId: space1.id,
       userId: proposalAuthor.id as string,
-      proposalStatus: 'reviewed'
+      proposalStatus: 'published'
     });
 
     const proposalVote = await createVote({
@@ -201,7 +201,7 @@ describe('POST /api/votes/[id]/cast - Cast a vote on a proposal', () => {
     const proposal = await generateProposal({
       spaceId: space1.id,
       userId: proposalAuthor.id as string,
-      proposalStatus: 'reviewed'
+      proposalStatus: 'published'
     });
 
     const proposalVote = await createVote({

@@ -1,10 +1,11 @@
+// @ts-nocheck
 import { Proposal } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
+import { getDefaultWorkflows } from 'lib/proposals/workflows/defaultWorkflows';
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalEvaluationInput } from 'lib/proposal/createProposal';
-import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposal/workflows/defaultEvaluation';
+import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
+import { getDefaultFeedbackEvaluation, getDefaultPermissions } from 'lib/proposals/workflows/defaultEvaluation';
 // This script is a work in progress
 // It adds proposal steps to existing proposals
 
@@ -87,6 +88,7 @@ async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
               workflowId: workflow?.id
             }
           });
+          // @ts-ignore
           const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {
@@ -172,6 +174,7 @@ async function convertProposals({ offset = 0 }: { offset?: number } = {}) {
               workflowId: workflow?.id
             }
           });
+          // @ts-ignore
           const feedbackComplete = p.status !== 'draft' && p.status !== 'discussion';
           await tx.proposalEvaluation.create({
             data: {

@@ -18,7 +18,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useUser } from 'hooks/useUser';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
-import { setUrlWithoutRerender } from 'lib/utilities/browser';
+import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import type { FormInputs } from '../interfaces';
 import { DraftPostList } from '../PostList/DraftPostList';

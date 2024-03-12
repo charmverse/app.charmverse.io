@@ -8,7 +8,7 @@ inputs:
     description: 'Whether commit the update to core package back to branch'
     required: false
   save_cache:
-    description: "Whether to save the cache"
+    description: 'Whether to save the cache'
     required: false
   use_github_core_branch:
     description: |
@@ -21,12 +21,12 @@ outputs:
     description: |
       Returns new commit hash after committing core version bump.
       If no new commits because core has already been bumped, return the existing github sha'Returns new commit hash after committing core version bump'
-    value: "${{ steps.commit_core_bump.outputs.commit_hash || github.sha }}"
+    value: '${{ steps.commit_core_bump.outputs.commit_hash || github.sha }}'
 
 runs:
   using: 'composite'
   steps:
-    - uses: actions/setup-node@v3
+    - uses: actions/setup-node@v4
       with:
         node-version: 18
 
@@ -36,7 +36,7 @@ runs:
 
     - name: Restore dependencies
       id: restore_node_modules
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       with:
         path: ./node_modules
         key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
@@ -44,7 +44,8 @@ runs:
     - name: Install npm dependencies
       shell: bash
       if: steps.restore_node_modules.outputs.cache-hit != 'true'
-      run: npm ci --no-audit --no-fund
+      # This is a temporary step while we figure out a way to ensure compatibility with lens protocol which currently needs ethers-v5
+      run: npm ci --no-audit --no-fund --force
 
     # If installing specific version of core via npmjs
     - name: Upgrade Core package to version ${{ inputs.core_pkg_version }}
@@ -81,7 +82,7 @@ runs:
 
     - name: Cache dependencies
       if: inputs.save_cache
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       with:
         path: ./node_modules
         key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}

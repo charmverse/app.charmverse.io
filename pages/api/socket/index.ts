@@ -6,7 +6,7 @@ import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
-import { authSecret } from 'lib/session/config';
+import { authSecret } from 'lib/session/authSecret';
 import { withSessionRoute } from 'lib/session/withSession';
 import { config } from 'lib/websockets/config';
 import type { SealedUserId, SocketAuthResponse } from 'lib/websockets/interfaces';

@@ -1,14 +1,18 @@
 import type {
   MemberProperty,
   MemberPropertyPermission,
+  Prisma,
   ProposalBlock,
+  ProposalWorkflow,
   RewardBlock,
   Role,
   Space,
   User
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { testUtilsMembers } from '@charmverse/core/test';
+import { v4 as uuid } from 'uuid';
 
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
@@ -26,6 +30,8 @@ describe('exportSpaceSettings', () => {
 
   let customRewardBlockBoard: RewardBlock;
   let customRewardBlockView: RewardBlock;
+
+  let proposalWorkflow: ProposalWorkflowTyped;
 
   beforeAll(async () => {
     ({ user, space } = await generateUserAndSpace({ isAdmin: true }));
@@ -249,6 +255,14 @@ describe('exportSpaceSettings', () => {
           }
         })
       ]);
+    proposalWorkflow = (await prisma.proposalWorkflow.create({
+      data: {
+        index: 0,
+        title: 'Default',
+        space: { connect: { id: space.id } },
+        evaluations: [{ id: uuid(), permissions: [], title: 'Example', type: 'feedback' }] as WorkflowEvaluationJson[]
+      }
+    })) as ProposalWorkflowTyped;
   });
 
   it('should export space settings correctly', async () => {
@@ -257,6 +271,7 @@ describe('exportSpaceSettings', () => {
     expect(exportedSettings).toMatchObject<{ space: SpaceSettingsExport }>({
       space: {
         proposalBlocks: expect.arrayContaining<ProposalBlock>([customProposalBlockBoard, customProposalBlockView]),
+        proposalWorkflows: [proposalWorkflow],
         rewardBlocks: expect.arrayContaining<RewardBlock>([customRewardBlockBoard, customRewardBlockView]),
         notificationToggles: space.notificationToggles,
         features: space.features,

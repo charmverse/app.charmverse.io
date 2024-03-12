@@ -1,6 +1,6 @@
-import { sortArrayByObjectProperty } from 'lib/utilities/array';
+import { sortArrayByObjectProperty } from 'lib/utils/array';
 
-import type { FeatureJson, MappedFeatures } from './constants';
+import type { FeatureJson, MappedFeature, FeatureMap } from './constants';
 import { STATIC_PAGES } from './constants';
 
 export function constructFeaturesRecord(features: FeatureJson[]) {
@@ -12,7 +12,7 @@ export function constructFeaturesRecord(features: FeatureJson[]) {
     features.map((feat) => feat.id)
   );
 
-  const extendedFeatures = sortedFeatures.map(({ feature, ...restFeat }) => ({
+  const extendedFeatures: MappedFeature[] = sortedFeatures.map(({ feature, ...restFeat }) => ({
     ...restFeat,
     id: feature,
     isHidden: !!dbFeatures[feature]?.isHidden,
@@ -22,7 +22,7 @@ export function constructFeaturesRecord(features: FeatureJson[]) {
   const mappedFeatures = extendedFeatures.reduce((acc, val) => {
     acc[val.id] = val;
     return acc;
-  }, {} as MappedFeatures);
+  }, {} as FeatureMap);
 
   return {
     features: extendedFeatures,

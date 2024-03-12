@@ -3,10 +3,10 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { getAnswersTable } from 'lib/proposal/rubric/getAnswersTable';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposal/rubric/interfaces';
-import type { RubricAnswerUpsert } from 'lib/proposal/rubric/upsertRubricAnswers';
-import { upsertRubricAnswers } from 'lib/proposal/rubric/upsertRubricAnswers';
+import { getAnswersTable } from 'lib/proposals/rubric/getAnswersTable';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
+import { upsertRubricAnswers } from 'lib/proposals/rubric/upsertRubricAnswers';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -45,7 +45,7 @@ async function upsertProposalAnswersController(
 async function deleteRubricAnswers(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const isDraft = req.query.isDraft === 'true';
-  const evaluationId = req.query.evaluationId as string | undefined;
+  const evaluationId = req.query.evaluationId as string;
 
   const userId = req.session.user.id;
 

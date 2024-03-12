@@ -1,5 +1,6 @@
 import { useTrackPageView } from 'charmClient/hooks/track';
 import getPageLayout from 'components/common/PageLayout/getLayout';
+import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
@@ -15,9 +16,11 @@ export default function ProposalsPageComponent() {
 
   return (
     <DbViewSettingsProvider>
-      <ProposalsBoardProvider>
-        <ProposalsPage title={proposalTitle} />
-      </ProposalsBoardProvider>
+      <ProposalsProvider>
+        <ProposalsBoardProvider>
+          <ProposalsPage title={proposalTitle} />
+        </ProposalsBoardProvider>
+      </ProposalsProvider>
     </DbViewSettingsProvider>
   );
 }

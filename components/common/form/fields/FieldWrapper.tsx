@@ -1,4 +1,4 @@
-import type { SxProps } from '@mui/material';
+import { Stack, type SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
@@ -25,8 +25,9 @@ export function FieldWrapperContainer({
   sx?: SxProps;
   children: ReactNode;
 }) {
+  // 100% width is necessary to contain the charm editor input field inside its width
   return (
-    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' sx={sx}>
+    <Box flex={1} flexDirection={{ xs: 'column', sm: inline ? 'row' : 'column' }} display='flex' width='100%' sx={sx}>
       {children}
     </Box>
   );
@@ -37,19 +38,23 @@ type ContentProps = {
   iconLabel?: ReactNode;
   required?: boolean;
   description?: PageContent;
-  endAdornment?: ReactNode;
+  labelEndAdornment?: ReactNode;
+  inputEndAdornment?: ReactNode;
+  inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 };
 
 // a wrapper for FieldWrapper with props for label and description
 export function FieldWrapper({
   sx,
-  endAdornment,
+  labelEndAdornment,
   description,
   required,
   children,
   label,
   inline,
-  iconLabel
+  iconLabel,
+  inputEndAdornment,
+  inputEndAdornmentAlignItems = 'center'
 }: ContentProps & FieldWrapperProps) {
   if (!label) {
     return children as JSX.Element;
@@ -68,13 +73,16 @@ export function FieldWrapper({
                   *
                 </Typography>
               )}
-              {endAdornment}
+              {labelEndAdornment}
             </FieldLabel>
           )}
         </Box>
       )}
       <ReadonlyCharmContent content={description} />
-      {children}
+      <Stack gap={1} alignItems={inputEndAdornmentAlignItems} flexDirection='row'>
+        <div style={{ flexGrow: 1, overflowX: 'hidden' }}>{children}</div>
+        {inputEndAdornment}
+      </Stack>
     </FieldWrapperContainer>
   );
 }

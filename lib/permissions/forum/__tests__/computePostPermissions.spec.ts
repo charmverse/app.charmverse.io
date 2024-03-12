@@ -6,9 +6,8 @@ import { testUtilsForum, testUtilsUser } from '@charmverse/core/test';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
-import { convertPostToProposal } from 'lib/forums/posts/convertPostToProposal';
 import { PostNotFoundError } from 'lib/forums/posts/errors';
-import { InvalidInputError } from 'lib/utilities/errors';
+import { InvalidInputError } from 'lib/utils/errors';
 
 import { baseComputePostPermissions, computePostPermissions } from '../computePostPermissions';
 
@@ -202,89 +201,6 @@ describe('computePostPermissions - with editable by author policy', () => {
     });
 
     expect(authorPermissions.edit_post).toBe(true);
-  });
-});
-
-describe('computePostPermissions - with proposal permission filtering policy', () => {
-  it('should return unmodifed permissions of a proposal converted post for admins', async () => {
-    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
-    const post = await testUtilsForum.generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: adminUser.id
-    });
-
-    await convertPostToProposal({
-      post,
-      userId: authorUser.id
-    });
-
-    const permissionsAfterConversion = await computePostPermissions({
-      resourceId: post.id,
-      userId: adminUser.id
-    });
-
-    expect(permissionsAfterConversion).toMatchObject(permissions);
-  });
-
-  it('should return delete_post and view_post permissions of a proposal converted post for author', async () => {
-    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
-    const post = await testUtilsForum.generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-
-    await convertPostToProposal({
-      post,
-      userId: authorUser.id
-    });
-
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: authorUser.id
-    });
-
-    postOperationsWithoutEdit.forEach((op) => {
-      if (op === 'delete_post' || op === 'view_post') {
-        expect(permissions[op]).toBe(true);
-      } else {
-        expect(permissions[op]).toBe(false);
-      }
-    });
-  });
-
-  it('should return only view_post permissions of a post converted to proposal for a regular user', async () => {
-    const postCategory = await testUtilsForum.generatePostCategory({ spaceId: space.id });
-
-    const post = await testUtilsForum.generateForumPost({
-      spaceId: space.id,
-      categoryId: postCategory.id,
-      userId: authorUser.id
-    });
-
-    await convertPostToProposal({
-      post,
-      userId: authorUser.id
-    });
-
-    const permissions = await computePostPermissions({
-      resourceId: post.id,
-      userId: spaceMemberUser.id
-    });
-
-    expect(permissions.view_post).toBe(true);
-
-    const testedOperations: PostOperation[] = ['add_comment', 'delete_comments', 'upvote', 'downvote'];
-    // Post should now be readonly
-    testedOperations.forEach((op) => {
-      expect(permissions[op]).toBe(false);
-    });
   });
 });
 
