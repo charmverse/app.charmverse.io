@@ -14,7 +14,7 @@ export async function getTokenAmountOnBlockNumber({
 }) {
   const chain = getChainById(chainId);
   if (!chain) {
-    return null;
+    return 0;
   }
 
   const rpcUrl = chain.rpcUrls[0];
