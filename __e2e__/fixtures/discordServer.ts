@@ -37,7 +37,9 @@ export const discordServer: DiscordServer = async ({}, use, workerInfo) => {
 
   router.get('/api/oauth2/authorize', (ctx) => {
     ctx.redirect(
-      'http://127.0.0.1:3335/authenticate/discord?code=1234&state={"redirect":"http://127.0.0.1:3335/","type":"login"}'
+      `http://localhost:3335/authenticate/discord?${encodeURI(
+        'code=1234&state={"redirect":"http://localhost:3335/","type":"login"}'
+      )}`
     );
   });
 
