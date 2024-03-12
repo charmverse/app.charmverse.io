@@ -1,11 +1,13 @@
 import { Prisma, VoteType, prisma } from '@charmverse/core/prisma-client';
 
+import { getTokenAmountOnBlockNumber } from 'lib/blockchain/getTokenAmountOnBlockNumber';
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishVoteEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
+import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
@@ -120,6 +122,12 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
 
   return {
     ...dbVote,
+    votingPower: (
+      await getVotingPowerForVotes({
+        userId: vote.createdBy,
+        votes: [dbVote]
+      })
+    )[0],
     aggregatedResult,
     userChoice,
     totalVotes: 0
