@@ -109,7 +109,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         autoHighlight
         size='small'
         getOptionLabel={(option) => {
-          if (!option) {
+          if (!option || option === ADD_NEW_CUSTOM) {
             return '';
           }
           const tokenInfo = getTokenInfo({
