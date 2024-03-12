@@ -34,7 +34,6 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   await loginPage.goto();
   await loginPage.universalConnectButton.click();
   await loginPage.connectDiscordButton.click();
-  await loginPage.waitForLogin(discordServer.host);
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });
 
@@ -45,7 +44,7 @@ test('login - allows user to login and see their workspace even when a wallet is
   const discordUserId = discordServer.discordUserId;
   const { address, user, space, page } = await generateUserAndSpace();
   await createDiscordUser({ userId: user.id, discordUserId });
-
+  await loginPage.waitForLogin(discordServer.host);
   await mockWeb3({
     page: loginPage.page,
     context: { address, privateKey: false },
@@ -61,9 +60,6 @@ test('login - allows user to login and see their workspace even when a wallet is
 
   await loginPage.goto();
   await loginPage.universalConnectButton.click();
-  await Promise.all([
-    loginPage.connectDiscordButton.click(),
-    loginPage.waitForLogin(discordServer.host),
-    loginPage.waitForWorkspaceLoaded({ domain: space.domain, page })
-  ]);
+  await loginPage.connectDiscordButton.click();
+  await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });

@@ -9,9 +9,7 @@ import type { AuthType, OauthFlowType } from 'lib/oauth/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const discordClientId = process.env.DISCORD_OAUTH_CLIENT_ID as string;
-const discordHost = isTestEnv ? 'http://localhost:9000' : 'https://discord.com';
-const discordUrl = `${discordHost}/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
-
+const discordUrl = `https://discord.com/api/oauth2/authorize?prompt=consent&client_id=${discordClientId}&response_type=code`;
 const handler = nc({
   onError,
   onNoMatch
