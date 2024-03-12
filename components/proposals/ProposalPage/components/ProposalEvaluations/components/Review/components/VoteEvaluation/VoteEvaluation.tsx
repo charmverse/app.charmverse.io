@@ -110,7 +110,7 @@ export function VoteEvaluation({ pageId, isCurrent, proposal, evaluation, refres
 
   vote.title = evaluation.title;
 
-  if (evaluation.voteSettings?.strategy === 'token') {
+  if (evaluation.voteSettings?.strategy === 'snapshot') {
     return evaluation.snapshotId ? null : (
       <NoCommentsMessage
         icon={

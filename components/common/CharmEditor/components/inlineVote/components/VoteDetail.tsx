@@ -312,6 +312,7 @@ export function VoteDetail({
                   />
                   <Typography fontWeight={500} color='secondary'>
                     {choices.join(', ')}
+                    {userVote.tokenAmount ? ` (${millify(userVote.tokenAmount)})` : ''}
                   </Typography>
                 </ListItem>
                 <Divider />
