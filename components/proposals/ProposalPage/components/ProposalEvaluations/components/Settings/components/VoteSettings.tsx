@@ -141,36 +141,27 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
 
   // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
-    async function main() {
-      if (onChange) {
-        const hasError =
-          passThreshold > 100 ||
-          (voteType === VoteType.SingleChoice && options.some((option) => option.length === 0)) ||
-          new Set(options).size !== options.length;
-        let blockNumber: null | number = null;
-        if (voteToken) {
-          const snapshot = (await import('@snapshot-labs/snapshot.js')).default;
-          const provider = await snapshot.utils.getProvider(voteToken.chainId);
-          blockNumber = await provider.getBlockNumber();
-        }
-        if (!hasError) {
-          onChange({
-            threshold: passThreshold,
-            type: voteType,
-            options,
-            maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
-            publishToSnapshot: voteStrategy === 'snapshot',
-            durationDays,
-            blockNumber: blockNumber?.toString() ?? null,
-            chainId: voteToken?.chainId ?? null,
-            tokenAddress: voteToken?.tokenAddress ?? null,
-            strategy: voteStrategy
-          });
-        }
+    if (onChange) {
+      const hasError =
+        passThreshold > 100 ||
+        (voteType === VoteType.SingleChoice && options.some((option) => option.length === 0)) ||
+        new Set(options).size !== options.length;
+
+      if (!hasError) {
+        onChange({
+          threshold: passThreshold,
+          type: voteType,
+          options,
+          maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
+          publishToSnapshot: voteStrategy === 'snapshot',
+          durationDays,
+          blockNumber: null,
+          chainId: voteToken?.chainId ?? null,
+          tokenAddress: voteToken?.tokenAddress ?? null,
+          strategy: voteStrategy
+        });
       }
     }
-
-    main();
   }, [voteType, options, maxChoices, durationDays, voteToken, passThreshold, voteStrategy]);
 
   function handleVoteTypeChange(_voteType: VoteType) {
