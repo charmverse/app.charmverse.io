@@ -157,6 +157,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     // Configure vote settings
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
+    await proposalPage.evaluationVoteSettings.click();
     await proposalPage.evaluationVoteDurationInput.fill(voteSettings.duration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(voteSettings.threshold.toString());
 
@@ -381,7 +382,11 @@ test.describe.serial('Create and use Proposal Template', async () => {
                 options: voteSettings.customOptions,
                 maxChoices: 1,
                 publishToSnapshot: false,
-                durationDays: voteSettings.duration
+                durationDays: voteSettings.duration,
+                strategy: 'regular',
+                tokenAddress: null,
+                chainId: null,
+                blockNumber: null
               },
               // We just want to save settings, but not create an actual vote
               vote: null,
@@ -592,7 +597,11 @@ test.describe.serial('Create and use Proposal Template', async () => {
                 options: voteSettings.customOptions,
                 maxChoices: 1,
                 publishToSnapshot: false,
-                durationDays: voteSettings.duration
+                durationDays: voteSettings.duration,
+                strategy: 'regular',
+                tokenAddress: null,
+                chainId: null,
+                blockNumber: null
               },
               // We just want to save settings, but not create an actual vote
               vote: null,
