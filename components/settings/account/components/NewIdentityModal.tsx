@@ -53,7 +53,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
 
   const { connectTelegram, isConnectingToTelegram } = useTelegramConnect();
 
-  const { connect, isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
+  const { isConnected, isLoading: isDiscordLoading, popupLogin } = useDiscordConnection();
 
   async function handleConnectEmailRequest(email: string) {
     if (sendingMagicLink.current === false) {
@@ -131,12 +131,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               <PrimaryButton
                 size='small'
                 onClick={() => {
-                  if (isOnCustomDomain) {
-                    popupLogin('/', 'connect');
-                  } else {
-                    connect();
-                  }
-
+                  popupLogin('/', 'connect');
                   onClose();
                 }}
                 disabled={isDiscordLoading}

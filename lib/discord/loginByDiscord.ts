@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { isTestEnv } from 'config/constants';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { getDiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { getDiscordCallbackUrl } from 'lib/discord/getDiscordCallbackUrl';
@@ -29,7 +30,7 @@ export async function loginByDiscord({
   discordApiUrl,
   userId = v4(),
   signupAnalytics = {},
-  authFlowType = 'page'
+  authFlowType
 }: LoginWithDiscord) {
   const discordAccount = await getDiscordAccount({
     code,

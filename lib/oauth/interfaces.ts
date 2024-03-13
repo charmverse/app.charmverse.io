@@ -1,4 +1,4 @@
-export type OauthFlowType = 'page' | 'popup';
+export type OauthFlowType = 'popup';
 
 export type AuthType = 'connect' | 'server' | 'login';
 
