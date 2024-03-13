@@ -53,8 +53,10 @@ export function ProfileWidgets({
     memberId: userId
   });
 
+  const readOnlyMemberProperties = !space || !canEditSpaceProfile(space.id);
+
   const pinnedNfts = nfts.filter((nft) => nft.isPinned);
-  const hideCollections = pinnedNfts.length === 0 && poaps.length === 0;
+  const hideCollections = pinnedNfts.length === 0 && poaps.length === 0 && readOnlyMemberProperties;
   const isLoading =
     isLoadingSummonProfile &&
     isLoadingEnsProfile &&
@@ -63,8 +65,6 @@ export function ProfileWidgets({
     isLoadingMemberPropertiesValues &&
     isLoadingLensProfile &&
     isLoadingUserCredentials;
-
-  const readOnlyMemberProperties = !space || !canEditSpaceProfile(space.id);
 
   if (isLoading) {
     return <LoadingComponent isLoading minHeight={300} />;
