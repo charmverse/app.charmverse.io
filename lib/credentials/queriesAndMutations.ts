@@ -170,6 +170,7 @@ export async function getCharmverseCredentialsByWallets({
     select: {
       id: true,
       ceramicId: true,
+      onChainAttestationId: true,
       rewardApplication: {
         select: {
           bounty: {
@@ -197,6 +198,11 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
+  const issuedCredsMap = issuedCredentials.reduce((acc, val) => {
+    acc[val.ceramicId as string] = val;
+    return acc;
+  }, {} as Record<string, (typeof issuedCredentials)[number]>);
+
   const favoriteCredentials = await prisma.favoriteCredential.findMany({
     where: {
       issuedCredentialId: {
@@ -210,29 +216,37 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
-  return charmverseCredentials.map((credential) => {
-    const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
-    const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
-    const iconUrl =
-      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
-      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
+  return (
+    charmverseCredentials
+      // Only display IPFS credentials for which we have a reference in our database, and which have not been attested on-chain
+      .filter(
+        (credentialFromCeramic) =>
+          !!issuedCredsMap[credentialFromCeramic.id] && !issuedCredsMap[credentialFromCeramic.id].onChainAttestationId
+      )
+      .map((credential) => {
+        const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
+        const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
+        const iconUrl =
+          (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
+          (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
 
-    if (favoriteCredential) {
-      return {
-        ...credential,
-        iconUrl,
-        favoriteCredentialId: favoriteCredential.id,
-        index: favoriteCredential.index,
-        issuedCredentialId: issuedCredential?.id
-      };
-    }
+        if (favoriteCredential) {
+          return {
+            ...credential,
+            iconUrl,
+            favoriteCredentialId: favoriteCredential.id,
+            index: favoriteCredential.index,
+            issuedCredentialId: issuedCredential?.id
+          };
+        }
 
-    return {
-      ...credential,
-      iconUrl,
-      favoriteCredentialId: null,
-      index: -1,
-      issuedCredentialId: issuedCredential?.id
-    };
-  });
+        return {
+          ...credential,
+          iconUrl,
+          favoriteCredentialId: null,
+          index: -1,
+          issuedCredentialId: issuedCredential?.id
+        };
+      })
+  );
 }
