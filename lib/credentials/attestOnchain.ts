@@ -60,12 +60,12 @@ export async function attestOnChainAndRecordCredential({
 
   await prisma.issuedCredential.create({
     data: {
-      easChainId: credential.chainId,
+      onchainAttestationId: attestationUid,
+      onchainChainId: credential.chainId,
       credentialEvent: credentialMetadata.event,
       credentialTemplate: { connect: { id: credentialMetadata.credentialTemplateId } },
       user: { connect: { id: credentialMetadata.userId } },
       schemaId: attestationSchemaIds[credential.type],
-      onChainAttestationId: attestationUid,
       rewardApplication: credentialMetadata.submissionId
         ? { connect: { id: credentialMetadata.submissionId } }
         : undefined,

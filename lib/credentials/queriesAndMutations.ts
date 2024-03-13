@@ -170,7 +170,7 @@ export async function getCharmverseCredentialsByWallets({
     select: {
       id: true,
       ceramicId: true,
-      onChainAttestationId: true,
+      onchainAttestationId: true,
       rewardApplication: {
         select: {
           bounty: {
@@ -221,7 +221,7 @@ export async function getCharmverseCredentialsByWallets({
       // Only display IPFS credentials for which we have a reference in our database, and which have not been attested on-chain
       .filter(
         (credentialFromCeramic) =>
-          !!issuedCredsMap[credentialFromCeramic.id] && !issuedCredsMap[credentialFromCeramic.id].onChainAttestationId
+          !!issuedCredsMap[credentialFromCeramic.id] && !issuedCredsMap[credentialFromCeramic.id].onchainAttestationId
       )
       .map((credential) => {
         const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
