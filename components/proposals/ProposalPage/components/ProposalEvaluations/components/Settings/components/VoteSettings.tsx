@@ -90,8 +90,10 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
       : null
   );
   const [paymentMethods] = usePaymentMethods({
-    filterDefaultPaymentMethods: true
+    filterUSDCPaymentMethods: true,
+    filterNativeTokens: true
   });
+
   const [availableCryptos, setAvailableCryptos] = useState<{ chainId: number; tokenAddress: string }[]>(
     paymentMethods.map((method) => {
       return {

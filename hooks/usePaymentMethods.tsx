@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 import { createContext, useContext, useMemo } from 'react';
 
 import { useGetPaymentMethods } from 'charmClient/hooks/spaces';
-import { defaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 
@@ -25,23 +23,30 @@ export function PaymentMethodsProvider({ children }: { children: ReactNode }) {
 
 export const usePaymentMethods = (
   {
-    filterDefaultPaymentMethods = false
+    filterUSDCPaymentMethods = false,
+    filterNativeTokens = false
   }: {
-    filterDefaultPaymentMethods: boolean;
+    filterUSDCPaymentMethods?: boolean;
+    filterNativeTokens?: boolean;
   } = {
-    filterDefaultPaymentMethods: false
+    filterUSDCPaymentMethods: false,
+    filterNativeTokens: false
   }
 ) => {
   const [paymentMethods, refreshPaymentMethods] = useContext(PaymentMethodsContext);
 
   const filteredPaymentMethods = useMemo(() => {
-    if (filterDefaultPaymentMethods) {
-      return paymentMethods.filter(
-        (pm) => !defaultPaymentMethods.some((dpm) => lowerCaseEqual(dpm.contractAddress, pm.contractAddress))
-      );
+    let _paymentMethods = paymentMethods;
+    if (filterUSDCPaymentMethods) {
+      _paymentMethods = _paymentMethods.filter((pm) => pm.tokenSymbol !== 'USDC');
     }
-    return paymentMethods;
-  }, [paymentMethods, filterDefaultPaymentMethods]);
+    if (filterNativeTokens) {
+      _paymentMethods = _paymentMethods.filter((pm) => {
+        return pm.contractAddress !== '0x0000000000000000000000000000000000000000';
+      });
+    }
+    return _paymentMethods;
+  }, [paymentMethods, filterUSDCPaymentMethods, filterNativeTokens]);
 
   return [filteredPaymentMethods, refreshPaymentMethods] as const;
 };
