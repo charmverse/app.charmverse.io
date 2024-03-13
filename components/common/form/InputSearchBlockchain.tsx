@@ -18,10 +18,12 @@ interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, tru
   sx?: SxProps<Theme>;
   chains?: number[];
   fullWidth?: boolean;
+  supportedChainIds?: number[];
 }
 export function InputSearchBlockchain({
   defaultChainId,
   chainId,
+  supportedChainIds,
   onChange = () => {},
   hideInputIcon,
   chains,
@@ -34,10 +36,14 @@ export function InputSearchBlockchain({
   const { space } = useCurrentSpace();
 
   const options = useMemo(() => {
-    return chains
+    const supportedChains = chains
       ? chains.map((chain) => getChainById(chain)).filter(isTruthy)
       : getChainList({ enableTestnets: !!space?.enableTestnets });
-  }, [chains, space?.enableTestnets]);
+    if (supportedChainIds?.length) {
+      return supportedChains.filter((chain) => supportedChainIds.includes(chain.chainId));
+    }
+    return supportedChains;
+  }, [chains, space?.enableTestnets, supportedChainIds]);
 
   useEffect(() => {
     if (defaultChainId && !value) {

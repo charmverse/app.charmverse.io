@@ -24,6 +24,7 @@ import {
 import { getChainById } from 'connectors/chains';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
+import { base, mainnet, mantle, optimism, polygon, polygonZkEvm } from 'viem/chains';
 
 import { Button } from 'components/common/Button';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
@@ -68,6 +69,8 @@ const StyledAccordion = styled(Accordion)`
     }
   }
 `;
+
+const supportedChainIds = [mainnet.id, optimism.id, base.id, polygon.id, polygonZkEvm.id, mantle.id];
 
 export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
@@ -236,6 +239,7 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
                     Token
                   </Typography>
                   <InputSearchCrypto
+                    supportedChainIds={supportedChainIds}
                     disabled={readOnly || isPublishedProposal}
                     readOnly={readOnly}
                     cryptoList={availableCryptos}

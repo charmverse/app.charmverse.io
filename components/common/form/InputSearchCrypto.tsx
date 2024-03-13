@@ -29,6 +29,7 @@ export interface IInputSearchCryptoProps<Value extends CryptoValue>
   variant?: 'standard' | 'outlined';
   placeholder?: string;
   showChain?: boolean;
+  supportedChainIds?: number[];
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
@@ -46,7 +47,8 @@ export function InputSearchCrypto<Value extends CryptoValue>({
   readOnly,
   variant,
   placeholder,
-  showChain
+  showChain,
+  supportedChainIds
 }: IInputSearchCryptoProps<Value>) {
   const [inputValue, setInputValue] = useState('');
 
@@ -185,7 +187,11 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         onClose={ERC20PopupState.close}
         size='500px'
       >
-        <CustomERCTokenForm defaultChainId={chainId} onSubmit={onNewPaymentMethod} />
+        <CustomERCTokenForm
+          supportedChainIds={supportedChainIds}
+          defaultChainId={chainId}
+          onSubmit={onNewPaymentMethod}
+        />
       </Modal>
     </>
   );
