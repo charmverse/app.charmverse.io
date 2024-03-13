@@ -171,12 +171,20 @@ export async function issueRewardCredentialsIfNecessary({
           if (baseReward.space.credentialsChainId) {
             await publishCredentialIssuableEvent({
               spaceId: baseReward.space.id,
-              credential: {
-                chainId: baseReward.space.credentialsChainId as EasSchemaChain,
-                type: 'reward',
-                credentialInputs: {
-                  recipient: targetWallet.address,
-                  data: credentialContent
+              data: {
+                credential: {
+                  chainId: baseReward.space.credentialsChainId as EasSchemaChain,
+                  type: 'reward',
+                  credentialInputs: {
+                    recipient: targetWallet.address,
+                    data: credentialContent
+                  }
+                },
+                credentialMetadata: {
+                  event,
+                  credentialTemplateId: credentialTemplate.id,
+                  submissionId: credentialTemplate.applicationId,
+                  userId: submitterUserId
                 }
               }
             });

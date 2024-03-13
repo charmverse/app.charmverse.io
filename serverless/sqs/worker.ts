@@ -5,7 +5,7 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
-import { attestOnchain, multiAttestOnchain } from 'lib/credentials/attestOnchain';
+import { attestOnChainAndRecordCredential } from 'lib/credentials/attestOnchain';
 import { count } from 'lib/metrics';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
@@ -58,7 +58,7 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
           }
         });
         if (webhookData.event.scope === WebhookEventNames.CredentialIssuable) {
-          await attestOnchain(webhookData.event.credential);
+          await attestOnChainAndRecordCredential(webhookData.event.data);
         } else {
           // Create and save notifications
           const notifications = await createNotificationsFromEvent(webhookData);
