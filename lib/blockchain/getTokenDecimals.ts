@@ -22,5 +22,5 @@ export async function getTokenDecimals({
   );
 
   const decimals = await tokenContract.decimals();
-  return decimals;
+  return decimals ? Number(decimals) : null;
 }
