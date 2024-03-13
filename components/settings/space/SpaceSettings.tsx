@@ -36,6 +36,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
+import { ConnectBoto } from './components/ConnectBoto';
 import { ConnectCollabland } from './components/ConnectCollabland';
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
@@ -425,6 +426,10 @@ export function SpaceSettings({
           <Grid item>
             <FieldLabel>Collab.Land</FieldLabel>
             <ConnectCollabland />
+          </Grid>
+          <Grid item>
+            <FieldLabel>Send events to Discord/Telegram</FieldLabel>
+            <ConnectBoto />
           </Grid>
           <Grid item>
             <Legend>Members</Legend>
