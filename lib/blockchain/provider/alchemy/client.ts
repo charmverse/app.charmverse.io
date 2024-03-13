@@ -11,36 +11,46 @@ import { toInt } from '../ankr/client';
 import type { SupportedChainId } from './config';
 
 interface NftMedia {
-  bytes: number;
-  format: string;
-  gateway: string;
-  raw: string;
-  thumbnail: string;
+  cachedUrl?: string;
+  thumbnailUrl: string;
+  pngUrl?: string;
+  contentType: string;
+  size: number;
+  originalUrl: string;
 }
 
 type AlchemyApiSuffix = '' | 'nft';
 
-export interface AlchemyNft {
+type UnstoppableDomainsMetaData = {
+  external_link: string;
+  image_url?: string;
+  attributes?: [];
+  background_color?: string;
+  animation_url?: string;
+  youtube_url?: string;
+  name: string;
+  tokenId: string;
+  namehash: string;
+  description: string;
+  image: string;
+  external_url: string;
+};
+
+interface AlchemyNft {
   contract: {
     address: string;
-  };
-  id: {
-    tokenId: string;
-  };
-  error?: string;
-  title: string;
-  contractMetadata: {
     name: string;
     symbol: string;
     contractDeployer: string;
     tokenType: 'ERC1155' | 'ERC721';
   };
+  tokenId: string;
+  tokenType: string;
+  name: string;
   description: string;
-  tokenUri: {
-    raw: string;
-    gateway: string;
-  };
-  media: NftMedia[];
+  image: NftMedia;
+  tokenUri: string;
+  error?: string;
   timeLastUpdated: string;
   walletAddress: string;
 }
@@ -56,7 +66,11 @@ const FILTERED_NFT_CONTRACTS = [
   '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85' // ENS
 ];
 
-export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: AlchemyApiSuffix = ''): string => {
+export const getAlchemyBaseUrl = (
+  chainId: SupportedChainId = 1,
+  apiSuffix: AlchemyApiSuffix = '',
+  version: 'v2' | 'v3' = 'v2'
+): string => {
   const apiKey = process.env.ALCHEMY_API_KEY;
 
   if (!apiKey) {
@@ -68,7 +82,7 @@ export const getAlchemyBaseUrl = (chainId: SupportedChainId = 1, apiSuffix: Alch
 
   const apiSuffixPath = apiSuffix ? `${apiSuffix}/` : '';
 
-  return `${alchemyUrl}/${apiSuffixPath}v2/${apiKey}`;
+  return `${alchemyUrl}/${apiSuffixPath}${version}/${apiKey}`;
 };
 
 // Docs: https://docs.alchemy.com/reference/getnfts
@@ -81,14 +95,18 @@ export async function getNFTs({
   chainId: SupportedChainId;
   walletId: string;
 }): Promise<NFTData[]> {
-  const url = `${getAlchemyBaseUrl(chainId, 'nft')}/getNFTs`;
-
+  const url = `${getAlchemyBaseUrl(chainId, 'nft', 'v3')}/getNFTsForOwner`;
   const responses = await paginatedCall(
-    (params) => {
-      return GET<AlchemyNftResponse>(url, {
+    async (params) => {
+      const resp = await GET<AlchemyNftResponse>(url, {
         ...params,
         owner: address
       });
+      const updatedResp = await Promise.all(resp.ownedNfts.map(updateNFTResp));
+      return {
+        ...resp,
+        ownedNfts: updatedResp
+      };
     },
     (response) => (response.pageKey ? { pageKey: response.pageKey } : null)
   );
@@ -107,7 +125,7 @@ export async function getNFTs({
         return false;
       }
       // No artwork found (animations and videos dotimeLastUpdatednt seem to be picked up)
-      if (!n.media[0].gateway) {
+      if (!n.image.thumbnailUrl) {
         return false;
       }
       return true;
@@ -127,9 +145,10 @@ export async function getNFT({
   tokenId: string;
   chainId: SupportedChainId;
 }) {
-  const url = `${getAlchemyBaseUrl(chainId)}/getNFTMetadata`;
+  const url = `${getAlchemyBaseUrl(chainId, 'nft', 'v3')}/getNFTMetadata`;
   const res = await GET<AlchemyNft>(url, { contractAddress: address, tokenId });
-  return mapNFTData(res, null, chainId);
+  const updateRes = await updateNFTResp(res);
+  return mapNFTData(updateRes, null, chainId);
 }
 
 export async function getNFTOwners({
@@ -141,52 +160,31 @@ export async function getNFTOwners({
   tokenId: string;
   chainId: SupportedChainId;
 }) {
-  const url = `${getAlchemyBaseUrl(chainId)}/getOwnersForToken`;
+  const url = `${getAlchemyBaseUrl(chainId, 'nft', 'v3')}/getOwnersForNFT`;
   const res = await GET<{ owners: string[] }>(url, { contractAddress: address, tokenId });
 
   return res.owners;
 }
-
-// export async function getTokenBalances({
-//   ownerAddress,
-//   chainAddress,
-//   chainId
-// }: {
-//   ownerAddress: string;
-//   chainAddress: string;
-//   chainId: SupportedChainId;
-// }) {
-//   const url = `${getAlchemyBaseUrl(chainId)}`;
-//   const payload = {
-//     jsonrpc: '2.0',
-//     method: 'alchemy_getTokenBalances',
-//     params: [ownerAddress, [chainAddress]],
-//     id: chainId
-//   };
-
-//   const res = await PUT<AlchemyNft>(url, payload);
-//   return res;
-// }
 
 function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: SupportedChainId): NFTData | null {
   if (nft.error) {
     // errors include "Contract does not have any code"
     return null;
   }
-  const tokenIdInt = toInt(nft.id.tokenId);
+  const tokenIdInt = toInt(nft.tokenId);
   const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdInt }) ?? '';
 
   // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
-  const image = nft.media[0].gateway?.startsWith('https://') ? nft.media[0].gateway : nft.media[0].raw;
+  const image = nft.image.thumbnailUrl?.startsWith('https://') ? nft.image.thumbnailUrl : nft.image.originalUrl;
   return {
-    id: `${nft.contract.address}:${nft.id.tokenId}`,
-    tokenId: nft.id.tokenId,
+    id: `${nft.contract.address}:${nft.tokenId}`,
+    tokenId: nft.tokenId,
     tokenIdInt,
     contract: nft.contract.address,
-    imageRaw: nft.media[0].raw,
+    imageRaw: nft.image.originalUrl,
     image,
-    imageThumb: nft.media[0].thumbnail,
-    title: nft.title,
+    imageThumb: nft.image.thumbnailUrl,
+    title: nft.name,
     description: nft.description,
     chainId,
     timeLastUpdated: nft.timeLastUpdated,
@@ -194,6 +192,23 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
     isPinned: false,
     link,
     walletId,
-    contractName: nft.contractMetadata.name
+    contractName: nft.contract.name
   };
+}
+
+async function updateNFTResp(nft: AlchemyNft): Promise<AlchemyNft> {
+  if (nft.contract.symbol === 'UD') {
+    const udMetadata = await GET<UnstoppableDomainsMetaData>(nft.tokenUri).catch(() => null);
+
+    return {
+      ...nft,
+      name: udMetadata?.name || nft.name,
+      image: {
+        ...nft.image,
+        thumbnailUrl: udMetadata?.image || nft.image.thumbnailUrl,
+        originalUrl: udMetadata?.image || nft.image.originalUrl
+      }
+    };
+  }
+  return nft;
 }

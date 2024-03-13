@@ -3,7 +3,6 @@ import { typedKeys } from 'lib/utils/objects';
 // Find supported chains:  https://www.ankr.com/docs/advanced-api/overview/#chains-supported
 export const ankrAdvancedApis = {
   56: 'bsc',
-  137: 'polygon',
   1101: 'polygon_zkevm',
   250: 'fantom',
   43114: 'avalanche',
