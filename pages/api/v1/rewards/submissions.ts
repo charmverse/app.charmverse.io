@@ -35,6 +35,9 @@ handler.get(getSubmissions);
  *        application:
  *          $ref: '#/components/schemas/Application'
  *          nullable: true
+ *        rewardId:
+ *          type: string
+ *          format: uuid
  *        credentials:
  *          type: array
  *          items:
@@ -57,6 +60,7 @@ handler.get(getSubmissions);
 type Application = {
   id: string;
   createdAt: Date;
+  rewardId: string;
 };
 
 export type PublicApiSubmission = {
@@ -123,6 +127,7 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
     select: {
       id: true,
       createdAt: true,
+      bountyId: true,
       issuedCredentials: {
         select: {
           createdAt: true,
@@ -146,7 +151,8 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
     submissions.map((submission) => {
       const application = {
         id: submission.id,
-        createdAt: submission.createdAt
+        createdAt: submission.createdAt,
+        rewardId: submission.bountyId
       };
 
       const isSubmission = submission.bounty.approveSubmitters ? submissionStatuses.includes(submission.status) : false;
