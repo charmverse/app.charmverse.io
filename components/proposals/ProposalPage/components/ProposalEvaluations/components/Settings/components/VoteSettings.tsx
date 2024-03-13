@@ -70,8 +70,6 @@ const StyledAccordion = styled(Accordion)`
   }
 `;
 
-const supportedChainIds = [mainnet.id, optimism.id, base.id, polygon.id, polygonZkEvm.id, mantle.id];
-
 export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
   // Default values for approval type vote
@@ -239,7 +237,6 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
                     Token
                   </Typography>
                   <InputSearchCrypto
-                    supportedChainIds={supportedChainIds}
                     disabled={readOnly || isPublishedProposal}
                     readOnly={readOnly}
                     cryptoList={availableCryptos}
