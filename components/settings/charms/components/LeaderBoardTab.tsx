@@ -71,7 +71,7 @@ function CharmLeader({
       >
         <Stack minWidth='30px'>
           <Typography variant='subtitle1' color='secondary' fontWeight='bold'>
-            #{position}
+            {position ? `#${position}` : '-'}
           </Typography>
         </Stack>
 

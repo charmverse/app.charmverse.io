@@ -54,7 +54,7 @@ export async function getLeaderBoard(currentUserId?: string | null) {
       LIMIT 1;
   `;
 
-    const currentUserData = await prisma.charmWallet.findFirst({
+    const currentUserWalletData = await prisma.charmWallet.findFirst({
       where: { userId: currentUserId, user: { isNot: null } },
       select: {
         totalBalance: true,
@@ -69,12 +69,25 @@ export async function getLeaderBoard(currentUserId?: string | null) {
     });
 
     currentUser = {
-      position: currentUserPositionRes[0]?.position?.toString(),
-      id: currentUserData?.user?.id || '',
-      username: currentUserData?.user?.username || '',
-      avatar: currentUserData?.user?.avatar || '',
-      totalBalance: currentUserData?.totalBalance || 0
+      position: currentUserPositionRes[0]?.position?.toString() || '-',
+      id: currentUserWalletData?.user?.id || '',
+      username: currentUserWalletData?.user?.username || '',
+      avatar: currentUserWalletData?.user?.avatar || '',
+      totalBalance: currentUserWalletData?.totalBalance || 0
     };
+
+    if (!currentUserWalletData) {
+      // user does not have wallet yet
+      const currentUserData = await prisma.user.findUnique({ where: { id: currentUserId } });
+
+      currentUser = {
+        position: '',
+        id: currentUserData?.id || '',
+        username: currentUserData?.username || '',
+        avatar: currentUserData?.avatar || '',
+        totalBalance: 0
+      };
+    }
   }
 
   return { leaders, currentUser };
