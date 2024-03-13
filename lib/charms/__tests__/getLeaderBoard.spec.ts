@@ -1,5 +1,5 @@
 import { addCharms } from 'lib/charms/addCharms';
-import { getLeaderBoard } from 'lib/charms/getLeaderboard';
+import { getLeaderBoard } from 'lib/charms/getLeaderBoard';
 import { getUserOrSpaceWallet } from 'lib/charms/getUserOrSpaceWallet';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 

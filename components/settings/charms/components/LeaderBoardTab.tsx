@@ -13,10 +13,10 @@ type Props = {
 
 export function LeaderBoardTab({ charmWallet }: Props) {
   const { user } = useUser();
-  const { data: charmLeaders } = useCharmsLeaderBoard();
-  const isUserOnLeaderBoard = charmLeaders?.findIndex((u) => u.id === user?.id) !== -1;
+  const { data: charmLeaderBoard } = useCharmsLeaderBoard();
+  const isUserOnLeaderBoard = charmLeaderBoard?.leaders?.findIndex((u) => u.id === user?.id) !== -1;
 
-  if (!charmLeaders) {
+  if (!charmLeaderBoard) {
     return <LoadingComponent isLoading />;
   }
 
@@ -24,7 +24,7 @@ export function LeaderBoardTab({ charmWallet }: Props) {
     <Stack gap={2} justifyContent='center'>
       <Typography variant='subtitle1'>Charm leaders</Typography>
       <Stack>
-        {charmLeaders.map((leader, i) => (
+        {charmLeaderBoard.leaders.map((leader, i) => (
           <Stack key={leader.id}>
             <Stack
               direction='row'
