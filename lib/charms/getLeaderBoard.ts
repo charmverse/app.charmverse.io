@@ -11,7 +11,7 @@ export type LeaderBoardUser = {
 
 export type LeaderBoardData = {
   leaders: LeaderBoardUser[];
-  currentUserPosition?: string;
+  currentUser?: { position: string; totalBalance: number; id: string; avatar: string; username: string };
 };
 
 export async function getLeaderBoard(currentUserId?: string | null) {
@@ -38,7 +38,7 @@ export async function getLeaderBoard(currentUserId?: string | null) {
     avatar: w.user?.avatar
   })) as LeaderBoardUser[];
 
-  let currentUserPosition: string | undefined;
+  let currentUser: LeaderBoardData['currentUser'];
 
   if (currentUserId) {
     // query current user position in the leaderboard using ROW_NUMBER
@@ -54,8 +54,28 @@ export async function getLeaderBoard(currentUserId?: string | null) {
       LIMIT 1;
   `;
 
-    currentUserPosition = currentUserPositionRes[0]?.position?.toString();
+    const currentUserData = await prisma.charmWallet.findFirst({
+      where: { userId: currentUserId, user: { isNot: null } },
+      select: {
+        totalBalance: true,
+        user: {
+          select: {
+            id: true,
+            username: true,
+            avatar: true
+          }
+        }
+      }
+    });
+
+    currentUser = {
+      position: currentUserPositionRes[0]?.position?.toString(),
+      id: currentUserData?.user?.id || '',
+      username: currentUserData?.user?.username || '',
+      avatar: currentUserData?.user?.avatar || '',
+      totalBalance: currentUserData?.totalBalance || 0
+    };
   }
 
-  return { leaders, currentUserPosition: currentUserPosition || '-' };
+  return { leaders, currentUser };
 }

@@ -50,9 +50,9 @@ describe('getLeaderBoard', () => {
     expect(leaderBoard.leaders[1]?.id).toBe(user4.id);
     expect(leaderBoard.leaders[2]?.id).toBe(user3.id);
     expect(leaderBoard.leaders[3]?.id).toBe(user2.id);
-    expect(leaderBoard.currentUserPosition).toEqual('30');
+    expect(leaderBoard.currentUser?.position).toEqual('30');
 
     const leaderBoard2 = await getLeaderBoard(user6.id);
-    expect(leaderBoard2.currentUserPosition).toEqual('31');
+    expect(leaderBoard2.currentUser?.position).toEqual('31');
   });
 });
