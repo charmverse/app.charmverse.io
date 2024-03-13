@@ -199,12 +199,14 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
 async function updateNFTResp(nft: AlchemyNft): Promise<AlchemyNft> {
   if (nft.contract.symbol === 'UD') {
     const udMetadata = await GET<UnstoppableDomainsMetaData>(nft.tokenUri).catch(() => null);
+
     return {
       ...nft,
+      name: udMetadata?.name || nft.name,
       image: {
         ...nft.image,
-        thumbnailUrl: udMetadata?.image || '',
-        originalUrl: udMetadata?.image || ''
+        thumbnailUrl: udMetadata?.image || nft.image.thumbnailUrl,
+        originalUrl: udMetadata?.image || nft.image.originalUrl
       }
     };
   }
