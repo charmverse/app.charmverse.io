@@ -1,5 +1,5 @@
 import { getChainById } from 'connectors/chains';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 
 export async function getTokenAmountOnBlockNumber({
   blockNumber,
@@ -21,6 +21,6 @@ export async function getTokenAmountOnBlockNumber({
   const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const abi = ['function balanceOf(address account) external view returns (uint256)'];
   const tokenContract = new ethers.Contract(tokenContractAddress, abi, provider);
-  const balance = await tokenContract.balanceOf(walletAddress, { blockTag: Number(blockNumber) });
+  const balance = await tokenContract.balanceOf(walletAddress, { blockTag: BigNumber.from(blockNumber).toNumber() });
   return Number(ethers.utils.formatUnits(balance, 18));
 }

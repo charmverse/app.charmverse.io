@@ -273,7 +273,6 @@ test.describe.serial('Proposal Evaluations', () => {
         durationDays: settingsToTest.voteDuration,
         maxChoices: 1,
         options: ['Yes', 'No', 'Abstain'],
-        publishToSnapshot: false,
         threshold: settingsToTest.votePassThreshold,
         type: 'Approval',
         strategy: 'regular',
