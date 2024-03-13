@@ -18,6 +18,7 @@ import { generatePagePathFromPathAndTitle } from '../pages';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getProposalErrors } from './getProposalErrors';
+import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsWithBlockNumber';
 import type { VoteSettings } from './interfaces';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
@@ -139,6 +140,12 @@ export async function createProposal({
     proposalFormId = await createForm(formFields);
   }
 
+  const evaluationsWithBlockNumber = await getVoteEvaluationStepsWithBlockNumber({
+    evaluations: evaluations.map((evaluation, index) => ({ ...evaluation, id: evaluationIds[index] })),
+    isDraft: !!isDraft,
+    proposalType: pageProps.type ?? 'page'
+  });
+
   // Using a transaction to ensure both the proposal and page gets created together
   const [proposal, _reviewerCreation, _evaluationPermissions, page] = await prisma.$transaction([
     prisma.proposal.create({
@@ -156,7 +163,7 @@ export async function createProposal({
         },
         evaluations: {
           createMany: {
-            data: evaluations.map((evaluation, index) => ({
+            data: evaluationsWithBlockNumber.map((evaluation, index) => ({
               id: evaluationIds[index],
               voteSettings: evaluation.voteSettings || undefined,
               index: evaluation.index,

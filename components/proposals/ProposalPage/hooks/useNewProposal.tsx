@@ -6,7 +6,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
-import { getVoteEvaluationStepsWithBlockNumber } from 'lib/proposals/getVoteEvaluationStepsWithBlockNumber';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -56,11 +55,7 @@ export function useNewProposal({ newProposal }: Props) {
           type: formInputs.type
         },
         formFields: formInputs.formFields,
-        evaluations: await getVoteEvaluationStepsWithBlockNumber({
-          isDraft: !!isDraft,
-          proposalType: formInputs.type,
-          evaluations: formInputs.evaluations
-        }),
+        evaluations: formInputs.evaluations,
         spaceId: currentSpace.id,
         fields: formInputs.fields,
         formId: formInputs.formId,

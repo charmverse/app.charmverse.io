@@ -22,13 +22,16 @@ export async function getVotingPowerForVotes({
 
   const votingPowers = await Promise.all(
     votes.map((vote) => {
-      if (vote.strategy === 'token' && vote.blockNumber && vote.tokenAddress && userWallets.length && vote.chainId) {
-        return getTokenAmountOnBlockNumber({
-          blockNumber: vote.blockNumber,
-          tokenContractAddress: vote.tokenAddress,
-          walletAddress: userWallets[0].address,
-          chainId: vote.chainId
-        });
+      if (vote.strategy === 'token') {
+        if (vote.blockNumber && vote.tokenAddress && userWallets.length && vote.chainId) {
+          return getTokenAmountOnBlockNumber({
+            blockNumber: vote.blockNumber,
+            tokenContractAddress: vote.tokenAddress,
+            walletAddress: userWallets[0].address,
+            chainId: vote.chainId
+          });
+        }
+        return 0;
       }
 
       return 1;
