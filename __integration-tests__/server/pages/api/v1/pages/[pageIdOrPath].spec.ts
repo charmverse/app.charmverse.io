@@ -1,12 +1,15 @@
 import type { Page, Space, SpaceApiToken, User } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
+import type { UserProfile } from 'lib/public-api';
 import type { PublicApiPage } from 'lib/public-api/getPageApi';
+import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
 import { baseUrl } from 'testing/mockApiCall';
 import { createPage, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 let page: Page;
-let user: User;
+let user: UserProfile;
 let space: Space;
 let apiToken: SpaceApiToken;
 let pageApiAssertion: PublicApiPage;
@@ -15,8 +18,9 @@ const pageText = `This is an awesome page content!`;
 
 beforeAll(async () => {
   const generated = await generateUserAndSpaceWithApiToken();
-
-  user = generated.user;
+  user = getUserProfile(
+    await prisma.user.findUniqueOrThrow({ where: { id: generated.user.id }, select: userProfileSelect })
+  );
   space = generated.space;
   apiToken = generated.apiToken;
 
@@ -42,6 +46,7 @@ beforeAll(async () => {
   });
 
   pageApiAssertion = {
+    author: user,
     createdAt: page.createdAt.toISOString() as any,
     content: {
       text: pageText,
