@@ -84,6 +84,8 @@ export function CharmsHistoryTab() {
 const receivedLabels: Record<CharmActionTrigger, (data: { amount: number }) => string> = {
   [CharmActionTrigger.referral]: ({ amount }) => `Received ${getAmountLabel(amount)} for a referral`,
   [CharmActionTrigger.referralReferee]: ({ amount }) => `Received ${getAmountLabel(amount)} from a referral`,
+  [CharmActionTrigger.createFirstProposal]: ({ amount }) =>
+    `Received ${getAmountLabel(amount)} for publishing first proposal`,
   [CharmActionTrigger.ETHDenver24ScavengerHunt]: ({ amount }) =>
     `Received ${getAmountLabel(amount)} (Eth Denver 24 Scavenger Hunt)`
 };
