@@ -34,13 +34,25 @@ describe('getLeaderBoard', () => {
     await getUserOrSpaceWallet({ userId: user4.id });
     await addCharms({ recipient: { userId: user4.id }, amount: 300 });
 
-    const leaderBoard = await getLeaderBoard();
+    const { user: user5 } = await generateUserAndSpace({ isAdmin: true });
+    await getUserOrSpaceWallet({ userId: user5.id });
+    await addCharms({ recipient: { userId: user5.id }, amount: 50 });
 
-    expect(leaderBoard).toHaveLength(20);
+    const { user: user6 } = await generateUserAndSpace({ isAdmin: true });
+    await getUserOrSpaceWallet({ userId: user6.id });
+    await addCharms({ recipient: { userId: user6.id }, amount: 20 });
+
+    const leaderBoard = await getLeaderBoard(user5.id);
+
+    expect(leaderBoard.leaders).toHaveLength(20);
     // sort first by totalBalance, then by createdAt
-    expect(leaderBoard[0]?.user?.id).toBe(user1.id);
-    expect(leaderBoard[1]?.user?.id).toBe(user4.id);
-    expect(leaderBoard[2]?.user?.id).toBe(user3.id);
-    expect(leaderBoard[3]?.user?.id).toBe(user2.id);
+    expect(leaderBoard.leaders[0]?.id).toBe(user1.id);
+    expect(leaderBoard.leaders[1]?.id).toBe(user4.id);
+    expect(leaderBoard.leaders[2]?.id).toBe(user3.id);
+    expect(leaderBoard.leaders[3]?.id).toBe(user2.id);
+    expect(leaderBoard.currentUserPosition).toEqual('30');
+
+    const leaderBoard2 = await getLeaderBoard(user6.id);
+    expect(leaderBoard2.currentUserPosition).toEqual('31');
   });
 });
