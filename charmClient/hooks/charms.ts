@@ -4,6 +4,7 @@ import * as http from 'adapters/http';
 import { useGET, usePUT } from 'charmClient/hooks/helpers';
 import type { TransactionResult } from 'lib/charms/addTransaction';
 import { TRANSACTIONS_PAGE_SIZE } from 'lib/charms/constants';
+import type { LeaderBoardUser } from 'lib/charms/getLeaderBoard';
 import type { SpaceCharmsStatus } from 'lib/charms/getSpacesCharmsStatus';
 import type { CharmsBalance } from 'lib/charms/getUserOrSpaceBalance';
 import type { HistoryTransaction } from 'lib/charms/listTransactionsHistory';
@@ -47,4 +48,8 @@ export function useTransactionHistory({
 
 export function useTransferCharms() {
   return usePUT<TransferCharmsInput, TransactionResult>(`/api/profile/charms`);
+}
+
+export function useCharmsLeaderBoard() {
+  return useGET<LeaderBoardUser[]>(`/api/profile/charms/leaderboard`);
 }

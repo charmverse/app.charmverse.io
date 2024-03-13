@@ -7,6 +7,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
 import { CharmsHistoryTab } from 'components/settings/charms/components/CharmsHistoryTab';
+import { LeaderBoardTab } from 'components/settings/charms/components/LeaderBoardTab';
 import { ReferralCodeButton } from 'components/settings/referrals/ReferralCodeButton';
 import { useUser } from 'hooks/useUser';
 
@@ -19,7 +20,7 @@ export function CharmsView() {
   const tabs: TabConfig[] = useMemo(() => {
     return [
       ['History', <CharmsHistoryTab key='history' />, { sx: { px: 0 } }],
-      ['Leaders', <ComingSoon key='leaders' />, { sx: { px: 0 } }],
+      ['Leaders', <LeaderBoardTab charmWallet={charmWallet} key='leaders' />, { sx: { px: 0 } }],
       ['Apply', <ComingSoon key='leaders' />, { sx: { px: 0 } }]
     ];
   }, []);
