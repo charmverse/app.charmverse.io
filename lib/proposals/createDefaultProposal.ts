@@ -5,7 +5,7 @@ import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
 import { Constants } from 'lib/focalboard/constants';
 
-import { AUTHORS_BLOCK_ID, CREATED_AT_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
+import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
 import type { VoteSettings } from './interfaces';
@@ -18,9 +18,13 @@ export const voteSettings: VoteSettings = {
   type: 'Approval',
   options: ['Yes', 'No', 'Abstain'],
   maxChoices: 1,
-  publishToSnapshot: false,
-  durationDays: 5
+  durationDays: 5,
+  strategy: 'regular',
+  blockNumber: null,
+  chainId: null,
+  tokenAddress: null
 };
+
 // replace the old method with this one once we have moved to new flow
 export async function createDefaultProposal({ spaceId, userId }: { spaceId: string; userId: string }) {
   const workflow = await prisma.proposalWorkflow.findFirstOrThrow({

@@ -61,11 +61,6 @@ interface AlchemyNftResponse {
   totalCount: number;
   pageKey?: string; // 100 nfts per page
 }
-
-const FILTERED_NFT_CONTRACTS = [
-  '0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85' // ENS
-];
-
 export const getAlchemyBaseUrl = (
   chainId: SupportedChainId = 1,
   apiSuffix: AlchemyApiSuffix = '',
@@ -117,15 +112,12 @@ export async function getNFTs({
     .flat()
     // Filter out invalid NFTs
     .filter((n) => {
-      if (FILTERED_NFT_CONTRACTS.includes(n.contract.address)) {
-        return false;
-      }
       // The error is most likely to be "Contract returned a broken token uri"
       if (n.error) {
         return false;
       }
       // No artwork found (animations and videos dotimeLastUpdatednt seem to be picked up)
-      if (!n.image.thumbnailUrl) {
+      if (!n.image.thumbnailUrl && !n.image.originalUrl) {
         return false;
       }
       return true;

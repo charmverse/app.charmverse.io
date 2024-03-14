@@ -5,7 +5,6 @@ import type { CheckDiscordGateResult } from 'lib/discord/interface';
 import type { OauthFlowType } from 'lib/oauth/interfaces';
 import type { LoggedInUser } from 'models';
 import type { ConnectDiscordPayload, ConnectDiscordResponse } from 'pages/api/discord/connect';
-import type { ImportDiscordRolesPayload, ImportRolesResponse } from 'pages/api/discord/importRoles';
 
 export class DiscordApi {
   disconnectDiscord() {
@@ -16,10 +15,6 @@ export class DiscordApi {
     const query = authFlowType ? `?authFlowType=${authFlowType}` : '';
 
     return http.POST<ConnectDiscordResponse>(`/api/discord/connect${query}`, payload);
-  }
-
-  importRolesFromDiscordServer(payload: ImportDiscordRolesPayload) {
-    return http.POST<ImportRolesResponse>('/api/discord/importRoles', payload);
   }
 
   checkDiscordGate(spaceDomain: string) {

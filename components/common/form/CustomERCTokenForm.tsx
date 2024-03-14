@@ -49,8 +49,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
     setValue,
     watch,
     trigger,
-    reset,
-    formState: { errors, isValid }
+    formState: { errors, isValid, isSubmitting }
   } = useForm<FormValues>({
     mode: 'onChange',
     defaultValues: {
@@ -286,7 +285,12 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
             </Grid>
           )}
           <Grid item>
-            <Button data-test='create-token-payment-method' type='submit' disabled={!isFormValid}>
+            <Button
+              data-test='create-token-payment-method'
+              type='submit'
+              disabled={!isFormValid}
+              loading={isSubmitting}
+            >
               Create payment method
             </Button>
           </Grid>

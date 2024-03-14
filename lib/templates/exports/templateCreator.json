@@ -8641,7 +8641,9 @@
             "__step": "Draft",
             "__title": "",
             "__status": "in_progress",
-            "__authors": [null],
+            "__authors": [
+              null
+            ],
             "__reviewers": [],
             "__evaluationType": "draft"
           }
@@ -8704,11 +8706,15 @@
             "proposalId": "3f1d1e30-13f1-4c62-801d-f774cc99c2b2",
             "voteSettings": {
               "type": "Approval",
-              "options": ["Yes", "No", "Abstain"],
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -9212,7 +9218,9 @@
             "__step": "Draft",
             "__title": "",
             "__status": "in_progress",
-            "__authors": [null],
+            "__authors": [
+              null
+            ],
             "__reviewers": [],
             "__evaluationType": "draft"
           }
@@ -9275,11 +9283,15 @@
             "proposalId": "638db32f-853c-4bc7-959d-d289906bb440",
             "voteSettings": {
               "type": "Approval",
-              "options": ["Yes", "No", "Abstain"],
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -9988,7 +10000,9 @@
             "__step": "Draft",
             "__title": "",
             "__status": "in_progress",
-            "__authors": [null],
+            "__authors": [
+              null
+            ],
             "__reviewers": [],
             "__evaluationType": "draft"
           }
@@ -10051,11 +10065,15 @@
             "proposalId": "ea98bb01-9127-42b3-bfc3-86d80fdd5f7b",
             "voteSettings": {
               "type": "Approval",
-              "options": ["Yes", "No", "Abstain"],
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -10831,7 +10849,9 @@
             "__step": "Draft",
             "__title": "",
             "__status": "in_progress",
-            "__authors": [null],
+            "__authors": [
+              null
+            ],
             "__reviewers": [],
             "__evaluationType": "draft"
           }
@@ -10894,11 +10914,15 @@
             "proposalId": "49932b20-c7ca-4f17-9ecb-32940c639930",
             "voteSettings": {
               "type": "Approval",
-              "options": ["Yes", "No", "Abstain"],
+              "options": [
+                "Yes",
+                "No",
+                "Abstain"
+              ],
               "threshold": 50,
               "maxChoices": 1,
               "durationDays": 7,
-              "publishToSnapshot": false
+              "strategy": "regular"
             },
             "voteId": null,
             "result": null,
@@ -11458,7 +11482,11 @@
         "type": "profile_pic",
         "options": null,
         "index": 0,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11473,7 +11501,11 @@
         "type": "role",
         "options": null,
         "index": 2,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11488,7 +11520,11 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11503,7 +11539,11 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11518,7 +11558,11 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11533,7 +11577,11 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11548,7 +11596,11 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11578,7 +11630,11 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -11638,7 +11694,11 @@
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       }

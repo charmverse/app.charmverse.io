@@ -101,7 +101,8 @@ export function CreateVoteModal({
       threshold: +passThreshold,
       context: 'inline',
       type: voteTypeToSave,
-      maxChoices: maxChoicesToSave
+      maxChoices: maxChoicesToSave,
+      strategy: 'regular'
     });
 
     if (onCreateVote) {

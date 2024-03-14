@@ -32,6 +32,7 @@ export function ProposalStickyFooter({
     }
     // refreshProposal();
   }
+
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
