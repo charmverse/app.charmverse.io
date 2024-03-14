@@ -74,7 +74,9 @@ export function MultiChoiceForm({
                 <Stack direction='row' spacing={1} justifyContent='space-between' mr={1} flex={1}>
                   <Typography fontWeight={hasOptionPassed(index) ? 'bold' : 'normal'}>
                     {name}
-                    {showAggregateResult && aggregatedResult?.[name] ? ` (${millify(aggregatedResult[name])})` : ''}
+                    {showAggregateResult && aggregatedResult?.[name]
+                      ? ` (${aggregatedResult[name] < 1 ? aggregatedResult[name] : millify(aggregatedResult[name])})`
+                      : ''}
                   </Typography>
                   {hasOptionPassed(index) && <Chip color='primary' size='small' label='Passed' />}
                 </Stack>

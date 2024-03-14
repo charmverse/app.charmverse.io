@@ -43,6 +43,7 @@ import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { removeInlineVoteMark } from 'lib/prosemirror/plugins/inlineVotes/removeInlineVoteMark';
 import { getTokenInfo } from 'lib/tokens/tokenData';
+import { nanofy } from 'lib/utils/numbers';
 import type { ExtendedVote } from 'lib/votes/interfaces';
 import { isVotingClosed } from 'lib/votes/utils';
 
@@ -97,13 +98,12 @@ export function VoteDetail({
     <Box
       sx={{
         fontWeight: 'bold',
-        mt: 1,
         display: 'flex',
         alignItems: 'center',
         gap: 1
       }}
     >
-      <span>Votes</span> <Chip size='small' label={millify(totalVotes)} />
+      <span>Votes</span> <Chip size='small' label={totalVotes < 1 ? totalVotes : millify(totalVotes)} />
     </Box>
   );
 
@@ -192,24 +192,31 @@ export function VoteDetail({
           <CharmEditor disablePageSpecificFeatures isContentControlled content={content as PageContent} readOnly />
         </Box>
       )}
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+      <Stack flexDirection='row' mt={1} justifyContent='space-between' alignItems='center'>
         {!detailed && voteCountLabel}
-        {tokenInfo && chain && (
-          <Stack my={1} flexDirection='row' gap={0.75} alignItems='center'>
+      </Stack>
+      {vote.strategy === 'token' && tokenInfo && chain && vote.blockNumber && blockExplorerUrl ? (
+        <Stack flexDirection='row' justifyContent='space-between' mt={2}>
+          <Stack flexDirection='row' gap={0.75} alignItems='center'>
             <TokenLogo src={tokenInfo.canonicalLogo} height={20} />
             <Box component='span'>{tokenInfo.tokenSymbol}</Box>
             <Box component='span'>on {chain.chainName}</Box>
           </Stack>
-        )}
-      </Stack>
-      {vote.strategy === 'token' && vote.blockNumber && blockExplorerUrl ? (
-        <Stack flexDirection='row' alignItems='center' gap={1} my={1}>
           <Link href={`${blockExplorerUrl}/block/${vote.blockNumber}`} target='_blank' rel='noreferrer'>
-            <Typography color='secondary' fontWeight={600}>
-              Snapshot #{vote.blockNumber}
-            </Typography>
+            <Tooltip title={`View block on ${chain.chainName} explorer`}>
+              <Stack flexDirection='row' alignItems='center' gap={0.5}>
+                <Typography style={{ margin: 0 }} color='secondary' variant='subtitle1' my={0} component='span'>
+                  {vote.blockNumber}
+                </Typography>
+                <OpenInNewIcon
+                  color='secondary'
+                  sx={{
+                    fontSize: 16
+                  }}
+                />
+              </Stack>
+            </Tooltip>
           </Link>
-          <OpenInNewIcon fontSize='small' color='secondary' />
         </Stack>
       ) : null}
       <Tooltip
@@ -252,7 +259,9 @@ export function VoteDetail({
         >
           {vote.strategy === 'token' && (
             <Stack gap={0.5}>
-              <Typography variant='subtitle1'>Your voting power: {millify(vote.votingPower)}</Typography>
+              <Typography variant='subtitle1'>
+                Your voting power: {vote.votingPower < 1 ? vote.votingPower : millify(vote.votingPower)}
+              </Typography>
               <Typography variant='subtitle1'>
                 Total voting power: {vote.totalVotingPower ? millify(vote.totalVotingPower) : 'N/A'}
               </Typography>
@@ -290,6 +299,8 @@ export function VoteDetail({
               return null;
             }
 
+            const userVotePower = userVote.tokenAmount ? parseFloat(userVote.tokenAmount) : null;
+
             return (
               <React.Fragment key={userVote.userId}>
                 <ListItem
@@ -312,7 +323,7 @@ export function VoteDetail({
                   />
                   <Typography fontWeight={500} color='secondary'>
                     {choices.join(', ')}
-                    {userVote.tokenAmount ? ` (${millify(parseFloat(userVote.tokenAmount))})` : ''}
+                    {userVotePower ? ` (${userVotePower < 1 ? userVotePower : millify(userVotePower)})` : ''}
                   </Typography>
                 </ListItem>
                 <Divider />

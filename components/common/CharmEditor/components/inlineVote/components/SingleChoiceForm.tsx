@@ -37,7 +37,11 @@ export function SingleChoiceForm({
               <span>
                 {voteOption.name}
                 {showAggregateResult && aggregatedResult?.[voteOption.name]
-                  ? ` (${millify(aggregatedResult[voteOption.name])})`
+                  ? ` (${
+                      aggregatedResult[voteOption.name] < 1
+                        ? aggregatedResult[voteOption.name]
+                        : millify(aggregatedResult[voteOption.name])
+                    })`
                   : ''}
               </span>
               <Typography variant='subtitle1' color='secondary' component='span'>
