@@ -2,13 +2,8 @@ import type { PaymentMethod } from '@charmverse/core/prisma';
 import { VoteStrategy, VoteType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
   Divider,
   FormControlLabel,
   FormLabel,
@@ -24,7 +19,6 @@ import {
 import { getChainById } from 'connectors/chains';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
-import { base, mainnet, mantle, optimism, polygon, polygonZkEvm } from 'viem/chains';
 
 import { Button } from 'components/common/Button';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
@@ -43,30 +37,6 @@ type CreateVoteModalProps = {
 const StyledVoteSettings = styled.div`
   & .MuiInputBase-input {
     box-sizing: content-box;
-  }
-`;
-
-const StyledAccordion = styled(Accordion)`
-  & .MuiAccordionSummary-root {
-    padding: 0px;
-    min-height: fit-content;
-
-    &.Mui-expanded {
-      padding-bottom: ${({ theme }) => theme.spacing(1)};
-      min-height: fit-content;
-    }
-  }
-
-  & .MuiAccordionDetails-root {
-    padding: 0px;
-  }
-
-  & .MuiAccordionSummary-content {
-    margin: 0px;
-
-    &.Mui-expanded {
-      margin: 0px;
-    }
   }
 `;
 

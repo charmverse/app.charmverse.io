@@ -1,9 +1,14 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
 import { Box, Typography, FormLabel } from '@mui/material';
+import { useEffect, useState } from 'react';
 
 import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import {
+  authorSystemRole,
+  allMembersSystemRole,
+  tokenHoldersSystemRole
+} from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
@@ -32,6 +37,7 @@ export function EvaluationStepSettings({
   onChange,
   readOnly
 }: Props) {
+  const [isTokenVoting, setIsTokenVoting] = useState(false);
   const isAdmin = useIsAdmin();
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
@@ -54,6 +60,15 @@ export function EvaluationStepSettings({
     });
   }
 
+  useEffect(() => {
+    if (evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token') {
+      setIsTokenVoting(true);
+      handleOnChangeReviewers([tokenHoldersSystemRole]);
+    } else {
+      setIsTokenVoting(false);
+    }
+  }, [evaluation]);
+
   return (
     <>
       <FormLabel required>
@@ -66,8 +81,8 @@ export function EvaluationStepSettings({
           data-test={`proposal-${evaluation.type}-select`}
           emptyPlaceholderContent='Select user or role'
           value={reviewerOptions as SelectOption[]}
-          readOnly={readOnlyReviewers}
-          systemRoles={[authorSystemRole, allMembersSystemRole]}
+          readOnly={readOnlyReviewers || isTokenVoting}
+          systemRoles={[authorSystemRole, isTokenVoting ? tokenHoldersSystemRole : allMembersSystemRole]}
           variant='outlined'
           onChange={handleOnChangeReviewers}
           required
