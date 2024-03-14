@@ -20,14 +20,29 @@ export async function getVotingPowerForVotes({
     }
   });
 
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: userId
+    },
+    select: {
+      primaryWallet: {
+        select: {
+          address: true
+        }
+      }
+    }
+  });
+
+  const primaryWalletAddress = user.primaryWallet?.address ?? userWallets[0]?.address;
+
   const votingPowers = await Promise.all(
     votes.map((vote) => {
       if (vote.strategy === 'token') {
-        if (vote.blockNumber && vote.tokenAddress && userWallets.length && vote.chainId) {
+        if (vote.blockNumber && vote.tokenAddress && primaryWalletAddress && vote.chainId) {
           return getTokenAmountOnBlockNumber({
             blockNumber: vote.blockNumber,
             tokenContractAddress: vote.tokenAddress,
-            walletAddress: userWallets[0].address,
+            walletAddress: primaryWalletAddress,
             chainId: vote.chainId
           });
         }
