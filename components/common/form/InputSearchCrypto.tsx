@@ -169,17 +169,26 @@ export function InputSearchCrypto<Value extends CryptoValue>({
             </Stack>
           );
         }}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            variant={variant}
-            InputProps={{
-              ...params.InputProps,
-              ...(variant === 'standard' && { disableUnderline: true }),
-              placeholder
-            }}
-          />
-        )}
+        renderInput={(params) => {
+          const tokenInfo = value
+            ? getTokenInfo({
+                methods: paymentMethods,
+                symbolOrAddress: typeof value === 'object' ? value.tokenAddress : value
+              })
+            : null;
+          return (
+            <TextField
+              {...params}
+              variant={variant}
+              InputProps={{
+                ...params.InputProps,
+                ...(variant === 'standard' && { disableUnderline: true }),
+                placeholder,
+                startAdornment: tokenInfo ? <TokenLogo height={20} src={tokenInfo.canonicalLogo} /> : null
+              }}
+            />
+          );
+        }}
         disabled={disabled}
         readOnly={readOnly}
       />
