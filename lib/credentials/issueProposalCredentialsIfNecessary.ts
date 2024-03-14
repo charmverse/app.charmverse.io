@@ -86,7 +86,7 @@ export async function issueProposalCredentialsIfNecessary({
       space: {
         select: {
           id: true,
-          issueCredentialsOnChainId: true,
+          credentialsChainId: true,
           features: true,
           credentialTemplates: {
             where: {
@@ -181,15 +181,23 @@ export async function issueProposalCredentialsIfNecessary({
             URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
           };
 
-          if (proposalWithSpaceConfig.space.issueCredentialsOnChainId) {
+          if (proposalWithSpaceConfig.space.credentialsChainId) {
             await publishCredentialIssuableEvent({
               spaceId: proposalWithSpaceConfig.space.id,
-              credential: {
-                chainId: proposalWithSpaceConfig.space.issueCredentialsOnChainId as EasSchemaChain,
-                type: 'proposal',
-                credentialInputs: {
-                  recipient: targetWallet.address,
-                  data: credentialContent
+              data: {
+                credential: {
+                  chainId: proposalWithSpaceConfig.space.credentialsChainId as EasSchemaChain,
+                  type: 'proposal',
+                  credentialInputs: {
+                    recipient: targetWallet.address,
+                    data: credentialContent
+                  }
+                },
+                credentialMetadata: {
+                  event,
+                  proposalId,
+                  userId: authorUserId,
+                  credentialTemplateId: credentialTemplate.id
                 }
               }
             });

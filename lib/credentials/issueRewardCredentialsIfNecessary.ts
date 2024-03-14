@@ -60,7 +60,7 @@ export async function issueRewardCredentialsIfNecessary({
       space: {
         select: {
           id: true,
-          issueCredentialsOnChainId: true,
+          credentialsChainId: true,
           features: true,
           credentialTemplates: {
             where: {
@@ -168,15 +168,23 @@ export async function issueRewardCredentialsIfNecessary({
             rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
           };
 
-          if (baseReward.space.issueCredentialsOnChainId) {
+          if (baseReward.space.credentialsChainId) {
             await publishCredentialIssuableEvent({
               spaceId: baseReward.space.id,
-              credential: {
-                chainId: baseReward.space.issueCredentialsOnChainId as EasSchemaChain,
-                type: 'reward',
-                credentialInputs: {
-                  recipient: targetWallet.address,
-                  data: credentialContent
+              data: {
+                credential: {
+                  chainId: baseReward.space.credentialsChainId as EasSchemaChain,
+                  type: 'reward',
+                  credentialInputs: {
+                    recipient: targetWallet.address,
+                    data: credentialContent
+                  }
+                },
+                credentialMetadata: {
+                  event,
+                  credentialTemplateId: credentialTemplate.id,
+                  submissionId: credentialTemplate.applicationId,
+                  userId: submitterUserId
                 }
               }
             });
