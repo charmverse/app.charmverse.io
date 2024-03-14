@@ -104,11 +104,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         sx={{ minWidth: 150, ...sx }}
         forcePopupIcon={variant !== 'standard'}
         onChange={(_, _value, reason) => {
-          if (_value === ADD_NEW_CUSTOM) {
-            if (reason === 'selectOption') {
-              ERC20PopupState.open();
-            }
-          } else {
+          if (_value !== ADD_NEW_CUSTOM) {
             emitValue(_value as any);
           }
         }}
@@ -128,7 +124,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
-              <Box data-test='add-custom-token' component='li' {...props}>
+              <Box data-test='add-custom-token' component='li' {...props} onClick={ERC20PopupState.open}>
                 <AddIcon color='secondary' sx={{ mr: '5px' }} />
                 <Typography variant='body2'>Add a custom token</Typography>
               </Box>
