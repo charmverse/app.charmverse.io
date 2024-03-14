@@ -126,8 +126,8 @@ function PageLayout({ children }: PageLayoutProps) {
     maxWidth: MAX_SIDEBAR_WIDTH,
     onResize: setSidebarStorageWidth
   });
-  const { user } = useUser();
-  const { space } = useCurrentSpace();
+  const { user, isLoaded: isUserLoaded } = useUser();
+  const { space, isLoading: isSpacesLoading } = useCurrentSpace();
 
   const showSpaceMemberView = !!space && !!user && !!user?.spaceRoles.some((sr) => sr.spaceId === space.id);
 
@@ -165,7 +165,7 @@ function PageLayout({ children }: PageLayoutProps) {
     [handleDrawerClose, !!user, isMobile]
   );
 
-  if (!accessChecked) {
+  if (!accessChecked || !isUserLoaded || isSpacesLoading) {
     return (
       <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
         <LoadingComponent isLoading />
