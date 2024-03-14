@@ -1,9 +1,9 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
-import { CryptoCurrencies } from 'connectors/chains';
+import { CryptoCurrencies, getChainById } from 'connectors/chains';
 import uniq from 'lodash/uniq';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -14,36 +14,40 @@ import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
-export interface IInputSearchCryptoProps
-  extends Omit<Partial<AutocompleteProps<string, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
-  onChange?: (value: CryptoCurrency) => void;
+type CryptoValue = string | CryptoCurrency | { chainId: number; tokenAddress: string };
+
+export interface IInputSearchCryptoProps<Value extends CryptoValue>
+  extends Omit<Partial<AutocompleteProps<Value, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
+  onChange?: (value: Value) => void;
   onNewPaymentMethod?: (method: PaymentMethod) => void;
-  defaultValue?: CryptoCurrency | string;
-  value?: CryptoCurrency | string; // allow parent to override value
+  defaultValue?: Value;
+  value?: Value; // allow parent to override value
   hideBackdrop?: boolean; // hide backdrop when modal is open
-  cryptoList?: (string | CryptoCurrency)[];
+  cryptoList?: Value[];
   chainId?: number; // allow passing this down to the 'new custom token' form
   sx?: SxProps<Theme>;
   variant?: 'standard' | 'outlined';
   placeholder?: string;
+  showChain?: boolean;
 }
 
 const ADD_NEW_CUSTOM = 'ADD_NEW_CUSTOM';
 
-export function InputSearchCrypto({
+export function InputSearchCrypto<Value extends CryptoValue>({
   hideBackdrop,
   onNewPaymentMethod: _onNewPaymentMethod,
   onChange = () => {},
-  defaultValue = '',
+  defaultValue,
   value: parentValue,
-  cryptoList = CryptoCurrencies,
+  cryptoList = CryptoCurrencies as Value[],
   chainId,
   sx = {},
   disabled,
   readOnly,
   variant,
-  placeholder
-}: IInputSearchCryptoProps) {
+  placeholder,
+  showChain
+}: IInputSearchCryptoProps<Value>) {
   const [inputValue, setInputValue] = useState('');
 
   const [value, setValue] = useState(defaultValue);
@@ -51,6 +55,22 @@ export function InputSearchCrypto({
   const [paymentMethods] = usePaymentMethods();
 
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
+
+  function getOptionLabel(option: Value | string) {
+    if (!option || option === ADD_NEW_CUSTOM) {
+      return '';
+    }
+    const tokenInfo = getTokenInfo({
+      methods: paymentMethods,
+      symbolOrAddress: typeof option === 'object' ? option.tokenAddress : option
+    });
+
+    const chain = tokenInfo.chain;
+    if (chain && showChain) {
+      return `${tokenInfo.tokenSymbol} on ${chain.chainName}`;
+    }
+    return tokenInfo.tokenSymbol;
+  }
 
   useEffect(() => {
     setValue(defaultValue);
@@ -62,10 +82,10 @@ export function InputSearchCrypto({
     }
   }, [cryptoList, parentValue]);
 
-  function emitValue(received: string) {
-    if (received && cryptoList.includes(received as CryptoCurrency)) {
+  function emitValue(received: Value) {
+    if (received && cryptoList.includes(received)) {
       setValue(received);
-      onChange(received as CryptoCurrency);
+      onChange(received);
     }
   }
 
@@ -80,7 +100,7 @@ export function InputSearchCrypto({
 
   return (
     <>
-      <Autocomplete
+      <Autocomplete<Value, false, true, true>
         sx={{ minWidth: 150, ...sx }}
         forcePopupIcon={variant !== 'standard'}
         onChange={(_, _value, reason) => {
@@ -100,20 +120,11 @@ export function InputSearchCrypto({
             setInputValue(newInputValue);
           }
         }}
-        options={cryptoOptions}
-        disableClearable={true}
+        options={cryptoOptions as Value[]}
+        disableClearable
         autoHighlight
         size='small'
-        getOptionLabel={(option) => {
-          if (!option) {
-            return '';
-          }
-          const tokenInfo = getTokenInfo({
-            methods: paymentMethods,
-            symbolOrAddress: option
-          });
-          return tokenInfo.tokenSymbol;
-        }}
+        getOptionLabel={getOptionLabel}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
@@ -123,24 +134,43 @@ export function InputSearchCrypto({
               </Box>
             );
           }
+          const chain = showChain && typeof option === 'object' ? getChainById(option.chainId) : null;
           const tokenInfo = getTokenInfo({
             methods: paymentMethods,
-            symbolOrAddress: option
+            symbolOrAddress: typeof option === 'object' ? option.tokenAddress : option
           });
 
           return (
-            <Box
-              component='li'
-              sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }}
+            <Stack
               {...props}
+              component='li'
+              sx={{ '& > img': { flexShrink: 0 }, display: 'flex' }}
               data-test={`select-crypto-${option}`}
             >
-              <Box display='inline-block' width={20}>
-                <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-              </Box>
-              <Box component='span'>{tokenInfo.tokenSymbol}</Box>
-              <Box component='span'>{tokenInfo.tokenName}</Box>
-            </Box>
+              <Stack alignItems='center' flexDirection='row' gap={1} alignSelf='flex-start'>
+                <Box display='inline-block' width={20}>
+                  <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+                </Box>
+                <Stack>
+                  <Stack flexDirection='row' gap={1}>
+                    <Box component='span'>{tokenInfo.tokenSymbol}</Box>
+                    <Box component='span'>{tokenInfo.tokenName}</Box>
+                  </Stack>
+                  {chain ? (
+                    <Typography
+                      variant='subtitle2'
+                      fontWeight='bold'
+                      component='span'
+                      sx={{
+                        alignSelf: 'flex-start'
+                      }}
+                    >
+                      {chain.chainName}
+                    </Typography>
+                  ) : null}
+                </Stack>
+              </Stack>
+            </Stack>
           );
         }}
         renderInput={(params) => (

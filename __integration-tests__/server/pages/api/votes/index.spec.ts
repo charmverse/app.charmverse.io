@@ -71,7 +71,8 @@ describe('POST /api/votes - Create a new poll', () => {
       threshold: 50,
       voteOptions: ['1', '2', '3'],
       createdBy: user.id,
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(201);
@@ -97,7 +98,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', nonAdminUserCookie).send(newVote).expect(201);
@@ -120,7 +122,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(404);
   });
@@ -144,7 +147,8 @@ describe('POST /api/votes - Create a new poll', () => {
       type: 'Approval',
       threshold: 50,
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     };
 
     await request(baseUrl).post('/api/votes').set('Cookie', userCookie).send(newVote).expect(401);

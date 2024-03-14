@@ -47,6 +47,7 @@ export class ProposalPage extends DocumentPage {
     public evaluationVoteTypeApproval = page
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-type-approval'),
+    public evaluationVoteSettings = page.locator('data-test=evaluation-vote-settings'),
     public evaluationVoteTypeCustomOptions = page
       .locator('data-test=evaluation-vote-settings')
       .locator('data-test=vote-type-custom-options'),

@@ -1,8 +1,14 @@
-import { VoteType } from '@charmverse/core/prisma';
+import type { PaymentMethod } from '@charmverse/core/prisma';
+import { VoteStrategy, VoteType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
 import AddCircle from '@mui/icons-material/AddCircle';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Divider,
   FormControlLabel,
   FormLabel,
@@ -11,22 +17,27 @@ import {
   Radio,
   RadioGroup,
   Stack,
-  Switch,
   TextField,
   Tooltip,
   Typography
 } from '@mui/material';
+import { getChainById } from 'connectors/chains';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
+import { base, mainnet, mantle, optimism, polygon, polygonZkEvm } from 'viem/chains';
 
 import { Button } from 'components/common/Button';
 import { NumericFieldWithButtons } from 'components/common/form/fields/NumericFieldWithButtons';
+import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
+import { isTruthy } from 'lib/utils/types';
 
 type CreateVoteModalProps = {
   readOnly?: boolean;
   onChange?: (vote: ProposalEvaluationInput['voteSettings']) => void;
   value: ProposalEvaluationInput['voteSettings'];
+  isPublishedProposal?: boolean;
 };
 
 const StyledVoteSettings = styled.div`
@@ -35,14 +46,101 @@ const StyledVoteSettings = styled.div`
   }
 `;
 
-export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps) {
+const StyledAccordion = styled(Accordion)`
+  & .MuiAccordionSummary-root {
+    padding: 0px;
+    min-height: fit-content;
+
+    &.Mui-expanded {
+      padding-bottom: ${({ theme }) => theme.spacing(1)};
+      min-height: fit-content;
+    }
+  }
+
+  & .MuiAccordionDetails-root {
+    padding: 0px;
+  }
+
+  & .MuiAccordionSummary-content {
+    margin: 0px;
+
+    &.Mui-expanded {
+      margin: 0px;
+    }
+  }
+`;
+
+export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }: CreateVoteModalProps) {
   const [passThreshold, setPassThreshold] = useState<number>(value?.threshold || 50);
   // Default values for approval type vote
   const [voteType, setVoteType] = useState<VoteType>(value?.type ?? VoteType.Approval);
   const [options, setOptions] = useState<string[]>(value?.options ?? ['Yes', 'No', 'Abstain']);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
-  const [publishToSnapshot, setPublishToSnapshot] = useState(value?.publishToSnapshot ?? false);
+  const [isAdvancedSectionVisible, setIsAdvancedSectionVisible] = useState(isPublishedProposal ?? false);
+  const [voteStrategy, setVoteStrategy] = useState<VoteStrategy>(value?.strategy ?? 'regular');
+  const [voteToken, setVoteToken] = useState<null | {
+    chainId: number;
+    tokenAddress: string;
+  }>(
+    value?.chainId && value?.tokenAddress && value?.strategy === 'token'
+      ? {
+          chainId: value.chainId,
+          tokenAddress: value.tokenAddress
+        }
+      : null
+  );
+  const [paymentMethods] = usePaymentMethods({
+    filterUSDCPaymentMethods: true,
+    filterNativeTokens: true
+  });
+
+  const [availableCryptos, setAvailableCryptos] = useState<{ chainId: number; tokenAddress: string }[]>(
+    paymentMethods.map((method) => {
+      return {
+        chainId: method.chainId,
+        tokenAddress: method.contractAddress || ''
+      };
+    })
+  );
+
+  function refreshCryptoList(chainId: number, rewardToken?: string) {
+    // Set the default chain currency
+    const selectedChain = getChainById(chainId);
+
+    if (selectedChain) {
+      const nativeCurrency = selectedChain.nativeCurrency.symbol;
+
+      const cryptosToDisplay = [nativeCurrency];
+
+      const contractAddresses = paymentMethods
+        .filter((method) => method.chainId === chainId)
+        .map((method) => {
+          return method.contractAddress;
+        })
+        .filter(isTruthy);
+      cryptosToDisplay.push(...contractAddresses);
+
+      setAvailableCryptos([
+        ...availableCryptos,
+        {
+          chainId,
+          tokenAddress: rewardToken || nativeCurrency
+        }
+      ]);
+      setVoteToken({
+        tokenAddress: rewardToken || nativeCurrency,
+        chainId
+      });
+    }
+    return selectedChain?.nativeCurrency.symbol;
+  }
+
+  async function onNewPaymentMethod(paymentMethod: PaymentMethod) {
+    if (paymentMethod.contractAddress) {
+      refreshCryptoList(paymentMethod.chainId, paymentMethod.contractAddress);
+    }
+  }
 
   // useEffect on the values to call onChange() doesnt seem ideal and triggers on the first load, but it works for now. TODO: use react-hook-form?
   useEffect(() => {
@@ -58,12 +156,15 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
           type: voteType,
           options,
           maxChoices: voteType === VoteType.Approval ? 1 : maxChoices,
-          publishToSnapshot,
-          durationDays
+          durationDays,
+          blockNumber: null,
+          chainId: voteToken?.chainId ?? null,
+          tokenAddress: voteToken?.tokenAddress ?? null,
+          strategy: voteStrategy
         });
       }
     }
-  }, [voteType, options, maxChoices, durationDays, passThreshold, publishToSnapshot]);
+  }, [voteType, options, maxChoices, durationDays, voteToken, passThreshold, voteStrategy]);
 
   function handleVoteTypeChange(_voteType: VoteType) {
     if (_voteType !== value?.type) {
@@ -78,111 +179,183 @@ export function VoteSettings({ readOnly, value, onChange }: CreateVoteModalProps
 
   return (
     <StyledVoteSettings data-test='evaluation-vote-settings'>
-      <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
-        <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Publish to Snapshot
-          </Typography>
-        </FormLabel>
-        <Switch
-          disabled={readOnly}
-          checked={publishToSnapshot}
-          onChange={(e, checked) => setPublishToSnapshot(checked)}
-        />
-      </Stack>
-      <Divider sx={{ mt: 1, mb: 2 }} />
-      {!publishToSnapshot && (
-        <>
-          <Stack
-            data-test='vote-duration'
-            direction='row'
-            alignItems='center'
-            gap={2}
-            justifyContent='space-between'
-            mb={1}
-          >
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Duration (days)
-              </Typography>
-            </FormLabel>
-            <NumericFieldWithButtons
-              disabled={readOnly}
-              value={durationDays}
-              onChange={setDurationDays}
-              min={1}
-              max={100}
-            />
+      <StyledAccordion
+        expanded={isAdvancedSectionVisible}
+        onChange={(_, expanded) => {
+          setIsAdvancedSectionVisible(expanded);
+        }}
+        elevation={0}
+      >
+        <AccordionSummary>
+          <Stack flexDirection='row' gap={0.5} alignItems='center'>
+            {isAdvancedSectionVisible ? (
+              <KeyboardArrowDownIcon fontSize='small' />
+            ) : (
+              <ChevronRightIcon fontSize='small' />
+            )}
+            <Typography>Advanced</Typography>
           </Stack>
-
-          <FormLabel>
-            <Typography component='span' variant='subtitle1'>
-              Options
-            </Typography>
-          </FormLabel>
-          <RadioGroup
-            row
-            defaultValue={voteType}
-            value={voteType}
-            onChange={(e) => {
-              handleVoteTypeChange(e.target.value as VoteType);
-            }}
-            sx={{ mb: 1 }}
-          >
+        </AccordionSummary>
+        <AccordionDetails>
+          <RadioGroup value={voteStrategy}>
             <FormControlLabel
-              disabled={readOnly}
-              value={VoteType.Approval}
-              control={<Radio />}
-              label='Yes / No / Abstain'
-              data-test='vote-type-approval'
+              disabled={readOnly || isPublishedProposal}
+              control={<Radio size='small' />}
+              value={VoteStrategy.regular}
+              label='One account one vote'
+              onChange={() => {
+                setVoteStrategy('regular');
+                setVoteToken(null);
+              }}
             />
             <FormControlLabel
-              disabled={readOnly}
-              value={VoteType.SingleChoice}
-              control={<Radio />}
-              data-test='vote-type-custom-options'
-              label='Custom Options'
-              sx={{ mr: 0 }}
+              disabled={readOnly || isPublishedProposal}
+              control={<Radio size='small' />}
+              value={VoteStrategy.token}
+              label='Token voting'
+              onChange={() => {
+                setVoteStrategy('token');
+              }}
+            />
+            <FormControlLabel
+              disabled={readOnly || isPublishedProposal}
+              control={<Radio size='small' />}
+              value={VoteStrategy.snapshot}
+              label='Publish to Snapshot'
+              onChange={() => {
+                setVoteStrategy('snapshot');
+                setVoteToken(null);
+              }}
             />
           </RadioGroup>
-          {voteType === VoteType.SingleChoice && (
-            <Stack mb={2}>
-              <InlineVoteOptions options={options} setOptions={setOptions} />
-              <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
+          <Divider sx={{ mt: 1, mb: 2 }} />
+          {voteStrategy === 'token' || voteStrategy === 'regular' ? (
+            <>
+              {voteStrategy === 'token' ? (
+                <>
+                  <Typography component='span' variant='subtitle1'>
+                    Token
+                  </Typography>
+                  <InputSearchCrypto
+                    disabled={readOnly || isPublishedProposal}
+                    readOnly={readOnly}
+                    cryptoList={availableCryptos}
+                    chainId={voteToken?.chainId}
+                    placeholder='Empty'
+                    value={voteToken ?? undefined}
+                    defaultValue={voteToken ?? undefined}
+                    onChange={setVoteToken}
+                    showChain
+                    key={`${voteToken?.chainId}.${voteToken?.tokenAddress}`}
+                    onNewPaymentMethod={(newPaymentMethod) => {
+                      onNewPaymentMethod(newPaymentMethod).then(() => {
+                        if (newPaymentMethod.contractAddress) {
+                          setVoteToken({
+                            chainId: newPaymentMethod.chainId,
+                            tokenAddress: newPaymentMethod.contractAddress
+                          });
+                        }
+                      });
+                    }}
+                    sx={{
+                      width: '100%',
+                      mb: 2
+                    }}
+                  />
+                </>
+              ) : null}
+              <Stack
+                data-test='vote-duration'
+                direction='row'
+                alignItems='center'
+                gap={2}
+                justifyContent='space-between'
+                mb={1}
+              >
                 <FormLabel>
                   <Typography component='span' variant='subtitle1'>
-                    Max choices
+                    Duration (days)
                   </Typography>
                 </FormLabel>
-                <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
+                <NumericFieldWithButtons
+                  disabled={readOnly}
+                  value={durationDays}
+                  onChange={setDurationDays}
+                  min={1}
+                  max={100}
+                />
               </Stack>
-            </Stack>
-          )}
 
-          {maxChoices === 1 && (
-            <Stack
-              data-test='vote-pass-threshold'
-              direction='row'
-              alignItems='center'
-              gap={2}
-              justifyContent='space-between'
-              mb={2}
-            >
               <FormLabel>
                 <Typography component='span' variant='subtitle1'>
-                  Pass Threshold (%)
+                  Options
                 </Typography>
               </FormLabel>
-              <NumericFieldWithButtons
-                disabled={readOnly}
-                value={passThreshold}
-                onChange={setPassThreshold}
-                max={100}
-              />
-            </Stack>
-          )}
-        </>
-      )}
+              <RadioGroup
+                row
+                defaultValue={voteType}
+                value={voteType}
+                onChange={(e) => {
+                  handleVoteTypeChange(e.target.value as VoteType);
+                }}
+                sx={{ mb: 1 }}
+              >
+                <FormControlLabel
+                  disabled={readOnly}
+                  value={VoteType.Approval}
+                  control={<Radio />}
+                  label='Yes / No / Abstain'
+                  data-test='vote-type-approval'
+                />
+                <FormControlLabel
+                  disabled={readOnly}
+                  value={VoteType.SingleChoice}
+                  control={<Radio />}
+                  data-test='vote-type-custom-options'
+                  label='Custom Options'
+                  sx={{ mr: 0 }}
+                />
+              </RadioGroup>
+              {voteType === VoteType.SingleChoice && (
+                <Stack mb={2}>
+                  <InlineVoteOptions options={options} setOptions={setOptions} />
+                  <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
+                    <FormLabel>
+                      <Typography component='span' variant='subtitle1'>
+                        Max choices
+                      </Typography>
+                    </FormLabel>
+                    <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
+                  </Stack>
+                </Stack>
+              )}
+
+              {maxChoices === 1 && (
+                <Stack
+                  data-test='vote-pass-threshold'
+                  direction='row'
+                  alignItems='center'
+                  gap={2}
+                  justifyContent='space-between'
+                  mb={2}
+                >
+                  <FormLabel>
+                    <Typography component='span' variant='subtitle1'>
+                      Pass Threshold (%)
+                    </Typography>
+                  </FormLabel>
+                  <NumericFieldWithButtons
+                    disabled={readOnly}
+                    value={passThreshold}
+                    onChange={setPassThreshold}
+                    max={100}
+                  />
+                </Stack>
+              )}
+            </>
+          ) : null}
+        </AccordionDetails>
+      </StyledAccordion>
     </StyledVoteSettings>
   );
 }

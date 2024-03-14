@@ -99,6 +99,7 @@ export function EvaluationStepSettings({
         <VoteSettings
           readOnly={readOnlyVoteSettings}
           value={evaluation.voteSettings}
+          isPublishedProposal={isPublishedProposal}
           onChange={(voteSettings) =>
             onChange({
               voteSettings

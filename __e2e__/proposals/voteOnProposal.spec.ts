@@ -104,6 +104,7 @@ test.describe.serial('Proposal Evaluation Votes', () => {
 
     // Configure rubric
     await proposalPage.selectEvaluationReviewer('vote', role.id);
+    await proposalPage.evaluationVoteSettings.click();
 
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
