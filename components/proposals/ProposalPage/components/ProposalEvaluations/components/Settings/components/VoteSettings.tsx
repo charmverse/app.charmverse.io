@@ -77,7 +77,6 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
   const [options, setOptions] = useState<string[]>(value?.options ?? ['Yes', 'No', 'Abstain']);
   const [maxChoices, setMaxChoices] = useState(value?.maxChoices ?? 1);
   const [durationDays, setDurationDays] = useState(value?.durationDays ?? 5);
-  const [isAdvancedSectionVisible, setIsAdvancedSectionVisible] = useState(isPublishedProposal ?? false);
   const [voteStrategy, setVoteStrategy] = useState<VoteStrategy>(value?.strategy ?? 'regular');
   const [voteToken, setVoteToken] = useState<null | {
     chainId: number;
@@ -179,183 +178,163 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
 
   return (
     <StyledVoteSettings data-test='evaluation-vote-settings'>
-      <StyledAccordion
-        expanded={isAdvancedSectionVisible}
-        onChange={(_, expanded) => {
-          setIsAdvancedSectionVisible(expanded);
-        }}
-        elevation={0}
-      >
-        <AccordionSummary>
-          <Stack flexDirection='row' gap={0.5} alignItems='center'>
-            {isAdvancedSectionVisible ? (
-              <KeyboardArrowDownIcon fontSize='small' />
-            ) : (
-              <ChevronRightIcon fontSize='small' />
-            )}
-            <Typography>Advanced</Typography>
-          </Stack>
-        </AccordionSummary>
-        <AccordionDetails>
-          <RadioGroup value={voteStrategy}>
-            <FormControlLabel
-              disabled={readOnly || isPublishedProposal}
-              control={<Radio size='small' />}
-              value={VoteStrategy.regular}
-              label='One account one vote'
-              onChange={() => {
-                setVoteStrategy('regular');
-                setVoteToken(null);
-              }}
-            />
-            <FormControlLabel
-              disabled={readOnly || isPublishedProposal}
-              control={<Radio size='small' />}
-              value={VoteStrategy.token}
-              label='Token voting'
-              onChange={() => {
-                setVoteStrategy('token');
-              }}
-            />
-            <FormControlLabel
-              disabled={readOnly || isPublishedProposal}
-              control={<Radio size='small' />}
-              value={VoteStrategy.snapshot}
-              label='Publish to Snapshot'
-              onChange={() => {
-                setVoteStrategy('snapshot');
-                setVoteToken(null);
-              }}
-            />
-          </RadioGroup>
-          <Divider sx={{ mt: 1, mb: 2 }} />
-          {voteStrategy === 'token' || voteStrategy === 'regular' ? (
+      <RadioGroup value={voteStrategy}>
+        <FormControlLabel
+          disabled={readOnly || isPublishedProposal}
+          control={<Radio size='small' />}
+          value={VoteStrategy.regular}
+          label='One account one vote'
+          onChange={() => {
+            setVoteStrategy('regular');
+            setVoteToken(null);
+          }}
+        />
+        <FormControlLabel
+          disabled={readOnly || isPublishedProposal}
+          control={<Radio size='small' />}
+          value={VoteStrategy.token}
+          label='Token voting'
+          onChange={() => {
+            setVoteStrategy('token');
+          }}
+        />
+        <FormControlLabel
+          disabled={readOnly || isPublishedProposal}
+          control={<Radio size='small' />}
+          value={VoteStrategy.snapshot}
+          label='Publish to Snapshot'
+          onChange={() => {
+            setVoteStrategy('snapshot');
+            setVoteToken(null);
+          }}
+        />
+      </RadioGroup>
+      <Divider sx={{ mt: 1, mb: 2 }} />
+      {voteStrategy === 'token' || voteStrategy === 'regular' ? (
+        <>
+          {voteStrategy === 'token' ? (
             <>
-              {voteStrategy === 'token' ? (
-                <>
-                  <Typography component='span' variant='subtitle1'>
-                    Token
-                  </Typography>
-                  <InputSearchCrypto
-                    disabled={readOnly || isPublishedProposal}
-                    readOnly={readOnly}
-                    cryptoList={availableCryptos}
-                    chainId={voteToken?.chainId}
-                    placeholder='Empty'
-                    value={voteToken ?? undefined}
-                    defaultValue={voteToken ?? undefined}
-                    onChange={setVoteToken}
-                    showChain
-                    key={`${voteToken?.chainId}.${voteToken?.tokenAddress}`}
-                    onNewPaymentMethod={(newPaymentMethod) => {
-                      onNewPaymentMethod(newPaymentMethod).then(() => {
-                        if (newPaymentMethod.contractAddress) {
-                          setVoteToken({
-                            chainId: newPaymentMethod.chainId,
-                            tokenAddress: newPaymentMethod.contractAddress
-                          });
-                        }
+              <Typography component='span' variant='subtitle1'>
+                Token
+              </Typography>
+              <InputSearchCrypto
+                disabled={readOnly || isPublishedProposal}
+                readOnly={readOnly}
+                cryptoList={availableCryptos}
+                chainId={voteToken?.chainId}
+                placeholder='Empty'
+                value={voteToken ?? undefined}
+                defaultValue={voteToken ?? undefined}
+                onChange={setVoteToken}
+                showChain
+                key={`${voteToken?.chainId}.${voteToken?.tokenAddress}`}
+                onNewPaymentMethod={(newPaymentMethod) => {
+                  onNewPaymentMethod(newPaymentMethod).then(() => {
+                    if (newPaymentMethod.contractAddress) {
+                      setVoteToken({
+                        chainId: newPaymentMethod.chainId,
+                        tokenAddress: newPaymentMethod.contractAddress
                       });
-                    }}
-                    sx={{
-                      width: '100%',
-                      mb: 2
-                    }}
-                  />
-                </>
-              ) : null}
-              <Stack
-                data-test='vote-duration'
-                direction='row'
-                alignItems='center'
-                gap={2}
-                justifyContent='space-between'
-                mb={1}
-              >
-                <FormLabel>
-                  <Typography component='span' variant='subtitle1'>
-                    Duration (days)
-                  </Typography>
-                </FormLabel>
-                <NumericFieldWithButtons
-                  disabled={readOnly}
-                  value={durationDays}
-                  onChange={setDurationDays}
-                  min={1}
-                  max={100}
-                />
-              </Stack>
-
-              <FormLabel>
-                <Typography component='span' variant='subtitle1'>
-                  Options
-                </Typography>
-              </FormLabel>
-              <RadioGroup
-                row
-                defaultValue={voteType}
-                value={voteType}
-                onChange={(e) => {
-                  handleVoteTypeChange(e.target.value as VoteType);
+                    }
+                  });
                 }}
-                sx={{ mb: 1 }}
-              >
-                <FormControlLabel
-                  disabled={readOnly}
-                  value={VoteType.Approval}
-                  control={<Radio />}
-                  label='Yes / No / Abstain'
-                  data-test='vote-type-approval'
-                />
-                <FormControlLabel
-                  disabled={readOnly}
-                  value={VoteType.SingleChoice}
-                  control={<Radio />}
-                  data-test='vote-type-custom-options'
-                  label='Custom Options'
-                  sx={{ mr: 0 }}
-                />
-              </RadioGroup>
-              {voteType === VoteType.SingleChoice && (
-                <Stack mb={2}>
-                  <InlineVoteOptions options={options} setOptions={setOptions} />
-                  <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
-                    <FormLabel>
-                      <Typography component='span' variant='subtitle1'>
-                        Max choices
-                      </Typography>
-                    </FormLabel>
-                    <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
-                  </Stack>
-                </Stack>
-              )}
-
-              {maxChoices === 1 && (
-                <Stack
-                  data-test='vote-pass-threshold'
-                  direction='row'
-                  alignItems='center'
-                  gap={2}
-                  justifyContent='space-between'
-                  mb={2}
-                >
-                  <FormLabel>
-                    <Typography component='span' variant='subtitle1'>
-                      Pass Threshold (%)
-                    </Typography>
-                  </FormLabel>
-                  <NumericFieldWithButtons
-                    disabled={readOnly}
-                    value={passThreshold}
-                    onChange={setPassThreshold}
-                    max={100}
-                  />
-                </Stack>
-              )}
+                sx={{
+                  width: '100%',
+                  mb: 2
+                }}
+              />
             </>
           ) : null}
-        </AccordionDetails>
-      </StyledAccordion>
+          <Stack
+            data-test='vote-duration'
+            direction='row'
+            alignItems='center'
+            gap={2}
+            justifyContent='space-between'
+            mb={1}
+          >
+            <FormLabel>
+              <Typography component='span' variant='subtitle1'>
+                Duration (days)
+              </Typography>
+            </FormLabel>
+            <NumericFieldWithButtons
+              disabled={readOnly}
+              value={durationDays}
+              onChange={setDurationDays}
+              min={1}
+              max={100}
+            />
+          </Stack>
+
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Options
+            </Typography>
+          </FormLabel>
+          <RadioGroup
+            row
+            defaultValue={voteType}
+            value={voteType}
+            onChange={(e) => {
+              handleVoteTypeChange(e.target.value as VoteType);
+            }}
+            sx={{ mb: 1 }}
+          >
+            <FormControlLabel
+              disabled={readOnly}
+              value={VoteType.Approval}
+              control={<Radio />}
+              label='Yes / No / Abstain'
+              data-test='vote-type-approval'
+            />
+            <FormControlLabel
+              disabled={readOnly}
+              value={VoteType.SingleChoice}
+              control={<Radio />}
+              data-test='vote-type-custom-options'
+              label='Custom Options'
+              sx={{ mr: 0 }}
+            />
+          </RadioGroup>
+          {voteType === VoteType.SingleChoice && (
+            <Stack mb={2}>
+              <InlineVoteOptions options={options} setOptions={setOptions} />
+              <Stack direction='row' alignItems='center' gap={2} mt={2} justifyContent='space-between'>
+                <FormLabel>
+                  <Typography component='span' variant='subtitle1'>
+                    Max choices
+                  </Typography>
+                </FormLabel>
+                <NumericFieldWithButtons disabled={readOnly} value={maxChoices} onChange={setMaxChoices} min={1} />
+              </Stack>
+            </Stack>
+          )}
+
+          {maxChoices === 1 && (
+            <Stack
+              data-test='vote-pass-threshold'
+              direction='row'
+              alignItems='center'
+              gap={2}
+              justifyContent='space-between'
+              mb={2}
+            >
+              <FormLabel>
+                <Typography component='span' variant='subtitle1'>
+                  Pass Threshold (%)
+                </Typography>
+              </FormLabel>
+              <NumericFieldWithButtons
+                disabled={readOnly}
+                value={passThreshold}
+                onChange={setPassThreshold}
+                max={100}
+              />
+            </Stack>
+          )}
+        </>
+      ) : null}
     </StyledVoteSettings>
   );
 }
