@@ -196,7 +196,7 @@ export function VoteDetail({
         {!detailed && voteCountLabel}
       </Stack>
       {vote.strategy === 'token' && tokenInfo && chain && vote.blockNumber && blockExplorerUrl ? (
-        <Stack flexDirection='row' justifyContent='space-between' mt={2}>
+        <Stack flexDirection='row' justifyContent='space-between' mt={1}>
           <Stack flexDirection='row' gap={0.75} alignItems='center'>
             <TokenLogo src={tokenInfo.canonicalLogo} height={20} />
             <Box component='span'>{tokenInfo.tokenSymbol}</Box>

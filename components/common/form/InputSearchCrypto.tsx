@@ -1,7 +1,7 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
-import { Autocomplete, Box, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
 import { CryptoCurrencies, getChainById } from 'connectors/chains';
 import uniq from 'lodash/uniq';
@@ -141,27 +141,36 @@ export function InputSearchCrypto<Value extends CryptoValue>({
           });
 
           return (
-            <Box
-              component='li'
-              sx={{ '& > img': { flexShrink: 0 }, display: 'flex', gap: 1, alignItems: 'center' }}
+            <Stack
               {...props}
+              component='li'
+              sx={{ '& > img': { flexShrink: 0 }, display: 'flex' }}
               data-test={`select-crypto-${option}`}
             >
-              <Box display='inline-block' width={20}>
-                <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-              </Box>
-              <Box component='span'>{tokenInfo.tokenSymbol}</Box>
-              <Box component='span'>{tokenInfo.tokenName}</Box>
-              {chain ? (
-                <>
-                  <Typography>on</Typography>
-                  <Box display='inline-block' width={20}>
-                    <TokenLogo height={20} src={chain.iconUrl} />
-                  </Box>
-                  <Box component='span'>{chain.chainName}</Box>
-                </>
-              ) : null}
-            </Box>
+              <Stack alignItems='center' flexDirection='row' gap={1} alignSelf='flex-start'>
+                <Box display='inline-block' width={20}>
+                  <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+                </Box>
+                <Stack>
+                  <Stack flexDirection='row' gap={1}>
+                    <Box component='span'>{tokenInfo.tokenSymbol}</Box>
+                    <Box component='span'>{tokenInfo.tokenName}</Box>
+                  </Stack>
+                  {chain ? (
+                    <Typography
+                      variant='subtitle2'
+                      fontWeight='bold'
+                      component='span'
+                      sx={{
+                        alignSelf: 'flex-start'
+                      }}
+                    >
+                      {chain.chainName}
+                    </Typography>
+                  ) : null}
+                </Stack>
+              </Stack>
+            </Stack>
           );
         }}
         renderInput={(params) => (
