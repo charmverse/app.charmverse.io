@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import * as http from 'adapters/http';
-import { getTokenDecimals } from 'lib/blockchain/getTokenDecimals';
+import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
 
 const SNAPSHOT_SCORE_URL = 'https://score.snapshot.org';
 
@@ -74,11 +74,11 @@ export async function getTokenAmountOnBlockNumber({
   walletAddress: string;
 }) {
   try {
-    const tokenDecimals = await getTokenDecimals({ chainId, tokenContractAddress });
-    if (tokenDecimals === null) {
-      return 0;
-    }
-
+    const tokenMetadata = await getTokenMetadata({
+      chainId,
+      contractAddress: tokenContractAddress
+    });
+    const tokenDecimals = tokenMetadata.decimals;
     const snapshotScoreResponse = await http.POST<SnapshotScoreResponse>(
       SNAPSHOT_SCORE_URL,
       createPayload({

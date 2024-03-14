@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 
-import { getTokenDecimals } from './getTokenDecimals';
+import { getTokenMetadata } from 'lib/tokens/getTokenMetadata';
 
 export async function getTokenSupplyAmount({
   chainId,
@@ -11,9 +11,8 @@ export async function getTokenSupplyAmount({
   tokenContractAddress: string;
   chainId: number;
 }) {
-  const tokenDecimal = await getTokenDecimals({ chainId, tokenContractAddress });
   const chain = getChainById(chainId);
-  if (!chain || tokenDecimal === null) {
+  if (!chain) {
     log.error('Chain not found or token decimal not found', {
       chainId,
       tokenContractAddress
@@ -21,6 +20,12 @@ export async function getTokenSupplyAmount({
     throw new Error('Chain not found or token decimal not found');
   }
 
+  const tokenMetadata = await getTokenMetadata({
+    chainId,
+    contractAddress: tokenContractAddress
+  });
+
+  const tokenDecimals = tokenMetadata.decimals;
   const rpcUrl = chain.rpcUrls[0];
   const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
   const tokenContract = new ethers.Contract(
@@ -30,5 +35,5 @@ export async function getTokenSupplyAmount({
   );
 
   const totalSupply = await tokenContract.totalSupply();
-  return Number(ethers.utils.formatUnits(totalSupply, tokenDecimal));
+  return Number(ethers.utils.formatUnits(totalSupply, tokenDecimals));
 }
