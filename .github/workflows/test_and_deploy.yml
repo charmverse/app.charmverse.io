@@ -206,9 +206,9 @@ jobs:
       matrix:
         include:
           - test_name: 'Browser e2e test #1'
-            test_command: 'apt install build-essential -y --no-install-recommends && npm run test:e2e:ci -- --shard=1/2'
+            test_command: 'npm run test:e2e:ci -- --shard=1/2'
           - test_name: 'Browser e2e test #2'
-            test_command: 'apt install build-essential -y --no-install-recommends && npm run test:e2e:ci -- --shard=2/2'
+            test_command: 'npm run test:e2e:ci -- --shard=2/2'
 
     steps:
       - uses: actions/checkout@v4
@@ -258,6 +258,9 @@ jobs:
             sleep_loop_ct=$((sleep_loop_ct + 1))
             sleep 10
           done
+
+      - name: Install make for npm ci
+        run: apt install build-essential -y --no-install-recommends
 
       - name: Restore app from cache
         uses: ./.github/actions/build
