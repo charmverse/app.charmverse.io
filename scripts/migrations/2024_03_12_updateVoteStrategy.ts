@@ -23,18 +23,18 @@ export async function updateVoteStrategy() {
     try {
       const vote = voteProposalEvaluation.vote;
       const voteSettings = voteProposalEvaluation.voteSettings as VoteSettings;
-      if (vote && voteSettings) {
+      if (voteSettings) {
         const publishToSnapshot = (voteSettings as any).publishToSnapshot as boolean;
         // delete (voteSettings as any).publishToSnapshot;
         await prisma.$transaction([
-          prisma.vote.update({
+          ...(vote ? [prisma.vote.update({
             where: {
               id: vote.id
             },
             data: {
               strategy: publishToSnapshot ? "snapshot" : "regular"
             }
-          }),
+          })] : []),
           prisma.proposalEvaluation.update({
             where: {
               id: voteProposalEvaluation.id
@@ -49,7 +49,7 @@ export async function updateVoteStrategy() {
         ])
       }
       current++;
-      console.log(`Updated ${current} vote strategies`);
+      console.log(`Updated vote strategy: ${current}/${voteProposalEvaluations.length}`);
     } catch (error) {
       current++;
       console.error(
