@@ -8,7 +8,7 @@ import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { issueProposalCredentialsIfNecessary } from '../issueProposalCredentialsIfNecessary';
 import { publishSignedCredential, type PublishedSignedCredential } from '../queriesAndMutations';
-import { getAttestationSchemaId } from '../schemas';
+import { attestationSchemaIds } from '../schemas';
 
 jest.mock('lib/credentials/queriesAndMutations', () => ({
   publishSignedCredential: jest.fn().mockImplementation(() =>
@@ -18,10 +18,7 @@ jest.mock('lib/credentials/queriesAndMutations', () => ({
       id: uuid(),
       issuer: '0x66d96dab921F7c8Ce98d0e05fb0B76Db8Bd54773',
       recipient: '0xAEfe164A5f55121AD98d0e347dA7990CcC8BE295',
-      schemaId: getAttestationSchemaId({
-        chainId: optimism.id,
-        credentialType: 'proposal'
-      }),
+      schemaId: attestationSchemaIds.proposal,
       sig: 'Signature content',
       timestamp: new Date(),
       type: 'proposal',

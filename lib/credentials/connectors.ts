@@ -1,9 +1,9 @@
 import { EAS } from '@ethereum-attestation-service/eas-sdk';
-import { arbitrum, base, optimism } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
 
 import type { ExternalCredentialChain } from './external/schemas';
 
-export const easSchemaChains = [optimism.id] as const;
+export const easSchemaChains = [optimism.id, optimismSepolia.id] as const;
 
 export const defaultCredentialChain = easSchemaChains[0];
 
@@ -21,6 +21,11 @@ export const easConnectors: Record<EasSchemaChain | ExternalCredentialChain, EAS
     attestationContract: '0x4200000000000000000000000000000000000021',
     schemaRegistryContract: '0x4200000000000000000000000000000000000020',
     attestationExplorerUrl: 'https://optimism.easscan.org'
+  },
+  [optimismSepolia.id]: {
+    attestationContract: '0x4200000000000000000000000000000000000021',
+    schemaRegistryContract: '0x4200000000000000000000000000000000000020',
+    attestationExplorerUrl: 'https://optimism-sepolia.easscan.org'
   },
   [arbitrum.id]: {
     attestationContract: '0xbd75f629a22dc1ced33dda0b68c546a1c035c458',

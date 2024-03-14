@@ -1,3 +1,7 @@
+/**
+ * @type {import('next').NextConfig}
+ */
+
 /* eslint-disable @typescript-eslint/no-var-requires */
 const BundleAnalyzer = require('@next/bundle-analyzer');
 

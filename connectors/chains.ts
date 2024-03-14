@@ -5,7 +5,6 @@ import {
   arbitrum,
   avalanche,
   base,
-  baseGoerli,
   baseSepolia,
   bsc,
   celo,
@@ -167,19 +166,6 @@ export const RPC: Record<string, IChainDetails> = {
     shortName: 'base-sepolia',
     testnet: true
   },
-  BASE_TESTNET: {
-    ...EVM_DEFAULT,
-    chainId: baseGoerli.id,
-    viem: baseGoerli,
-    chainName: 'Base - Goerli Testnet',
-    rpcUrls: ['https://goerli.base.org'],
-    gnosisUrl: 'https://safe-transaction-base-testnet.safe.global',
-    blockExplorerUrls: ['https://goerli.basescan.org'],
-    iconUrl: '/images/cryptoLogos/base-logo.svg',
-    shortName: 'base-testnet',
-    testnet: true,
-    unlockNetwork: true
-  },
   // https://docs.zora.co/docs/zora-network/network
   ZORA: {
     ...EVM_DEFAULT,
@@ -202,6 +188,7 @@ export const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
+    alchemyUrl: 'https://polygon-mainnet.g.alchemy.com',
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
@@ -471,10 +458,8 @@ export function getChainList(options: { enableTestnets?: boolean } = {}) {
   const enableTestNets = isDevEnv || options.enableTestnets;
   return (
     Object.values(RPC)
-      // filter out testnets in prod, except for Goerli and Sepolia
-      .filter(
-        (chain) => enableTestNets || !chain.testnet || chain.chainId === goerli.id || chain.chainId === sepolia.id
-      )
+      // filter out testnets in prod, except for Sepolia
+      .filter((chain) => enableTestNets || !chain.testnet || chain.chainId === sepolia.id)
       .sort(sortChainList)
   );
 }

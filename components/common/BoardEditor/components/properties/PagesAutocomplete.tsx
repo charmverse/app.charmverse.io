@@ -48,6 +48,27 @@ const StyledStack = styled(Stack)`
   gap: ${({ theme }) => theme.spacing(0.25)};
 `;
 
+const StyledRelatedPage = styled(Stack)`
+  flex-direction: row;
+  padding-left: ${({ theme }) => theme.spacing(0.5)};
+  padding-right: ${({ theme }) => theme.spacing(0.5)};
+  align-items: center;
+  cursor: pointer;
+  border-radius: ${({ theme }) => theme.spacing(0.25)};
+  transition: ${({ theme }) =>
+    theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
+      duration: theme.transitions.duration.shortest
+    })};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.palette.action.hover};
+    transition: ${({ theme }) =>
+      theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
+        duration: theme.transitions.duration.shortest
+      })};
+  }
+`;
+
 export function RelationPageListItemsContainer({
   readOnly,
   pageListItems,
@@ -198,27 +219,9 @@ function PagesAutocompleteBase({
                   <Typography variant='subtitle1' color='secondary' mr={0.5}>
                     In
                   </Typography>
-                  <Stack
+                  <StyledRelatedPage
                     onClick={() => {
                       navigateToSpacePath(`/${connectedBoard.path}`);
-                    }}
-                    sx={{
-                      flexDirection: 'row',
-                      px: 0.5,
-                      alignItems: 'center',
-                      cursor: 'pointer',
-                      borderRadius: (theme) => theme.spacing(0.25),
-                      transition: (theme) =>
-                        theme.transitions.create('background-color', {
-                          duration: theme.transitions.duration.shortest
-                        }),
-                      '&:hover': {
-                        backgroundColor: (theme) => theme.palette.action.hover,
-                        transition: (theme) =>
-                          theme.transitions.create('background-color', {
-                            duration: theme.transitions.duration.shortest
-                          })
-                      }
                     }}
                   >
                     <PageIcon
@@ -227,10 +230,13 @@ function PagesAutocompleteBase({
                       isEditorEmpty={!connectedBoard.hasContent}
                       pageType={connectedBoard.type}
                     />
-                    <PageTitle hasContent={!connectedBoard.title} sx={{ fontWeight: 'bold' }}>
+                    <PageTitle
+                      hasContent={!connectedBoard.title}
+                      sx={{ fontWeight: 'bold', maxWidth: 250, flexGrow: 1 }}
+                    >
                       {connectedBoard.title || 'Untitled'}
                     </PageTitle>
-                  </Stack>
+                  </StyledRelatedPage>
                 </Stack>
               ) : null,
               ...(variant === 'standard' && { disableUnderline: true })

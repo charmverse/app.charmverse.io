@@ -30,6 +30,7 @@ export function getTokenInfo({ chainId = 1, methods, symbolOrAddress }: getToken
   const paymentMethod = methods.find(
     (method) => method.contractAddress === symbolOrAddress || method.tokenSymbol === symbolOrAddress
   );
+
   if (paymentMethod) {
     return getTokenAndChainInfo(paymentMethod);
   }

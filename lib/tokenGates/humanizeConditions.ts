@@ -27,7 +27,7 @@ export function humanizeConditionsData(conditions: TokenGate['conditions']): Hum
     const chainDetails = getChainById(Number(acc.chain));
     const tokenSymbol = chainDetails?.viem.nativeCurrency.symbol;
     const quantity = acc.quantity;
-    const balance = Number(quantity) ? formatEther(BigInt(quantity)) : quantity;
+    const balance = Number(quantity) && Number(quantity) % 1 === 0 ? formatEther(BigInt(quantity)) : quantity;
     const image = acc.image;
     const tokenNameOrEtherscanUrl: HumanizeConditionsContent = acc.name
       ? { type: 'text', content: acc.name || '', props: { fontWeight: 'bold' } }

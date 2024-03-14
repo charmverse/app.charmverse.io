@@ -28,7 +28,8 @@ describe('createVote', () => {
       type: 'Approval',
       context: 'inline',
       voteOptions: ['1', '2', '3'],
-      maxChoices: 1
+      maxChoices: 1,
+      strategy: 'regular'
     });
     expect(createdVote).toMatchObject(
       expect.objectContaining({
@@ -84,7 +85,8 @@ describe('createVote', () => {
       context: 'inline',
       voteOptions: ['1', '2', '3'],
       maxChoices: 1,
-      evaluationId: voteStepId
+      evaluationId: voteStepId,
+      strategy: 'regular'
     });
     expect(createdVote).toMatchObject(
       expect.objectContaining({
@@ -115,7 +117,8 @@ describe('createVote', () => {
       context: 'inline',
       voteOptions: ['1', '2', '3'],
       maxChoices: 1,
-      evaluationId: secondVoteStepId
+      evaluationId: secondVoteStepId,
+      strategy: 'regular'
     });
 
     await expect(
@@ -132,7 +135,8 @@ describe('createVote', () => {
         context: 'inline',
         voteOptions: ['1', '2', '3'],
         maxChoices: 1,
-        evaluationId: voteStepId
+        evaluationId: voteStepId,
+        strategy: 'regular'
       })
     ).rejects.toBeInstanceOf(DuplicateDataError);
 
@@ -150,7 +154,8 @@ describe('createVote', () => {
         context: 'inline',
         voteOptions: ['1', '2', '3'],
         maxChoices: 1,
-        evaluationId: secondVoteStepId
+        evaluationId: secondVoteStepId,
+        strategy: 'regular'
       })
     ).rejects.toBeInstanceOf(DuplicateDataError);
   });

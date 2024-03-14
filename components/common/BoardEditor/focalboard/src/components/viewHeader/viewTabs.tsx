@@ -140,6 +140,7 @@ function ViewTab({
   const [isDragging, isOver, columnRef] = useSortable<BoardView, HTMLButtonElement>('view', view, true, onDrop);
   return (
     <TabButton
+      className='disable-drag-selection'
       ref={columnRef as any}
       disableRipple
       href={href}

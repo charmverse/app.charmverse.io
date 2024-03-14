@@ -1,5 +1,5 @@
 import * as http from 'adapters/http';
-import type { CharmVerseCredentialInput } from 'lib/credentials/attest';
+import type { CharmVerseCredentialInput } from 'lib/credentials/attestOffchain';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { CreateCredentialTemplateInput, CredentialTemplateUpdate } from 'lib/credentials/templates';
 

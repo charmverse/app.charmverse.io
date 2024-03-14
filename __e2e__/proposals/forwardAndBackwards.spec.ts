@@ -58,7 +58,7 @@ test.describe('Go through full proposal flow', async () => {
             type: 'SingleChoice',
             options: ['Yes', 'No'],
             maxChoices: 1,
-            publishToSnapshot: false
+            strategy: 'regular'
           },
           permissions: [{ assignee: { group: 'current_reviewer' }, operation: 'move' }],
           reviewers: [{ group: 'user', id: reviewer.id }]

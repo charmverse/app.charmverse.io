@@ -5,10 +5,11 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { SQSBatchItemFailure, SQSBatchResponse, SQSEvent, SQSRecord } from 'aws-lambda';
 
+import { attestOnChainAndRecordCredential } from 'lib/credentials/attestOnchain';
 import { count } from 'lib/metrics';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
-import type { WebhookPayload } from 'lib/webhookPublisher/interfaces';
+import { WebhookEventNames, type WebhookPayload } from 'lib/webhookPublisher/interfaces';
 
 import { publishToWebhook } from '../webhooks/publisher';
 
@@ -56,28 +57,31 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             payload: webhookData as Prisma.InputJsonObject
           }
         });
+        if (webhookData.event.scope === WebhookEventNames.CredentialIssuable) {
+          await attestOnChainAndRecordCredential(webhookData.event.data);
+        } else {
+          // Create and save notifications
+          const notifications = await createNotificationsFromEvent(webhookData);
 
-        // Create and save notifications
-        const notifications = await createNotificationsFromEvent(webhookData);
+          log.debug('Saved record of SQS message', {
+            id: webhookMessageHash,
+            notifications: notifications.length,
+            scope: webhookData.event.scope,
+            spaceId: webhookData.spaceId
+          });
 
-        log.debug('Saved record of SQS message', {
-          id: webhookMessageHash,
-          notifications: notifications.length,
-          scope: webhookData.event.scope,
-          spaceId: webhookData.spaceId
-        });
-
-        // Send emails
-        let notificationCount = 0;
-        for (const notification of notifications) {
-          const sent = await sendNotificationEmail(notification);
-          if (sent) {
-            notificationCount += 1;
+          // Send emails
+          let notificationCount = 0;
+          for (const notification of notifications) {
+            const sent = await sendNotificationEmail(notification);
+            if (sent) {
+              notificationCount += 1;
+            }
           }
-        }
-        if (notificationCount > 0) {
-          log.info(`Sent ${notificationCount} email notifications`);
-          count('cron.user-notifications.sent', notificationCount);
+          if (notificationCount > 0) {
+            log.info(`Sent ${notificationCount} email notifications`);
+            count('cron.user-notifications.sent', notificationCount);
+          }
         }
 
         await publishToWebhook({ webhookURL, signingSecret, ...webhookData });

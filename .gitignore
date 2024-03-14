@@ -25,7 +25,6 @@ serverless/*.node
 # test
 playwright-report
 
-
 # misc
 .DS_Store
 *.env*

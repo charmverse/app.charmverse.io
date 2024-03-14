@@ -63,7 +63,7 @@ export function CryptoPriceNodeView({
     })
     .map((method) => method.contractAddress) as string[];
 
-  const cryptoList = (CryptoCurrencies as string[]).concat(customCryptoContractAddresses);
+  const cryptoList = CryptoCurrencies.concat(customCryptoContractAddresses);
 
   useEffect(() => {
     setBaseCurrency(base);

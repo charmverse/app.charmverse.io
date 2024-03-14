@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { NotFoundError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import type { UserVoteExtendedDTO } from 'lib/votes/interfaces';
 

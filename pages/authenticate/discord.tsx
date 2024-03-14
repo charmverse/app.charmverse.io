@@ -10,9 +10,11 @@ export default function Oauth() {
     const listener = (event: MessageEvent<any>) => {
       if (event.source && event.origin) {
         const code = new URLSearchParams(window.location.search).get('code');
-        const message: OauthLoginState<{ code: string | null }> = {
+        const guildId = new URLSearchParams(window.location.search).get('guild_id');
+        const message: OauthLoginState<{ code: string | null; guildId: string | null }> = {
           status: code ? 'success' : 'error',
-          code
+          code,
+          guildId
         };
 
         event.source.postMessage(message, { targetOrigin: event.origin });

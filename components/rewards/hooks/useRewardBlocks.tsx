@@ -12,8 +12,11 @@ import type {
   RewardBlockInput,
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields,
+  RewardsBoardBlock,
   RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
+
+import { getDefaultBoard } from '../components/RewardsBoard/utils/boardData';
 
 import { useRewardsBoard } from './useRewardsBoard';
 
@@ -58,20 +61,19 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
       mutate(
         (blocks) => {
           if (!blocks) return blocks;
-
-          const udpatedCache = [...blocks];
+          const updatedCache = [...blocks];
           const updated = Array.isArray(updatedBlocks) ? updatedBlocks : [updatedBlocks];
 
           updated.forEach((updatedBlock) => {
-            const index = udpatedCache.findIndex((b) => b.id === updatedBlock.id);
+            const index = updatedCache.findIndex((b) => b.id === updatedBlock.id);
             if (index !== -1) {
-              udpatedCache[index] = updatedBlock;
+              updatedCache[index] = updatedBlock;
             } else {
-              udpatedCache.push(updatedBlock);
+              updatedCache.push(updatedBlock);
             }
           });
 
-          return udpatedCache;
+          return updatedCache;
         },
         { revalidate: false }
       );

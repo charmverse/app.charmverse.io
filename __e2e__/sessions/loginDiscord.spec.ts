@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { expect, test as base } from '@playwright/test';
+import { test as base } from '@playwright/test';
 
 import { createDiscordUser } from 'testing/utils/discord';
 
@@ -16,8 +16,29 @@ type Fixtures = {
 };
 
 const test = base.extend<Fixtures>({
-  sandboxPage: async ({ browser: _browser }, use) => {
+  sandboxPage: async ({ browser: _browser, discordServer }, use) => {
     const sandbox = await _browser.newContext();
+    // Using the browser context, since we need to catch requests in multiple pages (page and popup)
+    await sandbox.route(
+      `**/api/discord/oauth?${encodeURI('type=login&authFlowType=popup&redirect=/')}`,
+      async (route) => {
+        await route.fulfill({
+          status: 301,
+          headers: {
+            location: `${discordServer.host}/api/oauth2/authorize?prompt=consent&client_id=1234&response_type=code`
+          }
+        });
+      }
+    );
+    await sandbox.route('**/api/discord/login', async (route) => {
+      const _body = route.request().postData();
+      await route.continue({
+        postData: JSON.stringify({
+          ...(_body ? JSON.parse(_body) : undefined),
+          discordApiUrl: discordServer.host
+        })
+      });
+    });
     const page = await sandbox.newPage();
     await use(page);
   },
@@ -31,12 +52,8 @@ test('login - allows user to login and see their workspace', async ({ discordSer
   await createDiscordUser({ userId: user.id, discordUserId });
 
   await loginPage.goto();
-
-  const discordApiUrl = discordServer.host;
-  const discordWebsiteUrl = await loginPage.getDiscordUrl();
-  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
-
-  // should auto redirect to workspace
+  await loginPage.universalConnectButton.click();
+  await loginPage.connectDiscordButton.click();
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });
 
@@ -47,7 +64,6 @@ test('login - allows user to login and see their workspace even when a wallet is
   const discordUserId = discordServer.discordUserId;
   const { address, user, space, page } = await generateUserAndSpace();
   await createDiscordUser({ userId: user.id, discordUserId });
-
   await mockWeb3({
     page: loginPage.page,
     context: { address, privateKey: false },
@@ -62,13 +78,7 @@ test('login - allows user to login and see their workspace even when a wallet is
   });
 
   await loginPage.goto();
-
-  await expect(loginPage.universalConnectButton).toBeVisible();
-
-  const discordApiUrl = discordServer.host;
-  const discordWebsiteUrl = await loginPage.getDiscordUrl();
-  await loginPage.gotoDiscordCallback({ discordApiUrl, discordWebsiteUrl });
-
-  // should auto redirect to workspace
+  await loginPage.universalConnectButton.click();
+  await loginPage.connectDiscordButton.click();
   await loginPage.waitForWorkspaceLoaded({ domain: space.domain, page });
 });

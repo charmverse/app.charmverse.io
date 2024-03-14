@@ -206,9 +206,9 @@ jobs:
       matrix:
         include:
           - test_name: 'Browser e2e test #1'
-            test_command: 'npm run start:test:ci & npm run test:e2e:ci -- --shard=1/2'
+            test_command: 'npm run test:e2e:ci -- --shard=1/2'
           - test_name: 'Browser e2e test #2'
-            test_command: 'npm run start:test:ci & npm run test:e2e:ci -- --shard=2/2'
+            test_command: 'npm run test:e2e:ci -- --shard=2/2'
 
     steps:
       - uses: actions/checkout@v4

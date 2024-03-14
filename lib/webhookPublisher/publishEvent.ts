@@ -1,21 +1,22 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { OnChainAttestationInputWithMetadata } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
 import {
-  getRewardEntity,
-  getUserEntity,
+  getApplicationCommentEntity,
+  getApplicationEntity,
   getCommentEntity,
-  getSpaceEntity,
-  getPostEntity,
-  getProposalEntity,
   getDocumentEntity,
   getInlineCommentEntity,
-  getVoteEntity,
-  getApplicationEntity,
-  getApplicationCommentEntity
+  getPostEntity,
+  getProposalEntity,
+  getRewardEntity,
+  getSpaceEntity,
+  getUserEntity,
+  getVoteEntity
 } from './entities';
 import { publishWebhookEvent } from './publisher';
 
@@ -403,4 +404,18 @@ export async function publishCardEvent(context: CardEventContext) {
       return null;
     }
   }
+}
+
+export type CredentialIssuableContext = {
+  spaceId: string;
+  data: OnChainAttestationInputWithMetadata;
+};
+
+export async function publishCredentialIssuableEvent(context: CredentialIssuableContext) {
+  const space = await getSpaceEntity(context.spaceId);
+  return publishWebhookEvent(context.spaceId, {
+    scope: WebhookEventNames.CredentialIssuable,
+    space,
+    data: context.data
+  });
 }

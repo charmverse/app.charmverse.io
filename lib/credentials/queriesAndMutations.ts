@@ -2,7 +2,6 @@ import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma, type AttestationType } from '@charmverse/core/prisma-client';
 import { Wallet } from 'ethers';
-import { optimism } from 'viem/chains';
 
 import { credentialsWalletPrivateKey, graphQlServerEndpoint, isStagingEnv } from 'config/constants';
 
@@ -11,7 +10,8 @@ import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { CredentialData } from './schemas';
-import { attestationSchemaIds } from './schemas';
+import { proposalCredentialSchemaId } from './schemas/proposal';
+import { rewardCredentialSchemaId } from './schemas/reward';
 
 const ceramicGraphQlClient = new ApolloClientWithRedisCache({
   uri: graphQlServerEndpoint,
@@ -148,7 +148,7 @@ export async function getCharmverseCredentialsByWallets({
       variables: {
         filter: {
           where: {
-            schemaId: { in: [attestationSchemaIds.proposal[optimism.id], attestationSchemaIds.reward[optimism.id]] },
+            schemaId: { in: [proposalCredentialSchemaId, rewardCredentialSchemaId] },
             recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }
@@ -170,6 +170,7 @@ export async function getCharmverseCredentialsByWallets({
     select: {
       id: true,
       ceramicId: true,
+      onchainAttestationId: true,
       rewardApplication: {
         select: {
           bounty: {
@@ -197,6 +198,11 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
+  const issuedCredsMap = issuedCredentials.reduce((acc, val) => {
+    acc[val.ceramicId as string] = val;
+    return acc;
+  }, {} as Record<string, (typeof issuedCredentials)[number]>);
+
   const favoriteCredentials = await prisma.favoriteCredential.findMany({
     where: {
       issuedCredentialId: {
@@ -210,29 +216,37 @@ export async function getCharmverseCredentialsByWallets({
     }
   });
 
-  return charmverseCredentials.map((credential) => {
-    const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
-    const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
-    const iconUrl =
-      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
-      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
+  return (
+    charmverseCredentials
+      // Only display IPFS credentials for which we have a reference in our database, and which have not been attested on-chain
+      .filter(
+        (credentialFromCeramic) =>
+          !!issuedCredsMap[credentialFromCeramic.id] && !issuedCredsMap[credentialFromCeramic.id].onchainAttestationId
+      )
+      .map((credential) => {
+        const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
+        const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
+        const iconUrl =
+          (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
+          (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
 
-    if (favoriteCredential) {
-      return {
-        ...credential,
-        iconUrl,
-        favoriteCredentialId: favoriteCredential.id,
-        index: favoriteCredential.index,
-        issuedCredentialId: issuedCredential?.id
-      };
-    }
+        if (favoriteCredential) {
+          return {
+            ...credential,
+            iconUrl,
+            favoriteCredentialId: favoriteCredential.id,
+            index: favoriteCredential.index,
+            issuedCredentialId: issuedCredential?.id
+          };
+        }
 
-    return {
-      ...credential,
-      iconUrl,
-      favoriteCredentialId: null,
-      index: -1,
-      issuedCredentialId: issuedCredential?.id
-    };
-  });
+        return {
+          ...credential,
+          iconUrl,
+          favoriteCredentialId: null,
+          index: -1,
+          issuedCredentialId: issuedCredential?.id
+        };
+      })
+  );
 }

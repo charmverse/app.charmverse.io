@@ -1,4 +1,7 @@
-import { arbitrum, base, optimism } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
+
+import { proposalCredentialSchemaId } from '../schemas/proposal';
+import { rewardCredentialSchemaId } from '../schemas/reward';
 
 export const externalCredentialChains = [optimism.id, base.id, arbitrum.id] as const;
 
@@ -22,6 +25,7 @@ export type TrackedSchemaParams = {
 const baseLogo = '/images/cryptoLogos/base-logo.svg';
 const optimismLogo = '/images/cryptoLogos/optimism.svg';
 const devfolioLogo = '/images/logos/devfolio.png';
+const charmverseLogo = '/images/logo_black_lightgrey.png';
 
 // Optimism schemas ------------------
 // https://optimism.easscan.org/schema/view/0xfdcfdad2dbe7489e0ce56b260348b7f14e8365a8a325aef9834818c00d46b31b
@@ -47,6 +51,26 @@ const optimismRetroPgfContributionSchema: TrackedSchemaParams = {
       name: 'RetroPGF_Contribution'
     }
   ]
+};
+
+const charmverseWalletAddress = '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07';
+
+const optimismCharmverseProposalSchema: TrackedSchemaParams = {
+  schemaId: proposalCredentialSchemaId,
+  issuers: [charmverseWalletAddress],
+  title: 'Proposal',
+  organization: 'CharmVerse',
+  iconUrl: charmverseLogo,
+  fields: [{ name: 'Event' }]
+};
+
+const optimismCharmverseRewardSchema: TrackedSchemaParams = {
+  schemaId: rewardCredentialSchemaId,
+  issuers: [charmverseWalletAddress],
+  title: 'Reward',
+  organization: 'CharmVerse',
+  iconUrl: charmverseLogo,
+  fields: [{ name: 'Event' }]
 };
 
 // Base schemas ----------------------
@@ -86,8 +110,14 @@ const arbitrumDevfolioOnchainCredentialAttestationSchema: TrackedSchemaParams = 
 //   title: 'Cheer'
 // };
 
-export const trackedSchemas: Record<ExternalCredentialChain, TrackedSchemaParams[]> = {
-  [optimism.id]: [optimismRetroPgfBadgeHolderSchema, optimismRetroPgfContributionSchema],
+export const trackedSchemas: Record<ExternalCredentialChain | (typeof optimismSepolia)['id'], TrackedSchemaParams[]> = {
+  [optimism.id]: [
+    optimismRetroPgfBadgeHolderSchema,
+    optimismRetroPgfContributionSchema,
+    optimismCharmverseProposalSchema,
+    optimismCharmverseRewardSchema
+  ],
+  [optimismSepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
   [base.id]: [baseVerifiedAccountSchema],
   [arbitrum.id]: [arbitrumDevfolioQuadraticVotingAttestationSchema, arbitrumDevfolioOnchainCredentialAttestationSchema]
 };

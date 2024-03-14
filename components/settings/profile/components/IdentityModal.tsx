@@ -119,7 +119,7 @@ export function UserIdentities() {
     }
   );
 
-  const { connect } = useDiscordConnection();
+  const { disconnect } = useDiscordConnection();
   const { trigger: triggerRefreshENSName, isMutating: isRefreshingEns } = useRefreshENSName();
   // Don't allow a user to remove their last identity
   const cannotDisconnect = !user || (user.wallets.length === 0 && countConnectableIdentities(user) <= 1);
@@ -210,7 +210,7 @@ export function UserIdentities() {
                     ? [
                         <Tooltip title={identityDisconnectMenuItemTooltip} key='disconnect'>
                           <div>
-                            <MenuItem disabled={isIdentityDisconnectDisabled} key='disconnect' onClick={connect}>
+                            <MenuItem disabled={isIdentityDisconnectDisabled} key='disconnect' onClick={disconnect}>
                               Disconnect
                             </MenuItem>
                           </div>
@@ -291,7 +291,7 @@ export function UserIdentities() {
                               <LoadingComponent size={20} isLoading />
                             </IconButton>
                           ) : (
-                            <IconButton onClick={() => refreshENSName(item.username)}>
+                            <IconButton onClick={() => refreshENSName(wallet.address)}>
                               <RefreshIcon fontSize='small' />
                             </IconButton>
                           )}

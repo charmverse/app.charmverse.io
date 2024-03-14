@@ -12,7 +12,7 @@ export function addQueryToUrl({
   replace?: boolean;
   query?: ParsedUrlQuery | Record<string, string | null>;
 }) {
-  const result = new URL(url, url.match('http') ? undefined : urlBase);
+  const result = new URL(url, url.trim().startsWith('http') ? undefined : urlBase);
   const queryParams = new URLSearchParams(result.search);
   for (const key in query) {
     if (query.hasOwnProperty(key)) {

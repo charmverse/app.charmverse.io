@@ -68,6 +68,7 @@ export type DocumentPageProps = {
   sidebarView?: IPageSidebarContext['activeView'];
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
+  showParentChip?: boolean;
 };
 
 function DocumentPageComponent({
@@ -78,7 +79,8 @@ function DocumentPageComponent({
   setEditorState,
   sidebarView,
   setSidebarView,
-  showCard
+  showCard,
+  showParentChip
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -142,7 +144,8 @@ function DocumentPageComponent({
   const isSharedPage = router.pathname.startsWith('/share');
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
-  const showParentChip = !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
+  const _showParentChip =
+    showParentChip ?? !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
   const hideCardDetails = isRewardsPage && page.bountyId;
@@ -317,7 +320,7 @@ function DocumentPageComponent({
               readOnly={readOnly || !!enableSuggestingMode}
               setPage={savePage}
               readOnlyTitle={!!page.syncWithPageId}
-              parentId={showParentChip ? card.parentId : null}
+              parentId={_showParentChip && card ? card.parentId : null}
               insideModal={insideModal}
               pageId={page.id}
               focusDocumentEditor={focusDocumentEditor}

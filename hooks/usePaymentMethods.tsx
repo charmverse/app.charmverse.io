@@ -21,4 +21,32 @@ export function PaymentMethodsProvider({ children }: { children: ReactNode }) {
   return <PaymentMethodsContext.Provider value={value}>{children}</PaymentMethodsContext.Provider>;
 }
 
-export const usePaymentMethods = () => useContext(PaymentMethodsContext);
+export const usePaymentMethods = (
+  {
+    filterUSDCPaymentMethods = false,
+    filterNativeTokens = false
+  }: {
+    filterUSDCPaymentMethods?: boolean;
+    filterNativeTokens?: boolean;
+  } = {
+    filterUSDCPaymentMethods: false,
+    filterNativeTokens: false
+  }
+) => {
+  const [paymentMethods, refreshPaymentMethods] = useContext(PaymentMethodsContext);
+
+  const filteredPaymentMethods = useMemo(() => {
+    let _paymentMethods = paymentMethods;
+    if (filterUSDCPaymentMethods) {
+      _paymentMethods = _paymentMethods.filter((pm) => pm.tokenSymbol !== 'USDC');
+    }
+    if (filterNativeTokens) {
+      _paymentMethods = _paymentMethods.filter((pm) => {
+        return pm.contractAddress !== '0x0000000000000000000000000000000000000000';
+      });
+    }
+    return _paymentMethods;
+  }, [paymentMethods, filterUSDCPaymentMethods, filterNativeTokens]);
+
+  return [filteredPaymentMethods, refreshPaymentMethods] as const;
+};

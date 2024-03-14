@@ -20,8 +20,8 @@ type Props = {
 
 export function ProposalCredentialPreview({ credential, credentialTemplateType }: Props) {
   const { getFeatureTitle } = useSpaceFeatures();
-  const proposalSchemaUrl = `${getEasConnector(10).attestationExplorerUrl}/schema/view/${
-    attestationSchemaIds[credentialTemplateType]?.[optimism.id]
+  const proposalSchemaUrl = `${getEasConnector(optimism.id).attestationExplorerUrl}/schema/view/${
+    attestationSchemaIds[credentialTemplateType]
   }`;
   return (
     <Card sx={{ minWidth: 275 }}>

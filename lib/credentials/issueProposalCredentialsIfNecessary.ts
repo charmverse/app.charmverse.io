@@ -8,9 +8,12 @@ import { optimism } from 'viem/chains';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { prettyPrint } from 'lib/utils/strings';
+import { publishCredentialIssuableEvent } from 'lib/webhookPublisher/publishEvent';
 
-import { signAndPublishCharmverseCredential } from './attest';
+import { signAndPublishCharmverseCredential } from './attestOffchain';
+import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
+import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
@@ -83,6 +86,7 @@ export async function issueProposalCredentialsIfNecessary({
       space: {
         select: {
           id: true,
+          credentialsChainId: true,
           features: true,
           credentialTemplates: {
             where: {
@@ -169,26 +173,49 @@ export async function issueProposalCredentialsIfNecessary({
             getFeatureTitle(value, proposalWithSpaceConfig.space.features as any[])
           );
 
-          // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-          const publishedCredential = await signAndPublishCharmverseCredential({
-            chainId: optimism.id,
-            recipient: targetWallet.address,
-            credential: {
-              type: 'proposal',
+          const credentialContent: CredentialDataInput<'proposal'> = {
+            Name: credentialTemplate.name,
+            Description: credentialTemplate.description ?? '',
+            Organization: credentialTemplate.organization,
+            Event: eventLabel,
+            URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+          };
+
+          if (proposalWithSpaceConfig.space.credentialsChainId) {
+            await publishCredentialIssuableEvent({
+              spaceId: proposalWithSpaceConfig.space.id,
               data: {
-                Name: credentialTemplate.name,
-                Description: credentialTemplate.description ?? '',
-                Organization: credentialTemplate.organization,
-                Event: eventLabel,
-                URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
+                credential: {
+                  chainId: proposalWithSpaceConfig.space.credentialsChainId as EasSchemaChain,
+                  type: 'proposal',
+                  credentialInputs: {
+                    recipient: targetWallet.address,
+                    data: credentialContent
+                  }
+                },
+                credentialMetadata: {
+                  event,
+                  proposalId,
+                  userId: authorUserId,
+                  credentialTemplateId: credentialTemplate.id
+                }
               }
-            },
-            credentialTemplateId: credentialTemplate.id,
-            event,
-            recipientUserId: authorUserId,
-            proposalId,
-            pageId: proposalWithSpaceConfig.page.id
-          });
+            });
+          } else {
+            await signAndPublishCharmverseCredential({
+              chainId: optimism.id,
+              recipient: targetWallet.address,
+              credential: {
+                type: 'proposal',
+                data: credentialContent
+              },
+              credentialTemplateId: credentialTemplate.id,
+              event,
+              recipientUserId: authorUserId,
+              proposalId,
+              pageId: proposalWithSpaceConfig.page.id
+            });
+          }
         }
       } catch (e) {
         log.error('Failed to issue credential', {

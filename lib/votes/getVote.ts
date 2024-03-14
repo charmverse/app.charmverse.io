@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
+import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import type { ExtendedVote } from './interfaces';
 
 export async function getVote(id: string, userId?: string): Promise<ExtendedVote | null> {
@@ -42,6 +43,12 @@ export async function getVote(id: string, userId?: string): Promise<ExtendedVote
   return vote
     ? {
         ...vote,
+        votingPower: (
+          await getVotingPowerForVotes({
+            userId: vote.createdBy,
+            votes: [vote]
+          })
+        )[0],
         aggregatedResult,
         userChoice,
         status: voteStatus,

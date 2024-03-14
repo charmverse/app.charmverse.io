@@ -8,6 +8,7 @@ import type { Server, Socket } from 'socket.io';
 import type { Block } from 'lib/focalboard/block';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
 export type Resource<T = object> = { id: string } & T;
@@ -24,6 +25,11 @@ export type SocketAuthResponse = {
 type BlocksUpdated = {
   type: 'blocks_updated';
   payload: (Partial<Block> & ResourceWithSpaceId)[];
+};
+
+type RewardBlocksUpdated = {
+  type: 'reward_blocks_updated';
+  payload: RewardBlockWithTypedFields[];
 };
 
 type BlocksCreated = {
@@ -204,6 +210,7 @@ export type ClientMessage =
   | PageDuplicated;
 
 export type ServerMessage =
+  | RewardBlocksUpdated
   | BlocksUpdated
   | BlocksCreated
   | BlocksDeleted

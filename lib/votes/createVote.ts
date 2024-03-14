@@ -6,6 +6,7 @@ import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishVoteEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { aggregateVoteResult } from './aggregateVoteResult';
+import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import type { ExtendedVote, VoteDTO } from './interfaces';
 import { DEFAULT_THRESHOLD, VOTE_STATUS } from './interfaces';
 
@@ -22,7 +23,11 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
     deadline,
     type,
     voteOptions,
-    context
+    context,
+    strategy,
+    blockNumber,
+    chainId,
+    tokenAddress
   } = vote;
 
   if (pageId && evaluationId) {
@@ -61,6 +66,10 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
       maxChoices,
       context,
       evaluation: evaluationId ? { connect: { id: evaluationId } } : undefined,
+      strategy,
+      blockNumber,
+      chainId,
+      tokenAddress,
       page: pageId
         ? {
             connect: {
@@ -112,6 +121,12 @@ export async function createVote(vote: VoteDTO & { spaceId: string }): Promise<E
 
   return {
     ...dbVote,
+    votingPower: (
+      await getVotingPowerForVotes({
+        userId: vote.createdBy,
+        votes: [dbVote]
+      })
+    )[0],
     aggregatedResult,
     userChoice,
     totalVotes: 0

@@ -1,13 +1,14 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { prismaToBlock } from 'lib/focalboard/block';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/rewards/blocks/deleteBlocks';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';
 import type { RewardBlockUpdateInput, RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
 import { upsertBlocks } from 'lib/rewards/blocks/upsertBlocks';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -42,6 +43,14 @@ async function updateRewardBlocksHandler(req: NextApiRequest, res: NextApiRespon
     userId,
     spaceId
   });
+
+  relay.broadcast(
+    {
+      type: 'reward_blocks_updated',
+      payload: rewardBlocks
+    },
+    spaceId
+  );
 
   return res.status(200).json(rewardBlocks);
 }

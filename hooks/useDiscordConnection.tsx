@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
+import { useImportDiscordRolesFromServer } from 'charmClient/hooks/discord';
 import { usePopupLogin } from 'hooks/usePopupLogin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -9,6 +10,7 @@ import { AUTH_CODE_COOKIE, AUTH_ERROR_COOKIE } from 'lib/discord/constants';
 import { getDiscordLoginPath } from 'lib/discord/getDiscordLoginPath';
 import { getCookie, deleteCookie } from 'lib/utils/browser';
 
+import { useRoles } from './useRoles';
 import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 interface Props {
@@ -18,14 +20,16 @@ interface Props {
 type IDiscordConnectionContext = {
   isConnected: boolean;
   isLoading: boolean;
-  connect: () => Promise<void> | void;
+  disconnect: () => Promise<void> | void;
   error?: string;
   popupLogin: (redirectUrl: string, type: 'login' | 'connect') => void;
+  popupServer: (redirectUrl: string, spaceId: string) => void;
 };
 
 export const DiscordConnectionContext = createContext<Readonly<IDiscordConnectionContext>>({
-  connect: () => {},
+  disconnect: () => {},
   popupLogin: () => {},
+  popupServer: () => {},
   error: undefined,
   isConnected: false,
   isLoading: false
@@ -43,37 +47,25 @@ export function DiscordProvider({ children }: Props) {
   const connectedWithDiscord = Boolean(user?.discordUser);
   const { openPopupLogin } = usePopupLogin<{ code: string }>();
   const { open: openVerifyOtpModal } = useVerifyLoginOtp();
-
-  async function connect() {
-    if (!isConnectDiscordLoading) {
-      if (connectedWithDiscord) {
-        await disconnect();
-      } else {
-        const discordLoginPath = getDiscordLoginPath({
-          type: 'connect',
-          redirectUrl: encodeURIComponent(window.location.href.split('?')[0])
-        });
-
-        window.location.replace(discordLoginPath);
-      }
-    }
-    setIsDisconnectingDiscord(false);
-  }
+  const { refreshRoles } = useRoles();
+  const { trigger: importRolesFromDiscordServer, isMutating: isLoadingImportRoles } = useImportDiscordRolesFromServer();
 
   async function disconnect() {
-    setIsDisconnectingDiscord(true);
+    if (!isConnectDiscordLoading && connectedWithDiscord) {
+      setIsDisconnectingDiscord(true);
 
-    return charmClient.discord
-      .disconnectDiscord()
-      .then(() => {
-        updateUser({ discordUser: null });
-      })
-      .catch((error) => {
-        log.warn('Error disconnecting from discord', error);
-      })
-      .finally(() => {
-        setIsDisconnectingDiscord(false);
-      });
+      return charmClient.discord
+        .disconnectDiscord()
+        .then(() => {
+          updateUser({ discordUser: null });
+        })
+        .catch((error) => {
+          log.warn('Error disconnecting from discord', error);
+        })
+        .finally(() => {
+          setIsDisconnectingDiscord(false);
+        });
+    }
   }
 
   function popupLogin(redirectUrl: string, type: 'login' | 'connect') {
@@ -109,6 +101,30 @@ export function DiscordProvider({ children }: Props) {
     };
 
     openPopupLogin(discordLoginPath, loginCallback);
+  }
+
+  function popupServer(redirectUrl: string, spaceId: string) {
+    const discordLoginPath = getDiscordLoginPath({
+      type: 'server',
+      redirectUrl,
+      authFlowType: 'popup'
+    });
+
+    const serverCallback = async ({ code, guildId }: { code: string | null; guildId?: string | null }) => {
+      if (!code || !guildId) {
+        return;
+      }
+
+      await importRolesFromDiscordServer(
+        { guildId, spaceId },
+        {
+          onError: () => refreshRoles(),
+          onSuccess: () => refreshRoles()
+        }
+      );
+    };
+
+    openPopupLogin(discordLoginPath, serverCallback);
   }
 
   useEffect(() => {
@@ -151,16 +167,18 @@ export function DiscordProvider({ children }: Props) {
   }, [user, authCode]);
 
   const isConnected = connectedWithDiscord;
-  const isLoading = !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading);
+  const isLoading =
+    !discordError && (!!authCode || isDisconnectingDiscord || isConnectDiscordLoading || isLoadingImportRoles);
   const error = authError;
 
   const value = useMemo<IDiscordConnectionContext>(
     () => ({
       isLoading,
       isConnected,
-      connect,
+      disconnect,
       error,
-      popupLogin
+      popupLogin,
+      popupServer
     }),
     [isConnected, isLoading, error]
   );

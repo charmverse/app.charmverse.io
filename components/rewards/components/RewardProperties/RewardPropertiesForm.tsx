@@ -387,7 +387,7 @@ export function RewardPropertiesForm({
             {!!rewardCredentialTemplates?.length && (
               <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <PropertyLabel readOnly highlighted>
-                  Submitter Credentials
+                  Credentials
                 </PropertyLabel>
                 <Box display='flex' flex={1}>
                   <CredentialSelect

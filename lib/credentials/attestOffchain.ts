@@ -19,7 +19,7 @@ import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
 import type { PublishedSignedCredential } from './queriesAndMutations';
 import { publishSignedCredential } from './queriesAndMutations';
-import { encodeAttestion, getAttestationSchemaId, type CredentialData } from './schemas';
+import { encodeAttestion, attestationSchemaIds, type CredentialData } from './schemas';
 
 type AttestationInput<T extends AttestationType = AttestationType> = {
   recipient: string;
@@ -69,7 +69,7 @@ export async function attestOffchain({
       revocable: true,
       version: 1,
       nonce: BigInt(0),
-      schema: getAttestationSchemaId({ chainId, credentialType: credential.type }),
+      schema: attestationSchemaIds[credential.type],
       refUID: linkedAttestationUid ?? '0x0000000000000000000000000000000000000000000000000000000000000000',
       data: encodeAttestion(credential)
     },
@@ -165,7 +165,7 @@ export async function signAndPublishCharmverseCredential({
     type: credential.type,
     verificationUrl: signedCredential.verificationUrl,
     issuer: signedCredential.signer,
-    schemaId: getAttestationSchemaId({ chainId, credentialType: credential.type }),
+    schemaId: attestationSchemaIds[credential.type],
     sig: JSON.stringify(signedCredential.sig),
     charmverseId: publishedCredentialId
   };
@@ -176,11 +176,13 @@ export async function signAndPublishCharmverseCredential({
     data: {
       id: publishedCredentialId,
       ceramicId: published.id,
+      ceramicRecord: published,
       credentialEvent: event,
       credentialTemplate: { connect: { id: credentialTemplateId } },
       user: { connect: { id: recipientUserId } },
       proposal: proposalId ? { connect: { id: proposalId } } : undefined,
-      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
+      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined,
+      schemaId: attestationSchemaIds[credential.type]
     }
   });
 
