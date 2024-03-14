@@ -116,9 +116,9 @@ jobs:
           - test_name: 'Browser tests'
             test_command: 'npm run test:browser'
           - test_name: 'Browser e2e test #1'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci -- --shard=1/2'
+            test_command: 'npx playwright install chromium chrome --with-deps; npm run test:e2e:ci -- --shard=1/2'
           - test_name: 'Browser e2e test #2'
-            test_command: 'npx playwright install chromium chrome --with-deps; npm run start:test:ci & npm run test:e2e:ci -- --shard=2/2'
+            test_command: 'npx playwright install chromium chrome --with-deps; npm run test:e2e:ci -- --shard=2/2'
           - test_name: 'Serverless tests'
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
 
