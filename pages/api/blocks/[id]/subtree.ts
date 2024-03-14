@@ -17,6 +17,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getBlockSubtree);
 
+export const config = {
+  api: {
+    // silence errors about response size
+    // https://nextjs.org/docs/messages/api-routes-response-size-limit
+    responseLimit: false
+  }
+};
+
 async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
   const blockId = req.query.id as string;
   const page = await prisma.page.findFirstOrThrow({

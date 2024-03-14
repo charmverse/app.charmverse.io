@@ -16,6 +16,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getPages);
 
+export const config = {
+  api: {
+    // silence errors about response size
+    // https://nextjs.org/docs/messages/api-routes-response-size-limit
+    responseLimit: false
+  }
+};
+
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const userId = req.session?.user?.id;
 
