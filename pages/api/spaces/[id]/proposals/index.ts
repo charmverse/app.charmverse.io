@@ -13,6 +13,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getProposalsEndpoint);
 
+export const config = {
+  api: {
+    // silence errors about response size
+    // https://nextjs.org/docs/messages/api-routes-response-size-limit
+    responseLimit: false
+  }
+};
+
 async function getProposalsEndpoint(req: NextApiRequest, res: NextApiResponse<ProposalWithUsersLite[]>) {
   const userId = req.session.user?.id;
 
