@@ -1,8 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import * as http from 'adapters/http';
-
-import { getTokenDecimals } from './getTokenDecimals';
+import { getTokenDecimals } from 'lib/blockchain/getTokenDecimals';
 
 const SNAPSHOT_SCORE_URL = 'https://score.snapshot.org';
 

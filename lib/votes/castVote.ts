@@ -1,5 +1,6 @@
 import type { UserVote, Vote, VoteOptions } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { BigNumber } from 'ethers';
 
 import { InvalidInputError, UndesirableOperationError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -61,12 +62,12 @@ export async function castVote(
       userId,
       voteId,
       choices,
-      tokenAmount: votingPowers[0]
+      tokenAmount: votingPowers[0].toString()
     },
     update: {
       choices,
       updatedAt: new Date(),
-      tokenAmount: votingPowers[0]
+      tokenAmount: votingPowers[0].toString()
     },
     include: {
       vote: true

@@ -54,7 +54,9 @@ export async function getVotesByPage({
           return getTokenSupplyAmount({
             chainId: pageVote.chainId,
             tokenContractAddress: pageVote.tokenAddress
-          }).then((supply) => ({ supply, voteId: pageVote.id }));
+          })
+            .then((supply) => ({ supply, voteId: pageVote.id }))
+            .catch(() => ({ supply: undefined, voteId: pageVote.id }));
         }
         return null;
       })
@@ -71,7 +73,10 @@ export async function getVotesByPage({
       voteOptions: pageVote.voteOptions
     });
 
-    const totalVotes = userVotes.reduce((acc, userVote) => (userVote.tokenAmount ?? 1) + acc, 0);
+    const totalVotes = userVotes.reduce(
+      (acc, userVote) => (userVote.tokenAmount ? parseFloat(userVote.tokenAmount) : 1) + acc,
+      0
+    );
     const voteStatus = calculateVoteStatus(pageVote);
 
     delete (pageVote as any).userVotes;

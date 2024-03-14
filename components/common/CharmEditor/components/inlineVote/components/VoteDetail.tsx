@@ -253,9 +253,9 @@ export function VoteDetail({
           {vote.strategy === 'token' && (
             <Stack gap={0.5}>
               <Typography variant='subtitle1'>Your voting power: {millify(vote.votingPower)}</Typography>
-              {vote.totalVotingPower && (
-                <Typography variant='subtitle1'>Total voting power: {millify(vote.totalVotingPower)}</Typography>
-              )}
+              <Typography variant='subtitle1'>
+                Total voting power: {vote.totalVotingPower ? millify(vote.totalVotingPower) : 'N/A'}
+              </Typography>
             </Stack>
           )}
           <Button
@@ -312,7 +312,7 @@ export function VoteDetail({
                   />
                   <Typography fontWeight={500} color='secondary'>
                     {choices.join(', ')}
-                    {userVote.tokenAmount ? ` (${millify(userVote.tokenAmount)})` : ''}
+                    {userVote.tokenAmount ? ` (${millify(parseFloat(userVote.tokenAmount))})` : ''}
                   </Typography>
                 </ListItem>
                 <Divider />

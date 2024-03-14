@@ -8,9 +8,7 @@ export function aggregateVoteResult({
   voteOptions
 }: {
   voteOptions: Pick<VoteOptions, 'name'>[];
-  userVotes: (Pick<UserVote, 'choices' | 'userId'> & {
-    tokenAmount?: number | null;
-  })[];
+  userVotes: (Pick<UserVote, 'choices' | 'userId'> & { tokenAmount?: string | null })[];
   userId?: string;
 }) {
   const aggregatedResult: ExtendedVote['aggregatedResult'] = {};
@@ -27,7 +25,7 @@ export function aggregateVoteResult({
     }
 
     currentUserChoice.forEach((choice) => {
-      aggregatedResult[choice] += userVote.tokenAmount ?? 1;
+      aggregatedResult[choice] += userVote.tokenAmount ? parseFloat(userVote.tokenAmount) : 1;
     });
   });
 

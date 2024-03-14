@@ -32,7 +32,7 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
   const updatedEvaluations = await getVoteEvaluationStepsWithBlockNumber({
     evaluations: result.evaluations,
     isDraft: false,
-    proposalType: result.page?.type ?? 'proposal'
+    pageType: result.page?.type
   });
 
   await Promise.all(

@@ -143,7 +143,7 @@ export async function createProposal({
   const evaluationsWithBlockNumber = await getVoteEvaluationStepsWithBlockNumber({
     evaluations: evaluations.map((evaluation, index) => ({ ...evaluation, id: evaluationIds[index] })),
     isDraft: !!isDraft,
-    proposalType: pageProps.type ?? 'page'
+    pageType: pageProps.type
   });
 
   // Using a transaction to ensure both the proposal and page gets created together

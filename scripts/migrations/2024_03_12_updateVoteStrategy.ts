@@ -1,4 +1,5 @@
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
+import { VoteSettings } from 'lib/proposals/interfaces';
 
 export async function updateVoteStrategy() {
   const voteProposalEvaluations = await prisma.proposalEvaluation.findMany({
@@ -21,15 +22,17 @@ export async function updateVoteStrategy() {
   for (const voteProposalEvaluation of voteProposalEvaluations) {
     try {
       const vote = voteProposalEvaluation.vote;
-      if (vote && (voteProposalEvaluation.voteSettings as any).publishToSnapshot) {
-        delete (voteProposalEvaluation.voteSettings as any).publishToSnapshot;
+      const voteSettings = voteProposalEvaluation.voteSettings as VoteSettings;
+      if (vote && voteSettings) {
+        const publishToSnapshot = (voteSettings as any).publishToSnapshot as boolean;
+        delete (voteSettings as any).publishToSnapshot;
         await prisma.$transaction([
           prisma.vote.update({
             where: {
               id: vote.id
             },
             data: {
-              strategy: 'snapshot'
+              strategy: publishToSnapshot ? "snapshot" : "regular"
             }
           }),
           prisma.proposalEvaluation.update({
@@ -37,7 +40,10 @@ export async function updateVoteStrategy() {
               id: voteProposalEvaluation.id
             },
             data: {
-              voteSettings: voteProposalEvaluation.voteSettings as Prisma.InputJsonValue
+              voteSettings: {
+                ...voteSettings,
+                strategy: publishToSnapshot ? "snapshot" : "regular"
+              }
             }
           })
         ])

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 
@@ -13,7 +14,11 @@ export async function getTokenSupplyAmount({
   const tokenDecimal = await getTokenDecimals({ chainId, tokenContractAddress });
   const chain = getChainById(chainId);
   if (!chain || tokenDecimal === null) {
-    return null;
+    log.error('Chain not found or token decimal not found', {
+      chainId,
+      tokenContractAddress
+    });
+    throw new Error('Chain not found or token decimal not found');
   }
 
   const rpcUrl = chain.rpcUrls[0];

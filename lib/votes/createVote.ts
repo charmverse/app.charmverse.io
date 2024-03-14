@@ -1,6 +1,5 @@
 import { Prisma, VoteType, prisma } from '@charmverse/core/prisma-client';
 
-import { getTokenAmountOnBlockNumber } from 'lib/blockchain/getTokenAmountOnBlockNumber';
 import { PageNotFoundError } from 'lib/pages/server';
 import { DuplicateDataError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
