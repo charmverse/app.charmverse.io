@@ -25,7 +25,7 @@ export async function updateVoteStrategy() {
       const voteSettings = voteProposalEvaluation.voteSettings as VoteSettings;
       if (vote && voteSettings) {
         const publishToSnapshot = (voteSettings as any).publishToSnapshot as boolean;
-        delete (voteSettings as any).publishToSnapshot;
+        // delete (voteSettings as any).publishToSnapshot;
         await prisma.$transaction([
           prisma.vote.update({
             where: {

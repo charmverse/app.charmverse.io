@@ -246,7 +246,17 @@ export function VoteSettings({ isPublishedProposal, readOnly, value, onChange }:
                     defaultValue={voteToken ?? undefined}
                     onChange={setVoteToken}
                     showChain
-                    onNewPaymentMethod={onNewPaymentMethod}
+                    key={`${voteToken?.chainId}.${voteToken?.tokenAddress}`}
+                    onNewPaymentMethod={(newPaymentMethod) => {
+                      onNewPaymentMethod(newPaymentMethod).then(() => {
+                        if (newPaymentMethod.contractAddress) {
+                          setVoteToken({
+                            chainId: newPaymentMethod.chainId,
+                            tokenAddress: newPaymentMethod.contractAddress
+                          });
+                        }
+                      });
+                    }}
                     sx={{
                       width: '100%',
                       mb: 2

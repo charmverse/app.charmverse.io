@@ -56,6 +56,22 @@ export function InputSearchCrypto<Value extends CryptoValue>({
 
   const ERC20PopupState = usePopupState({ variant: 'popover', popupId: 'ERC20-popup' });
 
+  function getOptionLabel(option: Value | string) {
+    if (!option || option === ADD_NEW_CUSTOM) {
+      return '';
+    }
+    const tokenInfo = getTokenInfo({
+      methods: paymentMethods,
+      symbolOrAddress: typeof option === 'object' ? option.tokenAddress : option
+    });
+
+    const chain = tokenInfo.chain;
+    if (chain && showChain) {
+      return `${tokenInfo.tokenSymbol} on ${chain.chainName}`;
+    }
+    return tokenInfo.tokenSymbol;
+  }
+
   useEffect(() => {
     setValue(defaultValue);
   }, [cryptoList]);
@@ -108,21 +124,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         disableClearable
         autoHighlight
         size='small'
-        getOptionLabel={(option) => {
-          if (!option || option === ADD_NEW_CUSTOM) {
-            return '';
-          }
-          const tokenInfo = getTokenInfo({
-            methods: paymentMethods,
-            symbolOrAddress: typeof option === 'object' ? option.tokenAddress : option
-          });
-
-          const chain = tokenInfo.chain;
-          if (chain) {
-            return `${tokenInfo.tokenSymbol} on ${chain.chainName}`;
-          }
-          return tokenInfo.tokenSymbol;
-        }}
+        getOptionLabel={getOptionLabel}
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
