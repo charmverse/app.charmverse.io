@@ -45,8 +45,7 @@ export async function getNFT({
 export function mapNFTData(token: TokenResponseItem['token'], walletId: string | null = null) {
   return {
     id: `${token.collectionAddress}:${token.tokenId}`,
-    tokenId: token.tokenId,
-    tokenIdInt: BigInt(token.tokenId).toString(),
+    tokenId: BigInt(token.tokenId).toString(),
     contract: token.collectionAddress,
     imageRaw: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
     image: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
