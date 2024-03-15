@@ -6,7 +6,6 @@ import { paginatedCall } from 'lib/utils/async';
 import { isTruthy } from 'lib/utils/types';
 
 import type { NFTData } from '../../getNFTs';
-import { toInt } from '../ankr/client';
 
 import type { SupportedChainId } from './config';
 
@@ -163,15 +162,14 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
     // errors include "Contract does not have any code"
     return null;
   }
-  const tokenIdInt = toInt(nft.tokenId);
-  const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdInt }) ?? '';
+  const tokenIdBigInt = BigInt(nft.tokenId).toString();
+  const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdBigInt }) ?? '';
 
   // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
   const image = nft.image.thumbnailUrl?.startsWith('https://') ? nft.image.thumbnailUrl : nft.image.originalUrl;
   return {
     id: `${nft.contract.address}:${nft.tokenId}`,
-    tokenId: nft.tokenId,
-    tokenIdInt,
+    tokenId: tokenIdBigInt,
     contract: nft.contract.address,
     imageRaw: nft.image.originalUrl,
     image,
