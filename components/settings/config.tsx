@@ -1,4 +1,3 @@
-import { DiamondOutlined } from '@mui/icons-material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
@@ -10,8 +9,8 @@ import SettingsIcon from '@mui/icons-material/WorkOutline';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { SvgIcon } from '@mui/material';
 
+import { CharmsLogo } from 'components/common/CharmsLogo';
 import { ProposalIcon } from 'components/common/PageIcon';
-import CharmsLogo from 'public/images/charm.svg';
 
 export const premiumSettingSections = ['roles', 'api'] as const;
 
@@ -36,7 +35,7 @@ export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
   { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
   {
-    icon: <SvgIcon component={CharmsLogo} sx={{ height: 20 }} inheritViewBox color='inherit' />,
+    icon: <CharmsLogo />,
     path: 'charms',
     label: 'Charms'
   }

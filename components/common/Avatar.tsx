@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import type { SxProps, Theme } from '@mui/material';
-import Avatar from '@mui/material/Avatar';
+import MuiAvatar from '@mui/material/Avatar';
 import React from 'react';
 
 import { stringToColor } from 'lib/utils/strings';
@@ -93,7 +93,7 @@ function getAvatarCustomStyles(variant: AvatarVariant | undefined, size: AvatarS
   return { ...sizeStyles, ...variantStyles };
 }
 
-const StyledAvatar = styled(Avatar)`
+const StyledAvatar = styled(MuiAvatar)`
   color: white !important; // override CSS from Chip avatar
   font-weight: 500;
 `;
@@ -148,3 +148,5 @@ export default function InitialAvatar({
     </AvatarComponent>
   );
 }
+
+export const Avatar = InitialAvatar;
