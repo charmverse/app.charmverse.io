@@ -291,7 +291,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
               disabled={!isFormValid}
               loading={isSubmitting}
             >
-              Create payment method
+              Add token
             </Button>
           </Grid>
         </Grid>

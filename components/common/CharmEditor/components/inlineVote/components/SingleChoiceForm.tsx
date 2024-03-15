@@ -27,6 +27,9 @@ export function SingleChoiceForm({
     <RadioGroup value={value} onChange={(e, v) => onChange(v)}>
       {voteOptions.map((voteOption) => (
         <FormControlLabel
+          sx={{
+            mr: 0
+          }}
           data-test={`current-vote-${voteOption.name}`}
           key={voteOption.name}
           control={<Radio size='small' />}

@@ -240,10 +240,13 @@ export async function createProposal({
       ? await upsertProposalFormAnswers({ proposalId, answers: formAnswers })
       : null;
 
-  await createVoteIfNecessary({
-    createdBy: userId,
-    proposalId
-  });
+  // make sure proposal is published before we create a vote
+  if (!isDraft) {
+    await createVoteIfNecessary({
+      createdBy: userId,
+      proposalId
+    });
+  }
 
   if (sourcePageId) {
     await prisma.page.update({

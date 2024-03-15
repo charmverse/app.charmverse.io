@@ -40,6 +40,11 @@ export const allMembersSystemRole = {
   label: 'All members'
 } as const;
 
+export const tokenHoldersSystemRole = {
+  ...allMembersSystemRole,
+  label: 'Token holders'
+} as const;
+
 export const authorSystemRole = {
   group: 'system_role',
   icon: (

@@ -11,23 +11,34 @@ export async function getVotingPowerForVotes({
   votes: Pick<ExtendedVote, 'strategy' | 'blockNumber' | 'tokenAddress' | 'chainId'>[];
   userId: string;
 }) {
-  const userWallets = await prisma.userWallet.findMany({
+  const user = await prisma.user.findUniqueOrThrow({
     where: {
-      userId
+      id: userId
     },
     select: {
-      address: true
+      primaryWallet: {
+        select: {
+          address: true
+        }
+      },
+      wallets: {
+        select: {
+          address: true
+        }
+      }
     }
   });
+
+  const primaryWalletAddress = user.primaryWallet?.address ?? user.wallets[0]?.address;
 
   const votingPowers = await Promise.all(
     votes.map((vote) => {
       if (vote.strategy === 'token') {
-        if (vote.blockNumber && vote.tokenAddress && userWallets.length && vote.chainId) {
+        if (vote.blockNumber && vote.tokenAddress && primaryWalletAddress && vote.chainId) {
           return getTokenAmountOnBlockNumber({
             blockNumber: vote.blockNumber,
             tokenContractAddress: vote.tokenAddress,
-            walletAddress: userWallets[0].address,
+            walletAddress: primaryWalletAddress,
             chainId: vote.chainId
           });
         }
