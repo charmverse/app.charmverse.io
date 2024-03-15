@@ -6,6 +6,7 @@ import { useUserCharms } from 'charmClient/hooks/charms';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { TabConfig } from 'components/common/MultiTabs';
 import MultiTabs from 'components/common/MultiTabs';
+import { ApplyCharmsTab } from 'components/settings/charms/components/ApplyCharmsTab';
 import { CharmsHistoryTab } from 'components/settings/charms/components/CharmsHistoryTab';
 import { LeaderBoardTab } from 'components/settings/charms/components/LeaderBoardTab';
 import { ReferralCodeButton } from 'components/settings/referrals/ReferralCodeButton';
@@ -20,10 +21,14 @@ export function CharmsView() {
   const tabs: TabConfig[] = useMemo(() => {
     return [
       ['History', <CharmsHistoryTab key='history' />, { sx: { px: 0 } }],
-      ['Leaders', <LeaderBoardTab charmWallet={charmWallet} key='leaders' />, { sx: { px: 0 } }],
-      ['Apply', <ComingSoon key='leaders' />, { sx: { px: 0 } }]
+      ['Leaders', <LeaderBoardTab key='leaders' charmWallet={charmWallet} />, { sx: { px: 0 } }],
+      [
+        'Apply',
+        <ApplyCharmsTab key='apply' charmWallet={charmWallet} onRefresh={refreshCharmWallet} />,
+        { sx: { px: 0 } }
+      ]
     ];
-  }, []);
+  }, [charmWallet, refreshCharmWallet]);
 
   return (
     <Stack>
