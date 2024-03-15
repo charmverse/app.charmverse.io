@@ -176,11 +176,13 @@ export async function signAndPublishCharmverseCredential({
     data: {
       id: publishedCredentialId,
       ceramicId: published.id,
+      ceramicRecord: published,
       credentialEvent: event,
       credentialTemplate: { connect: { id: credentialTemplateId } },
       user: { connect: { id: recipientUserId } },
       proposal: proposalId ? { connect: { id: proposalId } } : undefined,
-      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
+      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined,
+      schemaId: attestationSchemaIds[credential.type]
     }
   });
 

@@ -1,6 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 
-import type { OnChainAttestationInput, OnChainMultiAttestationInput } from 'lib/credentials/attestOnchain';
+import type { OnChainAttestationInputWithMetadata } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
 export type UserEntity = {
@@ -289,7 +289,7 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         scope: WebhookEventNames.CredentialIssuable;
-        credential: OnChainAttestationInput;
+        data: OnChainAttestationInputWithMetadata;
       }
   );
 
