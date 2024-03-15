@@ -215,8 +215,8 @@ jobs:
 
       - name: Install make for npm ci
         run: |
-          sudo apt-get update
-          sudo apt install build-essential -y --no-install-recommends
+          apt update
+          apt install build-essential -y --no-install-recommends
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
