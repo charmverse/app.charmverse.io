@@ -1,4 +1,6 @@
+import { log } from '@charmverse/core/log';
 import { Box, Stack } from '@mui/material';
+import { useMemo } from 'react';
 
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -12,7 +14,16 @@ type Props = {
 
 export function TokenAmount({ amount, chainId, symbolOrAddress }: Props): JSX.Element {
   const [methods] = usePaymentMethods();
-  const tokenInfo = symbolOrAddress ? getTokenInfo({ chainId: parseInt(chainId, 10), methods, symbolOrAddress }) : null;
+  const tokenInfo = useMemo(() => {
+    if (symbolOrAddress) {
+      try {
+        return getTokenInfo({ chainId: parseInt(chainId, 10), methods, symbolOrAddress });
+      } catch (e) {
+        log.error('Cannot get token info', e);
+      }
+    }
+    return null;
+  }, [chainId, methods, symbolOrAddress]);
   return (
     <Stack direction='row' alignItems='center' height='100%' gap={1} className='octo-propertyvalue readonly'>
       {tokenInfo?.canonicalLogo && (

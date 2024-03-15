@@ -1,7 +1,7 @@
 import type { ProposalSystemRole, ProposalWorkflow, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
-import { testUtilsMembers, testUtilsSpaces } from '@charmverse/core/test';
+import { testUtilsMembers } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/utils/test';
 import { v4 as uuid } from 'uuid';
 
@@ -134,6 +134,7 @@ test.describe.serial('Proposal Evaluations', () => {
 
     // Configure vote
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
+    await proposalPage.evaluationVoteSettings.click();
 
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
@@ -272,9 +273,12 @@ test.describe.serial('Proposal Evaluations', () => {
         durationDays: settingsToTest.voteDuration,
         maxChoices: 1,
         options: ['Yes', 'No', 'Abstain'],
-        publishToSnapshot: false,
         threshold: settingsToTest.votePassThreshold,
-        type: 'Approval'
+        type: 'Approval',
+        strategy: 'regular',
+        chainId: null,
+        tokenAddress: null,
+        blockNumber: null
       }
     });
   });

@@ -1,12 +1,12 @@
 import type { Guild } from '@guildxyz/types';
 import { Box, MenuItem, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { Button, StyledSpinner } from 'components/common/Button';
 import { ScrollableModal } from 'components/common/Modal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { guild, user as guildUser } from 'lib/guild-xyz/client';
@@ -25,6 +25,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
   const { user: currentUser } = useUser();
   const addresses = currentUser?.wallets.map((w) => w.address) ?? [];
   const { showMessage } = useSnackbar();
+  const { refreshRoles } = useRoles();
 
   useEffect(() => {
     async function main() {
@@ -67,7 +68,7 @@ export default function ImportGuildRolesMenuItem({ onClose }: { onClose: () => v
       });
       resetState();
       showMessage(`Successfully imported and assigned ${importedRolesCount} roles from guild.xyz`);
-      mutate(`roles/${space.id}`);
+      refreshRoles();
     }
   }
 

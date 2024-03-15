@@ -1,7 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getTokenSupplyAmount } from 'lib/blockchain/getTokenSupplyAmount';
+import { isTruthy } from 'lib/utils/types';
+
 import { aggregateVoteResult } from './aggregateVoteResult';
 import { calculateVoteStatus } from './calculateVoteStatus';
+import { getVotingPowerForVotes } from './getVotingPowerForVotes';
 import type { ExtendedVote } from './interfaces';
 
 export async function getVotesByPage({
@@ -36,7 +40,32 @@ export async function getVotesByPage({
     }
   });
 
-  return pageVotes.map((pageVote) => {
+  const votingPowers = userId
+    ? await getVotingPowerForVotes({
+        votes: pageVotes,
+        userId
+      })
+    : [];
+
+  const votingTokenTotalSupplies = await Promise.all(
+    pageVotes
+      .map((pageVote) => {
+        if (pageVote.strategy === 'token' && pageVote.tokenAddress && pageVote.chainId) {
+          return getTokenSupplyAmount({
+            chainId: pageVote.chainId,
+            tokenContractAddress: pageVote.tokenAddress
+          })
+            .then((supply) => ({ supply, voteId: pageVote.id }))
+            .catch(() => ({ supply: undefined, voteId: pageVote.id }));
+        }
+        return null;
+      })
+      .filter(isTruthy)
+  );
+
+  return pageVotes.map((pageVote, index) => {
+    const votingTokenTotalSupply = votingTokenTotalSupplies.find((v) => v.voteId === pageVote.id)?.supply ?? undefined;
+
     const userVotes = pageVote.userVotes?.filter((uv) => uv.choices.length) ?? [];
     const { aggregatedResult, userChoice } = aggregateVoteResult({
       userId,
@@ -44,6 +73,10 @@ export async function getVotesByPage({
       voteOptions: pageVote.voteOptions
     });
 
+    const totalVotes = userVotes.reduce(
+      (acc, userVote) => (userVote.tokenAmount ? parseFloat(userVote.tokenAmount) : 1) + acc,
+      0
+    );
     const voteStatus = calculateVoteStatus(pageVote);
 
     delete (pageVote as any).userVotes;
@@ -53,7 +86,9 @@ export async function getVotesByPage({
       aggregatedResult,
       userChoice,
       status: voteStatus,
-      totalVotes: userVotes.length
+      totalVotes,
+      votingPower: votingPowers[index] ?? 1,
+      totalVotingPower: votingTokenTotalSupply
     };
   });
 }

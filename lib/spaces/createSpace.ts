@@ -11,7 +11,7 @@ import { logSpaceCreation } from 'lib/metrics/postToDiscord';
 import { convertJsonPagesToPrisma } from 'lib/pages/server/convertJsonPagesToPrisma';
 import { createPage } from 'lib/pages/server/createPage';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
-import { setupDefaultPaymentMethods } from 'lib/payment-methods/defaultPaymentMethods';
+import { setupDefaultPaymentMethods } from 'lib/payment-methods/setupDefaultPaymentMethods';
 import { updateSpacePermissionConfigurationMode } from 'lib/permissions/meta';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createDefaultProposal } from 'lib/proposals/createDefaultProposal';

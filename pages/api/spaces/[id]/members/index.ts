@@ -12,6 +12,14 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getMembers);
 
+export const config = {
+  api: {
+    // silence errors about response size
+    // https://nextjs.org/docs/messages/api-routes-response-size-limit
+    responseLimit: false
+  }
+};
+
 async function getMembers(req: NextApiRequest, res: NextApiResponse<Member[]>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user?.id as string | undefined;

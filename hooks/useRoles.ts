@@ -10,9 +10,8 @@ export function useRoles() {
   const { space } = useCurrentSpace();
   const { mutateMembers } = useMembers();
 
-  const { data: roles } = useSWR(
-    () => (space ? `roles/${space.id}` : null),
-    () => (space ? charmClient.roles.listRoles(space.id) : null)
+  const { data: roles } = useSWR(space ? `roles/${space.id}` : null, () =>
+    space ? charmClient.roles.listRoles(space.id) : null
   );
 
   async function createRole(role: CreateRoleInput): Promise<Role> {
@@ -68,9 +67,7 @@ export function useRoles() {
   }
 
   async function refreshRoles() {
-    if (space) {
-      return mutate(`roles/${space.id}`);
-    }
+    return mutate((key) => typeof key === 'string' && key.startsWith(`roles/${space?.id || ''}`));
   }
 
   return {

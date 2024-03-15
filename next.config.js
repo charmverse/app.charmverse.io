@@ -1,3 +1,7 @@
+/**
+ * @type {import('next').NextConfig}
+ */
+
 /* eslint-disable @typescript-eslint/no-var-requires */
 const BundleAnalyzer = require('@next/bundle-analyzer');
 
@@ -14,11 +18,6 @@ const config = {
   typescript: {
     ignoreBuildErrors: true,
     tsconfigPath: 'tsconfig.next.json'
-  },
-  api: {
-    // silence errors about response size
-    // https://nextjs.org/docs/messages/api-routes-response-size-limit
-    responseLimit: false
   },
   compiler: {
     styledComponents: true

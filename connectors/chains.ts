@@ -188,6 +188,7 @@ export const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
     },
+    alchemyUrl: 'https://polygon-mainnet.g.alchemy.com',
     rpcUrls: ['https://polygon-rpc.com'],
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
@@ -458,7 +459,7 @@ export function getChainList(options: { enableTestnets?: boolean } = {}) {
   return (
     Object.values(RPC)
       // filter out testnets in prod, except for Sepolia
-      .filter((chain) => (enableTestNets && chain.chainId !== 5) || !chain.testnet || chain.chainId === sepolia.id)
+      .filter((chain) => enableTestNets || !chain.testnet || chain.chainId === sepolia.id)
       .sort(sortChainList)
   );
 }

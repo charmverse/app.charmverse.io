@@ -49,7 +49,8 @@ describe(`Test vote events and notifications`, () => {
       title: 'Vote',
       type: 'Approval',
       voteOptions: [],
-      pageId: page.id
+      pageId: page.id,
+      strategy: 'regular'
     });
 
     await createPollNotifications({
@@ -158,7 +159,8 @@ describe(`Test vote events and notifications`, () => {
       title: 'Vote',
       type: 'Approval',
       voteOptions: [],
-      postId: post.id
+      postId: post.id,
+      strategy: 'regular'
     });
 
     await createPollNotifications({
@@ -230,7 +232,8 @@ describe(`Test vote events and notifications`, () => {
       title: 'Vote',
       type: 'Approval',
       voteOptions: [],
-      pageId: page.id
+      pageId: page.id,
+      strategy: 'regular'
     });
 
     await createNotificationsFromEvent({

@@ -43,7 +43,8 @@ export async function getPollNotifications({ id, userId }: QueryCondition): Prom
           userVotes: {
             select: {
               choices: true,
-              userId: true
+              userId: true,
+              tokenAmount: true
             }
           },
           voteOptions: {

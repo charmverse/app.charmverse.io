@@ -19,7 +19,7 @@ export async function updateProposalEvaluation({
   actorId
 }: UpdateEvaluationRequest & { actorId: string }) {
   await prisma.$transaction(async (tx) => {
-    // updatereviewers only when it is present in request payload
+    // update reviewers only when it is present in request payload
     if (reviewers) {
       await tx.proposalReviewer.deleteMany({
         where: {
