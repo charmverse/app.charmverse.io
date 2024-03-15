@@ -42,8 +42,6 @@ handler.get(getSubmissions);
  *                type: string
  *                format: uuid
  *                example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *              ceramicId:
- *                type: string
  *              createdAt:
  *                type: string
  *                format: date-time
@@ -80,7 +78,6 @@ export type PublicApiSubmission = {
   rewardId: string;
   credentials: {
     id: string;
-    ceramicId: string;
     createdAt: Date;
   }[];
   submission?: {
@@ -151,7 +148,6 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       issuedCredentials: {
         select: {
           createdAt: true,
-          ceramicId: true,
           id: true
         }
       },
