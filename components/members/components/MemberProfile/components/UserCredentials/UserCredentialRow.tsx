@@ -17,6 +17,8 @@ import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
+import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
+
 export function UserCredentialRow({
   credential,
   readOnly = false,
@@ -91,7 +93,6 @@ export function UserCredentialRow({
   if (credential.type === 'onchain' && !schemaInfo) {
     return null;
   }
-
   const favoriteAndVerificationIconsComponent = (
     <Stack
       flexBasis={isSmallScreen ? undefined : '30%'}
@@ -163,11 +164,23 @@ export function UserCredentialRow({
     </Stack>
   ) : null;
 
+  const hideAndPublishComponent = (
+    <UserCredentialHideAndPublish
+      credential={credential}
+      isSmallScreen={isSmallScreen}
+      isUserRecipient={!!isUserRecipient}
+      readOnly={readOnly}
+      isMutating={isMutating}
+      toggleFavorite={toggleFavorite}
+    />
+  );
+
   if (isSmallScreen) {
     return (
       <Stack gap={1}>
         <Box gap={2} display='flex' alignItems='center' justifyItems='flex-start'>
           {credentialOrganizationComponent}
+
           {favoriteAndVerificationIconsComponent}
         </Box>
         {attestationContentComponent}
@@ -184,6 +197,7 @@ export function UserCredentialRow({
         {attestationContentComponent}
         {favoriteAndVerificationIconsComponent}
       </Stack>
+      {hideAndPublishComponent}
     </Stack>
   );
 }
