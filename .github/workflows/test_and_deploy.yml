@@ -212,7 +212,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
       # - name: Install make for npm ci
       #   run: |
       #     apt update
