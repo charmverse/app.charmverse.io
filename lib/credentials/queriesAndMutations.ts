@@ -82,7 +82,8 @@ function getParsedCredential(credential: CredentialFromCeramic): EASAttestationF
     content: parsed,
     attester: credential.issuer,
     timeCreated: new Date(credential.timestamp).valueOf(),
-    type: 'charmverse'
+    type: 'charmverse',
+    isOnchain: false
   };
 }
 
