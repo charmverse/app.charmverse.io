@@ -1,16 +1,17 @@
+import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
 import { getUserProfile } from 'lib/public-api/searchUserProfile';
-import { prettyPrint } from 'lib/utils/strings';
 import type { PublicApiSubmission } from 'pages/api/v1/rewards/submissions';
 import { baseUrl } from 'testing/mockApiCall';
+import { _ } from 'testing/prosemirror/builders';
 import {
-  generateUserAndSpaceWithApiToken,
   generateBountyWithSingleApplication,
-  generateSpaceUser
+  generateSpaceUser,
+  generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
 
-describe('GET /api/v1/submissions', () => {
+describe('GET /api/v1/rewards/submissions', () => {
   it('should return a list of submissions in the workspace', async () => {
     const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(undefined, false);
     const reviewerUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
@@ -40,6 +41,27 @@ describe('GET /api/v1/submissions', () => {
       })
     ]);
 
+    await prisma.$transaction([
+      prisma.application.update({
+        where: {
+          id: bountyWithPaidApplication.applications[0].id
+        },
+        data: {
+          submission: 'Submission',
+          submissionNodes: JSON.stringify(_.doc(_.paragraph(_.bold('Submission'))).toJSON()),
+          message: 'Application'
+        }
+      }),
+      prisma.application.update({
+        where: {
+          id: bountyWithInProgressWork.applications[0].id
+        },
+        data: {
+          message: 'Application'
+        }
+      })
+    ]);
+
     const response = (
       await request(baseUrl)
         .get(`/api/v1/rewards/submissions?api_key=${apiToken.token}&spaceId=${space.id}`)
@@ -50,24 +72,97 @@ describe('GET /api/v1/submissions', () => {
     expect(response).toMatchObject(
       expect.arrayContaining([
         {
-          application: null,
+          application: {
+            content: {
+              text: 'Application'
+            }
+          },
+          status: 'paid',
+          id: bountyWithPaidApplication.applications[0].id,
+          createdAt: expect.any(String),
+          rewardId: bountyWithPaidApplication.id,
           submission: {
-            id: bountyWithPaidApplication.applications[0].id,
-            createdAt: expect.any(String),
-            rewardId: bountyWithPaidApplication.id
+            content: {
+              text: 'Submission',
+              markdown: '**Submission**'
+            }
           },
           credentials: [],
           author: getUserProfile(user)
         },
         {
-          submission: null,
+          id: bountyWithInProgressWork.applications[0].id,
+          createdAt: expect.any(String),
+          rewardId: bountyWithInProgressWork.id,
           application: {
-            id: bountyWithInProgressWork.applications[0].id,
-            createdAt: expect.any(String),
-            rewardId: bountyWithInProgressWork.id
+            content: {
+              text: 'Application'
+            }
           },
           credentials: [],
-          author: getUserProfile(secondUser)
+          author: getUserProfile(secondUser),
+          status: 'in_progress'
+        }
+      ])
+    );
+  });
+
+  it('should return a list of submissions in the reward', async () => {
+    const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(undefined, false);
+    const reviewerUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    const paidBountyDescription = 'This is a bounty description for a paid application';
+
+    const bountyWithPaidApplication = await generateBountyWithSingleApplication({
+      spaceId: space.id,
+      applicationStatus: 'paid',
+      bountyCap: 10,
+      bountyStatus: 'open',
+      userId: user.id,
+      reviewer: reviewerUser.id,
+      bountyDescription: paidBountyDescription,
+      approveSubmitters: true
+    });
+
+    await prisma.$transaction([
+      prisma.application.update({
+        where: {
+          id: bountyWithPaidApplication.applications[0].id
+        },
+        data: {
+          submission: 'Submission',
+          submissionNodes: JSON.stringify(_.doc(_.paragraph(_.bold('Submission'))).toJSON()),
+          message: 'Application'
+        }
+      })
+    ]);
+
+    const response = (
+      await request(baseUrl)
+        .get(`/api/v1/rewards/submissions?api_key=${apiToken.token}&rewardId=${bountyWithPaidApplication.id}`)
+        .send()
+        .expect(200)
+    ).body as PublicApiSubmission[];
+
+    expect(response).toMatchObject(
+      expect.arrayContaining([
+        {
+          application: {
+            content: {
+              text: 'Application'
+            }
+          },
+          status: 'paid',
+          id: bountyWithPaidApplication.applications[0].id,
+          createdAt: expect.any(String),
+          rewardId: bountyWithPaidApplication.id,
+          submission: {
+            content: {
+              text: 'Submission',
+              markdown: '**Submission**'
+            }
+          },
+          credentials: [],
+          author: getUserProfile(user)
         }
       ])
     );
