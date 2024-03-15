@@ -213,6 +213,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install make for npm ci
+        run: apt install build-essential -y --no-install-recommends
+
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
 
@@ -258,9 +261,6 @@ jobs:
             sleep_loop_ct=$((sleep_loop_ct + 1))
             sleep 10
           done
-
-      - name: Install make for npm ci
-        run: apt install build-essential -y --no-install-recommends
 
       - name: Restore app from cache
         uses: ./.github/actions/build
