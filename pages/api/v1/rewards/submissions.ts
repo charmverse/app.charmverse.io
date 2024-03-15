@@ -1,11 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 import type { UserProfile } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
-import { submissionStatuses } from 'lib/rewards/constants';
 
 const handler = apiHandler();
 
@@ -15,7 +16,10 @@ handler.get(getSubmissions);
  * @swagger
  * components:
  *  schemas:
- *    Application:
+ *    ApplicationStatus:
+ *      type: string
+ *      enum: [applied, submission_rejected, in_progress, in_review, rejected, processing, complete, paid, cancelled]
+ *    PublicApiSubmission:
  *      type: object
  *      properties:
  *        id:
@@ -26,15 +30,6 @@ handler.get(getSubmissions);
  *          type: string
  *          format: date-time
  *          example: 2022-04-04T21:32:38.317Z
- *    Submission:
- *      type: object
- *      properties:
- *        submission:
- *          $ref: '#/components/schemas/Application'
- *          nullable: true
- *        application:
- *          $ref: '#/components/schemas/Application'
- *          nullable: true
  *        rewardId:
  *          type: string
  *          format: uuid
@@ -53,37 +48,59 @@ handler.get(getSubmissions);
  *                type: string
  *                format: date-time
  *                example: 2022-04-04T21:32:38.317Z
+ *        submission:
+ *          type: object
+ *          properties:
+ *            content:
+ *              type: object
+ *              properties:
+ *                text:
+ *                  type: string
+ *                markdown:
+ *                  type: string
+ *          nullable: true
+ *        application:
+ *          type: object
+ *          properties:
+ *            content:
+ *              type: object
+ *              properties:
+ *                text:
+ *                  type: string
+ *          nullable: true
  *        author:
  *          $ref: '#/components/schemas/UserProfile'
+ *        status:
+ *          $ref: '#/components/schemas/ApplicationStatus'
  */
 
-type Application = {
+export type PublicApiSubmission = {
   id: string;
   createdAt: Date;
   rewardId: string;
-};
-
-export type PublicApiSubmission = {
   credentials: {
     id: string;
     ceramicId: string;
     createdAt: Date;
   }[];
+  submission?: {
+    content: {
+      text: string;
+      markdown: string;
+    };
+  };
+  application?: {
+    content: {
+      text: string;
+    };
+  };
+  status: Omit<ApplicationStatus, 'inProgress' | 'review'> | 'in_progress' | 'in_review';
   author: UserProfile;
-} & (
-  | {
-      submission: Application;
-      application: null;
-    }
-  | {
-      submission: null;
-      application: Application;
-    }
-);
+};
 
 /**
  * @swagger
- * /submissions:
+ * /rewards/submissions:
  *   get:
  *     summary: Retrieve a list of submissions
  *     description: Retrieve submissions from your space.
@@ -102,7 +119,7 @@ export type PublicApiSubmission = {
  *        required: false
  *     responses:
  *       200:
- *         description: List of submissions
+ *         description: List of submissions (with applications) for the space or reward
  *         content:
  *            application/json:
  *              schema:
@@ -128,6 +145,9 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       id: true,
       createdAt: true,
       bountyId: true,
+      submission: true,
+      submissionNodes: true,
+      message: true,
       issuedCredentials: {
         select: {
           createdAt: true,
@@ -148,28 +168,39 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
   });
 
   return res.status(200).json(
-    submissions.map((submission) => {
-      const application = {
-        id: submission.id,
-        createdAt: submission.createdAt,
-        rewardId: submission.bountyId
-      };
-
-      const isSubmission = submission.bounty.approveSubmitters ? submissionStatuses.includes(submission.status) : false;
-      return {
-        ...(isSubmission
-          ? {
-              submission: application,
-              application: null
-            }
-          : {
-              application,
-              submission: null
-            }),
-        credentials: submission.issuedCredentials,
-        author: getUserProfile(submission.applicant)
-      };
-    })
+    await Promise.all(
+      submissions.map(async (submission) => {
+        return {
+          id: submission.id,
+          createdAt: submission.createdAt,
+          rewardId: submission.bountyId,
+          author: getUserProfile(submission.applicant),
+          status:
+            submission.status === 'inProgress'
+              ? 'in_progress'
+              : submission.status === 'review'
+              ? 'in_review'
+              : submission.status,
+          submission:
+            submission.submissionNodes && submission.submission
+              ? {
+                  content: {
+                    text: submission.submission,
+                    markdown: await getMarkdownText(JSON.parse(submission.submissionNodes))
+                  }
+                }
+              : undefined,
+          application: submission.message
+            ? {
+                content: {
+                  text: submission.message
+                }
+              }
+            : undefined,
+          credentials: submission.issuedCredentials
+        };
+      })
+    )
   );
 }
 
