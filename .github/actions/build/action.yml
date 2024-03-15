@@ -28,7 +28,6 @@ runs:
           background/ceramicServer/generated
         # including the app_env helps make sure that deploy_staging.yml does not reuse values from test_and_deploy.yml which are meant for production
         key: nextjs-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.gql', '**/*.scss', '!node_modules', '!.next', '!dist', '!dont_cache') }}
-        enableCrossOsArchive: true # so it works with playwright container
 
     - name: Build
       shell: bash

@@ -40,7 +40,6 @@ runs:
       with:
         path: ./node_modules
         key: nodemodules-cache-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
-        enableCrossOsArchive: true # so it works with playwright container
 
     - name: Install npm dependencies
       shell: bash
