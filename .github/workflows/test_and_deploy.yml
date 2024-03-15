@@ -267,6 +267,9 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
 
+      - name: Start services
+        run: npm run start:test:ci
+
       - name: Run ${{matrix.test_name}}
         env:
           REACT_APP_APP_ENV: 'test'
