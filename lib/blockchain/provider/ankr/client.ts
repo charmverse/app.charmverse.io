@@ -129,8 +129,7 @@ function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedC
   const link = getNFTUrl({ chain: chainId, contract: nft.contractAddress, token: nft.tokenId }) ?? '';
   return {
     id: `${nft.contractAddress}:${nft.tokenId}`,
-    tokenId: nft.tokenId,
-    tokenIdInt: toInt(nft.tokenId),
+    tokenId: BigInt(nft.tokenId).toString(),
     contract: nft.contractAddress,
     imageRaw: nft.imageUrl,
     image: nft.imageUrl,
@@ -144,13 +143,6 @@ function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedC
     link,
     walletId
   };
-}
-
-export function toInt(tokenId: string) {
-  if (tokenId.includes('0x')) {
-    return parseInt(tokenId, 16);
-  }
-  return parseInt(tokenId);
 }
 
 type TokenMetadata = {
@@ -177,8 +169,7 @@ export async function getTokenInfoOnMantle({
   const imageUrl = metadata.image?.replace('ipfs://', 'https://ipfs.io/ipfs/');
   return {
     id: `${address}:${tokenId}`,
-    tokenId,
-    tokenIdInt: toInt(tokenId),
+    tokenId: BigInt(tokenId).toString(),
     contract: address,
     imageRaw: imageUrl,
     image: imageUrl,

@@ -38,9 +38,9 @@ export function CharmsHistoryTab() {
       <Stack gap={2}>
         {transactions.map((transaction, i) => (
           <>
-            <Grid key={transaction.id} container display='flex' gap={1} alignItems='center'>
-              <Grid item xs={0.5}>
-                <Stack direction='row' alignItems='center' gap={0.5}>
+            <Stack direction='row' gap={1} alignItems='center' justifyContent='space-between'>
+              <Stack direction='row' gap={1} alignItems='center'>
+                <Stack direction='row' alignItems='center' gap={0.5} minWidth='30px'>
                   <Typography
                     variant='subtitle1'
                     color={transaction.metadata.isReceived ? ({ palette }) => palette.primary.main : 'secondary'}
@@ -49,16 +49,14 @@ export function CharmsHistoryTab() {
                     {transaction.amount}
                   </Typography>
                 </Stack>
-              </Grid>
-              <Grid item xs={9}>
+
                 <Typography>{getTransactionDescription(transaction)}</Typography>
-              </Grid>
-              <Grid item xs={2} justifyContent='flex-end'>
-                <Typography color='secondary' variant='subtitle1'>
-                  {formatDateTime(transaction.createdAt)}
-                </Typography>
-              </Grid>
-            </Grid>
+              </Stack>
+
+              <Typography color='secondary' variant='subtitle1'>
+                {formatDateTime(transaction.createdAt)}
+              </Typography>
+            </Stack>
             <Divider />
           </>
         ))}
@@ -84,6 +82,8 @@ export function CharmsHistoryTab() {
 const receivedLabels: Record<CharmActionTrigger, (data: { amount: number }) => string> = {
   [CharmActionTrigger.referral]: ({ amount }) => `Received ${getAmountLabel(amount)} for a referral`,
   [CharmActionTrigger.referralReferee]: ({ amount }) => `Received ${getAmountLabel(amount)} from a referral`,
+  [CharmActionTrigger.createFirstProposal]: ({ amount }) =>
+    `Received ${getAmountLabel(amount)} for publishing first proposal`,
   [CharmActionTrigger.ETHDenver24ScavengerHunt]: ({ amount }) =>
     `Received ${getAmountLabel(amount)} (Eth Denver 24 Scavenger Hunt)`
 };

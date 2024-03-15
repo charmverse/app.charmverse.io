@@ -8,6 +8,7 @@ import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import { rewardCharmsForProposal } from 'lib/charms/triggers/rewardCharmsForProposal';
 import { createForm } from 'lib/forms/createForm';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
@@ -266,6 +267,10 @@ export async function createProposal({
         proposalId
       }
     });
+  }
+
+  if (proposalStatus === 'published') {
+    rewardCharmsForProposal(userId);
   }
 
   return {
