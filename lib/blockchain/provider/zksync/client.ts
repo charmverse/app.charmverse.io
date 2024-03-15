@@ -136,7 +136,7 @@ function mapNFTData(
   return {
     id: `${token.contractAddress}:${token.tokenId}`,
     tokenId: String(token.tokenId),
-    tokenIdInt: Number(token.tokenId),
+    tokenIdInt: BigInt(token.tokenId).toString(),
     contract: token.contractAddress,
     imageRaw: tokenUriDNSVersion,
     image: tokenUriDNSVersion,

@@ -46,7 +46,7 @@ export function mapNFTData(token: TokenResponseItem['token'], walletId: string |
   return {
     id: `${token.collectionAddress}:${token.tokenId}`,
     tokenId: token.tokenId,
-    tokenIdInt: parseInt(token.tokenId),
+    tokenIdInt: BigInt(token.tokenId).toString(),
     contract: token.collectionAddress,
     imageRaw: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',
     image: token.image?.url?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '',

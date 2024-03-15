@@ -38,7 +38,7 @@ export type SupportedChainId = SupportedChainIdByAlchemy | SupportedChainIdByAnk
 export type NFTData = {
   id: string;
   tokenId: string;
-  tokenIdInt: number | null;
+  tokenIdInt: string | null;
   contract: string;
   title: string;
   description: string;

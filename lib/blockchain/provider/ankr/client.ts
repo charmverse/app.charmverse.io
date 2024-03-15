@@ -130,7 +130,7 @@ function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedC
   return {
     id: `${nft.contractAddress}:${nft.tokenId}`,
     tokenId: nft.tokenId,
-    tokenIdInt: toInt(nft.tokenId),
+    tokenIdInt: BigInt(nft.tokenId).toString(),
     contract: nft.contractAddress,
     imageRaw: nft.imageUrl,
     image: nft.imageUrl,
@@ -144,13 +144,6 @@ function mapNFTData(nft: NFTFields, walletId: string | null, chainId: SupportedC
     link,
     walletId
   };
-}
-
-export function toInt(tokenId: string) {
-  if (tokenId.includes('0x')) {
-    return parseInt(tokenId, 16);
-  }
-  return parseInt(tokenId);
 }
 
 type TokenMetadata = {
@@ -178,7 +171,7 @@ export async function getTokenInfoOnMantle({
   return {
     id: `${address}:${tokenId}`,
     tokenId,
-    tokenIdInt: toInt(tokenId),
+    tokenIdInt: BigInt(tokenId).toString(),
     contract: address,
     imageRaw: imageUrl,
     image: imageUrl,
