@@ -11,15 +11,6 @@ export async function getVotingPowerForVotes({
   votes: Pick<ExtendedVote, 'strategy' | 'blockNumber' | 'tokenAddress' | 'chainId'>[];
   userId: string;
 }) {
-  const userWallets = await prisma.userWallet.findMany({
-    where: {
-      userId
-    },
-    select: {
-      address: true
-    }
-  });
-
   const user = await prisma.user.findUniqueOrThrow({
     where: {
       id: userId
@@ -29,11 +20,16 @@ export async function getVotingPowerForVotes({
         select: {
           address: true
         }
+      },
+      wallets: {
+        select: {
+          address: true
+        }
       }
     }
   });
 
-  const primaryWalletAddress = user.primaryWallet?.address ?? userWallets[0]?.address;
+  const primaryWalletAddress = user.primaryWallet?.address ?? user.wallets[0]?.address;
 
   const votingPowers = await Promise.all(
     votes.map((vote) => {

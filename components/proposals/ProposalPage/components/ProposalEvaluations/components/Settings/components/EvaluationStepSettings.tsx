@@ -37,7 +37,6 @@ export function EvaluationStepSettings({
   onChange,
   readOnly
 }: Props) {
-  const [isTokenVoting, setIsTokenVoting] = useState(false);
   const isAdmin = useIsAdmin();
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
@@ -50,6 +49,8 @@ export function EvaluationStepSettings({
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
 
+  const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
+
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers.map((r) => ({
@@ -61,13 +62,10 @@ export function EvaluationStepSettings({
   }
 
   useEffect(() => {
-    if (evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token') {
-      setIsTokenVoting(true);
+    if (isTokenVoting) {
       handleOnChangeReviewers([tokenHoldersSystemRole]);
-    } else {
-      setIsTokenVoting(false);
     }
-  }, [evaluation]);
+  }, [isTokenVoting]);
 
   return (
     <>
