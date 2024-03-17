@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { useCallback } from 'react';
 import { getAddress, parseUnits } from 'viem';
 
+import charmClient from 'charmClient';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { eToNumber } from 'lib/utils/numbers';
 
@@ -25,7 +26,7 @@ export function useMultiRewardPayment() {
   const { pages } = usePages();
   const [paymentMethods] = usePaymentMethods();
   const prepareGnosisSafeRewardPayment = useCallback(
-    ({
+    async ({
       recipientAddress,
       recipientUserId,
       token,
@@ -44,8 +45,17 @@ export function useMultiRewardPayment() {
       applicationId: string;
       title?: string;
     }) => {
+      const resolvedRecipientAddress =
+        recipientAddress.endsWith('.eth') && ethers.utils.isValidName(recipientAddress)
+          ? await charmClient.resolveEnsName(recipientAddress)
+          : getAddress(recipientAddress);
+
+      if (!resolvedRecipientAddress) {
+        return null;
+      }
+
       let data = '0x';
-      let to = recipientAddress;
+      let to: string | null = resolvedRecipientAddress;
       let value = parseUnits(eToNumber(amount), 18).toString();
 
       // assume this is ERC20 if its not a native token
@@ -54,15 +64,16 @@ export function useMultiRewardPayment() {
         const paymentMethod = paymentMethods.find((method) => method.contractAddress === token);
         const erc20 = new Interface(ERC20_ABI);
         const parsedAmount = parseUnits(eToNumber(amount), paymentMethod!.tokenDecimals).toString();
-        data = erc20.encodeFunctionData('transfer', [getAddress(recipientAddress), parsedAmount]);
+        data = erc20.encodeFunctionData('transfer', [resolvedRecipientAddress, parsedAmount]);
         // send the request to the token contract
-        to = token;
+        to =
+          token.endsWith('.eth') && ethers.utils.isValidName(token) ? await charmClient.resolveEnsName(token) : token;
+        if (!to) {
+          return null;
+        }
         value = '0';
       } else {
-        to =
-          recipientAddress.endsWith('.eth') && ethers.utils.isValidName(recipientAddress)
-            ? recipientAddress
-            : getAddress(recipientAddress);
+        to = resolvedRecipientAddress;
       }
 
       const defaultTitle = 'Untitled';
