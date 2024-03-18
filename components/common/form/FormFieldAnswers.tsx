@@ -26,7 +26,7 @@ const FormFieldAnswersContainer = styled(Stack)`
 `;
 
 type FormFieldAnswersProps = {
-  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
+  formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
     formFieldAnswer?: FormFieldAnswer | null;
@@ -130,7 +130,7 @@ export function FormFieldAnswers({
 
   return (
     <FormFieldAnswersContainer>
-      {formFields.map((formField) => {
+      {formFields?.map((formField) => {
         const fieldAnswerThreads =
           (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
         return (

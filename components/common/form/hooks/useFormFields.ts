@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { isValidName } from 'ethers/lib/utils';
+import { useEffect } from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -12,34 +13,18 @@ import { isUUID, isUrl, isValidEmail } from 'lib/utils/strings';
 
 import type { FieldType, FormFieldValue } from '../interfaces';
 
-export function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValue }) {
-  const value =
-    prop.type === 'multiselect' || prop.type === 'person'
-      ? // Convert to array if not already as yup expects array
-        Array.isArray(prop.value)
-        ? prop.value
-        : []
-      : prop.type === 'long_text'
-      ? // convert to content and contentText for prosemirror document
-        prop.value || {
-          content: emptyDocument,
-          contentText: ''
-        }
-      : prop.value || '';
-
-  return value;
-}
+type FormFieldInput = {
+  value?: any;
+  id: string;
+  required: boolean;
+  type: FieldType;
+};
 
 export function useFormFields({
   fields,
   onSubmit
 }: {
-  fields: {
-    value?: any;
-    id: string;
-    required: boolean;
-    type: FieldType;
-  }[];
+  fields?: FormFieldInput[];
   onSubmit?: (values: FieldValues) => void;
 }) {
   const {
@@ -52,15 +37,10 @@ export function useFormFields({
     getValues
   } = useForm({
     mode: 'onChange',
-    defaultValues: fields
-      .filter((field) => field.type !== 'label')
-      .reduce<Record<string, FormFieldValue>>((acc, prop) => {
-        acc[prop.id] = getInitialFormFieldValue(prop);
-        return acc;
-      }, {}),
+    defaultValues: getFormFieldMap(fields || []),
     resolver: yupResolver(
       yup.object(
-        fields.reduce((acc, property) => {
+        (fields || []).reduce((acc, property) => {
           const isRequired = property.required;
           switch (property.type) {
             case 'text':
@@ -189,6 +169,16 @@ export function useFormFields({
     });
   }
 
+  useEffect(() => {
+    // set form values onece fields are defined
+    if (fields) {
+      reset(getFormFieldMap(fields), {
+        keepDirty: false,
+        keepDirtyValues: false
+      });
+    }
+  }, [!!fields, reset]);
+
   return {
     values,
     control,
@@ -213,4 +203,31 @@ export function useFormFields({
     },
     onFormChange
   };
+}
+
+export function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValue }) {
+  const value =
+    prop.type === 'multiselect' || prop.type === 'person'
+      ? // Convert to array if not already as yup expects array
+        Array.isArray(prop.value)
+        ? prop.value
+        : []
+      : prop.type === 'long_text'
+      ? // convert to content and contentText for prosemirror document
+        prop.value || {
+          content: emptyDocument,
+          contentText: ''
+        }
+      : prop.value || '';
+
+  return value;
+}
+
+function getFormFieldMap(fields: FormFieldInput[]) {
+  return fields
+    .filter((field) => field.type !== 'label')
+    .reduce<Record<string, FormFieldValue>>((acc, prop) => {
+      acc[prop.id] = getInitialFormFieldValue(prop);
+      return acc;
+    }, {});
 }

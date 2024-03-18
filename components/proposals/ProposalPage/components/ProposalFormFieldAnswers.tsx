@@ -5,6 +5,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldValue } from 'components/common/form/interfaces';
+import LoadingComponent from 'components/common/LoadingComponent';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -20,7 +21,7 @@ export function ProposalFormFieldAnswers({
   readOnly?: boolean;
   enableComments: boolean;
   proposalId: string;
-  formFields: FormField[];
+  formFields?: FormField[];
   pageId: string;
   threads: Record<string, ThreadWithComments | undefined>;
   isDraft?: boolean;
@@ -28,19 +29,21 @@ export function ProposalFormFieldAnswers({
   const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
 
-  const fields = formFields
-    .map((formField) => {
-      const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
-        (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-      );
-      return {
-        ...formField,
-        formFieldAnswer: proposalFormFieldAnswer,
-        value: proposalFormFieldAnswer?.value as FormFieldValue,
-        options: (formField.options ?? []) as SelectOptionType[]
-      };
-    })
-    .filter(isTruthy);
+  const fields =
+    !isLoading && formFields
+      ? formFields.map((formField) => {
+          const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
+            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+          );
+          return {
+            ...formField,
+            formFieldAnswer: proposalFormFieldAnswer,
+            value: proposalFormFieldAnswer?.value as FormFieldValue,
+            options: (formField.options ?? []) as SelectOptionType[]
+          };
+        })
+      : undefined;
+
   const { control, errors, onFormChange, values } = useFormFields({ fields });
 
   const onSave = async (answers: { id: string; value: FormFieldValue }[]) => {
@@ -56,7 +59,7 @@ export function ProposalFormFieldAnswers({
   };
 
   if (isLoading) {
-    return null;
+    return <LoadingComponent minHeight={600} />;
   }
 
   return (
