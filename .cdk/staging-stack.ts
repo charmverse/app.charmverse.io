@@ -47,7 +47,7 @@ export class CdkDeployStack extends Stack {
         }
       },
       Version: 1
-    }
+    };
 
     // list of all options: https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/command-options-general.html
     const optionSettingProperties: elasticbeanstalk.CfnEnvironment.OptionSettingProperty[] = [
@@ -90,6 +90,11 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elbv2:listener:443',
         optionName: 'SSLCertificateArns',
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
+      },
+      {
+        namespace: 'aws:elbv2:listener:443',
+        optionName: 'SSLPolicy',
+        value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
       },
       {
         namespace: 'aws:elasticbeanstalk:environment:process:websocket',
