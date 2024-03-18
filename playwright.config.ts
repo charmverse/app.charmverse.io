@@ -104,7 +104,7 @@ const config: PlaywrightTestConfig = {
     command: 'npm run start:test:ci',
     // port: 3335,
     url: 'http://localhost:3335',
-    reuseExistingServer: true // !!process.env.CI
+    reuseExistingServer: !process.env.CI
   }
 };
 
