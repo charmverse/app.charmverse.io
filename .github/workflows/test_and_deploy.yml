@@ -284,7 +284,7 @@ jobs:
           docker run --name mcrmicrosoftcomplaywrightv1343jammy_68c205 --workdir /github/workspace --rm  \
                       -e "REACT_APP_APP_ENV" -e CI=true \
                       -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
-                      --network "${{ job.services.postgres.network }}"  \
+
                       mcr.microsoft.com/playwright:v1.34.3-jammy \
                       ${{matrix.test_command}}
         # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
