@@ -26,7 +26,7 @@ const FormFieldAnswersContainer = styled(Stack)`
 `;
 
 type FormFieldAnswersProps = {
-  formFields: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
+  formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
     formFieldAnswer?: FormFieldAnswer | null;
@@ -48,20 +48,6 @@ type FormFieldAnswersProps = {
   threads?: Record<string, ThreadWithComments | undefined>;
 };
 
-export function ControlledFormFieldAnswers(props: Omit<FormFieldAnswersProps, 'onSave'>) {
-  return <FormFieldAnswersBase {...props} />;
-}
-
-export function FormFieldAnswers(props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange'>) {
-  const { control, errors, onFormChange, values } = useFormFields({
-    fields: props.formFields
-  });
-
-  return (
-    <FormFieldAnswersBase {...props} control={control} errors={errors} onFormChange={onFormChange} values={values} />
-  );
-}
-
 const StyledStack = styled(Stack)`
   ${hoverIconsStyle()};
   flex-direction: row;
@@ -70,7 +56,7 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-function FormFieldAnswersBase({
+export function FormFieldAnswers({
   onSave,
   formFields,
   values,
@@ -144,7 +130,7 @@ function FormFieldAnswersBase({
 
   return (
     <FormFieldAnswersContainer>
-      {formFields.map((formField) => {
+      {formFields?.map((formField) => {
         const fieldAnswerThreads =
           (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
         return (

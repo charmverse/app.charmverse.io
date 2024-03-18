@@ -87,7 +87,7 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
-    <Box sx={{ overflowY: 'auto' }}>
+    <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <DocumentPageWithSidebars page={publicPage.page} savePage={() => null} readOnly />
     </Box>
   );
