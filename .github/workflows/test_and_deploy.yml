@@ -267,7 +267,15 @@ jobs:
         uses: ./.github/actions/build
 
       - name: Start services
-        run: npm run start:test:ci
+        run: |
+          npm run start:test:ci &
+
+          sleep_loop_ct=0
+          until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 10
+          done
 
       - name: Run ${{matrix.test_name}}
         env:
