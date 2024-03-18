@@ -253,7 +253,7 @@ jobs:
             docker inspect permissions-api
             echo "permission api not up in loop $sleep_loop_ct ... sleeping"
             sleep_loop_ct=$((sleep_loop_ct + 1))
-            sleep 10
+            sleep 1
           done
 
       - name: Restore app from cache
@@ -267,7 +267,7 @@ jobs:
           until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
             echo "webapp not up in loop $sleep_loop_ct ... sleeping"
             sleep_loop_ct=$((sleep_loop_ct + 1))
-            sleep 10
+            sleep 1
           done
 
       - name: Run ${{matrix.test_name}}
