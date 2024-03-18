@@ -36,7 +36,7 @@ export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id'> & {
   createdAt: string;
   updatedAt: string;
   updatedBy: string;
-  // pageId: string;
+  pageId: string;
   title: string;
 };
 
@@ -57,6 +57,7 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
       rewards: true,
       page: {
         select: {
+          id: true,
           title: true,
           createdAt: true,
           updatedAt: true,
@@ -97,7 +98,7 @@ function mapDbProposalToProposalLite({
     authors: ProposalAuthor[];
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
-    page: { title: string; updatedAt: Date; createdAt: Date; updatedBy: string } | null;
+    page: { id: string; title: string; updatedAt: Date; createdAt: Date; updatedBy: string } | null;
   };
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersLite {
@@ -132,6 +133,7 @@ function mapDbProposalToProposalLite({
     title: proposal.page?.title || '',
     updatedAt: (proposal.page?.updatedAt || new Date()).toISOString(),
     updatedBy: proposal.page?.updatedBy || '',
+    pageId: proposal.page?.id || '',
     reviewers: (proposal.status !== 'draft' && currentEvaluation?.reviewers) || [],
     rewardIds: rewards.map((r) => r.id),
     fields

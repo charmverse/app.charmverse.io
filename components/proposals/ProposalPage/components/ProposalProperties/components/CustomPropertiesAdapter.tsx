@@ -33,6 +33,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     reviewers: [],
     evaluations: [],
     id: '',
+    pageId: '',
     title: '',
     createdAt: '',
     createdBy: '',
