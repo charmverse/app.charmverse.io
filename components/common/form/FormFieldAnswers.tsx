@@ -56,7 +56,23 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-export function FormFieldAnswers({
+export function FormFieldAnswers(props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange'>) {
+  const { control, errors, onFormChange, values } = useFormFields({
+    fields: props.formFields
+  });
+
+  return (
+    <FormFieldAnswersControlled
+      {...props}
+      control={control}
+      errors={errors}
+      onFormChange={onFormChange}
+      values={values}
+    />
+  );
+}
+
+export function FormFieldAnswersControlled({
   onSave,
   formFields,
   values,
