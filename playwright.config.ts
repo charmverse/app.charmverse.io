@@ -100,10 +100,10 @@ const config: PlaywrightTestConfig = {
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    // command: 'npx react-env --path .env.test.local -- npm run start',
+    // add DEBUG=pw:webserver environment variable to see server output
     command: 'npm run start:test:ci',
     port: 3335,
-    reuseExistingServer: !process.env.CI // throws an error if existing server is running and CI is true
+    reuseExistingServer: true // !!process.env.CI
   }
 };
 
