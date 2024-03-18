@@ -3,12 +3,7 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import type { EasSchemaChain } from 'lib/credentials/connectors';
-import {
-  getTrackedOnChainCredential,
-  type EASAttestationFromApi
-} from 'lib/credentials/external/getOnchainCredentials';
-import type { ExternalCredentialChain } from 'lib/credentials/external/schemas';
+import { type EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 import type { UserProfile } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
@@ -157,7 +152,14 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
   }
 
   const submissions = await prisma.application.findMany({
-    where: spaceId ? { spaceId } : { bountyId: rewardId, spaceId: authorizedSpaceId },
+    where: {
+      ...(spaceId ? { spaceId } : { bountyId: rewardId, spaceId: authorizedSpaceId }),
+      bounty: {
+        page: {
+          deletedAt: null
+        }
+      }
+    },
     orderBy: {
       createdAt: 'desc'
     },
@@ -170,12 +172,12 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       message: true,
       issuedCredentials: {
         where: {
-          onchainChainId: {
-            not: null
-          },
-          onchainAttestationId: {
-            not: null
+          ceramicRecord: {
+            not: undefined
           }
+        },
+        select: {
+          ceramicRecord: true
         }
       },
       bounty: {
@@ -189,34 +191,6 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       }
     }
   });
-
-  const submissionCredentialsRecord: Record<
-    string,
-    {
-      attestationId: string;
-      chainId: ExternalCredentialChain | EasSchemaChain;
-    }
-  > = {};
-
-  submissions.forEach((submission) => {
-    submission.issuedCredentials.forEach((credential) => {
-      if (credential.onchainAttestationId && credential.onchainChainId) {
-        submissionCredentialsRecord[submission.id] = {
-          attestationId: credential.onchainAttestationId,
-          chainId: credential.onchainChainId as ExternalCredentialChain | EasSchemaChain
-        };
-      }
-    });
-  });
-
-  const onChainCredentials = await Promise.all(
-    Object.values(submissionCredentialsRecord).map(({ attestationId, chainId }) =>
-      getTrackedOnChainCredential({
-        chainId,
-        id: attestationId
-      })
-    )
-  );
 
   return res.status(200).json(
     await Promise.all(
@@ -250,11 +224,13 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
             : undefined,
           credentials: submission.issuedCredentials
             .map((credential) => {
-              const easCredential = onChainCredentials.find((c) => c.id === credential.onchainAttestationId);
-
-              return easCredential;
+              return credential.ceramicRecord;
             })
             .filter(isTruthy)
+            .map((ceramicRecord: any) => {
+              const { sig, issuer, timestamp, charmverseId, __typename, ...credential } = ceramicRecord;
+              return credential as EASAttestationFromApi;
+            })
         };
       })
     )
