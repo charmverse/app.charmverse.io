@@ -59,7 +59,7 @@ export function ProposalFormFieldAnswers({
   };
 
   if (isLoading) {
-    return <LoadingComponent minHeight={600} />;
+    return <LoadingComponent />;
   }
 
   return (

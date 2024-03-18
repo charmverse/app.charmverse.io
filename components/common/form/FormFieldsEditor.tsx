@@ -39,6 +39,7 @@ export function FormFieldsEditor({
     const errors = checkFormFieldErrors(_formFields);
     setFormFields(_formFields);
     if (errors) {
+      showError(errors);
       return;
     }
     try {
