@@ -270,6 +270,12 @@ jobs:
             sleep 1
           done
 
+      - name: Cache Playwright Docker image
+        uses: ScribeMD/docker-cache@0.4.0
+        with:
+          # include the version we want to cache
+          key: docker-${{ runner.os }}-v1.42.1-jammy
+
       - name: Run ${{matrix.test_name}}
         env:
           REACT_APP_APP_ENV: 'test'
