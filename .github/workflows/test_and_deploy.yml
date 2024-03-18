@@ -282,7 +282,6 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         run: |
           docker run --name mcrmicrosoftcomplaywrightv1343jammy_68c205 --workdir /github/workspace --rm  \
-                      -p "3335:3335"     \
                       -e "REACT_APP_APP_ENV" -e CI=true \
                       -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
                       --network "${{ job.services.postgres.network }}"  \
