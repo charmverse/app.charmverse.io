@@ -181,9 +181,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-app
     if: ${{ !contains(needs.build-app.outputs.head-commit-message, 'skip-tests') }}
-    # container:
-    #   # image from https://playwright.dev/docs/ci-intro
-    #   image: mcr.microsoft.com/playwright:v1.42.1-jammy
     # Postgres setup copied from https://gist.github.com/2color/537f8ef13ecec80059abb007839a6878
     services:
       postgres:
@@ -212,10 +209,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      # - name: Install make for npm ci
-      #   run: |
-      #     apt update
-      #     apt install build-essential -y --no-install-recommends
 
       - name: Restore dependencies from cache
         uses: ./.github/actions/install
