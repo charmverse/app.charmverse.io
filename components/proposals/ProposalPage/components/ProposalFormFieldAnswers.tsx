@@ -1,13 +1,12 @@
 import type { FormField } from '@charmverse/core/prisma-client';
+import { useMemo } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
-import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 export function ProposalFormFieldAnswers({
   proposalId,
@@ -26,25 +25,30 @@ export function ProposalFormFieldAnswers({
   threads: Record<string, ThreadWithComments | undefined>;
   isDraft?: boolean;
 }) {
-  const { data: proposalFormFieldAnswers = [], isLoading } = useGetProposalFormFieldAnswers({ proposalId });
+  const { data: proposalFormFieldAnswers = [], isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
+    proposalId
+  });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
 
-  const fields =
-    !isLoading && formFields
-      ? formFields.map((formField) => {
-          const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
-            (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-          );
-          return {
-            ...formField,
-            formFieldAnswer: proposalFormFieldAnswer,
-            value: proposalFormFieldAnswer?.value as FormFieldValue,
-            options: (formField.options ?? []) as SelectOptionType[]
-          };
-        })
-      : undefined;
+  const isLoading = isLoadingAnswers || !formFields;
 
-  const { control, errors, onFormChange, values } = useFormFields({ fields });
+  const fields = useMemo(
+    () =>
+      !isLoading
+        ? formFields.map((formField) => {
+            const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
+              (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+            );
+            return {
+              ...formField,
+              formFieldAnswer: proposalFormFieldAnswer,
+              value: proposalFormFieldAnswer?.value as FormFieldValue,
+              options: (formField.options ?? []) as SelectOptionType[]
+            };
+          })
+        : undefined,
+    [formFields, isLoading, proposalFormFieldAnswers]
+  );
 
   const onSave = async (answers: { id: string; value: FormFieldValue }[]) => {
     await trigger({
@@ -71,10 +75,6 @@ export function ProposalFormFieldAnswers({
       disabled={readOnly}
       threads={threads}
       isDraft={isDraft}
-      control={control}
-      errors={errors}
-      onFormChange={onFormChange}
-      values={values}
     />
   );
 }
