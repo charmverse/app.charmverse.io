@@ -10,7 +10,6 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
 
-import { checkFormFieldErrors } from './checkFormFieldErrors';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
 import type { FormFieldInput } from './interfaces';
@@ -29,19 +28,14 @@ export function FormFieldsEditor({
   const { trigger } = useUpdateProposalFormFields({ proposalId });
   const { showError } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
-    return debounce(trigger, 500);
+    return debounce(trigger, 200);
   }, [trigger]);
 
   async function updateFormFields(_formFields: FormFieldInput[]) {
     if (readOnly) {
       return;
     }
-    const errors = checkFormFieldErrors(_formFields);
     setFormFields(_formFields);
-    if (errors) {
-      showError(errors);
-      return;
-    }
     try {
       await debouncedUpdate({ formFields: _formFields });
     } catch (error) {
