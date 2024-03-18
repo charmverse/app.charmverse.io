@@ -3,10 +3,17 @@ import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
+import type { EasSchemaChain } from 'lib/credentials/connectors';
+import {
+  getTrackedOnChainCredential,
+  type EASAttestationFromApi
+} from 'lib/credentials/external/getOnchainCredentials';
+import type { ExternalCredentialChain } from 'lib/credentials/external/schemas';
 import { getMarkdownText } from 'lib/prosemirror/getMarkdownText';
 import type { UserProfile } from 'lib/public-api';
 import { apiHandler } from 'lib/public-api/handler';
 import { getUserProfile, userProfileSelect } from 'lib/public-api/searchUserProfile';
+import { isTruthy } from 'lib/utils/types';
 
 const handler = apiHandler();
 
@@ -16,9 +23,37 @@ handler.get(getSubmissions);
  * @swagger
  * components:
  *  schemas:
- *    ApplicationStatus:
- *      type: string
- *      enum: [applied, submission_rejected, in_progress, in_review, rejected, processing, complete, paid, cancelled]
+ *    EASAttestationFromApi:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: string
+ *          format: uuid
+ *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+ *        content:
+ *          type: object
+ *        attester:
+ *          type: string
+ *        recipient:
+ *          type: string
+ *        schemaId:
+ *          type: string
+ *        timeCreated:
+ *          type: number
+ *        chainId:
+ *          type: string
+ *        type:
+ *          type: string
+ *          enum: [onchain, charmverse, gitcoin]
+ *        verificationUrl:
+ *          type: string
+ *          nullable: true
+ *        iconUrl:
+ *          type: string
+ *          nullable: true
+ *        issuedCredentialId:
+ *          type: string
+ *          nullable: true
  *    PublicApiSubmission:
  *      type: object
  *      properties:
@@ -36,16 +71,7 @@ handler.get(getSubmissions);
  *        credentials:
  *          type: array
  *          items:
- *            type: object
- *            properties:
- *              id:
- *                type: string
- *                format: uuid
- *                example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
- *              createdAt:
- *                type: string
- *                format: date-time
- *                example: 2022-04-04T21:32:38.317Z
+ *            $ref: '#/components/schemas/EASAttestationFromApi'
  *        submission:
  *          type: object
  *          properties:
@@ -76,10 +102,7 @@ export type PublicApiSubmission = {
   id: string;
   createdAt: Date;
   rewardId: string;
-  credentials: {
-    id: string;
-    createdAt: Date;
-  }[];
+  credentials: EASAttestationFromApi[];
   submission?: {
     content: {
       text: string;
@@ -146,9 +169,13 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       submissionNodes: true,
       message: true,
       issuedCredentials: {
-        select: {
-          createdAt: true,
-          id: true
+        where: {
+          onchainChainId: {
+            not: null
+          },
+          onchainAttestationId: {
+            not: null
+          }
         }
       },
       bounty: {
@@ -162,6 +189,34 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
       }
     }
   });
+
+  const submissionCredentialsRecord: Record<
+    string,
+    {
+      attestationId: string;
+      chainId: ExternalCredentialChain | EasSchemaChain;
+    }
+  > = {};
+
+  submissions.forEach((submission) => {
+    submission.issuedCredentials.forEach((credential) => {
+      if (credential.onchainAttestationId && credential.onchainChainId) {
+        submissionCredentialsRecord[submission.id] = {
+          attestationId: credential.onchainAttestationId,
+          chainId: credential.onchainChainId as ExternalCredentialChain | EasSchemaChain
+        };
+      }
+    });
+  });
+
+  const onChainCredentials = await Promise.all(
+    Object.values(submissionCredentialsRecord).map(({ attestationId, chainId }) =>
+      getTrackedOnChainCredential({
+        chainId,
+        id: attestationId
+      })
+    )
+  );
 
   return res.status(200).json(
     await Promise.all(
@@ -194,6 +249,12 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
               }
             : undefined,
           credentials: submission.issuedCredentials
+            .map((credential) => {
+              const easCredential = onChainCredentials.find((c) => c.id === credential.onchainAttestationId);
+
+              return easCredential;
+            })
+            .filter(isTruthy)
         };
       })
     )

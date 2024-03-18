@@ -86,6 +86,38 @@ const GET_EXTERNAL_CREDENTIALS = gql`
   }
 `;
 
+function mapAttestationDataToEASCredential(attestation: any): EASAttestationFromApi {
+  return {
+    ...attestation,
+    type: 'onchain',
+    content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
+      acc[val.name] = val.value.value;
+      return acc;
+    }, {} as any),
+    timeCreated: attestation.timeCreated * 1000,
+    verificationUrl: getOnChainAttestationUrl({ chainId: attestation.chainId, attestationId: attestation.id })
+  };
+}
+
+export function getTrackedOnChainCredential({
+  id,
+  chainId
+}: {
+  id: string;
+  chainId: ExternalCredentialChain | EasSchemaChain;
+}) {
+  return graphQlClients[chainId]
+    .query({
+      query: GET_EXTERNAL_CREDENTIALS,
+      variables: {
+        where: {
+          id
+        }
+      }
+    })
+    .then(({ data }) => mapAttestationDataToEASCredential(data.attestation));
+}
+
 function getTrackedOnChainCredentials({
   chainId,
   wallets
@@ -115,20 +147,7 @@ function getTrackedOnChainCredentials({
       }
     })
     .then(({ data }) => {
-      return data.attestations.map(
-        (attestation: any) =>
-          ({
-            ...attestation,
-            type: 'onchain',
-            chainId,
-            content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
-              acc[val.name] = val.value.value;
-              return acc;
-            }, {} as any),
-            timeCreated: attestation.timeCreated * 1000,
-            verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
-          } as EASAttestationFromApi)
-      );
+      return data.attestations.map(mapAttestationDataToEASCredential);
     });
 }
 
