@@ -102,7 +102,8 @@ const config: PlaywrightTestConfig = {
   webServer: {
     // command: 'npx react-env --path .env.test.local -- npm run start',
     command: 'npm run start:test:ci',
-    port: 3335,
+    // port: 3335,
+    url: 'http://localhost:3335',
     reuseExistingServer: !!process.env.CI
   }
 };

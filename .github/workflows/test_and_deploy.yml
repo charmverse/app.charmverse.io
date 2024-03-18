@@ -282,7 +282,6 @@ jobs:
           REACT_APP_APP_ENV: 'test'
         uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
         with:
-          ports: 3335:3335
           args: ${{matrix.test_command}}
 
   deploy:
