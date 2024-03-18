@@ -8,7 +8,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 
 export function ArchiveProposalAction({ proposalId }: { proposalId: string }) {
   const { trigger: archiveProposal } = useArchiveProposal({ proposalId });
-  const { proposal, refreshProposal } = useProposal({
+  const { proposal } = useProposal({
     proposalId
   });
   const { showError } = useSnackbar();

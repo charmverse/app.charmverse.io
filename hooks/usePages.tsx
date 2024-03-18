@@ -134,7 +134,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     const pageType = page?.type;
 
-    if (page && user && currentSpace) {
+    if (user && currentSpace) {
       if (pageType === 'page' || pageType === 'board') {
         sendMessage({
           payload: {
@@ -156,7 +156,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
           );
         }
       } else {
-        const result = await trashPages({ pageIds: [page.id], trash: true });
+        const result = await trashPages({ pageIds: [pageId], trash: true });
         if (!result) {
           return;
         }
