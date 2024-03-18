@@ -48,20 +48,6 @@ type FormFieldAnswersProps = {
   threads?: Record<string, ThreadWithComments | undefined>;
 };
 
-export function ControlledFormFieldAnswers(props: Omit<FormFieldAnswersProps, 'onSave'>) {
-  return <FormFieldAnswersBase {...props} />;
-}
-
-export function FormFieldAnswers(props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange'>) {
-  const { control, errors, onFormChange, values } = useFormFields({
-    fields: props.formFields
-  });
-
-  return (
-    <FormFieldAnswersBase {...props} control={control} errors={errors} onFormChange={onFormChange} values={values} />
-  );
-}
-
 const StyledStack = styled(Stack)`
   ${hoverIconsStyle()};
   flex-direction: row;
@@ -70,7 +56,7 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-function FormFieldAnswersBase({
+export function FormFieldAnswers({
   onSave,
   formFields,
   values,
