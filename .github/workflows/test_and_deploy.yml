@@ -266,23 +266,31 @@ jobs:
       - name: Restore app from cache
         uses: ./.github/actions/build
 
-      # - name: Start services
-      #   run: |
-      #     npm run start:test:ci &
+      - name: Start services
+        run: |
+          npm run start:test:ci &
 
-      #     sleep_loop_ct=0
-      #     until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
-      #       echo "webapp not up in loop $sleep_loop_ct ... sleeping"
-      #       sleep_loop_ct=$((sleep_loop_ct + 1))
-      #       sleep 10
-      #     done
+          sleep_loop_ct=0
+          until curl localhost:3335/api/health || [[ $sleep_loop_ct > 30 ]]; do
+            echo "webapp not up in loop $sleep_loop_ct ... sleeping"
+            sleep_loop_ct=$((sleep_loop_ct + 1))
+            sleep 10
+          done
 
       - name: Run ${{matrix.test_name}}
         env:
           REACT_APP_APP_ENV: 'test'
-        uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
-        with:
-          args: ${{matrix.test_command}}
+        run: |
+          docker run --name mcrmicrosoftcomplaywrightv1343jammy_68c205 --workdir /github/workspace --rm  \
+                      -p "3335:3335"     \
+                      -e "REACT_APP_APP_ENV" -e CI=true \
+                      -v "/var/run/docker.sock":"/var/run/docker.sock" -v "/home/runner/work/_temp/_github_home":"/github/home" -v "/home/runner/work/_temp/_github_workflow":"/github/workflow" -v "/home/runner/work/_temp/_runner_file_commands":"/github/file_commands" -v "/home/runner/work/app.charmverse.io/app.charmverse.io":"/github/workspace" \
+                      --network "${{ job.services.postgres.network }}"  \
+                      mcr.microsoft.com/playwright:v1.34.3-jammy \
+                      ${{matrix.test_command}}
+        # uses: docker://mcr.microsoft.com/playwright:v1.34.3-jammy
+        # with:
+        #   args: ${{matrix.test_command}}
 
   deploy:
     name: Deploy to production
