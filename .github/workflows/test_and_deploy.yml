@@ -202,9 +202,11 @@ jobs:
       matrix:
         include:
           - test_name: 'Browser e2e test #1'
-            test_command: 'npm run test:e2e:ci -- --shard=1/2'
+            test_command: 'npm run test:e2e:ci -- --shard=1/3'
           - test_name: 'Browser e2e test #2'
-            test_command: 'npm run test:e2e:ci -- --shard=2/2'
+            test_command: 'npm run test:e2e:ci -- --shard=2/3'
+          - test_name: 'Browser e2e test #2'
+            test_command: 'npm run test:e2e:ci -- --shard=3/3'
 
     steps:
       - uses: actions/checkout@v4
@@ -301,7 +303,7 @@ jobs:
     runs-on: ubuntu-latest
     # run whether previous jobs were successful or skipped
     if: github.ref == 'refs/heads/main' && !(failure() || cancelled())
-    needs: [test, test-matrix]
+    needs: [test, test-matrix, e2e-test-matrix]
     steps:
       - uses: actions/checkout@v4
         with:
