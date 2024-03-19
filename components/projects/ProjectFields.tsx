@@ -36,17 +36,17 @@ const ProjectConstants: {
   {
     field: 'name',
     required: true,
-    label: 'Name'
+    label: 'Project Name'
   },
   {
     field: 'excerpt',
     required: true,
-    label: 'Excerpt'
+    label: 'Describe your project in one sentence'
   },
   {
     field: 'description',
     required: true,
-    label: 'Description'
+    label: 'Describe your project in more depth'
   },
   {
     field: 'twitter',
@@ -71,12 +71,12 @@ const ProjectConstants: {
   {
     field: 'productUrl',
     required: false,
-    label: 'Product URL'
+    label: 'Product or Demo URL'
   },
   {
     field: 'communityUrl',
     required: false,
-    label: 'Community URL'
+    label: 'Community URL (Discord/Discourse/Farcaster channel)'
   },
   {
     field: 'otherUrl',
@@ -86,7 +86,7 @@ const ProjectConstants: {
   {
     field: 'walletAddress',
     required: false,
-    label: 'Wallet Address'
+    label: 'Wallet Address to receive funds'
   }
 ];
 
@@ -147,7 +147,7 @@ export function ProjectFields({ onChange, defaultValues }: Props) {
                 label={property.label}
                 error={errors[property.field] as any}
                 required={property.required}
-                onChange={(e) => {
+                onChange={(e: any) => {
                   field.onChange(e);
                   onChange({
                     ...project,
