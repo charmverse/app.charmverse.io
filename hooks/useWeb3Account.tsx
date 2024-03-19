@@ -8,8 +8,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { SiweMessage } from 'siwe';
 import { mutate } from 'swr';
 import { getAddress } from 'viem';
-import type { ConnectorData } from 'wagmi';
-import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
+import { useAccount, useConnect, useSignMessage } from 'wagmi';
 
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
@@ -57,10 +56,9 @@ export const Web3Context = createContext<Readonly<IContext>>({
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
-  const { address: account, connector: activeConnector, isConnecting } = useAccount();
+  const { address: account, chain, connector: activeConnector, isConnecting } = useAccount();
   const { open: openVerifyOtpModal, isOpen: isVerifyOtpModalOpen, close: closeVerifyOtpModal } = useVerifyLoginOtp();
   const router = useRouter();
-  const { chain } = useNetwork();
   const chainId = chain?.id;
   const { signMessageAsync } = useSignMessage({});
 
@@ -179,7 +177,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   }, [account, isConnecting, accountUpdatePaused, !!user, storedAccount]);
 
   useEffect(() => {
-    const handleConnectorUpdate = ({ account: _acc }: ConnectorData) => {
+    const handleConnectorUpdate = ({ account: _acc }: { account?: string }) => {
       // This runs every time the wallet account changes.
       if (_acc) {
         if (isVerifyOtpModalOpen) {
@@ -229,7 +227,9 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           window.ethereum?.isMetaMask
         ) {
           const injectedConnector = connectors.find((c) => c.id === 'injected');
-          connectAsync({ connector: injectedConnector });
+          if (injectedConnector) {
+            connectAsync({ connector: injectedConnector });
+          }
         }
       };
 
