@@ -45,7 +45,7 @@ function SafeMenuItem({
     onSuccess: onPaymentSuccess,
     safeAddress: safeInfo.address,
     onError,
-    transactions: rewards
+    transactionPromises: rewards
       .flatMap((reward) => reward.submissions)
       .map((submission) => {
         const reward = rewards.find((_reward) => _reward.id === submission.bountyId);
@@ -61,7 +61,7 @@ function SafeMenuItem({
           token: reward.rewardToken as string,
           txChainId: reward.chainId as number,
           rewardId: reward.id
-        });
+        }).catch(() => null);
       })
       .filter(isTruthy)
   });

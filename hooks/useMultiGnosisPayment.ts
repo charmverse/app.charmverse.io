@@ -28,11 +28,17 @@ export type GnosisPaymentProps = {
   chainId?: number;
   onSuccess: (results: GnosisProposeTransactionResult) => void;
   safeAddress: string;
-  transactions: MetaTransactionDataWithApplicationId[];
+  transactionPromises: Promise<MetaTransactionDataWithApplicationId | null>[];
   onError?: (error: SystemError) => void;
 };
 
-export function useMultiGnosisPayment({ onError, chainId, safeAddress, transactions, onSuccess }: GnosisPaymentProps) {
+export function useMultiGnosisPayment({
+  onError,
+  chainId,
+  safeAddress,
+  transactionPromises,
+  onSuccess
+}: GnosisPaymentProps) {
   const { account, chainId: connectedChainId, signer } = useWeb3Account();
   const [safe] = useCreateSafes([safeAddress]);
   const network = chainId ? getChainById(chainId) : null;
@@ -58,24 +64,7 @@ export function useMultiGnosisPayment({ onError, chainId, safeAddress, transacti
 
     const txNonce = nonce + pendingTx.results.length;
 
-    const transactionsWithRecipients = (
-      await Promise.all(
-        transactions.map(async (transaction) => {
-          const recipientAddress =
-            transaction.to.endsWith('.eth') && ethers.utils.isValidName(transaction.to)
-              ? await charmClient.resolveEnsName(transaction.to)
-              : transaction.to;
-
-          if (recipientAddress) {
-            return {
-              ...transaction,
-              to: recipientAddress
-            };
-          }
-          return null;
-        })
-      )
-    ).filter(isTruthy);
+    const transactionsWithRecipients = (await Promise.all(transactionPromises)).filter(isTruthy);
 
     if (transactionsWithRecipients.length === 0) {
       onError?.(
@@ -143,7 +132,7 @@ export function useMultiGnosisPayment({ onError, chainId, safeAddress, transacti
 
     onSuccess({
       safeAddress,
-      transactions,
+      transactions: transactionsWithRecipients,
       txHash
     });
   }
