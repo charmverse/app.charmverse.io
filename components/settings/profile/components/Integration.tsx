@@ -43,44 +43,45 @@ function Integration(props: IntegrationProps) {
 
   return (
     <StyledStack>
-      <Stack flexDirection='row' justifyContent='space-between' width='100%' alignItems='center'>
-        <Stack
-          display='flex'
-          flexDirection={{
-            xs: 'column',
-            md: 'row'
-          }}
-          gap={{
-            xs: 0.5
-          }}
-          alignItems={{
-            xs: 'flex-start',
-            md: 'center'
+      <Stack
+        flexDirection={{
+          xs: 'column',
+          md: 'row'
+        }}
+        gap={0.5}
+        justifyContent='space-between'
+        width='100%'
+        alignItems='center'
+      >
+        <Box
+          width={{
+            xs: '100%',
+            md: '50%'
           }}
         >
-          <Box
-            sx={{
-              minWidth: {
-                xs: 'fit-content',
-                md: 400
-              }
-            }}
-          >
-            <Tooltip title={secondaryUserName}>
-              <Typography
-                component='span'
-                fontSize={{
-                  xs: '1em',
-                  md: '1.15em'
-                }}
-                fontWeight={700}
-              >
-                {username}
-                {action}
-              </Typography>
-            </Tooltip>
-          </Box>
+          <Tooltip title={secondaryUserName}>
+            <Typography
+              component='span'
+              fontSize={{
+                xs: '1em',
+                md: '1.15em'
+              }}
+              fontWeight={700}
+            >
+              {username}
+              {action}
+            </Typography>
+          </Tooltip>
+        </Box>
 
+        <Stack
+          flexDirection='row'
+          width={{
+            xs: '100%',
+            md: '50%'
+          }}
+          justifyContent='space-between'
+        >
           <Chip
             variant='outlined'
             size='medium'
@@ -94,52 +95,44 @@ function Integration(props: IntegrationProps) {
               width: 'fit-content'
             }}
           />
-        </Stack>
+          <Stack gap={0.5} flexDirection='row' alignItems='center'>
+            {isInUse ? (
+              <Stack flexDirection='row' mr={!hasActionsMenu ? 4.5 : 0}>
+                <CheckIcon fontSize='small' />
+                <Typography ml={1} variant='body2'>
+                  Selected
+                </Typography>
+              </Stack>
+            ) : (
+              <Button
+                size='small'
+                color='secondary'
+                variant='outlined'
+                onClick={() => selectIntegration(username, identityType)}
+                sx={{
+                  mr: !hasActionsMenu
+                    ? {
+                        xs: 4.25,
+                        md: 4.5
+                      }
+                    : 0
+                }}
+              >
+                Select
+              </Button>
+            )}
 
-        <Stack
-          flexDirection='row'
-          gap={{
-            xs: 0.5,
-            md: 1
-          }}
-          alignItems='center'
-        >
-          {isInUse ? (
-            <Stack flexDirection='row' mr={!hasActionsMenu ? 4.5 : 0}>
-              <CheckIcon fontSize='small' />
-              <Typography ml={1} variant='body2'>
-                Selected
-              </Typography>
-            </Stack>
-          ) : (
-            <Button
-              size='small'
-              color='secondary'
-              variant='outlined'
-              onClick={() => selectIntegration(username, identityType)}
-              sx={{
-                mr: !hasActionsMenu
-                  ? {
-                      xs: 4.25,
-                      md: 4.5
-                    }
-                  : 0
-              }}
-            >
-              Select
-            </Button>
-          )}
-
-          {hasActionsMenu && (
-            <IconButton
-              size='small'
-              className='icons'
-              aria-label={`Open ${identityType.toLowerCase()} identity options`}
-              {...bindTrigger(identityMenuState)}
-            >
-              <MoreHoriz fontSize='small' />
-            </IconButton>
-          )}
+            {hasActionsMenu && (
+              <IconButton
+                size='small'
+                className='icons'
+                aria-label={`Open ${identityType.toLowerCase()} identity options`}
+                {...bindTrigger(identityMenuState)}
+              >
+                <MoreHoriz fontSize='small' />
+              </IconButton>
+            )}
+          </Stack>
 
           <Menu
             {...bindMenu(identityMenuState)}
