@@ -6,8 +6,8 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import type { ProjectValues, ProjectRequiredFieldValues } from 'components/projects/interfaces';
-import { projectDefaultValues, ProjectFields } from 'components/projects/ProjectFields';
-import { ProjectForm } from 'components/projects/ProjectForm';
+import { projectDefaultValues } from 'components/projects/ProjectFields';
+import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -164,7 +164,7 @@ export function FormFieldAnswersControlled({
               control={control}
               render={({ field }) =>
                 formField.type === 'project_profile' ? (
-                  <ProjectForm
+                  <ProjectFormAnswers
                     requiredValues={formField.extraFields as ProjectRequiredFieldValues}
                     values={
                       (formField?.value as ProjectValues) ?? {

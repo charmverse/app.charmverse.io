@@ -3,10 +3,10 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import type { ProjectValues } from 'components/projects/interfaces';
 import { projectDefaultValues } from 'components/projects/ProjectFields';
-import { ProjectForm } from 'components/projects/ProjectForm';
+import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 
-export function ProjectFormComponent() {
+export function ProjectFormAnswersComponent() {
   const [project, setProject] = useState<ProjectValues>({
     ...projectDefaultValues,
     members: [projectMemberDefaultValues]
@@ -14,12 +14,12 @@ export function ProjectFormComponent() {
 
   return (
     <GlobalContext>
-      <ProjectForm onChange={setProject} values={project} />
+      <ProjectFormAnswers onChange={setProject} values={project} />
     </GlobalContext>
   );
 }
 
 export default {
-  title: 'Projects/ProjectForm',
-  component: ProjectFormComponent
+  title: 'Projects/ProjectFormAnswers',
+  component: ProjectFormAnswersComponent
 };

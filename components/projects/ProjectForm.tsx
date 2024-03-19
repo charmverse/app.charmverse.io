@@ -8,7 +8,7 @@ import type { ProjectValues, ProjectRequiredFieldValues } from './interfaces';
 import { ProjectFields, ProjectFieldsEditor } from './ProjectFields';
 import { projectMemberDefaultValues, ProjectMemberFields, ProjectMemberFieldsEditor } from './ProjectMemberFields';
 
-export function ProjectForm({
+export function ProjectFormAnswers({
   onChange,
   values,
   requiredValues,
