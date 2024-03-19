@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { FormField } from '@charmverse/core/prisma-client';
+import type { FormField, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -76,7 +76,8 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required
+            required,
+            extraFields: field.extraFields as Prisma.InputJsonValue
           },
           update: {
             type: field.type,
@@ -85,7 +86,8 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required
+            required,
+            extraFields: field.extraFields as Prisma.InputJsonValue
           }
         });
       })

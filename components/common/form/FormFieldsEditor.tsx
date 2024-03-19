@@ -124,7 +124,8 @@ export function ControlledFormFieldsEditor({
         options: [],
         private: false,
         required: true,
-        id: fieldId
+        id: fieldId,
+        extraFields: {}
       }
     ]);
 

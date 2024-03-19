@@ -17,6 +17,7 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
 
 export const formFieldTypes = [
+  'project_profile',
   'short_text',
   'long_text',
   'number',

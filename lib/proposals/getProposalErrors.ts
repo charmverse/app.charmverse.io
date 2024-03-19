@@ -97,7 +97,7 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
 export function checkFormFieldErrors(formFields: FormFieldInput[]): string | undefined {
   if (formFields.length === 0) {
     return 'Form fields are required for structured proposals';
-  } else if (formFields.some((formField) => !formField.name)) {
+  } else if (formFields.some((formField) => formField.type !== 'project_profile' && !formField.name)) {
     return 'Form fields must have a name';
   } else if (
     formFields.some(

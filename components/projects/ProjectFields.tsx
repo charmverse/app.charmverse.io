@@ -1,10 +1,13 @@
 import type { Project } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Stack } from '@mui/material';
+import { Stack, Switch, Typography } from '@mui/material';
 import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
+import { TextInputField } from 'components/common/form/fields/TextInputField';
+
+import type { ProjectFormWithRequiredTogglesValues } from './interfaces';
 
 export type ProjectPayload = Pick<
   Project,
@@ -21,10 +24,10 @@ export type ProjectPayload = Pick<
   | 'walletAddress'
 >;
 
-type ProjectField = keyof ProjectPayload;
+export type ProjectField = keyof ProjectPayload;
 
 type Props = {
-  onChange: (project: ProjectPayload) => void;
+  onChange?: (project: ProjectPayload) => void;
   defaultValues?: ProjectPayload;
 };
 
@@ -118,6 +121,20 @@ export const projectDefaultValues = {
   walletAddress: ''
 };
 
+export const projectRequiredValues: Record<ProjectField, boolean> = {
+  name: true,
+  excerpt: true,
+  description: true,
+  twitter: true,
+  website: true,
+  github: true,
+  blog: true,
+  productUrl: true,
+  communityUrl: true,
+  otherUrl: true,
+  walletAddress: true
+};
+
 export function ProjectFields({ onChange, defaultValues }: Props) {
   const {
     control,
@@ -147,9 +164,10 @@ export function ProjectFields({ onChange, defaultValues }: Props) {
                 label={property.label}
                 error={errors[property.field] as any}
                 required={property.required}
+                disabled={onChange === undefined}
                 onChange={(e: any) => {
                   field.onChange(e);
-                  onChange({
+                  onChange?.({
                     ...project,
                     [property.field]: e.target.value
                   });
@@ -157,6 +175,47 @@ export function ProjectFields({ onChange, defaultValues }: Props) {
               />
             )}
           />
+        );
+      })}
+    </Stack>
+  );
+}
+
+export function ProjectFieldsWithRequiredToggle({
+  onChange,
+  values
+}: {
+  onChange?: (value: Omit<ProjectFormWithRequiredTogglesValues, 'members'>) => void;
+  values: Omit<ProjectFormWithRequiredTogglesValues, 'members'>;
+}) {
+  return (
+    <Stack gap={2}>
+      {ProjectConstants.map((property) => {
+        return (
+          <Stack gap={1} key={property.label}>
+            <TextInputField
+              label={property.label}
+              multiline={property.field === 'excerpt' || property.field === 'description'}
+              rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
+              disabled
+              required={values[property.field] ?? true}
+            />
+            {onChange && (
+              <Stack gap={0.5} flexDirection='row' alignItems='center'>
+                <Switch
+                  size='small'
+                  checked={values[property.field] ?? true}
+                  onChange={(e) => {
+                    onChange({
+                      ...values,
+                      [property.field]: e.target.checked
+                    });
+                  }}
+                />
+                <Typography>Required</Typography>
+              </Stack>
+            )}
+          </Stack>
         );
       })}
     </Stack>

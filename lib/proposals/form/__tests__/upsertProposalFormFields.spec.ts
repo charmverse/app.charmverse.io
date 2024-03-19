@@ -16,7 +16,8 @@ const numberFieldInput: FormFieldInput = {
   index: 1,
   options: [],
   private: true,
-  required: true
+  required: true,
+  extraFields: {}
 };
 
 describe('upsertProposalFormFields', () => {
@@ -44,7 +45,8 @@ describe('upsertProposalFormFields', () => {
         index: 0,
         options: [],
         private: false,
-        required: true
+        required: true,
+        extraFields: {}
       },
       {
         id: v4(),
@@ -54,7 +56,8 @@ describe('upsertProposalFormFields', () => {
         index: 1,
         options: [],
         private: true,
-        required: true
+        required: true,
+        extraFields: {}
       }
     ];
 
@@ -101,7 +104,8 @@ describe('upsertProposalFormFields', () => {
         index: 0,
         options: [],
         private: false,
-        required: true
+        required: true,
+        extraFields: {}
       },
       {
         id: v4(),
@@ -111,7 +115,8 @@ describe('upsertProposalFormFields', () => {
         index: 1,
         options: [],
         private: true,
-        required: false
+        required: false,
+        extraFields: {}
       }
     ];
 

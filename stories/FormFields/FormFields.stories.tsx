@@ -40,7 +40,8 @@ export function FormFieldsEditor() {
     private: false,
     required: true,
     type: 'short_text',
-    id: v4()
+    id: v4(),
+    extraFields: {}
   };
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([field.id]);
   const [formFields, setFormFields] = useState<FormFieldInput[]>([field]);

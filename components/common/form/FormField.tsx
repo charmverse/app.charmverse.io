@@ -22,6 +22,8 @@ import {
 import { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
+import type { ProjectFormWithRequiredTogglesValues } from 'components/projects/interfaces';
+import { ProjectFormWithRequiredToggles } from 'components/projects/ProjectForm';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utils/react';
@@ -138,54 +140,74 @@ function ExpandedFormField({
           </IconButton>
         </PopperPopup>
       </Stack>
-      <TextField
-        value={formField.name}
-        onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
-        placeholder='Title (required)'
-        error={!formField.name}
-        ref={titleTextFieldRef}
-        data-test='form-field-name-input'
-      />
-      <CharmEditor
-        isContentControlled
-        content={(formField.description ?? emptyDocument) as PageContent}
-        onContentChange={({ doc }) => {
-          updateFormField({
-            description: doc,
-            id: formField.id
-          });
-        }}
-        colorMode='dark'
-        style={{
-          left: 0,
-          paddingLeft: theme.spacing(2)
-        }}
-        disableMention
-        disableNestedPages
-        disablePageSpecificFeatures
-        disableRowHandles
-        placeholderText='Add your description here (optional)'
-        focusOnInit={false}
-      />
-      <FieldTypeRenderer
-        rows={undefined}
-        maxRows={10}
-        type={formField.type as any}
-        onCreateOption={onCreateOption}
-        onDeleteOption={onDeleteOption}
-        onUpdateOption={onUpdateOption}
-        placeholder={fieldTypePlaceholderRecord[formField.type]}
-        // Enable select and multiselect fields to be able to create options
-        disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
-        options={formField.options}
-      />
+      {formField.type !== 'project_profile' && (
+        <>
+          <TextField
+            value={formField.name}
+            onChange={(e) => updateFormField({ name: e.target.value, id: formField.id })}
+            placeholder='Title (required)'
+            error={!formField.name}
+            ref={titleTextFieldRef}
+            data-test='form-field-name-input'
+          />
+          <CharmEditor
+            isContentControlled
+            content={(formField.description ?? emptyDocument) as PageContent}
+            onContentChange={({ doc }) => {
+              updateFormField({
+                description: doc,
+                id: formField.id
+              });
+            }}
+            colorMode='dark'
+            style={{
+              left: 0,
+              paddingLeft: theme.spacing(2)
+            }}
+            disableMention
+            disableNestedPages
+            disablePageSpecificFeatures
+            disableRowHandles
+            placeholderText='Add your description here (optional)'
+            focusOnInit={false}
+          />
+        </>
+      )}
+      {formField.type === 'project_profile' ? (
+        <ProjectFormWithRequiredToggles
+          values={
+            (formField.extraFields as ProjectFormWithRequiredTogglesValues) ?? {
+              members: [{}]
+            }
+          }
+          onChange={(extraFields) => {
+            updateFormField({
+              id: formField.id,
+              extraFields
+            });
+          }}
+        />
+      ) : (
+        <FieldTypeRenderer
+          rows={undefined}
+          maxRows={10}
+          type={formField.type as any}
+          onCreateOption={onCreateOption}
+          onDeleteOption={onDeleteOption}
+          onUpdateOption={onUpdateOption}
+          placeholder={fieldTypePlaceholderRecord[formField.type]}
+          // Enable select and multiselect fields to be able to create options
+          disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
+          options={formField.options}
+        />
+      )}
       <Divider
         sx={{
           my: 1
         }}
       />
 
-      {formField.type !== 'label' && (
+      {formField.type !== 'label' && formField.type !== 'project_profile' && (
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
           <Switch
             data-test='form-field-required-switch'
@@ -197,15 +219,17 @@ function ExpandedFormField({
         </Stack>
       )}
 
-      <Stack gap={0.5} flexDirection='row' alignItems='center'>
-        <Switch
-          data-test='form-field-private-switch'
-          size='small'
-          checked={formField.private}
-          onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
-        />
-        <Typography>Private (Authors & Reviewers can view)</Typography>
-      </Stack>
+      {formField.type !== 'project_profile' && (
+        <Stack gap={0.5} flexDirection='row' alignItems='center'>
+          <Switch
+            data-test='form-field-private-switch'
+            size='small'
+            checked={formField.private}
+            onChange={(e) => updateFormField({ private: e.target.checked, id: formField.id })}
+          />
+          <Typography>Private (Authors & Reviewers can view)</Typography>
+        </Stack>
+      )}
     </>
   );
 }
@@ -296,16 +320,24 @@ export function FormField(
         <Stack gap={1} width='100%' ml={1}>
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
-              <FieldTypeRenderer
-                labelEndAdornment={formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined}
-                type={formField.type as any}
-                description={formField.description as PageContent}
-                disabled
-                label={formField.name}
-                required={formField.required}
-                options={formField.options}
-                placeholder={fieldTypePlaceholderRecord[formField.type]}
-              />
+              {formField.type === 'project_profile' ? (
+                <ProjectFormWithRequiredToggles
+                  values={(formField.extraFields as ProjectFormWithRequiredTogglesValues) ?? { members: [{}] }}
+                />
+              ) : (
+                <FieldTypeRenderer
+                  labelEndAdornment={
+                    formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
+                  }
+                  type={formField.type as any}
+                  description={formField.description as PageContent}
+                  disabled
+                  label={formField.name}
+                  required={formField.required}
+                  options={formField.options}
+                  placeholder={fieldTypePlaceholderRecord[formField.type]}
+                />
+              )}
             </div>
           ) : (
             <ExpandedFormField {...props} shouldFocus={shouldFocus} />

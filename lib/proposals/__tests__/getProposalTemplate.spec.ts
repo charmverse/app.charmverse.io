@@ -44,7 +44,8 @@ describe('getProposal', () => {
         index: 0,
         options: [],
         private: true,
-        required: true
+        required: true,
+        extraFields: {}
       }
     ];
     const formId = await createForm(fieldsInput);
