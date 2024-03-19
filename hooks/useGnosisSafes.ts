@@ -18,13 +18,18 @@ export function useGnosisSafes(chainIdToUse?: number) {
   const _chainId = chainIdToUse ?? chainId ?? 1;
 
   const safeApiClient = useMemo(() => {
-    return getSafeApiClient({ chainId: _chainId });
+    try {
+      return getSafeApiClient({ chainId: _chainId });
+    } catch (_) {
+      return null;
+    }
   }, [_chainId]);
 
   const { data: safeInfos } = useSWR(
     account && _chainId ? `/connected-gnosis-safes/${account}/${_chainId}` : null,
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     () =>
+      safeApiClient &&
       safeApiClient
         .getSafesByOwner(getAddress(account!))
         .then(async (response) =>

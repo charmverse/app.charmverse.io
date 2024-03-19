@@ -7,7 +7,7 @@ import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
 
-import { isProdEnv, isStagingEnv } from 'config/constants';
+import { isProdEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
@@ -115,20 +115,18 @@ function getTrackedOnChainCredentials({
       }
     })
     .then(({ data }) => {
-      return data.attestations.map(
-        (attestation: any) =>
-          ({
-            ...attestation,
-            type: 'onchain',
-            chainId,
-            content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
-              acc[val.name] = val.value.value;
-              return acc;
-            }, {} as any),
-            timeCreated: attestation.timeCreated * 1000,
-            verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
-          } as EASAttestationFromApi)
-      );
+      return data.attestations.map((attestation: any) => {
+        return {
+          ...attestation,
+          type: 'onchain',
+          content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
+            acc[val.name] = val.value.value;
+            return acc;
+          }, {} as any),
+          timeCreated: attestation.timeCreated * 1000,
+          verificationUrl: getOnChainAttestationUrl({ chainId: attestation.chainId, attestationId: attestation.id })
+        };
+      });
     });
 }
 

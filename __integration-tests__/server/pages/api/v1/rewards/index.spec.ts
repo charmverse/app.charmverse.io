@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { PublicApiReward } from 'pages/api/v1/bounties/index';
+import type { PublicApiReward } from 'pages/api/v1/rewards/index';
 import { baseUrl } from 'testing/mockApiCall';
 import {
   generateBountyWithSingleApplication,
@@ -12,9 +12,9 @@ import {
   generateUserAndSpaceWithApiToken
 } from 'testing/setupDatabase';
 
-describe('GET /api/v1/bounties', () => {
+describe('GET /api/v1/rewards', () => {
   // This test needs to be fixed.
-  it('should return a list of bounties in the workspace along with who has been paid for this bounty', async () => {
+  it('should return a list of rewards in the workspace along with who has been paid for this bounty', async () => {
     const { user, space, apiToken } = await generateUserAndSpaceWithApiToken(undefined, false);
 
     const secondUser = await generateSpaceUser({ spaceId: space.id, isAdmin: false });
@@ -44,10 +44,10 @@ describe('GET /api/v1/bounties', () => {
       })
     ]);
 
-    const response = (await request(baseUrl).get(`/api/v1/bounties?api_key=${apiToken.token}`).send().expect(200))
+    const response = (await request(baseUrl).get(`/api/v1/rewards?api_key=${apiToken.token}`).send().expect(200))
       .body as PublicApiReward[];
 
-    // Both bounties should have been returned
+    // Both rewards should have been returned
     expect(response.length).toEqual(2);
 
     const bountyWithPaidFromApi = response.find((b) => b.id === bountyWithPaidApplication.id) as PublicApiReward;
@@ -76,7 +76,7 @@ describe('GET /api/v1/bounties', () => {
         },
         title: bountyWithPaidApplication.page.title,
         status: bountyWithPaidApplication.status,
-        url: `${baseUrl}/${space.domain}/bounties/${bountyWithPaidApplication.id}`
+        url: `${baseUrl}/${space.domain}/${bountyWithPaidApplication.id}`
       })
     );
 
@@ -103,12 +103,12 @@ describe('GET /api/v1/bounties', () => {
         },
         title: bountyWithInProgressWork.page.title,
         status: bountyWithInProgressWork.status,
-        url: `${baseUrl}/${space.domain}/bounties/${bountyWithInProgressWork.id}`
+        url: `${baseUrl}/${space.domain}/${bountyWithInProgressWork.id}`
       })
     );
   });
 
-  it('should ignore bounties whose page has been soft deleted', async () => {
+  it('should ignore rewards whose page has been soft deleted', async () => {
     const { space: space2, user: space2User } = await generateUserAndSpace();
 
     const space2SuperApiToken = await prisma.superApiToken.create({
@@ -141,13 +141,13 @@ describe('GET /api/v1/bounties', () => {
       }
     };
 
-    const deletedBounty = await prisma.bounty.create({
+    await prisma.bounty.create({
       data: bountyCreateInput
     });
 
     const response = (
       await request(baseUrl)
-        .get(`/api/v1/bounties?spaceId=${space2.id}`)
+        .get(`/api/v1/rewards?spaceId=${space2.id}`)
         .set({ authorization: `Bearer ${space2SuperApiToken.token}` })
         .send()
         .expect(200)

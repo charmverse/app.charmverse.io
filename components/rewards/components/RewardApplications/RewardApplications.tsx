@@ -1,4 +1,3 @@
-import type { ApplicationStatus } from '@charmverse/core/prisma';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
@@ -10,6 +9,7 @@ import { NewWorkButton } from 'components/rewards/components/RewardApplications/
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
+import { submissionStatuses } from 'lib/rewards/constants';
 import type { ApplicationMeta } from 'lib/rewards/interfaces';
 import { formatDate, formatDateTime } from 'lib/utils/dates';
 import type { LoggedInUser } from 'models';
@@ -140,15 +140,6 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
         submissions: []
       };
     }
-
-    const submissionStatuses: ApplicationStatus[] = [
-      'submission_rejected',
-      'review',
-      'processing',
-      'paid',
-      'complete',
-      'cancelled'
-    ];
 
     if (applicationRequired) {
       return {

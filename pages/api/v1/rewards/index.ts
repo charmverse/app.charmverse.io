@@ -10,7 +10,7 @@ import { isTruthy } from 'lib/utils/types';
 
 const handler = apiHandler();
 
-handler.get(getBounties);
+handler.get(getRewards);
 
 /**
  * @swagger
@@ -74,7 +74,7 @@ handler.get(getBounties);
  *          example: Social media boost
  *        url:
  *          type: string
- *          example: https://app.charmverse.io/my-workspace/bounties/5985679461310778
+ *          example: https://app.charmverse.io/my-workspace/getting-started-5985679461310778
  *
  */
 export interface PublicApiReward {
@@ -101,20 +101,9 @@ export interface PublicApiReward {
   }[];
 }
 
-interface BountyVC {
-  id: string;
-  action: string; // created, started, completed
-  actionDate: string;
-  description: string;
-  rewardAmount: number;
-  rewardChain: number;
-  rewardToken: string;
-  title: string;
-  url: string;
-}
 /**
  * @swagger
- * /bounties:
+ * /rewards:
  *   get:
  *     summary: Retrieve a list of rewards
  *     description: Retrieve rewards from your space.
@@ -135,13 +124,13 @@ interface BountyVC {
  *                  type: object
  *                  $ref: '#/components/schemas/Reward'
  */
-async function getBounties(req: NextApiRequest, res: NextApiResponse) {
+async function getRewards(req: NextApiRequest, res: NextApiResponse) {
   const { status } = req.query;
   const statuses = (Array.isArray(status) ? status : status ? [status] : null) as BountyStatus[];
 
   const spaceId = req.authorizedSpaceId;
 
-  const bounties = await prisma.bounty
+  const rewards = await prisma.bounty
     .findMany({
       where: {
         spaceId,
@@ -172,13 +161,13 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       }
     })
     // Make the API response faster by avoiding a join operation on the database, and filtering the results
-    .then((_bounties) => _bounties.filter((b) => !b.page?.deletedAt));
+    .then((_rewards) => _rewards.filter((b) => !b.page?.deletedAt));
 
   /**
-   * Returns the wallet addresses that have received a payment for this bounty
+   * Returns the wallet addresses that have received a payment for this reward
    */
-  function getRecipients(bounty: (typeof bounties)[number]) {
-    return bounty.applications
+  function getRecipients(reward: (typeof rewards)[number]) {
+    return reward.applications
       .filter((application) => application.status === 'paid' && application.walletAddress)
       .map(async (application) => {
         if (!application.walletAddress) {
@@ -205,16 +194,16 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
       });
   }
 
-  function getUrl(bounty: (typeof bounties)[number]) {
-    return `${process.env.DOMAIN}/${bounty.space.domain}/bounties/${bounty.id}`;
+  function getUrl(reward: (typeof rewards)[number]) {
+    return `${process.env.DOMAIN}/${reward.space.domain}/${reward.id}`;
   }
 
   const markdown: string[] = [];
 
-  for (const bounty of bounties) {
+  for (const reward of rewards) {
     try {
       const markdownText = await generateMarkdown({
-        content: bounty.page?.content ?? { type: 'doc', content: [] }
+        content: reward.page?.content ?? { type: 'doc', content: [] }
       });
       markdown.push(markdownText);
     } catch {
@@ -222,35 +211,35 @@ async function getBounties(req: NextApiRequest, res: NextApiResponse) {
     }
   }
 
-  const bountiesResponse: PublicApiReward[] = [];
+  const rewardsResponse: PublicApiReward[] = [];
   let index = 0;
-  for (const bounty of bounties) {
-    const bountyResponse: PublicApiReward = {
-      createdAt: bounty.createdAt.toISOString(),
+  for (const reward of rewards) {
+    const rewardResponse: PublicApiReward = {
+      createdAt: reward.createdAt.toISOString(),
       content: {
-        text: bounty.page?.contentText ?? '',
+        text: reward.page?.contentText ?? '',
         markdown: markdown[index]
       },
-      id: bounty.id,
+      id: reward.id,
       issuer: {
-        address: bounty.author.wallets[0]?.address
+        address: reward.author.wallets[0]?.address
       },
-      recipients: (await Promise.all(getRecipients(bounty))).filter(isTruthy),
+      recipients: (await Promise.all(getRecipients(reward))).filter(isTruthy),
       reward: {
-        amount: bounty.rewardAmount,
-        chain: bounty.chainId,
-        token: bounty.rewardToken,
-        custom: bounty.customReward
+        amount: reward.rewardAmount,
+        chain: reward.chainId,
+        token: reward.rewardToken,
+        custom: reward.customReward
       },
-      title: bounty.page?.title ?? 'Untitled',
-      status: bounty.status,
-      url: getUrl(bounty)
+      title: reward.page?.title ?? 'Untitled',
+      status: reward.status,
+      url: getUrl(reward)
     };
     index += 1;
-    bountiesResponse.push(bountyResponse);
+    rewardsResponse.push(rewardResponse);
   }
 
-  return res.status(200).json(bountiesResponse);
+  return res.status(200).json(rewardsResponse);
 }
 
 export default handler;

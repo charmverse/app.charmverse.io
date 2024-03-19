@@ -19,7 +19,7 @@ import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
 import type { PublishedSignedCredential } from './queriesAndMutations';
 import { publishSignedCredential } from './queriesAndMutations';
-import { encodeAttestion, attestationSchemaIds, type CredentialData } from './schemas';
+import { encodeAttestation, attestationSchemaIds, type CredentialData } from './schemas';
 
 type AttestationInput<T extends AttestationType = AttestationType> = {
   recipient: string;
@@ -71,7 +71,7 @@ export async function attestOffchain({
       nonce: BigInt(0),
       schema: attestationSchemaIds[credential.type],
       refUID: linkedAttestationUid ?? '0x0000000000000000000000000000000000000000000000000000000000000000',
-      data: encodeAttestion(credential)
+      data: encodeAttestation(credential)
     },
     signer
   );

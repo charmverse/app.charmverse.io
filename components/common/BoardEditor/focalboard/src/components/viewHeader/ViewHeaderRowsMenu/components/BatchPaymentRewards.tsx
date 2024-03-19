@@ -72,7 +72,13 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
   if (!account || !chainId || !signer) {
     return (
       <Tooltip title='Your wallet must be unlocked to pay for rewards'>
-        <OpenWalletSelectorButton size='small' label='Unlock Wallet' />
+        <OpenWalletSelectorButton
+          sx={{
+            minWidth: 'fit-content'
+          }}
+          size='small'
+          label='Unlock Wallet'
+        />
       </Tooltip>
     );
   }
