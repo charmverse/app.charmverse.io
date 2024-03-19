@@ -459,7 +459,8 @@ export async function generateBountyWithSingleApplication({
   bountyDescription = 'Bounty description',
   customReward,
   deletedAt,
-  selectedCredentialTemplateIds
+  selectedCredentialTemplateIds,
+  approveSubmitters = false
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -473,6 +474,7 @@ export async function generateBountyWithSingleApplication({
   bountyDescription?: string;
   deletedAt?: Date | null;
   selectedCredentialTemplateIds?: string[];
+  approveSubmitters?: boolean;
 }): Promise<Bounty & { applications: Application[]; page: Page }> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -483,7 +485,7 @@ export async function generateBountyWithSingleApplication({
       customReward,
       status: bountyStatus ?? 'open',
       spaceId,
-      approveSubmitters: false,
+      approveSubmitters,
       selectedCredentialTemplates: selectedCredentialTemplateIds,
       // Important variable
       maxSubmissions: bountyCap,

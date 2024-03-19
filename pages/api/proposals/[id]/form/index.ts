@@ -1,3 +1,4 @@
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { FormField } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -15,6 +16,9 @@ handler.use(requireUser).put(upsertProposalFormController);
 async function upsertProposalFormController(req: NextApiRequest, res: NextApiResponse<FormField[]>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
+  if (!proposalId) {
+    throw new InvalidInputError(`No proposal found with id: ${proposalId}`);
+  }
 
   const permissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,

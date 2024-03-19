@@ -9,9 +9,8 @@ import { generatePageWithLinkedPage } from './utils/pages';
 
 let browser: Browser;
 
-test.beforeAll(async () => {
-  // Set headless to false in chromium.launch to visually debug the test
-  browser = await chromium.launch();
+test.beforeAll(async ({ browser: _browser }) => {
+  browser = _browser;
 });
 
 test('click on link for another public page in same workspace and make sure that page renders', async () => {
