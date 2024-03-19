@@ -1,4 +1,3 @@
-import { InvalidInputError } from '@charmverse/core/errors';
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -18,13 +17,11 @@ handler.get(getSubmissions);
  * @swagger
  * components:
  *  schemas:
- *    EASAttestationFromApi:
+ *    EASCredential:
  *      type: object
  *      properties:
  *        id:
  *          type: string
- *          format: uuid
- *          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
  *        content:
  *          type: object
  *        attester:
@@ -33,20 +30,14 @@ handler.get(getSubmissions);
  *          type: string
  *        schemaId:
  *          type: string
- *        timeCreated:
- *          type: number
+ *        createdAt:
+ *          type: string
  *        chainId:
+ *          type: number
+ *        source:
  *          type: string
- *        type:
- *          type: string
- *          enum: [onchain, charmverse, gitcoin]
+ *          enum: [onchain, charmverse]
  *        verificationUrl:
- *          type: string
- *          nullable: true
- *        iconUrl:
- *          type: string
- *          nullable: true
- *        issuedCredentialId:
  *          type: string
  *          nullable: true
  *    PublicApiSubmission:
@@ -66,7 +57,7 @@ handler.get(getSubmissions);
  *        credentials:
  *          type: array
  *          items:
- *            $ref: '#/components/schemas/EASAttestationFromApi'
+ *            $ref: '#/components/schemas/EASCredential'
  *        submission:
  *          type: object
  *          properties:
@@ -90,14 +81,50 @@ handler.get(getSubmissions);
  *        author:
  *          $ref: '#/components/schemas/UserProfile'
  *        status:
- *          $ref: '#/components/schemas/ApplicationStatus'
+ *          type: string
+ *          enum:
+ *            - application_applied
+ *            - submission_rejected
+ *            - cancelled
+ *            - submission_in_progress
+ *            - application_rejected
+ *            - submission_in_review
+ *            - complete
+ *            - processing
+ *            - paid
  */
+
+type PublicApiEASCredential = {
+  id: string;
+  content: object;
+  attester: string;
+  recipient: string;
+  schemaId: string;
+  createdAt: string;
+  chainId: number;
+  source: 'onchain' | 'charmverse';
+  verificationUrl: string | null;
+};
+
+export const REWARD_APPLICATION_STATUS_RENAME: Record<ApplicationStatus, string> = {
+  applied: 'application_applied',
+  submission_rejected: 'submission_rejected',
+  cancelled: 'cancelled',
+  inProgress: 'submission_in_progress',
+  rejected: 'application_rejected',
+  review: 'submission_in_review',
+  complete: 'complete',
+  processing: 'processing',
+  paid: 'paid'
+};
+
+type PublicApiSubmissionStatus = keyof typeof REWARD_APPLICATION_STATUS_RENAME;
 
 export type PublicApiSubmission = {
   id: string;
   createdAt: Date;
   rewardId: string;
-  credentials: EASAttestationFromApi[];
+  credentials: PublicApiEASCredential[];
   submission?: {
     content: {
       text: string;
@@ -109,7 +136,7 @@ export type PublicApiSubmission = {
       text: string;
     };
   };
-  status: Omit<ApplicationStatus, 'inProgress' | 'review'> | 'in_progress' | 'in_review';
+  status: PublicApiSubmissionStatus;
   author: UserProfile;
 };
 
@@ -143,17 +170,12 @@ export type PublicApiSubmission = {
  *                  $ref: '#/components/schemas/PublicApiSubmission'
  */
 async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicApiSubmission[]>) {
-  const spaceId = req.query.spaceId as string;
   const rewardId = req.query.rewardId as string;
-  const authorizedSpaceId = req.authorizedSpaceId;
-
-  if (!spaceId && !rewardId) {
-    throw new InvalidInputError('Missing spaceId or rewardId');
-  }
+  const spaceId = req.authorizedSpaceId;
 
   const submissions = await prisma.application.findMany({
     where: {
-      ...(spaceId ? { spaceId } : { bountyId: rewardId, spaceId: authorizedSpaceId }),
+      ...(spaceId ? { spaceId } : { bountyId: rewardId, spaceId }),
       bounty: {
         page: {
           deletedAt: null
@@ -200,12 +222,7 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
           createdAt: submission.createdAt,
           rewardId: submission.bountyId,
           author: getUserProfile(submission.applicant),
-          status:
-            submission.status === 'inProgress'
-              ? 'in_progress'
-              : submission.status === 'review'
-              ? 'in_review'
-              : submission.status,
+          status: REWARD_APPLICATION_STATUS_RENAME[submission.status] as PublicApiSubmissionStatus,
           submission:
             submission.submissionNodes && submission.submission
               ? {
@@ -224,12 +241,21 @@ async function getSubmissions(req: NextApiRequest, res: NextApiResponse<PublicAp
             : undefined,
           credentials: submission.issuedCredentials
             .map((credential) => {
-              return credential.ceramicRecord;
+              return credential.ceramicRecord as EASAttestationFromApi;
             })
             .filter(isTruthy)
-            .map((ceramicRecord: any) => {
-              const { sig, issuer, timestamp, charmverseId, __typename, ...credential } = ceramicRecord;
-              return credential as EASAttestationFromApi;
+            .map((ceramicRecord) => {
+              return {
+                id: ceramicRecord.id,
+                source: ceramicRecord.type as 'onchain' | 'charmverse',
+                chainId: ceramicRecord.chainId,
+                content: ceramicRecord.content,
+                attester: ceramicRecord.attester,
+                recipient: ceramicRecord.recipient,
+                schemaId: ceramicRecord.schemaId,
+                createdAt: new Date(ceramicRecord.timeCreated).toISOString(),
+                verificationUrl: ceramicRecord.verificationUrl
+              };
             })
         };
       })
