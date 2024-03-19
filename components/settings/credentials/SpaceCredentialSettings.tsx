@@ -1,4 +1,5 @@
 import { Box, Typography } from '@mui/material';
+import _isEqual from 'lodash/isEqual';
 import { useState } from 'react';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
@@ -6,10 +7,13 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 
 import Legend from '../Legend';
 import Avatar from '../space/components/LargeAvatar';
 
+import type { UpdateableCredentialProps } from './components/CredentialsOnChainConfig';
+import { CredentialsOnChainConfig } from './components/CredentialsOnChainConfig';
 import { CredentialTemplates } from './components/CredentialTemplates';
 
 export function SpaceCredentialSettings() {
@@ -18,6 +22,20 @@ export function SpaceCredentialSettings() {
   const isAdmin = useIsAdmin();
   const [credentialLogo, setCredentialLogo] = useState(space?.credentialLogo ?? '');
   const { trigger, isMutating } = useUpdateSpace(space?.id);
+
+  const [spaceOnChainCredentialSettings, setSpaceOnChainCredentialSettings] =
+    useState<UpdateableCredentialProps | null>(null);
+
+  const disableSaveButton =
+    isMutating ||
+    (credentialLogo === (space?.credentialLogo ?? '') &&
+      (!spaceOnChainCredentialSettings ||
+        _isEqual(spaceOnChainCredentialSettings, {
+          useOnchainCredentials: space?.useOnchainCredentials,
+          credentialsChainId: space?.credentialsChainId,
+          credentialsWallet: space?.credentialsWallet
+        })));
+
   return (
     <>
       <Legend>Credentials</Legend>
@@ -43,6 +61,10 @@ export function SpaceCredentialSettings() {
           hideDelete={isMutating || credentialLogo === ''}
         />
       </Box>
+      <Typography variant='h6'>Onchain Credentials</Typography>
+      <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
+        <CredentialsOnChainConfig readOnly={!isAdmin} onChange={setSpaceOnChainCredentialSettings} />
+      </Box>
       {isAdmin && (
         <Button
           sx={{
@@ -50,9 +72,18 @@ export function SpaceCredentialSettings() {
           }}
           disableElevation
           size='large'
-          disabled={isMutating || credentialLogo === (space?.credentialLogo ?? '')}
+          disabled={disableSaveButton}
           onClick={() => {
-            trigger({ credentialLogo }).then(() => refreshCurrentSpace());
+            const update: UpdateableSpaceFields = {};
+            if (credentialLogo !== space?.credentialLogo) {
+              update.credentialLogo = credentialLogo;
+            }
+            if (spaceOnChainCredentialSettings) {
+              update.useOnchainCredentials = spaceOnChainCredentialSettings.useOnchainCredentials;
+              update.credentialsChainId = spaceOnChainCredentialSettings.credentialsChainId;
+              update.credentialsWallet = spaceOnChainCredentialSettings.credentialsWallet;
+            }
+            trigger(update).then(() => refreshCurrentSpace());
           }}
           loading={isMutating}
         >
