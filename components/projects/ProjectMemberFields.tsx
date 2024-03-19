@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
-import type { ProjectFormWithRequiredTogglesValues } from './interfaces';
+import type { ProjectRequiredFieldValues } from './interfaces';
 
 export type ProjectMemberPayload = Pick<
   ProjectMember,
@@ -126,7 +126,7 @@ export function ProjectMemberFields({
   defaultValues = projectMemberDefaultValues,
   requiredValues = {}
 }: {
-  requiredValues?: ProjectFormWithRequiredTogglesValues['members'][number];
+  requiredValues?: ProjectRequiredFieldValues['members'][number];
   onChange?: (projectMember: ProjectMemberPayload) => void;
   defaultValues?: ProjectMemberPayload;
 }) {
@@ -174,7 +174,7 @@ export function ProjectMemberFields({
   );
 }
 
-export function ProjectMemberFieldsWithRequiredToggle({
+export function ProjectMemberFieldsEditor({
   onChange,
   values
 }: {

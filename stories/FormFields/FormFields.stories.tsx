@@ -75,7 +75,8 @@ export function FormFieldsInputs() {
       required: index % 2 !== 0,
       type: formFieldType,
       id: v4(),
-      value: ''
+      value: '',
+      extraFields: {}
     };
   });
   const props = useFormFields({ fields });
@@ -155,7 +156,8 @@ export function FormFieldsInputsDisplay() {
       required: index % 2 === 0,
       type: formFieldType,
       id: v4(),
-      value
+      value,
+      extraFields: {}
     };
   });
   const props = useFormFields({ fields });

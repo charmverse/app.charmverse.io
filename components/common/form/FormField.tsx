@@ -22,8 +22,8 @@ import {
 import { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import type { ProjectFormWithRequiredTogglesValues } from 'components/projects/interfaces';
-import { ProjectFormWithRequiredToggles } from 'components/projects/ProjectForm';
+import type { ProjectRequiredFieldValues } from 'components/projects/interfaces';
+import { ProjectFormEditor } from 'components/projects/ProjectForm';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utils/react';
@@ -174,9 +174,9 @@ function ExpandedFormField({
         </>
       )}
       {formField.type === 'project_profile' ? (
-        <ProjectFormWithRequiredToggles
+        <ProjectFormEditor
           values={
-            (formField.extraFields as ProjectFormWithRequiredTogglesValues) ?? {
+            (formField.extraFields as ProjectRequiredFieldValues) ?? {
               members: [{}]
             }
           }
@@ -321,8 +321,8 @@ export function FormField(
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
-                <ProjectFormWithRequiredToggles
-                  values={(formField.extraFields as ProjectFormWithRequiredTogglesValues) ?? { members: [{}] }}
+                <ProjectFormEditor
+                  values={(formField.extraFields as ProjectRequiredFieldValues) ?? { members: [{}] }}
                 />
               ) : (
                 <FieldTypeRenderer

@@ -4,22 +4,20 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { ProjectFormValues, ProjectFormWithRequiredTogglesValues } from './interfaces';
-import { ProjectFields, ProjectFieldsWithRequiredToggle } from './ProjectFields';
-import {
-  projectMemberDefaultValues,
-  ProjectMemberFields,
-  ProjectMemberFieldsWithRequiredToggle
-} from './ProjectMemberFields';
+import type { ProjectValues, ProjectRequiredFieldValues } from './interfaces';
+import { ProjectFields, ProjectFieldsEditor } from './ProjectFields';
+import { projectMemberDefaultValues, ProjectMemberFields, ProjectMemberFieldsEditor } from './ProjectMemberFields';
 
 export function ProjectForm({
   onChange,
   values,
-  requiredValues
+  requiredValues,
+  showAddTeamMemberButton
 }: {
-  values: ProjectFormValues;
-  onChange: (project: ProjectFormValues) => void;
-  requiredValues?: ProjectFormWithRequiredTogglesValues;
+  values: ProjectValues;
+  onChange: (project: ProjectValues) => void;
+  requiredValues?: ProjectRequiredFieldValues;
+  showAddTeamMemberButton?: boolean;
 }) {
   return (
     <Stack gap={2} width='100%'>
@@ -74,31 +72,37 @@ export function ProjectForm({
           />
         </>
       ))}
-      {/* <Button
-        sx={{
-          width: 'fit-content'
-        }}
-        startIcon={<MuiAddIcon fontSize='small' />}
-        onClick={() => {
-        }}
-      >
-        Add a team member
-      </Button> */}
+      {showAddTeamMemberButton && (
+        <Button
+          sx={{
+            width: 'fit-content'
+          }}
+          startIcon={<MuiAddIcon fontSize='small' />}
+          onClick={() => {
+            onChange({
+              ...values,
+              members: [...values.members, projectMemberDefaultValues]
+            });
+          }}
+        >
+          Add a team member
+        </Button>
+      )}
     </Stack>
   );
 }
 
-export function ProjectFormWithRequiredToggles({
+export function ProjectFormEditor({
   onChange,
   values
 }: {
-  onChange?: (project: ProjectFormWithRequiredTogglesValues) => void;
-  values: ProjectFormWithRequiredTogglesValues;
+  onChange?: (project: ProjectRequiredFieldValues) => void;
+  values: ProjectRequiredFieldValues;
 }) {
   return (
     <Stack gap={2} p={2}>
       <Typography variant='h5'>Project Info</Typography>
-      <ProjectFieldsWithRequiredToggle
+      <ProjectFieldsEditor
         values={values}
         onChange={
           onChange === undefined
@@ -115,7 +119,7 @@ export function ProjectFormWithRequiredToggles({
         Team Info
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
-      <ProjectMemberFieldsWithRequiredToggle
+      <ProjectMemberFieldsEditor
         values={values.members[0]}
         onChange={
           onChange === undefined
@@ -137,7 +141,7 @@ export function ProjectFormWithRequiredToggles({
       {values.members.slice(1).map((member, index) => (
         <>
           <FieldLabel>Add a team member</FieldLabel>
-          <ProjectMemberFieldsWithRequiredToggle
+          <ProjectMemberFieldsEditor
             values={member}
             onChange={
               onChange === undefined

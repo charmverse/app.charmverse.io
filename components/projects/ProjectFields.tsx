@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
-import type { ProjectFormWithRequiredTogglesValues } from './interfaces';
+import type { ProjectRequiredFieldValues } from './interfaces';
 
 export type ProjectPayload = Pick<
   Project,
@@ -29,7 +29,7 @@ export type ProjectField = keyof ProjectPayload;
 type Props = {
   onChange?: (project: ProjectPayload) => void;
   defaultValues?: ProjectPayload;
-  requiredValues?: Omit<ProjectFormWithRequiredTogglesValues, 'members'>;
+  requiredValues?: Omit<ProjectRequiredFieldValues, 'members'>;
 };
 
 const ProjectConstants: {
@@ -182,12 +182,12 @@ export function ProjectFields({ requiredValues = {}, onChange, defaultValues }: 
   );
 }
 
-export function ProjectFieldsWithRequiredToggle({
+export function ProjectFieldsEditor({
   onChange,
   values
 }: {
-  onChange?: (value: Omit<ProjectFormWithRequiredTogglesValues, 'members'>) => void;
-  values: Omit<ProjectFormWithRequiredTogglesValues, 'members'>;
+  onChange?: (value: Omit<ProjectRequiredFieldValues, 'members'>) => void;
+  values: Omit<ProjectRequiredFieldValues, 'members'>;
 }) {
   return (
     <Stack gap={2}>
