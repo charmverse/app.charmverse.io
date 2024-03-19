@@ -22,7 +22,7 @@ import {
 import { useEffect, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import type { ProjectRequiredFieldValues } from 'components/projects/interfaces';
+import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
 import { ProjectFormEditor } from 'components/projects/ProjectForm';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -176,7 +176,7 @@ function ExpandedFormField({
       {formField.type === 'project_profile' ? (
         <ProjectFormEditor
           values={
-            (formField.extraFields as ProjectRequiredFieldValues) ?? {
+            (formField.extraFields as ProjectEditorFieldConfig) ?? {
               members: [{}]
             }
           }
@@ -321,9 +321,7 @@ export function FormField(
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
-                <ProjectFormEditor
-                  values={(formField.extraFields as ProjectRequiredFieldValues) ?? { members: [{}] }}
-                />
+                <ProjectFormEditor values={(formField.extraFields as ProjectEditorFieldConfig) ?? { members: [{}] }} />
               ) : (
                 <FieldTypeRenderer
                   labelEndAdornment={

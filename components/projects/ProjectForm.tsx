@@ -4,7 +4,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { ProjectValues, ProjectRequiredFieldValues } from './interfaces';
+import type { ProjectEditorFieldConfig, ProjectValues } from './interfaces';
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import {
   projectMemberDefaultValues,
@@ -15,12 +15,12 @@ import {
 export function ProjectFormAnswers({
   onChange,
   values,
-  requiredValues,
+  fieldConfig,
   showAddTeamMemberButton
 }: {
   values: ProjectValues;
   onChange: (project: ProjectValues) => void;
-  requiredValues?: ProjectRequiredFieldValues;
+  fieldConfig?: ProjectEditorFieldConfig;
   showAddTeamMemberButton?: boolean;
 }) {
   return (
@@ -34,7 +34,7 @@ export function ProjectFormAnswers({
             ..._project
           });
         }}
-        requiredValues={requiredValues}
+        fieldConfig={fieldConfig}
       />
       <Typography variant='h5' mt={2}>
         Team Info
@@ -47,7 +47,7 @@ export function ProjectFormAnswers({
             members: [projectMember, ...values.members.slice(1)]
           });
         }}
-        requiredValues={requiredValues?.members[0] ?? {}}
+        fieldConfig={fieldConfig?.members[0] ?? {}}
         values={projectMemberDefaultValues}
       />
       <Divider
@@ -66,7 +66,7 @@ export function ProjectFormAnswers({
                 members: [...values.members.slice(0, index + 1), projectMember, ...values.members.slice(index + 2)]
               });
             }}
-            requiredValues={requiredValues?.members[index + 1] ?? {}}
+            fieldConfig={fieldConfig?.members[index + 1] ?? {}}
             values={member}
           />
           <Divider
@@ -100,8 +100,8 @@ export function ProjectFormEditor({
   onChange,
   values
 }: {
-  onChange?: (project: ProjectRequiredFieldValues) => void;
-  values: ProjectRequiredFieldValues;
+  onChange?: (project: ProjectEditorFieldConfig) => void;
+  values: ProjectEditorFieldConfig;
 }) {
   return (
     <Stack gap={2} p={2}>

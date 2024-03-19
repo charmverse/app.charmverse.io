@@ -4,7 +4,7 @@ import * as yup from 'yup';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
-import type { ProjectRequiredFieldValues } from './interfaces';
+import type { ProjectEditorFieldConfig } from './interfaces';
 
 export type ProjectMemberPayload = Pick<
   ProjectMember,
@@ -121,9 +121,9 @@ export const projectMemberRequiredValues: Record<ProjectMemberField, boolean> = 
 export function ProjectMemberFieldAnswers({
   onChange,
   values,
-  requiredValues = {}
+  fieldConfig
 }: {
-  requiredValues?: ProjectRequiredFieldValues['members'][number];
+  fieldConfig?: ProjectEditorFieldConfig['members'][number];
   onChange?: (projectMember: ProjectMemberPayload) => void;
   values: ProjectMemberPayload;
 }) {
@@ -135,7 +135,7 @@ export function ProjectMemberFieldAnswers({
           label={property.label}
           multiline={property.field === 'previousProjects'}
           rows={property.field === 'previousProjects' ? 5 : 1}
-          required={requiredValues[property.field] ?? true}
+          required={fieldConfig?.[property.field]?.required ?? true}
           disabled={onChange === undefined}
           onChange={(e) => {
             onChange?.({
@@ -153,8 +153,8 @@ export function ProjectMemberFieldsEditor({
   onChange,
   values
 }: {
-  onChange?: (values: Partial<Record<ProjectMemberField, boolean>>) => void;
-  values: Partial<Record<ProjectMemberField, boolean>>;
+  onChange?: (values: ProjectEditorFieldConfig['members'][number]) => void;
+  values: ProjectEditorFieldConfig['members'][number];
 }) {
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
@@ -165,21 +165,43 @@ export function ProjectMemberFieldsEditor({
             multiline={property.field === 'previousProjects'}
             rows={property.field === 'previousProjects' ? 5 : 1}
             disabled
-            required={values?.[property.field] ?? true}
+            required={values?.[property.field]?.required ?? true}
           />
           {onChange && (
-            <Stack gap={0.5} flexDirection='row' alignItems='center'>
-              <Switch
-                size='small'
-                checked={values?.[property.field] ?? true}
-                onChange={(e) => {
-                  onChange({
-                    ...(values ?? {}),
-                    [property.field]: e.target.checked
-                  });
-                }}
-              />
-              <Typography>Required</Typography>
+            <Stack gap={1}>
+              <Stack gap={0.5} flexDirection='row' alignItems='center'>
+                <Switch
+                  size='small'
+                  checked={values?.[property.field]?.hidden ?? true}
+                  onChange={(e) => {
+                    onChange({
+                      ...(values ?? {}),
+                      [property.field]: {
+                        ...values?.[property.field],
+                        hidden: e.target.checked
+                      }
+                    });
+                  }}
+                />
+                <Typography>Hidden</Typography>
+              </Stack>
+
+              <Stack gap={0.5} flexDirection='row' alignItems='center'>
+                <Switch
+                  size='small'
+                  checked={values?.[property.field]?.required ?? true}
+                  onChange={(e) => {
+                    onChange({
+                      ...(values ?? {}),
+                      [property.field]: {
+                        ...values?.[property.field],
+                        required: e.target.checked
+                      }
+                    });
+                  }}
+                />
+                <Typography>Required</Typography>
+              </Stack>
             </Stack>
           )}
         </Stack>

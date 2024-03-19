@@ -4,7 +4,7 @@ import * as yup from 'yup';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
-import type { ProjectRequiredFieldValues } from './interfaces';
+import type { ProjectEditorFieldConfig } from './interfaces';
 
 export type ProjectPayload = Pick<
   Project,
@@ -22,12 +22,6 @@ export type ProjectPayload = Pick<
 >;
 
 export type ProjectField = keyof ProjectPayload;
-
-type Props = {
-  onChange?: (project: ProjectPayload) => void;
-  values: ProjectPayload;
-  requiredValues?: Omit<ProjectRequiredFieldValues, 'members'>;
-};
 
 const ProjectConstants: {
   field: ProjectField;
@@ -133,7 +127,15 @@ export const projectRequiredValues: Record<ProjectField, boolean> = {
   walletAddress: true
 };
 
-export function ProjectFieldAnswers({ requiredValues = {}, onChange, values }: Props) {
+export function ProjectFieldAnswers({
+  fieldConfig,
+  onChange,
+  values
+}: {
+  onChange?: (project: ProjectPayload) => void;
+  values: ProjectPayload;
+  fieldConfig?: ProjectEditorFieldConfig;
+}) {
   return (
     <Stack gap={2}>
       {ProjectConstants.map((property) => {
@@ -143,7 +145,7 @@ export function ProjectFieldAnswers({ requiredValues = {}, onChange, values }: P
             label={property.label}
             multiline={property.field === 'excerpt' || property.field === 'description'}
             rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
-            required={requiredValues[property.field] ?? true}
+            required={fieldConfig?.[property.field]?.required ?? true}
             disabled={onChange === undefined}
             onChange={(e) => {
               onChange?.({
@@ -162,8 +164,8 @@ export function ProjectFieldsEditor({
   onChange,
   values
 }: {
-  onChange?: (value: Omit<ProjectRequiredFieldValues, 'members'>) => void;
-  values: Omit<ProjectRequiredFieldValues, 'members'>;
+  onChange?: (value: Omit<ProjectEditorFieldConfig, 'members'>) => void;
+  values: Omit<ProjectEditorFieldConfig, 'members'>;
 }) {
   return (
     <Stack gap={2}>
@@ -175,21 +177,42 @@ export function ProjectFieldsEditor({
               multiline={property.field === 'excerpt' || property.field === 'description'}
               rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
               disabled
-              required={values[property.field] ?? true}
+              required={values[property.field]?.required ?? true}
             />
             {onChange && (
-              <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                <Switch
-                  size='small'
-                  checked={values[property.field] ?? true}
-                  onChange={(e) => {
-                    onChange({
-                      ...values,
-                      [property.field]: e.target.checked
-                    });
-                  }}
-                />
-                <Typography>Required</Typography>
+              <Stack gap={1}>
+                <Stack gap={0.5} flexDirection='row' alignItems='center'>
+                  <Switch
+                    size='small'
+                    checked={values?.[property.field]?.hidden ?? true}
+                    onChange={(e) => {
+                      onChange({
+                        ...(values ?? {}),
+                        [property.field]: {
+                          ...values?.[property.field],
+                          hidden: e.target.checked
+                        }
+                      });
+                    }}
+                  />
+                  <Typography>Hidden</Typography>
+                </Stack>
+                <Stack gap={0.5} flexDirection='row' alignItems='center'>
+                  <Switch
+                    size='small'
+                    checked={values[property.field]?.required ?? true}
+                    onChange={(e) => {
+                      onChange({
+                        ...values,
+                        [property.field]: {
+                          ...values[property.field],
+                          required: e.target.checked
+                        }
+                      });
+                    }}
+                  />
+                  <Typography>Required</Typography>
+                </Stack>
               </Stack>
             )}
           </Stack>

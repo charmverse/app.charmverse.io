@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import type { ProjectValues, ProjectRequiredFieldValues } from 'components/projects/interfaces';
+import type { ProjectValues, ProjectEditorFieldConfig } from 'components/projects/interfaces';
 import { projectDefaultValues } from 'components/projects/ProjectFields';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
@@ -165,7 +165,7 @@ export function FormFieldAnswersControlled({
               render={({ field }) =>
                 formField.type === 'project_profile' ? (
                   <ProjectFormAnswers
-                    requiredValues={formField.extraFields as ProjectRequiredFieldValues}
+                    fieldConfig={formField.extraFields as ProjectEditorFieldConfig}
                     values={
                       (formField?.value as ProjectValues) ?? {
                         ...projectDefaultValues,
