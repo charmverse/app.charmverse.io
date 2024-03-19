@@ -66,11 +66,7 @@ export function useMultiRewardPayment() {
         const parsedAmount = parseUnits(eToNumber(amount), paymentMethod!.tokenDecimals).toString();
         data = erc20.encodeFunctionData('transfer', [resolvedRecipientAddress, parsedAmount]);
         // send the request to the token contract
-        to =
-          token.endsWith('.eth') && ethers.utils.isValidName(token) ? await charmClient.resolveEnsName(token) : token;
-        if (!to) {
-          return null;
-        }
+        to = token;
         value = '0';
       } else {
         to = resolvedRecipientAddress;
