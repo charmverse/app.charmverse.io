@@ -6,7 +6,7 @@ import * as yup from 'yup';
 
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 
-type ProjectMemberPayload = Pick<
+export type ProjectMemberPayload = Pick<
   ProjectMember,
   | 'email'
   | 'github'
@@ -23,7 +23,8 @@ type ProjectMemberPayload = Pick<
 type ProjectMemberField = keyof ProjectMemberPayload;
 
 type Props = {
-  onChange: (values: any) => void;
+  onChange: (projectMember: ProjectMemberPayload) => void;
+  defaultValues?: ProjectMemberPayload;
 };
 
 const ProjectMemberConstants: {
@@ -96,27 +97,30 @@ const schema = yup.object().shape({
   previousProjects: yup.string().nullable()
 });
 
-export function ProjectMemberFields({ onChange }: Props) {
+export const projectMemberDefaultValues: ProjectMemberPayload = {
+  name: '',
+  walletAddress: '',
+  email: '',
+  twitter: '',
+  warpcast: '',
+  github: '',
+  linkedin: '',
+  telegram: '',
+  otherUrl: '',
+  previousProjects: ''
+};
+
+export function ProjectMemberFields({ onChange, defaultValues }: Props) {
   const {
     control,
     formState: { errors },
-    watch,
-    setValue,
-    handleSubmit
+    watch
   } = useForm<ProjectMemberPayload>({
-    defaultValues: {
-      name: '',
-      walletAddress: '',
-      email: '',
-      twitter: '',
-      warpcast: '',
-      github: '',
-      linkedin: '',
-      telegram: '',
-      otherUrl: ''
-    },
+    defaultValues,
     resolver: yupResolver(schema)
   });
+
+  const projectMember = watch();
 
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
@@ -136,6 +140,10 @@ export function ProjectMemberFields({ onChange }: Props) {
               required={property.required}
               onChange={(e) => {
                 field.onChange(e);
+                onChange({
+                  ...projectMember,
+                  [property.field]: e.target.value
+                });
               }}
             />
           )}
