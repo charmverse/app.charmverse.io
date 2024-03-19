@@ -7,6 +7,8 @@ import * as yup from 'yup';
 import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
+import type { ProjectFormWithRequiredTogglesValues } from './interfaces';
+
 export type ProjectMemberPayload = Pick<
   ProjectMember,
   | 'email'
@@ -121,8 +123,10 @@ export const projectMemberRequiredValues: Record<ProjectMemberField, boolean> = 
 
 export function ProjectMemberFields({
   onChange,
-  defaultValues = projectMemberDefaultValues
+  defaultValues = projectMemberDefaultValues,
+  requiredValues = {}
 }: {
+  requiredValues?: ProjectFormWithRequiredTogglesValues['members'][number];
   onChange?: (projectMember: ProjectMemberPayload) => void;
   defaultValues?: ProjectMemberPayload;
 }) {
@@ -138,7 +142,7 @@ export function ProjectMemberFields({
   const projectMember = watch();
 
   return (
-    <Stack display='flex' flexDirection='column' gap={2}>
+    <Stack display='flex' flexDirection='column' gap={2} width='100%'>
       {ProjectMemberConstants.map((property) => (
         <Stack gap={1} key={property.label}>
           <Controller
@@ -152,7 +156,7 @@ export function ProjectMemberFields({
                 type='text'
                 label={property.label}
                 error={errors[property.field] as any}
-                required={property.required}
+                required={requiredValues[property.field] ?? true}
                 disabled={onChange === undefined}
                 onChange={(e: any) => {
                   field.onChange(e);

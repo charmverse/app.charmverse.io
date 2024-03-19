@@ -29,6 +29,7 @@ export type ProjectField = keyof ProjectPayload;
 type Props = {
   onChange?: (project: ProjectPayload) => void;
   defaultValues?: ProjectPayload;
+  requiredValues?: Omit<ProjectFormWithRequiredTogglesValues, 'members'>;
 };
 
 const ProjectConstants: {
@@ -135,7 +136,7 @@ export const projectRequiredValues: Record<ProjectField, boolean> = {
   walletAddress: true
 };
 
-export function ProjectFields({ onChange, defaultValues }: Props) {
+export function ProjectFields({ requiredValues = {}, onChange, defaultValues }: Props) {
   const {
     control,
     watch,
@@ -163,7 +164,7 @@ export function ProjectFields({ onChange, defaultValues }: Props) {
                 type='text'
                 label={property.label}
                 error={errors[property.field] as any}
-                required={property.required}
+                required={requiredValues[property.field] ?? true}
                 disabled={onChange === undefined}
                 onChange={(e: any) => {
                   field.onChange(e);

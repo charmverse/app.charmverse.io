@@ -5,6 +5,10 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import type { ProjectFormValues, ProjectFormWithRequiredTogglesValues } from 'components/projects/interfaces';
+import { projectDefaultValues, ProjectFields } from 'components/projects/ProjectFields';
+import { ProjectForm } from 'components/projects/ProjectForm';
+import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -26,7 +30,7 @@ const FormFieldAnswersContainer = styled(Stack)`
 `;
 
 type FormFieldAnswersProps = {
-  formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private'> & {
+  formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private' | 'extraFields'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
     formFieldAnswer?: FormFieldAnswer | null;
@@ -158,62 +162,82 @@ export function FormFieldAnswersControlled({
             <Controller
               name={formField.id}
               control={control}
-              render={({ field }) => (
-                <FieldTypeRenderer
-                  {...field}
-                  rows={undefined}
-                  maxRows={10}
-                  sx={{ mb: 2 }}
-                  value={(field.value ?? '') as FormFieldValue}
-                  placeholder={fieldTypePlaceholderRecord[formField.type]}
-                  labelEndAdornment={
-                    formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
-                  }
-                  inputEndAdornment={
-                    pageId &&
-                    formField.type !== 'label' &&
-                    formField.formFieldAnswer &&
-                    user && (
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          left: '100%',
-                          ml: {
-                            md: 1,
-                            xs: 0.5
-                          }
-                        }}
-                      >
-                        <FormFieldAnswerComment
-                          formFieldAnswer={formField.formFieldAnswer}
-                          pageId={pageId}
-                          formFieldName={formField.name}
-                          disabled={disabled}
-                          fieldAnswerThreads={fieldAnswerThreads}
-                          enableComments={enableComments}
-                        />
-                      </Box>
-                    )
-                  }
-                  description={formField.description as PageContent}
-                  disabled={disabled}
-                  type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
-                  label={formField.name}
-                  options={formField.options as SelectOptionType[]}
-                  error={errors[formField.id] as any}
-                  required={formField.required}
-                  data-test={`form-field-input-${formField.id}`}
-                  onChange={(e) => {
-                    setIsFormDirty(true);
-                    onFormChange([
-                      {
-                        id: formField.id,
-                        value: typeof e?.target?.value === 'string' ? e.target.value : e
+              render={({ field }) =>
+                formField.type === 'project_profile' ? (
+                  <ProjectForm
+                    requiredValues={formField.extraFields as ProjectFormWithRequiredTogglesValues}
+                    values={
+                      (formField?.value as ProjectFormValues) ?? {
+                        ...projectDefaultValues,
+                        members: [projectMemberDefaultValues]
                       }
-                    ]);
-                  }}
-                />
-              )}
+                    }
+                    onChange={(projectFormValues) => {
+                      onFormChange([
+                        {
+                          id: formField.id,
+                          value: projectFormValues
+                        }
+                      ]);
+                    }}
+                  />
+                ) : (
+                  <FieldTypeRenderer
+                    {...field}
+                    rows={undefined}
+                    maxRows={10}
+                    sx={{ mb: 2 }}
+                    value={(field.value ?? '') as FormFieldValue}
+                    placeholder={fieldTypePlaceholderRecord[formField.type]}
+                    labelEndAdornment={
+                      formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
+                    }
+                    inputEndAdornment={
+                      pageId &&
+                      formField.type !== 'label' &&
+                      formField.formFieldAnswer &&
+                      user && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            left: '100%',
+                            ml: {
+                              md: 1,
+                              xs: 0.5
+                            }
+                          }}
+                        >
+                          <FormFieldAnswerComment
+                            formFieldAnswer={formField.formFieldAnswer}
+                            pageId={pageId}
+                            formFieldName={formField.name}
+                            disabled={disabled}
+                            fieldAnswerThreads={fieldAnswerThreads}
+                            enableComments={enableComments}
+                          />
+                        </Box>
+                      )
+                    }
+                    description={formField.description as PageContent}
+                    disabled={disabled}
+                    type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
+                    label={formField.name}
+                    options={formField.options as SelectOptionType[]}
+                    error={errors[formField.id] as any}
+                    required={formField.required}
+                    data-test={`form-field-input-${formField.id}`}
+                    onChange={(e) => {
+                      setIsFormDirty(true);
+                      onFormChange([
+                        {
+                          id: formField.id,
+                          value: typeof e?.target?.value === 'string' ? e.target.value : e
+                        }
+                      ]);
+                    }}
+                  />
+                )
+              }
             />
           </StyledStack>
         );

@@ -1,35 +1,38 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Divider, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { ProjectFormWithRequiredTogglesValues } from './interfaces';
-import type { ProjectPayload } from './ProjectFields';
-import { projectDefaultValues, ProjectFields, ProjectFieldsWithRequiredToggle } from './ProjectFields';
-import type { ProjectMemberPayload } from './ProjectMemberFields';
+import type { ProjectFormValues, ProjectFormWithRequiredTogglesValues } from './interfaces';
+import { ProjectFields, ProjectFieldsWithRequiredToggle } from './ProjectFields';
 import {
   projectMemberDefaultValues,
   ProjectMemberFields,
   ProjectMemberFieldsWithRequiredToggle
 } from './ProjectMemberFields';
 
-export function ProjectForm() {
-  const [project, setProject] = useState<ProjectPayload>(projectDefaultValues);
-  const [projectMembers, setProjectMembers] = useState<ProjectMemberPayload[]>([projectMemberDefaultValues]);
-
+export function ProjectForm({
+  onChange,
+  values,
+  requiredValues
+}: {
+  values: ProjectFormValues;
+  onChange: (project: ProjectFormValues) => void;
+  requiredValues?: ProjectFormWithRequiredTogglesValues;
+}) {
   return (
-    <Stack gap={2} p={2}>
+    <Stack gap={2} width='100%'>
       <Typography variant='h5'>Project Info</Typography>
       <ProjectFields
-        defaultValues={project}
+        defaultValues={values}
         onChange={(_project) => {
-          setProject({
-            ...project,
+          onChange({
+            ...values,
             ..._project
           });
         }}
+        requiredValues={requiredValues}
       />
       <Typography variant='h5' mt={2}>
         Team Info
@@ -37,8 +40,12 @@ export function ProjectForm() {
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFields
         onChange={(projectMember) => {
-          setProjectMembers([projectMember, ...projectMembers.slice(1)]);
+          onChange({
+            ...values,
+            members: [projectMember, ...values.members.slice(1)]
+          });
         }}
+        requiredValues={requiredValues?.members[0] ?? {}}
         defaultValues={projectMemberDefaultValues}
       />
       <Divider
@@ -47,18 +54,18 @@ export function ProjectForm() {
         }}
       />
 
-      {projectMembers.slice(1).map((_, index) => (
+      {values.members.slice(1).map((member, index) => (
         <>
           <FieldLabel>Add a team member</FieldLabel>
           <ProjectMemberFields
             onChange={(projectMember) => {
-              setProjectMembers([
-                ...projectMembers.slice(0, index + 1),
-                projectMember,
-                ...projectMembers.slice(index + 2)
-              ]);
+              onChange({
+                ...values,
+                members: [...values.members.slice(0, index + 1), projectMember, ...values.members.slice(index + 2)]
+              });
             }}
-            defaultValues={projectMemberDefaultValues}
+            requiredValues={requiredValues?.members[index + 1] ?? {}}
+            defaultValues={member}
           />
           <Divider
             sx={{
@@ -67,17 +74,16 @@ export function ProjectForm() {
           />
         </>
       ))}
-      <Button
+      {/* <Button
         sx={{
           width: 'fit-content'
         }}
         startIcon={<MuiAddIcon fontSize='small' />}
         onClick={() => {
-          setProjectMembers([...projectMembers, projectMemberDefaultValues]);
         }}
       >
         Add a team member
-      </Button>
+      </Button> */}
     </Stack>
   );
 }
