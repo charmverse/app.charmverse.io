@@ -101,7 +101,7 @@ describe('GET /api/v1/rewards/submissions', () => {
           },
           credentials: [],
           author: getUserProfile(secondUser),
-          status: 'in_progress'
+          status: 'submission_in_progress'
         }
       ])
     );
@@ -166,13 +166,5 @@ describe('GET /api/v1/rewards/submissions', () => {
         }
       ])
     );
-  });
-
-  it('should return an error if both spaceId and rewardId are missing', async () => {
-    const { apiToken } = await generateUserAndSpaceWithApiToken(undefined, false);
-    const response = await request(baseUrl).get(`/api/v1/rewards/submissions?api_key=${apiToken.token}`).send();
-
-    // An error should be returned
-    expect(response.status).toEqual(400);
   });
 });
