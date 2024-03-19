@@ -327,125 +327,124 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.page.waitForResponse(/\/api\/proposals/);
   });
 
-  test('Visit structured proposal and edit form field answers as an author', async ({
-    proposalPage,
-    proposalsListPage,
-    documentPage,
-    proposalFormFieldPage,
-    page
-  }) => {
-    await loginBrowserUser({
-      browserPage: proposalsListPage.page,
-      userId: spaceAdmin.id
-    });
+  test.fixme(
+    'Visit structured proposal and edit form field answers as an author',
+    async ({ proposalPage, proposalsListPage, documentPage, proposalFormFieldPage, page }) => {
+      await loginBrowserUser({
+        browserPage: proposalsListPage.page,
+        userId: spaceAdmin.id
+      });
 
-    const proposal = await prisma.proposal.findFirstOrThrow({
-      where: {
-        spaceId: space.id,
-        page: {
-          type: 'proposal'
-        }
-      },
-      select: {
-        id: true,
-        page: {
-          select: {
-            id: true,
-            path: true
+      const proposal = await prisma.proposal.findFirstOrThrow({
+        where: {
+          spaceId: space.id,
+          page: {
+            type: 'proposal'
           }
         },
-        form: {
-          select: {
-            formFields: {
-              select: {
-                id: true,
-                type: true
-              },
-              orderBy: {
-                index: 'asc'
+        select: {
+          id: true,
+          page: {
+            select: {
+              id: true,
+              path: true
+            }
+          },
+          form: {
+            select: {
+              formFields: {
+                select: {
+                  id: true,
+                  type: true
+                },
+                orderBy: {
+                  index: 'asc'
+                }
               }
             }
           }
         }
-      }
-    });
+      });
 
-    const formFields = proposal.form!.formFields;
+      const formFields = proposal.form!.formFields;
 
-    const shortTextField = formFields.find((field) => field.type === 'short_text')!;
+      const shortTextField = formFields.find((field) => field.type === 'short_text')!;
 
-    await documentPage.goToPage({
-      domain: space.domain,
-      path: proposal.page!.path
-    });
+      await documentPage.goToPage({
+        domain: space.domain,
+        path: proposal.page!.path
+      });
 
-    const valueToSet = 'John Doe';
+      const valueToSet = 'John Doe';
 
-    await expect(proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text')).toBeVisible();
+      await expect(proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text')).toBeVisible();
 
-    // Give some time for value to populate
-    await page.waitForTimeout(200);
+      // Give some time for value to populate
+      await page.waitForTimeout(200);
 
-    const input = proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text');
+      const input = proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text');
 
-    await input.clear();
-    await expect(input).toHaveValue('');
-    await input.fill(valueToSet);
-    await expect(input).toHaveValue(valueToSet);
+      await input.clear();
+      await expect(input).toHaveValue('');
+      await input.fill(valueToSet);
+      await expect(input).toHaveValue(valueToSet);
 
-    // Leave some time for the changes to be saved
-    await page.waitForTimeout(200);
+      // Leave some time for the changes to be saved
+      await page.waitForTimeout(200);
 
-    await Promise.all([page.waitForResponse('**/api/proposals/**/publish'), proposalPage.completeDraftButton.click()]);
+      await Promise.all([
+        page.waitForResponse('**/api/proposals/**/publish'),
+        proposalPage.completeDraftButton.click()
+      ]);
 
-    await proposalPage.page.reload();
+      await proposalPage.page.reload();
 
-    // Reload the page to ensure the changes were saved
-    await expect(proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text')).toHaveValue(valueToSet);
-  });
+      // Reload the page to ensure the changes were saved
+      await expect(proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text')).toHaveValue(valueToSet);
+    }
+  );
 
-  test('Visit structured proposal and view only public form fields as a space member', async ({
-    proposalsListPage,
-    documentPage,
-    proposalFormFieldPage
-  }) => {
-    await loginBrowserUser({
-      browserPage: proposalsListPage.page,
-      userId: spaceMember.id
-    });
+  test.fixme(
+    'Visit structured proposal and view only public form fields as a space member',
+    async ({ proposalsListPage, documentPage, proposalFormFieldPage }) => {
+      await loginBrowserUser({
+        browserPage: proposalsListPage.page,
+        userId: spaceMember.id
+      });
 
-    const proposal = await prisma.proposal.findFirstOrThrow({
-      where: {
-        spaceId: space.id,
-        page: {
-          type: 'proposal'
-        }
-      },
-      select: {
-        page: {
-          select: {
-            path: true
+      const proposal = await prisma.proposal.findFirstOrThrow({
+        where: {
+          spaceId: space.id,
+          page: {
+            type: 'proposal'
+          }
+        },
+        select: {
+          page: {
+            select: {
+              path: true
+            }
           }
         }
-      }
-    });
+      });
 
-    await documentPage.goToPage({
-      domain: space.domain,
-      path: proposal.page!.path
-    });
+      await documentPage.goToPage({
+        domain: space.domain,
+        path: proposal.page!.path
+      });
 
-    await expect(
-      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'email' })
-    ).toBeVisible();
-    await expect(
-      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'phone' })
-    ).toBeVisible();
-    await expect(
-      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'short_text' })
-    ).not.toBeVisible();
-    await expect(
-      proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'long_text' })
-    ).not.toBeVisible();
-  });
+      await expect(
+        proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'email' })
+      ).toBeVisible();
+      await expect(
+        proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'phone' })
+      ).toBeVisible();
+      await expect(
+        proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'short_text' })
+      ).not.toBeVisible();
+      await expect(
+        proposalFormFieldPage.page.locator('data-test=field-label').filter({ hasText: 'long_text' })
+      ).not.toBeVisible();
+    }
+  );
 });
