@@ -5,8 +5,12 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 
 import type { ProjectValues, ProjectRequiredFieldValues } from './interfaces';
-import { ProjectFields, ProjectFieldsEditor } from './ProjectFields';
-import { projectMemberDefaultValues, ProjectMemberFields, ProjectMemberFieldsEditor } from './ProjectMemberFields';
+import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
+import {
+  projectMemberDefaultValues,
+  ProjectMemberFieldAnswers,
+  ProjectMemberFieldsEditor
+} from './ProjectMemberFields';
 
 export function ProjectFormAnswers({
   onChange,
@@ -22,8 +26,8 @@ export function ProjectFormAnswers({
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h5'>Project Info</Typography>
-      <ProjectFields
-        defaultValues={values}
+      <ProjectFieldAnswers
+        values={values}
         onChange={(_project) => {
           onChange({
             ...values,
@@ -36,7 +40,7 @@ export function ProjectFormAnswers({
         Team Info
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
-      <ProjectMemberFields
+      <ProjectMemberFieldAnswers
         onChange={(projectMember) => {
           onChange({
             ...values,
@@ -44,7 +48,7 @@ export function ProjectFormAnswers({
           });
         }}
         requiredValues={requiredValues?.members[0] ?? {}}
-        defaultValues={projectMemberDefaultValues}
+        values={projectMemberDefaultValues}
       />
       <Divider
         sx={{
@@ -55,7 +59,7 @@ export function ProjectFormAnswers({
       {values.members.slice(1).map((member, index) => (
         <>
           <FieldLabel>Add a team member</FieldLabel>
-          <ProjectMemberFields
+          <ProjectMemberFieldAnswers
             onChange={(projectMember) => {
               onChange({
                 ...values,
@@ -63,7 +67,7 @@ export function ProjectFormAnswers({
               });
             }}
             requiredValues={requiredValues?.members[index + 1] ?? {}}
-            defaultValues={member}
+            values={member}
           />
           <Divider
             sx={{

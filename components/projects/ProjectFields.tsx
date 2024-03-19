@@ -1,10 +1,7 @@
 import type { Project } from '@charmverse/core/prisma-client';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Stack, Switch, Typography } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
 import type { ProjectRequiredFieldValues } from './interfaces';
@@ -28,7 +25,7 @@ export type ProjectField = keyof ProjectPayload;
 
 type Props = {
   onChange?: (project: ProjectPayload) => void;
-  defaultValues?: ProjectPayload;
+  values: ProjectPayload;
   requiredValues?: Omit<ProjectRequiredFieldValues, 'members'>;
 };
 
@@ -136,45 +133,24 @@ export const projectRequiredValues: Record<ProjectField, boolean> = {
   walletAddress: true
 };
 
-export function ProjectFields({ requiredValues = {}, onChange, defaultValues }: Props) {
-  const {
-    control,
-    watch,
-    formState: { errors }
-  } = useForm<ProjectPayload>({
-    defaultValues,
-    resolver: yupResolver(schema)
-  });
-
-  const project = watch();
-
+export function ProjectFieldAnswers({ requiredValues = {}, onChange, values }: Props) {
   return (
     <Stack gap={2}>
       {ProjectConstants.map((property) => {
         return (
-          <Controller
-            key={property.label}
-            name={property.field}
-            control={control}
-            render={({ field }) => (
-              <FieldTypeRenderer
-                {...field}
-                rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
-                value={field.value ?? ''}
-                type='text'
-                label={property.label}
-                error={errors[property.field] as any}
-                required={requiredValues[property.field] ?? true}
-                disabled={onChange === undefined}
-                onChange={(e: any) => {
-                  field.onChange(e);
-                  onChange?.({
-                    ...project,
-                    [property.field]: e.target.value
-                  });
-                }}
-              />
-            )}
+          <TextInputField
+            key={property.field}
+            label={property.label}
+            multiline={property.field === 'excerpt' || property.field === 'description'}
+            rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
+            required={requiredValues[property.field] ?? true}
+            disabled={onChange === undefined}
+            onChange={(e) => {
+              onChange?.({
+                ...values,
+                [property.field]: e.target.value
+              });
+            }}
           />
         );
       })}

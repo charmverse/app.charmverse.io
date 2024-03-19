@@ -1,10 +1,7 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { Stack, Switch, Typography } from '@mui/material';
-import { Controller, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { FieldTypeRenderer } from 'components/common/form/fields/FieldTypeRenderer';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
 import type { ProjectRequiredFieldValues } from './interfaces';
@@ -121,54 +118,32 @@ export const projectMemberRequiredValues: Record<ProjectMemberField, boolean> = 
   previousProjects: true
 };
 
-export function ProjectMemberFields({
+export function ProjectMemberFieldAnswers({
   onChange,
-  defaultValues = projectMemberDefaultValues,
+  values,
   requiredValues = {}
 }: {
   requiredValues?: ProjectRequiredFieldValues['members'][number];
   onChange?: (projectMember: ProjectMemberPayload) => void;
-  defaultValues?: ProjectMemberPayload;
+  values: ProjectMemberPayload;
 }) {
-  const {
-    control,
-    formState: { errors },
-    watch
-  } = useForm<ProjectMemberPayload>({
-    defaultValues,
-    resolver: yupResolver(schema)
-  });
-
-  const projectMember = watch();
-
   return (
     <Stack display='flex' flexDirection='column' gap={2} width='100%'>
       {ProjectMemberConstants.map((property) => (
-        <Stack gap={1} key={property.label}>
-          <Controller
-            name={property.field}
-            control={control}
-            render={({ field }) => (
-              <FieldTypeRenderer
-                {...field}
-                rows={property.field === 'previousProjects' ? 5 : 1}
-                value={field.value ?? ''}
-                type='text'
-                label={property.label}
-                error={errors[property.field] as any}
-                required={requiredValues[property.field] ?? true}
-                disabled={onChange === undefined}
-                onChange={(e: any) => {
-                  field.onChange(e);
-                  onChange?.({
-                    ...projectMember,
-                    [property.field]: e.target.value
-                  });
-                }}
-              />
-            )}
-          />
-        </Stack>
+        <TextInputField
+          key={property.field}
+          label={property.label}
+          multiline={property.field === 'previousProjects'}
+          rows={property.field === 'previousProjects' ? 5 : 1}
+          required={requiredValues[property.field] ?? true}
+          disabled={onChange === undefined}
+          onChange={(e) => {
+            onChange?.({
+              ...values,
+              [property.field]: e.target.value
+            });
+          }}
+        />
       ))}
     </Stack>
   );
