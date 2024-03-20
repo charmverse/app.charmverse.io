@@ -12,7 +12,7 @@ export type ChainId = keyof typeof PROJECT_REGISTRY_ADDRESSES;
 export async function getProjectCount() {
   const rateLimiter = RateLimit(1);
   const chains = Object.keys(PROJECT_REGISTRY_ADDRESSES).map(Number) as ChainId[];
-  const projects = await chains.reduce<Promise<Record<ChainId, number>>>(async (_acc, chainId, indx) => {
+  const projects = await chains.reduce<Promise<Record<ChainId, number>>>(async (_acc, chainId) => {
     await rateLimiter();
     const acc = await _acc;
     const publicClient = getPublicClient(chainId);
