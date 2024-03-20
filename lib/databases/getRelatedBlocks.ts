@@ -93,18 +93,14 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
 
   const validBlocks = blocks
     .map((block) => {
-      // views do not have a page
-      if (block.type === 'view') {
-        return block as BlockWithDetails;
-      }
       const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
       // @ts-ignore mutate to be faster than spread
-      block.pageId = page?.id || '';
-      block.title = page?.title || '';
+      block.pageId = page?.id;
+      block.title = page?.title || block.title;
       return block as BlockWithDetails;
     })
     // remove orphan blocks
-    .filter((block) => !!block.pageId || block.type === 'view');
+    .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
 
   return { blocks: validBlocks, source };
 }

@@ -61,12 +61,6 @@ function createBoardTree(): [Block[], Block] {
     const card = TestBlockFactory.createCard(board);
     card.id = `card${i}`;
     blocks.push(card);
-
-    for (let j = 0; j < 3; j++) {
-      const textBlock = TestBlockFactory.createText(card);
-      textBlock.id = `text${j}`;
-      blocks.push(textBlock);
-    }
   }
 
   return [blocks, board];
@@ -79,12 +73,6 @@ function createCardTree(): [Block[], Block] {
   card.id = 'card1';
   card.rootId = 'board1';
   blocks.push(card);
-
-  for (let i = 0; i < 5; i++) {
-    const textBlock = TestBlockFactory.createText(card);
-    textBlock.id = `text${i}`;
-    blocks.push(textBlock);
-  }
 
   return [blocks, card];
 }
