@@ -1,10 +1,9 @@
 import type { Project } from '@charmverse/core/prisma-client';
-import { Stack, Switch, Typography } from '@mui/material';
 import * as yup from 'yup';
 
-import { TextInputField } from 'components/common/form/fields/TextInputField';
-
-import type { ProjectEditorFieldConfig } from './interfaces';
+import { FieldAnswers } from './FormFields/FieldAnswers';
+import { FieldsEditor } from './FormFields/FieldsEditor';
+import type { ProjectEditorFieldConfig, ProjectFieldConfig } from './interfaces';
 
 export type ProjectPayload = Pick<
   Project,
@@ -134,30 +133,9 @@ export function ProjectFieldAnswers({
 }: {
   onChange?: (project: ProjectPayload) => void;
   values: ProjectPayload;
-  fieldConfig?: ProjectEditorFieldConfig;
+  fieldConfig?: ProjectFieldConfig;
 }) {
-  return (
-    <Stack gap={2}>
-      {ProjectConstants.map((property) => {
-        return (
-          <TextInputField
-            key={property.field}
-            label={property.label}
-            multiline={property.field === 'excerpt' || property.field === 'description'}
-            rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
-            required={fieldConfig?.[property.field]?.required ?? true}
-            disabled={onChange === undefined}
-            onChange={(e) => {
-              onChange?.({
-                ...values,
-                [property.field]: e.target.value
-              });
-            }}
-          />
-        );
-      })}
-    </Stack>
-  );
+  return <FieldAnswers values={values} onChange={onChange} fieldConfig={fieldConfig} properties={ProjectConstants} />;
 }
 
 export function ProjectFieldsEditor({
@@ -167,57 +145,5 @@ export function ProjectFieldsEditor({
   onChange?: (value: Omit<ProjectEditorFieldConfig, 'members'>) => void;
   values: Omit<ProjectEditorFieldConfig, 'members'>;
 }) {
-  return (
-    <Stack gap={2}>
-      {ProjectConstants.map((property) => {
-        return (
-          <Stack gap={1} key={property.label}>
-            <TextInputField
-              label={property.label}
-              multiline={property.field === 'excerpt' || property.field === 'description'}
-              rows={property.field === 'excerpt' ? 3 : property.field === 'description' ? 5 : 1}
-              disabled
-              required={values[property.field]?.required ?? true}
-            />
-            {onChange && (
-              <Stack gap={1}>
-                <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                  <Switch
-                    size='small'
-                    checked={values?.[property.field]?.hidden ?? true}
-                    onChange={(e) => {
-                      onChange({
-                        ...(values ?? {}),
-                        [property.field]: {
-                          ...values?.[property.field],
-                          hidden: e.target.checked
-                        }
-                      });
-                    }}
-                  />
-                  <Typography>Hidden</Typography>
-                </Stack>
-                <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                  <Switch
-                    size='small'
-                    checked={values[property.field]?.required ?? true}
-                    onChange={(e) => {
-                      onChange({
-                        ...values,
-                        [property.field]: {
-                          ...values[property.field],
-                          required: e.target.checked
-                        }
-                      });
-                    }}
-                  />
-                  <Typography>Required</Typography>
-                </Stack>
-              </Stack>
-            )}
-          </Stack>
-        );
-      })}
-    </Stack>
-  );
+  return <FieldsEditor properties={ProjectConstants} values={values} onChange={onChange} />;
 }

@@ -1,24 +1,16 @@
 import type { ProjectField, ProjectPayload } from './ProjectFields';
 import type { ProjectMemberField, ProjectMemberPayload } from './ProjectMemberFields';
 
-export type ProjectEditorFieldConfig = Partial<
-  Record<
-    ProjectField,
-    {
-      required?: boolean;
-      hidden?: boolean;
-    }
-  >
-> & {
-  members: Partial<
-    Record<
-      ProjectMemberField,
-      {
-        required?: boolean;
-        hidden?: boolean;
-      }
-    >
-  >[];
+export type ProjectFieldConfig<Fields extends string = string> = Record<
+  Fields,
+  {
+    required?: boolean;
+    hidden?: boolean;
+  }
+>;
+
+export type ProjectEditorFieldConfig = Partial<ProjectFieldConfig<ProjectField>> & {
+  members: ProjectFieldConfig<ProjectMemberField>[];
 };
 
 export type ProjectValues = ProjectPayload & {

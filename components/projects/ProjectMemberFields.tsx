@@ -1,9 +1,8 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
-import { Stack, Switch, Typography } from '@mui/material';
 import * as yup from 'yup';
 
-import { TextInputField } from 'components/common/form/fields/TextInputField';
-
+import { FieldAnswers } from './FormFields/FieldAnswers';
+import { FieldsEditor } from './FormFields/FieldsEditor';
 import type { ProjectEditorFieldConfig } from './interfaces';
 
 export type ProjectMemberPayload = Pick<
@@ -128,24 +127,7 @@ export function ProjectMemberFieldAnswers({
   values: ProjectMemberPayload;
 }) {
   return (
-    <Stack display='flex' flexDirection='column' gap={2} width='100%'>
-      {ProjectMemberConstants.map((property) => (
-        <TextInputField
-          key={property.field}
-          label={property.label}
-          multiline={property.field === 'previousProjects'}
-          rows={property.field === 'previousProjects' ? 5 : 1}
-          required={fieldConfig?.[property.field]?.required ?? true}
-          disabled={onChange === undefined}
-          onChange={(e) => {
-            onChange?.({
-              ...values,
-              [property.field]: e.target.value
-            });
-          }}
-        />
-      ))}
-    </Stack>
+    <FieldAnswers values={values} onChange={onChange} fieldConfig={fieldConfig} properties={ProjectMemberConstants} />
   );
 }
 
@@ -156,56 +138,5 @@ export function ProjectMemberFieldsEditor({
   onChange?: (values: ProjectEditorFieldConfig['members'][number]) => void;
   values: ProjectEditorFieldConfig['members'][number];
 }) {
-  return (
-    <Stack display='flex' flexDirection='column' gap={2}>
-      {ProjectMemberConstants.map((property) => (
-        <Stack gap={1} key={property.label}>
-          <TextInputField
-            label={property.label}
-            multiline={property.field === 'previousProjects'}
-            rows={property.field === 'previousProjects' ? 5 : 1}
-            disabled
-            required={values?.[property.field]?.required ?? true}
-          />
-          {onChange && (
-            <Stack gap={1}>
-              <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                <Switch
-                  size='small'
-                  checked={values?.[property.field]?.hidden ?? true}
-                  onChange={(e) => {
-                    onChange({
-                      ...(values ?? {}),
-                      [property.field]: {
-                        ...values?.[property.field],
-                        hidden: e.target.checked
-                      }
-                    });
-                  }}
-                />
-                <Typography>Hidden</Typography>
-              </Stack>
-
-              <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                <Switch
-                  size='small'
-                  checked={values?.[property.field]?.required ?? true}
-                  onChange={(e) => {
-                    onChange({
-                      ...(values ?? {}),
-                      [property.field]: {
-                        ...values?.[property.field],
-                        required: e.target.checked
-                      }
-                    });
-                  }}
-                />
-                <Typography>Required</Typography>
-              </Stack>
-            </Stack>
-          )}
-        </Stack>
-      ))}
-    </Stack>
-  );
+  return <FieldsEditor properties={ProjectMemberConstants} values={values} onChange={onChange} />;
 }
