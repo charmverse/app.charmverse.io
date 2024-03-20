@@ -25,10 +25,10 @@ import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utils/browser';
 import { mergeRefs } from 'lib/utils/react';
 
-import { TextInput } from '../../../../components/properties/TextInput';
 import { Utils } from '../../utils';
 import { filterPropertyTemplates } from '../../utils/updateVisibilePropertyIds';
 import Button from '../../widgets/buttons/button';
+import { TextInput } from '../properties/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
 export type CardPageWithCustomIcon = CardPage & {

@@ -7,8 +7,8 @@ import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } fro
 import type { Card } from 'lib/databases/card';
 import { getPropertyName } from 'lib/databases/getPropertyName';
 
-import type { Mutator } from '../../../mutator';
 import { useSortable } from '../../hooks/sortable';
+import type { Mutator } from '../../mutator';
 import Button from '../../widgets/buttons/button';
 import PropertyMenu from '../../widgets/propertyMenu';
 import { PropertyLabel } from '../properties/PropertyLabel';

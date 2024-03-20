@@ -43,13 +43,6 @@ describe('components/centerPanel', () => {
   card2.title = 'card2';
   card2.fields.properties = { id: 'property_value_id_1' };
   const state = {
-    clientConfig: {
-      value: {
-        featureFlags: {
-          subscriptions: true
-        }
-      }
-    },
     boards: {
       current: board.id,
       boards: {

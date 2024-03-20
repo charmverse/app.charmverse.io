@@ -1,7 +1,6 @@
 import type { Block } from 'lib/databases/block';
 
 import type { ISharing } from './blocks/sharing';
-import type { ClientConfig } from './config/clientConfig';
 import { OctoUtils } from './octoUtils';
 import type { IUser } from './user';
 import { Utils } from './utils';
@@ -44,20 +43,6 @@ class OctoClient {
     } catch {
       return defaultValue;
     }
-  }
-
-  async getClientConfig(): Promise<ClientConfig | null> {
-    const path = '/api/focalboard/clientConfig';
-    const response = await fetch(this.getBaseURL() + path, {
-      method: 'GET',
-      headers: this.headers()
-    });
-    if (response.status !== 200) {
-      return null;
-    }
-
-    const json = (await this.getJson(response, {})) as ClientConfig;
-    return json;
   }
 
   async register(

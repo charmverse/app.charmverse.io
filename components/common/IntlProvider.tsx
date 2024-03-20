@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { IntlProvider } from 'react-intl';
 
 // import { getMessages } from 'components/common/BoardEditor/focalboard/src/i18n';
-import englishMessages from 'components/common/DatabaseEditor/focalboard/i18n/en.json';
+import englishMessages from 'components/common/DatabaseEditor/i18n/en.json';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { fetchLanguage, getLanguage } from 'components/common/DatabaseEditor/store/language';
 

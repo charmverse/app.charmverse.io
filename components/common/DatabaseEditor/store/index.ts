@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { reducer as boardsReducer } from './boards';
 import { reducer as cardsReducer } from './cards';
-import { reducer as clientConfigReducer } from './clientConfig';
 import { reducer as globalErrorReducer } from './globalError';
 import { reducer as globalTemplatesReducer } from './globalTemplates';
 import { reducer as languageReducer } from './language';
@@ -19,7 +18,6 @@ const store = configureStore({
     cards: cardsReducer,
     searchText: searchTextReducer,
     globalError: globalErrorReducer,
-    clientConfig: clientConfigReducer,
     loadingState: loadingStateReducer
   }
 });

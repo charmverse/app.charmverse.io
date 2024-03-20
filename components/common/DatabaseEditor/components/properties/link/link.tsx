@@ -2,9 +2,9 @@ import LinkIcon from '@mui/icons-material/Link';
 import type { ReactNode } from 'react';
 import React from 'react';
 
-import { TextInput } from '../../../../../components/properties/TextInput';
 import type { PropertyValueDisplayType } from '../../../interfaces';
 import { Utils } from '../../../utils';
+import { TextInput } from '../TextInput';
 
 type Props = {
   value: string;
