@@ -6,8 +6,10 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from './block';
 
+type SourceType = 'proposals';
+
 // get all the blocks of a tree, as well as any blocks from linked databases
-export async function getRelatedBlocks(blockId: string): Promise<BlockWithDetails[]> {
+export async function getRelatedBlocks(blockId: string): Promise<{ blocks: BlockWithDetails[]; source?: SourceType }> {
   const blocks = await prisma.block.findMany({
     where: {
       OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
@@ -63,6 +65,7 @@ export async function getRelatedBlocks(blockId: string): Promise<BlockWithDetail
 
     blocks.push(...linkedDatabaseBlocks);
   }
+
   const pages = await prisma.page.findMany({
     where: {
       OR: [
@@ -77,16 +80,31 @@ export async function getRelatedBlocks(blockId: string): Promise<BlockWithDetail
           }
         }
       ]
+    },
+    select: {
+      id: true,
+      title: true,
+      cardId: true,
+      boardId: true
     }
   });
 
-  return blocks
+  let source: SourceType | undefined;
+
+  const validBlocks = blocks
     .map((block) => {
+      // views do not have a page
+      if (block.type === 'view') {
+        return block as BlockWithDetails;
+      }
       const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
       // @ts-ignore mutate to be faster than spread
       block.pageId = page?.id || '';
       block.title = page?.title || '';
       return block as BlockWithDetails;
     })
-    .filter((block) => !!block.pageId);
+    // remove orphan blocks
+    .filter((block) => !!block.pageId || block.type === 'view');
+
+  return { blocks: validBlocks, source };
 }

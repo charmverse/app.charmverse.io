@@ -46,7 +46,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
     return res.status(404).json({ error: 'page not found' });
   }
 
-  const blocks = await getRelatedBlocks(blockId);
+  const { blocks } = await getRelatedBlocks(blockId);
 
   return res.status(200).json(blocks);
 }

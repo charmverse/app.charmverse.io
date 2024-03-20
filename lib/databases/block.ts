@@ -2,8 +2,8 @@ import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
-export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
-export const blockTypes = [...contentBlockTypes, 'board', 'view', 'card', 'unknown'] as const;
+// export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
+export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
 export type BlockTypes = (typeof blockTypes)[number];
 
 export type BlockPatch = {
@@ -38,7 +38,7 @@ export type Block = {
   deletedAt: number | null;
 };
 
-export type BlockWithDetails = PrismaBlock & { pageId: string };
+export type BlockWithDetails = PrismaBlock & { pageId?: string };
 
 // cant think of a better word for this.. handle some edge cases with types from the prisma client
 export type PrismaBlockSortOf = Omit<PrismaBlock, 'fields' | 'type'> & { fields: any; type: BlockTypes };

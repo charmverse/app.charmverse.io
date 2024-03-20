@@ -15,9 +15,6 @@ import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
-import { createCheckboxBlock } from './blocks/checkboxBlock';
-import { createImageBlock } from './blocks/imageBlock';
-import { createTextBlock } from './blocks/textBlock';
 import type { PageListItemsRecord } from './interfaces';
 import { Utils } from './utils';
 
@@ -156,15 +153,6 @@ class OctoUtils {
       }
       case 'card': {
         return createCard(block);
-      }
-      case 'text': {
-        return createTextBlock(block);
-      }
-      case 'image': {
-        return createImageBlock(block);
-      }
-      case 'checkbox': {
-        return createCheckboxBlock(block);
       }
       default: {
         Utils.assertFailure(`Can't hydrate unknown block type: ${block.type}`);
