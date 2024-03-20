@@ -2,10 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { resolvePageTree } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { Formatters, PropertyContext } from 'components/common/BoardEditor/focalboard/src/octoUtils';
-import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
+import type { PageListItemsRecord } from 'components/common/DatabaseEditor/interfaces';
+import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
+import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import { CardFilter } from 'lib/databases/cardFilter';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { permissionsApiClient } from 'lib/permissions/api/client';

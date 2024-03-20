@@ -1,4 +1,4 @@
-import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
+import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import type { IPropertyOption } from 'lib/databases/board';
 import type { RewardType } from 'lib/rewards/interfaces';
 

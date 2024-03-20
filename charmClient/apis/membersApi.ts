@@ -1,7 +1,7 @@
 import type { MemberProperty } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
-import type { IUser } from 'components/common/BoardEditor/focalboard/src/user';
+import type { IUser } from 'components/common/DatabaseEditor/user';
 import type {
   CreateMemberPropertyPermissionInput,
   Member,

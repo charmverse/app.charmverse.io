@@ -22,7 +22,7 @@ import type { OpenGraphProps } from 'components/_app/OpenGraphData';
 import { OpenGraphData } from 'components/_app/OpenGraphData';
 import { Web3ConnectionManager } from 'components/_app/Web3ConnectionManager';
 import { WalletSelectorModal } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/WalletSelectorModal';
-import FocalBoardProvider from 'components/common/BoardEditor/FocalBoardProvider';
+import FocalBoardProvider from 'components/common/DatabaseEditor/FocalBoardProvider';
 import ErrorBoundary from 'components/common/errors/ErrorBoundary';
 import IntlProvider from 'components/common/IntlProvider';
 import ReactDndProvider from 'components/common/ReactDndProvider';

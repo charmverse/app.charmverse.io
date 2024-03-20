@@ -4,9 +4,9 @@ import Typography from '@mui/material/Typography';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { databaseViewsLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/DatabaseEditor/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
 import { formatViewTitle } from 'lib/databases/boardView';

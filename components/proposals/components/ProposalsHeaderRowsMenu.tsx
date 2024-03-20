@@ -3,9 +3,9 @@ import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { useArchiveProposals } from 'charmClient/hooks/proposals';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
-import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import type { ViewHeaderRowsMenuProps } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import { ViewHeaderRowsMenu } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';

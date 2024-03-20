@@ -1,4 +1,4 @@
-import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
+import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
 import type { Board } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 

@@ -8,9 +8,9 @@ import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useTrashPages, useInitialPagesForSpace } from 'charmClient/hooks/pages';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { updateCards } from 'components/common/DatabaseEditor/store/cards';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import type { Block } from 'lib/databases/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';

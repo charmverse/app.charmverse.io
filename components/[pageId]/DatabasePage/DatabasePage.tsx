@@ -5,20 +5,14 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import CenterPanel from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import {
-  getCurrentBoard,
-  setCurrent as setCurrentBoard
-} from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import {
-  getCurrentBoardViews,
-  setCurrent as setCurrentView
-} from 'components/common/BoardEditor/focalboard/src/store/views';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import CenterPanel from 'components/common/DatabaseEditor/components/centerPanel';
+import FocalBoardPortal from 'components/common/DatabaseEditor/FocalBoardPortal';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/DatabaseEditor/store/boards';
+import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { getCurrentBoardViews, setCurrent as setCurrentView } from 'components/common/DatabaseEditor/store/views';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';

@@ -1,9 +1,9 @@
 import { Box, Card, Stack, FormLabel, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { authorSystemRole, allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';

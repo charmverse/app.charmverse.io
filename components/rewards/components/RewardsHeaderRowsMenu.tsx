@@ -2,9 +2,9 @@ import type { DateTime } from 'luxon';
 import { useState } from 'react';
 
 import charmClient from 'charmClient';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
-import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import type { ViewHeaderRowsMenuProps } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import { ViewHeaderRowsMenu } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';

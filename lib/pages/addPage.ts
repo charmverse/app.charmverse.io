@@ -5,7 +5,7 @@ import { mutate } from 'swr';
 import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { getPagesListCacheKey } from 'hooks/usePages';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';
 import type { Board } from 'lib/databases/board';

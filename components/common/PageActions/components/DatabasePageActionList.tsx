@@ -15,11 +15,11 @@ import type { ChangeEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import charmClient from 'charmClient';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { getCurrentBoardViews, getView } from 'components/common/BoardEditor/focalboard/src/store/views';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
+import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
+import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { getCurrentBoardViews, getView } from 'components/common/DatabaseEditor/store/views';
 import LoadingComponent from 'components/common/LoadingComponent';
 import type { ImportAction } from 'components/common/Modal/ConfirmImportModal';
 import ConfirmImportModal from 'components/common/Modal/ConfirmImportModal';

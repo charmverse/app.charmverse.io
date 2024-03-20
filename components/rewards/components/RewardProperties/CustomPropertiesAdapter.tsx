@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

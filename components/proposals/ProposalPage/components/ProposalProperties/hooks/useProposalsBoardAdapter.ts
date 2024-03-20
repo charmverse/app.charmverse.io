@@ -2,8 +2,8 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo } from 'react';
 
-import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { sortCards } from 'components/common/DatabaseEditor/store/cards';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

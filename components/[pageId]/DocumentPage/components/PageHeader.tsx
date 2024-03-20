@@ -13,9 +13,9 @@ import ListItemText from '@mui/material/ListItemText';
 import { memo, useCallback, useState } from 'react';
 
 import { PageParentChip } from 'components/[pageId]/DocumentPage/components/PageParentChip';
-import { BlockIcons } from 'components/common/BoardEditor/focalboard/src/blockIcons';
-import { randomEmojiList } from 'components/common/BoardEditor/focalboard/src/emojiList';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
+import { BlockIcons } from 'components/common/DatabaseEditor/blockIcons';
+import { randomEmojiList } from 'components/common/DatabaseEditor/emojiList';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utils/random';
 

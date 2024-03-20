@@ -4,9 +4,9 @@ import type { MockStoreEnhanced } from 'redux-mock-store';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
-import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
-import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
+import type { RootState } from 'components/common/DatabaseEditor/store';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { createTableView } from 'lib/databases/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';

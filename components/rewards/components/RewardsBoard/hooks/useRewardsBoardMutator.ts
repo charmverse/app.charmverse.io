@@ -1,9 +1,9 @@
 import type { RewardBlock } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
 
-import type { BlockUpdater } from 'components/common/BoardEditor/charmClient.interface';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { blockToFBBlock, fbBlockToBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { blockToFBBlock, fbBlockToBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';

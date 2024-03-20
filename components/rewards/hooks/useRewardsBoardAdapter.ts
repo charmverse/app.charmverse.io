@@ -1,8 +1,8 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { useMemo } from 'react';
 
-import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { sortCards } from 'components/common/DatabaseEditor/store/cards';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';

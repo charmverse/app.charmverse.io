@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
-import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { createFilterClause } from 'lib/databases/filterClause';
 import { createFilterGroup } from 'lib/databases/filterGroup';

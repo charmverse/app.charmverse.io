@@ -1,6 +1,6 @@
 /* eslint-disable default-param-last */
-import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
-import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { Mutator } from 'components/common/DatabaseEditor/mutator';
+import { IDType, Utils } from 'components/common/DatabaseEditor/utils';
 import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
 import type { Block } from 'lib/databases/block';
 import type {

@@ -4,9 +4,9 @@ import { rest } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { createTableView } from 'lib/databases/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';

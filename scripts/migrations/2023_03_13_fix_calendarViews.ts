@@ -1,7 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { BoardFields } from 'lib/databases/board';
 import { CardFields } from 'lib/databases/card';
-import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { IDType, Utils } from 'components/common/DatabaseEditor/utils';
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 
 async function init() {

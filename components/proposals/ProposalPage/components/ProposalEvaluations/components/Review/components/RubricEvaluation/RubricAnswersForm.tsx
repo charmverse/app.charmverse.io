@@ -10,8 +10,8 @@ import {
   useUpsertDraftRubricCriteriaAnswers,
   useDeleteRubricCriteriaAnswers
 } from 'charmClient/hooks/proposals';
-import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
 import { Button } from 'components/common/Button';
+import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { getNumberFromString } from 'lib/utils/numbers';

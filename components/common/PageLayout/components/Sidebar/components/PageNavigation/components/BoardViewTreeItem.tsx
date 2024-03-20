@@ -1,6 +1,6 @@
 import { forwardRef, memo } from 'react';
 
-import { iconForViewType } from 'components/common/BoardEditor/focalboard/src/components/viewMenu';
+import { iconForViewType } from 'components/common/DatabaseEditor/components/viewMenu';
 import type { IViewType } from 'lib/databases/boardView';
 
 import { StyledTreeItem, PageLink } from './PageTreeItem';

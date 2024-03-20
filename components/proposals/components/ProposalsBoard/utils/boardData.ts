@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { Block } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { createBoard } from 'lib/databases/board';

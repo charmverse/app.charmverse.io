@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 
-import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 import { propertyConfigs } from 'lib/databases/filterClause';
