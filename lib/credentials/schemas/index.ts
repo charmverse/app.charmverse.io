@@ -1,6 +1,8 @@
 // 1. Loan Officer Schema used by Financial Institution for verifying a loan officer
 import type { AttestationType } from '@charmverse/core/prisma';
 
+import type { ExternalCredential } from './external';
+import { encodeExternalCredential, externalCredentialSchemaId } from './external';
 import type { ProposalCredential } from './proposal';
 import { encodeProposalCredential, proposalCredentialSchemaId } from './proposal';
 import type { RewardCredential } from './reward';
@@ -8,18 +10,22 @@ import { encodeRewardCredential, rewardCredentialSchemaId } from './reward';
 
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
-  reward: 'Reward'
+  reward: 'Reward',
+  external: 'External'
 };
 
 export const attestationSchemaIds: Record<AttestationType, string> = {
   proposal: proposalCredentialSchemaId,
-  reward: rewardCredentialSchemaId
+  reward: rewardCredentialSchemaId,
+  external: externalCredentialSchemaId
 };
 
 export type CredentialDataInput<T extends AttestationType = AttestationType> = T extends 'proposal'
   ? ProposalCredential
   : T extends 'reward'
   ? RewardCredential
+  : T extends 'external'
+  ? ExternalCredential
   : never;
 
 export type CredentialData<T extends AttestationType = AttestationType> = {
@@ -32,6 +38,8 @@ export function encodeAttestation<T extends AttestationType = AttestationType>({
     return encodeProposalCredential(data as ProposalCredential);
   } else if (type === 'reward') {
     return encodeRewardCredential(data as RewardCredential);
+  } else if (type === 'external') {
+    return encodeExternalCredential(data as ExternalCredential);
   }
   throw new Error(`Invalid Attestation Type: ${type}'`);
 }
