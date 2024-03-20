@@ -40,7 +40,7 @@ import { isTruthy } from 'lib/utils/types';
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
 import { publishIncrementalUpdate } from '../../publisher';
-import { IDType, Utils } from '../../utils';
+import { Utils } from '../../utils';
 import AddViewMenu from '../addViewMenu';
 import { iconForViewType } from '../viewMenu';
 
@@ -258,7 +258,7 @@ function ViewTabs(props: ViewTabsProps) {
     if (!dropdownView) return;
     const newView = createBoardView(dropdownView);
     newView.title = `${dropdownView.title || `${capitalize(dropdownView.fields.viewType)} view`} copy`;
-    newView.id = Utils.createGuid(IDType.View);
+    newView.id = Utils.createGuid();
     await mutator.insertBlock(
       newView,
       'duplicate view',

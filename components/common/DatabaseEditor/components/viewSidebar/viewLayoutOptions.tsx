@@ -13,7 +13,7 @@ import { Constants } from 'lib/databases/constants';
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';
 import { updateView } from '../../store/views';
-import { IDType, Utils } from '../../utils';
+import { Utils } from '../../utils';
 import BoardIcon from '../../widgets/icons/board';
 import CalendarIcon from '../../widgets/icons/calendar';
 import GalleryIcon from '../../widgets/icons/gallery';
@@ -117,7 +117,7 @@ function LayoutOptions(props: LayoutOptionsProps) {
     // Create one if it doesn't exist
     if (!newView.fields.dateDisplayPropertyId) {
       const template: IPropertyTemplate = {
-        id: Utils.createGuid(IDType.BlockID),
+        id: Utils.createGuid(),
         name: typeDisplayName(intl, 'date'),
         type: 'date',
         options: []

@@ -1,6 +1,6 @@
 /* eslint-disable default-param-last */
 import { Mutator } from 'components/common/DatabaseEditor/mutator';
-import { IDType, Utils } from 'components/common/DatabaseEditor/utils';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
 import type { Block } from 'lib/databases/block';
 import type {
@@ -48,7 +48,7 @@ export class ProposalsMutator extends Mutator {
     template?: IPropertyTemplate
   ): Promise<string> {
     const newTemplate = template || {
-      id: Utils.createGuid(IDType.BlockID),
+      id: Utils.createGuid(),
       name: 'New Property',
       type: 'text',
       options: []

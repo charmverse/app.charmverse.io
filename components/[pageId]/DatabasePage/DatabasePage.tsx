@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import CenterPanel from 'components/common/DatabaseEditor/components/centerPanel';
-import FocalBoardPortal from 'components/common/DatabaseEditor/FocalBoardPortal';
+import DatabasePortal from 'components/common/DatabaseEditor/DatabasePortal';
 import mutator from 'components/common/DatabaseEditor/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/DatabaseEditor/store/boards';
 import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
@@ -15,7 +15,7 @@ import { getCurrentBoardViews, setCurrent as setCurrentView } from 'components/c
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { useDatabaseViews } from 'hooks/useDatabaseViews';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -43,7 +43,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const dispatch = useAppDispatch();
   const [shownCardId, setShownCardId] = useState<string | null>((router.query.cardId as string) ?? null);
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-  const { setFocalboardViewsRecord } = useFocalboardViews();
+  const { setViewsRecord } = useDatabaseViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
   const { pages } = usePages();
   const shownCardPage = Object.values(pages).find((_page) => _page?.cardId === shownCardId);
@@ -80,7 +80,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
       dispatch(setCurrentBoard(boardId));
       // Note: current view in Redux is only used for search, which we currently are not using at the moment
       dispatch(setCurrentView(urlViewId || ''));
-      setFocalboardViewsRecord((focalboardViewsRecord) => ({ ...focalboardViewsRecord, [boardId]: urlViewId }));
+      setViewsRecord((record) => ({ ...record, [boardId]: urlViewId }));
     }
   }, [page.boardId, boardViews]);
 
@@ -180,7 +180,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
           </DbViewSettingsProvider>
         </div>
         {/** include the root portal for focalboard's popup */}
-        <FocalBoardPortal />
+        <DatabasePortal />
       </>
     );
   }

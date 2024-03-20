@@ -194,7 +194,7 @@ class OctoUtils {
     const now = Date.now();
     const newBlocks = blocks.map((block) => {
       const newBlock = this.hydrateBlock(block);
-      newBlock.id = Utils.createGuid(Utils.blockTypeToIDType(newBlock.type));
+      newBlock.id = Utils.createGuid();
       newBlock.createdAt = now;
       newBlock.updatedAt = now;
       idMap[block.id] = newBlock.id;

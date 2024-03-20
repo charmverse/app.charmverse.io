@@ -8,7 +8,7 @@ import { publishDeletes, publishIncrementalUpdate } from './publisher';
 import store from './store';
 
 // load focalboard data when a workspace is selected
-function FocalBoardWatcher({ children }: { children: JSX.Element }) {
+function DatabaseWatcher({ children }: { children: JSX.Element }) {
   const { subscribe } = useWebSocketClient();
 
   const handleBlockUpdates = useCallback((value: WebSocketPayload<'blocks_updated' | 'blocks_created'>) => {
@@ -34,10 +34,10 @@ function FocalBoardWatcher({ children }: { children: JSX.Element }) {
   return children;
 }
 
-export default function FocalBoardProvider({ children }: { children: JSX.Element }) {
+export function DatabaseProvider({ children }: { children: JSX.Element }) {
   return (
     <ReduxProvider store={store}>
-      <FocalBoardWatcher>{children}</FocalBoardWatcher>
+      <DatabaseWatcher>{children}</DatabaseWatcher>
     </ReduxProvider>
   );
 }

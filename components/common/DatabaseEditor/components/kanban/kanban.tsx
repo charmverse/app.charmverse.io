@@ -17,7 +17,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { BlockChange } from '../../mutator';
 import mutator from '../../mutator';
-import { IDType, Utils } from '../../utils';
+import { Utils } from '../../utils';
 import { typeDisplayName } from '../../widgets/typeDisplayName';
 import { dragAndDropRearrange } from '../cardDetail/cardDetailContentsUtility';
 
@@ -102,7 +102,7 @@ function Kanban(props: Props) {
       Utils.log('onAddGroupClicked');
 
       const option: IPropertyOption = {
-        id: Utils.createGuid(IDType.BlockID),
+        id: Utils.createGuid(),
         value: groupName,
         color: 'propColorDefault'
       };
@@ -306,7 +306,7 @@ function Kanban(props: Props) {
 
   const createNewSelectProperty = async () => {
     const template: IPropertyTemplate = {
-      id: Utils.createGuid(IDType.BlockID),
+      id: Utils.createGuid(),
       name: typeDisplayName(props.intl, 'select'),
       type: 'select',
       options: []

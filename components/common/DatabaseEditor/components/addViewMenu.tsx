@@ -23,7 +23,7 @@ import { createTableView } from 'lib/databases/tableView';
 
 import mutator from '../mutator';
 import { publishIncrementalUpdate } from '../publisher';
-import { IDType, Utils } from '../utils';
+import { Utils } from '../utils';
 import IconButton from '../widgets/buttons/iconButton';
 import BoardIcon from '../widgets/icons/board';
 import CalendarIcon from '../widgets/icons/calendar';
@@ -188,7 +188,7 @@ function AddViewMenu(props: AddViewProps) {
     // Create one if it doesn't exist
     if (!view.fields.dateDisplayPropertyId) {
       const template: IPropertyTemplate = {
-        id: Utils.createGuid(IDType.BlockID),
+        id: Utils.createGuid(),
         name: typeDisplayName(intl, 'date'),
         type: 'date',
         options: []

@@ -8,7 +8,7 @@ import { useCallback, useState } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
-import { StyledFocalboardTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
+import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import type { RoleOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
@@ -362,7 +362,7 @@ export function RewardPropertiesForm({
                   <PropertyLabel readOnly highlighted>
                     # Available
                   </PropertyLabel>
-                  <StyledFocalboardTextInput
+                  <StyledPropertyTextInput
                     onChange={updateRewardMaxSubmissions}
                     required
                     defaultValue={values?.maxSubmissions}
@@ -459,7 +459,7 @@ export function RewardPropertiesForm({
                   Custom {getFeatureTitle('Reward')}
                 </PropertyLabel>
 
-                <StyledFocalboardTextInput
+                <StyledPropertyTextInput
                   onChange={updateRewardCustomReward}
                   value={values?.customReward ?? ''}
                   required

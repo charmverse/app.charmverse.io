@@ -47,7 +47,7 @@ const StyledInput = styled(InputBase)`
 `;
 
 // Text Input from MUI with focalboard styles
-export const StyledFocalboardTextInput = StyledInput as typeof TextField;
+export const StyledPropertyTextInput = StyledInput as typeof TextField;
 
 function Editable(
   {

@@ -1,7 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardFields } from 'lib/databases/board';
-import { CardFields } from 'lib/databases/card';
-import { IDType, Utils } from 'components/common/DatabaseEditor/utils';
+import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 
 async function init() {
@@ -20,7 +18,7 @@ async function init() {
       counts.needsDate++;
 
       const template: IPropertyTemplate = {
-        id: Utils.createGuid(IDType.BlockID),
+        id: Utils.createGuid(),
         name: 'Date',
         type: 'date',
         options: []

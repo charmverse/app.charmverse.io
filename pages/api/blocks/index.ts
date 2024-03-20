@@ -86,7 +86,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
     if ((candidateParentBoardPage?.fields as any as BoardFields).sourceType === 'proposals') {
       if (data[0].id) {
-        // Focalboard pre-emptively adds the card to the cardOrder prop. This prevents invalid property IDs building up in the cardOrder prop
+        // we pre-emptively add the card to the cardOrder prop. This prevents invalid property IDs building up in the cardOrder prop
         const viewsToClean = candidateParentProposalViewBlocks.filter((viewBlock) =>
           (viewBlock.fields as BoardViewFields).cardOrder.includes(data[0].id as string)
         );

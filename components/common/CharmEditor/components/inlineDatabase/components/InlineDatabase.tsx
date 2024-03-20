@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import FocalBoardPortal from 'components/common/DatabaseEditor/FocalBoardPortal';
+import FocalBoardPortal from 'components/common/DatabaseEditor/DatabasePortal';
 import { getBoards } from 'components/common/DatabaseEditor/store/boards';
 import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';

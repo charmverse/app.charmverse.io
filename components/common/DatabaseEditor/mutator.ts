@@ -24,7 +24,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { OctoUtils } from './octoUtils';
 import { publishIncrementalUpdate } from './publisher';
 import undoManager from './undomanager';
-import { IDType, Utils } from './utils';
+import { Utils } from './utils';
 
 export interface BlockChange {
   block: Block;
@@ -86,7 +86,7 @@ export class Mutator {
       Utils.assertFailure('UndoManager does not support nested groups');
       return undefined;
     }
-    this.undoGroupId = Utils.createGuid(IDType.None);
+    this.undoGroupId = Utils.createGuid();
     return this.undoGroupId;
   }
 
@@ -395,7 +395,7 @@ export class Mutator {
     template?: IPropertyTemplate
   ): Promise<string> {
     const newTemplate = template || {
-      id: Utils.createGuid(IDType.BlockID),
+      id: Utils.createGuid(),
       name: 'New Property',
       type: 'text',
       options: []
@@ -447,7 +447,7 @@ export class Mutator {
     }
     const srcTemplate = newBoard.fields.cardProperties[index];
     const newTemplate: IPropertyTemplate = {
-      id: Utils.createGuid(IDType.BlockID),
+      id: Utils.createGuid(),
       name: `${srcTemplate.name} copy`,
       type: srcTemplate.type,
       options: srcTemplate.options.slice()
@@ -740,7 +740,7 @@ export class Mutator {
             let option = newTemplate.options.find((o: IPropertyOption) => o.value === oldValue);
             if (!option) {
               option = {
-                id: Utils.createGuid(IDType.None),
+                id: Utils.createGuid(),
                 value: oldValue,
                 color: 'propColorDefault'
               };

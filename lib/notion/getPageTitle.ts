@@ -8,7 +8,7 @@ export function getPageTitleText(page: PageObjectResponse | DatabaseObjectRespon
   if (page.object === 'database') {
     title = convertToPlainText(page.title);
   } else if (page.parent.type === 'database_id') {
-    // Focalboard cards
+    // db cards
     title = convertToPlainText(
       (Object.values(page.properties).find((property) => property.type === 'title') as any).title
     );

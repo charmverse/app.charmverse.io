@@ -22,7 +22,7 @@ import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../mutator';
 import { OctoUtils } from '../../octoUtils';
-import { IDType, Utils } from '../../utils';
+import { Utils } from '../../utils';
 import { filterPropertyTemplates } from '../../utils/updateVisibilePropertyIds';
 import Button from '../../widgets/buttons/button';
 import { PropertyTypes } from '../../widgets/propertyTypes';
@@ -186,7 +186,7 @@ function TableHeaders(props: Props): JSX.Element {
           onClick={async ({ type, relationData, name }) => {
             addPropertyPopupState.close();
             const template: IPropertyTemplate = {
-              id: Utils.createGuid(IDType.BlockID),
+              id: Utils.createGuid(),
               name: name ?? typeDisplayName(intl, type),
               type,
               options: [],

@@ -19,7 +19,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { Mutator } from '../../mutator';
 import defaultMutator from '../../mutator';
-import { IDType, Utils } from '../../utils';
+import { Utils } from '../../utils';
 import Button from '../../widgets/buttons/button';
 import { PropertyTypes } from '../../widgets/propertyTypes';
 import { typeDisplayName } from '../../widgets/typeDisplayName';
@@ -251,7 +251,7 @@ function CardDetailProperties(props: Props) {
         isMobile={isSmallScreen}
         onClick={async ({ type, relationData, name }) => {
           const template: IPropertyTemplate = {
-            id: Utils.createGuid(IDType.BlockID),
+            id: Utils.createGuid(),
             name: name ?? typeDisplayName(intl, type),
             type,
             options: [],

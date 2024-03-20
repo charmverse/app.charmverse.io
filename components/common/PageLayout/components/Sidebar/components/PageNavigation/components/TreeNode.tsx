@@ -7,7 +7,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/DatabaseEditor/store/views';
-import { useFocalboardViews } from 'hooks/useFocalboardViews';
+import { useDatabaseViews } from 'hooks/useDatabaseViews';
 import useRefState from 'hooks/useRefState';
 import { formatViewTitle } from 'lib/databases/boardView';
 import { mergeRefs } from 'lib/utils/react';
@@ -154,7 +154,7 @@ function DraggableTreeNode({
     [item.id, addPage]
   );
 
-  const { focalboardViewsRecord, setFocalboardViewsRecord } = useFocalboardViews();
+  const { viewsRecord, setViewsRecord } = useDatabaseViews();
 
   const selectSortedViews = useMemo(makeSelectSortedViews, []);
   const views = useAppSelector((state) => selectSortedViews(state, item.id));
@@ -170,17 +170,17 @@ function DraggableTreeNode({
   const hideChildren = !expanded;
 
   useEffect(() => {
-    const focalboardViewId = focalboardViewsRecord[item.id];
+    const focalboardViewId = viewsRecord[item.id];
     if (views && focalboardViewId && item.type.match(/board/) && !views.some((view) => view.id === focalboardViewId)) {
       const firstView = views[0];
       if (firstView) {
-        setFocalboardViewsRecord((_focalboardViewsRecord) => ({
-          ..._focalboardViewsRecord,
+        setViewsRecord((_viewsRecord) => ({
+          ..._viewsRecord,
           [firstView.parentId]: firstView.id
         }));
       }
     }
-  }, [focalboardViewsRecord, views, item]);
+  }, [viewsRecord, views, item]);
 
   return (
     <PageTreeItem
@@ -191,7 +191,7 @@ function DraggableTreeNode({
       ref={dndEnabled ? mergeRefs([ref, drag, drop, dragPreview, focusListener]) : null}
       label={item.title}
       href={`${pathPrefix}/${item.path}${
-        item.type.includes('board') && focalboardViewsRecord[item.id] ? `?viewId=${focalboardViewsRecord[item.id]}` : ''
+        item.type.includes('board') && viewsRecord[item.id] ? `?viewId=${viewsRecord[item.id]}` : ''
       }`}
       pagePath={item.path}
       isActive={isActive}
