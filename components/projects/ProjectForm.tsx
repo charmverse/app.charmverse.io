@@ -4,7 +4,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { ProjectEditorFieldConfig, ProjectValues } from './interfaces';
+import type { ProjectEditorFieldConfig, ProjectFieldConfig, ProjectValues } from './interfaces';
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import {
   projectMemberDefaultValues,
@@ -34,7 +34,7 @@ export function ProjectFormAnswers({
             ..._project
           });
         }}
-        fieldConfig={fieldConfig}
+        fieldConfig={fieldConfig as ProjectFieldConfig}
       />
       <Typography variant='h5' mt={2}>
         Team Info
@@ -47,7 +47,7 @@ export function ProjectFormAnswers({
             members: [projectMember, ...values.members.slice(1)]
           });
         }}
-        fieldConfig={fieldConfig?.members[0] ?? {}}
+        fieldConfig={fieldConfig?.members[0]}
         values={projectMemberDefaultValues}
       />
       <Divider
@@ -66,7 +66,7 @@ export function ProjectFormAnswers({
                 members: [...values.members.slice(0, index + 1), projectMember, ...values.members.slice(index + 2)]
               });
             }}
-            fieldConfig={fieldConfig?.members[index + 1] ?? {}}
+            fieldConfig={fieldConfig?.members[index + 1]}
             values={member}
           />
           <Divider

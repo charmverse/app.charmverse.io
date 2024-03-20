@@ -13,6 +13,7 @@ export type StaticPageType =
   | 'members_list'
   | 'settings/my-account'
   | 'settings/my-profile'
+  | 'settings/my-projects'
   | 'settings/my-charms'
   | 'settings/api'
   | 'settings/space'

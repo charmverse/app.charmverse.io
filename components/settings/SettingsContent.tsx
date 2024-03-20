@@ -31,6 +31,7 @@ import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
 import { SpaceCredentialSettings } from './credentials/SpaceCredentialSettings';
 import { ImportSettings } from './import/ImportSettings';
 import { Invites } from './invites/Invites';
+import { ProjectsSettings } from './projects/ProjectsSettings';
 import { SpaceProposalSettings } from './proposals/SpaceProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
 import { SpaceSettings } from './space/SpaceSettings';
@@ -196,7 +197,13 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         {ACCOUNT_TABS.map((tab) => {
           return (
             <TabPanel key={tab.path} value={activePath ?? ''} index={tab.path}>
-              {tab.path === 'account' ? <AccountSettings /> : tab.path === 'charms' ? <CharmsSettings /> : null}
+              {tab.path === 'account' ? (
+                <AccountSettings />
+              ) : tab.path === 'charms' ? (
+                <CharmsSettings />
+              ) : tab.path === 'projects' ? (
+                <ProjectsSettings />
+              ) : null}
             </TabPanel>
           );
         })}

@@ -27,8 +27,9 @@ export function FieldAnswers<Values extends Record<string, any> = Record<string,
           label={property.label}
           multiline={property.field === 'previousProjects'}
           rows={property.field === 'previousProjects' ? 5 : 1}
-          required={fieldConfig?.[property.field]?.required ?? true}
+          required={fieldConfig?.[property.field]?.required ?? false}
           disabled={onChange === undefined}
+          value={values?.[property.field]}
           onChange={(e) => {
             onChange?.({
               ...values,
