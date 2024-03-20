@@ -10,7 +10,7 @@ import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { prettyPrint } from 'lib/utils/strings';
 import { publishCredentialIssuableEvent } from 'lib/webhookPublisher/publishEvent';
 
-import { signAndPublishCharmverseCredential } from './attestOffchain';
+import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
 import type { CredentialDataInput } from './schemas';
@@ -202,7 +202,7 @@ export async function issueProposalCredentialsIfNecessary({
               }
             });
           } else {
-            await signAndPublishCharmverseCredential({
+            await signPublishAndRecordCharmverseCredential({
               chainId: optimism.id,
               recipient: targetWallet.address,
               credential: {
