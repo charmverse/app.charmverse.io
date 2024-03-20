@@ -197,6 +197,7 @@ export async function signAndPublishCharmverseCredential({
     pageId,
     event,
     proposalId,
+    rewardApplicationId,
     userId: recipientUserId,
     credentialTemplateId
   });
