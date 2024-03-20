@@ -970,10 +970,8 @@ export async function generateProposal({
  * @returns
  */
 export async function generateBoard({
-  id,
   createdBy,
   spaceId,
-  // parentId,
   cardCount,
   boardTitle,
   views,
@@ -986,10 +984,8 @@ export async function generateBoard({
   deletedAt,
   permissions
 }: {
-  id?: string;
   createdBy: string;
   spaceId: string;
-  // parentId?: string;
   cardCount?: number;
   boardTitle?: string;
   views?: number;
@@ -1006,7 +1002,6 @@ export async function generateBoard({
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
     spaceId,
-    // parentId,
     cardCount,
     views,
     boardTitle,

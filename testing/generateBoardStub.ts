@@ -28,7 +28,6 @@ export type CustomBoardProps = {
 export function boardWithCardsArgs({
   createdBy,
   spaceId,
-  parentId,
   cardCount = 2,
   addPageContent,
   views = 1,
@@ -42,7 +41,6 @@ export function boardWithCardsArgs({
 }: {
   createdBy: string;
   spaceId: string;
-  parentId?: string;
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
@@ -75,7 +73,6 @@ export function boardWithCardsArgs({
     icon: '📝',
     path: `page-${v4()}`,
     isTemplate: false,
-    parentId,
     spaceId,
     type: boardPageType ?? 'board',
     boardId,
