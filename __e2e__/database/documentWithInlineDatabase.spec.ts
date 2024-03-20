@@ -100,8 +100,8 @@ test.beforeAll(async () => {
     },
     data: {
       content: generatePageContentWithInlineDatabaseRefs({
-        inlineDatabaseId: inlineDatabase.id,
-        inlineLinkedDatabaseId: inlineLinkedDatabase.id
+        inlineDBPageId: inlineDatabase.id,
+        inlineLinkedDBPageId: inlineLinkedDatabase.id
       })
     }
   });
