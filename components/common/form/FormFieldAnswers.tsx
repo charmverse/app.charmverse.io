@@ -5,10 +5,6 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import type { ProjectValues, ProjectEditorFieldConfig } from 'components/projects/interfaces';
-import { projectDefaultValues } from 'components/projects/ProjectFields';
-import { ProjectFormAnswers } from 'components/projects/ProjectForm';
-import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -95,6 +91,7 @@ export function FormFieldAnswersControlled({
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
   const debouncedValues = useDebouncedValue(values, 300);
+
   const hasErrors = Object.keys(errors).length !== 0;
   async function saveFormFieldAnswers() {
     if (hasErrors) {
@@ -167,12 +164,17 @@ export function FormFieldAnswersControlled({
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
                     formField={{
-                      id: formField.id,
                       extraFields: formField.extraFields,
                       value: field.value
                     }}
                     onChange={(projectFormValues) => {
-                      onFormChange(projectFormValues);
+                      setIsFormDirty(true);
+                      onFormChange([
+                        {
+                          id: formField.id,
+                          value: projectFormValues
+                        }
+                      ]);
                     }}
                   />
                 ) : (

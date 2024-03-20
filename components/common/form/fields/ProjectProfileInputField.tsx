@@ -14,15 +14,10 @@ export function ProjectProfileInputField({
   onChange,
   formField
 }: {
-  formField: Pick<FormField, 'extraFields' | 'id'> & {
+  formField: Pick<FormField, 'extraFields'> & {
     value?: FormFieldValue;
   };
-  onChange: (
-    updatedFields: {
-      id: string;
-      value: FormFieldValue;
-    }[]
-  ) => void;
+  onChange: (updatedValue: FormFieldValue) => void;
 }) {
   const { data } = useGetProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(null);
@@ -43,7 +38,7 @@ export function ProjectProfileInputField({
         value={selectedProject?.id}
         onChange={(e) => {
           const projectId = e.target.value as string;
-          onChange([{ id: formField.id, value: { projectId } }]);
+          onChange({ projectId });
         }}
         renderValue={() => {
           if (!selectedProject) {
