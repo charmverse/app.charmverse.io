@@ -2,8 +2,6 @@ import { configureStore } from '@reduxjs/toolkit';
 
 import { reducer as boardsReducer } from './boards';
 import { reducer as cardsReducer } from './cards';
-import { reducer as globalErrorReducer } from './globalError';
-import { reducer as globalTemplatesReducer } from './globalTemplates';
 import { reducer as languageReducer } from './language';
 import { reducer as loadingStateReducer } from './loadingState';
 import { reducer as searchTextReducer } from './searchText';
@@ -12,12 +10,10 @@ import { reducer as viewsReducer } from './views';
 const store = configureStore({
   reducer: {
     language: languageReducer,
-    globalTemplates: globalTemplatesReducer,
     boards: boardsReducer,
     views: viewsReducer,
     cards: cardsReducer,
     searchText: searchTextReducer,
-    globalError: globalErrorReducer,
     loadingState: loadingStateReducer
   }
 });

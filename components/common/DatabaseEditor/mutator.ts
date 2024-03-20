@@ -21,7 +21,6 @@ import type { FilterClause } from 'lib/databases/filterClause';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import octoClient from './octoClient';
 import { OctoUtils } from './octoUtils';
 import { publishIncrementalUpdate } from './publisher';
 import undoManager from './undomanager';
@@ -1128,16 +1127,6 @@ export class Mutator {
       },
       () => {}
     );
-  }
-
-  // Not a mutator, but convenient to put here since Mutator wraps OctoClient
-  async exportArchive(boardID?: string): Promise<Block[]> {
-    return octoClient.exportArchive(boardID);
-  }
-
-  // Not a mutator, but convenient to put here since Mutator wraps OctoClient
-  async importFullArchive(blocks: readonly Block[]): Promise<Response> {
-    return octoClient.importFullArchive(blocks);
   }
 
   get canUndo(): boolean {

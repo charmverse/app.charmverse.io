@@ -4,7 +4,6 @@ import { Provider as ReduxProvider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 
 import mutator from '../../mutator';
-import octoClient from '../../octoClient';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
 
@@ -12,7 +11,6 @@ import GalleryCard from './galleryCard';
 
 jest.mock('../../mutator');
 jest.mock('../../utils');
-jest.mock('../../octoClient');
 jest.mock('next/router', () => ({
   useRouter: () => ({
     pathname: '/[domain]/',
@@ -24,10 +22,6 @@ jest.mock('next/router', () => ({
 }));
 
 describe('src/components/gallery/GalleryCard', () => {
-  const mockedMutator = jest.mocked(mutator, { shallow: true });
-  const mockedOcto = jest.mocked(octoClient, { shallow: true });
-  mockedOcto.getFileAsDataUrl.mockResolvedValue('test.jpg');
-
   const board = TestBlockFactory.createBoard();
   board.id = 'boardId';
 
