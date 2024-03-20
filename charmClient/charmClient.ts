@@ -15,7 +15,7 @@ import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { BlockPatch, Block as FBBlock } from 'lib/databases/block';
+import type { BlockWithDetails, BlockPatch, Block as FBBlock } from 'lib/databases/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
@@ -208,7 +208,7 @@ class CharmClient {
 
   getSubtree({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/subtree`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/subtree`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }

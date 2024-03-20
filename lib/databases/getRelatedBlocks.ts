@@ -4,8 +4,10 @@ import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
 import { isTruthy } from 'lib/utils/types';
 
+import type { BlockWithDetails } from './block';
+
 // get all the blocks of a tree, as well as any blocks from linked databases
-export async function getRelatedBlocks(blockId: string) {
+export async function getRelatedBlocks(blockId: string): Promise<BlockWithDetails[]> {
   const blocks = await prisma.block.findMany({
     where: {
       OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
@@ -61,5 +63,30 @@ export async function getRelatedBlocks(blockId: string) {
 
     blocks.push(...linkedDatabaseBlocks);
   }
-  return blocks;
+  const pages = await prisma.page.findMany({
+    where: {
+      OR: [
+        {
+          cardId: {
+            in: blocks.map((b) => b.id)
+          }
+        },
+        {
+          boardId: {
+            in: blocks.map((b) => b.id)
+          }
+        }
+      ]
+    }
+  });
+
+  return blocks
+    .map((block) => {
+      const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
+      // @ts-ignore mutate to be faster than spread
+      block.pageId = page?.id || '';
+      block.title = page?.title || '';
+      return block as BlockWithDetails;
+    })
+    .filter((block) => !!block.pageId);
 }
