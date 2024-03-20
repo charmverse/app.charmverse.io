@@ -1047,9 +1047,10 @@ export async function generateBoard({
   const permissionsToCreate = prisma.pagePermission.createMany({
     data: permissionCreateArgs as any
   });
+
   return prisma
-    .$transaction([...pageArgs.map((p) => createPageDb(p)), prisma.block.createMany(blockArgs), permissionsToCreate])
-    .then((result) => result[0] as Page);
+    .$transaction([prisma.block.createMany(blockArgs), ...pageArgs.map((p) => createPageDb(p)), permissionsToCreate])
+    .then((result) => result[1] as Page);
 }
 
 export async function generateForumComment({

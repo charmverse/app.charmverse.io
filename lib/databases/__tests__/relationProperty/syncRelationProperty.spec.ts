@@ -75,6 +75,9 @@ describe('syncRelationProperty', () => {
       select: {
         id: true,
         fields: true
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 
@@ -86,6 +89,9 @@ describe('syncRelationProperty', () => {
       },
       select: {
         id: true
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 
@@ -96,6 +102,9 @@ describe('syncRelationProperty', () => {
       },
       select: {
         id: true
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 
@@ -107,6 +116,9 @@ describe('syncRelationProperty', () => {
       },
       select: {
         id: true
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 

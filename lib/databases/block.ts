@@ -38,7 +38,7 @@ export type Block = {
   deletedAt: number | null;
 };
 
-export type BlockWithDetails = PrismaBlock & { pageId?: string };
+export type BlockWithDetails = PrismaBlock & { pageId?: string; icon?: string; hasContent?: boolean };
 
 // cant think of a better word for this.. handle some edge cases with types from the prisma client
 export type PrismaBlockSortOf = Omit<PrismaBlock, 'fields' | 'type'> & { fields: any; type: BlockTypes };

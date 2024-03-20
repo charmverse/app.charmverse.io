@@ -83,24 +83,29 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     },
     select: {
       id: true,
+      icon: true,
       title: true,
       cardId: true,
-      boardId: true
+      boardId: true,
+      updatedAt: true,
+      updatedBy: true
     }
   });
 
   let source: SourceType | undefined;
 
-  const validBlocks = blocks
-    .map((block) => {
-      const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
-      // @ts-ignore mutate to be faster than spread
-      block.pageId = page?.id;
-      block.title = page?.title || block.title;
-      return block as BlockWithDetails;
-    })
-    // remove orphan blocks
-    .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
-
+  const validBlocks = blocks.map((block) => {
+    const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
+    const blockWithDetails = block as BlockWithDetails;
+    blockWithDetails.pageId = page?.id;
+    blockWithDetails.icon = page?.title || block.title;
+    blockWithDetails.hasContent = true; // not really necesssary to show this, which requires retrieving all content columns
+    blockWithDetails.title = page?.title || block.title;
+    blockWithDetails.updatedAt = page?.updatedAt || block.updatedAt;
+    blockWithDetails.updatedBy = page?.updatedBy || block.updatedBy;
+    return blockWithDetails;
+  });
+  // remove orphan blocks
+  // .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
   return { blocks: validBlocks, source };
 }

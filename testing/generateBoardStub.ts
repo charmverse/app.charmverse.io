@@ -387,6 +387,15 @@ export function boardWithCardsArgs({
           id: createdBy
         }
       },
+      card:
+        page.type === 'card'
+          ? {
+              connect: {
+                id: page.id
+              }
+            }
+          : undefined,
+      boardId: page.type === 'board' ? page.id : undefined,
       space: {
         connect: {
           id: spaceId
