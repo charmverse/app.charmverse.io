@@ -13,7 +13,7 @@ type MetadataOnchainDetails = {
   protocol: bigint;
 };
 
-type Owners = readonly `0x${string}`[];
+export type Owners = readonly `0x${string}`[];
 
 type ProjectOnchainDetails = readonly [bigint, MetadataOnchainDetails];
 
