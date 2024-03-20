@@ -3,7 +3,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-var-requires */
-const BundleAnalyzer = require('@next/bundle-analyzer');
+const BundleAnalyzer = require('next-bundle-analyzer');
 
 const esmModules = require('./next.base').esmModules;
 
