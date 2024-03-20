@@ -72,6 +72,8 @@ describe('generateCredentialInputsForProposal', () => {
         credentialTemplateId: credentialTemplateId1,
         recipientAddress: authorWalletAddress1,
         recipientUserId: authorId1,
+        pageId: proposal.page.id,
+        event: 'proposal_approved',
         credential: {
           Description: space.credentialTemplates[0].description,
           Name: space.credentialTemplates[0].name,
@@ -85,6 +87,8 @@ describe('generateCredentialInputsForProposal', () => {
         credentialTemplateId: credentialTemplateId1,
         recipientAddress: authorWalletAddress2,
         recipientUserId: authorId2,
+        pageId: proposal.page.id,
+        event: 'proposal_approved',
         credential: {
           Description: space.credentialTemplates[0].description,
           Name: space.credentialTemplates[0].name,
@@ -98,6 +102,8 @@ describe('generateCredentialInputsForProposal', () => {
         credentialTemplateId: credentialTemplateId1,
         recipientAddress: authorWalletAddress1,
         recipientUserId: authorId1,
+        pageId: proposal.page.id,
+        event: 'proposal_created',
         credential: {
           Description: space.credentialTemplates[0].description,
           Name: space.credentialTemplates[0].name,
@@ -111,6 +117,8 @@ describe('generateCredentialInputsForProposal', () => {
         credentialTemplateId: credentialTemplateId1,
         recipientAddress: authorWalletAddress2,
         recipientUserId: authorId2,
+        pageId: proposal.page.id,
+        event: 'proposal_created',
         credential: {
           Description: space.credentialTemplates[0].description,
           Name: space.credentialTemplates[0].name,
@@ -274,6 +282,8 @@ describe('generateCredentialInputsForProposal', () => {
         recipientUserId: authorId1,
         recipientAddress: authorWalletAddress1,
         credentialTemplateId: credentialTemplateId1,
+        event: 'proposal_approved',
+        pageId: proposal.page.id,
         credential: {
           Description: space.credentialTemplates[0].description,
           Name: space.credentialTemplates[0].name,
