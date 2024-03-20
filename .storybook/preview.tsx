@@ -49,8 +49,8 @@ import 'components/common/DatabaseEditor/widgets/checkbox.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-vars.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-indent.scss';
 import 'components/common/CharmEditor/components/listItemNew/czi-list.scss';
-import 'theme/focalboard/focalboard.button.scss';
-import 'theme/focalboard/focalboard.main.scss';
+import 'theme/databases/databases.button.scss';
+import 'theme/databases/databases.main.scss';
 import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
