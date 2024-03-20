@@ -12,7 +12,7 @@ type SourceType = 'proposals';
 export async function getRelatedBlocks(blockId: string): Promise<{ blocks: BlockWithDetails[]; source?: SourceType }> {
   const blocks = await prisma.block.findMany({
     where: {
-      OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
+      OR: [{ id: blockId }, { rootId: blockId }]
     }
   });
 
