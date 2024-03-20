@@ -2,8 +2,8 @@ import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { usePreventReload } from 'hooks/usePreventReload';
 

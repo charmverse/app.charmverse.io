@@ -22,11 +22,11 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { FormFieldAnswersControlled } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';

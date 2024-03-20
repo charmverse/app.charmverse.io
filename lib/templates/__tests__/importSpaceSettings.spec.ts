@@ -12,8 +12,8 @@ import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { BoardFields } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
 
 import type { SpaceDataExport } from '../exportSpaceData';
 import type { SpaceSettingsExport } from '../exportSpaceSettings';

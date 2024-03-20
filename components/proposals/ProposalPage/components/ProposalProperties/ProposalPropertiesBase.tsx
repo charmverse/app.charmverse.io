@@ -4,8 +4,8 @@ import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/mate
 import { useEffect, useState } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
+import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';

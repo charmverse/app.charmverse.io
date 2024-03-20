@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { PropertyType } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';
 import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';

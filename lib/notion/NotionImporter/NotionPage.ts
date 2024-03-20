@@ -9,7 +9,7 @@ import type {
 import promiseRetry from 'promise-retry';
 import { v4 } from 'uuid';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 

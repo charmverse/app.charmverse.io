@@ -54,7 +54,7 @@ export function GlobalComponents() {
     }
   };
 
-  // Moving it inside usePages doesn't work since <FocalboardProvider> is located aboev
+  // Moving it inside usePages doesn't work since <DatabaseProvider> is located aboev
   useEffect(() => {
     const unsubscribeRestoreListener = subscribe('pages_restored', handlePagesRestoredEvent);
     return () => {

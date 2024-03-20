@@ -1,4 +1,4 @@
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 
 export function convertPropertyType(propertyType: string): PropertyType | null {
   switch (propertyType) {

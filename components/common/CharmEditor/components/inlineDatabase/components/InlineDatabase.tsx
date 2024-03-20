@@ -4,11 +4,11 @@ import { useRouter } from 'next/router';
 import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { getBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { makeSelectSortedViews, makeSelectView } from 'components/common/BoardEditor/focalboard/src/store/views';
-import FocalBoardPortal from 'components/common/BoardEditor/FocalBoardPortal';
+import FocalBoardPortal from 'components/common/DatabaseEditor/DatabasePortal';
+import { getBoards } from 'components/common/DatabaseEditor/store/boards';
+import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { makeSelectSortedViews, makeSelectView } from 'components/common/DatabaseEditor/store/views';
 import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
@@ -21,7 +21,7 @@ import type { CharmNodeViewProps } from '../../nodeView/nodeView';
 import { InlineDatabaseContainer } from './InlineDatabaseContainer';
 
 // Lazy load focalboard entrypoint (ignoring the redux state stuff for now)
-const CenterPanel = dynamic(() => import('components/common/BoardEditor/focalboard/src/components/centerPanel'), {
+const CenterPanel = dynamic(() => import('components/common/DatabaseEditor/components/centerPanel'), {
   ssr: false
 });
 

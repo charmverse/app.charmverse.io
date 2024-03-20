@@ -2,9 +2,9 @@ import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } fr
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
 import { Button } from 'components/common/Button';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';

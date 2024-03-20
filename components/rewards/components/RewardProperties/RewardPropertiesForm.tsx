@@ -7,12 +7,12 @@ import type { ChangeEvent } from 'react';
 import { useCallback, useState } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { StyledFocalboardTextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import type { RoleOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import Checkbox from 'components/common/BoardEditor/focalboard/src/widgets/checkbox';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
+import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
+import type { RoleOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
+import Checkbox from 'components/common/DatabaseEditor/widgets/checkbox';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
@@ -362,7 +362,7 @@ export function RewardPropertiesForm({
                   <PropertyLabel readOnly highlighted>
                     # Available
                   </PropertyLabel>
-                  <StyledFocalboardTextInput
+                  <StyledPropertyTextInput
                     onChange={updateRewardMaxSubmissions}
                     required
                     defaultValue={values?.maxSubmissions}
@@ -459,7 +459,7 @@ export function RewardPropertiesForm({
                   Custom {getFeatureTitle('Reward')}
                 </PropertyLabel>
 
-                <StyledFocalboardTextInput
+                <StyledPropertyTextInput
                   onChange={updateRewardCustomReward}
                   value={values?.customReward ?? ''}
                   required

@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
-import { createCard } from 'lib/focalboard/card';
+import { createCard } from 'lib/databases/card';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { convertToPlainText } from '../convertToPlainText';

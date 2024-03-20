@@ -1,8 +1,8 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { ProposalBlock } from '@charmverse/core/prisma-client';
 
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { BoardFields } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
 
 export type ProposalPropertyOption = { id: string; color: string; value: string };
 

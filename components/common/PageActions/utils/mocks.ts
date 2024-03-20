@@ -1,6 +1,6 @@
 import type { ParseResult } from 'papaparse';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 
 import type { MappedProperties } from './databasePageOptions';
 

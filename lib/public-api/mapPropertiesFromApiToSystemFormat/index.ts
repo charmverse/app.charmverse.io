@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 import { InvalidStateError } from 'lib/middleware';
 import type { BoardPropertyValue, PageProperty } from 'lib/public-api/interfaces';
 

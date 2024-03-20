@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 as uuid } from 'uuid';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 import type { PageProperty } from 'lib/public-api/interfaces';
 import type { UpdateableDatabaseFields } from 'lib/public-api/mapPropertiesFromApiToSystemFormat';
 
