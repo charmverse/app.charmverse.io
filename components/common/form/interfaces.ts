@@ -17,7 +17,9 @@ export type FormFieldValue =
       contentText: string;
     }
   | UploadedFileInfo
-  | ProjectValues;
+  | {
+      projectId: string;
+    };
 
 export type ControlFieldProps<T extends FormFieldValue = FormFieldValue> = {
   onChange?: (value: any) => void;

@@ -19,7 +19,7 @@ export function ProjectFormAnswers({
   showAddTeamMemberButton
 }: {
   values: ProjectValues;
-  onChange: (project: ProjectValues) => void;
+  onChange?: (project: ProjectValues) => void;
   fieldConfig?: ProjectEditorFieldConfig;
   showAddTeamMemberButton?: boolean;
 }) {
@@ -28,12 +28,16 @@ export function ProjectFormAnswers({
       <Typography variant='h5'>Project Info</Typography>
       <ProjectFieldAnswers
         values={values}
-        onChange={(_project) => {
-          onChange({
-            ...values,
-            ..._project
-          });
-        }}
+        onChange={
+          onChange === undefined
+            ? undefined
+            : (_project) => {
+                onChange({
+                  ...values,
+                  ..._project
+                });
+              }
+        }
         fieldConfig={fieldConfig as ProjectFieldConfig}
       />
       <Typography variant='h5' mt={2}>
@@ -41,12 +45,16 @@ export function ProjectFormAnswers({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldAnswers
-        onChange={(projectMember) => {
-          onChange({
-            ...values,
-            members: [projectMember, ...values.members.slice(1)]
-          });
-        }}
+        onChange={
+          onChange === undefined
+            ? undefined
+            : (projectMember) => {
+                onChange({
+                  ...values,
+                  members: [projectMember, ...values.members.slice(1)]
+                });
+              }
+        }
         fieldConfig={fieldConfig?.members?.[0]}
         values={projectMemberDefaultValues}
       />
@@ -60,12 +68,20 @@ export function ProjectFormAnswers({
         <>
           <FieldLabel>Add a team member</FieldLabel>
           <ProjectMemberFieldAnswers
-            onChange={(projectMember) => {
-              onChange({
-                ...values,
-                members: [...values.members.slice(0, index + 1), projectMember, ...values.members.slice(index + 2)]
-              });
-            }}
+            onChange={
+              onChange === undefined
+                ? undefined
+                : (projectMember) => {
+                    onChange({
+                      ...values,
+                      members: [
+                        ...values.members.slice(0, index + 1),
+                        projectMember,
+                        ...values.members.slice(index + 2)
+                      ]
+                    });
+                  }
+            }
             fieldConfig={fieldConfig?.members[index + 1]}
             values={member}
           />
@@ -76,7 +92,7 @@ export function ProjectFormAnswers({
           />
         </>
       ))}
-      {showAddTeamMemberButton && (
+      {showAddTeamMemberButton && onChange && (
         <Button
           sx={{
             width: 'fit-content'

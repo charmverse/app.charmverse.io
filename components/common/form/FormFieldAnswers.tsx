@@ -19,6 +19,7 @@ import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
+import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
@@ -164,21 +165,14 @@ export function FormFieldAnswersControlled({
               control={control}
               render={({ field }) =>
                 formField.type === 'project_profile' ? (
-                  <ProjectFormAnswers
-                    fieldConfig={formField.extraFields as ProjectEditorFieldConfig}
-                    values={
-                      (formField?.value as ProjectValues) ?? {
-                        ...projectDefaultValues,
-                        members: [projectMemberDefaultValues]
-                      }
-                    }
+                  <ProjectProfileInputField
+                    formField={{
+                      id: formField.id,
+                      extraFields: formField.extraFields,
+                      value: field.value
+                    }}
                     onChange={(projectFormValues) => {
-                      onFormChange([
-                        {
-                          id: formField.id,
-                          value: projectFormValues
-                        }
-                      ]);
+                      onFormChange(projectFormValues);
                     }}
                   />
                 ) : (
