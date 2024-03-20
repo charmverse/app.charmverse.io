@@ -93,6 +93,9 @@ export type SignedAttestation = {
   timestamp: number;
 };
 
+/**
+ *  Only the raw offchain signed credential is returned. The call will handle persisting or publishing this signature
+ * */
 export async function signCharmverseAttestation({
   chainId,
   credential,
@@ -126,7 +129,39 @@ export async function signCharmverseAttestation({
   return signedCredential;
 }
 
+/**
+ * Sign the credential offchain and send to IPFS
+ *
+ * Only useful for scripts. Prefer signPublishAndRecordCharmverseCredential for production use with existing users
+ * */
 export async function signAndPublishCharmverseCredential({
+  chainId,
+  credential,
+  recipient
+}: CharmVerseCredentialInput) {
+  const signedCredential = await signCharmverseAttestation({ chainId, credential, recipient });
+
+  const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
+    chainId,
+    recipient: signedCredential.recipient,
+    content: credential.data,
+    timestamp: new Date(signedCredential.timestamp),
+    type: credential.type,
+    verificationUrl: signedCredential.verificationUrl,
+    issuer: signedCredential.signer,
+    schemaId: attestationSchemaIds[credential.type],
+    sig: JSON.stringify(signedCredential.sig)
+  };
+
+  const published = await publishSignedCredential(contentToPublish);
+
+  return published;
+}
+
+/**
+ * Sign the credential offchain, send to IPFS, record as Issued Credential
+ * */
+export async function signPublishAndRecordCharmverseCredential({
   chainId,
   credential,
   recipient,
