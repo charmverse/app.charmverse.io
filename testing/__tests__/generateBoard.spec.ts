@@ -293,22 +293,6 @@ describe('generateBoard', () => {
     expect(viewBlocks.length).toBe(4);
   });
 
-  it('should generate a board under another page if this option is passed', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const board = await generateBoard({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: page.id
-    });
-
-    expect(board.parentId).toBe(page.id);
-  });
-
   it('should create custom permissions for the boards and cards if this option is provided', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
     const role = await generateRole({

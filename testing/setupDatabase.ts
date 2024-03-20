@@ -970,9 +970,10 @@ export async function generateProposal({
  * @returns
  */
 export async function generateBoard({
+  id,
   createdBy,
   spaceId,
-  parentId,
+  // parentId,
   cardCount,
   boardTitle,
   views,
@@ -985,9 +986,10 @@ export async function generateBoard({
   deletedAt,
   permissions
 }: {
+  id?: string;
   createdBy: string;
   spaceId: string;
-  parentId?: string;
+  // parentId?: string;
   cardCount?: number;
   boardTitle?: string;
   views?: number;
@@ -1004,7 +1006,7 @@ export async function generateBoard({
   const { pageArgs, blockArgs } = boardWithCardsArgs({
     createdBy,
     spaceId,
-    parentId,
+    // parentId,
     cardCount,
     views,
     boardTitle,
@@ -1050,7 +1052,7 @@ export async function generateBoard({
 
   return prisma
     .$transaction([prisma.block.createMany(blockArgs), ...pageArgs.map((p) => createPageDb(p)), permissionsToCreate])
-    .then((result) => result[1] as Page);
+    .then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
 }
 
 export async function generateForumComment({

@@ -80,7 +80,7 @@ test.beforeAll(async () => {
     boardPageType: 'inline_board',
     views: 1,
     cardCount: sourceDatabaseCardCount,
-    parentId: documentPage.id
+    id: documentPage.id
   });
 
   inlineLinkedDatabase = await generateBoard({
@@ -91,7 +91,7 @@ test.beforeAll(async () => {
     views: 1,
     cardCount: 0,
     linkedSourceId: standaloneDatabase.id,
-    parentId: documentPage.id
+    id: documentPage.id
   });
 
   await prisma.page.update({

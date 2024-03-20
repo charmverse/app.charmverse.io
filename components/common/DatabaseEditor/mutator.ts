@@ -1076,7 +1076,7 @@ export class Mutator {
     afterRedo?: (newCardId: string) => Promise<void>;
     beforeUndo?: () => Promise<void>;
   }): Promise<[UIBlockWithDetails[], string]> {
-    const blocks = await charmClient.getSubtree({ pageId: cardId });
+    const blocks = await charmClient.getSubtree({ pageId: cardPage.id });
     const pageDetails = await charmClient.pages.getPage(cardId);
     const [newBlocks, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
       UIBlockWithDetails[],

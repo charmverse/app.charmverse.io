@@ -395,7 +395,7 @@ export function boardWithCardsArgs({
               }
             }
           : undefined,
-      boardId: page.type === 'board' ? page.id : undefined,
+      boardId: page.type.includes('board') ? page.id : undefined,
       space: {
         connect: {
           id: spaceId

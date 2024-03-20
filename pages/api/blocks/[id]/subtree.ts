@@ -27,23 +27,30 @@ export const config = {
 };
 
 async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
-  const blockId = req.query.id as string;
+  const pageId = req.query.id as string;
+
   const page = await prisma.page.findFirstOrThrow({
     where: {
-      OR: [{ boardId: blockId }, { cardId: blockId }]
+      id: pageId
     },
     select: {
-      id: true
+      boardId: true,
+      cardId: true
     }
   });
 
   const computed = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: page.id,
+    resourceId: pageId,
     userId: req.session.user?.id
   });
 
   if (computed.read !== true) {
     return res.status(404).json({ error: 'page not found' });
+  }
+
+  const blockId = page.boardId || page.cardId;
+  if (!blockId) {
+    return res.status(404).json({ error: 'block not found' });
   }
 
   const { blocks } = await getRelatedBlocks(blockId);
