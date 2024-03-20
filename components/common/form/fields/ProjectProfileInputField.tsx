@@ -1,11 +1,10 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
-import SelectInput from '@mui/material/Select/SelectInput';
 import { useEffect, useState } from 'react';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
-import type { ProjectEditorFieldConfig, ProjectValues } from 'components/projects/interfaces';
+import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import type { ProjectWithMembers } from 'lib/projects/getProjects';
 
