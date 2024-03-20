@@ -5,6 +5,7 @@ import nc from 'next-connect';
 
 import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
+import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -44,61 +45,8 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[]
   if (computed.read !== true) {
     return res.status(404).json({ error: 'page not found' });
   }
-  const blocks = await prisma.block.findMany({
-    where: {
-      OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
-    }
-  });
 
-  const boardBlocks = blocks.filter((b) => b.type === 'board');
-  const connectedBoardIds = boardBlocks
-    .map((boardBlock) =>
-      (boardBlock.fields as unknown as BoardFields).cardProperties
-        .filter((cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData)
-        .map((cardProperty) => cardProperty.relationData?.boardId)
-    )
-    .flat()
-    .filter(isTruthy);
-  const connectedBoards = await prisma.block.findMany({
-    where: {
-      type: 'board',
-      id: {
-        in: connectedBoardIds
-      }
-    }
-  });
-
-  blocks.push(...connectedBoards);
-
-  const viewsWithLinkedSource = blocks.filter((b) => b.type === 'view' && (b.fields as BoardViewFields).linkedSourceId);
-
-  if (viewsWithLinkedSource.length > 0) {
-    const sourceDatabaseIds = viewsWithLinkedSource.map((b) => (b.fields as BoardViewFields).linkedSourceId as string);
-
-    const linkedDatabaseBlocks = await prisma.block.findMany({
-      where: {
-        OR: [
-          {
-            id: {
-              in: sourceDatabaseIds
-            }
-          },
-          {
-            rootId: {
-              in: sourceDatabaseIds
-            }
-          },
-          {
-            parentId: {
-              in: sourceDatabaseIds
-            }
-          }
-        ]
-      }
-    });
-
-    blocks.push(...linkedDatabaseBlocks);
-  }
+  const blocks = await getRelatedBlocks(blockId);
 
   return res.status(200).json(blocks);
 }
