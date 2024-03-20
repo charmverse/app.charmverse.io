@@ -34,6 +34,7 @@ export type IssuableProposalCredentialContent = {
   credential: CredentialDataInput<'proposal'>;
   credentialTemplateId: string;
   proposalId: string;
+  event: CredentialEventType;
 };
 
 type GenerateCredentialsParams = {
@@ -104,6 +105,7 @@ export function generateCredentialInputsForProposal({
             recipientAddress: targetWallet,
             proposalId: proposal.id,
             recipientUserId: author.id,
+            event,
             credential: {
               Name: credentialTemplate.name,
               Description: credentialTemplate.description ?? '',

@@ -36,6 +36,7 @@ import { useUser } from 'hooks/useUser';
 import { createBoard } from 'lib/focalboard/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+import { IssuableProposalCredentials } from './components/IssuableProposalCredentials';
 import { NewProposalButton } from './components/NewProposalButton';
 import { useProposalsBoardMutator } from './components/ProposalsBoard/hooks/useProposalsBoardMutator';
 import { ProposalsHeaderRowsMenu } from './components/ProposalsHeaderRowsMenu';
@@ -188,7 +189,8 @@ export function ProposalsPage({ title }: { title: string }) {
               {title}
             </Typography>
 
-            <Box display='flex'>
+            <Box display='flex' justifyContent='space-between'>
+              <IssuableProposalCredentials />
               <Box
                 gap={3}
                 sx={{

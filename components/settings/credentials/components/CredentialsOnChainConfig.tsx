@@ -98,7 +98,7 @@ export function CredentialsOnChainConfig({ onChange, readOnly }: Props) {
 
       {values.useOnchainCredentials && (
         <Grid container item justifyContent='flex-start' alignItems='center'>
-          <Grid item xs={3}>
+          <Grid item xs={4}>
             <InputSearchBlockchain
               chains={[optimism.id, optimismSepolia.id]}
               chainId={values.credentialsChainId as number}

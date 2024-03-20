@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { AttestationType } from '@charmverse/core/prisma-client';
 import type { Signer } from 'ethers';
+import { v4 as uuid } from 'uuid';
+import { optimismSepolia } from 'viem/chains';
 import { getAddress } from 'viem/utils';
 
 import { conditionalPlural } from 'lib/utils/strings';
@@ -9,6 +11,7 @@ import type { OnChainAttestationInput } from './attestOnchain';
 import { getEasInstance } from './connectors';
 import { getCharmverseSigner } from './getCharmverseSigner';
 import { attestationSchemaIds, encodeAttestion, type CredentialDataInput } from './schemas';
+import type { ProposalCredential } from './schemas/proposal';
 
 export type OnChainMultiAttestationInput<T extends AttestationType = AttestationType> = Omit<
   OnChainAttestationInput<T>,
@@ -36,6 +39,16 @@ export async function multiAttestOnchain({
 
   eas.connect(easSigner);
 
+  // const attestations = await eas.multiAttestByDelegation([
+  //   {
+  //     data: credentialInputs.map(({ data, recipient }) => ({
+  //       data: encodeAttestion({ type, data }),
+  //       recipient: getAddress(recipient)
+  //     })),
+  //     schema: schemaId
+  //   }
+  // ]);
+
   const attestations = await eas
     .multiAttest([
       {
@@ -48,14 +61,14 @@ export async function multiAttestOnchain({
     ])
     .then((tx) => tx.wait());
 
-  log.info(
-    `Issued ${credentialInputs.length} ${type} ${conditionalPlural({
-      count: credentialInputs.length,
-      word: 'credential'
-    })} on chain ${chainId}`
-  );
+  // log.info(
+  //   `Issued ${credentialInputs.length} ${type} ${conditionalPlural({
+  //     count: credentialInputs.length,
+  //     word: 'credential'
+  //   })} on chain ${chainId}`
+  // );
 
-  return attestations;
+  return attestations as any;
 }
 
 // These code snippets provide a quick test to check we can issue credentials onchain ----------
