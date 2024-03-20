@@ -47,7 +47,7 @@ export function ProjectFormAnswers({
             members: [projectMember, ...values.members.slice(1)]
           });
         }}
-        fieldConfig={fieldConfig?.members[0]}
+        fieldConfig={fieldConfig?.members?.[0]}
         values={projectMemberDefaultValues}
       />
       <Divider
@@ -124,14 +124,14 @@ export function ProjectFormEditor({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldsEditor
-        values={values.members[0]}
+        values={values?.members?.[0]}
         onChange={
           onChange === undefined
             ? undefined
             : (member) => {
                 onChange?.({
                   ...values,
-                  members: [member, ...values.members.slice(1)]
+                  members: [member, ...(values.members?.slice(1) ?? [])]
                 });
               }
         }
@@ -142,7 +142,7 @@ export function ProjectFormEditor({
         }}
       />
 
-      {values.members.slice(1).map((member, index) => (
+      {values.members?.slice(1).map((member, index) => (
         <>
           <FieldLabel>Add a team member</FieldLabel>
           <ProjectMemberFieldsEditor
@@ -153,7 +153,11 @@ export function ProjectFormEditor({
                 : (_member) => {
                     onChange?.({
                       ...values,
-                      members: [...values.members.slice(0, index + 1), _member, ...values.members.slice(index + 2)]
+                      members: [
+                        ...values.members.slice(0, index + 1),
+                        _member,
+                        ...(values.members?.slice(index + 2) ?? [])
+                      ]
                     });
                   }
             }

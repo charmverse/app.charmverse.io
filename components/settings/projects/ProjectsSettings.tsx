@@ -51,7 +51,7 @@ export function ProjectsSettings() {
         Projects can be used to autofill proposal and grant request information.
       </Typography>
 
-      {!project && data && data.length !== 0 && (
+      {data && data.length !== 0 && (
         <Box mb={3}>
           {data.map((projectWithMember) => (
             <Accordion key={projectWithMember.id}>

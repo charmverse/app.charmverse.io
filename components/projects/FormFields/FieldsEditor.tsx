@@ -31,13 +31,14 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
               <Stack gap={0.5} flexDirection='row' alignItems='center'>
                 <Switch
                   size='small'
-                  checked={values?.[property.field]?.hidden ?? true}
+                  checked={values?.[property.field]?.hidden ?? false}
                   onChange={(e) => {
+                    const isChecked = e.target.checked;
                     onChange({
                       ...(values ?? {}),
                       [property.field]: {
-                        ...values?.[property.field],
-                        hidden: e.target.checked
+                        required: isChecked ? false : values?.[property.field]?.required ?? true,
+                        hidden: isChecked
                       }
                     });
                   }}
@@ -48,6 +49,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
               <Stack gap={0.5} flexDirection='row' alignItems='center'>
                 <Switch
                   size='small'
+                  disabled={values?.[property.field]?.hidden === true}
                   checked={values?.[property.field]?.required ?? true}
                   onChange={(e) => {
                     onChange({
