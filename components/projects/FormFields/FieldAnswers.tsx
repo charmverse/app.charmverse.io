@@ -2,7 +2,7 @@ import { Stack } from '@mui/material';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
-import type { ProjectFieldConfig } from '../interfaces';
+import type { ProjectFieldConfig, ProjectFieldProperty } from '../interfaces';
 
 export function FieldAnswers<Values extends Record<string, any> = Record<string, any>>({
   onChange,
@@ -13,20 +13,16 @@ export function FieldAnswers<Values extends Record<string, any> = Record<string,
   fieldConfig?: ProjectFieldConfig<keyof Values & string>;
   onChange?: (values: Values) => void;
   values: Values;
-  properties: {
-    field: keyof Values & string;
-    required: boolean;
-    label: string;
-  }[];
+  properties: ProjectFieldProperty<keyof Values>[];
 }) {
   return (
     <Stack display='flex' flexDirection='column' gap={2} width='100%'>
       {properties.map((property) => (
         <TextInputField
-          key={property.field}
+          key={property.label}
           label={property.label}
-          multiline={property.field === 'previousProjects'}
-          rows={property.field === 'previousProjects' ? 5 : 1}
+          multiline={property.multiline}
+          rows={property.rows ?? 1}
           required={fieldConfig?.[property.field]?.required ?? false}
           disabled={onChange === undefined}
           value={values?.[property.field]}

@@ -18,3 +18,11 @@ export type ProjectEditorFieldConfig = ProjectFieldConfig<ProjectField> & {
 export type ProjectValues = ProjectPayload & {
   members: ProjectMemberPayload[];
 };
+
+export type ProjectFieldProperty<Fields> = {
+  field: Fields;
+  required: boolean;
+  label: string;
+  multiline?: boolean;
+  rows?: number;
+};

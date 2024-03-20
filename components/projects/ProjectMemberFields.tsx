@@ -3,7 +3,7 @@ import * as yup from 'yup';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
-import type { ProjectEditorFieldConfig } from './interfaces';
+import type { ProjectEditorFieldConfig, ProjectFieldProperty } from './interfaces';
 
 export type ProjectMemberPayload = Pick<
   ProjectMember,
@@ -21,11 +21,7 @@ export type ProjectMemberPayload = Pick<
 
 export type ProjectMemberField = keyof ProjectMemberPayload;
 
-const ProjectMemberConstants: {
-  field: ProjectMemberField;
-  required: boolean;
-  label: string;
-}[] = [
+const ProjectMemberConstants: ProjectFieldProperty<ProjectMemberField>[] = [
   {
     field: 'name',
     required: true,
@@ -74,7 +70,9 @@ const ProjectMemberConstants: {
   {
     field: 'previousProjects',
     required: false,
-    label: 'Previous Projects'
+    label: 'Previous Projects',
+    multiline: true,
+    rows: 3
   }
 ];
 

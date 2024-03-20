@@ -2,6 +2,8 @@ import { Stack, Switch, Typography } from '@mui/material';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 
+import type { ProjectFieldProperty } from '../interfaces';
+
 export function FieldsEditor<Values extends Record<string, any> = Record<string, any>>({
   onChange,
   values,
@@ -9,11 +11,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
 }: {
   onChange?: (values: Values) => void;
   values: Values;
-  properties: {
-    field: keyof Values & string;
-    required: boolean;
-    label: string;
-  }[];
+  properties: ProjectFieldProperty<keyof Values>[];
 }) {
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
@@ -21,8 +19,8 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
         <Stack gap={1} key={property.label}>
           <TextInputField
             label={property.label}
-            multiline={property.field === 'previousProjects'}
-            rows={property.field === 'previousProjects' ? 5 : 1}
+            multiline={property.multiline}
+            rows={property.rows ?? 1}
             disabled
             required={values?.[property.field]?.required ?? true}
           />
