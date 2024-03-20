@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import type { Space } from '@charmverse/core/prisma';
 import type { Block, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
