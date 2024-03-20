@@ -4,13 +4,13 @@ import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalDbProperties,
   proposalStatusColors
-} from 'lib/focalboard/proposalDbProperties';
+} from 'lib/databases/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 

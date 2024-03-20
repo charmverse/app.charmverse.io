@@ -1,6 +1,6 @@
 import type { IntlShape } from 'react-intl';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 
 import { Utils } from '../utils';
 

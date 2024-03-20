@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid';
 
 import { MAX_EMBED_WIDTH } from 'components/common/CharmEditor/components/iframe/config';
 import { VIDEO_ASPECT_RATIO } from 'components/common/CharmEditor/components/video/videoSpec';
-import { Constants } from 'lib/focalboard/constants';
+import { Constants } from 'lib/databases/constants';
 
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from './blocks/constants';
 import type { ProposalEvaluationInput } from './createProposal';

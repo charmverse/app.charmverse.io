@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import type { Block } from 'lib/focalboard/block';
+import type { Block } from 'lib/databases/block';
 
 import { OctoUtils } from './octoUtils';
 import { TestBlockFactory } from './test/testBlockFactory';

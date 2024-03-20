@@ -2,7 +2,7 @@ import type { AttestationType, CredentialTemplate } from '@charmverse/core/prism
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import type { IPropertyOption } from 'lib/databases/board';
 
 // import { EmptyPlaceholder } from './EmptyPlaceholder';
 

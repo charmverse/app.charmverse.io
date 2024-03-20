@@ -14,9 +14,9 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card, CardPropertyValue } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card, CardPropertyValue } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import {
   APPLICANT_BLOCK_ID,

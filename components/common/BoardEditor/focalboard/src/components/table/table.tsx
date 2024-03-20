@@ -9,11 +9,11 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import useEfficientDragLayer from 'hooks/useEffecientDragLayer';
 import useKeydownPress from 'hooks/useKeydownPress';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';

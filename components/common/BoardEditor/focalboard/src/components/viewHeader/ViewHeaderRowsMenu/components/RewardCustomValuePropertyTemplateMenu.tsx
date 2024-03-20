@@ -2,8 +2,8 @@ import { Box } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import { validatePropertyValue } from '../../../propertyValueElement';
 

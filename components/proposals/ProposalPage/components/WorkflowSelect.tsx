@@ -8,7 +8,7 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import type { IPropertyOption } from 'lib/databases/board';
 
 type Props = {
   onChange?: (value: ProposalWorkflowTyped) => void;

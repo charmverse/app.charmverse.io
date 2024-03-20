@@ -9,8 +9,8 @@ import { ControlledProposalStatusSelect } from 'components/proposals/components/
 import { ControlledProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
 import { allMembersSystemRole, authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card, CardPropertyValue } from 'lib/focalboard/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card, CardPropertyValue } from 'lib/databases/card';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import {
   DUE_DATE_ID,

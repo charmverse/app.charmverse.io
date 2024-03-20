@@ -24,7 +24,7 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { CardPage } from 'lib/focalboard/card';
+import type { CardPage } from 'lib/databases/card';
 import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';

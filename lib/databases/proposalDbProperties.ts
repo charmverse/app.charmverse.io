@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
-import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
-import type { Constants } from 'lib/focalboard/constants';
+import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
+import type { Constants } from 'lib/databases/constants';
 import type {
   ProposalEvaluationResultExtended,
   ProposalEvaluationStatus,

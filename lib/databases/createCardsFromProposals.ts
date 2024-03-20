@@ -4,7 +4,7 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { prismaToBlock } from 'lib/focalboard/block';
+import { prismaToBlock } from 'lib/databases/block';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';

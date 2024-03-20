@@ -4,9 +4,9 @@ import React from 'react';
 import { useDrop } from 'react-dnd';
 
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
-import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 
 import TableGroupHeaderRow from './tableGroupHeaderRow';
 import TableRows from './tableRows';

@@ -9,9 +9,9 @@ import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/
 import type { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import Button from 'components/common/BoardEditor/focalboard/src/widgets/buttons/button';
 import PropertyMenu from 'components/common/BoardEditor/focalboard/src/widgets/propertyMenu';
-import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { getPropertyName } from 'lib/focalboard/getPropertyName';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 
 export const PropertyNameContainer = styled(Stack)`
   position: relative;

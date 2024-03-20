@@ -1,9 +1,9 @@
 import { batch } from 'react-redux';
 
-import type { Block } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Block } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 
 import store from './focalboard/src/store';
 import { deleteBoards, updateBoards } from './focalboard/src/store/boards';

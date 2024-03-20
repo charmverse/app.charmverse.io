@@ -2,7 +2,7 @@ import { ProposalStatus } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 
 import type { ExtractedCardProposalProperties } from '../extractCardProposalProperties';
 import { extractCardProposalProperties } from '../extractCardProposalProperties';

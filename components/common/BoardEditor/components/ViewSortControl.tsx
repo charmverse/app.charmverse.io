@@ -5,9 +5,9 @@ import { FormattedMessage } from 'react-intl';
 import ViewHeaderSortMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderSortMenu';
 import { Button } from 'components/common/Button';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 
 type Props = {
   viewSortPopup: PopupState;

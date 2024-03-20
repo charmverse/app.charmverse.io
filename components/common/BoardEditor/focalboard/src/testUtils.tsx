@@ -9,7 +9,7 @@ import configureStore from 'redux-mock-store';
 import { v4 } from 'uuid';
 
 import { PagesContext } from 'hooks/usePages';
-import type { Block } from 'lib/focalboard/block';
+import type { Block } from 'lib/databases/block';
 import { pageStubToCreate } from 'testing/generatePageStub';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 

@@ -2,23 +2,23 @@
 import type { PageMeta } from '@charmverse/core/pages';
 
 import charmClient from 'charmClient';
-import type { Block, BlockPatch } from 'lib/focalboard/block';
-import { createPatchesFromBlocks } from 'lib/focalboard/block';
+import type { Block, BlockPatch } from 'lib/databases/block';
+import { createPatchesFromBlocks } from 'lib/databases/block';
 import type {
   Board,
   IPropertyOption,
   IPropertyTemplate,
   PropertyType,
   RelationPropertyData
-} from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { createCard } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
-import type { FilterClause } from 'lib/focalboard/filterClause';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
+} from 'lib/databases/board';
+import { createBoard } from 'lib/databases/board';
+import type { BoardView, ISortOption, KanbanCalculationFields } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { createCard } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
+import type { FilterClause } from 'lib/databases/filterClause';
+import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { publishIncrementalUpdate } from '../../publisher';

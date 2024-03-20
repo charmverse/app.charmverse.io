@@ -10,9 +10,9 @@ import { KanbanPageActionsMenuButton } from 'components/common/PageActions/Kanba
 import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import { isTouchScreen } from 'lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';

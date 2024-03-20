@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import { ListItemIcon, MenuItem, Typography } from '@mui/material';
 
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/databases/boardView';
 
 export type NewDatabaseSourceProps = {
   onCreateDatabase: () => Promise<BoardView>;

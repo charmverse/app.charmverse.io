@@ -13,9 +13,9 @@ import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSo
 import Link from 'components/common/Link';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 
 import { mutator } from '../../mutator';
 import IconButton from '../../widgets/buttons/iconButton';

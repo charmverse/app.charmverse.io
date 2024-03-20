@@ -1,4 +1,4 @@
-import type { BoardFields, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
 
 export type ExtractedDatabaseProposalProperties = Partial<Record<DatabaseProposalPropertyType, IPropertyTemplate>>;
 

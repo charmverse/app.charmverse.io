@@ -5,9 +5,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import { prismaToBlock } from 'lib/databases/block';
+import type { BoardFields } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
 import {
   ActionNotPermittedError,
   InvalidStateError,

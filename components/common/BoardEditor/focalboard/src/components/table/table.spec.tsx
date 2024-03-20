@@ -4,7 +4,7 @@ import { render } from '@testing-library/react';
 import { Provider as ReduxProvider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/databases/boardView';
 import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { FetchMock } from '../../test/fetchMock';

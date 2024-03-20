@@ -33,9 +33,9 @@ import { publishIncrementalUpdate } from 'components/common/BoardEditor/publishe
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { BoardView, IViewType } from 'lib/focalboard/boardView';
-import { formatViewTitle, createBoardView } from 'lib/focalboard/boardView';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { BoardView, IViewType } from 'lib/databases/boardView';
+import { formatViewTitle, createBoardView } from 'lib/databases/boardView';
 import { isTruthy } from 'lib/utils/types';
 
 import { useSortable } from '../../hooks/sortable';

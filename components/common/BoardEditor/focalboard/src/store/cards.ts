@@ -3,12 +3,12 @@ import { createSelector, createSlice } from '@reduxjs/toolkit';
 import { getChainList } from 'connectors/chains';
 
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import type { Board } from 'lib/databases/board';
+import type { BoardView, ISortOption } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { Constants } from 'lib/databases/constants';
+import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { Member } from 'lib/members/interfaces';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 

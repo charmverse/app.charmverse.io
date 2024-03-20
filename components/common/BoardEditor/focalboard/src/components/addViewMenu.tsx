@@ -15,12 +15,12 @@ import { v4 as uuid } from 'uuid';
 
 import { publishIncrementalUpdate } from 'components/common/BoardEditor/publisher';
 import { Button } from 'components/common/Button';
-import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView, IViewType } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
-import { createTableView } from 'lib/focalboard/tableView';
+import type { Block } from 'lib/databases/block';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView, IViewType } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
+import { createTableView } from 'lib/databases/tableView';
 
 import mutator from '../mutator';
 import { IDType, Utils } from '../utils';

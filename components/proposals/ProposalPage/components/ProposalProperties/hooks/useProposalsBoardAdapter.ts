@@ -10,13 +10,13 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { BlockTypes } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { BlockTypes } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { Constants } from 'lib/databases/constants';
+import { PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,

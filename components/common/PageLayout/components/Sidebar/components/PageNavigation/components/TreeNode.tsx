@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from 'components/common/BoardEditor/fo
 import { makeSelectSortedViews, getLoadedBoardViews } from 'components/common/BoardEditor/focalboard/src/store/views';
 import { useFocalboardViews } from 'hooks/useFocalboardViews';
 import useRefState from 'hooks/useRefState';
-import { formatViewTitle } from 'lib/focalboard/boardView';
+import { formatViewTitle } from 'lib/databases/boardView';
 import { mergeRefs } from 'lib/utils/react';
 import { greyColor2 } from 'theme/colors';
 

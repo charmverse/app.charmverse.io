@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-import type { Board } from 'lib/focalboard/board';
+import type { Board } from 'lib/databases/board';
 
 import client, { OctoClient } from '../octoClient';
 

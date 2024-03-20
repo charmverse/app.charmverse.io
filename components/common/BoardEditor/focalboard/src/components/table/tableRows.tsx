@@ -8,9 +8,9 @@ import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
 
 import TableRow from './tableRow';
 

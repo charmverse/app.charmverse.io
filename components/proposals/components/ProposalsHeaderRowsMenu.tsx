@@ -8,7 +8,7 @@ import type { ViewHeaderRowsMenuProps } from 'components/common/BoardEditor/foca
 import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import { isTruthy } from 'lib/utils/types';
 

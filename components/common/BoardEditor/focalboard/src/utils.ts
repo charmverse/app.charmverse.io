@@ -5,10 +5,10 @@ import { marked } from 'marked';
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import type { Block } from 'lib/focalboard/block';
-import { createBoard } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
+import type { Block } from 'lib/databases/block';
+import { createBoard } from 'lib/databases/board';
+import { createBoardView } from 'lib/databases/boardView';
+import { createCard } from 'lib/databases/card';
 
 import type { IAppWindow } from './types';
 

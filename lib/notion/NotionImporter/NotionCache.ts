@@ -3,7 +3,7 @@ import type { Page } from '@charmverse/core/prisma';
 import type { DatabaseObjectResponse, PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { RateLimit } from 'async-sema';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 
 import type { BlocksRecord, CreatePageInput, FailedImportsError } from '../types';
 

@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
-import type { BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
 import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { mutator } from '../../mutator';

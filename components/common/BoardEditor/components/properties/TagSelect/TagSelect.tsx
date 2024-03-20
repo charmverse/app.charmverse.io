@@ -13,7 +13,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { isEmptyValue } from 'components/common/form/fields/utils';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import type { IPropertyOption } from 'lib/databases/board';
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;

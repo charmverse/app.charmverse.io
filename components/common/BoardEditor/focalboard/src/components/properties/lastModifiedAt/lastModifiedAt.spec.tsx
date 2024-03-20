@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import React from 'react';
 
-import { createCard } from 'lib/focalboard/card';
+import { createCard } from 'lib/databases/card';
 
 import { wrapIntl } from '../../../testUtils';
 

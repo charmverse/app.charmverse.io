@@ -2,8 +2,8 @@ import Box from '@mui/material/Box';
 
 import type { TagSelectProps } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import mutator from '../../../../mutator';
 

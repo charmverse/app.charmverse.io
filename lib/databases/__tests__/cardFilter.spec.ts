@@ -2,9 +2,9 @@ import { v4 } from 'uuid';
 
 import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { createFilterClause } from 'lib/focalboard/filterClause';
-import { createFilterGroup } from 'lib/focalboard/filterGroup';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { createFilterClause } from 'lib/databases/filterClause';
+import { createFilterGroup } from 'lib/databases/filterGroup';
 
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';

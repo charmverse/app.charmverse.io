@@ -1,7 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 
-import type { Block } from 'lib/focalboard/block';
-import { createBlock } from 'lib/focalboard/block';
+import type { Block } from 'lib/databases/block';
+import { createBlock } from 'lib/databases/block';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 import type { RewardType } from 'lib/rewards/interfaces';

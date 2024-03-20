@@ -3,8 +3,8 @@ import type { DateTime } from 'luxon';
 
 import { RewardsDueDatePicker } from 'components/common/BoardEditor/components/properties/RewardsDueDatePicker';
 import { usePages } from 'hooks/usePages';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import { PropertyMenu } from './PropertyMenu';
 

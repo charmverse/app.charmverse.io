@@ -6,10 +6,10 @@ import { injectIntl } from 'react-intl';
 import { isSupportedViewType } from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
 import SelectMenu from 'components/common/Menu';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView, IViewType } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView, IViewType } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../mutator';
 import { useAppDispatch } from '../../store/hooks';

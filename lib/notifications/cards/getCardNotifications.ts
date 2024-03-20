@@ -1,7 +1,7 @@
 import type { Page } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 
 import type { CardNotification } from '../interfaces';
 import type { QueryCondition } from '../utils';

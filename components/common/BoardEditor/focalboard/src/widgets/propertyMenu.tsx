@@ -5,7 +5,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import React, { useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
 
-import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, PropertyType, RelationPropertyData } from 'lib/databases/board';
 
 import { DeleteRelationPropertyModal } from '../components/properties/relation/DeleteRelationPropertyModal';
 

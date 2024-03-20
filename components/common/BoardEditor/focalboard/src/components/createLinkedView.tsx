@@ -6,8 +6,8 @@ import { useEffect } from 'react';
 import { Button } from 'components/common/Button';
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
 
 import { StyledSidebar } from './viewSidebar/styledSidebar';
 import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOptions';

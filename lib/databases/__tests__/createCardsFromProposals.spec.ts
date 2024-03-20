@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';

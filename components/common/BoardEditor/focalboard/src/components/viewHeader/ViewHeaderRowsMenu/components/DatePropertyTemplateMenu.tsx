@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import mutator from '../../../../mutator';
 import DateRange from '../../../properties/dateRange/dateRange';

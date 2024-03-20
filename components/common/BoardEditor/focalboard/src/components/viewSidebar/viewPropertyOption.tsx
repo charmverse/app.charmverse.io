@@ -7,11 +7,11 @@ import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
-import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
-import { getPropertyName } from 'lib/focalboard/getPropertyName';
+import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';

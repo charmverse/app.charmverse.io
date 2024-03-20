@@ -8,8 +8,8 @@ import KanbanCard from 'components/common/BoardEditor/focalboard/src/components/
 import KanbanColumn from 'components/common/BoardEditor/focalboard/src/components/kanban/kanbanColumn';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 type Props = {
   group: BoardGroup;

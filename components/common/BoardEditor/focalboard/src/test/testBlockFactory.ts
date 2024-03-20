@@ -1,14 +1,14 @@
 import { v4 } from 'uuid';
 
-import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { createCard } from 'lib/focalboard/card';
-import { createFilterClause } from 'lib/focalboard/filterClause';
-import { createFilterGroup } from 'lib/focalboard/filterGroup';
+import type { Block } from 'lib/databases/block';
+import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
+import { createBoard } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { createCard } from 'lib/databases/card';
+import { createFilterClause } from 'lib/databases/filterClause';
+import { createFilterGroup } from 'lib/databases/filterGroup';
 
 import type { CheckboxBlock } from '../blocks/checkboxBlock';
 import { createCheckboxBlock } from '../blocks/checkboxBlock';

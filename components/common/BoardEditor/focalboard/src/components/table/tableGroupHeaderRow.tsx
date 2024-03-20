@@ -8,11 +8,11 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import React, { useEffect, useState } from 'react';
 import { FormattedMessage, useIntl } from 'react-intl';
 
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
-import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
+import { proposalPropertyTypesList } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
+import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
 import { useSortable } from '../../hooks/sortable';

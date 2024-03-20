@@ -1,4 +1,4 @@
-import type { Block, BlockPatch } from 'lib/focalboard/block';
+import type { Block, BlockPatch } from 'lib/databases/block';
 
 export type BlockUpdater = (blocks: Block[]) => void;
 

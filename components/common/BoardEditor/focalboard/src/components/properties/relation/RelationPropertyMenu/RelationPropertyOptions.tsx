@@ -13,7 +13,7 @@ import { PageIcon } from 'components/common/PageIcon';
 import PopperPopup from 'components/common/PopperPopup';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate, RelationPropertyData } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate, RelationPropertyData } from 'lib/databases/board';
 
 import { useAppSelector } from '../../../../store/hooks';
 

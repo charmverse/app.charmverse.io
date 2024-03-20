@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardFields } from 'lib/focalboard/board';
-import { CardFields } from 'lib/focalboard/card';
+import { BoardFields } from 'lib/databases/board';
+import { CardFields } from 'lib/databases/card';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { Board, IPropertyOption, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 
 async function init() {
   const views = await prisma.block.findMany({

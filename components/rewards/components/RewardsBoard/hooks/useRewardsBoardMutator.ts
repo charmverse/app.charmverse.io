@@ -8,8 +8,8 @@ import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { usePages } from 'hooks/usePages';
-import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { BlockPatch, Block as FBBlock } from 'lib/databases/block';
+import type { IPropertyTemplate } from 'lib/databases/board';
 import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
 export function useRewardsBoardMutator() {

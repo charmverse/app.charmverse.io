@@ -33,14 +33,14 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { Card, CardPage } from 'lib/focalboard/card';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import { proposalPropertyTypesList } from 'lib/databases/board';
+import type { Card, CardPage } from 'lib/databases/card';
 import {
   EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalStatusColors
-} from 'lib/focalboard/proposalDbProperties';
+} from 'lib/databases/proposalDbProperties';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';

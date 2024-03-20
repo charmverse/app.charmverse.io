@@ -6,7 +6,7 @@ import React from 'react';
 import { createIntl } from 'react-intl';
 import { v4 } from 'uuid';
 
-import type { IPropertyOption } from 'lib/focalboard/board';
+import type { IPropertyOption } from 'lib/databases/board';
 import { pageStubToCreate } from 'testing/generatePageStub';
 
 import Mutator from '../../mutator';

@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BlockTypes } from 'lib/focalboard/block';
+import type { BlockTypes } from 'lib/databases/block';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';

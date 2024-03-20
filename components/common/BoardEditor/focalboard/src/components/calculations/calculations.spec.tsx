@@ -1,6 +1,6 @@
 import { createIntl } from 'react-intl';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 

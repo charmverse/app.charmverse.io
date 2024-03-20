@@ -1,5 +1,5 @@
 import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import type { IPropertyOption } from 'lib/databases/board';
 import type { RewardApplicationType } from 'lib/rewards/getApplicationType';
 
 export const rewardTypeOptions: IPropertyOption[] = [

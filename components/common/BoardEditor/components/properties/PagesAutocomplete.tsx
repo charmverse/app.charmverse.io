@@ -21,7 +21,7 @@ import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import type { PageListItem } from 'components/common/PagesList';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { usePages } from 'hooks/usePages';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 import { isTruthy } from 'lib/utils/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';

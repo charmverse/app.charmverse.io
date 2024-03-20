@@ -11,8 +11,8 @@ import { RiFolder2Line } from 'react-icons/ri';
 
 import { PageIcon } from 'components/common/PageIcon';
 import { usePages } from 'hooks/usePages';
-import type { Board, DataSourceType, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { Board, DataSourceType, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 

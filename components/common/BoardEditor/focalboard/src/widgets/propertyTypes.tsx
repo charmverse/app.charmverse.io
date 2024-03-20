@@ -2,7 +2,7 @@ import { Divider, ListItemIcon, MenuItem, Stack, Typography } from '@mui/materia
 import { bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 
 import { RelationPropertyMenu } from '../components/properties/relation/RelationPropertyMenu/RelationPropertyMenu';
 

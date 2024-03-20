@@ -13,7 +13,7 @@ import PhoneIcon from '@mui/icons-material/Phone';
 import SubjectIcon from '@mui/icons-material/Subject';
 import type { SvgIconProps } from '@mui/material';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 
 export const iconForPropertyType = (propertyType: PropertyType, props?: SvgIconProps) => {
   switch (propertyType) {

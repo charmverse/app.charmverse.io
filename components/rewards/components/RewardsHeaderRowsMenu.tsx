@@ -8,7 +8,7 @@ import { ViewHeaderRowsMenu } from 'components/common/BoardEditor/focalboard/src
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import { paidRewardStatuses } from 'lib/rewards/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';

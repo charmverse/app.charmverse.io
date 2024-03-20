@@ -12,7 +12,7 @@ import { randomBannerImage } from 'components/[pageId]/DocumentPage/components/P
 import { PageControlItem, PageHeaderControls } from 'components/[pageId]/DocumentPage/components/PageHeader';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
-import type { Board } from 'lib/focalboard/board';
+import type { Board } from 'lib/databases/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { BlockIcons } from '../blockIcons';

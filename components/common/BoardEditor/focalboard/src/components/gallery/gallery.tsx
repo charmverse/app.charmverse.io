@@ -3,10 +3,10 @@ import { FormattedMessage } from 'react-intl';
 
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../mutator';
 import { Utils } from '../../utils';

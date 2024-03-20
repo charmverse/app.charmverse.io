@@ -10,12 +10,12 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import type { BlockTypes } from 'lib/focalboard/block';
-import type { BoardView, IViewType } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
+import type { BlockTypes } from 'lib/databases/block';
+import type { BoardView, IViewType } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { Constants } from 'lib/databases/constants';
+import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,

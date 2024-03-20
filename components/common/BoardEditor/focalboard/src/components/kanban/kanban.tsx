@@ -9,11 +9,11 @@ import { FormattedMessage, injectIntl } from 'react-intl';
 import { KanbanGroupColumn } from 'components/common/BoardEditor/components/kanban/KanbanGroupColumn';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
+import { proposalPropertyTypesList } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import { isTruthy } from 'lib/utils/types';
 
 import type { BlockChange } from '../../mutator';

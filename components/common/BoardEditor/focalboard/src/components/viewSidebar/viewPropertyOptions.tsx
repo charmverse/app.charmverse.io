@@ -5,10 +5,10 @@ import { IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } f
 import { useMemo } from 'react';
 
 import { Button } from 'components/common/Button';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
-import { getPropertyName } from 'lib/focalboard/getPropertyName';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';

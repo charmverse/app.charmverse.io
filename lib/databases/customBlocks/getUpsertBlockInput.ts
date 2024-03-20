@@ -2,10 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { Block, Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { Board } from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
+import type { Board } from 'lib/databases/board';
+import { createBoard } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 
 export function getUpsertBlockInput({
   data: upsertData,

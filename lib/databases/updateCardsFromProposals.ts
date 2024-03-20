@@ -8,9 +8,9 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import { extractCardProposalProperties } from 'lib/focalboard/extractCardProposalProperties';
-import { extractDatabaseProposalProperties } from 'lib/focalboard/extractDatabaseProposalProperties';
+import { prismaToBlock } from 'lib/databases/block';
+import { extractCardProposalProperties } from 'lib/databases/extractCardProposalProperties';
+import { extractDatabaseProposalProperties } from 'lib/databases/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';

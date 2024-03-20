@@ -2,16 +2,16 @@
 import { Mutator } from 'components/common/BoardEditor/focalboard/src/mutator';
 import { IDType, Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
-import type { Block } from 'lib/focalboard/block';
+import type { Block } from 'lib/databases/block';
 import type {
   Board,
   IPropertyOption,
   IPropertyTemplate,
   PropertyType,
   RelationPropertyData
-} from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+} from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 import type { ProposalBoardBlockFields, ProposalPropertiesField } from 'lib/proposals/blocks/interfaces';
 
 export interface BlockChange {

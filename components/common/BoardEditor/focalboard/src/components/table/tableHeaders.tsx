@@ -14,11 +14,11 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView, ISortOption } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 
 import { filterPropertyTemplates } from '../../../../utils/updateVisibilePropertyIds';
 import mutator from '../../mutator';

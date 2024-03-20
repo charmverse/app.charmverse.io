@@ -4,7 +4,7 @@ import { useRemoveRelationProperty } from 'charmClient/hooks/blocks';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { usePages } from 'hooks/usePages';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
 
 export function DeleteRelationPropertyModal({
   board,

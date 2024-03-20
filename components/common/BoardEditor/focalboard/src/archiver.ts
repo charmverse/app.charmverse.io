@@ -1,5 +1,5 @@
-import type { Block } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
+import type { Block } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
 
 import type { ArchiveHeader, ArchiveLine, BlockArchiveLine } from './blocks/archive';
 import { ArchiveUtils } from './blocks/archive';

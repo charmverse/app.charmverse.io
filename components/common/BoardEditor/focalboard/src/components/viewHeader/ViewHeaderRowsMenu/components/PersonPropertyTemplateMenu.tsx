@@ -2,8 +2,8 @@ import { Box } from '@mui/material';
 
 import type { UserSelectProps } from 'components/common/BoardEditor/components/properties/UserSelect';
 import { UserSelect } from 'components/common/BoardEditor/components/properties/UserSelect';
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import { PropertyMenu } from './PropertyMenu';
 

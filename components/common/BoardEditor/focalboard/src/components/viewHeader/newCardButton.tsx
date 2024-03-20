@@ -8,7 +8,7 @@ import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePages } from 'hooks/usePages';
-import type { Card } from 'lib/focalboard/card';
+import type { Card } from 'lib/databases/card';
 
 import { makeSelectBoardTemplates } from '../../store/cards';
 import { useAppSelector } from '../../store/hooks';

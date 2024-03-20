@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 import { filterPropertyTemplates } from 'components/common/BoardEditor/utils/updateVisibilePropertyIds';
-import type { Board } from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board } from 'lib/databases/board';
+import { createBoard } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../../mutator';
 import Calculation from '../../calculations/calculation';

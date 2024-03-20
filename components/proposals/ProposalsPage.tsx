@@ -33,7 +33,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { createBoard } from 'lib/focalboard/board';
+import { createBoard } from 'lib/databases/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { NewProposalButton } from './components/NewProposalButton';

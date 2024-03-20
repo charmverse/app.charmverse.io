@@ -1,9 +1,9 @@
 import { upperFirst } from 'lodash';
 
-import type { Block } from 'lib/focalboard/block';
-import { createBlock } from 'lib/focalboard/block';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
-import { createFilterGroup } from 'lib/focalboard/filterGroup';
+import type { Block } from 'lib/databases/block';
+import { createBlock } from 'lib/databases/block';
+import type { FilterGroup } from 'lib/databases/filterGroup';
+import { createFilterGroup } from 'lib/databases/filterGroup';
 
 import type { DataSourceType, GoogleFormSourceData } from './board';
 

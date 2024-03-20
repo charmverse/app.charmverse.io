@@ -7,9 +7,9 @@ import FilterComponent from 'components/common/BoardEditor/focalboard/src/compon
 import { Button } from 'components/common/Button';
 import { usePages } from 'hooks/usePages';
 import { useViewFilter } from 'hooks/useViewFilter';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { getRelationPropertiesCardsRecord } from 'lib/focalboard/getRelationPropertiesCardsRecord';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { getRelationPropertiesCardsRecord } from 'lib/databases/getRelationPropertiesCardsRecord';
 
 type Props = {
   activeBoard: Board | undefined;

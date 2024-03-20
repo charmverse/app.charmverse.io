@@ -1,4 +1,4 @@
-import type { Block } from 'lib/focalboard/block';
+import type { Block } from 'lib/databases/block';
 
 interface ArchiveHeader {
   version: number;

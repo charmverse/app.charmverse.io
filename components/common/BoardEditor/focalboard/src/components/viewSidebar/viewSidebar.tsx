@@ -3,9 +3,9 @@ import { ClickAwayListener, Collapse } from '@mui/material';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo, useEffect, useState } from 'react';
 
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView, IViewType } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView, IViewType } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 
 import { DatabaseSidebarHeader } from './databaseSidebarHeader';
 import { StyledSidebar } from './styledSidebar';

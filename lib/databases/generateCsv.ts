@@ -6,8 +6,8 @@ import type { Formatters, PropertyContext } from 'components/common/BoardEditor/
 import { OctoUtils } from 'components/common/BoardEditor/focalboard/src/octoUtils';
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import { CardFilter } from 'lib/databases/cardFilter';
+import type { FilterGroup } from 'lib/databases/filterGroup';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utils/dates';
 

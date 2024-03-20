@@ -1,7 +1,7 @@
 import { convertFocalboardToMUIColor } from 'components/common/BoardEditor/utils/convertFocalboardToMUIColor';
 import { mapMUIColorToProperty } from 'components/common/BoardEditor/utils/mapMUIColorToProperty';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import type { IPropertyOption } from 'lib/databases/board';
 
 export function mapSelectOptionToPropertyOption(option: SelectOptionType): IPropertyOption {
   return {

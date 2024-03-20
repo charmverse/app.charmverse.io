@@ -10,7 +10,7 @@ import useSwr from 'swr';
 
 import charmClient from 'charmClient';
 import LoadingComponent from 'components/common/LoadingComponent';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { BoardViewFields } from 'lib/databases/boardView';
 import type { CredentialItem } from 'pages/api/google/credentials';
 import type { GoogleFormItem } from 'pages/api/google/forms';
 

@@ -1,9 +1,9 @@
 import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/BoardEditor/focalboard/src/utils';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { propertyConfigs } from 'lib/focalboard/filterClause';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
+import { propertyConfigs } from 'lib/databases/filterClause';
 import type {
   NumberDataTypeConditions,
   FilterClause,
@@ -12,9 +12,9 @@ import type {
   MultiSelectDataTypeConditions,
   SelectDataTypeConditions,
   DateDataTypeConditions
-} from 'lib/focalboard/filterClause';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
-import { isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+} from 'lib/databases/filterClause';
+import type { FilterGroup } from 'lib/databases/filterGroup';
+import { isAFilterGroupInstance } from 'lib/databases/filterGroup';
 import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposals/blocks/constants';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';

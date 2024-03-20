@@ -11,13 +11,13 @@ import { v4 } from 'uuid';
 import type { PageListItemsRecord } from 'components/common/BoardEditor/interfaces';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewFilter } from 'hooks/useViewFilter';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
-import type { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
-import { createFilterClause } from 'lib/focalboard/filterClause';
-import type { FilterGroup, FilterGroupOperation } from 'lib/focalboard/filterGroup';
-import { createFilterGroup, isAFilterGroupInstance } from 'lib/focalboard/filterGroup';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
+import type { FilterClause, FilterCondition } from 'lib/databases/filterClause';
+import { createFilterClause } from 'lib/databases/filterClause';
+import type { FilterGroup, FilterGroupOperation } from 'lib/databases/filterGroup';
+import { createFilterGroup, isAFilterGroupInstance } from 'lib/databases/filterGroup';
 
 import mutator from '../../mutator';
 

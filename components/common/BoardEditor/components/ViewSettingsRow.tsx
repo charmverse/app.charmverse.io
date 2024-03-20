@@ -4,7 +4,7 @@ import { Stack, Tooltip, Typography } from '@mui/material';
 import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { Button } from 'components/common/Button';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/databases/boardView';
 
 type Props = {
   activeView: BoardView;

@@ -14,8 +14,8 @@ import charmClient from 'charmClient';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookEndpoint } from 'config/constants';
 import { usePages } from 'hooks/usePages';
-import type { Board, DataSourceType } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { Board, DataSourceType } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
 
 import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 

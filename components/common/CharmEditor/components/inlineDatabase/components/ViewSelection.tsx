@@ -3,8 +3,8 @@ import { Box, Card, Divider, MenuItem, Typography } from '@mui/material';
 import { upperFirst } from 'lodash';
 
 import { Button } from 'components/common/Button';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { formatViewTitle } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/databases/boardView';
+import { formatViewTitle } from 'lib/databases/boardView';
 
 interface Props {
   title: string;

@@ -29,12 +29,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
-import type { Board, IPropertyTemplate } from 'lib/focalboard/board';
-import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { BoardView, ISortOption } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
-import { getPropertyName } from 'lib/focalboard/getPropertyName';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import { proposalPropertyTypesList } from 'lib/databases/board';
+import type { BoardView, ISortOption } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 import {
   AUTHORS_BLOCK_ID,
   DEFAULT_BOARD_BLOCK_ID,

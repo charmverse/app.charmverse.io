@@ -1,6 +1,6 @@
 import type { Block } from '@charmverse/core/prisma';
 
-import type { Block as FBBlock } from 'lib/focalboard/block';
+import type { Block as FBBlock } from 'lib/databases/block';
 import { replaceS3Domain } from 'lib/utils/url';
 import type { ServerBlockFields } from 'pages/api/blocks';
 

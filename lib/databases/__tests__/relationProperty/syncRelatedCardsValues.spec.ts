@@ -2,9 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import { syncRelatedCardsValues } from 'lib/focalboard/relationProperty/syncRelatedCardsValues';
-import { syncRelationProperty } from 'lib/focalboard/relationProperty/syncRelationProperty';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
+import { syncRelatedCardsValues } from 'lib/databases/relationProperty/syncRelatedCardsValues';
+import { syncRelationProperty } from 'lib/databases/relationProperty/syncRelationProperty';
 import { generateBoard } from 'testing/setupDatabase';
 
 describe('syncRelatedCardsValues', () => {

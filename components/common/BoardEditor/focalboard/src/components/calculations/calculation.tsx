@@ -3,8 +3,8 @@ import type { CSSProperties } from 'react';
 import React from 'react';
 import { useIntl } from 'react-intl';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import Calculations from './calculations';
 import type { CommonCalculationOptionProps } from './options';

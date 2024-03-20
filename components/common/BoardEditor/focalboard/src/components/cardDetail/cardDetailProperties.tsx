@@ -10,11 +10,11 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/focalboard/board';
-import { proposalPropertyTypesList } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/databases/board';
+import { proposalPropertyTypesList } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { isTruthy } from 'lib/utils/types';
 

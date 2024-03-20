@@ -24,8 +24,8 @@ import type { Application, PagePermission, PageType } from '@charmverse/core/pri
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { DataSourceType } from 'lib/focalboard/board';
-import type { IViewType } from 'lib/focalboard/boardView';
+import type { DataSourceType } from 'lib/databases/board';
+import type { IViewType } from 'lib/databases/boardView';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
