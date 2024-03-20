@@ -9,7 +9,7 @@ import { createFilterGroup } from 'lib/databases/filterGroup';
 import { CardFilter } from '../cardFilter';
 import { Constants } from '../constants';
 
-jest.mock('components/common/DatabaseEditor/src/utils');
+jest.mock('components/common/DatabaseEditor/utils');
 const mockedUtils = jest.mocked(Utils, { shallow: true });
 describe('src/cardFilter', () => {
   const board = TestBlockFactory.createBoard();
