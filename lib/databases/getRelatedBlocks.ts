@@ -87,6 +87,7 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       title: true,
       cardId: true,
       boardId: true,
+      type: true,
       updatedAt: true,
       updatedBy: true
     }
@@ -101,6 +102,7 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     blockWithDetails.icon = page?.title || block.title;
     blockWithDetails.hasContent = true; // not really necesssary to show this, which requires retrieving all content columns
     blockWithDetails.title = page?.title || block.title;
+    blockWithDetails.pageType = page?.type;
     blockWithDetails.updatedAt = page?.updatedAt || block.updatedAt;
     blockWithDetails.updatedBy = page?.updatedBy || block.updatedBy;
     return blockWithDetails;

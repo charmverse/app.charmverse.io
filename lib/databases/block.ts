@@ -1,4 +1,4 @@
-import type { Block as PrismaBlock } from '@charmverse/core/prisma';
+import type { PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
@@ -30,7 +30,6 @@ export type Block = {
   schema: number;
   type: BlockTypes;
   title: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   fields: Record<string, any>;
 
   createdAt: number;
@@ -38,7 +37,21 @@ export type Block = {
   deletedAt: number | null;
 };
 
-export type BlockWithDetails = PrismaBlock & { pageId?: string; icon?: string; hasContent?: boolean };
+export type BlockWithDetails = Omit<PrismaBlock, 'fields' | 'type'> & {
+  pageId?: string;
+  icon?: string;
+  fields: Record<string, any>;
+  hasContent?: boolean;
+  pageType?: PageType;
+  type: BlockTypes;
+};
+
+export type UIBlockWithDetails = Block & {
+  pageId?: string;
+  icon?: string;
+  hasContent?: boolean;
+  pageType?: PageType;
+};
 
 // cant think of a better word for this.. handle some edge cases with types from the prisma client
 export type PrismaBlockSortOf = Omit<PrismaBlock, 'fields' | 'type'> & { fields: any; type: BlockTypes };
