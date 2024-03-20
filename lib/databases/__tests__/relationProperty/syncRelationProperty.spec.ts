@@ -188,6 +188,9 @@ describe('syncRelationProperty', () => {
       },
       select: {
         fields: true
+      },
+      orderBy: {
+        createdAt: 'asc'
       }
     });
 
