@@ -424,10 +424,10 @@ function CriteriaInput({
                     }}
                     disabled={disabled}
                     error={
-                      (_field.value &&
+                      (typeof _field.value === 'number' &&
                         (_field.value < parameters.min || _field.value > parameters.max) &&
                         'Invalid score') ||
-                      (value.comment && !(value.response as any)?.score && 'Score is required')
+                      (value.comment && typeof _field.value !== 'number' && 'Score is required')
                     }
                     inputProps={{
                       placeholder: 'N/A',
