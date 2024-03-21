@@ -21,7 +21,7 @@ export type BlockPatch = {
   deletedAt?: number;
 };
 
-export type Block = {
+type Block = {
   id: string;
   spaceId: string;
   parentId?: string;

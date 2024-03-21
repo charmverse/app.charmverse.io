@@ -1,11 +1,11 @@
-import type { Block, BlockPatch } from 'lib/databases/block';
+import type { UIBlockWithDetails, BlockPatch } from 'lib/databases/block';
 
-export type BlockUpdater = (blocks: Block[]) => void;
+export type BlockUpdater = (blocks: UIBlockWithDetails[]) => void;
 
 export interface ICharmClient {
   patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void>;
-  patchBlocks(_blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
+  patchBlocks(_blocks: UIBlockWithDetails[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
   deleteBlock(blockId: string, updater: BlockUpdater): Promise<void>;
-  insertBlock(block: Block, updater: BlockUpdater): Promise<Block[]>;
-  insertBlocks(newBlocks: Block[], updater: BlockUpdater): Promise<Block[]>;
+  insertBlock(block: UIBlockWithDetails, updater: BlockUpdater): Promise<UIBlockWithDetails[]>;
+  insertBlocks(newBlocks: UIBlockWithDetails[], updater: BlockUpdater): Promise<UIBlockWithDetails[]>;
 }

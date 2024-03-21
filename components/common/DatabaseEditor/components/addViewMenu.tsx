@@ -14,7 +14,7 @@ import { injectIntl } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
 import { Button } from 'components/common/Button';
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView, IViewType } from 'lib/databases/boardView';
 import { createBoardView } from 'lib/databases/boardView';
@@ -87,7 +87,7 @@ function AddViewMenu(props: AddViewProps) {
     await mutator.insertBlock(
       view,
       'add view',
-      async (block: Block) => {
+      async (block: UIBlockWithDetails) => {
         // This delay is needed because WSClient has a default 100 ms notification delay before updates
         // setTimeout(() => {
         //     Utils.log(`showView: ${block.id}`)
@@ -116,7 +116,7 @@ function AddViewMenu(props: AddViewProps) {
     await mutator.insertBlock(
       view,
       'add view',
-      async (block: Block) => {
+      async (block: UIBlockWithDetails) => {
         // This delay is needed because WSClient has a default 100 ms notification delay before updates
         // setTimeout(() => {
         //     Utils.log(`showView: ${block.id}`)
@@ -151,7 +151,7 @@ function AddViewMenu(props: AddViewProps) {
     await mutator.insertBlock(
       view,
       'add view',
-      async (block: Block) => {
+      async (block: UIBlockWithDetails) => {
         // This delay is needed because WSClient has a default 100 ms notification delay before updates
         setTimeout(() => {
           Utils.log(`showView: ${block.id}`);
@@ -200,7 +200,7 @@ function AddViewMenu(props: AddViewProps) {
     await mutator.insertBlock(
       view,
       'add view',
-      async (block: Block) => {
+      async (block: UIBlockWithDetails) => {
         // This delay is needed because WSClient has a default 100 ms notification delay before updates
         setTimeout(() => {
           Utils.log(`showView: ${block.id}`);

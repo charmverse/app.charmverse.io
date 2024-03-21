@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
 import { createBoard } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
@@ -130,7 +130,11 @@ class TestBlockFactory {
     return card;
   }
 
-  private static addToCard<BlockType extends Block>(block: BlockType, card: Card, isContent = true): BlockType {
+  private static addToCard<BlockType extends UIBlockWithDetails>(
+    block: BlockType,
+    card: Card,
+    isContent = true
+  ): BlockType {
     block.parentId = card.id;
     block.rootId = card.rootId;
     if (isContent) {

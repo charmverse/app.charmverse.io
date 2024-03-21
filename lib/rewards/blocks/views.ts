@@ -1,7 +1,7 @@
 import { v4 as uuid } from 'uuid';
 
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-import type { Block as FBBlock } from 'lib/databases/block';
+import type { UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { IViewType } from 'lib/databases/boardView';
 import { createBoardView } from 'lib/databases/boardView';
 import { Constants } from 'lib/databases/constants';

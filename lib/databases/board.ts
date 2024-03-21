@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
@@ -95,14 +95,14 @@ export type BoardFields = {
   sourceData?: GoogleFormSourceData;
 };
 
-type Board = Block & {
+type Board = UIBlockWithDetails & {
   fields: BoardFields;
 };
 
 function createBoard({
   block,
   addDefaultProperty
-}: { block?: Partial<Block>; addDefaultProperty?: boolean } | undefined = {}): Board {
+}: { block?: Partial<UIBlockWithDetails>; addDefaultProperty?: boolean } | undefined = {}): Board {
   const cardProperties: IPropertyTemplate[] =
     block?.fields?.cardProperties?.map((o: IPropertyTemplate) => {
       return {

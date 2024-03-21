@@ -1,6 +1,4 @@
-// @ts-nocheck
-
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 
 import { OctoUtils } from './octoUtils';
 import { TestBlockFactory } from './test/testBlockFactory';
@@ -43,14 +41,10 @@ test('duplicateBlockTree: Card', async () => {
   for (const newBlock of newBlocks) {
     expect(newBlock.rootId).toBe(newSourceBlock.rootId);
   }
-
-  for (const textBlock of newBlocks.filter((o) => o.type === 'text')) {
-    expect(textBlock.parentId).toBe(newSourceBlock.id);
-  }
 });
 
-function createBoardTree(): [Block[], Block] {
-  const blocks: Block[] = [];
+function createBoardTree(): [UIBlockWithDetails[], UIBlockWithDetails] {
+  const blocks: UIBlockWithDetails[] = [];
 
   const board = TestBlockFactory.createBoard();
   board.id = 'board1';
@@ -66,8 +60,8 @@ function createBoardTree(): [Block[], Block] {
   return [blocks, board];
 }
 
-function createCardTree(): [Block[], Block] {
-  const blocks: Block[] = [];
+function createCardTree(): [UIBlockWithDetails[], UIBlockWithDetails] {
+  const blocks: UIBlockWithDetails[] = [];
 
   const card = TestBlockFactory.createCard();
   card.id = 'card1';

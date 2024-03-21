@@ -1,8 +1,6 @@
-import type { Block } from '@charmverse/core/prisma';
-
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-import type { Block as FBBlock, BlockWithDetails } from 'lib/databases/block';
+import type { UIBlockWithDetails as FBBlock, BlockWithDetails } from 'lib/databases/block';
 import { createBoard } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews } from 'lib/rewards/blocks/views';

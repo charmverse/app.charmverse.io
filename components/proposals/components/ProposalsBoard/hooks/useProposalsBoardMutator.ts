@@ -6,7 +6,7 @@ import { blockToFBBlock, fbBlockToBlock } from 'components/common/DatabaseEditor
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { BlockPatch, Block as FBBlock } from 'lib/databases/block';
+import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposals/blocks/interfaces';
 

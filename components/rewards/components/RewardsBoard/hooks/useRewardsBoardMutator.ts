@@ -8,7 +8,7 @@ import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { usePages } from 'hooks/usePages';
-import type { BlockPatch, Block as FBBlock } from 'lib/databases/block';
+import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
