@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Types } from '@prisma/client/runtime/library';
 
 type Result<T extends Prisma.PageSelect | null> = Prisma.Prisma__PageClient<
-  Types.Result.GetResult<Prisma.$PagePayload, { select: T }, 'findUniqueOrThrow'>,
+  Types.Result.GetResult<Prisma.$PagePayload, { select: T }, 'findUnique'>,
   never
 >;
 

@@ -33,6 +33,10 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     getPageByBlockId(permissionsBlockId, { id: true })
   ]);
 
+  if (!permissionsPage) {
+    throw new DataNotFoundError(`Page not found for permissions: ${permissionsBlockId}`);
+  }
+
   const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: permissionsPage.id,
     userId: req.session.user?.id
