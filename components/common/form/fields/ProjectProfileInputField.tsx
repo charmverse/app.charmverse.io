@@ -21,7 +21,9 @@ function ProjectProfileFormAnswers({
 }) {
   const { isAddingMember, isTeamLead, control, onProjectMemberAdd, onProjectMemberRemove, onProjectUpdate } =
     useProject({
-      projectId: selectedProject.id
+      projectId: selectedProject.id,
+      fieldConfig,
+      defaultRequired: true
     });
 
   return (

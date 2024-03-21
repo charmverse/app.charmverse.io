@@ -3,13 +3,22 @@ import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import { useUpdateProject, useAddProjectMember, useGetProjects } from 'charmClient/hooks/projects';
-import { defaultProjectFieldConfig, type ProjectValues } from 'components/projects/interfaces';
+import { defaultProjectFieldConfig } from 'components/projects/interfaces';
+import type { ProjectEditorFieldConfig, ProjectValues } from 'components/projects/interfaces';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
 import { useProjectForm } from './useProjectForm';
 
-export function useProject({ projectId, defaultRequired }: { defaultRequired?: boolean; projectId: string }) {
+export function useProject({
+  fieldConfig = defaultProjectFieldConfig,
+  projectId,
+  defaultRequired
+}: {
+  fieldConfig?: ProjectEditorFieldConfig;
+  defaultRequired?: boolean;
+  projectId: string;
+}) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const { trigger: updateProject } = useUpdateProject({ projectId });
   const { trigger: addProjectMember, isMutating: isAddingMember } = useAddProjectMember({ projectId });
@@ -17,9 +26,9 @@ export function useProject({ projectId, defaultRequired }: { defaultRequired?: b
   const projectWithMember = projectsWithMembers?.find((project) => project.id === projectId);
   const isTeamLead = projectWithMember?.projectMembers[0].userId === user?.id;
 
-  const { control, isValid, errors } = useProjectForm({
+  const { control, yupSchema, isValid, errors } = useProjectForm({
     defaultValues: projectWithMember,
-    fieldConfig: defaultProjectFieldConfig,
+    fieldConfig,
     defaultRequired
   });
 
@@ -29,7 +38,15 @@ export function useProject({ projectId, defaultRequired }: { defaultRequired?: b
   }, [updateProject]);
 
   async function onProjectUpdate(_project: ProjectValues) {
-    if (!projectWithMember || !isTeamLead || !isValid) {
+    let _isValid = false;
+    try {
+      // Validate project separate since there is a lag
+      await yupSchema.current.validate(_project);
+      _isValid = true;
+    } catch (_) {
+      _isValid = false;
+    }
+    if (!projectWithMember || !isTeamLead || !_isValid) {
       return;
     }
 

@@ -155,10 +155,10 @@ export function ProjectFormEditor({
         onChange={
           onChange === undefined
             ? undefined
-            : (_project) => {
+            : (fieldConfig) => {
                 onChange?.({
                   ...values,
-                  ..._project
+                  ...fieldConfig
                 });
               }
         }
@@ -173,10 +173,10 @@ export function ProjectFormEditor({
         onChange={
           onChange === undefined
             ? undefined
-            : (member) => {
+            : (memberFieldConfig) => {
                 onChange?.({
                   ...values,
-                  projectMember: member
+                  projectMember: memberFieldConfig
                 });
               }
         }

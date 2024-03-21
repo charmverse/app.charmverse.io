@@ -1,4 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -8,7 +9,7 @@ import { ProjectFieldProperties } from 'components/projects/ProjectFields';
 import type { ProjectMemberField } from 'components/projects/ProjectMemberFields';
 import { ProjectMemberFieldProperties } from 'components/projects/ProjectMemberFields';
 
-function createProjectYupSchema({
+export function createProjectYupSchema({
   fieldConfig,
   defaultRequired
 }: {
@@ -62,21 +63,24 @@ export function useProjectForm({
   defaultValues?: ProjectValues;
   fieldConfig: ProjectEditorFieldConfig;
 }) {
+  const yupSchema = useRef(
+    createProjectYupSchema({
+      fieldConfig,
+      defaultRequired
+    })
+  );
+
   const { control, formState } = useForm({
     defaultValues,
     reValidateMode: 'onChange',
-    resolver: yupResolver(
-      createProjectYupSchema({
-        fieldConfig,
-        defaultRequired
-      })
-    ),
+    resolver: yupResolver(yupSchema.current),
     criteriaMode: 'all'
   });
 
   return {
     isValid: formState.isValid,
     errors: formState.errors,
-    control
+    control,
+    yupSchema
   };
 }
