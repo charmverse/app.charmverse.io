@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Divider, Stack, Tooltip } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
@@ -25,7 +25,7 @@ export function CreateProjectForm({
   const { trigger: createProject, isMutating } = useCreateProject();
 
   const { control, isValid } = useProjectForm({
-    defaultValues: project ?? undefined,
+    defaultValues: defaultProject,
     fieldConfig: defaultProjectFieldConfig,
     defaultRequired: false
   });
