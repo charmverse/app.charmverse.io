@@ -361,6 +361,10 @@ class CharmClient {
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
   }
+
+  removeProjectMember({ projectId, memberId }: { projectId: string; memberId: string }) {
+    return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
+  }
 }
 
 const charmClient = new CharmClient();

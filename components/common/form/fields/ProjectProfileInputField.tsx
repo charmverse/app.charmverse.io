@@ -64,6 +64,9 @@ export function ProjectProfileInputField({
       </Select>
       {selectedProject && (
         <ProjectFormAnswers
+          onMemberRemove={() => {}}
+          onMemberAdd={() => {}}
+          onChange={() => {}}
           isTeamLead={isTeamLead}
           fieldConfig={formField.extraFields as ProjectEditorFieldConfig}
           values={selectedProject}

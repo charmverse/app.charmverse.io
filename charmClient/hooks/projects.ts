@@ -1,4 +1,4 @@
-import { useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
+import { useDELETE, useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
 import type { ProjectUpdatePayload, ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
 
 export function useCreateProject() {

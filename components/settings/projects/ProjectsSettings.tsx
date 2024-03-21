@@ -5,6 +5,7 @@ import debounce from 'lodash/debounce';
 import { useMemo, useState } from 'react';
 import type { KeyedMutator } from 'swr';
 
+import charmClient from 'charmClient';
 import { useAddProjectMember, useCreateProject, useGetProjects, useUpdateProject } from 'charmClient/hooks/projects';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
@@ -116,6 +117,38 @@ function ProjectRow({
     }
   }
 
+  async function onProjectMemberRemove(memberIndex: number) {
+    const memberId = projectWithMember.projectMembers[memberIndex]?.id;
+    if (!memberId) {
+      return;
+    }
+
+    try {
+      await charmClient.removeProjectMember({
+        projectId: projectWithMember.id,
+        memberId
+      });
+      mutate((projects) => {
+        if (!projects) {
+          return projects;
+        }
+
+        return projects.map((project) => {
+          if (project.id === projectWithMember.id) {
+            return {
+              ...project,
+              projectMembers: project.projectMembers.filter((_, index) => index !== memberIndex)
+            };
+          }
+
+          return project;
+        });
+      });
+    } catch (_) {
+      showMessage('Failed to remove project member', 'error');
+    }
+  }
+
   return (
     <Accordion>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -123,6 +156,7 @@ function ProjectRow({
       </AccordionSummary>
       <AccordionDetails>
         <ProjectFormAnswers
+          onMemberRemove={onProjectMemberRemove}
           isTeamLead={isTeamLead}
           fieldConfig={defaultFieldConfig}
           onChange={onProjectUpdate}
@@ -193,6 +227,12 @@ export function ProjectsSettings() {
             fieldConfig={defaultFieldConfig}
             onChange={setProject}
             isTeamLead
+            onMemberRemove={(memberIndex) => {
+              setProject({
+                ...project,
+                projectMembers: project.projectMembers.filter((_, index) => index !== memberIndex)
+              });
+            }}
             onMemberAdd={() => {
               setProject({
                 ...project,

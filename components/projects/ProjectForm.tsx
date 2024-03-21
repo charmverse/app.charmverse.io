@@ -1,5 +1,6 @@
 import MuiAddIcon from '@mui/icons-material/Add';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -18,13 +19,15 @@ export function ProjectFormAnswers({
   fieldConfig,
   onMemberAdd,
   disableAddMemberButton,
-  isTeamLead
+  isTeamLead,
+  onMemberRemove
 }: {
+  onMemberRemove: (index: number) => void;
   disableAddMemberButton?: boolean;
   values: ProjectValues;
-  onChange?: (project: ProjectValues) => void;
+  onChange: (project: ProjectValues) => void;
   fieldConfig?: ProjectEditorFieldConfig;
-  onMemberAdd?: () => void;
+  onMemberAdd: () => void;
   isTeamLead: boolean;
 }) {
   return (
@@ -70,7 +73,19 @@ export function ProjectFormAnswers({
 
       {values.projectMembers.slice(1).map((member, index) => (
         <>
-          <FieldLabel>Team member</FieldLabel>
+          <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+            <FieldLabel>Team member</FieldLabel>
+            <IconButton disabled={!isTeamLead}>
+              <DeleteOutlineOutlinedIcon
+                color='error'
+                fontSize='small'
+                onClick={() => {
+                  // + 1 because we are skipping the team lead
+                  onMemberRemove(index + 1);
+                }}
+              />
+            </IconButton>
+          </Stack>
           <ProjectMemberFieldAnswers
             onChange={
               onChange === undefined || !isTeamLead
@@ -96,22 +111,20 @@ export function ProjectFormAnswers({
           />
         </>
       ))}
-      {onChange && (
-        <Box
-          sx={{
-            width: 'fit-content'
-          }}
+      <Box
+        sx={{
+          width: 'fit-content'
+        }}
+      >
+        <Button
+          disabledTooltip={!isTeamLead ? 'You must be a team lead to add a team member' : undefined}
+          disabled={disableAddMemberButton || !isTeamLead}
+          startIcon={<MuiAddIcon fontSize='small' />}
+          onClick={onMemberAdd}
         >
-          <Button
-            disabledTooltip={!isTeamLead ? 'You must be a team lead to add a team member' : undefined}
-            disabled={disableAddMemberButton || !isTeamLead}
-            startIcon={<MuiAddIcon fontSize='small' />}
-            onClick={onMemberAdd}
-          >
-            Add a team member
-          </Button>
-        </Box>
-      )}
+          Add a team member
+        </Button>
+      </Box>
     </Stack>
   );
 }
