@@ -5,9 +5,11 @@ import { useEffect, useState } from 'react';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
+import { projectDefaultValues } from 'components/projects/ProjectFields';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
+import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
+import { CreateProjectForm } from 'components/settings/projects/CreateProjectForm';
 import { useProject } from 'components/settings/projects/hooks/useProjects';
-import { useUser } from 'hooks/useUser';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -45,16 +47,17 @@ export function ProjectProfileInputField({
   };
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
-  const { user } = useUser();
   const { data } = useGetProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(null);
-  const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
+  const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
 
   useEffect(() => {
     if (formField.value && data) {
       const project = data.find((_project) => _project.id === (formField.value as { projectId: string }).projectId);
       if (project) {
         setSelectedProject(project);
+      } else {
+        setSelectedProject(null);
       }
     }
   }, [data, formField.value]);
@@ -66,7 +69,13 @@ export function ProjectProfileInputField({
         value={selectedProject?.id}
         onChange={(e) => {
           const projectId = e.target.value as string;
-          onChange({ projectId });
+          if (projectId === 'ADD_PROFILE') {
+            onChange({ projectId: '' });
+            setShowCreateProjectForm(true);
+          } else {
+            onChange({ projectId });
+            setShowCreateProjectForm(false);
+          }
         }}
         renderValue={() => {
           if (!selectedProject) {
@@ -92,6 +101,22 @@ export function ProjectProfileInputField({
         <ProjectProfileFormAnswers
           selectedProject={selectedProject}
           fieldConfig={formField.extraFields as ProjectEditorFieldConfig}
+        />
+      )}
+      {showCreateProjectForm && (
+        <CreateProjectForm
+          project={{
+            ...projectDefaultValues,
+            projectMembers: [projectMemberDefaultValues]
+          }}
+          onSave={(project) => {
+            onChange({ projectId: project.id });
+            setShowCreateProjectForm(false);
+          }}
+          onCancel={() => {
+            onChange({ projectId: '' });
+            setShowCreateProjectForm(false);
+          }}
         />
       )}
     </Stack>

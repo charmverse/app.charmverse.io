@@ -79,17 +79,28 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
       });
     }),
     prisma.formFieldAnswer.findMany({ where: { proposalId } }),
-    ...(projectProfileValue?.projectId
-      ? [
-          prisma.proposal.update({
-            where: {
-              id: proposalId
-            },
-            data: {
-              projectId: projectProfileValue.projectId
-            }
-          })
-        ]
+    ...(projectProfileValue
+      ? projectProfileValue.projectId
+        ? [
+            prisma.proposal.update({
+              where: {
+                id: proposalId
+              },
+              data: {
+                projectId: projectProfileValue.projectId
+              }
+            })
+          ]
+        : [
+            prisma.proposal.update({
+              where: {
+                id: proposalId
+              },
+              data: {
+                projectId: null
+              }
+            })
+          ]
       : [])
   ]);
 
