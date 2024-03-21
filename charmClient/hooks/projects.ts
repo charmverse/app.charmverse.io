@@ -12,3 +12,7 @@ export function useGetProjects() {
 export function useUpdateProject({ projectId }: { projectId: string }) {
   return usePUT<ProjectUpdatePayload, ProjectWithMembers>(`/api/projects/${projectId}`);
 }
+
+export function useAddProjectMember({ projectId }: { projectId: string }) {
+  return usePOST<undefined, ProjectWithMembers['projectMembers'][number]>(`/api/projects/${projectId}/members`);
+}

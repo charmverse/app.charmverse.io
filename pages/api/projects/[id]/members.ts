@@ -1,18 +1,17 @@
+import type { ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { ProjectUpdatePayload, ProjectWithMembers } from 'components/projects/interfaces';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { updateProject } from 'lib/projects/updateProject';
+import { addProjectMember } from 'lib/projects/addProjectMember';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).put(updateProjectController);
+handler.use(requireUser).post(addProjectMemberController);
 
-async function updateProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers>) {
-  const projectUpdatePayload = req.body as ProjectUpdatePayload;
+async function addProjectMemberController(req: NextApiRequest, res: NextApiResponse<ProjectMember>) {
   const projectId = req.query.id as string;
   const projectLead = await prisma.projectMember.findFirst({
     where: {
@@ -23,14 +22,14 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
   });
 
   if (!projectLead) {
-    throw new ActionNotPermittedError('You are not the team lead for this project');
+    throw new ActionNotPermittedError('Only team lead can add project members');
   }
 
-  const updatedProjectWithMembers = await updateProject({
-    userId: req.session.user.id,
-    payload: projectUpdatePayload
+  const projectMember = await addProjectMember({
+    projectId,
+    userId: req.session.user.id
   });
-  return res.status(201).json(updatedProjectWithMembers);
+  return res.status(201).json(projectMember);
 }
 
 export default withSessionRoute(handler);

@@ -15,11 +15,15 @@ import {
 export function ProjectFormAnswers({
   onChange,
   values,
-  fieldConfig
+  fieldConfig,
+  onMemberAdd,
+  disableAddMemberButton
 }: {
+  disableAddMemberButton?: boolean;
   values: ProjectValues;
   onChange?: (project: ProjectValues) => void;
   fieldConfig?: ProjectEditorFieldConfig;
+  onMemberAdd?: () => void;
 }) {
   return (
     <Stack gap={2} width='100%'>
@@ -95,13 +99,9 @@ export function ProjectFormAnswers({
           sx={{
             width: 'fit-content'
           }}
+          disabled={disableAddMemberButton}
           startIcon={<MuiAddIcon fontSize='small' />}
-          onClick={() => {
-            onChange({
-              ...values,
-              projectMembers: [...values.projectMembers, projectMemberDefaultValues]
-            });
-          }}
+          onClick={onMemberAdd}
         >
           Add a team member
         </Button>
