@@ -116,8 +116,11 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
   const newBlocks = data.map((block) => ({
     ...block,
-    fields: block.fields,
+    fields: block.fields as any,
+    parentId: block.parentId || '',
+    schema: 1,
     spaceId: space.id,
+    title: block.title || '',
     createdBy: req.session.user.id,
     updatedBy: req.session.user.id,
     deletedAt: null
@@ -215,7 +218,6 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
   await prisma.$transaction([
     prisma.block.createMany({
-      // @ts-ignore - cant fix type for json field "fields"
       data: newBlocks
     }),
     ...cardPageQueries
