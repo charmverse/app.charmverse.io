@@ -427,7 +427,8 @@ function CriteriaInput({
                       (typeof _field.value === 'number' &&
                         (_field.value < parameters.min || _field.value > parameters.max) &&
                         'Invalid score') ||
-                      (value.comment && typeof _field.value !== 'number' && 'Score is required')
+                      (!!value.comment && typeof _field.value !== 'number' && 'Score is required') ||
+                      ''
                     }
                     inputProps={{
                       placeholder: 'N/A',
