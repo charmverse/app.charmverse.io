@@ -1,10 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
 import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from './block';
+import type { BoardFields } from './board';
+import type { BoardViewFields } from './boardView';
+import { buildBlockWithDetails } from './buildBlockWithDetails';
 
 type SourceType = 'proposals';
 
@@ -95,19 +96,16 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
 
   let source: SourceType | undefined;
 
-  const validBlocks = blocks.map((block) => {
-    const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
-    const blockWithDetails = block as BlockWithDetails;
-    blockWithDetails.pageId = page?.id;
-    blockWithDetails.icon = page?.title || block.title;
-    blockWithDetails.hasContent = true; // not really necesssary to show this, which requires retrieving all content columns
-    blockWithDetails.title = page?.title || block.title;
-    blockWithDetails.pageType = page?.type;
-    blockWithDetails.updatedAt = page?.updatedAt || block.updatedAt;
-    blockWithDetails.updatedBy = page?.updatedBy || block.updatedBy;
-    return blockWithDetails;
-  });
-  // remove orphan blocks
-  // .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
+  const validBlocks = blocks
+    .map((block) => {
+      const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
+      if (page) {
+        return buildBlockWithDetails(block, page);
+      }
+      return block as BlockWithDetails;
+    })
+    // remove orphan blocks
+    .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
+
   return { blocks: validBlocks, source };
 }

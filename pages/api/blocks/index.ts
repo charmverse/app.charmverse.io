@@ -352,7 +352,7 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
 
   log.info('User deleted blocks', { count: blocks.length, spaceId: spaceIds[0], userId });
 
-  return res.status(200).json(blocks as BlockWithDetails[]);
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

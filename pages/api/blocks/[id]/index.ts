@@ -5,6 +5,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
+import { buildBlockWithDetails } from 'lib/databases/buildBlockWithDetails';
+import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -24,10 +26,15 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     }
   });
 
-  const pageId = block.type === 'view' ? block.rootId : block.id;
+  const permissionsBlockId = block.type === 'view' ? block.rootId : block.id;
+
+  const [page, permissionsPage] = await Promise.all([
+    getPageByBlockId(block.id),
+    getPageByBlockId(permissionsBlockId, { id: true })
+  ]);
 
   const permissions = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: pageId,
+    resourceId: permissionsPage.id,
     userId: req.session.user?.id
   });
 
@@ -35,7 +42,9 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     throw new DataNotFoundError('Block not found');
   }
 
-  return res.status(200).json(block);
+  const result = buildBlockWithDetails(block, page);
+
+  return res.status(200).json(result);
 }
 
 async function deleteBlock(
