@@ -51,11 +51,11 @@ export function ProjectFormAnswers({
             : (projectMember) => {
                 onChange({
                   ...values,
-                  members: [projectMember, ...values.members.slice(1)]
+                  projectMembers: [projectMember, ...values.projectMembers.slice(1)]
                 });
               }
         }
-        fieldConfig={fieldConfig?.members?.[0]}
+        fieldConfig={fieldConfig?.projectMembers?.[0]}
         values={projectMemberDefaultValues}
       />
       <Divider
@@ -64,7 +64,7 @@ export function ProjectFormAnswers({
         }}
       />
 
-      {values.members.slice(1).map((member, index) => (
+      {values.projectMembers.slice(1).map((member, index) => (
         <>
           <FieldLabel>Add a team member</FieldLabel>
           <ProjectMemberFieldAnswers
@@ -74,15 +74,15 @@ export function ProjectFormAnswers({
                 : (projectMember) => {
                     onChange({
                       ...values,
-                      members: [
-                        ...values.members.slice(0, index + 1),
+                      projectMembers: [
+                        ...values.projectMembers.slice(0, index + 1),
                         projectMember,
-                        ...values.members.slice(index + 2)
+                        ...values.projectMembers.slice(index + 2)
                       ]
                     });
                   }
             }
-            fieldConfig={fieldConfig?.members[index + 1]}
+            fieldConfig={fieldConfig?.projectMembers[index + 1]}
             values={member}
           />
           <Divider
@@ -101,7 +101,7 @@ export function ProjectFormAnswers({
           onClick={() => {
             onChange({
               ...values,
-              members: [...values.members, projectMemberDefaultValues]
+              projectMembers: [...values.projectMembers, projectMemberDefaultValues]
             });
           }}
         >
@@ -140,14 +140,14 @@ export function ProjectFormEditor({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldsEditor
-        values={values?.members?.[0]}
+        values={values?.projectMembers?.[0]}
         onChange={
           onChange === undefined
             ? undefined
             : (member) => {
                 onChange?.({
                   ...values,
-                  members: [member, ...(values.members?.slice(1) ?? [])]
+                  projectMembers: [member, ...(values.projectMembers?.slice(1) ?? [])]
                 });
               }
         }
@@ -158,7 +158,7 @@ export function ProjectFormEditor({
         }}
       />
 
-      {values.members?.slice(1).map((member, index) => (
+      {values.projectMembers?.slice(1).map((member, index) => (
         <>
           <FieldLabel>Add a team member</FieldLabel>
           <ProjectMemberFieldsEditor
@@ -169,10 +169,10 @@ export function ProjectFormEditor({
                 : (_member) => {
                     onChange?.({
                       ...values,
-                      members: [
-                        ...values.members.slice(0, index + 1),
+                      projectMembers: [
+                        ...values.projectMembers.slice(0, index + 1),
                         _member,
-                        ...(values.members?.slice(index + 2) ?? [])
+                        ...(values.projectMembers?.slice(index + 2) ?? [])
                       ]
                     });
                   }
@@ -194,7 +194,7 @@ export function ProjectFormEditor({
           onClick={() => {
             onChange({
               ...values,
-              members: [...values.members, {}]
+              projectMembers: [...values.projectMembers, {}]
             });
           }}
         >

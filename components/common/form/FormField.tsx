@@ -177,7 +177,7 @@ function ExpandedFormField({
         <ProjectFormEditor
           values={
             (formField.extraFields as ProjectEditorFieldConfig) ?? {
-              members: [{}]
+              projectMembers: [{}]
             }
           }
           onChange={(extraFields) => {
@@ -321,7 +321,9 @@ export function FormField(
           {!isOpen || readOnly ? (
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
-                <ProjectFormEditor values={(formField.extraFields as ProjectEditorFieldConfig) ?? { members: [{}] }} />
+                <ProjectFormEditor
+                  values={(formField.extraFields as ProjectEditorFieldConfig) ?? { projectMembers: [{}] }}
+                />
               ) : (
                 <FieldTypeRenderer
                   labelEndAdornment={

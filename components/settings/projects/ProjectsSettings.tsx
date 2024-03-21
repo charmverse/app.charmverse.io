@@ -1,16 +1,107 @@
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Box, Divider, Typography, Accordion, AccordionDetails, AccordionSummary, Stack } from '@mui/material';
-import { useState } from 'react';
+import debounce from 'lodash/debounce';
+import { useMemo, useState } from 'react';
+import type { KeyedMutator } from 'swr';
 
-import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
+import { useCreateProject, useGetProjects, useUpdateProject } from 'charmClient/hooks/projects';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import type { ProjectValues } from 'components/projects/interfaces';
+import type { ProjectUpdatePayload, ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
 import { projectDefaultValues } from 'components/projects/ProjectFields';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 import Legend from 'components/settings/Legend';
+
+const defaultFieldConfig = {
+  name: {
+    required: true
+  },
+  projectMembers: [
+    {
+      name: {
+        required: true
+      }
+    }
+  ]
+};
+
+function ProjectRow({
+  mutate,
+  projectWithMember
+}: {
+  projectWithMember: ProjectWithMembers;
+  mutate: KeyedMutator<ProjectWithMembers[]>;
+}) {
+  const { trigger: updateProject } = useUpdateProject({ projectId: projectWithMember.id });
+
+  const debouncedUpdate = useMemo(() => {
+    return debounce(updateProject, 300);
+  }, [updateProject]);
+
+  async function onProjectUpdate(_project: ProjectValues) {
+    try {
+      // Add ids to project & projectMembers
+      await debouncedUpdate({
+        id: projectWithMember.id,
+        ..._project,
+        projectMembers: _project.projectMembers.map((projectMember, index) => {
+          return {
+            ...projectWithMember.projectMembers[index],
+            ...projectMember
+          };
+        })
+      });
+
+      mutate(
+        (cachedData) => {
+          if (!cachedData) {
+            return cachedData;
+          }
+
+          return cachedData.map((project) => {
+            if (project.id === projectWithMember.id) {
+              return {
+                ...project,
+                ..._project,
+                projectMembers: _project.projectMembers.map((projectMember, index) => {
+                  return {
+                    ...project.projectMembers[index],
+                    ...projectMember
+                  };
+                })
+              };
+            }
+
+            return project;
+          });
+        },
+        {
+          revalidate: false
+        }
+      );
+    } catch (_) {
+      //
+    }
+  }
+
+  return (
+    <Accordion>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Typography>{projectWithMember.name}</Typography>
+      </AccordionSummary>
+      <AccordionDetails>
+        <ProjectFormAnswers
+          fieldConfig={defaultFieldConfig}
+          onChange={onProjectUpdate}
+          values={projectWithMember}
+          showAddTeamMemberButton
+        />
+      </AccordionDetails>
+    </Accordion>
+  );
+}
 
 export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
@@ -54,30 +145,7 @@ export function ProjectsSettings() {
       {data && data.length !== 0 && (
         <Box mb={3}>
           {data.map((projectWithMember) => (
-            <Accordion key={projectWithMember.id}>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography>{projectWithMember.name}</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <ProjectFormAnswers
-                  fieldConfig={{
-                    name: {
-                      required: true
-                    },
-                    members: [
-                      {
-                        name: {
-                          required: true
-                        }
-                      }
-                    ]
-                  }}
-                  onChange={setProject}
-                  values={projectWithMember}
-                  showAddTeamMemberButton
-                />
-              </AccordionDetails>
-            </Accordion>
+            <ProjectRow mutate={mutate} key={projectWithMember.id} projectWithMember={projectWithMember} />
           ))}
         </Box>
       )}
@@ -90,18 +158,7 @@ export function ProjectsSettings() {
             }}
           />
           <ProjectFormAnswers
-            fieldConfig={{
-              name: {
-                required: true
-              },
-              members: [
-                {
-                  name: {
-                    required: true
-                  }
-                }
-              ]
-            }}
+            fieldConfig={defaultFieldConfig}
             onChange={setProject}
             values={project}
             showAddTeamMemberButton
@@ -131,7 +188,7 @@ export function ProjectsSettings() {
           onClick={() => {
             setProject({
               ...projectDefaultValues,
-              members: [projectMemberDefaultValues]
+              projectMembers: [projectMemberDefaultValues]
             });
           }}
           startIcon={<AddIcon fontSize='small' />}

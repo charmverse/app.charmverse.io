@@ -1,3 +1,5 @@
+import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
+
 import type { ProjectField, ProjectPayload } from './ProjectFields';
 import type { ProjectMemberField, ProjectMemberPayload } from './ProjectMemberFields';
 
@@ -12,11 +14,16 @@ export type ProjectFieldConfig<Fields extends string = string> = Partial<
 >;
 
 export type ProjectEditorFieldConfig = ProjectFieldConfig<ProjectField> & {
-  members: ProjectFieldConfig<ProjectMemberField>[];
+  projectMembers: ProjectFieldConfig<ProjectMemberField>[];
 };
 
 export type ProjectValues = ProjectPayload & {
-  members: ProjectMemberPayload[];
+  projectMembers: ProjectMemberPayload[];
+};
+
+export type ProjectUpdatePayload = Partial<ProjectPayload> & {
+  id: string;
+  projectMembers: (Partial<ProjectMemberPayload> & { id: string })[];
 };
 
 export type ProjectFieldProperty<Fields> = {
@@ -25,4 +32,8 @@ export type ProjectFieldProperty<Fields> = {
   label: string;
   multiline?: boolean;
   rows?: number;
+};
+
+export type ProjectWithMembers = Project & {
+  projectMembers: ProjectMember[];
 };

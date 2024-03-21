@@ -1,17 +1,15 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProjectValues } from 'components/projects/interfaces';
-
-import type { ProjectWithMembers } from './getProjects';
+import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
 
 export async function createProject(payload: { userId: string; project: ProjectValues }): Promise<ProjectWithMembers> {
-  if (payload.project.members.length === 0) {
+  if (payload.project.projectMembers.length === 0) {
     throw new InvalidInputError('At least one member is required');
   }
 
   const project = payload.project;
-  const projectLeadMember = project.members[0];
+  const projectLeadMember = project.projectMembers[0];
 
   const createdProjectWithMembers = await prisma.project.create({
     data: {
@@ -37,7 +35,7 @@ export async function createProject(payload: { userId: string; project: ProjectV
               userId: payload.userId,
               ...projectLeadMember
             },
-            ...project.members.slice(1).map((member) => ({
+            ...project.projectMembers.slice(1).map((member) => ({
               updatedBy: payload.userId,
               ...member
             }))
@@ -52,6 +50,6 @@ export async function createProject(payload: { userId: string; project: ProjectV
 
   return {
     ...createdProjectWithMembers,
-    members: createdProjectWithMembers.projectMembers
+    projectMembers: createdProjectWithMembers.projectMembers
   };
 }
