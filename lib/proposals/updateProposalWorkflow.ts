@@ -1,6 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
+import { getNewCriteria } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
+
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export type UpdateWorkflowRequest = {
@@ -16,6 +18,14 @@ export async function updateProposalWorkflow({
   const workflow = await prisma.proposalWorkflow.findUniqueOrThrow({
     where: {
       id: workflowId
+    }
+  });
+  const existingEvaluations = await prisma.proposalEvaluation.findMany({
+    where: {
+      proposalId
+    },
+    include: {
+      rubricCriteria: true
     }
   });
   const typedWorkflow = workflow as ProposalWorkflowTyped;
@@ -37,12 +47,34 @@ export async function updateProposalWorkflow({
     // prisma does not support nested createMany
     for (let index = 0; index < typedWorkflow.evaluations.length; index++) {
       const evaluation = typedWorkflow.evaluations[index];
+      const existingStep = existingEvaluations.find((e) => e.title === evaluation.title);
+      const rubricCriteria =
+        evaluation.type === 'rubric'
+          ? (existingStep?.rubricCriteria.length &&
+              existingStep?.rubricCriteria.map(({ evaluationId, ...criteria }) => ({
+                ...criteria,
+                parameters: criteria.parameters as any
+              }))) || [{ proposalId, ...getNewCriteria() }]
+          : [];
+
+      // include author as default reviewer for feedback
+      const defaultReviewers = evaluation.type === 'feedback' ? [{ proposalId, systemRole: 'author' as const }] : [];
       await tx.proposalEvaluation.create({
         data: {
           proposalId,
           index,
           title: evaluation.title,
           type: evaluation.type,
+          reviewers: {
+            createMany: {
+              data: defaultReviewers
+            }
+          },
+          rubricCriteria: {
+            createMany: {
+              data: rubricCriteria
+            }
+          },
           permissions: {
             createMany: {
               data: evaluation.permissions

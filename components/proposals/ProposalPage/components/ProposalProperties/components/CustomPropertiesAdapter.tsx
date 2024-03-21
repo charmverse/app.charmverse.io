@@ -35,7 +35,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     id: '',
     pageId: '',
     title: '',
-    createdAt: '',
+    createdAt: proposalForm.createdAt,
     createdBy: '',
     updatedAt: proposalForm?.createdAt || '',
     updatedBy: '',
