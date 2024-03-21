@@ -14,6 +14,7 @@ import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 
 const defaultFieldConfig = {
   name: {
@@ -35,6 +36,8 @@ function ProjectRow({
   projectWithMember: ProjectWithMembers;
   mutate: KeyedMutator<ProjectWithMembers[]>;
 }) {
+  const { user } = useUser();
+  const isTeamLead = projectWithMember.projectMembers[0].userId === user?.id;
   const { trigger: updateProject } = useUpdateProject({ projectId: projectWithMember.id });
   const { trigger: addProjectMember, isMutating } = useAddProjectMember({ projectId: projectWithMember.id });
 
@@ -120,6 +123,7 @@ function ProjectRow({
       </AccordionSummary>
       <AccordionDetails>
         <ProjectFormAnswers
+          isTeamLead={isTeamLead}
           fieldConfig={defaultFieldConfig}
           onChange={onProjectUpdate}
           onMemberAdd={onProjectMemberAdd}
@@ -188,6 +192,7 @@ export function ProjectsSettings() {
           <ProjectFormAnswers
             fieldConfig={defaultFieldConfig}
             onChange={setProject}
+            isTeamLead
             onMemberAdd={() => {
               setProject({
                 ...project,
