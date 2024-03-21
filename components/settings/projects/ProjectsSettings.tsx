@@ -3,18 +3,19 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { useTrackPageView } from 'charmClient/hooks/track';
-import type { ProjectWithMembers } from 'components/projects/interfaces';
+import { defaultProjectFieldConfig, type ProjectWithMembers } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import Legend from 'components/settings/Legend';
 
 import { CreateProjectForm } from './CreateProjectForm';
-import { useGetDefaultProject } from './hooks/useGetDefaultProject';
-import { useProject } from './hooks/useProjects';
+import { useProject } from './hooks/useProject';
 
 function ProjectRow({ projectWithMember }: { projectWithMember: ProjectWithMembers }) {
-  const { isTeamLead, onProjectMemberAdd, onProjectMemberRemove, isAddingMember, onProjectUpdate } = useProject({
-    projectId: projectWithMember.id
-  });
+  const { control, isTeamLead, onProjectMemberAdd, onProjectMemberRemove, isAddingMember, onProjectUpdate } =
+    useProject({
+      projectId: projectWithMember.id,
+      defaultRequired: false
+    });
 
   return (
     <Accordion>
@@ -23,19 +24,11 @@ function ProjectRow({ projectWithMember }: { projectWithMember: ProjectWithMembe
       </AccordionSummary>
       <AccordionDetails>
         <ProjectFormAnswers
+          control={control}
           defaultRequired={false}
           onMemberRemove={onProjectMemberRemove}
           isTeamLead={isTeamLead}
-          fieldConfig={{
-            name: {
-              required: true
-            },
-            projectMembers: projectWithMember.projectMembers.map(() => ({
-              name: {
-                required: true
-              }
-            }))
-          }}
+          fieldConfig={defaultProjectFieldConfig}
           onChange={onProjectUpdate}
           onMemberAdd={onProjectMemberAdd}
           values={projectWithMember}

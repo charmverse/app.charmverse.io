@@ -6,7 +6,7 @@ import { ProjectFormEditor } from 'components/projects/ProjectForm';
 
 export function ProjectFormEditorComponent() {
   const [projectRequiredValues, setProjectRequiredValues] = useState<ProjectEditorFieldConfig>({
-    projectMembers: [{}]
+    projectMember: {}
   });
 
   return (

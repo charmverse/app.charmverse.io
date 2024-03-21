@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import type { ProjectValues } from 'components/projects/interfaces';
@@ -12,9 +13,18 @@ export function ProjectFormAnswersComponent() {
     projectMembers: [projectMemberDefaultValues]
   });
 
+  const { control } = useForm();
+
   return (
     <GlobalContext>
-      <ProjectFormAnswers onChange={setProject} values={project} />
+      <ProjectFormAnswers
+        isTeamLead={false}
+        onMemberAdd={() => {}}
+        onMemberRemove={() => {}}
+        control={control as any}
+        onChange={setProject}
+        values={project}
+      />
     </GlobalContext>
   );
 }

@@ -8,7 +8,7 @@ import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/pr
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { CreateProjectForm } from 'components/settings/projects/CreateProjectForm';
 import { useGetDefaultProject } from 'components/settings/projects/hooks/useGetDefaultProject';
-import { useProject } from 'components/settings/projects/hooks/useProjects';
+import { useProject } from 'components/settings/projects/hooks/useProject';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -19,12 +19,14 @@ function ProjectProfileFormAnswers({
   selectedProject: ProjectWithMembers;
   fieldConfig: ProjectEditorFieldConfig;
 }) {
-  const { isAddingMember, isTeamLead, onProjectMemberAdd, onProjectMemberRemove, onProjectUpdate } = useProject({
-    projectId: selectedProject.id
-  });
+  const { isAddingMember, isTeamLead, control, onProjectMemberAdd, onProjectMemberRemove, onProjectUpdate } =
+    useProject({
+      projectId: selectedProject.id
+    });
 
   return (
     <ProjectFormAnswers
+      control={control}
       defaultRequired
       onMemberRemove={onProjectMemberRemove}
       onMemberAdd={onProjectMemberAdd}

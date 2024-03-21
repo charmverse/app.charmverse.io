@@ -1,9 +1,9 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
-import * as yup from 'yup';
+import type { Control } from 'react-hook-form';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
-import type { ProjectEditorFieldConfig, ProjectFieldProperty } from './interfaces';
+import type { ProjectEditorFieldConfig, ProjectFieldProperty, ProjectValues } from './interfaces';
 
 export type ProjectMemberPayload = Pick<
   ProjectMember,
@@ -21,7 +21,7 @@ export type ProjectMemberPayload = Pick<
 
 export type ProjectMemberField = keyof ProjectMemberPayload;
 
-const ProjectMemberConstants: ProjectFieldProperty<ProjectMemberField>[] = [
+export const ProjectMemberFieldProperties: ProjectFieldProperty<ProjectMemberField>[] = [
   {
     field: 'name',
     label: 'Name'
@@ -66,19 +66,6 @@ const ProjectMemberConstants: ProjectFieldProperty<ProjectMemberField>[] = [
   }
 ];
 
-const schema = yup.object().shape({
-  name: yup.string().required(),
-  walletAddress: yup.string().required(),
-  email: yup.string().email().required(),
-  twitter: yup.string().nullable(),
-  warpcast: yup.string().nullable(),
-  github: yup.string().nullable(),
-  linkedin: yup.string().nullable(),
-  telegram: yup.string().nullable(),
-  otherUrl: yup.string().nullable(),
-  previousProjects: yup.string().nullable()
-});
-
 export const projectMemberDefaultValues: ProjectMemberPayload = {
   name: '',
   walletAddress: '',
@@ -92,26 +79,17 @@ export const projectMemberDefaultValues: ProjectMemberPayload = {
   previousProjects: ''
 };
 
-export const projectMemberRequiredValues: Record<ProjectMemberField, boolean> = {
-  name: true,
-  walletAddress: true,
-  email: true,
-  twitter: true,
-  warpcast: true,
-  github: true,
-  linkedin: true,
-  telegram: true,
-  otherUrl: true,
-  previousProjects: true
-};
-
 export function ProjectMemberFieldAnswers({
   onChange,
   values,
   fieldConfig,
-  defaultRequired
+  defaultRequired,
+  projectMemberIndex,
+  control
 }: {
-  fieldConfig?: ProjectEditorFieldConfig['projectMembers'][number];
+  control: Control<ProjectValues, any>;
+  projectMemberIndex: number;
+  fieldConfig?: ProjectEditorFieldConfig['projectMember'];
   onChange?: (projectMember: ProjectMemberPayload) => void;
   values: ProjectMemberPayload;
   defaultRequired?: boolean;
@@ -119,10 +97,20 @@ export function ProjectMemberFieldAnswers({
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}
-      values={values}
-      onChange={onChange}
+      control={control}
+      name={`projectMembers[${projectMemberIndex}]`}
+      onChange={
+        onChange
+          ? (_values) => {
+              onChange?.({
+                ...values,
+                ..._values
+              });
+            }
+          : undefined
+      }
       fieldConfig={fieldConfig}
-      properties={ProjectMemberConstants}
+      properties={ProjectMemberFieldProperties}
     />
   );
 }
@@ -133,13 +121,13 @@ export function ProjectMemberFieldsEditor({
   defaultRequired
 }: {
   defaultRequired?: boolean;
-  onChange?: (values: ProjectEditorFieldConfig['projectMembers'][number]) => void;
-  values: ProjectEditorFieldConfig['projectMembers'][number];
+  onChange?: (values: ProjectEditorFieldConfig['projectMember']) => void;
+  values: ProjectEditorFieldConfig['projectMember'];
 }) {
   return (
     <FieldsEditor
       defaultRequired={defaultRequired}
-      properties={ProjectMemberConstants}
+      properties={ProjectMemberFieldProperties}
       values={values}
       onChange={onChange}
     />

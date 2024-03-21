@@ -14,7 +14,7 @@ export type ProjectFieldConfig<Fields extends string = string> = Partial<
 >;
 
 export type ProjectEditorFieldConfig = ProjectFieldConfig<ProjectField> & {
-  projectMembers: ProjectFieldConfig<ProjectMemberField>[];
+  projectMember: ProjectFieldConfig<ProjectMemberField>;
 };
 
 export type ProjectValues = ProjectPayload & {
@@ -26,7 +26,7 @@ export type ProjectUpdatePayload = Partial<ProjectPayload> & {
   projectMembers: (Partial<ProjectMemberPayload> & { id: string })[];
 };
 
-export type ProjectFieldProperty<Fields> = {
+export type ProjectFieldProperty<Fields extends string> = {
   field: Fields;
   label: string;
   multiline?: boolean;
@@ -35,4 +35,15 @@ export type ProjectFieldProperty<Fields> = {
 
 export type ProjectWithMembers = Project & {
   projectMembers: ProjectMember[];
+};
+
+export const defaultProjectFieldConfig = {
+  name: {
+    required: true
+  },
+  projectMember: {
+    name: {
+      required: true
+    }
+  }
 };

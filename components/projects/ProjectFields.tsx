@@ -1,9 +1,9 @@
 import type { Project } from '@charmverse/core/prisma-client';
-import * as yup from 'yup';
+import type { Control } from 'react-hook-form';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
-import type { ProjectEditorFieldConfig, ProjectFieldConfig, ProjectFieldProperty } from './interfaces';
+import type { ProjectEditorFieldConfig, ProjectFieldConfig, ProjectFieldProperty, ProjectValues } from './interfaces';
 
 export type ProjectPayload = Pick<
   Project,
@@ -22,7 +22,7 @@ export type ProjectPayload = Pick<
 
 export type ProjectField = keyof ProjectPayload;
 
-const ProjectConstants: ProjectFieldProperty<ProjectField>[] = [
+export const ProjectFieldProperties: ProjectFieldProperty<ProjectField>[] = [
   {
     field: 'name',
     label: 'Project Name'
@@ -73,20 +73,6 @@ const ProjectConstants: ProjectFieldProperty<ProjectField>[] = [
   }
 ];
 
-const schema = yup.object().shape({
-  name: yup.string().required(),
-  excerpt: yup.string().required(),
-  description: yup.string().required(),
-  twitter: yup.string().nullable(),
-  website: yup.string().nullable(),
-  github: yup.string().nullable(),
-  blog: yup.string().nullable(),
-  productUrl: yup.string().nullable(),
-  communityUrl: yup.string().nullable(),
-  otherUrl: yup.string().nullable(),
-  walletAddress: yup.string().nullable()
-});
-
 export const projectDefaultValues = {
   name: '',
   excerpt: '',
@@ -101,38 +87,24 @@ export const projectDefaultValues = {
   walletAddress: ''
 };
 
-export const projectRequiredValues: Record<ProjectField, boolean> = {
-  name: true,
-  excerpt: true,
-  description: true,
-  twitter: true,
-  website: true,
-  github: true,
-  blog: true,
-  productUrl: true,
-  communityUrl: true,
-  otherUrl: true,
-  walletAddress: true
-};
-
 export function ProjectFieldAnswers({
   fieldConfig,
   onChange,
-  values,
+  control,
   defaultRequired
 }: {
-  onChange?: (project: ProjectPayload) => void;
-  values: ProjectPayload;
+  control: Control<ProjectValues, any>;
+  onChange?: (project: Partial<ProjectPayload>) => void;
   fieldConfig?: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
   return (
     <FieldAnswers
+      control={control}
       defaultRequired={defaultRequired}
-      values={values}
       onChange={onChange}
       fieldConfig={fieldConfig}
-      properties={ProjectConstants}
+      properties={ProjectFieldProperties}
     />
   );
 }
@@ -147,6 +119,11 @@ export function ProjectFieldsEditor({
   values: Omit<ProjectEditorFieldConfig, 'members'>;
 }) {
   return (
-    <FieldsEditor defaultRequired={defaultRequired} properties={ProjectConstants} values={values} onChange={onChange} />
+    <FieldsEditor
+      defaultRequired={defaultRequired}
+      properties={ProjectFieldProperties}
+      values={values}
+      onChange={onChange}
+    />
   );
 }

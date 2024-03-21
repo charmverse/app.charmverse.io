@@ -1,14 +1,15 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Divider, Stack } from '@mui/material';
+import { Box, Divider, Stack, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
+import { defaultProjectFieldConfig, type ProjectValues, type ProjectWithMembers } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 
 import { useGetDefaultProject } from './hooks/useGetDefaultProject';
+import { useProjectForm } from './hooks/useProjectForm';
 
 export function CreateProjectForm({
   onCancel,
@@ -22,6 +23,13 @@ export function CreateProjectForm({
   const defaultProject = useGetDefaultProject();
   const [project, setProject] = useState<ProjectValues | null>(_project);
   const { trigger: createProject, isMutating } = useCreateProject();
+
+  const { control, isValid } = useProjectForm({
+    defaultValues: project ?? undefined,
+    fieldConfig: defaultProjectFieldConfig,
+    defaultRequired: false
+  });
+
   const { mutate } = useGetProjects();
 
   async function saveProject() {
@@ -61,18 +69,10 @@ export function CreateProjectForm({
           />
           <ProjectFormAnswers
             defaultRequired={false}
-            fieldConfig={{
-              name: {
-                required: true
-              },
-              projectMembers: project.projectMembers.map(() => ({
-                name: {
-                  required: true
-                }
-              }))
-            }}
+            fieldConfig={defaultProjectFieldConfig}
             onChange={setProject}
             isTeamLead
+            control={control}
             onMemberRemove={(memberIndex) => {
               setProject({
                 ...project,
@@ -92,7 +92,11 @@ export function CreateProjectForm({
 
       {project ? (
         <Stack gap={1} flexDirection='row'>
-          <Button disabled={isMutating} onClick={saveProject}>
+          <Button
+            disabledTooltip={!isValid ? 'Please fill out all required fields' : ''}
+            disabled={isMutating || !isValid}
+            onClick={saveProject}
+          >
             Save
           </Button>
           <Button

@@ -1,17 +1,14 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
+import type { Control } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 
 import type { ProjectEditorFieldConfig, ProjectFieldConfig, ProjectValues } from './interfaces';
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
-import {
-  projectMemberDefaultValues,
-  ProjectMemberFieldAnswers,
-  ProjectMemberFieldsEditor
-} from './ProjectMemberFields';
+import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectMemberFields';
 
 export function ProjectFormAnswers({
   onChange,
@@ -21,7 +18,8 @@ export function ProjectFormAnswers({
   disableAddMemberButton,
   isTeamLead,
   onMemberRemove,
-  defaultRequired
+  defaultRequired,
+  control
 }: {
   onMemberRemove: (index: number) => void;
   disableAddMemberButton?: boolean;
@@ -31,13 +29,14 @@ export function ProjectFormAnswers({
   onMemberAdd: () => void;
   isTeamLead: boolean;
   defaultRequired?: boolean;
+  control: Control<ProjectValues, any>;
 }) {
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h5'>Project Info</Typography>
       <ProjectFieldAnswers
+        control={control}
         defaultRequired={defaultRequired}
-        values={values}
         onChange={
           onChange === undefined || !isTeamLead
             ? undefined
@@ -55,6 +54,8 @@ export function ProjectFormAnswers({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldAnswers
+        control={control}
+        projectMemberIndex={0}
         defaultRequired={defaultRequired}
         onChange={
           onChange === undefined || !isTeamLead
@@ -66,8 +67,8 @@ export function ProjectFormAnswers({
                 });
               }
         }
-        fieldConfig={fieldConfig?.projectMembers?.[0]}
-        values={values.projectMembers[0] ?? projectMemberDefaultValues}
+        fieldConfig={fieldConfig?.projectMember}
+        values={values.projectMembers[0]}
       />
       <Divider
         sx={{
@@ -91,6 +92,8 @@ export function ProjectFormAnswers({
             </IconButton>
           </Stack>
           <ProjectMemberFieldAnswers
+            control={control}
+            projectMemberIndex={index + 1}
             defaultRequired={defaultRequired}
             onChange={
               onChange === undefined || !isTeamLead
@@ -106,7 +109,7 @@ export function ProjectFormAnswers({
                     });
                   }
             }
-            fieldConfig={fieldConfig?.projectMembers[index + 1]}
+            fieldConfig={fieldConfig?.projectMember}
             values={member}
           />
           <Divider
@@ -166,14 +169,14 @@ export function ProjectFormEditor({
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldsEditor
         defaultRequired={defaultRequired}
-        values={values?.projectMembers?.[0]}
+        values={values?.projectMember}
         onChange={
           onChange === undefined
             ? undefined
             : (member) => {
                 onChange?.({
                   ...values,
-                  projectMembers: [member, ...(values.projectMembers?.slice(1) ?? [])]
+                  projectMember: member
                 });
               }
         }
