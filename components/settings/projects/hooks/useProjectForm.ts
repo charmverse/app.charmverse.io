@@ -4,11 +4,6 @@ import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import {
-  GITHUB_URL_REGEX,
-  LINKEDIN_URL_REGEX,
-  TWITTER_URL_REGEX
-} from 'components/members/hooks/useRequiredMemberProperties';
 import type { ProjectEditorFieldConfig, ProjectValues } from 'components/projects/interfaces';
 import type { ProjectField } from 'components/projects/ProjectFields';
 import { ProjectFieldProperties } from 'components/projects/ProjectFields';
@@ -24,11 +19,7 @@ function addMatchersToSchema({
   isRequired: boolean;
   schemaObject: Record<string, yup.StringSchema>;
 }) {
-  if (fieldType === 'twitter') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.matches(TWITTER_URL_REGEX, 'Invalid Twitter URL');
-  } else if (fieldType === 'github') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.matches(GITHUB_URL_REGEX, 'Invalid GitHub URL');
-  } else if (fieldType === 'walletAddress') {
+  if (fieldType === 'walletAddress') {
     schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-address', 'Invalid wallet address', (value) => {
       try {
         if (isRequired && !value) {
@@ -36,7 +27,7 @@ function addMatchersToSchema({
         }
 
         if (value) {
-          return ethers.utils.isAddress(value);
+          return ethers.utils.isAddress(value) || value.endsWith('.eth');
         }
 
         return true;
@@ -44,8 +35,6 @@ function addMatchersToSchema({
         return false;
       }
     });
-  } else if (fieldType === 'linkedin') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.matches(LINKEDIN_URL_REGEX, 'Invalid LinkedIn URL');
   } else if (fieldType === 'email') {
     schemaObject[fieldType] = schemaObject[fieldType]!.email('Invalid email');
   }
