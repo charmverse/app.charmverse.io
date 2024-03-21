@@ -125,7 +125,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
   const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
 
-  const parentPageIds = cardBlocks.map((block) => block.parentId).filter((id) => Boolean(id));
+  const parentPageIds = cardBlocks.map((block) => block.parentId).filter(isTruthy);
 
   const parentPages = await prisma.page.findMany({
     where: {
@@ -188,7 +188,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
         },
         createdAt: cardBlock.createdAt,
         path: getPagePath(),
-        title: cardBlock.title,
+        title: cardBlock.title || '',
         icon: cardFields.icon,
         type: cardFields.isTemplate ? 'card_template' : 'card',
         headerImage: cardFields.headerImage,

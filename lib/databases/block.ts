@@ -2,6 +2,8 @@ import type { PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
+import type { OptionalFalseyFields } from 'lib/utils/objects';
+
 // export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
 export type BlockTypes = (typeof blockTypes)[number];
@@ -22,29 +24,33 @@ export type BlockPatch = {
 export type Block = {
   id: string;
   spaceId: string;
-  parentId: string;
+  parentId?: string;
   rootId: string;
   createdBy: string;
   updatedBy: string;
 
-  schema: number;
+  // schema: number;
   type: BlockTypes;
   title: string;
   fields: Record<string, any>;
 
   createdAt: number;
   updatedAt: number;
-  deletedAt: number | null;
+  deletedAt?: number | null;
 };
 
-export type BlockWithDetails = Omit<PrismaBlock, 'fields' | 'type'> & {
-  pageId?: string;
-  icon?: string;
-  fields: Record<string, any>;
-  hasContent?: boolean;
-  pageType?: PageType;
-  type: BlockTypes;
-};
+// The following fields always have a value, and therefore will never be optional
+type RequiredFields = 'id' | 'spaceId' | 'rootId' | 'createdBy' | 'updatedBy' | 'createdAt' | 'updatedAt';
+
+export type BlockWithDetails = OptionalFalseyFields<
+  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | RequiredFields> & {
+    pageId?: string;
+    icon?: string;
+    hasContent?: boolean;
+    pageType?: PageType;
+  }
+> &
+  Pick<PrismaBlock, RequiredFields> & { fields: Record<string, any>; type: BlockTypes };
 
 export type UIBlockWithDetails = Block & {
   pageId?: string;
@@ -61,7 +67,6 @@ export function createBlock(block?: Partial<Block>): Block {
   const updatedAt = block?.updatedAt || createdAt;
   return {
     id: block?.id || v4(),
-    schema: 1,
     spaceId: block?.spaceId || '',
     parentId: block?.parentId || '',
     rootId: block?.rootId || '',
@@ -126,12 +131,12 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
 export function blockToPrisma(fbBlock: Block): PrismaBlockSortOf {
   return {
     id: fbBlock.id,
-    parentId: fbBlock.parentId,
+    parentId: fbBlock.parentId || '',
     rootId: fbBlock.rootId,
     spaceId: fbBlock.spaceId,
     updatedBy: fbBlock.updatedBy,
     createdBy: fbBlock.createdBy,
-    schema: fbBlock.schema,
+    schema: 1,
     type: fbBlock.type,
     title: fbBlock.title,
     fields: fbBlock.fields,
@@ -149,7 +154,6 @@ export function prismaToBlock(block: PrismaBlock): Block {
     spaceId: block.spaceId,
     updatedBy: block.updatedBy,
     createdBy: block.createdBy,
-    schema: block.schema,
     type: block.type as BlockTypes,
     title: block.title,
     fields: block.fields as any,

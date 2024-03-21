@@ -23,6 +23,7 @@ export function blockToFBBlock(block: BlockWithDetails): UIBlockWithDetails {
     deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
     createdAt: new Date(block.createdAt).getTime(),
     updatedAt: new Date(block.updatedAt).getTime(),
+    title: block.title || '',
     type: block.type as UIBlockWithDetails['type'],
     fields
   };
@@ -33,7 +34,6 @@ export function fbBlockToBlock(fbBlock: UIBlockWithDetails): Omit<BlockWithDetai
     id: fbBlock.id,
     parentId: fbBlock.parentId,
     rootId: fbBlock.rootId,
-    schema: fbBlock.schema,
     type: fbBlock.type,
     title: fbBlock.title,
     fields: fbBlock.fields,

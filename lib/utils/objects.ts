@@ -22,18 +22,18 @@ export function typedKeys<T>(obj: T): (keyof T)[] {
 }
 
 // Mark fields that we dont need to send to the frotnend (booleans, nulls and empty strings) as optional
-type OptionalFalseyFields<T> = {
+export type OptionalFalseyFields<T> = {
   [K in keyof T]: T[K] extends string
     ? T[K] | undefined
     : T[K] extends boolean
     ? T[K] | undefined
     : null extends T[K]
     ? T[K] | undefined
-    : K;
+    : T[K];
 };
 
 // mutative method
-export function removeFalseyFields<T extends object>(obj: T): OptionalFalseyFields<T> {
+export function removeFalseyFields<T extends object, U extends keyof T>(obj: T): OptionalFalseyFields<T> {
   const result = obj as OptionalFalseyFields<T>;
   for (const [key, value] of Object.entries(result)) {
     if (value === null || obj[key as keyof T] === '') {

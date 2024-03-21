@@ -116,6 +116,8 @@ export class CharmversePage {
 
         await prisma.block.create({
           data: {
+            parentId: '',
+            schema: 1,
             ...createCard({
               title: notionPageTitle,
               id: this.charmversePageId,
