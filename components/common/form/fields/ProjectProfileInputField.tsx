@@ -6,9 +6,35 @@ import { useEffect, useState } from 'react';
 import { useGetProjects } from 'charmClient/hooks/projects';
 import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
+import { useProject } from 'components/settings/projects/hooks/useProjects';
 import { useUser } from 'hooks/useUser';
 
 import type { FormFieldValue } from '../interfaces';
+
+function ProjectProfileFormAnswers({
+  selectedProject,
+  fieldConfig
+}: {
+  selectedProject: ProjectWithMembers;
+  fieldConfig: ProjectEditorFieldConfig;
+}) {
+  const { isAddingMember, isTeamLead, onProjectMemberAdd, onProjectMemberRemove, onProjectUpdate } = useProject({
+    projectId: selectedProject.id
+  });
+
+  return (
+    <ProjectFormAnswers
+      defaultRequired
+      onMemberRemove={onProjectMemberRemove}
+      onMemberAdd={onProjectMemberAdd}
+      onChange={onProjectUpdate}
+      isTeamLead={isTeamLead}
+      fieldConfig={fieldConfig}
+      values={selectedProject}
+      disableAddMemberButton={isAddingMember}
+    />
+  );
+}
 
 export function ProjectProfileInputField({
   onChange,
@@ -63,14 +89,9 @@ export function ProjectProfileInputField({
         </MenuItem>
       </Select>
       {selectedProject && (
-        <ProjectFormAnswers
-          defaultRequired
-          onMemberRemove={() => {}}
-          onMemberAdd={() => {}}
-          onChange={() => {}}
-          isTeamLead={isTeamLead}
+        <ProjectProfileFormAnswers
+          selectedProject={selectedProject}
           fieldConfig={formField.extraFields as ProjectEditorFieldConfig}
-          values={selectedProject}
         />
       )}
     </Stack>

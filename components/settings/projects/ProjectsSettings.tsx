@@ -17,6 +17,8 @@ import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
+import { useProject } from './hooks/useProjects';
+
 function ProjectRow({
   mutate,
   projectWithMember
@@ -24,117 +26,9 @@ function ProjectRow({
   projectWithMember: ProjectWithMembers;
   mutate: KeyedMutator<ProjectWithMembers[]>;
 }) {
-  const { user } = useUser();
-  const isTeamLead = projectWithMember.projectMembers[0].userId === user?.id;
-  const { trigger: updateProject } = useUpdateProject({ projectId: projectWithMember.id });
-  const { trigger: addProjectMember, isMutating } = useAddProjectMember({ projectId: projectWithMember.id });
-
-  const { showMessage } = useSnackbar();
-  const debouncedUpdate = useMemo(() => {
-    return debounce(updateProject, 300);
-  }, [updateProject]);
-
-  async function onProjectUpdate(_project: ProjectValues) {
-    try {
-      // Add ids to project & projectMembers
-      await debouncedUpdate({
-        id: projectWithMember.id,
-        ..._project,
-        projectMembers: _project.projectMembers.map((projectMember, index) => {
-          return {
-            ...projectWithMember.projectMembers[index],
-            ...projectMember
-          };
-        })
-      });
-
-      mutate(
-        (projects) => {
-          if (!projects) {
-            return projects;
-          }
-
-          return projects.map((project) => {
-            if (project.id === projectWithMember.id) {
-              return {
-                ...project,
-                ..._project,
-                projectMembers: _project.projectMembers.map((projectMember, index) => {
-                  return {
-                    ...project.projectMembers[index],
-                    ...projectMember
-                  };
-                })
-              };
-            }
-
-            return project;
-          });
-        },
-        {
-          revalidate: false
-        }
-      );
-    } catch (_) {
-      showMessage('Failed to update project', 'error');
-    }
-  }
-
-  async function onProjectMemberAdd() {
-    try {
-      const addedProjectMember = await addProjectMember();
-      mutate((projects) => {
-        if (!projects) {
-          return projects;
-        }
-
-        return projects.map((project) => {
-          if (project.id === projectWithMember.id) {
-            return {
-              ...project,
-              projectMembers: [...project.projectMembers, addedProjectMember]
-            };
-          }
-
-          return project;
-        });
-      });
-    } catch (_) {
-      showMessage('Failed to add project member', 'error');
-    }
-  }
-
-  async function onProjectMemberRemove(memberIndex: number) {
-    const memberId = projectWithMember.projectMembers[memberIndex]?.id;
-    if (!memberId) {
-      return;
-    }
-
-    try {
-      await charmClient.removeProjectMember({
-        projectId: projectWithMember.id,
-        memberId
-      });
-      mutate((projects) => {
-        if (!projects) {
-          return projects;
-        }
-
-        return projects.map((project) => {
-          if (project.id === projectWithMember.id) {
-            return {
-              ...project,
-              projectMembers: project.projectMembers.filter((_, index) => index !== memberIndex)
-            };
-          }
-
-          return project;
-        });
-      });
-    } catch (_) {
-      showMessage('Failed to remove project member', 'error');
-    }
-  }
+  const { isTeamLead, onProjectMemberAdd, onProjectMemberRemove, isAddingMember, onProjectUpdate } = useProject({
+    projectId: projectWithMember.id
+  });
 
   return (
     <Accordion>
@@ -159,7 +53,7 @@ function ProjectRow({
           onChange={onProjectUpdate}
           onMemberAdd={onProjectMemberAdd}
           values={projectWithMember}
-          disableAddMemberButton={isMutating}
+          disableAddMemberButton={isAddingMember}
         />
       </AccordionDetails>
     </Accordion>
