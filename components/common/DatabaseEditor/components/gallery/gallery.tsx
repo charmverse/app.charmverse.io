@@ -5,7 +5,7 @@ import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../mutator';

@@ -91,7 +91,6 @@ const GalleryCard = React.memo((props: Props) => {
               key={template.id}
               updatedAt={cardPage?.updatedAt.toString() || ''}
               updatedBy={cardPage?.updatedBy || ''}
-              syncWithPageId={cardPage.syncWithPageId}
               board={board}
               readOnly
               card={card}

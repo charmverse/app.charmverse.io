@@ -62,7 +62,7 @@ export function ProposalsPage({ title }: { title: string }) {
   const isAdmin = useIsAdmin();
   const { showError } = useSnackbar();
   const { user } = useUser();
-  const { board: activeBoard, views, cardPages, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
+  const { board: activeBoard, views, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
@@ -267,7 +267,7 @@ export function ProposalsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {cardPages.length > 0 ? (
+            {cards.length > 0 ? (
               <Box width='100%'>
                 <Table
                   boardType='proposals'
@@ -277,7 +277,7 @@ export function ProposalsPage({ title }: { title: string }) {
                   }}
                   board={activeBoard}
                   activeView={activeView}
-                  cardPages={cardPages}
+                  cards={cards}
                   groupByProperty={groupByProperty}
                   views={views}
                   visibleGroups={[]}

@@ -28,7 +28,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import { proposalPropertyTypesList } from 'lib/databases/board';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { CardWithRelations } from 'lib/databases/card';
 import {
   EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
@@ -81,8 +81,7 @@ import { UserSelect } from './properties/UserSelect';
 type Props = {
   board: Board;
   readOnly: boolean;
-  card: Card;
-  syncWithPageId?: string | null;
+  card: CardWithRelations;
   updatedBy: string;
   updatedAt: string;
   propertyTemplate: IPropertyTemplate;
@@ -93,8 +92,6 @@ type Props = {
   columnRef?: React.RefObject<HTMLDivElement>;
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
-  proposal?: CardPage['proposal'];
-  reward?: CardPage['reward'];
   showCard?: (cardId: string | null) => void;
 };
 
@@ -147,10 +144,9 @@ function PropertyValueElement(props: Props) {
     updatedAt,
     displayType,
     mutator = defaultMutator,
-    subRowsEmptyValueContent,
-    proposal,
-    reward
+    subRowsEmptyValueContent
   } = props;
+  const { proposal, reward } = card;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
   const { trigger: syncRelationPropertyValue } = useSyncRelationPropertyValue();
 

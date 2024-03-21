@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { resolvePageTree } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { PageListItemsRecord } from 'components/common/DatabaseEditor/interfaces';
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
@@ -15,7 +14,6 @@ import type { Board, BoardFields, IPropertyTemplate, PropertyType } from './boar
 import type { BoardView, BoardViewFields } from './boardView';
 import type { Card, CardFields } from './card';
 import { Constants } from './constants';
-import { getRelationPropertiesCardsRecord } from './getRelationPropertiesCardsRecord';
 
 export async function loadAndGenerateCsv({
   databaseId,
@@ -140,16 +138,14 @@ export async function loadAndGenerateCsv({
     (property) => property.type === 'relation'
   );
 
-  const cardPropertyPageIds: string[] = [];
-
-  relationProperties.forEach((relationProperty) => {
-    cardBlocks.forEach((cardBlock) => {
-      const connectedPageIds = (cardBlock.fields as CardFields).properties[relationProperty.id] as string[];
-      if (connectedPageIds?.length) {
-        cardPropertyPageIds.push(...connectedPageIds);
-      }
-    });
-  });
+  const cardPropertyPageIds = relationProperties
+    .map((relationProperty) => {
+      return cardBlocks.map((cardBlock) => {
+        const connectedPageIds = (cardBlock.fields as CardFields).properties[relationProperty.id] as string[];
+        return connectedPageIds || [];
+      });
+    })
+    .flat(2);
 
   const connectedAccessiblePageIds = await permissionsApiClient.pages
     .bulkComputePagePermissions({
@@ -170,21 +166,14 @@ export async function loadAndGenerateCsv({
     },
     select: {
       id: true,
-      title: true,
-      type: true,
-      path: true,
-      parentId: true,
-      icon: true,
-      hasContent: true
+      title: true
     }
   });
 
-  const relationPropertiesCardsRecord = boardBlock
-    ? getRelationPropertiesCardsRecord({
-        properties: (boardBlock.fields as unknown as BoardFields)?.cardProperties ?? [],
-        pages: connectedPages
-      })
-    : {};
+  const cardMap = connectedPages.reduce<Record<string, { title: string }>>((acc, page) => {
+    acc[page.id] = page;
+    return acc;
+  }, {});
 
   const csvData = generateCSV(
     boardBlock as any,
@@ -198,7 +187,7 @@ export async function loadAndGenerateCsv({
       users: spaceMembers,
       spaceDomain: space.domain
     },
-    relationPropertiesCardsRecord
+    cardMap
   );
 
   return {
@@ -213,9 +202,9 @@ function generateCSV(
   cards: Card[],
   formatters: Formatters,
   context: PropertyContext,
-  relationPropertiesCardsRecord: PageListItemsRecord
+  cardMap: Record<string, { title: string }>
 ) {
-  const { rows, rowIds } = generateTableArray(board, cards, view, formatters, context, relationPropertiesCardsRecord);
+  const { rows, rowIds } = generateTableArray(board, cards, view, formatters, context, cardMap);
   let csvContent = '';
 
   rows.forEach((row) => {
@@ -247,7 +236,7 @@ function generateTableArray(
   viewToExport: BoardView,
   formatters: Formatters,
   context: PropertyContext,
-  relationPropertiesCardsRecord: PageListItemsRecord
+  cardMap: Record<string, { title: string }>
 ): { rows: string[][]; rowIds: string[] } {
   const rows: string[][] = [];
   const cardProperties = board.fields.cardProperties as IPropertyTemplate[];
@@ -283,7 +272,7 @@ function generateTableArray(
       formatters,
       hasTitleProperty: !!titleProperty,
       visibleProperties: cardProperties,
-      relationPropertiesCardsRecord
+      cardMap
     });
     rows.push(rowColumns);
   });
@@ -297,9 +286,9 @@ export function getCSVColumns({
   formatters,
   hasTitleProperty,
   visibleProperties,
-  relationPropertiesCardsRecord
+  cardMap
 }: {
-  relationPropertiesCardsRecord: PageListItemsRecord;
+  cardMap: Record<string, { title: string }>;
   card: Card;
   context: PropertyContext;
   formatters: Formatters;
@@ -319,7 +308,7 @@ export function getCSVColumns({
         propertyValue,
         propertyTemplate,
         formatters,
-        relationPropertiesCardsRecord
+        cardMap
       }) || '';
     if (propertyTemplate.id === Constants.titleColumnId) {
       columns.push(`"${encodeText(card.title)}"`);

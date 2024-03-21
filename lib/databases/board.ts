@@ -5,7 +5,7 @@ import { createBlock } from 'lib/databases/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
-import type { Card, CardPage } from './card';
+import type { Card } from './card';
 
 export const proposalPropertyTypesList = [
   'proposalUrl',
@@ -159,7 +159,6 @@ function createBoard({
 type BoardGroup = {
   option: IPropertyOption;
   cards: Card[];
-  cardPages: CardPage[];
 };
 
 export { createBoard };

@@ -90,50 +90,18 @@ describe('src/component/kanban/kanban', () => {
   const visibleGroups: BoardGroup[] = [
     {
       option: optionQ1,
-      cards: [card1, card2],
-      cardPages: [
-        {
-          card: card1,
-          page: pageStubToCreate({
-            id: card1.id,
-            createdBy: 'user-id-1',
-            spaceId: 'space-id-1',
-            path: card1.id
-          }) as PageMeta
-        },
-        {
-          card: card2,
-          page: pageStubToCreate({
-            id: card2.id,
-            createdBy: 'user-id-1',
-            spaceId: 'space-id-1',
-            path: card2.id
-          }) as PageMeta
-        }
-      ]
+      cards: [card1, card2]
     },
     {
       option: optionQ2,
-      cards: [card3],
-      cardPages: [
-        {
-          card: card3,
-          page: pageStubToCreate({
-            id: card3.id,
-            createdBy: 'user-id-1',
-            spaceId: 'space-id-1',
-            path: card3.id
-          }) as PageMeta
-        }
-      ]
+      cards: [card3]
     }
   ];
 
   const hiddenGroups: BoardGroup[] = [
     {
       option: optionQ3,
-      cards: [],
-      cardPages: []
+      cards: []
     }
   ];
 

@@ -20,15 +20,15 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
   const boardBlocks = blocks.filter((b) => b.type === 'board');
   const connectedBoardIds = boardBlocks
     .map((boardBlock) =>
-      (boardBlock.fields as unknown as BoardFields).cardProperties
-        .filter((cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData)
-        .map((cardProperty) => cardProperty.relationData?.boardId)
+      (boardBlock.fields as unknown as BoardFields).cardProperties.map(
+        (cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData?.boardId
+      )
     )
     .flat()
     .filter(isTruthy);
+
   const connectedBoards = await prisma.block.findMany({
     where: {
-      type: 'board',
       id: {
         in: connectedBoardIds
       }
@@ -86,8 +86,10 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       id: true,
       icon: true,
       title: true,
+      bountyId: true,
       cardId: true,
       boardId: true,
+      hasContent: true,
       type: true,
       updatedAt: true,
       updatedBy: true
@@ -96,9 +98,17 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
 
   let source: SourceType | undefined;
 
+  const pagesMap = pages.reduce<Record<string, (typeof pages)[number]>>((acc, page) => {
+    const id = page.cardId || page.boardId;
+    if (id) {
+      acc[id] = page;
+    }
+    return acc;
+  }, {});
+
   const validBlocks = blocks
     .map((block) => {
-      const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
+      const page = pagesMap[block.id];
       if (page) {
         return buildBlockWithDetails(block, page);
       }

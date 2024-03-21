@@ -4,14 +4,13 @@ import { getChainList } from 'connectors/chains';
 
 import type { Board } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card } from 'lib/databases/card';
 import { CardFilter } from 'lib/databases/cardFilter';
 import { Constants } from 'lib/databases/constants';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { Member } from 'lib/members/interfaces';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
-import type { PageListItemsRecord } from '../interfaces';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
@@ -109,9 +108,11 @@ const cardsSlice = createSlice({
 export const { updateCards, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
-export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
+const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
 
-export const getSortedCards = createSelector(getCards, (cards) => {
+export const getAllCards = createSelector(getCards, (cards) => cards);
+
+const getSortedCards = createSelector(getCards, (cards) => {
   return Object.values(cards).sort((a, b) => a.title.localeCompare(b.title)) as Card[];
 });
 
@@ -123,12 +124,9 @@ export function getCard(cardId: string): (state: RootState) => Card | undefined 
   };
 }
 
-function titleOrCreatedOrder(
-  cardA: { card: { createdAt: number }; page: { title: string } },
-  cardB: { card: { createdAt: number }; page: { title: string } }
-) {
-  const aValue = cardA.page.title;
-  const bValue = cardB.page.title;
+function titleOrCreatedOrder(cardA: { createdAt: number; title: string }, cardB: { createdAt: number; title: string }) {
+  const aValue = cardA.title;
+  const bValue = cardB.title;
 
   if (aValue && bValue && aValue.localeCompare) {
     return aValue.localeCompare(bValue);
@@ -143,12 +141,12 @@ function titleOrCreatedOrder(
   }
 
   // If both cards are untitled, use the create date
-  return new Date(cardA.card.createdAt).getTime() - new Date(cardB.card.createdAt).getTime();
+  return new Date(cardA.createdAt).getTime() - new Date(cardB.createdAt).getTime();
 }
 
-function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
-  const indexA = activeView.fields.cardOrder.indexOf(cardA.card.id);
-  const indexB = activeView.fields.cardOrder.indexOf(cardB.card.id);
+function manualOrder(activeView: BoardView, cardA: Card, cardB: Card) {
+  const indexA = activeView.fields.cardOrder.indexOf(cardA.id);
+  const indexB = activeView.fields.cardOrder.indexOf(cardB.id);
 
   if (indexA < 0 && indexB < 0) {
     return titleOrCreatedOrder(cardA, cardB);
@@ -160,25 +158,25 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 }
 
 export function sortCards(
-  cardPages: CardPage[],
+  cards: Card[],
   board: Pick<Board, 'fields'>,
   activeView: BoardView,
   members: Record<string, Member>,
-  relationPropertiesCardsRecord: PageListItemsRecord,
+  cardTitles: Record<string, { title: string }>,
   localSort?: ISortOption[] | null
-): CardPage[] {
+): Card[] {
   if (!activeView) {
-    return cardPages;
+    return cards;
   }
 
   const { sortOptions: globalSortOptions } = activeView.fields;
   const sortOptions = localSort || globalSortOptions;
 
   if (sortOptions?.length < 1) {
-    return cardPages.sort((a, b) => manualOrder(activeView, a, b));
+    return cards.sort((a, b) => manualOrder(activeView, a, b));
   }
 
-  let sortedCards = cardPages;
+  let sortedCards = cards;
   for (const sortOption of sortOptions) {
     if (sortOption.propertyId === Constants.titleColumnId) {
       Utils.log('Sort by title');
@@ -194,15 +192,15 @@ export function sortCards(
         return sortedCards;
       }
       sortedCards = sortedCards.sort((a, b) => {
-        let aValue = a.card.fields.properties[sortPropertyId] || '';
-        let bValue = b.card.fields.properties[sortPropertyId] || '';
+        let aValue = a.fields.properties[sortPropertyId] || '';
+        let bValue = b.fields.properties[sortPropertyId] || '';
 
         if (template.type === 'createdBy') {
-          aValue = members[a.card.createdBy]?.username || '';
-          bValue = members[b.card.createdBy]?.username || '';
+          aValue = members[a.createdBy]?.username || '';
+          bValue = members[b.createdBy]?.username || '';
         } else if (template.type === 'updatedBy') {
-          aValue = members[a.page.updatedBy]?.username || '';
-          bValue = members[b.page.updatedBy]?.username || '';
+          aValue = members[a.updatedBy]?.username || '';
+          bValue = members[b.updatedBy]?.username || '';
         } else if (template.type === 'date') {
           if (typeof aValue !== 'number') {
             aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
@@ -212,15 +210,8 @@ export function sortCards(
             bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
           }
         } else if (template.type === 'relation') {
-          const pageListItems = relationPropertiesCardsRecord[template.id] ?? [];
-          const aPageListItems = Array.isArray(aValue)
-            ? aValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
-            : [];
-          const bPageListItems = Array.isArray(bValue)
-            ? bValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
-            : [];
-          aValue = aPageListItems.join(', ');
-          bValue = bPageListItems.join(', ');
+          aValue = Array.isArray(aValue) ? aValue.map((pageId) => cardTitles[pageId]?.title || '').join() : '';
+          bValue = Array.isArray(bValue) ? bValue.map((pageId) => cardTitles[pageId]?.title || '').join() : '';
         }
 
         let result = 0;
@@ -244,9 +235,9 @@ export function sortCards(
             result = Number(aValue) - Number(bValue);
           }
         } else if (template.type === 'createdTime') {
-          result = a.card.createdAt - b.card.createdAt;
+          result = a.createdAt - b.createdAt;
         } else if (template.type === 'updatedTime') {
-          result = a.card.updatedAt - b.card.updatedAt;
+          result = a.updatedAt - b.updatedAt;
         } else if (template.type === 'checkbox') {
           // aValue will be true or empty string
           if (aValue) {

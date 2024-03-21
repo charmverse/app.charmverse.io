@@ -27,7 +27,7 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
     () =>
       activeBoard?.fields && pages
         ? getRelationPropertiesCardsRecord({
-            pages: Object.values(pages),
+            cards: Object.values(pages),
             properties: activeBoard.fields.cardProperties
           })
         : {},

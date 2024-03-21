@@ -1,35 +1,33 @@
-import type { PageMeta } from '@charmverse/core/pages';
-
 import type { PageListItemsRecord } from 'components/common/DatabaseEditor/interfaces';
 import type { PageListItem } from 'components/common/PagesList';
-import { isTruthy } from 'lib/utils/types';
+import type { Card } from 'lib/databases/card';
 
 import type { IPropertyTemplate } from './board';
 
 export function getRelationPropertiesCardsRecord({
   properties,
-  pages
+  cards
 }: {
   properties: IPropertyTemplate[];
-  pages: ((PageListItem & { parentId: PageMeta['parentId'] }) | undefined)[];
+  cards: Card[];
 }) {
   const boardCardsRecord: PageListItemsRecord = {};
   const relationProperties = properties.filter((o) => o.type === 'relation');
 
-  pages.filter(isTruthy).forEach((page) => {
-    const pageListItem = {
-      icon: page.icon,
-      id: page.id,
-      title: page.title,
-      hasContent: page.hasContent,
-      path: page.path,
-      type: page.type
+  cards.forEach((card) => {
+    const pageListItem: PageListItem = {
+      icon: card.icon || null,
+      id: card.pageId || '',
+      title: card.title,
+      hasContent: !!card.hasContent,
+      path: card.pageId || '',
+      type: 'card'
     };
-    if (page.type === 'card' && page.parentId) {
-      if (!boardCardsRecord[page.parentId]) {
-        boardCardsRecord[page.parentId] = [pageListItem];
+    if (card.type === 'card' && card.parentId) {
+      if (!boardCardsRecord[card.parentId]) {
+        boardCardsRecord[card.parentId] = [pageListItem];
       } else {
-        boardCardsRecord[page.parentId].push(pageListItem);
+        boardCardsRecord[card.parentId].push(pageListItem);
       }
     }
   });

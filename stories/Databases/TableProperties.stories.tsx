@@ -139,10 +139,7 @@ export function DatabaseTableView() {
           onCardClicked={voidFunction}
           selectedCardIds={[]}
           visibleGroups={[]}
-          cardPages={[
-            { card: card1, page: page1 },
-            { card: card2, page: page2 }
-          ]}
+          cards={[card1, card2]}
         />
       </div>
     </GlobalContext>

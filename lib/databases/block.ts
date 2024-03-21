@@ -45,6 +45,7 @@ type RequiredFields = 'id' | 'spaceId' | 'rootId' | 'createdBy' | 'updatedBy' | 
 export type BlockWithDetails = OptionalFalseyFields<
   Omit<PrismaBlock, 'fields' | 'schema' | 'type' | RequiredFields> & {
     pageId?: string;
+    bountyId?: string;
     icon?: string;
     hasContent?: boolean;
     pageType?: PageType;
@@ -54,6 +55,7 @@ export type BlockWithDetails = OptionalFalseyFields<
 
 export type UIBlockWithDetails = Block & {
   pageId?: string;
+  bountyId?: string;
   icon?: string;
   hasContent?: boolean;
   pageType?: PageType;

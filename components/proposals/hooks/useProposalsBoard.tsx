@@ -4,7 +4,7 @@ import type { KeyedMutator } from 'swr';
 
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { CardWithRelations } from 'lib/databases/card';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 
 import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
@@ -12,8 +12,7 @@ import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalPro
 export type ProposalsBoardContextType = {
   board: Board;
   boardCustomProperties: Board;
-  cards: Card[];
-  cardPages: CardPage[];
+  cards: CardWithRelations[];
   activeView: BoardView;
   views: BoardView[];
   isLoading: boolean;

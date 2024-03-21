@@ -15,7 +15,6 @@ import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
-import type { PageListItemsRecord } from './interfaces';
 import { Utils } from './utils';
 
 export type Formatters = {
@@ -35,14 +34,14 @@ class OctoUtils {
     propertyTemplate,
     formatters,
     context,
-    relationPropertiesCardsRecord = {}
+    cardMap = {}
   }: {
     block: UIBlockWithDetails;
     propertyValue: string | string[] | undefined | number;
     propertyTemplate: IPropertyTemplate;
     formatters: Formatters;
     context?: PropertyContext;
-    relationPropertiesCardsRecord?: PageListItemsRecord;
+    cardMap?: Record<string, { title: string }>;
   }) {
     const { date: formatDate, dateTime: formatDateTime } = formatters;
     let displayValue: string | string[] | undefined | number;
@@ -92,11 +91,9 @@ class OctoUtils {
         break;
       }
       case 'relation': {
-        const pageListItems = relationPropertiesCardsRecord[propertyTemplate.id];
-        if (pageListItems && Array.isArray(propertyValue)) {
-          displayValue = propertyValue.map((pageListItemId) => {
-            const pageListItem = pageListItems.find((item) => item.id === pageListItemId);
-            return pageListItem?.title || 'Untitled';
+        if (Array.isArray(propertyValue)) {
+          displayValue = propertyValue.map((pageId) => {
+            return cardMap[pageId]?.title || 'Untitled';
           });
         }
         break;
