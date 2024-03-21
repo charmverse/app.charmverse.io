@@ -4,6 +4,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { SelectChangeEvent } from '@mui/material';
 import {
+  Autocomplete,
   Button,
   Checkbox,
   Chip,
@@ -44,6 +45,8 @@ import { focalboardColorsMap } from 'theme/colors';
 import type { PageListItemsRecord } from '../../interfaces';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 import { RelationPageListItemsContainer } from '../properties/PagesAutocomplete';
+
+import { RelatedPagesSelect } from './RelatedPagesSelect';
 
 type Props = {
   properties: IPropertyTemplate[];
@@ -270,53 +273,7 @@ function FilterPropertyValue({
         </Select>
       );
     } else if (property.type === 'relation') {
-      const pageListItems = relationPropertiesCardsRecord[property.id];
-      return (
-        <Select<string[]>
-          size='small'
-          multiple
-          displayEmpty
-          value={filter.values}
-          onChange={updateMultiSelectValue}
-          renderValue={(pageListItemIds) => {
-            return pageListItemIds.length === 0 ? (
-              <Typography color='secondary' fontSize='small'>
-                Select a page
-              </Typography>
-            ) : (
-              <RelationPageListItemsContainer
-                pageListItems={pageListItemIds
-                  .map((pageListItemId) => {
-                    const pageListItem = pageListItems.find((_pageListItem) => _pageListItem.id === pageListItemId);
-                    return pageListItem;
-                  })
-                  .filter(isTruthy)}
-              />
-            );
-          }}
-        >
-          {pageListItems.map((pageListItem) => {
-            return (
-              <MenuItem
-                key={pageListItem.id}
-                value={pageListItem.id}
-                selected={!!filter.values.find((selectedPageListItemId) => selectedPageListItemId === pageListItem.id)}
-              >
-                <ListItemIcon>
-                  <PageIcon
-                    icon={pageListItem.icon}
-                    isEditorEmpty={!pageListItem.hasContent}
-                    pageType={pageListItem.type}
-                  />
-                </ListItemIcon>
-                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-                  {pageListItem.title ? pageListItem.title : 'Untitled'}
-                </PageTitle>
-              </MenuItem>
-            );
-          })}
-        </Select>
-      );
+      return <RelatedPagesSelect value={filter.values} parentPageId={} onChange={updateMultiSelectValue} />;
     } else {
       return (
         <Select<string[]>
