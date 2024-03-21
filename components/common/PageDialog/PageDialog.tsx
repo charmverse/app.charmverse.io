@@ -8,15 +8,15 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
-import { useGetPage } from 'charmClient/hooks/pages';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DocumentPage } from 'components/[pageId]/DocumentPage/DocumentPage';
 import { DocumentPageProviders } from 'components/[pageId]/DocumentPage/DocumentPageProviders';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utils/debouncePromise';
 
@@ -51,7 +51,7 @@ function PageDialogBase(props: Props) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
   const { updatePage } = usePages();
-  const { data: page } = useGetPage(pageId);
+  const { page } = usePage({ pageIdOrPath: pageId });
   const pagePermissions = page?.permissionFlags || new AvailablePagePermissions().full;
   const domain = router.query.domain as string;
   const fullPageUrl = page?.path

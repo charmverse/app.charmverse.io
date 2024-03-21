@@ -1,9 +1,9 @@
 import type { RewardBlock } from '@charmverse/core/prisma-client';
 
-import type { Block } from 'lib/focalboard/block';
-import type { Board, IPropertyTemplate, BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
-import type { Card, CardPropertyValue } from 'lib/focalboard/card';
+import type { Block } from 'lib/databases/block';
+import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
+import type { Card, CardPropertyValue } from 'lib/databases/card';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 import type { ApplicationMeta } from '../interfaces';

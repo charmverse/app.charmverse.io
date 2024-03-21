@@ -6,8 +6,8 @@ import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 
 import { baseUrl } from 'config/constants';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { CardFields } from 'lib/focalboard/card';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { CardFields } from 'lib/databases/card';
 import { getDatabaseWithSchema } from 'lib/public-api/getDatabaseWithSchema';
 import { generateBoard } from 'testing/setupDatabase';
 

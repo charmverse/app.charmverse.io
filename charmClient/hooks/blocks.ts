@@ -1,7 +1,7 @@
-import type { RemoveRelationPropertyPayload } from 'lib/focalboard/relationProperty/removeRelationProperty';
-import type { RenameRelationPropertyPayload } from 'lib/focalboard/relationProperty/renameRelationProperty';
-import type { SyncRelatedCardsValuesPayload } from 'lib/focalboard/relationProperty/syncRelatedCardsValues';
-import type { SyncRelationPropertyPayload } from 'lib/focalboard/relationProperty/syncRelationProperty';
+import type { RemoveRelationPropertyPayload } from 'lib/databases/relationProperty/removeRelationProperty';
+import type { RenameRelationPropertyPayload } from 'lib/databases/relationProperty/renameRelationProperty';
+import type { SyncRelatedCardsValuesPayload } from 'lib/databases/relationProperty/syncRelatedCardsValues';
+import type { SyncRelationPropertyPayload } from 'lib/databases/relationProperty/syncRelationProperty';
 
 import { usePOST, usePUT } from './helpers';
 

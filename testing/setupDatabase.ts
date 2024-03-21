@@ -24,8 +24,8 @@ import type { Application, PagePermission, PageType } from '@charmverse/core/pri
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { DataSourceType } from 'lib/focalboard/board';
-import type { IViewType } from 'lib/focalboard/boardView';
+import type { DataSourceType } from 'lib/databases/board';
+import type { IViewType } from 'lib/databases/boardView';
 import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
@@ -459,7 +459,8 @@ export async function generateBountyWithSingleApplication({
   bountyDescription = 'Bounty description',
   customReward,
   deletedAt,
-  selectedCredentialTemplateIds
+  selectedCredentialTemplateIds,
+  approveSubmitters = false
 }: {
   customReward?: string;
   applicationStatus: ApplicationStatus;
@@ -473,6 +474,7 @@ export async function generateBountyWithSingleApplication({
   bountyDescription?: string;
   deletedAt?: Date | null;
   selectedCredentialTemplateIds?: string[];
+  approveSubmitters?: boolean;
 }): Promise<Bounty & { applications: Application[]; page: Page }> {
   const createdBounty = (await prisma.bounty.create({
     data: {
@@ -483,7 +485,7 @@ export async function generateBountyWithSingleApplication({
       customReward,
       status: bountyStatus ?? 'open',
       spaceId,
-      approveSubmitters: false,
+      approveSubmitters,
       selectedCredentialTemplates: selectedCredentialTemplateIds,
       // Important variable
       maxSubmissions: bountyCap,

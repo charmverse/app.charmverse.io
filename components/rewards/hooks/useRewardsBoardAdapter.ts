@@ -1,8 +1,8 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { useMemo } from 'react';
 
-import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { sortCards } from 'components/common/DatabaseEditor/store/cards';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -10,12 +10,12 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import type { BlockTypes } from 'lib/focalboard/block';
-import type { BoardView, IViewType } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
+import type { BlockTypes } from 'lib/databases/block';
+import type { BoardView, IViewType } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { Constants } from 'lib/databases/constants';
+import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
 import type { Member } from 'lib/members/interfaces';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,

@@ -1,7 +1,7 @@
 import type { Block, PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getUpsertBlockInput } from 'lib/focalboard/customBlocks/getUpsertBlockInput';
+import { getUpsertBlockInput } from 'lib/databases/customBlocks/getUpsertBlockInput';
 import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
 export function upsertBlock({

@@ -34,7 +34,7 @@ export function useCreateSafes(safeAddresses: string[]) {
     if (safeAddresses.length && account && signer) {
       loadSafes();
     }
-  }, [account, safeAddresses.join(), signer]);
+  }, [account, safeAddresses, signer]);
 
   return safes;
 }

@@ -5,7 +5,7 @@ import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
 import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
 
-import type { Block } from 'lib/focalboard/block';
+import type { Block } from 'lib/databases/block';
 import type { FailedImportsError } from 'lib/notion/types';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';

@@ -20,8 +20,8 @@ import useSWR, { mutate } from 'swr';
 
 import charmClient from 'charmClient';
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { initialDatabaseLoad } from 'components/common/BoardEditor/focalboard/src/store/databaseBlocksLoad';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
+import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { ScrollableModal as Modal } from 'components/common/Modal';
 import { useCharmRouter } from 'hooks/useCharmRouter';

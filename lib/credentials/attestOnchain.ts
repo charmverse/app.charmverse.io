@@ -9,7 +9,7 @@ import { credentialsWalletPrivateKey } from 'config/constants';
 import { conditionalPlural } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
-import { attestationSchemaIds, encodeAttestion, type CredentialDataInput } from './schemas';
+import { attestationSchemaIds, encodeAttestation, type CredentialDataInput } from './schemas';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;
@@ -32,7 +32,7 @@ async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttesta
   const attestationUid = await eas
     .attest({
       schema: schemaId,
-      data: { recipient: credentialInputs.recipient, data: encodeAttestion({ type, data: credentialInputs.data }) }
+      data: { recipient: credentialInputs.recipient, data: encodeAttestation({ type, data: credentialInputs.data }) }
     })
     .then((tx) => tx.wait());
 
@@ -100,7 +100,7 @@ export async function multiAttestOnchain({
   const attestations = await eas.multiAttest([
     {
       data: credentialInputs.map(({ data, recipient }) => ({
-        data: encodeAttestion({ type, data }),
+        data: encodeAttestation({ type, data }),
         recipient: getAddress(recipient)
       })),
       schema: schemaId

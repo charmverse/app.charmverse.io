@@ -1,4 +1,5 @@
 import type { Node } from '@bangle.dev/pm';
+import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
@@ -138,7 +139,7 @@ function ResizableImage({
   updateAttrs,
   selected
 }: CharmNodeViewProps) {
-  const imageSource = node.attrs.src;
+  const imageSource = node.attrs.src as string | undefined;
   const autoOpen = node.marks.some((mark) => mark.type.name === 'tooltip-marker');
   const imageRef = useRef<HTMLElement>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
@@ -172,7 +173,8 @@ function ResizableImage({
               src: url
             });
           })
-          .catch(() => {
+          .catch((error) => {
+            log.error('Could not upload image', { imageSource: imageSource.slice(0, 100), error });
             setUploadFailed(true);
           })
           .finally(() => {

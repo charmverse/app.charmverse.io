@@ -7,8 +7,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ProfileSettings from 'components/settings/profile/ProfileSettings';
 import { MemberActions } from 'components/settings/roles/components/MemberActions';

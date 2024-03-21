@@ -6,7 +6,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 

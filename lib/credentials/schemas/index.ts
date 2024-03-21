@@ -27,7 +27,7 @@ export type CredentialData<T extends AttestationType = AttestationType> = {
   data: CredentialDataInput<T>;
 };
 
-export function encodeAttestion<T extends AttestationType = AttestationType>({ type, data }: CredentialData<T>) {
+export function encodeAttestation<T extends AttestationType = AttestationType>({ type, data }: CredentialData<T>) {
   if (type === 'proposal') {
     return encodeProposalCredential(data as ProposalCredential);
   } else if (type === 'reward') {

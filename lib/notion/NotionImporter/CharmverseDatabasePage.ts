@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
-import { createBoard } from 'lib/focalboard/board';
-import { createBoardView } from 'lib/focalboard/boardView';
+import { createBoard } from 'lib/databases/board';
+import { createBoardView } from 'lib/databases/boardView';
 
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';

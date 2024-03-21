@@ -141,7 +141,7 @@ jobs:
           cat files_to_zip.txt | zip --symlinks -r@ deploy.zip
           aws s3 sync .next/static/ s3://charm.cdn/webapp-assets/_next/static/
 
-      - name: Deploy to stagings
+      - name: Deploy to staging
         id: cdk_deploy
         run: |
           npm install aws-cdk aws-cdk-lib --no-audit --no-fund --force

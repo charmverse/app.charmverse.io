@@ -16,9 +16,9 @@ import React, { forwardRef, memo, useCallback, useMemo, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { CustomEmojiPicker } from 'components/common/CustomEmojiPicker';
+import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
+import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import Link from 'components/common/Link';
 import { AddToFavoritesAction } from 'components/common/PageActions/components/AddToFavoritesAction';
 import { CopyPageLinkAction } from 'components/common/PageActions/components/CopyPageLinkAction';

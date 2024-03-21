@@ -1,9 +1,9 @@
 // @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import { Block, blockToPrisma } from 'lib/focalboard/block';
-import { IPropertyTemplate } from 'lib/focalboard/board';
-import { BoardView } from 'lib/focalboard/boardView';
+import { Block, blockToPrisma } from 'lib/databases/block';
+import { IPropertyTemplate } from 'lib/databases/board';
+import { BoardView } from 'lib/databases/boardView';
 import { DEFAULT_BOARD_BLOCK_ID, DEFAULT_VIEW_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { ProposalBoardBlock } from 'lib/proposals/blocks/interfaces';
 import { ProposalFields } from 'lib/proposals/interfaces';
