@@ -19,7 +19,7 @@ import {
   TextField,
   Typography
 } from '@mui/material';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
@@ -31,7 +31,13 @@ import { mergeRefs } from 'lib/utils/react';
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
 
-import { fieldTypeIconRecord, fieldTypeLabelRecord, fieldTypePlaceholderRecord, formFieldTypes } from './constants';
+import {
+  fieldTypeIconRecord,
+  fieldTypeLabelRecord,
+  fieldTypePlaceholderRecord,
+  formFieldTypes,
+  nonDuplicateFieldTypes
+} from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import type { FormFieldInput } from './interfaces';
@@ -66,6 +72,7 @@ export interface FormFieldProps {
   onDeleteOption?: (option: SelectOptionType) => void;
   onUpdateOption?: (option: SelectOptionType) => void;
   shouldFocus?: boolean;
+  formFieldTypeFrequencyCount?: Record<FormFieldType, number>;
 }
 
 function ExpandedFormField({
@@ -76,7 +83,8 @@ function ExpandedFormField({
   onCreateOption,
   onDeleteOption,
   onUpdateOption,
-  shouldFocus
+  shouldFocus,
+  formFieldTypeFrequencyCount
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
@@ -87,6 +95,22 @@ function ExpandedFormField({
       titleTextFieldRef.current.querySelector('input')?.focus();
     }
   }, [titleTextFieldRef]);
+
+  const formFieldType = formField.type;
+  const filteredFormFieldTypes = useMemo(() => {
+    if (!formFieldTypeFrequencyCount) {
+      return formFieldTypes;
+    }
+
+    return formFieldTypes.filter((_formFieldType) => {
+      const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
+      if (nonDuplicateFieldType) {
+        return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
+      }
+
+      return true;
+    });
+  }, [formFieldTypeFrequencyCount, formFieldType]);
 
   return (
     <>
@@ -105,7 +129,7 @@ function ExpandedFormField({
           }}
           variant='outlined'
         >
-          {formFieldTypes.map((fieldType) => {
+          {filteredFormFieldTypes.map((fieldType) => {
             return (
               <MenuItem data-test={`form-field-type-option-${fieldType}`} key={fieldType} value={fieldType}>
                 <Stack flexDirection='row' gap={1} alignItems='center'>

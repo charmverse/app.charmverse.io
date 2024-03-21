@@ -34,6 +34,8 @@ export const formFieldTypes = [
   'file'
 ] as FormFieldType[];
 
+export const nonDuplicateFieldTypes = ['project_profile'] as FormFieldType[];
+
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
   email: 'Email',

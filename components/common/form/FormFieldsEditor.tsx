@@ -1,3 +1,4 @@
+import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import debounce from 'lodash/debounce';
@@ -196,10 +197,20 @@ export function ControlledFormFieldsEditor({
     setFormFields(newFormFields);
   }
 
+  const formFieldTypeFrequencyCount = formFields.reduce((acc, formField) => {
+    if (formField.type in acc) {
+      acc[formField.type] += 1;
+    } else {
+      acc[formField.type] = 1;
+    }
+    return acc;
+  }, {} as Record<FormFieldType, number>);
+
   return (
     <Stack gap={1}>
       {formFields.map((formField) => (
         <FormField
+          formFieldTypeFrequencyCount={formFieldTypeFrequencyCount}
           readOnly={readOnly}
           toggleOpen={() => {
             toggleCollapse(formField.id);

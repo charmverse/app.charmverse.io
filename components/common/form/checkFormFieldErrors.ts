@@ -1,3 +1,6 @@
+import type { FormFieldType } from '@charmverse/core/prisma-client';
+
+import { nonDuplicateFieldTypes } from './constants';
 import type { FormFieldInput } from './interfaces';
 
 export function checkFormFieldErrors(formFields: FormFieldInput[]): string | undefined {
@@ -13,5 +16,23 @@ export function checkFormFieldErrors(formFields: FormFieldInput[]): string | und
   ) {
     return 'Select fields must have at least one option';
   }
+
+  const formFieldTypeFrequencyCount = formFields.reduce((acc, formField) => {
+    if (formField.type in acc) {
+      acc[formField.type] += 1;
+    } else {
+      acc[formField.type] = 1;
+    }
+    return acc;
+  }, {} as Record<FormFieldType, number>);
+
+  const duplicatedFieldType = nonDuplicateFieldTypes.find(
+    (nonDuplicateFieldType) => formFieldTypeFrequencyCount[nonDuplicateFieldType] > 1
+  );
+
+  if (duplicatedFieldType) {
+    return `You can only have one ${duplicatedFieldType} field`;
+  }
+
   return undefined;
 }
