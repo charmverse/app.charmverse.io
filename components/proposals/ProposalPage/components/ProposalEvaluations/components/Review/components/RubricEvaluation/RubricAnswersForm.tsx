@@ -142,6 +142,7 @@ export function RubricAnswersForm({
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { isDirty }
   } = useForm<FormInput>({
     // mode: 'onChange',
@@ -150,7 +151,18 @@ export function RubricAnswersForm({
     }
   });
 
-  const { fields } = useFieldArray({ control, name: 'answers' });
+  const { fields } = useFieldArray({
+    control,
+    name: 'answers'
+  });
+
+  const answerValues = watch('answers');
+
+  const answersError = answerValues.some(
+    (value) => typeof (value.response as any)?.score !== 'number' && !!value.comment
+  )
+    ? 'Comments cannot be entered without a score'
+    : undefined;
 
   async function submitAnswers(values: FormInput) {
     const { confirmed } = await showConfirmation({
@@ -281,6 +293,7 @@ export function RubricAnswersForm({
           <CriteriaInput
             key={field.id}
             criteria={criteriaList[index]}
+            value={answerValues[index]}
             field={field}
             index={index}
             control={control}
@@ -293,13 +306,14 @@ export function RubricAnswersForm({
             <Button
               data-test='save-rubric-answers'
               sx={{ alignSelf: 'start' }}
-              disabled={disabled || (!isDirty && !showDraftAnswers)}
+              disabled={answersError || disabled || (!isDirty && !showDraftAnswers)}
               disabledTooltip={
-                archived
+                answersError ||
+                (archived
                   ? 'You cannot evaluate an archived proposal'
                   : disabled
                   ? 'You must be a reviewer to submit an evaluation'
-                  : undefined
+                  : undefined)
               }
               loading={isSaving}
               onClick={handleSubmit(submitAnswers)}
@@ -339,6 +353,7 @@ function CriteriaInput({
   criteria,
   disabled,
   field,
+  value,
   index,
   control,
   register
@@ -346,6 +361,7 @@ function CriteriaInput({
   criteria: ProposalRubricCriteria;
   disabled?: boolean;
   field: FieldArrayWithId<FormInput, 'answers', 'id'>;
+  value: FormInput['answers'][number]; // a readonly prop so we can do validation between fields
   index: number;
   control: any;
   register: UseFormRegister<FormInput>;
@@ -355,10 +371,10 @@ function CriteriaInput({
   const IconContainerComponent = useMemo(
     () =>
       // eslint-disable-next-line react/no-unstable-nested-components
-      function NumberIcon({ value, ...other }: { value: number }) {
+      function NumberIcon({ value: _value, ...other }: { value: number }) {
         return (
           <Box {...other} mx={0.5}>
-            <StyledIcon className='icon'>{convertMUIRatingToActual(value, parameters.min)}</StyledIcon>
+            <StyledIcon className='icon'>{convertMUIRatingToActual(_value, parameters.min)}</StyledIcon>
           </Box>
         );
       },
@@ -408,9 +424,10 @@ function CriteriaInput({
                     }}
                     disabled={disabled}
                     error={
-                      _field.value &&
-                      (_field.value < parameters.min || _field.value > parameters.max) &&
-                      'Invalid score'
+                      (_field.value &&
+                        (_field.value < parameters.min || _field.value > parameters.max) &&
+                        'Invalid score') ||
+                      (value.comment && !(value.response as any)?.score && 'Score is required')
                     }
                     inputProps={{
                       placeholder: 'N/A',
