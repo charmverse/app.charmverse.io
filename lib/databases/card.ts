@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
@@ -15,7 +15,7 @@ export type CardFields<V = CardPropertyValue> = {
   contentOrder: (string | string[])[];
 };
 
-export type Card<V = CardPropertyValue> = Block & {
+export type Card<V = CardPropertyValue> = UIBlockWithDetails & {
   fields: CardFields<V>;
   customIconType?: 'applicationStatus' | 'reward';
 };
@@ -58,7 +58,7 @@ export type CardPage<V = CardPropertyValue> = {
   isStructuredProposal?: boolean;
 };
 
-export function createCard(block?: Partial<Block>): Card {
+export function createCard(block?: Partial<UIBlockWithDetails>): Card {
   const contentOrder: (string | string[])[] = [];
   const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null);
 
@@ -75,10 +75,8 @@ export function createCard(block?: Partial<Block>): Card {
     ...createBlock(block),
     type: 'card',
     fields: {
-      icon: block?.fields?.icon || '',
       properties: { ...(block?.fields?.properties || {}) },
       contentOrder,
-      isTemplate: block?.fields?.isTemplate || false,
       headerImage: block?.fields?.headerImage || null
     }
   };

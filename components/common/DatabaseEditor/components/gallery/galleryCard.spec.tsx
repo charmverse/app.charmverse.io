@@ -31,10 +31,6 @@ describe('src/components/gallery/GalleryCard', () => {
   const card = TestBlockFactory.createCard(board);
   card.id = 'cardId';
 
-  const contentImage = TestBlockFactory.createImage(card);
-  contentImage.id = 'contentId-image';
-  contentImage.fields.fileId = 'test.jpg';
-
   let store: MockStoreEnhanced<unknown, unknown>;
 
   beforeEach(() => {

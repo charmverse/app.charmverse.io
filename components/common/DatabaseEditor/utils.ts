@@ -1,11 +1,9 @@
 /* eslint-disable no-plusplus */
 import { log } from '@charmverse/core/log';
-import { DateTime } from 'luxon';
-import { marked } from 'marked';
 import type { IntlShape } from 'react-intl';
 import { v4 as uuid } from 'uuid';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBoard } from 'lib/databases/board';
 import { createBoardView } from 'lib/databases/boardView';
 import { createCard } from 'lib/databases/card';
@@ -18,7 +16,6 @@ const IconClass = 'octo-icon';
 const OpenButtonClass = 'open-button';
 const SpacerClass = 'octo-spacer';
 const HorizontalGripClass = 'HorizontalGrip';
-const base32Alphabet = 'ybndrfg8ejkmcpqxot1uwisza345h769';
 
 class Utils {
   static createGuid(): string {
@@ -235,7 +232,7 @@ class Utils {
     return Math.round(num * 10 ** decimalPlaces) / 10 ** decimalPlaces;
   }
 
-  static fixBlock(block: Block): Block {
+  static fixBlock(block: UIBlockWithDetails): UIBlockWithDetails {
     switch (block.type) {
       case 'board':
         return createBoard({ block });

@@ -2,7 +2,7 @@ import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 import { DateTime } from 'luxon';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { createBoard } from 'lib/databases/board';
@@ -15,9 +15,6 @@ import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
-import { createCheckboxBlock } from './blocks/checkboxBlock';
-import { createImageBlock } from './blocks/imageBlock';
-import { createTextBlock } from './blocks/textBlock';
 import type { PageListItemsRecord } from './interfaces';
 import { Utils } from './utils';
 
@@ -40,7 +37,7 @@ class OctoUtils {
     context,
     relationPropertiesCardsRecord = {}
   }: {
-    block: Block;
+    block: UIBlockWithDetails;
     propertyValue: string | string[] | undefined | number;
     propertyTemplate: IPropertyTemplate;
     formatters: Formatters;
@@ -146,7 +143,7 @@ class OctoUtils {
     return displayValue;
   }
 
-  static hydrateBlock(block: Block): Block {
+  static hydrateBlock(block: UIBlockWithDetails): UIBlockWithDetails {
     switch (block.type) {
       case 'board': {
         return createBoard({ block });
@@ -157,15 +154,6 @@ class OctoUtils {
       case 'card': {
         return createCard(block);
       }
-      case 'text': {
-        return createTextBlock(block);
-      }
-      case 'image': {
-        return createImageBlock(block);
-      }
-      case 'checkbox': {
-        return createCheckboxBlock(block);
-      }
       default: {
         Utils.assertFailure(`Can't hydrate unknown block type: ${block.type}`);
         return createBlock(block);
@@ -173,11 +161,14 @@ class OctoUtils {
     }
   }
 
-  static hydrateBlocks(blocks: readonly Block[]): Block[] {
+  static hydrateBlocks(blocks: readonly UIBlockWithDetails[]): UIBlockWithDetails[] {
     return blocks.map((block) => this.hydrateBlock(block));
   }
 
-  static mergeBlocks(blocks: readonly Block[], updatedBlocks: readonly Block[]): Block[] {
+  static mergeBlocks(
+    blocks: readonly UIBlockWithDetails[],
+    updatedBlocks: readonly UIBlockWithDetails[]
+  ): UIBlockWithDetails[] {
     const updatedBlockIds = updatedBlocks.map((o) => o.id);
     const newBlocks = blocks.filter((o) => !updatedBlockIds.includes(o.id));
     const updatedAndNotDeletedBlocks = updatedBlocks.filter((o) => o.deletedAt === 0);
@@ -187,9 +178,9 @@ class OctoUtils {
 
   // Creates a copy of the blocks with new ids and parentIDs
   static duplicateBlockTree(
-    blocks: readonly Block[],
+    blocks: readonly UIBlockWithDetails[],
     sourceBlockId: string
-  ): [Block[], Block, Readonly<Record<string, string>>] {
+  ): [UIBlockWithDetails[], UIBlockWithDetails, Readonly<Record<string, string>>] {
     const idMap: Record<string, string> = {};
     const now = Date.now();
     const newBlocks = blocks.map((block) => {
