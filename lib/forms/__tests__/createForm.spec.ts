@@ -17,7 +17,7 @@ describe('createForm', () => {
         options: [],
         private: false,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       },
       {
         id: v4(),
@@ -28,7 +28,7 @@ describe('createForm', () => {
         options: [],
         private: true,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 

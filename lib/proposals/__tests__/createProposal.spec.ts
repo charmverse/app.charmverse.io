@@ -99,7 +99,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
         options: [],
         private: false,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       },
       {
         id: uuid(),
@@ -110,7 +110,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
         options: [],
         private: true,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 
@@ -134,7 +134,7 @@ describe('Creates a page and proposal with relevant configuration', () => {
         ...item,
         description: item.description ?? '',
         formId: proposalTemplateForm.id,
-        extraFields: {}
+        fieldConfig: {}
       }))
     });
 

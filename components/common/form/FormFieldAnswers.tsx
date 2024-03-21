@@ -27,7 +27,7 @@ const FormFieldAnswersContainer = styled(Stack)`
 `;
 
 type FormFieldAnswersProps = {
-  formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private' | 'extraFields'> & {
+  formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private' | 'fieldConfig'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
     formFieldAnswer?: FormFieldAnswer | null;
@@ -164,7 +164,7 @@ export function FormFieldAnswersControlled({
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
                     formField={{
-                      extraFields: formField.extraFields,
+                      fieldConfig: formField.fieldConfig,
                       value: field.value
                     }}
                     onChange={(projectFormValues) => {

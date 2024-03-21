@@ -133,7 +133,7 @@ export function NewProposalPage({
           private: false,
           required: true,
           id: uuid(),
-          extraFields: {}
+          fieldConfig: {}
         } as FormFieldInput
       ]
     : [];

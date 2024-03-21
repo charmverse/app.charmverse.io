@@ -51,7 +51,7 @@ export type FieldProps = {
 
 export type FormFieldInput = Pick<
   FormField,
-  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'extraFields'
+  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'fieldConfig'
 > & {
   options?: SelectOptionType[];
 };

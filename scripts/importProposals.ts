@@ -347,7 +347,7 @@ async function importTemplate() {
       data: rubricCriteria.map((c) => ({ ...c, parameters: c.parameters as any }))
     }),
     prisma.formField.createMany({
-      data: formFields.map((f) => ({ ...f, extraFields: f.extraFields as Prisma.InputJsonValue, description: f.description as any, options: f.options as any }))
+      data: formFields.map((f) => ({ ...f, fieldConfig: f.fieldConfig as Prisma.InputJsonValue, description: f.description as any, options: f.options as any }))
     })
   ]);
 }

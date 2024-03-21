@@ -45,7 +45,7 @@ export function ProjectProfileInputField({
   onChange,
   formField
 }: {
-  formField: Pick<FormField, 'extraFields'> & {
+  formField: Pick<FormField, 'fieldConfig'> & {
     value?: FormFieldValue;
   };
   onChange: (updatedValue: FormFieldValue) => void;
@@ -104,7 +104,7 @@ export function ProjectProfileInputField({
       {selectedProject && (
         <ProjectProfileFormAnswers
           selectedProject={selectedProject}
-          fieldConfig={formField.extraFields as ProjectEditorFieldConfig}
+          fieldConfig={formField.fieldConfig as ProjectEditorFieldConfig}
         />
       )}
       {showCreateProjectForm && (

@@ -78,7 +78,7 @@ export async function upsertProposalFormFields({
             options: field.options,
             private: field.private,
             required,
-            extraFields: field.extraFields as Prisma.InputJsonValue
+            fieldConfig: field.fieldConfig as Prisma.InputJsonValue
           },
           update: {
             type: field.type,
@@ -88,7 +88,7 @@ export async function upsertProposalFormFields({
             options: field.options,
             private: field.private,
             required,
-            extraFields: field.extraFields as Prisma.InputJsonValue
+            fieldConfig: field.fieldConfig as Prisma.InputJsonValue
           }
         });
       })

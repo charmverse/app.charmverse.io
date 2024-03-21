@@ -40,7 +40,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: false,
-        extraFields: {}
+        fieldConfig: {}
       },
       {
         id: v4(),
@@ -51,7 +51,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: false,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 
@@ -109,7 +109,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       },
       {
         id: v4(),
@@ -120,7 +120,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 
@@ -166,7 +166,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: false,
-        extraFields: {}
+        fieldConfig: {}
       },
       {
         id: v4(),
@@ -177,7 +177,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: false,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 
@@ -240,7 +240,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       },
       {
         id: v4(),
@@ -251,7 +251,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: true,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 
@@ -294,7 +294,7 @@ describe('upsertFormAnswers', () => {
         options: [],
         private: false,
         required: false,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
 

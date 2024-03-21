@@ -201,14 +201,14 @@ function ExpandedFormField({
         <ProjectFormEditor
           defaultRequired
           values={
-            (formField.extraFields as ProjectEditorFieldConfig) ?? {
+            (formField.fieldConfig as ProjectEditorFieldConfig) ?? {
               projectMember: {}
             }
           }
-          onChange={(extraFields) => {
+          onChange={(fieldConfig) => {
             updateFormField({
               id: formField.id,
-              extraFields
+              fieldConfig
             });
           }}
         />
@@ -347,7 +347,7 @@ export function FormField(
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
                 <ProjectFormEditor
-                  values={(formField.extraFields as ProjectEditorFieldConfig) ?? { projectMember: {} }}
+                  values={(formField.fieldConfig as ProjectEditorFieldConfig) ?? { projectMember: {} }}
                   defaultRequired
                 />
               ) : (

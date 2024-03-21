@@ -82,7 +82,7 @@ describe('GET /api/proposals/[id] - Get proposal', () => {
         options: [],
         private: false,
         required: true,
-        extraFields: {}
+        fieldConfig: {}
       }
     ];
     const formId = await createForm(fieldsInput);
