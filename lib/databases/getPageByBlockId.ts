@@ -8,13 +8,13 @@ type Result<T extends Prisma.PageSelect | null> = Prisma.Prisma__PageClient<
 >;
 
 export function getPageByBlockId<T extends Prisma.PageSelect>(blockId: string, select: T): Result<T>;
-export function getPageByBlockId(blockId: string): Promise<Page>;
+export function getPageByBlockId(blockId: string): Promise<Page | null>;
 
 export async function getPageByBlockId<T extends Prisma.PageSelect | null>(blockId: string, select?: T) {
-  return prisma.page.findFirstOrThrow({
+  return prisma.page.findFirst({
     where: {
       OR: [{ boardId: blockId }, { cardId: blockId }]
     },
     select
-  }) as Result<T | null> | Promise<Page>;
+  }) as Result<T | null> | Promise<Page | null>;
 }

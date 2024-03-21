@@ -42,7 +42,7 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     throw new DataNotFoundError('Block not found');
   }
 
-  const result = buildBlockWithDetails(block, page);
+  const result = page ? buildBlockWithDetails(block, page) : (block as BlockWithDetails);
 
   return res.status(200).json(result);
 }
