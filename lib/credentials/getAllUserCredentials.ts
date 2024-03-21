@@ -6,7 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import { getAllOnChainAttestations } from './external/getOnchainCredentials';
 import { getGitcoinCredentialsByWallets } from './getGitcoinCredentialsByWallets';
-import { getCharmverseCredentialsByWallets } from './queriesAndMutations';
+import { getCharmverseCredentialsByWallets, getExternalCredentialsByWallets } from './queriesAndMutations';
 
 // Use these wallets to return at least 1 of all the tracked credentials
 const testWallets = [
@@ -37,6 +37,10 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
   const allCredentials = await Promise.all([
     getCharmverseCredentialsByWallets({ wallets }).catch((error) => {
       log.error(`Error loading Charmverse Ceramic credentials for user ${userId}`, { error, userId });
+      return [];
+    }),
+    getExternalCredentialsByWallets({ wallets }).catch((error) => {
+      log.error(`Error loading External Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
     getGitcoinCredentialsByWallets({ wallets }).catch((error) => {

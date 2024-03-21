@@ -60,12 +60,19 @@ export function UserCredentialRow({
     iconUrl: string;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'charmverse'
+    credential.type === 'charmverse' && 'Organization' in charmCredential
       ? {
           title: charmCredential.Name,
           subtitle: charmCredential.Organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+        }
+      : credential.type === 'charmverse'
+      ? {
+          title: charmCredential.Name,
+          subtitle: 'Gitcoin Round',
+          iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
+          attestationContent: [{ name: 'Event', value: 'Proposal approved' }]
         }
       : credential.type === 'gitcoin'
       ? {
