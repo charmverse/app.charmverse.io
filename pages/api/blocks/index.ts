@@ -1,10 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { copyAllPagePermissions } from '@charmverse/core/permissions';
-import type { Block, Prisma } from '@charmverse/core/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { BlockWithDetails } from 'lib/databases/block';
 import { prismaToBlock } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
@@ -35,8 +36,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).post(createBlocks).put(updateBlocks).delete(deleteBlocks);
 
-async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block, ServerBlockFields>[]>) {
-  const data = req.body as Omit<Block, ServerBlockFields>[];
+async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<BlockWithDetails, ServerBlockFields>[]>) {
+  const data = req.body as Omit<BlockWithDetails, ServerBlockFields>[];
   const referer = req.headers.referer as string;
   const url = new URL(referer);
   url.hash = '';
@@ -255,8 +256,8 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   return res.status(201).json(newBlocks);
 }
 
-async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
-  const blocks: Block[] = req.body;
+async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[]>) {
+  const blocks: BlockWithDetails[] = req.body;
   const dbBlocks = await prisma.block.findMany({
     where: {
       id: {
@@ -305,10 +306,10 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
     updatedBlocks[0].spaceId
   );
 
-  return res.status(200).json(updatedBlocks);
+  return res.status(200).json(updatedBlocks as BlockWithDetails[]);
 }
 
-async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) {
+async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[]>) {
   const queryBlockIds = (req.query.blockIds ?? []) as string[];
   const blockIds = typeof queryBlockIds === 'string' ? [queryBlockIds] : queryBlockIds;
   const userId = req.session.user.id as string | undefined;
@@ -351,7 +352,7 @@ async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<Block[]>) 
 
   log.info('User deleted blocks', { count: blocks.length, spaceId: spaceIds[0], userId });
 
-  return res.status(200).json(blocks);
+  return res.status(200).json(blocks as BlockWithDetails[]);
 }
 
 export default withSessionRoute(handler);

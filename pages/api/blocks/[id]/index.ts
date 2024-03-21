@@ -1,11 +1,10 @@
 import { DataNotFoundError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BlockTypes } from 'lib/databases/block';
+import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -15,7 +14,8 @@ import { relay } from 'lib/websockets/relay';
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.use(requireUser).get(getBlock).delete(deleteBlock);
-async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
+
+async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetails>) {
   const blockId = req.query.id as string;
 
   const block = await prisma.block.findUniqueOrThrow({
@@ -40,7 +40,7 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<Block>) {
 
 async function deleteBlock(
   req: NextApiRequest,
-  res: NextApiResponse<{ deletedCount: number; rootBlock: Block } | { error: string }>
+  res: NextApiResponse<{ deletedCount: number; rootBlock: BlockWithDetails } | { error: string }>
 ) {
   const blockId = req.query.id as string;
   const userId = req.session.user.id as string;
@@ -154,7 +154,7 @@ async function deleteBlock(
     );
   }
 
-  return res.status(200).json({ deletedCount, rootBlock });
+  return res.status(200).json({ deletedCount, rootBlock: rootBlock as BlockWithDetails });
 }
 
 export default withSessionRoute(handler);

@@ -1,15 +1,12 @@
-import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
+import type { BlockWithDetails } from 'lib/databases/block';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isTruthy } from 'lib/utils/types';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -26,7 +23,7 @@ export const config = {
   }
 };
 
-async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
+async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[] | { error: string }>) {
   const pageId = req.query.id as string;
 
   const page = await prisma.page.findFirstOrThrow({
