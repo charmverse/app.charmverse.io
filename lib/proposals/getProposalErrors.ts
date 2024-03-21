@@ -1,5 +1,4 @@
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import { validateAnswers } from 'lib/forms/validateAnswers';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utils/types';

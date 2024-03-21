@@ -66,7 +66,7 @@ export function ProjectFormAnswers({
 
       {values.projectMembers.slice(1).map((member, index) => (
         <>
-          <FieldLabel>Add a team member</FieldLabel>
+          <FieldLabel>Team member</FieldLabel>
           <ProjectMemberFieldAnswers
             onChange={
               onChange === undefined
@@ -152,55 +152,6 @@ export function ProjectFormEditor({
               }
         }
       />
-      <Divider
-        sx={{
-          my: 1
-        }}
-      />
-
-      {values.projectMembers?.slice(1).map((member, index) => (
-        <>
-          <FieldLabel>Add a team member</FieldLabel>
-          <ProjectMemberFieldsEditor
-            values={member}
-            onChange={
-              onChange === undefined
-                ? undefined
-                : (_member) => {
-                    onChange?.({
-                      ...values,
-                      projectMembers: [
-                        ...values.projectMembers.slice(0, index + 1),
-                        _member,
-                        ...(values.projectMembers?.slice(index + 2) ?? [])
-                      ]
-                    });
-                  }
-            }
-          />
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-        </>
-      ))}
-      {onChange && (
-        <Button
-          sx={{
-            width: 'fit-content'
-          }}
-          startIcon={<MuiAddIcon fontSize='small' />}
-          onClick={() => {
-            onChange({
-              ...values,
-              projectMembers: [...values.projectMembers, {}]
-            });
-          }}
-        >
-          Add a team member
-        </Button>
-      )}
     </Stack>
   );
 }
