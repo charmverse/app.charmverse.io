@@ -35,7 +35,6 @@ const schema = yup.object({
 type FormValues = yup.InferType<typeof schema>;
 
 export function CredentialsOnChainConfig({ onChange, readOnly }: Props) {
-  const isAdmin = useIsAdmin();
   const { space } = useCurrentSpace();
 
   const {
@@ -59,8 +58,8 @@ export function CredentialsOnChainConfig({ onChange, readOnly }: Props) {
 
   const isValidForm =
     isValid &&
-    (!values.credentialsChainId ||
-      (values.credentialsChainId && values.credentialsChainId && values.credentialsWallet));
+    (!values.useOnchainCredentials ||
+      (values.useOnchainCredentials && values.credentialsChainId && values.credentialsWallet));
 
   useEffect(() => {
     if (isValidForm) {

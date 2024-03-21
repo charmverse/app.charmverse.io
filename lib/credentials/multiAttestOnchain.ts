@@ -1,23 +1,26 @@
-import { log } from '@charmverse/core/log';
+/* eslint-disable camelcase */
 import type { AttestationType } from '@charmverse/core/prisma-client';
-import type { Signer } from 'ethers';
-import { v4 as uuid } from 'uuid';
-import { optimismSepolia } from 'viem/chains';
+import type { Transaction } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
+import type { PopulatedTransaction, Signer } from 'ethers';
+import type { Chain } from 'viem';
+import { optimism, optimismSepolia } from 'viem/chains';
 import { getAddress } from 'viem/utils';
 
-import { conditionalPlural } from 'lib/utils/strings';
-
 import type { OnChainAttestationInput } from './attestOnchain';
+import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './connectors';
-import { getCharmverseSigner } from './getCharmverseSigner';
 import { attestationSchemaIds, encodeAttestion, type CredentialDataInput } from './schemas';
-import type { ProposalCredential } from './schemas/proposal';
 
 export type OnChainMultiAttestationInput<T extends AttestationType = AttestationType> = Omit<
   OnChainAttestationInput<T>,
   'credentialInputs'
 > & {
   credentialInputs: { recipient: string; data: CredentialDataInput<T> }[];
+};
+
+const chainMap: Record<EasSchemaChain, Chain> = {
+  [optimismSepolia.id]: optimismSepolia,
+  [optimism.id]: optimism
 };
 
 /**
@@ -30,45 +33,61 @@ export async function multiAttestOnchain({
   type,
   chainId,
   signer
-}: OnChainMultiAttestationInput & { signer?: Signer }): Promise<string[]> {
+}: OnChainMultiAttestationInput & { signer: Signer }): Promise<Transaction<string[]>> {
   const schemaId = attestationSchemaIds[type];
 
-  const easSigner = signer || getCharmverseSigner({ chainId });
+  const easSigner = signer;
 
   const eas = getEasInstance(chainId);
 
   eas.connect(easSigner);
 
-  // const attestations = await eas.multiAttestByDelegation([
-  //   {
-  //     data: credentialInputs.map(({ data, recipient }) => ({
-  //       data: encodeAttestion({ type, data }),
-  //       recipient: getAddress(recipient)
-  //     })),
-  //     schema: schemaId
-  //   }
-  // ]);
+  const attestationTx = await eas.multiAttest([
+    {
+      data: credentialInputs.map(({ data, recipient }) => ({
+        data: encodeAttestion({ type, data }),
+        recipient: getAddress(recipient)
+      })),
+      schema: schemaId
+    }
+  ]);
 
-  const attestations = await eas
-    .multiAttest([
-      {
-        data: credentialInputs.map(({ data, recipient }) => ({
-          data: encodeAttestion({ type, data }),
-          recipient: getAddress(recipient)
-        })),
-        schema: schemaId
-      }
-    ])
-    .then((tx) => tx.wait());
+  return attestationTx;
+}
 
-  // log.info(
-  //   `Issued ${credentialInputs.length} ${type} ${conditionalPlural({
-  //     count: credentialInputs.length,
-  //     word: 'credential'
-  //   })} on chain ${chainId}`
-  // );
+const ZERO_BIGINT = BigInt(0);
+const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-  return attestations as any;
+/**
+ * This method can be used on the backend or frontend
+ *
+ * Prepares a transaction which can be broadcast later
+ */
+export async function prepareOnChainAttestationTransaction({
+  credentialInputs,
+  type,
+  chainId
+}: OnChainMultiAttestationInput): Promise<PopulatedTransaction> {
+  const schemaId = attestationSchemaIds[type];
+
+  const eas = getEasInstance(chainId);
+
+  const populatedTransaction = await eas.contract.populateTransaction.multiAttest([
+    {
+      data: credentialInputs.map(({ data, recipient }) => ({
+        recipient,
+        expirationTime: ZERO_BIGINT,
+        revocable: true,
+        // We don't currently refer to other attestations
+        refUID: ZERO_BYTES32,
+        data: encodeAttestion({ type, data }),
+        value: ZERO_BIGINT
+      })),
+      schema: schemaId
+    }
+  ]);
+
+  return populatedTransaction;
 }
 
 // These code snippets provide a quick test to check we can issue credentials onchain ----------

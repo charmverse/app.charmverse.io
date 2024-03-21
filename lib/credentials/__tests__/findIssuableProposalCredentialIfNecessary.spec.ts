@@ -1,4 +1,4 @@
-import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
+import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { getPagePermalink } from 'lib/pages/getPagePermalink';

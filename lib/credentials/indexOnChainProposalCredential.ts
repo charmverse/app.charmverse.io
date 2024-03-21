@@ -1,30 +1,34 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import type { CredentialEventType, IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
+import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
+import { getChainById } from 'connectors/chains';
 
+import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
-import type { EasSchemaChain } from './connectors';
-import { getEasInstance } from './connectors';
-import type { IssuableProposalCredentialContent } from './findIssuableProposalCredentials';
-import { getCharmverseSigner } from './getCharmverseSigner';
+import { getEasInstance, type EasSchemaChain } from './connectors';
+import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
 import type { ProposalCredential } from './schemas/proposal';
 import { decodeProposalCredential } from './schemas/proposal';
 
 type IndexableCredential = {
   attestationId: string;
-  issuableCredential: IssuableProposalCredentialContent;
 };
 
 async function indexOnChainProposalCredential({
   chainId,
   attestationId,
-  issuableCredential,
   eas,
   expectedIssuerAddress
-}: IndexableCredential & { eas: EAS; chainId: EasSchemaChain; expectedIssuerAddress?: string }): Promise<void> {
+}: IndexableCredential & {
+  eas: EAS;
+  chainId: EasSchemaChain;
+  expectedIssuerAddress?: string;
+}): Promise<IssuedCredential> {
   const attestation = await eas.getAttestation(attestationId);
   if (expectedIssuerAddress && !lowerCaseEqual(expectedIssuerAddress, attestation.attester)) {
     throw new InvalidInputError(
@@ -32,9 +36,9 @@ async function indexOnChainProposalCredential({
     );
   }
 
-  const decoded = decodeProposalCredential(attestation.data) as ProposalCredential;
+  const decodedContent = decodeProposalCredential(attestation.data) as ProposalCredential;
 
-  const pagePermalinkId = decoded.URL.split('/').pop();
+  const pagePermalinkId = decodedContent.URL.split('/').pop();
 
   if (!pagePermalinkId || !stringUtils.isUUID(pagePermalinkId)) {
     throw new Error(`Invalid page permalink ID for credential ${attestationId} on ${chainId}`);
@@ -49,39 +53,107 @@ async function indexOnChainProposalCredential({
       }
     },
     select: {
-      id: true
+      id: true,
+      selectedCredentialTemplates: true,
+      spaceId: true,
+      space: {
+        select: {
+          credentialsWallet: true
+        }
+      },
+      authors: {
+        where: {
+          author: {
+            wallets: {
+              some: {
+                address: attestation.recipient.toLowerCase()
+              }
+            }
+          }
+        }
+      }
     }
   });
 
-  await prisma.issuedCredential.create({
+  if (!proposal.authors.length) {
+    throw new Error(`No author with wallet address ${attestation.recipient} found for proposal ${proposal.id}`);
+  }
+
+  if (!lowerCaseEqual(proposal.space.credentialsWallet, attestation.attester)) {
+    throw new Error(
+      `Proposal ${proposal.id} was issued on chain ${chainId} by ${attestation.recipient}, but credentials wallet is ${proposal.space.credentialsWallet}`
+    );
+  }
+
+  const credentialEvent: CredentialEventType | null = decodedContent.Event.match(proposalCreatedVerb)
+    ? 'proposal_created'
+    : decodedContent.Event.match(proposalApprovedVerb)
+    ? 'proposal_approved'
+    : null;
+
+  if (!credentialEvent) {
+    throw new Error(`Invalid event ${decodedContent.Event} for credential ${attestationId} on ${chainId}`);
+  }
+
+  const matchingCredentialTemplate = await prisma.credentialTemplate.findFirstOrThrow({
+    where: {
+      spaceId: proposal.spaceId,
+      name: decodedContent.Name,
+      description: decodedContent.Description,
+      id: {
+        in: proposal.selectedCredentialTemplates
+      }
+    }
+  });
+
+  const issuedCredential = await prisma.issuedCredential.create({
     data: {
-      credentialEvent: issuableCredential.event,
-      credentialTemplate: { connect: { id: issuableCredential.credentialTemplateId } },
-      onchainAttestationId: attestationId,
-      user: { connect: { id: issuableCredential.recipientUserId } },
+      credentialEvent,
+      credentialTemplate: { connect: { id: matchingCredentialTemplate.id } },
+      user: { connect: { id: proposal.authors[0].userId } },
       proposal: { connect: { id: proposal.id } },
       schemaId: attestation.schema,
-      onchainChainId: chainId
+      onchainChainId: chainId,
+      onchainAttestationId: attestationId
     }
   });
+
+  return issuedCredential;
 }
 
-type ProposalCredentialsToIndex = {
+// Avoid spamming RPC with requests
+const limiter = RateLimit(10);
+
+export type ProposalCredentialsToIndex = {
   chainId: EasSchemaChain;
-  attestations: IndexableCredential[];
+  txHash: string;
 };
 
-export async function bulkIndexProposalCredentials({ chainId, attestations }: ProposalCredentialsToIndex) {
-  const provider = getCharmverseSigner({ chainId });
-  const eas = getEasInstance(chainId);
-  await eas.connect(provider);
+export async function indexProposalCredentials({
+  chainId,
+  txHash
+}: ProposalCredentialsToIndex): Promise<IssuedCredential[]> {
+  const publicClient = getPublicClient(chainId);
 
-  const limiter = RateLimit(10);
+  const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
 
-  await Promise.allSettled(
-    attestations.map(async (attestation) => {
+  const attestationUids = receipt.logs.map((log) => log.data);
+
+  const eas = await getEasInstance(chainId);
+  eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
+
+  await indexOnChainProposalCredential({ attestationId: attestationUids[0], chainId, eas });
+
+  const issuedCredentials = await Promise.allSettled(
+    attestationUids.map(async (uid) => {
       await limiter();
-      await indexOnChainProposalCredential({ ...attestation, chainId, eas });
+      return indexOnChainProposalCredential({ attestationId: uid, chainId, eas });
     })
+  ).then((results) =>
+    results
+      .filter((result) => result.status === 'fulfilled')
+      .map((result) => (result as PromiseFulfilledResult<IssuedCredential>).value)
   );
+
+  return issuedCredentials;
 }
