@@ -106,6 +106,18 @@ async function indexOnChainProposalCredential({
     }
   });
 
+  const existingCredential = await prisma.issuedCredential.findFirst({
+    where: {
+      onchainChainId: chainId,
+      onchainAttestationId: attestationId
+    }
+  });
+
+  // If we already indexed this attestation, no need to reindex it
+  if (existingCredential) {
+    return existingCredential;
+  }
+
   const issuedCredential = await prisma.issuedCredential.create({
     data: {
       credentialEvent,
