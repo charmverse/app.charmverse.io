@@ -1,6 +1,5 @@
 import { useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
-import type { ProjectUpdatePayload, ProjectValues } from 'components/projects/interfaces';
-import type { ProjectWithMembers } from 'lib/projects/getProjects';
+import type { ProjectUpdatePayload, ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
 
 export function useCreateProject() {
   return usePOST<ProjectValues, ProjectWithMembers>('/api/projects');

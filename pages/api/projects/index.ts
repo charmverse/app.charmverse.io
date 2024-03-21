@@ -1,10 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { ProjectValues } from 'components/projects/interfaces';
+import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createProject } from 'lib/projects/createProject';
-import type { ProjectWithMembers } from 'lib/projects/getProjects';
 import { getProjects } from 'lib/projects/getProjects';
 import { withSessionRoute } from 'lib/session/withSession';
 

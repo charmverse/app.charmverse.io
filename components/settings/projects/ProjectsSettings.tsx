@@ -92,12 +92,7 @@ function ProjectRow({
         <Typography>{projectWithMember.name}</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        <ProjectFormAnswers
-          fieldConfig={defaultFieldConfig}
-          onChange={onProjectUpdate}
-          values={projectWithMember}
-          showAddTeamMemberButton
-        />
+        <ProjectFormAnswers fieldConfig={defaultFieldConfig} onChange={onProjectUpdate} values={projectWithMember} />
       </AccordionDetails>
     </Accordion>
   );
@@ -157,12 +152,7 @@ export function ProjectsSettings() {
               my: 1
             }}
           />
-          <ProjectFormAnswers
-            fieldConfig={defaultFieldConfig}
-            onChange={setProject}
-            values={project}
-            showAddTeamMemberButton
-          />
+          <ProjectFormAnswers fieldConfig={defaultFieldConfig} onChange={setProject} values={project} />
         </Box>
       )}
 

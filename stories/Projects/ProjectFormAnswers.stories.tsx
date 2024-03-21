@@ -9,7 +9,7 @@ import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFie
 export function ProjectFormAnswersComponent() {
   const [project, setProject] = useState<ProjectValues>({
     ...projectDefaultValues,
-    members: [projectMemberDefaultValues]
+    projectMembers: [projectMemberDefaultValues]
   });
 
   return (

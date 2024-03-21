@@ -4,9 +4,8 @@ import { Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
+import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
-import type { ProjectWithMembers } from 'lib/projects/getProjects';
 
 import type { FormFieldValue } from '../interfaces';
 

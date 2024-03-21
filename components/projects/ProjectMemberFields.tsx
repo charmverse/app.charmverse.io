@@ -120,7 +120,7 @@ export function ProjectMemberFieldAnswers({
   values,
   fieldConfig
 }: {
-  fieldConfig?: ProjectEditorFieldConfig['members'][number];
+  fieldConfig?: ProjectEditorFieldConfig['projectMembers'][number];
   onChange?: (projectMember: ProjectMemberPayload) => void;
   values: ProjectMemberPayload;
 }) {
@@ -133,8 +133,8 @@ export function ProjectMemberFieldsEditor({
   onChange,
   values
 }: {
-  onChange?: (values: ProjectEditorFieldConfig['members'][number]) => void;
-  values: ProjectEditorFieldConfig['members'][number];
+  onChange?: (values: ProjectEditorFieldConfig['projectMembers'][number]) => void;
+  values: ProjectEditorFieldConfig['projectMembers'][number];
 }) {
   return <FieldsEditor properties={ProjectMemberConstants} values={values} onChange={onChange} />;
 }

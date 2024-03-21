@@ -15,13 +15,11 @@ import {
 export function ProjectFormAnswers({
   onChange,
   values,
-  fieldConfig,
-  showAddTeamMemberButton
+  fieldConfig
 }: {
   values: ProjectValues;
   onChange?: (project: ProjectValues) => void;
   fieldConfig?: ProjectEditorFieldConfig;
-  showAddTeamMemberButton?: boolean;
 }) {
   return (
     <Stack gap={2} width='100%'>
@@ -56,7 +54,7 @@ export function ProjectFormAnswers({
               }
         }
         fieldConfig={fieldConfig?.projectMembers?.[0]}
-        values={projectMemberDefaultValues}
+        values={values.projectMembers[0] ?? projectMemberDefaultValues}
       />
       <Divider
         sx={{
@@ -92,7 +90,7 @@ export function ProjectFormAnswers({
           />
         </>
       ))}
-      {showAddTeamMemberButton && onChange && (
+      {onChange && (
         <Button
           sx={{
             width: 'fit-content'
