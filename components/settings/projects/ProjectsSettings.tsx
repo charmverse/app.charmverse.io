@@ -8,6 +8,7 @@ import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import Legend from 'components/settings/Legend';
 
 import { CreateProjectForm } from './CreateProjectForm';
+import { useGetDefaultProject } from './hooks/useGetDefaultProject';
 import { useProject } from './hooks/useProjects';
 
 function ProjectRow({ projectWithMember }: { projectWithMember: ProjectWithMembers }) {
@@ -48,7 +49,6 @@ function ProjectRow({ projectWithMember }: { projectWithMember: ProjectWithMembe
 export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
   const { data } = useGetProjects();
-
   return (
     <>
       <Legend>My Projects</Legend>

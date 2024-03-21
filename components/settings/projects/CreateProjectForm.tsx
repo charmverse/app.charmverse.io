@@ -1,13 +1,14 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Divider, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
-import { projectDefaultValues } from 'components/projects/ProjectFields';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
+
+import { useGetDefaultProject } from './hooks/useGetDefaultProject';
 
 export function CreateProjectForm({
   onCancel,
@@ -18,13 +19,10 @@ export function CreateProjectForm({
   onCancel?: VoidFunction;
   project?: ProjectValues | null;
 }) {
+  const defaultProject = useGetDefaultProject();
   const [project, setProject] = useState<ProjectValues | null>(_project);
   const { trigger: createProject, isMutating } = useCreateProject();
   const { mutate } = useGetProjects();
-
-  useEffect(() => {
-    setProject(_project);
-  }, [_project]);
 
   async function saveProject() {
     if (!project) {
@@ -113,10 +111,7 @@ export function CreateProjectForm({
         <Button
           disabled={isMutating}
           onClick={() => {
-            setProject({
-              ...projectDefaultValues,
-              projectMembers: [projectMemberDefaultValues]
-            });
+            setProject(defaultProject);
           }}
           startIcon={<AddIcon fontSize='small' />}
         >

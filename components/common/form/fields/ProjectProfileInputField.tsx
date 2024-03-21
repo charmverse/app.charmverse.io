@@ -5,10 +5,9 @@ import { useEffect, useState } from 'react';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
-import { projectDefaultValues } from 'components/projects/ProjectFields';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
-import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
 import { CreateProjectForm } from 'components/settings/projects/CreateProjectForm';
+import { useGetDefaultProject } from 'components/settings/projects/hooks/useGetDefaultProject';
 import { useProject } from 'components/settings/projects/hooks/useProjects';
 
 import type { FormFieldValue } from '../interfaces';
@@ -47,6 +46,7 @@ export function ProjectProfileInputField({
   };
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
+  const defaultProject = useGetDefaultProject();
   const { data } = useGetProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(null);
   const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
@@ -105,10 +105,7 @@ export function ProjectProfileInputField({
       )}
       {showCreateProjectForm && (
         <CreateProjectForm
-          project={{
-            ...projectDefaultValues,
-            projectMembers: [projectMemberDefaultValues]
-          }}
+          project={defaultProject}
           onSave={(project) => {
             onChange({ projectId: project.id });
             setShowCreateProjectForm(false);

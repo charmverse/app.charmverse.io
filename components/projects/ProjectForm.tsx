@@ -116,7 +116,7 @@ export function ProjectFormAnswers({
           />
         </>
       ))}
-      <Box
+      {/* <Box
         sx={{
           width: 'fit-content'
         }}
@@ -129,7 +129,7 @@ export function ProjectFormAnswers({
         >
           Add a team member
         </Button>
-      </Box>
+      </Box> */}
     </Stack>
   );
 }
