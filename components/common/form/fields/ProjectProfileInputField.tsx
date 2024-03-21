@@ -64,6 +64,7 @@ export function ProjectProfileInputField({
       </Select>
       {selectedProject && (
         <ProjectFormAnswers
+          defaultRequired
           onMemberRemove={() => {}}
           onMemberAdd={() => {}}
           onChange={() => {}}

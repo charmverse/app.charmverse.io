@@ -25,61 +25,50 @@ export type ProjectField = keyof ProjectPayload;
 const ProjectConstants: ProjectFieldProperty<ProjectField>[] = [
   {
     field: 'name',
-    required: true,
     label: 'Project Name'
   },
   {
     field: 'excerpt',
-    required: true,
     label: 'Describe your project in one sentence',
     multiline: true,
     rows: 3
   },
   {
     field: 'description',
-    required: true,
     label: 'Describe your project in more depth',
     multiline: true,
     rows: 5
   },
   {
     field: 'twitter',
-    required: false,
     label: 'Twitter'
   },
   {
     field: 'website',
-    required: false,
     label: 'Website'
   },
   {
     field: 'github',
-    required: false,
     label: 'GitHub'
   },
   {
     field: 'blog',
-    required: false,
     label: 'Blog'
   },
   {
     field: 'productUrl',
-    required: false,
     label: 'Product or Demo URL'
   },
   {
     field: 'communityUrl',
-    required: false,
     label: 'Community URL (Discord/Discourse/Farcaster channel)'
   },
   {
     field: 'otherUrl',
-    required: false,
     label: 'Other URL'
   },
   {
     field: 'walletAddress',
-    required: false,
     label: 'Wallet Address to receive funds'
   }
 ];
@@ -129,21 +118,35 @@ export const projectRequiredValues: Record<ProjectField, boolean> = {
 export function ProjectFieldAnswers({
   fieldConfig,
   onChange,
-  values
+  values,
+  defaultRequired
 }: {
   onChange?: (project: ProjectPayload) => void;
   values: ProjectPayload;
   fieldConfig?: ProjectFieldConfig;
+  defaultRequired?: boolean;
 }) {
-  return <FieldAnswers values={values} onChange={onChange} fieldConfig={fieldConfig} properties={ProjectConstants} />;
+  return (
+    <FieldAnswers
+      defaultRequired={defaultRequired}
+      values={values}
+      onChange={onChange}
+      fieldConfig={fieldConfig}
+      properties={ProjectConstants}
+    />
+  );
 }
 
 export function ProjectFieldsEditor({
   onChange,
-  values
+  values,
+  defaultRequired
 }: {
+  defaultRequired?: boolean;
   onChange?: (value: Omit<ProjectEditorFieldConfig, 'members'>) => void;
   values: Omit<ProjectEditorFieldConfig, 'members'>;
 }) {
-  return <FieldsEditor properties={ProjectConstants} values={values} onChange={onChange} />;
+  return (
+    <FieldsEditor defaultRequired={defaultRequired} properties={ProjectConstants} values={values} onChange={onChange} />
+  );
 }

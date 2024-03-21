@@ -17,19 +17,6 @@ import Legend from 'components/settings/Legend';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
-const defaultFieldConfig = {
-  name: {
-    required: true
-  },
-  projectMembers: [
-    {
-      name: {
-        required: true
-      }
-    }
-  ]
-};
-
 function ProjectRow({
   mutate,
   projectWithMember
@@ -156,9 +143,19 @@ function ProjectRow({
       </AccordionSummary>
       <AccordionDetails>
         <ProjectFormAnswers
+          defaultRequired={false}
           onMemberRemove={onProjectMemberRemove}
           isTeamLead={isTeamLead}
-          fieldConfig={defaultFieldConfig}
+          fieldConfig={{
+            name: {
+              required: true
+            },
+            projectMembers: projectWithMember.projectMembers.map(() => ({
+              name: {
+                required: true
+              }
+            }))
+          }}
           onChange={onProjectUpdate}
           onMemberAdd={onProjectMemberAdd}
           values={projectWithMember}
@@ -224,7 +221,17 @@ export function ProjectsSettings() {
             }}
           />
           <ProjectFormAnswers
-            fieldConfig={defaultFieldConfig}
+            defaultRequired={false}
+            fieldConfig={{
+              name: {
+                required: true
+              },
+              projectMembers: project.projectMembers.map(() => ({
+                name: {
+                  required: true
+                }
+              }))
+            }}
             onChange={setProject}
             isTeamLead
             onMemberRemove={(memberIndex) => {

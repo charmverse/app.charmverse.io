@@ -20,7 +20,8 @@ export function ProjectFormAnswers({
   onMemberAdd,
   disableAddMemberButton,
   isTeamLead,
-  onMemberRemove
+  onMemberRemove,
+  defaultRequired
 }: {
   onMemberRemove: (index: number) => void;
   disableAddMemberButton?: boolean;
@@ -29,11 +30,13 @@ export function ProjectFormAnswers({
   fieldConfig?: ProjectEditorFieldConfig;
   onMemberAdd: () => void;
   isTeamLead: boolean;
+  defaultRequired?: boolean;
 }) {
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h5'>Project Info</Typography>
       <ProjectFieldAnswers
+        defaultRequired={defaultRequired}
         values={values}
         onChange={
           onChange === undefined || !isTeamLead
@@ -52,6 +55,7 @@ export function ProjectFormAnswers({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldAnswers
+        defaultRequired={defaultRequired}
         onChange={
           onChange === undefined || !isTeamLead
             ? undefined
@@ -87,6 +91,7 @@ export function ProjectFormAnswers({
             </IconButton>
           </Stack>
           <ProjectMemberFieldAnswers
+            defaultRequired={defaultRequired}
             onChange={
               onChange === undefined || !isTeamLead
                 ? undefined
@@ -131,15 +136,18 @@ export function ProjectFormAnswers({
 
 export function ProjectFormEditor({
   onChange,
-  values
+  values,
+  defaultRequired
 }: {
   onChange?: (project: ProjectEditorFieldConfig) => void;
   values: ProjectEditorFieldConfig;
+  defaultRequired?: boolean;
 }) {
   return (
     <Stack gap={2} p={2}>
       <Typography variant='h5'>Project Info</Typography>
       <ProjectFieldsEditor
+        defaultRequired={defaultRequired}
         values={values}
         onChange={
           onChange === undefined
@@ -157,6 +165,7 @@ export function ProjectFormEditor({
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldsEditor
+        defaultRequired={defaultRequired}
         values={values?.projectMembers?.[0]}
         onChange={
           onChange === undefined

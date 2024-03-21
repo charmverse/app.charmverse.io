@@ -199,6 +199,7 @@ function ExpandedFormField({
       )}
       {formField.type === 'project_profile' ? (
         <ProjectFormEditor
+          defaultRequired
           values={
             (formField.extraFields as ProjectEditorFieldConfig) ?? {
               projectMembers: [{}]
@@ -347,6 +348,7 @@ export function FormField(
               {formField.type === 'project_profile' ? (
                 <ProjectFormEditor
                   values={(formField.extraFields as ProjectEditorFieldConfig) ?? { projectMembers: [{}] }}
+                  defaultRequired
                 />
               ) : (
                 <FieldTypeRenderer

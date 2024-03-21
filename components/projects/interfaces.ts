@@ -28,7 +28,6 @@ export type ProjectUpdatePayload = Partial<ProjectPayload> & {
 
 export type ProjectFieldProperty<Fields> = {
   field: Fields;
-  required: boolean;
   label: string;
   multiline?: boolean;
   rows?: number;

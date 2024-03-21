@@ -7,11 +7,13 @@ import type { ProjectFieldProperty } from '../interfaces';
 export function FieldsEditor<Values extends Record<string, any> = Record<string, any>>({
   onChange,
   values,
-  properties
+  properties,
+  defaultRequired
 }: {
   onChange?: (values: Values) => void;
   values: Values;
   properties: ProjectFieldProperty<keyof Values>[];
+  defaultRequired?: boolean;
 }) {
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
@@ -29,7 +31,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
               multiline={property.multiline}
               rows={property.rows ?? 1}
               disabled
-              required={values?.[property.field]?.required ?? true}
+              required={values?.[property.field]?.required ?? defaultRequired}
             />
             {onChange && (
               <Stack gap={1}>
@@ -55,7 +57,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
                   <Switch
                     size='small'
                     disabled={values?.[property.field]?.hidden === true}
-                    checked={values?.[property.field]?.required ?? true}
+                    checked={values?.[property.field]?.required ?? defaultRequired}
                     onChange={(e) => {
                       onChange({
                         ...(values ?? {}),

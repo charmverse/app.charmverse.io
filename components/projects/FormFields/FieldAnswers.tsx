@@ -8,8 +8,10 @@ export function FieldAnswers<Values extends Record<string, any> = Record<string,
   onChange,
   values,
   fieldConfig,
-  properties
+  properties,
+  defaultRequired = false
 }: {
+  defaultRequired?: boolean;
   fieldConfig?: ProjectFieldConfig<keyof Values & string>;
   onChange?: (values: Values) => void;
   values: Values;
@@ -28,7 +30,7 @@ export function FieldAnswers<Values extends Record<string, any> = Record<string,
             label={property.label}
             multiline={property.multiline}
             rows={property.rows ?? 1}
-            required={fieldConfig?.[property.field]?.required ?? true}
+            required={fieldConfig?.[property.field]?.required ?? defaultRequired}
             disabled={onChange === undefined}
             value={values?.[property.field]}
             onChange={(e) => {
