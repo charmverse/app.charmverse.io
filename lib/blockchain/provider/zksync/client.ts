@@ -135,8 +135,7 @@ function mapNFTData(
   const tokenUriDNSVersion = token.image?.replace('ipfs://', 'https://ipfs.io/ipfs/') || '';
   return {
     id: `${token.contractAddress}:${token.tokenId}`,
-    tokenId: String(token.tokenId),
-    tokenIdInt: BigInt(token.tokenId).toString(),
+    tokenId: BigInt(token.tokenId).toString(),
     contract: token.contractAddress,
     imageRaw: tokenUriDNSVersion,
     image: tokenUriDNSVersion,

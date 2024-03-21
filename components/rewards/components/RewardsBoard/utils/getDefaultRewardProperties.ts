@@ -1,7 +1,7 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import type { Constants } from 'lib/focalboard/constants';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import type { Constants } from 'lib/databases/constants';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,

@@ -4,7 +4,7 @@ import charmClient from 'charmClient';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { createCard } from 'lib/focalboard/card';
+import { createCard } from 'lib/databases/card';
 
 import { AddIconButton } from './Sidebar/components/AddIconButton';
 

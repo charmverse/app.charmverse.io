@@ -13,9 +13,9 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
-import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
+import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { BlockPatch, Block as FBBlock } from 'lib/databases/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';

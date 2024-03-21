@@ -131,26 +131,6 @@ describe('upsertProposalFormFields', () => {
     );
   });
 
-  it('should throw an error if no proposalId is provided', async () => {
-    await expect(
-      upsertProposalFormFields({
-        proposalId: undefined as any,
-        formFields: [
-          {
-            id: v4(),
-            type: 'long_text',
-            name: 'long name',
-            description: 'another description',
-            index: 1,
-            options: [],
-            private: true,
-            required: true
-          }
-        ]
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
-  });
-
   it('should throw an error if no form fields were provided', async () => {
     await expect(
       upsertProposalFormFields({

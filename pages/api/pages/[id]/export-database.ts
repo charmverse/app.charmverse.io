@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
-import { loadAndGenerateCsv } from 'lib/focalboard/generateCsv';
+import type { FilterGroup } from 'lib/databases/filterGroup';
+import { loadAndGenerateCsv } from 'lib/databases/generateCsv';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';

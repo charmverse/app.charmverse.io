@@ -1,9 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { isProdEnv } from 'config/constants';
-import type { CharmVerseCredentialInput } from 'lib/credentials/attestOffchain';
-import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
 import { getAllUserCredentials } from 'lib/credentials/getAllUserCredentials';
 import { onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';

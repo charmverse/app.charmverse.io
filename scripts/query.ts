@@ -5,23 +5,12 @@ import { uniq } from 'lodash';
  */
 
 async function search() {
-  const acc = await prisma.page.findUnique({
+  const acc = await prisma.page.findFirst({
     where: {
-      id: '0cbeaa44-7b44-4d80-8f86-139fd1f844e7'
-    },
-    include: {
-      proposal: {
-        include: {
-          evaluations: {
-            orderBy: {
-              index: 'asc'
-            }
-          }
-        }
-      }
+      path: 'mufi-universal-music-distribution-protocol-8932847830027102'
     }
   });
-  console.log(acc);
+  console.log(acc?.id);
 }
 
 search().then(() => console.log('Done'));

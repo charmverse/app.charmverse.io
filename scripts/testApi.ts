@@ -1,24 +1,10 @@
 /* eslint-disable no-console */
 
-import { GET } from '@charmverse/core/http';
 export {};
 
 // use this file and test api keys
 const apiDomain = 'https://app.charmverse.io';
 const apiKey = process.env.API_KEY;
-
-async function getBounties() {
-  try {
-    const response = await GET(`${apiDomain}/api/v1/bounties`, {
-      headers: {
-        Authorization: `Bearer ${apiKey}`
-      }
-    });
-    console.log(response);
-  } catch (err) {
-    console.error('Error', err);
-  }
-}
 
 async function testCreateSpace() {
   try {

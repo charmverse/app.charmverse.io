@@ -11,7 +11,7 @@ export function checkFormFieldErrors(formFields: FormFieldInput[]): string | und
         (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
     )
   ) {
-    return 'Select fields must have atleast one option';
+    return 'Select fields must have at least one option';
   }
   return undefined;
 }

@@ -9,21 +9,21 @@ import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
-import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
-import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
-import AddViewMenu from 'components/common/BoardEditor/focalboard/src/components/addViewMenu';
-import { getVisibleAndHiddenGroups } from 'components/common/BoardEditor/focalboard/src/components/centerPanel';
-import Kanban from 'components/common/BoardEditor/focalboard/src/components/kanban/kanban';
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
-import ViewHeaderDisplayByMenu from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewHeaderDisplayByMenu';
-import ViewTabs from 'components/common/BoardEditor/focalboard/src/components/viewHeader/viewTabs';
-import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { Button } from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
+import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
+import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
+import Table from 'components/common/DatabaseEditor/components/table/table';
+import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
+import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';
+import ViewHeaderDisplayByMenu from 'components/common/DatabaseEditor/components/viewHeader/viewHeaderDisplayByMenu';
+import ViewTabs from 'components/common/DatabaseEditor/components/viewHeader/viewTabs';
+import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
+import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
+import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -42,9 +42,9 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
-import { createBoard } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
-import { viewTypeToBlockId } from 'lib/focalboard/customBlocks/constants';
+import { createBoard } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
+import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
@@ -52,10 +52,9 @@ import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks
 import { RewardsHeaderRowsMenu } from './components/RewardsHeaderRowsMenu';
 import { useRewards } from './hooks/useRewards';
 
-const CalendarFullView = dynamic(
-  () => import('../common/BoardEditor/focalboard/src/components/calendar/fullCalendar'),
-  { ssr: false }
-);
+const CalendarFullView = dynamic(() => import('../common/DatabaseEditor/components/calendar/fullCalendar'), {
+  ssr: false
+});
 
 const StyledButton = styled(Button)`
   position: absolute;

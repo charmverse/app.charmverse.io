@@ -36,7 +36,7 @@ export function NftGalleryItem({ nft, isSelected, onClick }: Props) {
           {nft.title}
         </Typography>
         <Typography noWrap variant='subtitle2'>
-          {nft.tokenIdInt ? `#${nft.tokenIdInt}` : ''}
+          {nft.tokenId ? `#${nft.tokenId}` : ''}
         </Typography>
       </Stack>
 

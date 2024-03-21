@@ -1,5 +1,5 @@
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
-import type { BoardView } from 'lib/focalboard/boardView';
+import type { BoardView } from 'lib/databases/boardView';
 
 export function useViewSortOptions(activeView: BoardView) {
   const { sortOptions: globalSortOptions } = activeView.fields;

@@ -1,4 +1,4 @@
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -33,6 +33,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     reviewers: [],
     evaluations: [],
     id: '',
+    pageId: '',
     title: '',
     createdAt: '',
     createdBy: '',

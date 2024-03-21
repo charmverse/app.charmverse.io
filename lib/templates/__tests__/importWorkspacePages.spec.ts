@@ -19,8 +19,8 @@ import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } fr
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
+import { prismaToBlock } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
 import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { WorkspacePagesExport } from '../exportWorkspacePages';

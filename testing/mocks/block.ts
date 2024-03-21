@@ -1,6 +1,6 @@
-import { TestBlockFactory } from 'components/common/BoardEditor/focalboard/src/test/testBlockFactory';
-import type { Board } from 'lib/focalboard/board';
-import type { Card } from 'lib/focalboard/card';
+import { TestBlockFactory } from 'components/common/DatabaseEditor/test/testBlockFactory';
+import type { Board } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 export function createMockBoard(): Board {
   return TestBlockFactory.createBoard();

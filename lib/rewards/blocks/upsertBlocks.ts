@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { filterInternalProperties } from 'lib/focalboard/utilities';
+import { filterInternalProperties } from 'lib/databases/utilities';
 import type {
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields,

@@ -1,18 +1,13 @@
 import { log } from '@charmverse/core/log';
-import type { CredentialEventType, AttestationType } from '@charmverse/core/prisma-client';
+import type { AttestationType, CredentialEventType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { MultiAttestationRequest } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
-import type { Signer } from 'ethers';
 import { Wallet, providers } from 'ethers';
-import { getAddress } from 'viem/utils';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
-import { conditionalPlural } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
-import { getCharmverseSigner } from './getCharmverseSigner';
-import { attestationSchemaIds, encodeAttestion, type CredentialDataInput } from './schemas';
+import { attestationSchemaIds, encodeAttestation, type CredentialDataInput } from './schemas';
 
 export type OnChainAttestationInput<T extends AttestationType = AttestationType> = {
   chainId: EasSchemaChain;
@@ -35,7 +30,7 @@ async function attestOnchain({ credentialInputs, type, chainId }: OnChainAttesta
   const attestationUid = await eas
     .attest({
       schema: schemaId,
-      data: { recipient: credentialInputs.recipient, data: encodeAttestion({ type, data: credentialInputs.data }) }
+      data: { recipient: credentialInputs.recipient, data: encodeAttestation({ type, data: credentialInputs.data }) }
     })
     .then((tx) => tx.wait());
 

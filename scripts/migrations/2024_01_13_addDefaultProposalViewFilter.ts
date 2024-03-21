@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardView } from 'lib/focalboard/boardView';
+import { BoardView } from 'lib/databases/boardView';
 import { DEFAULT_VIEW_BLOCK_ID, PROPOSAL_STATUS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { v4 } from 'uuid';
 

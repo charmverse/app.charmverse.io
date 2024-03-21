@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
+import { checkFormFieldErrors } from 'lib/proposals/getProposalErrors';
 import { isUUID } from 'lib/utils/strings';
 
 export async function upsertProposalFormFields({
@@ -13,10 +14,6 @@ export async function upsertProposalFormFields({
   proposalId: string;
   formFields: FormFieldInput[];
 }) {
-  if (!proposalId) {
-    throw new InvalidInputError(`No proposal found with id: ${proposalId}`);
-  }
-
   if (!formFields.length) {
     throw new InvalidInputError(`You need to specify at least one form field`);
   }
@@ -25,6 +22,11 @@ export async function upsertProposalFormFields({
 
   if (proposal.page?.type !== 'proposal_template') {
     throw new InvalidInputError(`Proposal with id: ${proposalId} is not a template`);
+  }
+
+  const formErrors = checkFormFieldErrors(formFields);
+  if (proposal.status === 'published' && formErrors) {
+    throw new InvalidInputError(formErrors);
   }
 
   const { formId } = proposal;

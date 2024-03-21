@@ -57,7 +57,7 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
   }, [proposals]);
 
   useEffect(() => {
-    function handleUpdatedEvent(updated: WebSocketPayload<'proposals_updated'>) {
+    function handleArchivedEvent(updated: WebSocketPayload<'proposals_updated'>) {
       mutateProposals(
         (list) => {
           if (!list) return list;
@@ -76,9 +76,42 @@ export function ProposalsProvider({ children }: { children: ReactNode }) {
         { revalidate: false }
       );
     }
-    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleUpdatedEvent);
+    function handleUpdatedEvent(updated: WebSocketPayload<'pages_meta_updated'>) {
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.map((proposal) => {
+            const updatedMatch = updated.find((p) => p.id === proposal.pageId);
+            if (updatedMatch) {
+              return {
+                ...proposal,
+                title: updatedMatch.title || proposal.title
+              };
+            }
+            return proposal;
+          });
+        },
+        { revalidate: false }
+      );
+    }
+    function handleDeleteEvent(deleted: WebSocketPayload<'pages_deleted'>) {
+      mutateProposals(
+        (list) => {
+          if (!list) return list;
+          return list.filter((proposal) => {
+            return !deleted.some((p) => p.id === proposal.pageId);
+          });
+        },
+        { revalidate: false }
+      );
+    }
+    const unsubscribeFromProposalArchived = subscribe('proposals_updated', handleArchivedEvent);
+    const unsubscribeFromPageUpdates = subscribe('pages_meta_updated', handleUpdatedEvent);
+    const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
     return () => {
       unsubscribeFromProposalArchived();
+      unsubscribeFromPageUpdates();
+      unsubscribeFromPageDeletes();
     };
   }, [mutateProposals, subscribe]);
 

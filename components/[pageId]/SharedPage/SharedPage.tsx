@@ -4,10 +4,10 @@ import { useEffect } from 'react';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
-import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { updateBoards } from 'components/common/DatabaseEditor/store/boards';
+import { addCard } from 'components/common/DatabaseEditor/store/cards';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
+import { addView, setCurrent } from 'components/common/DatabaseEditor/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -87,7 +87,7 @@ export function SharedPage({ publicPage }: Props) {
   return currentPage.type.match(/board/) ? (
     <DatabasePage page={currentPage} setPage={() => null} readOnly />
   ) : (
-    <Box sx={{ overflowY: 'auto' }}>
+    <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
       <DocumentPageWithSidebars page={publicPage.page} savePage={() => null} readOnly />
     </Box>
   );

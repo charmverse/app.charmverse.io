@@ -169,8 +169,7 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
   const image = nft.image.thumbnailUrl?.startsWith('https://') ? nft.image.thumbnailUrl : nft.image.originalUrl;
   return {
     id: `${nft.contract.address}:${nft.tokenId}`,
-    tokenId: nft.tokenId,
-    tokenIdInt: tokenIdBigInt,
+    tokenId: tokenIdBigInt,
     contract: nft.contract.address,
     imageRaw: nft.image.originalUrl,
     image,

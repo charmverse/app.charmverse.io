@@ -3,9 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
-import type { CardFields } from 'lib/focalboard/card';
+import type { BoardFields } from 'lib/databases/board';
+import type { BoardViewFields, IViewType } from 'lib/databases/boardView';
+import type { CardFields } from 'lib/databases/card';
 import { generateSchema } from 'testing/publicApi/schemas';
 
 import { createPage, generateBoard, generateRole } from '../setupDatabase';

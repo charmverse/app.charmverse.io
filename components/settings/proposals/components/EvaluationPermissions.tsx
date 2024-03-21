@@ -4,12 +4,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { capitalize } from 'lodash';
 
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import {
   UserAndRoleSelect,
   type SelectOption,
   type SystemRoleOptionPopulated
-} from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+} from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { MembersIcon } from 'components/common/PageIcon';
 
 import { evaluationIcons } from '../constants';
