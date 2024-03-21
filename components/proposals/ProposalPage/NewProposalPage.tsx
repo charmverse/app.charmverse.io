@@ -125,7 +125,7 @@ export function NewProposalPage({
   const proposalFormFields = isStructured
     ? formInputs.formFields ?? [
         {
-          type: 'short_text',
+          type: 'project_profile',
           name: '',
           description: emptyDocument,
           index: 0,
