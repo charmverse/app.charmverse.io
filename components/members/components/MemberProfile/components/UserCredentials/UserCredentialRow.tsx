@@ -167,16 +167,17 @@ export function UserCredentialRow({
     <div />
   );
 
-  const hideAndPublishComponent = (
-    <UserCredentialHideAndPublish
-      credential={credential}
-      isSmallScreen={isSmallScreen}
-      isUserRecipient={!!isUserRecipient}
-      readOnly={readOnly}
-      isMutating={isMutating}
-      toggleFavorite={toggleFavorite}
-    />
-  );
+  // Readd this later
+  // const hideAndPublishComponent = (
+  //   <UserCredentialHideAndPublish
+  //     credential={credential}
+  //     isSmallScreen={isSmallScreen}
+  //     isUserRecipient={!!isUserRecipient}
+  //     readOnly={readOnly}
+  //     isMutating={isMutating}
+  //     toggleFavorite={toggleFavorite}
+  //   />
+  // );
 
   if (isSmallScreen) {
     return (
@@ -200,7 +201,7 @@ export function UserCredentialRow({
         {attestationContentComponent}
         {favoriteAndVerificationIconsComponent}
       </Stack>
-      {hideAndPublishComponent}
+      {/* {hideAndPublishComponent} */}
     </Stack>
   );
 }
