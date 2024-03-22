@@ -82,8 +82,7 @@ function getParsedCredential(credential: CredentialFromCeramic): EASAttestationF
     content: parsed,
     attester: credential.issuer,
     timeCreated: new Date(credential.timestamp).valueOf(),
-    type: 'charmverse',
-    isOnchain: false
+    type: 'charmverse'
   };
 }
 
@@ -130,7 +129,7 @@ const GET_CREDENTIALS = gql`
   }
 `;
 
-export async function getCharmverseCredentialsByWallets({
+export async function getCharmverseOffchainCredentialsByWallets({
   wallets
 }: {
   wallets: string[];

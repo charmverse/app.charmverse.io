@@ -11,7 +11,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
-import { trackedSchemas } from 'lib/credentials/external/schemas';
+import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialDataInput } from 'lib/credentials/schemas';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
@@ -32,9 +32,10 @@ export function UserCredentialRow({
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
   const { showMessage } = useSnackbar();
-  const schemaInfo = trackedSchemas[credential.chainId as keyof typeof trackedSchemas]?.find(
-    (s) => s.schemaId === credential.schemaId
-  );
+  const schemaInfo = (
+    trackedSchemas[credential.chainId as keyof typeof trackedSchemas] ??
+    trackedCharmverseSchemas[credential.chainId as keyof typeof trackedCharmverseSchemas]
+  )?.find((s) => s.schemaId === credential.schemaId);
   const { user } = useUser();
   const isUserRecipient = user?.wallets.find((wallet) => lowerCaseEqual(wallet.address, credential.recipient));
   const isMutating = isRemoveFavoriteCredentialLoading || isAddFavoriteCredentialLoading;
