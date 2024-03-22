@@ -11,12 +11,13 @@ import ImpactCommunityIcon from 'public/images/template_icons/impact_icon.svg';
 import LightBulbIcon from 'public/images/template_icons/light_bulb_icon_bnw.svg';
 import NFTCommunityIcon from 'public/images/template_icons/nft_community_icon.svg';
 import NounsIcon from 'public/images/template_icons/nounish_icon.svg';
+import GamingIcon from 'public/images/template_icons/pacman_icon.svg';
 
 type SvgComponent = OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
 
 const templateIcons: Record<StaticSpaceTemplateType, SvgComponent> = {
   templateCreator: CreatorIcon,
-  templateGaming: NFTCommunityIcon,
+  templateGaming: GamingIcon,
   templateNftCommunity: NFTCommunityIcon,
   templateHackathon: HackathonIcon,
   templateNounishDAO: NounsIcon,
