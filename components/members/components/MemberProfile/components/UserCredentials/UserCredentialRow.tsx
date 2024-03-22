@@ -115,7 +115,7 @@ export function UserCredentialRow({
       {isUserRecipient && !readOnly && (
         <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
           <div>
-            <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
+            <IconButton sx={{ p: 0 }} size='small' onClick={toggleFavorite} disabled={isMutating}>
               {!credential.favoriteCredentialId ? (
                 <StarBorderOutlinedIcon
                   color={isMutating ? 'disabled' : 'primary'}
@@ -161,7 +161,9 @@ export function UserCredentialRow({
         <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
       ))}
     </Stack>
-  ) : null;
+  ) : (
+    <div />
+  );
 
   if (isSmallScreen) {
     return (
@@ -180,7 +182,7 @@ export function UserCredentialRow({
       <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='50%'>
         {credentialOrganizationComponent}
       </Box>
-      <Stack justifyContent='space-between' alignItems='center' flexDirection='row' flexGrow={1}>
+      <Stack justifyContent='space-between' alignItems='center' flexDirection='row' width='50%'>
         {attestationContentComponent}
         {favoriteAndVerificationIconsComponent}
       </Stack>
