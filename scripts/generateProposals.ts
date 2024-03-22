@@ -69,9 +69,9 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
 //   }
 // }).then(console.log)
 
-const spaceDomain = 'working-lime-mastodon'
+const spaceDomain = 'expected-pink-parrotfish'
 
-generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['bfd46fdb-60ca-47d1-a0f4-3b51fd7e9332'] })
+generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['25894011-8b37-4bfd-b3e3-1871193f5c91'] })
 .then(console.log);
 
 // prisma.proposal.updateMany({

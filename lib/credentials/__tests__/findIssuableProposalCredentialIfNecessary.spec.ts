@@ -1,11 +1,75 @@
-import type { CredentialTemplate } from '@charmverse/core/prisma-client';
+import { prisma, type CredentialTemplate } from '@charmverse/core/prisma-client';
+import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { generateCredentialInputsForProposal } from '../findIssuableProposalCredentials';
+import { proposalCreatedVerb } from '../constants';
+import {
+  findSpaceIssuableProposalCredentials,
+  generateCredentialInputsForProposal
+} from '../findIssuableProposalCredentials';
 import type { ProposalWithJoinedData, IssuableProposalCredentialContent } from '../findIssuableProposalCredentials';
+
+describe('findIssuableProposalCredentialIfNecessary', () => {
+  it('should not duplicate credentials for proposals where credentials with the same proposalId and event already feature in a pending Gnosis Safe transaction', async () => {
+    const userWalletAddress = randomETHWallet().address;
+    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWalletAddress });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved', 'proposal_created'],
+      schemaType: 'proposal',
+      schemaAddress: '0x1234',
+      description: 'Description 1',
+      name: 'Template 1',
+      organization: 'Org 1'
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      proposalStatus: 'published',
+      authors: [user.id],
+      evaluationInputs: [{ index: 1, result: 'pass', evaluationType: 'pass_fail', permissions: [], reviewers: [] }],
+      selectedCredentialTemplateIds: [credentialTemplate.id],
+      userId: user.id
+    });
+
+    await prisma.pendingSafeTransaction.create({
+      data: {
+        chainId: 1,
+        safeAddress: '0x1234',
+        safeTxHash: '0x1234',
+        schemaId: '0x1234',
+        credentialEvents: ['proposal_approved'],
+        proposalIds: [proposal.id],
+        space: { connect: { id: space.id } }
+      }
+    });
+
+    const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
+    expect(result).toMatchObject(
+      expect.arrayContaining<IssuableProposalCredentialContent>([
+        {
+          proposalId: proposal.id,
+          recipientUserId: space.createdBy,
+          recipientAddress: userWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_created',
+          pageId: proposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `${proposalCreatedVerb} Proposal`,
+            URL: getPagePermalink({ pageId: proposal.page.id })
+          }
+        } as IssuableProposalCredentialContent
+      ])
+    );
+  });
+});
 
 describe('generateCredentialInputsForProposal', () => {
   it('should generate correct credential inputs for an approved proposal', () => {

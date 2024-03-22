@@ -105,7 +105,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeRewardsReviewers?: PropertyTemplateMenuProps['onChangeRewardsReviewers'];
   onChangeRewardsToken?: PropertyTemplateMenuProps['onChangeRewardsToken'];
   onChangeCustomRewardsValue?: PropertyTemplateMenuProps['onChangeCustomRewardsValue'];
-  onIssueProposalCredentials?: () => void;
+  showIssueProposalCredentials?: boolean;
   showRewardsPaymentButton?: boolean;
   showTrashIcon?: boolean;
   onMarkRewardsAsPaid?: () => Promise<void>;
@@ -134,7 +134,7 @@ export function ViewHeaderRowsMenu({
   onChangeProposalsSteps,
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
-  onIssueProposalCredentials,
+  showIssueProposalCredentials,
   showRewardsPaymentButton,
   showTrashIcon = !board.fields.sourceType,
   onMarkRewardsAsComplete,
@@ -334,7 +334,7 @@ export function ViewHeaderRowsMenu({
           </div>
         </Tooltip>
       )}
-      <IssueProposalCredentials selectedPageIds={checkedIds} />
+      {showIssueProposalCredentials && <IssueProposalCredentials selectedPageIds={checkedIds} />}
       {/* {onIssueProposalCredentials && (<IssueProposalCredentials)} */}
       {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (

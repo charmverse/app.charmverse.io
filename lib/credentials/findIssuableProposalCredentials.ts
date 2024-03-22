@@ -9,6 +9,7 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { arrayUtils } from '@charmverse/core/utilities';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
@@ -38,6 +39,9 @@ export type IssuableProposalCredentialContent = {
   event: CredentialEventType;
 };
 
+/**
+ * @existingPendingTransactionEvents - Events with already pending credentials awaiting a Gnosis safe transaction
+ */
 type GenerateCredentialsParams = {
   proposal: ProposalWithJoinedData;
   space: Pick<Space, 'id' | 'features'> & {
@@ -46,13 +50,15 @@ type GenerateCredentialsParams = {
       'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
     >[];
   };
+  existingPendingTransactionEvents?: CredentialEventType[];
 };
 
 const events: CredentialEventType[] = ['proposal_created', 'proposal_approved'];
 
 export function generateCredentialInputsForProposal({
   proposal,
-  space
+  space,
+  existingPendingTransactionEvents
 }: GenerateCredentialsParams): IssuableProposalCredentialContent[] {
   if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length) {
     return [];
@@ -84,39 +90,41 @@ export function generateCredentialInputsForProposal({
 
     proposal.selectedCredentialTemplates.forEach((credentialTemplateId) => {
       for (const event of issuableEvents) {
-        const credentialTemplate = templateMap.get(credentialTemplateId);
+        if (!existingPendingTransactionEvents?.includes(event)) {
+          const credentialTemplate = templateMap.get(credentialTemplateId);
 
-        const canIssueCredential =
-          !!credentialTemplate &&
-          credentialTemplate.credentialEvents.includes(event) &&
-          !proposal.issuedCredentials.some(
-            (ic) =>
-              ic.userId === author.id &&
-              ic.credentialTemplateId === credentialTemplateId &&
-              ic.credentialEvent === event
-          );
+          const canIssueCredential =
+            !!credentialTemplate &&
+            credentialTemplate.credentialEvents.includes(event) &&
+            !proposal.issuedCredentials.some(
+              (ic) =>
+                ic.userId === author.id &&
+                ic.credentialTemplateId === credentialTemplateId &&
+                ic.credentialEvent === event
+            );
 
-        if (canIssueCredential) {
-          const getEventLabel = credentialEventLabels[event];
-          const eventLabel = getEventLabel
-            ? getEventLabel((value) => getFeatureTitle(value, space.features as any))
-            : '';
+          if (canIssueCredential) {
+            const getEventLabel = credentialEventLabels[event];
+            const eventLabel = getEventLabel
+              ? getEventLabel((value) => getFeatureTitle(value, space.features as any))
+              : '';
 
-          credentialsToIssue.push({
-            recipientAddress: targetWallet,
-            proposalId: proposal.id,
-            recipientUserId: author.id,
-            pageId: proposal.page.id,
-            event,
-            credential: {
-              Name: credentialTemplate.name,
-              Description: credentialTemplate.description ?? '',
-              Organization: credentialTemplate.organization,
-              Event: eventLabel,
-              URL: getPagePermalink({ pageId: proposal.page.id })
-            },
-            credentialTemplateId: credentialTemplate.id
-          });
+            credentialsToIssue.push({
+              recipientAddress: targetWallet,
+              proposalId: proposal.id,
+              recipientUserId: author.id,
+              pageId: proposal.page.id,
+              event,
+              credential: {
+                Name: credentialTemplate.name,
+                Description: credentialTemplate.description ?? '',
+                Organization: credentialTemplate.organization,
+                Event: eventLabel,
+                URL: getPagePermalink({ pageId: proposal.page.id })
+              },
+              credentialTemplateId: credentialTemplate.id
+            });
+          }
         }
       }
     });
@@ -193,7 +201,38 @@ export async function findSpaceIssuableProposalCredentials({
     select: proposalCredentialInputFieldsSelect()
   });
 
+  const pendingSafeTransactions = await prisma.pendingSafeTransaction.findMany({
+    where: {
+      spaceId,
+      proposalIds: {
+        hasSome: proposals.map((p) => p.id)
+      }
+    },
+    select: {
+      credentialEvents: true,
+      proposalIds: true
+    }
+  });
+
+  const pendingProposalsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
+    for (const proposalId of pendingTx.proposalIds) {
+      if (!acc[proposalId]) {
+        acc[proposalId] = [];
+      }
+
+      acc[proposalId].push(...pendingTx.credentialEvents);
+    }
+
+    return acc;
+  }, {} as Record<string, CredentialEventType[]>);
+
   return proposals
-    .map((p) => generateCredentialInputsForProposal({ proposal: p as ProposalWithJoinedData, space }))
+    .map((p) =>
+      generateCredentialInputsForProposal({
+        proposal: p as ProposalWithJoinedData,
+        space,
+        existingPendingTransactionEvents: pendingProposalsInSafe[p.id]
+      })
+    )
     .flat();
 }

@@ -12,6 +12,7 @@ import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
 import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
+import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 
 export function useProposalCredentials() {
   const { space } = useCurrentSpace();
@@ -64,24 +65,38 @@ export function useProposalCredentials() {
             data: ic.credential
           }))
         });
-        await proposeTransaction({ ...populatedTransaction, value: '0' });
-        return;
-      }
+        const safeTxHash = await proposeTransaction({ safeTransactionData: { ...populatedTransaction, value: '0' } });
 
-      const txOutput = await multiAttestOnchain({
-        chainId: space?.credentialsChainId as EasSchemaChain,
-        type: 'proposal',
-        signer,
-        credentialInputs: _issuableProposalCredentials.map((ic) => ({
-          recipient: ic.recipientAddress,
-          data: ic.credential
-        }))
-      });
-      await charmClient.credentials.requestProposalCredentialIndexing({
-        chainId: space.credentialsChainId as EasSchemaChain,
-        txHash: txOutput.tx.hash
-      });
-      refreshIssuableCredentials();
+        await charmClient.credentials.requestPendingProposalCredentialGnosisSafeIndexing({
+          chainId: space.credentialsChainId as EasSchemaChain,
+          safeTxHash,
+          safeAddress: gnosisSafeForCredentials.address,
+          schemaId: proposalCredentialSchemaId,
+          spaceId: space.id,
+          credentials: _issuableProposalCredentials.map((ic) => ({
+            event: ic.event,
+            proposalId: ic.proposalId
+          }))
+        });
+        await refreshIssuableCredentials();
+        return 'gnosis';
+      } else {
+        const txOutput = await multiAttestOnchain({
+          chainId: space?.credentialsChainId as EasSchemaChain,
+          type: 'proposal',
+          signer,
+          credentialInputs: _issuableProposalCredentials.map((ic) => ({
+            recipient: ic.recipientAddress,
+            data: ic.credential
+          }))
+        });
+        await charmClient.credentials.requestProposalCredentialIndexing({
+          chainId: space.credentialsChainId as EasSchemaChain,
+          txHash: txOutput.tx.hash
+        });
+        await refreshIssuableCredentials();
+        return 'wallet';
+      }
     },
     [
       signer,

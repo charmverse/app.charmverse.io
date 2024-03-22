@@ -38,7 +38,7 @@ export function useGetGnosisSafe({ address, chainId }: { chainId: number; addres
   const safeClients = useCreateSafes(address ? [address] : []);
 
   const proposeTransaction = useCallback(
-    async (safeTransactionData: MetaTransactionData) => {
+    async ({ safeTransactionData }: { safeTransactionData: MetaTransactionData }) => {
       const safeTransactionClient = safeClients?.[0];
       if (!gnosisSafe) {
         throw new MissingDataError('No gnosis safe found to propose transaction');
@@ -49,25 +49,30 @@ export function useGetGnosisSafe({ address, chainId }: { chainId: number; addres
       } else if (!safeApiClient || !safeTransactionClient) {
         throw new MissingDataError('Safe transaction client or safe api client not ready. Please wait and try again.');
       }
-      if (safeApiClient && safeTransactionClient && gnosisSafe && account && currentWalletIsSafeOwner) {
-        const safeTransaction = await safeTransactionClient.createTransaction({ safeTransactionData });
-        const safeTxHash = await safeTransactionClient.getTransactionHash(safeTransaction);
-        const signature = await safeTransactionClient.signTransactionHash(safeTxHash);
-        await safeApiClient.proposeTransaction({
-          safeAddress: gnosisSafe.address,
-          safeTransactionData: {
-            ...safeTransaction.data,
-            safeTxGas: safeTransaction.data.safeTxGas.toString(),
-            baseGas: safeTransaction.data.baseGas.toString(),
-            gasPrice: safeTransaction.data.gasPrice.toString()
-          },
-          safeTxHash,
-          senderAddress: getAddress(account),
-          senderSignature: signature.data
-        });
 
-        return safeTxHash;
-      }
+      // Loads the next highest nonce that has not been executed. This nonce might have pending transactions.
+      const nonce = await safeApiClient.getNextNonce(gnosisSafe.address);
+
+      const safeTransaction = await safeTransactionClient.createTransaction({
+        safeTransactionData: { ...safeTransactionData, nonce }
+      });
+
+      const safeTxHash = await safeTransactionClient.getTransactionHash(safeTransaction);
+      const signature = await safeTransactionClient.signTransactionHash(safeTxHash);
+      await safeApiClient.proposeTransaction({
+        safeAddress: gnosisSafe.address,
+        safeTransactionData: {
+          ...safeTransaction.data,
+          safeTxGas: safeTransaction.data.safeTxGas.toString(),
+          baseGas: safeTransaction.data.baseGas.toString(),
+          gasPrice: safeTransaction.data.gasPrice.toString()
+        },
+        safeTxHash,
+        senderAddress: getAddress(account),
+        senderSignature: signature.data
+      });
+
+      return safeTxHash;
     },
     [safeApiClient, safeClients?.[0], gnosisSafe?.address, account]
   );

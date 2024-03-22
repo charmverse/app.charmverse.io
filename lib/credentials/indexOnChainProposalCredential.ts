@@ -1,17 +1,20 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { CredentialEventType, IssuedCredential } from '@charmverse/core/prisma-client';
+import type { CredentialEventType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
+import { sepolia } from 'wagmi';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
-import { lowerCaseEqual } from 'lib/utils/strings';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
+import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
+import type { IssuableProposalCredentialContent } from './findIssuableProposalCredentials';
 import type { ProposalCredential } from './schemas/proposal';
 import { decodeProposalCredential } from './schemas/proposal';
 
@@ -164,3 +167,67 @@ export async function indexProposalCredentials({
 
   return issuedCredentials;
 }
+
+export type GnosisSafeTransactionToIndex = Pick<
+  PendingSafeTransaction,
+  'safeTxHash' | 'chainId' | 'safeAddress' | 'spaceId' | 'schemaId'
+> & { credentials: Pick<IssuableProposalCredentialContent, 'proposalId' | 'event'>[] };
+
+export async function saveGnosisSafeTransactionToIndex({
+  chainId,
+  credentials,
+  safeAddress,
+  safeTxHash,
+  schemaId,
+  spaceId
+}: GnosisSafeTransactionToIndex): Promise<PendingSafeTransaction> {
+  const { proposalIds, credentialEvents } = credentials.reduce(
+    (acc, val) => {
+      acc.proposalIds.push(val.proposalId);
+
+      if (!acc.credentialEvents.includes(val.event)) {
+        acc.credentialEvents.push(val.event);
+      }
+      return acc;
+    },
+    {
+      proposalIds: [] as string[],
+      credentialEvents: [] as CredentialEventType[]
+    }
+  );
+
+  const pendingSafeTransactionToIndex = await prisma.pendingSafeTransaction.create({
+    data: {
+      space: { connect: { id: spaceId } },
+      schemaId,
+      safeTxHash,
+      safeAddress,
+      chainId,
+      credentialEvents,
+      proposalIds,
+      processed: false
+    }
+  });
+
+  return pendingSafeTransactionToIndex;
+}
+
+export async function indexSafeTransaction({
+  safeTxHash,
+  chainId
+}: {
+  safeTxHash: string;
+  chainId: number;
+}): Promise<IssuedCredential[]> {
+  const apiClient = getSafeApiClient({ chainId });
+  const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
+
+  prettyPrint(pendingSafeTransaction.transactionHash);
+
+  return [];
+}
+
+// indexSafeTransaction({
+//   chainId: sepolia.id,
+//   safeTxHash: '0x6773a9797f19a1c7e9f70819024eb29f4c68573fb89c6821d192656f3689a310'
+// }).then(console.log);

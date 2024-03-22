@@ -2,7 +2,10 @@ import * as http from 'adapters/http';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attestOffchain';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
-import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
+import type {
+  GnosisSafeTransactionToIndex,
+  ProposalCredentialsToIndex
+} from 'lib/credentials/indexOnChainProposalCredential';
 import type { CreateCredentialTemplateInput, CredentialTemplateUpdate } from 'lib/credentials/templates';
 
 export class CredentialsApi {
@@ -29,5 +32,9 @@ export class CredentialsApi {
 
   requestProposalCredentialIndexing(data: ProposalCredentialsToIndex) {
     return http.POST(`/api/credentials/proposals/request-indexing`, data);
+  }
+
+  requestPendingProposalCredentialGnosisSafeIndexing(data: GnosisSafeTransactionToIndex) {
+    return http.POST(`/api/credentials/proposals/request-gnosis-safe-indexing`, data);
   }
 }

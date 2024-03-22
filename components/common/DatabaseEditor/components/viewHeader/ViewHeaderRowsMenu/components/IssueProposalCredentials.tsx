@@ -96,8 +96,12 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     setPublishingCredential(true);
 
     try {
-      await issueAndSaveProposalCredentials(_issuableProposalCredentials);
-      showMessage(`Issued ${_issuableProposalCredentials.length} proposal credentials`);
+      const result = await issueAndSaveProposalCredentials(_issuableProposalCredentials);
+      if (result === 'gnosis') {
+        showMessage('Transaction submitted to Gnosis Safe. Please execute it there');
+      } else {
+        showMessage(`Issued ${_issuableProposalCredentials.length} proposal credentials`);
+      }
     } catch (err: any) {
       if (err.code === 'ACTION_REJECTED') {
         showMessage('Transaction rejected', 'warning');

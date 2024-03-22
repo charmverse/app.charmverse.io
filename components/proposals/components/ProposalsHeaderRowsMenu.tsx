@@ -252,6 +252,7 @@ export function ProposalsHeaderRowsMenu({
       onChangeProposalsStatuses={onChangeProposalsStatuses}
       onChangeProposalsSteps={onChangeProposalsSteps}
       onArchiveProposals={onArchiveProposals}
+      showIssueProposalCredentials
     />
   );
 }
