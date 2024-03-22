@@ -412,7 +412,6 @@ function PropertyValueElement(props: Props) {
   } else if (propertyTemplate.type === 'relation') {
     return (
       <RelationPropertyPagesAutocomplete
-        boardProperties={board.fields.cardProperties}
         propertyTemplate={propertyTemplate}
         selectedPageListItemIds={
           typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []

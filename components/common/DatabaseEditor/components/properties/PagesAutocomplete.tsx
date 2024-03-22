@@ -108,7 +108,6 @@ export function RelationPageListItemsContainer({
 
 function PagesAutocompleteBase({
   board,
-  loading,
   onChange,
   value: selectedCardIds,
   cards,
@@ -122,7 +121,6 @@ function PagesAutocompleteBase({
   showCard
 }: {
   board?: Board;
-  loading: boolean;
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
   cards: Card[];
@@ -146,7 +144,7 @@ function PagesAutocompleteBase({
     const _selectedCards = cards.filter((card) => _selected[card.id]);
     const _sortedCards: Card[] = [...cards].sort(
       (cardA, cardB) =>
-        (selected[cardB.id] ? 1 : 0) - (selected[cardA.id] ? 1 : 0) || (cardA.title > cardB.title ? 1 : -1)
+        (_selected[cardB.id] ? 1 : 0) - (_selected[cardA.id] ? 1 : 0) || (cardA.title > cardB.title ? 1 : -1)
     );
     return { selected: _selected, selectedCards: _selectedCards, sortedCards: _sortedCards };
   }, [cards, selectedCardIds]);
@@ -189,7 +187,6 @@ function PagesAutocompleteBase({
         disableClearable
         forcePopupIcon={false}
         fullWidth
-        loading={loading}
         groupBy={(option) => (selected[option.id] ? 'Linked page' : 'Link another page')}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple

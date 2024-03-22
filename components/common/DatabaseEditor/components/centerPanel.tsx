@@ -120,8 +120,8 @@ function CenterPanel(props: Props) {
   const { data: activePage } = useGetPageMeta(activeBoardId);
 
   const { keys } = useApiPageKeys(props.page?.id);
-  const selectBoard = useMemo(makeSelectBoard, []);
   const cardMap = useAppSelector(getAllCards);
+  const selectBoard = useMemo(makeSelectBoard, []);
   const activeBoard = useAppSelector((state) => selectBoard(state, activeBoardId ?? ''));
   const _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
   const _dateDisplayProperty = activeBoard?.fields.cardProperties.find(

@@ -25,7 +25,6 @@ export const config = {
 
 async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[] | { error: string }>) {
   const pageId = req.query.id as string;
-
   const page = await prisma.page.findFirstOrThrow({
     where: {
       id: pageId

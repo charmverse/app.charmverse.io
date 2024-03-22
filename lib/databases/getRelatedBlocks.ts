@@ -27,15 +27,24 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     .flat()
     .filter(isTruthy);
 
-  const connectedBoards = await prisma.block.findMany({
+  const relationalBlocks = await prisma.block.findMany({
     where: {
-      id: {
-        in: connectedBoardIds
-      }
+      OR: [
+        {
+          id: {
+            in: connectedBoardIds
+          }
+        },
+        {
+          rootId: {
+            in: connectedBoardIds
+          }
+        }
+      ]
     }
   });
 
-  blocks.push(...connectedBoards);
+  blocks.push(...relationalBlocks);
 
   const viewsWithLinkedSource = blocks.filter((b) => b.type === 'view' && (b.fields as BoardViewFields).linkedSourceId);
 
