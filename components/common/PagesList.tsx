@@ -7,8 +7,10 @@ import type { PagePathType } from 'components/common/PageIcon';
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
 
-export type PageListItem = Pick<Page, 'id' | 'title' | 'path' | 'hasContent' | 'icon'> & {
+export type PageListItem = Pick<Page, 'id' | 'title' | 'path'> & {
   type: PagePathType;
+  hasContent?: boolean;
+  icon?: string | null;
 };
 
 interface Props {

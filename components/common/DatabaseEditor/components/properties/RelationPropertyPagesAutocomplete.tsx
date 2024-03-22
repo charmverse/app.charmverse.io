@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 
+import { useGetSubtree } from 'charmClient/hooks/blocks';
 import type { PageListItem } from 'components/common/PagesList';
 import { usePages } from 'hooks/usePages';
-import type { IPropertyTemplate } from 'lib/databases/board';
-import { getRelationPropertiesCardsRecord } from 'lib/databases/getRelationPropertiesCardsRecord';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import { isTruthy } from 'lib/utils/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
@@ -33,24 +33,24 @@ export function RelationPropertyPagesAutocomplete({
   boardProperties: IPropertyTemplate[];
   showCard?: (cardId: string | null, isTemplate?: boolean) => void;
 }) {
-  const { pages } = usePages();
-  const relationPropertiesCardsRecord = useMemo(() => {
-    return getRelationPropertiesCardsRecord({
-      pages: Object.values(pages),
-      properties: boardProperties
-    });
-  }, [pages, boardProperties]);
+  const boardId = propertyTemplate.id;
+  const { blocks, isLoading } = useGetSubtree(boardId);
+
+  const options = blocks.filter((block) => block.type === 'card' && block.parentId === boardId) || [];
+  const board = blocks.find((block) => block.id === boardId) as Board | undefined;
 
   return (
     <PagesAutocomplete
+      board={board}
+      loading={isLoading}
+      multiple={propertyTemplate.relationData?.limit !== 'single_page'}
       showCard={showCard}
       onChange={onChange}
-      selectedPageListItems={selectedPageListItemIds.map((id) => pages[id]).filter(isTruthy) as PageListItem[]}
-      pageListItems={relationPropertiesCardsRecord[propertyTemplate.id] ?? []}
+      value={selectedPageListItemIds}
+      pageListItems={options}
       readOnly={readOnly}
       wrapColumn={wrapColumn}
       displayType={displayType}
-      relationTemplate={propertyTemplate}
       emptyPlaceholderContent={emptyPlaceholderContent}
       showEmptyPlaceholder={showEmptyPlaceholder}
       variant='standard'

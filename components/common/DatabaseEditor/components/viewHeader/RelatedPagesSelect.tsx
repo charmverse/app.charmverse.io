@@ -1,18 +1,22 @@
 import { Autocomplete, Typography } from '@mui/material';
 
 import { useGetSubtree } from 'charmClient/hooks/blocks';
+import type { Card } from 'lib/databases/card';
 import { isTruthy } from 'lib/utils/types';
 
 import { RelationPageListItemsContainer } from '../properties/PagesAutocomplete';
 
 type Props = {
-  boardPageId: string;
+  boardPageId?: string;
   value: string[];
   onChange: (pageListItemIds: string[]) => void;
 };
 
 export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
   const { blocks, isLoading } = useGetSubtree(boardPageId);
+
+  const options =
+    blocks.filter((block) => block.type === 'card' && block.parentId === boardPageId).map((b) => b.id) || [];
 
   return (
     <Autocomplete
@@ -21,19 +25,18 @@ export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
       value={value}
       onChange={(e, newValue) => onChange(newValue)}
       loading={isLoading}
-      options={blocks.map((b) => b.id) || []}
+      options={options}
       renderInput={(params) => {
-        const pageIds = Array.isArray(params.inputProps.value) ? params.inputProps.value : [];
-        return pageIds.length === 0 ? (
+        const cardIds = Array.isArray(params.inputProps.value) ? params.inputProps.value : [];
+        return cardIds.length === 0 ? (
           <Typography color='secondary' fontSize='small'>
             Select a page
           </Typography>
         ) : (
           <RelationPageListItemsContainer
-            pageListItems={pageIds
-              .map((pageId) => {
-                const pageListItem = blocks?.find((card) => card.id === pageId);
-                return pageListItem;
+            cards={cardIds
+              .map((cardId) => {
+                return blocks?.find((card) => card.id === cardId) as Card | undefined;
               })
               .filter(isTruthy)}
           />

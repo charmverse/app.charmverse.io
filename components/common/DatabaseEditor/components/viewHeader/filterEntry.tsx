@@ -4,7 +4,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { SelectChangeEvent } from '@mui/material';
 import {
-  Autocomplete,
   Button,
   Checkbox,
   Chip,
@@ -24,8 +23,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { DatePicker } from 'components/common/DatePicker';
-import { PageIcon } from 'components/common/PageIcon';
-import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -39,12 +36,10 @@ import { getPropertyName } from 'lib/databases/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
-import { isTruthy } from 'lib/utils/types';
 import { focalboardColorsMap } from 'theme/colors';
 
 import type { PageListItemsRecord } from '../../interfaces';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
-import { RelationPageListItemsContainer } from '../properties/PagesAutocomplete';
 
 import { RelatedPagesSelect } from './RelatedPagesSelect';
 
@@ -54,7 +49,6 @@ type Props = {
   filter: FilterClause;
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 function formatCondition(condition: string) {
@@ -87,14 +81,12 @@ function FilterPropertyValue({
   properties,
   filter: initialFilter,
   changeViewFilter,
-  currentFilter,
-  relationPropertiesCardsRecord
+  currentFilter
 }: {
   filter: FilterClause;
   properties: IPropertyTemplate[];
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 }) {
   const [filter, setFilter] = useState(initialFilter);
   const { space } = useCurrentSpace();
@@ -154,6 +146,15 @@ function FilterPropertyValue({
 
   const updateMultiSelectValue = (e: SelectChangeEvent<string[]>) => {
     const values = e.target.value as string[];
+    const newFilterValue = {
+      ...filter,
+      values
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
+  };
+
+  const updateMultiSelect = (values: string[]) => {
     const newFilterValue = {
       ...filter,
       values
@@ -273,7 +274,13 @@ function FilterPropertyValue({
         </Select>
       );
     } else if (property.type === 'relation') {
-      return <RelatedPagesSelect value={filter.values} parentPageId={} onChange={updateMultiSelectValue} />;
+      return (
+        <RelatedPagesSelect
+          value={filter.values}
+          boardPageId={property.relationData?.boardId}
+          onChange={updateMultiSelect}
+        />
+      );
     } else {
       return (
         <Select<string[]>
@@ -518,7 +525,6 @@ function FilterEntry(props: Props) {
         </PopupState>
         <FilterPropertyValue
           filter={filter}
-          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
           properties={properties}
           changeViewFilter={changeViewFilter}
           currentFilter={currentFilter}

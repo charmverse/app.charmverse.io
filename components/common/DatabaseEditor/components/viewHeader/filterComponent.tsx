@@ -26,7 +26,6 @@ import FilterEntry from './filterEntry';
 type Props = {
   properties: IPropertyTemplate[];
   activeView: BoardView;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 const StyledFilterComponent = styled(Box)`
@@ -129,7 +128,6 @@ const FilterComponent = React.memo((props: Props) => {
                 conditionClicked={conditionClicked}
                 filter={filter}
                 currentFilter={currentFilter}
-                relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
               />
             </Stack>
           ))}
