@@ -32,12 +32,6 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
 
   const group = {
     option,
-    cardPages: [
-      {
-        card,
-        page: pageStubToCreate({ spaceId: v4(), createdBy: v4(), id: card.id, path: card.id }) as PageMeta
-      }
-    ],
     cards: [card]
   };
 

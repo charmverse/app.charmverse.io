@@ -155,7 +155,7 @@ function CenterPanel(props: Props) {
   const { sortedCards, cardIds } = useMemo(() => {
     const result = _cards;
 
-    const _cardPages = isActiveView
+    const _sortedCards = isActiveView
       ? sortCards(
           result,
           activeBoard,
@@ -168,10 +168,10 @@ function CenterPanel(props: Props) {
       : [];
 
     const _cardIds = new Set<string>();
-    _cardPages.forEach((cardPage) => _cardIds.add(cardPage.id));
+    _sortedCards.forEach((cardPage) => _cardIds.add(cardPage.id));
 
     return {
-      sortedCards: _cardPages,
+      sortedCards: _sortedCards,
       cardIds: _cardIds
     };
   }, [isActiveView, _cards, localViewSettings?.localSort, cardMap]);

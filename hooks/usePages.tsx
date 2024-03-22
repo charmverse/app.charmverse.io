@@ -112,19 +112,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     return updatedData;
   };
 
-  useEffect(() => {
-    if (data && !isLoading && !pagesDispatched.current) {
-      const cardPages = Object.values(data)
-        .filter(isTruthy)
-        .filter((page) => page.type === 'card');
-
-      if (cardPages.length) {
-        dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
-      }
-      pagesDispatched.current = true;
-    }
-  }, [data, isLoading]);
-
   async function deletePage({ pageId, board }: { pageId: string; board?: UIBlockWithDetails }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(

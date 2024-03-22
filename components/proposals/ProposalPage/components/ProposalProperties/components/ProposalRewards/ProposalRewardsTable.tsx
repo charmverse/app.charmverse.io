@@ -96,7 +96,7 @@ export function ProposalRewardsTable({
     () => rewardIds.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy),
     [rewardIds, allRewards]
   );
-  const cardPages = useMemo(
+  const cards = useMemo(
     () =>
       publishedRewards.length > 0
         ? getCardsFromPublishedRewards(publishedRewards, pages)
@@ -219,7 +219,7 @@ export function ProposalRewardsTable({
       <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
         <div className='BoardComponent drag-area-container'>
           <DatabaseStickyHeader>
-            <Box display={cardPages.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
+            <Box display={cards.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
               <Box my={1}>
                 <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
               </Box>
@@ -232,7 +232,7 @@ export function ProposalRewardsTable({
           </DatabaseStickyHeader>
           {loadingData ? (
             <LoadingComponent height={500} isLoading />
-          ) : cardPages.length ? (
+          ) : cards.length ? (
             <Box className='container-container'>
               <Stack>
                 <Box width='100%' mb={1}>
@@ -242,7 +242,7 @@ export function ProposalRewardsTable({
                     setSelectedPropertyId={() => {}}
                     board={boardBlock!}
                     activeView={tableView}
-                    cards={cardPages}
+                    cards={cards}
                     views={[]}
                     visibleGroups={[]}
                     selectedCardIds={[]}

@@ -35,12 +35,6 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
 
   const group = {
     option,
-    cardPages: [
-      {
-        card,
-        page: pageStubToCreate({ id: card.id, createdBy: v4(), spaceId: v4(), path: card.id }) as PageMeta
-      }
-    ],
     cards: [card]
   };
   beforeAll(() => {});
