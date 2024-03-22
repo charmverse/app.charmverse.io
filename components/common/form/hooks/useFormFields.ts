@@ -170,7 +170,7 @@ export function useFormFields({
   }
 
   useEffect(() => {
-    // set form values onece fields are defined
+    // set form values once fields are defined
     if (fields) {
       reset(getFormFieldMap(fields), {
         keepDirty: false,
