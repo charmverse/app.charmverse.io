@@ -11,14 +11,14 @@ import { isProdEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
-import { getOnChainAttestationUrl } from '../connectors';
+import { easSchemaChains, getOnChainAttestationUrl } from '../connectors';
 import type { ProposalCredential } from '../schemas/proposal';
 import { proposalCredentialSchemaId } from '../schemas/proposal';
 import type { RewardCredential } from '../schemas/reward';
 import { rewardCredentialSchemaId } from '../schemas/reward';
 
 import type { ExternalCredentialChain } from './schemas';
-import { externalCredentialChains, trackedSchemas } from './schemas';
+import { externalCredentialChains, trackedCharmverseSchemas, trackedSchemas } from './schemas';
 
 // For a specific profile, only refresh attestations every half hour
 const defaultEASCacheDuration = 1800;
@@ -92,17 +92,19 @@ const GET_EXTERNAL_CREDENTIALS = gql`
   }
 `;
 
-function getTrackedOnChainCredentials({
+function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | EasSchemaChain>({
   chainId,
-  wallets
+  wallets,
+  schemas
 }: {
-  chainId: ExternalCredentialChain;
+  schemas: Record<Chain, { schemaId: string; issuers: string[] }[]>;
+  chainId: Chain;
   wallets: string[];
 }): Promise<EASAttestationFromApi[]> {
   const recipient = wallets.map((w) => getAddress(w));
 
   const query = {
-    OR: trackedSchemas[chainId].map((_schema) => ({
+    OR: schemas[chainId].map((_schema) => ({
       schemaId: {
         equals: _schema.schemaId
       },
@@ -137,18 +139,10 @@ function getTrackedOnChainCredentials({
     });
 }
 
-export async function getAllOnChainAttestations({
-  wallets
-}: {
-  wallets: string[];
-}): Promise<EASAttestationWithFavorite[]> {
-  if (!wallets.length) {
-    return [];
-  }
-
-  const attestations = await Promise.all(
-    externalCredentialChains.map((chainId) =>
-      getTrackedOnChainCredentials({ chainId, wallets }).catch((err) => {
+export async function getCharmverseCredentials({ wallets }: { wallets: string[] }) {
+  const charmverseAttestations = await Promise.all(
+    easSchemaChains.map((chainId) =>
+      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedCharmverseSchemas }).catch((err) => {
         log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
           wallets,
           chainId,
@@ -159,10 +153,61 @@ export async function getAllOnChainAttestations({
     )
   ).then((results) => results.flat());
 
+  const { rewardCredentials, proposalCredentials } = charmverseAttestations.reduce(
+    (acc, val) => {
+      if (val.schemaId === rewardCredentialSchemaId) {
+        const submissionId = (val.content as RewardCredential).rewardURL.split('/').pop()?.trim();
+        if (submissionId && stringUtils.isUUID(submissionId)) {
+          acc.rewardCredentials.push({ ...val, submissionId });
+        }
+      } else if (val.schemaId === proposalCredentialSchemaId) {
+        const proposalPageId = (val.content as ProposalCredential).URL.split('/').pop()?.trim();
+        if (proposalPageId && stringUtils.isUUID(proposalPageId)) {
+          acc.proposalCredentials.push({ ...val, proposalPageId });
+        }
+      }
+      return acc;
+    },
+    { rewardCredentials: [], proposalCredentials: [] } as {
+      rewardCredentials: (EASAttestationFromApi & { submissionId: string })[];
+      proposalCredentials: (EASAttestationFromApi & { proposalPageId: string })[];
+    }
+  );
+
+  return {
+    rewardCredentials,
+    proposalCredentials
+  };
+}
+
+export async function getAllOnChainAttestations({
+  wallets
+}: {
+  wallets: string[];
+}): Promise<EASAttestationWithFavorite[]> {
+  if (!wallets.length) {
+    return [];
+  }
+
+  const otherCredentials = await Promise.all(
+    externalCredentialChains.map((chainId) =>
+      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedSchemas }).catch((err) => {
+        log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
+          wallets,
+          chainId,
+          error: err
+        });
+        return [] as EASAttestationFromApi[];
+      })
+    )
+  ).then((results) => results.flat());
+
+  const { proposalCredentials, rewardCredentials } = await getCharmverseCredentials({ wallets });
+
   const favoriteCredentials = await prisma.favoriteCredential.findMany({
     where: {
       attestationId: {
-        in: attestations.map((a) => a.id)
+        in: [...proposalCredentials, ...rewardCredentials, ...otherCredentials].map((a) => a.id)
       }
     },
     select: {
@@ -171,34 +216,6 @@ export async function getAllOnChainAttestations({
       id: true
     }
   });
-
-  const { rewardCredentials, proposalCredentials, otherCredentials } = attestations.reduce(
-    (acc, val) => {
-      if (val.schemaId === rewardCredentialSchemaId) {
-        const submissionId = (val.content as RewardCredential).rewardURL.split('/').pop()?.trim();
-        if (submissionId && stringUtils.isUUID(submissionId)) {
-          acc.rewardCredentials.push({ ...val, submissionId });
-        } else {
-          acc.otherCredentials.push(val);
-        }
-      } else if (val.schemaId === proposalCredentialSchemaId) {
-        const proposalPageId = (val.content as ProposalCredential).URL.split('/').pop()?.trim();
-        if (proposalPageId && stringUtils.isUUID(proposalPageId)) {
-          acc.proposalCredentials.push({ ...val, proposalPageId });
-        } else {
-          acc.otherCredentials.push(val);
-        }
-      } else {
-        acc.otherCredentials.push(val);
-      }
-      return acc;
-    },
-    { rewardCredentials: [], proposalCredentials: [], otherCredentials: [] } as {
-      rewardCredentials: (EASAttestationFromApi & { submissionId: string })[];
-      proposalCredentials: (EASAttestationFromApi & { proposalPageId: string })[];
-      otherCredentials: EASAttestationFromApi[];
-    }
-  );
 
   const rewardCredentialIconUrls = (
     rewardCredentials.length
