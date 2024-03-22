@@ -9,7 +9,8 @@ import { getAddress } from 'viem/utils';
 import type { OnChainAttestationInput } from './attestOnchain';
 import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './connectors';
-import { attestationSchemaIds, encodeAttestion, type CredentialDataInput } from './schemas';
+import type { CredentialDataInput } from './schemas';
+import { attestationSchemaIds, encodeAttestation } from './schemas';
 
 export type OnChainMultiAttestationInput<T extends AttestationType = AttestationType> = Omit<
   OnChainAttestationInput<T>,
@@ -36,16 +37,14 @@ export async function multiAttestOnchain({
 }: OnChainMultiAttestationInput & { signer: Signer }): Promise<Transaction<string[]>> {
   const schemaId = attestationSchemaIds[type];
 
-  const easSigner = signer;
-
   const eas = getEasInstance(chainId);
 
-  eas.connect(easSigner);
+  eas.connect(signer);
 
   const attestationTx = await eas.multiAttest([
     {
       data: credentialInputs.map(({ data, recipient }) => ({
-        data: encodeAttestion({ type, data }),
+        data: encodeAttestation({ type, data }),
         recipient: getAddress(recipient)
       })),
       schema: schemaId
@@ -80,7 +79,7 @@ export async function prepareOnChainAttestationTransaction({
         revocable: true,
         // We don't currently refer to other attestations
         refUID: ZERO_BYTES32,
-        data: encodeAttestion({ type, data }),
+        data: encodeAttestation({ type, data }),
         value: ZERO_BIGINT
       })),
       schema: schemaId

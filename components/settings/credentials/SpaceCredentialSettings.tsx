@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import _isEqual from 'lodash/isEqual';
 import { useState } from 'react';
+import { isAddress } from 'viem';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { useTrackPageView } from 'charmClient/hooks/track';
@@ -23,18 +24,37 @@ export function SpaceCredentialSettings() {
   const [credentialLogo, setCredentialLogo] = useState(space?.credentialLogo ?? '');
   const { trigger, isMutating } = useUpdateSpace(space?.id);
 
-  const [spaceOnChainCredentialSettings, setSpaceOnChainCredentialSettings] =
-    useState<UpdateableCredentialProps | null>(null);
+  const [spaceOnChainCredentialSettings, setSpaceOnChainCredentialSettings] = useState<
+    Partial<UpdateableCredentialProps>
+  >({
+    credentialsChainId: space?.credentialsChainId,
+    credentialsWallet: space?.credentialsWallet,
+    useOnchainCredentials: !!space?.useOnchainCredentials
+  });
+
+  const spaceCredentialConfigValid =
+    !spaceOnChainCredentialSettings.useOnchainCredentials ||
+    (spaceOnChainCredentialSettings.useOnchainCredentials &&
+      spaceOnChainCredentialSettings.credentialsChainId &&
+      isAddress(spaceOnChainCredentialSettings.credentialsWallet ?? ''));
+
+  const spaceCredentialConfigChanged = !_isEqual(spaceOnChainCredentialSettings, {
+    useOnchainCredentials: !!space?.useOnchainCredentials,
+    credentialsChainId: space?.credentialsChainId,
+    credentialsWallet: space?.credentialsWallet
+  });
 
   const disableSaveButton =
     isMutating ||
     (credentialLogo === (space?.credentialLogo ?? '') &&
-      (!spaceOnChainCredentialSettings ||
-        _isEqual(spaceOnChainCredentialSettings, {
-          useOnchainCredentials: space?.useOnchainCredentials,
-          credentialsChainId: space?.credentialsChainId,
-          credentialsWallet: space?.credentialsWallet
-        })));
+      (!spaceCredentialConfigChanged || !spaceCredentialConfigValid));
+
+  function handleCredentialSettingsChange(data: Partial<UpdateableCredentialProps>) {
+    setSpaceOnChainCredentialSettings((prev) => ({
+      ...prev,
+      ...data
+    }));
+  }
 
   return (
     <>
@@ -63,7 +83,11 @@ export function SpaceCredentialSettings() {
       </Box>
       <Typography variant='h6'>Onchain Credentials</Typography>
       <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
-        <CredentialsOnChainConfig readOnly={!isAdmin} onChange={setSpaceOnChainCredentialSettings} />
+        <CredentialsOnChainConfig
+          readOnly={!isAdmin}
+          onChange={handleCredentialSettingsChange}
+          {...spaceOnChainCredentialSettings}
+        />
       </Box>
       {isAdmin && (
         <Button
@@ -78,10 +102,14 @@ export function SpaceCredentialSettings() {
             if (credentialLogo !== space?.credentialLogo) {
               update.credentialLogo = credentialLogo;
             }
-            if (spaceOnChainCredentialSettings) {
-              update.useOnchainCredentials = spaceOnChainCredentialSettings.useOnchainCredentials;
-              update.credentialsChainId = spaceOnChainCredentialSettings.credentialsChainId;
-              update.credentialsWallet = spaceOnChainCredentialSettings.credentialsWallet;
+            if (spaceCredentialConfigValid) {
+              if (!spaceOnChainCredentialSettings.useOnchainCredentials) {
+                update.useOnchainCredentials = false;
+              } else {
+                update.useOnchainCredentials = spaceOnChainCredentialSettings.useOnchainCredentials;
+                update.credentialsChainId = spaceOnChainCredentialSettings.credentialsChainId;
+                update.credentialsWallet = spaceOnChainCredentialSettings.credentialsWallet?.toLowerCase();
+              }
             }
             trigger(update).then(() => refreshCurrentSpace());
           }}

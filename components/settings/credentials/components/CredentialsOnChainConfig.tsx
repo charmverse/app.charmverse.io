@@ -1,16 +1,18 @@
 import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, FormControlLabel, Grid, Input, Switch } from '@mui/material';
+import { Box, FormControlLabel, Grid, Input, Stack, Switch, TextField } from '@mui/material';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
 import { optimism, optimismSepolia } from 'viem/chains';
-import * as yup from 'yup';
+import type * as yup from 'yup';
 
+import FieldLabel from 'components/common/form/FieldLabel';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { Typography } from 'components/common/Typography';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { easSchemaChains } from 'lib/credentials/connectors';
 
 export type UpdateableCredentialProps = Pick<
   Space,
@@ -18,58 +20,23 @@ export type UpdateableCredentialProps = Pick<
 >;
 
 type Props = {
-  onChange: (data: UpdateableCredentialProps) => void;
+  onChange: (data: Partial<UpdateableCredentialProps>) => void;
   readOnly: boolean;
-};
+} & Partial<Pick<Space, 'useOnchainCredentials' | 'credentialsChainId' | 'credentialsWallet'>>;
 
-const schema = yup.object({
-  useOnchainCredentials: yup.boolean().required(),
-  credentialsChainId: yup.number().required().nullable(),
-  credentialsWallet: yup
-    .string()
-    .required()
-    .nullable()
-    .test((value: any) => !value || isAddress(value))
-});
-
-type FormValues = yup.InferType<typeof schema>;
-
-export function CredentialsOnChainConfig({ onChange, readOnly }: Props) {
-  const { space } = useCurrentSpace();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    getValues,
-    setValue,
-    watch
-  } = useForm<FormValues>({
-    mode: 'onChange',
-    defaultValues: {
-      useOnchainCredentials: !!space?.useOnchainCredentials ?? false,
-      credentialsChainId: space?.credentialsChainId ?? optimism.id,
-      credentialsWallet: space?.credentialsWallet ?? null
-    },
-    resolver: yupResolver(schema)
-  });
-
-  const values = watch();
-
-  const isValidForm =
-    isValid &&
-    (!values.useOnchainCredentials ||
-      (values.useOnchainCredentials && values.credentialsChainId && values.credentialsWallet));
-
-  useEffect(() => {
-    if (isValidForm) {
-      onChange(values);
-    }
-  }, [watch, values.credentialsWallet, values.credentialsChainId, values.useOnchainCredentials]);
+export function CredentialsOnChainConfig({
+  onChange,
+  readOnly,
+  credentialsChainId,
+  credentialsWallet,
+  useOnchainCredentials
+}: Props) {
+  const validAddress = !credentialsWallet || isAddress(credentialsWallet);
 
   return (
     <Grid container display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
       <Grid item>
+        <Box></Box>
         <FormControlLabel
           sx={{
             margin: 0,
@@ -79,9 +46,8 @@ export function CredentialsOnChainConfig({ onChange, readOnly }: Props) {
           control={
             <Box display='flex' gap={2} alignItems='center'>
               <Switch
-                value={values.useOnchainCredentials}
-                defaultChecked={values.useOnchainCredentials}
-                onChange={(ev) => setValue('useOnchainCredentials', ev.target.checked)}
+                checked={!!useOnchainCredentials}
+                onChange={(ev) => onChange({ useOnchainCredentials: ev.target.checked })}
                 disabled={readOnly}
               />
             </Box>
@@ -95,30 +61,40 @@ export function CredentialsOnChainConfig({ onChange, readOnly }: Props) {
         </Typography>
       </Grid>
 
-      {values.useOnchainCredentials && (
-        <Grid container item justifyContent='flex-start' alignItems='center'>
-          <Grid item xs={4}>
+      {useOnchainCredentials && (
+        <Grid container item justifyContent='flex-start' alignItems='flex-start'>
+          {' '}
+          {/* Changed alignItems to 'flex-start' to align items to the top */}
+          <Grid item xs={4} style={{ minHeight: '72px' }}>
+            {' '}
+            {/* Added a minimum height */}
             <InputSearchBlockchain
-              chains={[optimism.id, optimismSepolia.id]}
-              chainId={values.credentialsChainId as number}
-              onChange={(chainId) => setValue('credentialsChainId', chainId)}
+              chains={[...easSchemaChains]}
+              chainId={credentialsChainId as number}
+              onChange={(chainId) => onChange({ credentialsChainId: chainId })}
             />
           </Grid>
           <Grid item xs={6} px={2}>
-            <Input
-              {...register('credentialsWallet')}
-              autoFocus
-              placeholder='Enter wallet address which will sign credentials'
-              type='text'
-              fullWidth
-              disabled={readOnly}
-              sx={{
-                '.Mui-disabled': {
-                  color: 'var(--text-primary) !important',
-                  WebkitTextFillColor: 'var(--text-primary) !important'
-                }
-              }}
-            />
+            <Stack style={{ minHeight: '72px' }}>
+              {' '}
+              {/* Added a minimum height */}
+              <TextField
+                value={credentialsWallet}
+                onChange={(ev) => {
+                  const value = ev.target.value;
+                  if (!value) {
+                    onChange({ credentialsWallet: null });
+                  } else {
+                    onChange({ credentialsWallet: ev.target.value });
+                  }
+                }}
+                error={!validAddress}
+                helperText={!validAddress ? 'Please enter a valid address' : ' '}
+                placeholder='Wallet or Gnosis Safe address'
+                disabled={readOnly}
+                fullWidth
+              />
+            </Stack>
           </Grid>
         </Grid>
       )}

@@ -4,6 +4,7 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
@@ -14,7 +15,7 @@ export function useProposalCredentials() {
   const {
     data: issuableProposalCredentials,
     error,
-    isLoading,
+    isLoading: isLoadingIssuableProposalCredentials,
     mutate: refreshIssuableCredentials
   } = useSWR(space ? `/api/credentials/proposals?spaceId=${space.id}` : null, () =>
     charmClient.credentials.getIssuableProposalCredentials({ spaceId: space?.id as string })
@@ -49,7 +50,7 @@ export function useProposalCredentials() {
 
   return {
     issuableProposalCredentials,
-    isLoading,
+    isLoadingIssuableProposalCredentials,
     error,
     refreshIssuableCredentials,
     issueAndSaveProposalCredentials

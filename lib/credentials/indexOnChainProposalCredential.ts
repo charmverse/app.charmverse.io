@@ -41,7 +41,7 @@ async function indexOnChainProposalCredential({
   const pagePermalinkId = decodedContent.URL.split('/').pop();
 
   if (!pagePermalinkId || !stringUtils.isUUID(pagePermalinkId)) {
-    throw new Error(`Invalid page permalink ID for credential ${attestationId} on ${chainId}`);
+    throw new InvalidInputError(`Invalid page permalink ID for credential ${attestationId} on ${chainId}`);
   }
 
   // Sanity check to ensure the proposal exists in our db
@@ -76,11 +76,13 @@ async function indexOnChainProposalCredential({
   });
 
   if (!proposal.authors.length) {
-    throw new Error(`No author with wallet address ${attestation.recipient} found for proposal ${proposal.id}`);
+    throw new InvalidInputError(
+      `No author with wallet address ${attestation.recipient} found for proposal ${proposal.id}`
+    );
   }
 
   if (!lowerCaseEqual(proposal.space.credentialsWallet, attestation.attester)) {
-    throw new Error(
+    throw new InvalidInputError(
       `Proposal ${proposal.id} was issued on chain ${chainId} by ${attestation.recipient}, but credentials wallet is ${proposal.space.credentialsWallet}`
     );
   }
@@ -92,7 +94,7 @@ async function indexOnChainProposalCredential({
     : null;
 
   if (!credentialEvent) {
-    throw new Error(`Invalid event ${decodedContent.Event} for credential ${attestationId} on ${chainId}`);
+    throw new InvalidInputError(`Invalid event ${decodedContent.Event} for credential ${attestationId} on ${chainId}`);
   }
 
   const matchingCredentialTemplate = await prisma.credentialTemplate.findFirstOrThrow({
