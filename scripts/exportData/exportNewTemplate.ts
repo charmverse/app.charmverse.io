@@ -3,7 +3,7 @@ import { exportWorkspacePagesToDisk } from 'lib/templates/exportWorkspacePages';
 import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
 
 exportWorkspacePagesToDisk({
-  sourceSpaceIdOrDomain: 'template-gaming',
+  sourceSpaceIdOrDomain: 'cvt-template-gaming',
   exportName: 'templateGaming'
 }).then(() => console.log('Export complete'));
 

@@ -18276,5 +18276,1447 @@
         }
       ]
     }
-  ]
+  ],
+  "roles": [
+    {
+      "id": "2aa348d2-941f-4e7a-a9fc-226b1c43e9d2",
+      "createdAt": "2024-03-20T17:04:18.790Z",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "externalId": null,
+      "name": "Moderator",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+      "source": null,
+      "sourceId": null
+    },
+    {
+      "id": "e09c1c12-d067-4e5f-b58d-dfb83ae48e29",
+      "createdAt": "2024-03-20T17:04:18.790Z",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "externalId": null,
+      "name": "Core Contributor",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+      "source": null,
+      "sourceId": null
+    },
+    {
+      "id": "d15c1427-e744-402a-8c9c-3abe47828a5f",
+      "createdAt": "2024-03-21T20:20:30.964Z",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "externalId": null,
+      "name": "Secret",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+      "source": null,
+      "sourceId": null
+    }
+  ],
+  "permissions": {
+    "postCategoryPermissions": [
+      {
+        "id": "7b3049b4-a6aa-4262-9cc5-d2626ebb8d58",
+        "permissionLevel": "full_access",
+        "postCategoryId": "a5f9af24-5830-423d-9475-f978fc410ed3",
+        "assignee": {
+          "group": "role",
+          "id": "e09c1c12-d067-4e5f-b58d-dfb83ae48e29"
+        }
+      },
+      {
+        "id": "69c47c21-03ea-4e2b-bf91-dcb7d45acbb6",
+        "permissionLevel": "full_access",
+        "postCategoryId": "a5f9af24-5830-423d-9475-f978fc410ed3",
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        }
+      },
+      {
+        "id": "003ccb29-0ae7-4a55-bbf4-730a600a3ffa",
+        "permissionLevel": "full_access",
+        "postCategoryId": "dbb5e469-3db7-402b-858a-a56e1a3cae1c",
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        }
+      },
+      {
+        "id": "5906743f-d336-4d1c-9882-706c89b853b1",
+        "permissionLevel": "full_access",
+        "postCategoryId": "47fccde6-3541-4588-af36-d72eceb731ea",
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        }
+      },
+      {
+        "id": "0661d409-85da-4ca5-8b16-8f38f4dfd20f",
+        "permissionLevel": "full_access",
+        "postCategoryId": "0f1d2d8c-e12d-4b7b-b99f-5e042f3d64f4",
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        }
+      },
+      {
+        "id": "9ad36009-d9e4-445d-b96f-297138c941b1",
+        "permissionLevel": "full_access",
+        "postCategoryId": "5762e4cb-1a00-4dfd-9d8d-75283e5863ad",
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        }
+      },
+      {
+        "id": "1292919e-b8ba-4724-9c34-257694d3d141",
+        "permissionLevel": "full_access",
+        "postCategoryId": "f092f0f5-203e-4f4b-b7a8-08db16860e2e",
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        }
+      }
+    ],
+    "spacePermissions": [
+      {
+        "assignee": {
+          "group": "space",
+          "id": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+        },
+        "operations": {
+          "createPage": true,
+          "createBounty": true,
+          "createForumCategory": false,
+          "moderateForums": false,
+          "reviewProposals": true,
+          "deleteAnyPage": false,
+          "deleteAnyBounty": false,
+          "deleteAnyProposal": false,
+          "createProposals": true
+        }
+      },
+      {
+        "assignee": {
+          "group": "role",
+          "id": "e09c1c12-d067-4e5f-b58d-dfb83ae48e29"
+        },
+        "operations": {
+          "createPage": true,
+          "createBounty": true,
+          "createForumCategory": false,
+          "moderateForums": false,
+          "reviewProposals": true,
+          "deleteAnyPage": false,
+          "deleteAnyBounty": false,
+          "deleteAnyProposal": false,
+          "createProposals": true
+        }
+      },
+      {
+        "assignee": {
+          "group": "role",
+          "id": "2aa348d2-941f-4e7a-a9fc-226b1c43e9d2"
+        },
+        "operations": {
+          "createPage": true,
+          "createBounty": true,
+          "createForumCategory": false,
+          "moderateForums": true,
+          "reviewProposals": true,
+          "deleteAnyPage": true,
+          "deleteAnyBounty": true,
+          "deleteAnyProposal": true,
+          "createProposals": false
+        }
+      }
+    ]
+  },
+  "postCategories": [
+    {
+      "id": "a5f9af24-5830-423d-9475-f978fc410ed3",
+      "name": "Lore",
+      "description": "",
+      "path": "lore",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+    },
+    {
+      "id": "dbb5e469-3db7-402b-858a-a56e1a3cae1c",
+      "name": "Characters",
+      "description": "",
+      "path": "characters",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+    },
+    {
+      "id": "47fccde6-3541-4588-af36-d72eceb731ea",
+      "name": "Items",
+      "description": "",
+      "path": "items",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+    },
+    {
+      "id": "0f1d2d8c-e12d-4b7b-b99f-5e042f3d64f4",
+      "name": "Strategy",
+      "description": "",
+      "path": "strategy",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+    },
+    {
+      "id": "5762e4cb-1a00-4dfd-9d8d-75283e5863ad",
+      "name": "Patch Notes",
+      "description": "",
+      "path": "patch_notes",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+    },
+    {
+      "id": "f092f0f5-203e-4f4b-b7a8-08db16860e2e",
+      "name": "Exploits",
+      "description": "",
+      "path": "exploits",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b"
+    }
+  ],
+  "posts": [
+    {
+      "createdAt": "2024-03-20T17:04:20.405Z",
+      "updatedAt": "2024-03-20T17:04:20.405Z",
+      "deletedAt": null,
+      "id": "d39d4511-ec48-4341-8010-f039f467c3d1",
+      "title": "Get the conversation started!",
+      "content": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "heading",
+            "attrs": {
+              "id": null,
+              "level": 2,
+              "track": []
+            },
+            "content": [
+              {
+                "type": "emoji",
+                "attrs": {
+                  "emoji": "👋"
+                }
+              },
+              {
+                "text": " Welcome to your CharmVerse Forum!",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "It is easy to start a conversation here, in CharmVerse! Simply click ",
+                "type": "text"
+              },
+              {
+                "text": "[Create Post]",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "text-color",
+                    "attrs": {
+                      "color": "",
+                      "bgColor": "teal"
+                    }
+                  }
+                ]
+              },
+              {
+                "text": " and choose a ",
+                "type": "text"
+              },
+              {
+                "text": "Category",
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "bold"
+                  }
+                ]
+              },
+              {
+                "text": " from the dropdown menu. Make sure to title your post because you won't be able to publish it without one.",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "When creating a post, you have access to most of the CharmEditor's cool features.",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "type": "bullet_list",
+            "attrs": {
+              "indent": 0,
+              "listStyleType": null
+            },
+            "content": [
+              {
+                "type": "list_item",
+                "attrs": {
+                  "track": [],
+                  "todoChecked": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Highlight",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "text-color",
+                            "attrs": {
+                              "color": "",
+                              "bgColor": "blue"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "text": " text to style, format, or add a link",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "list_item",
+                "attrs": {
+                  "track": [],
+                  "todoChecked": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "Type ",
+                        "type": "text"
+                      },
+                      {
+                        "text": "/",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "code"
+                          }
+                        ]
+                      },
+                      {
+                        "text": " to bring up a menu of available blocks. Insert an image or video, embed a tweet or NFT, and more.",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "list_item",
+                "attrs": {
+                  "track": [],
+                  "todoChecked": null
+                },
+                "content": [
+                  {
+                    "type": "paragraph",
+                    "attrs": {
+                      "track": []
+                    },
+                    "content": [
+                      {
+                        "text": "@",
+                        "type": "text",
+                        "marks": [
+                          {
+                            "type": "code"
+                          }
+                        ]
+                      },
+                      {
+                        "text": "-mention a member, role, or even a page to add a useful link",
+                        "type": "text"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            },
+            "content": [
+              {
+                "text": "It is also easy to join a conversation! Reply or add your thoughts below a post. The ",
+                "type": "text"
+              },
+              {
+                "type": "emoji",
+                "attrs": {
+                  "emoji": "💬"
+                }
+              },
+              {
+                "text": " comments will be threaded and easy to follow. And if you think a post is really amazing, don't forget to upvote ",
+                "type": "text"
+              },
+              {
+                "type": "emoji",
+                "attrs": {
+                  "emoji": "⬆️"
+                }
+              },
+              {
+                "text": " .",
+                "type": "text"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "track": []
+            }
+          }
+        ]
+      },
+      "contentText": "👋 Welcome to your CharmVerse Forum!It is easy to start a conversation here, in CharmVerse! Simply click [Create Post] and choose a Category from the dropdown menu. Make sure to title your post because you won't be able to publish it without one.When creating a post, you have access to most of the CharmEditor's cool features.Highlight text to style, format, or add a linkType / to bring up a menu of available blocks. Insert an image or video, embed a tweet or NFT, and more.@-mention a member, role, or even a page to add a useful linkIt is also easy to join a conversation! Reply or add your thoughts below a post. The 💬 comments will be threaded and easy to follow. And if you think a post is really amazing, don't forget to upvote ⬆️ .",
+      "path": "get_the_conversation_started_7j5prkcn",
+      "categoryId": "47fccde6-3541-4588-af36-d72eceb731ea",
+      "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+      "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+      "pinned": false,
+      "locked": false,
+      "proposalId": null,
+      "isDraft": false
+    }
+  ],
+  "space": {
+    "features": [
+      {
+        "id": "member_directory",
+        "path": "members",
+        "title": "Member Directory",
+        "isHidden": false
+      },
+      {
+        "id": "proposals",
+        "path": "proposals",
+        "title": "Proposals",
+        "isHidden": false
+      },
+      {
+        "id": "forum",
+        "path": "forum",
+        "title": "Forum",
+        "isHidden": false
+      },
+      {
+        "id": "rewards",
+        "path": "rewards",
+        "title": "Rewards",
+        "isHidden": false
+      }
+    ],
+    "memberProfiles": [
+      {
+        "id": "charmverse",
+        "title": "CharmVerse",
+        "isHidden": false
+      },
+      {
+        "id": "collection",
+        "title": "Collection",
+        "isHidden": false
+      },
+      {
+        "id": "ens",
+        "title": "ENS",
+        "isHidden": false
+      },
+      {
+        "id": "lens",
+        "title": "Lens",
+        "isHidden": false
+      },
+      {
+        "id": "summon",
+        "title": "Summon",
+        "isHidden": false
+      },
+      {
+        "id": "credentials",
+        "title": "Credentials",
+        "isHidden": false
+      }
+    ],
+    "notificationToggles": {},
+    "defaultPagePermissionGroup": "full_access",
+    "hiddenFeatures": [],
+    "requireProposalTemplate": false,
+    "publicBountyBoard": false,
+    "publicProposals": false,
+    "defaultPublicPages": false,
+    "memberProperties": [
+      {
+        "id": "a9ba7e94-d086-4ff5-955f-40654f39a023",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Timezone",
+        "type": "timezone",
+        "options": null,
+        "index": 8,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "6eda8b29-90a9-454f-96ad-07f886aa2f37",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Roles",
+        "type": "role",
+        "options": [],
+        "index": 2,
+        "enabledViews": [
+          "table",
+          "profile",
+          "gallery"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "959c1155-8998-443f-8b3d-b9acc081a8e7",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Bio",
+        "type": "bio",
+        "options": null,
+        "index": 3,
+        "enabledViews": [
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "a09ff996-4ff7-44e0-9647-c2760cbfb48a",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Discord",
+        "type": "discord",
+        "options": null,
+        "index": 4,
+        "enabledViews": [
+          "gallery",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "5bb83729-f0ea-487b-98d5-c1568e9d95ef",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "LinkedIn",
+        "type": "linked_in",
+        "options": null,
+        "index": 6,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "011d2a23-4fd8-4b57-9e73-4bbcaac3bead",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Avatar",
+        "type": "profile_pic",
+        "options": [],
+        "index": 0,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "592546b1-9045-493a-80e2-b08e3cdb4e5a",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Name",
+        "type": "text",
+        "options": null,
+        "index": 1,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "19f83dd9-5e64-457b-b2d8-09af3f6130dc",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Join date",
+        "type": "join_date",
+        "options": null,
+        "index": 9,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "2965a778-1ec2-4d79-a9c3-0872b868f9d7",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "GitHub",
+        "type": "github",
+        "options": null,
+        "index": 7,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "6ecf4b7e-b183-431a-a187-0c4c82b8fbc6",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Interests",
+        "type": "text_multiline",
+        "options": [],
+        "index": 12,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "c254cb39-d782-4bd6-aee0-8695788729a3",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Skills",
+        "type": "multiselect",
+        "options": [
+          {
+            "id": "0d62599f-4736-4a68-aab9-7c4be14f1422",
+            "name": "Digital Artistry",
+            "color": "pink",
+            "index": 0
+          },
+          {
+            "id": "9d896d62-7ee1-4712-b166-717b730528c7",
+            "name": "Smart Contract Dev",
+            "color": "yellow",
+            "index": 1
+          },
+          {
+            "id": "5ec6712e-451f-43b3-99fe-be658bb4b9c7",
+            "name": "Blockchain Basics",
+            "color": "blue",
+            "index": 2
+          },
+          {
+            "id": "809d8dba-e627-45f0-a690-557c0f584c23",
+            "name": "Tokenomics",
+            "color": "purple",
+            "index": 3
+          },
+          {
+            "id": "4fff3ff7-a5eb-493c-bf4c-dbf1150e70f9",
+            "name": "Marketplace Nav",
+            "color": "teal",
+            "index": 4
+          },
+          {
+            "id": "4e5cb053-3203-41ca-bc5d-631e5fa0f7a1",
+            "name": "Community Building",
+            "color": "pink",
+            "index": 5
+          },
+          {
+            "id": "670cde63-2e7f-4d02-a235-275ba7d999f3",
+            "name": "Legal Knowledge",
+            "color": "red",
+            "index": 6
+          },
+          {
+            "id": "4f9c25cc-4079-436b-9c9c-2d0b252e7578",
+            "name": "Digital Ownership & Security",
+            "color": "blue",
+            "index": 7
+          },
+          {
+            "id": "4fdfddb4-ca6a-4982-a758-197d21c09d7b",
+            "name": "Blockchain/NFT Analytics",
+            "color": "yellow",
+            "index": 8
+          },
+          {
+            "id": "36d9d9a8-5aac-43c6-b23c-96905873196a",
+            "name": "Crypto Wallets",
+            "color": "orange",
+            "index": 9
+          },
+          {
+            "id": "f5bedd7e-38d2-440f-87d6-948f1b59ff9f",
+            "name": "Education & Advocacy",
+            "color": "red",
+            "index": 10
+          },
+          {
+            "id": "d46562ee-6533-4ff4-b875-a0621e6d0d6a",
+            "name": "Storytelling & Branding",
+            "color": "teal",
+            "index": 11
+          },
+          {
+            "id": "1997b57b-b97c-44ef-9992-a5c595cb3e58",
+            "name": "Technical Integration",
+            "color": "purple",
+            "index": 12
+          },
+          {
+            "id": "4e04c650-3fc7-4f2b-b71c-2c78a716dc2e",
+            "name": "Continuous Learning",
+            "color": "red",
+            "index": 13
+          }
+        ],
+        "index": 13,
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "b5842604-ed51-4e1f-ac7b-296c71dde7b8",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "X",
+        "type": "twitter",
+        "options": null,
+        "index": 5,
+        "enabledViews": [
+          "gallery",
+          "profile"
+        ],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "f65ef55b-c8bc-42ff-964b-82c7e6af89d6",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Google",
+        "type": "google",
+        "options": null,
+        "index": 15,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "0eb157f2-e962-434f-8ac8-4e37d466121b",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Wallet",
+        "type": "wallet",
+        "options": null,
+        "index": 17,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      },
+      {
+        "id": "fa0b6c0c-2be2-4b3a-b45c-37555ba9e955",
+        "createdAt": "2024-03-20T17:04:18.965Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.965Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "name": "Telegram",
+        "type": "telegram",
+        "options": null,
+        "index": 16,
+        "enabledViews": [],
+        "required": false,
+        "permissions": []
+      }
+    ],
+    "rewardBlocks": [
+      {
+        "id": "__defaultBoard",
+        "deletedAt": null,
+        "createdAt": "2024-03-20T17:04:18.729Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.729Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "parentId": "",
+        "rootId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "schema": 1,
+        "type": "board",
+        "title": "",
+        "fields": {
+          "icon": "",
+          "viewIds": [
+            "__defaultView",
+            "__defaultBoardView",
+            "__defaultCalendarView"
+          ],
+          "isTemplate": false,
+          "description": "",
+          "headerImage": null,
+          "cardProperties": [],
+          "showDescription": false,
+          "columnCalculations": []
+        }
+      },
+      {
+        "id": "__defaultView",
+        "deletedAt": null,
+        "createdAt": "2024-03-20T17:04:18.741Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.741Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "parentId": "__defaultBoard",
+        "rootId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "schema": 1,
+        "type": "view",
+        "title": "",
+        "fields": {
+          "filter": {
+            "filters": [],
+            "operation": "and"
+          },
+          "viewType": "table",
+          "cardOrder": [],
+          "openPageIn": "center_peek",
+          "sortOptions": [
+            {
+              "reversed": true,
+              "propertyId": "__createdAt"
+            }
+          ],
+          "columnWidths": {
+            "__limit": 150,
+            "__title": 400,
+            "__available": 150,
+            "__reviewers": 150,
+            "__applicants": 200,
+            "__rewardChain": 150,
+            "__rewardAmount": 150,
+            "__rewardStatus": 150,
+            "__rewardCustomValue": 150,
+            "__rewardApplicantsCount": 150
+          },
+          "hiddenOptionIds": [],
+          "columnWrappedIds": [
+            "__title"
+          ],
+          "visibleOptionIds": [],
+          "defaultTemplateId": "",
+          "collapsedOptionIds": [],
+          "columnCalculations": {},
+          "kanbanCalculations": {},
+          "visiblePropertyIds": [
+            "__title",
+            "__limit",
+            "__applicants",
+            "__reviewers",
+            "__available",
+            "__rewardStatus",
+            "__rewardAmount",
+            "__rewardChain",
+            "__rewardCustomValue",
+            "__rewardApplicantsCount"
+          ]
+        }
+      },
+      {
+        "id": "__defaultBoardView",
+        "deletedAt": null,
+        "createdAt": "2024-03-20T17:04:18.749Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.749Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "parentId": "__defaultBoard",
+        "rootId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "schema": 1,
+        "type": "view",
+        "title": "",
+        "fields": {
+          "filter": {
+            "filters": [],
+            "operation": "and"
+          },
+          "viewType": "board",
+          "cardOrder": [],
+          "openPageIn": "center_peek",
+          "sortOptions": [],
+          "columnWidths": {},
+          "hiddenOptionIds": [],
+          "columnWrappedIds": [],
+          "visibleOptionIds": [],
+          "defaultTemplateId": "",
+          "collapsedOptionIds": [],
+          "columnCalculations": {},
+          "kanbanCalculations": {},
+          "visiblePropertyIds": [
+            "__title",
+            "__rewardAmount",
+            "__rewardApplicantsCount"
+          ]
+        }
+      },
+      {
+        "id": "__defaultCalendarView",
+        "deletedAt": null,
+        "createdAt": "2024-03-20T17:04:18.761Z",
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedAt": "2024-03-20T17:04:18.761Z",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "parentId": "__defaultBoard",
+        "rootId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "schema": 1,
+        "type": "view",
+        "title": "",
+        "fields": {
+          "filter": {
+            "filters": [],
+            "operation": "and"
+          },
+          "viewType": "calendar",
+          "cardOrder": [],
+          "openPageIn": "center_peek",
+          "sortOptions": [],
+          "columnWidths": {},
+          "hiddenOptionIds": [],
+          "columnWrappedIds": [],
+          "visibleOptionIds": [],
+          "defaultTemplateId": "",
+          "collapsedOptionIds": [],
+          "columnCalculations": {},
+          "kanbanCalculations": {},
+          "visiblePropertyIds": [
+            "__title",
+            "__rewardAmount"
+          ],
+          "dateDisplayPropertyId": "__limit"
+        }
+      }
+    ],
+    "proposalBlocks": [
+      {
+        "createdBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "updatedBy": "e5dba747-be62-49be-a7ba-71cf27b17174",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "rootId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "id": "__defaultBoard",
+        "deletedAt": null,
+        "createdAt": "2024-03-20T17:04:18.970Z",
+        "updatedAt": "2024-03-20T17:04:18.970Z",
+        "parentId": "",
+        "schema": 1,
+        "type": "board",
+        "title": "",
+        "fields": {
+          "icon": "",
+          "viewIds": [],
+          "isTemplate": false,
+          "description": "",
+          "headerImage": null,
+          "cardProperties": [
+            {
+              "id": "e25d9676-face-42d6-9994-686e0f76d895",
+              "name": "Category",
+              "type": "select",
+              "options": [
+                {
+                  "id": "67f004c9-ff0f-459a-a9d0-d02fd563158c",
+                  "color": "pink",
+                  "value": "Grants"
+                },
+                {
+                  "id": "8e80fb13-ce4b-45e9-abcf-fe01aea62ddd",
+                  "color": "yellow",
+                  "value": "Tech"
+                },
+                {
+                  "id": "037cac71-c4c7-4355-83dc-577a4cc30a08",
+                  "color": "blue",
+                  "value": "Partnerships"
+                },
+                {
+                  "id": "9d39b289-e4a9-4817-bfe6-4ea83f9094c9",
+                  "color": "orange",
+                  "value": "Education"
+                },
+                {
+                  "id": "53726def-5070-4911-a095-681c85aeacaa",
+                  "color": "turquoise",
+                  "value": "Tokenomics"
+                },
+                {
+                  "id": "f7a37418-ffb8-483c-a260-c6162ae88155",
+                  "color": "green",
+                  "value": "Community"
+                },
+                {
+                  "id": "3b721d2f-d5af-4119-a11f-a43419266146",
+                  "color": "purple",
+                  "value": "Art Direction"
+                },
+                {
+                  "id": "e826b6ff-ea89-47aa-9bda-83234bff9491",
+                  "color": "red",
+                  "value": "Governance"
+                }
+              ]
+            }
+          ],
+          "showDescription": false,
+          "columnCalculations": []
+        }
+      }
+    ],
+    "proposalWorkflows": [
+      {
+        "id": "121e8cec-da86-44b5-af6b-d43b39e917c6",
+        "createdAt": "2024-03-20T17:04:18.969Z",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "index": 0,
+        "title": "Community Proposals",
+        "evaluations": [
+          {
+            "id": "3702df51-7449-4a53-a562-7afef369ada5",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "699e47f0-3a3e-48f9-aa89-4295428912a4",
+            "type": "pass_fail",
+            "title": "Review",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "7388e14c-ce97-4de6-886f-ee0bba1d8316",
+            "type": "vote",
+            "title": "Community vote",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "f6c56883-cab0-44bd-bc7b-033936767589",
+        "createdAt": "2024-03-20T17:04:18.969Z",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "index": 2,
+        "title": "Grant Applications",
+        "evaluations": [
+          {
+            "id": "2808c634-e63b-4ef6-acf1-40b2b8bf2ae7",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "05de10f2-1a88-43c7-9676-69ee5bfe700e",
+        "createdAt": "2024-03-20T17:04:18.969Z",
+        "spaceId": "710c95c8-305a-49bb-a67b-c11659d41d7b",
+        "index": 1,
+        "title": "Decision Matrix",
+        "evaluations": [
+          {
+            "id": "c147bdb5-ad4f-489e-8212-cc4c092b8d88",
+            "type": "feedback",
+            "title": "Feedback",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          },
+          {
+            "id": "1fac1322-44f6-4bca-8195-5bb29fd67a39",
+            "type": "rubric",
+            "title": "Rubric evaluation",
+            "permissions": [
+              {
+                "operation": "view",
+                "systemRole": "author"
+              },
+              {
+                "operation": "edit",
+                "systemRole": "author"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "author"
+              },
+              {
+                "operation": "move",
+                "systemRole": "author"
+              },
+              {
+                "operation": "view",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "move",
+                "systemRole": "current_reviewer"
+              },
+              {
+                "operation": "view",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "all_reviewers"
+              },
+              {
+                "operation": "view",
+                "systemRole": "space_member"
+              },
+              {
+                "operation": "comment",
+                "systemRole": "space_member"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
