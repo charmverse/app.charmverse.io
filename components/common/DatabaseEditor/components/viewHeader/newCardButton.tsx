@@ -6,7 +6,6 @@ import { memo, useRef, useMemo } from 'react';
 import { Button } from 'components/common/Button';
 import { TemplatesMenu } from 'components/common/TemplatesMenu/TemplatesMenu';
 import { usePagePermissions } from 'hooks/usePagePermissions';
-import { usePages } from 'hooks/usePages';
 import type { Card } from 'lib/databases/card';
 
 import { makeSelectBoardTemplates } from '../../store/cards';
@@ -18,7 +17,7 @@ type Props = {
   addCardTemplate: () => void;
   deleteCardTemplate: (cardTemplateId: string) => void;
   showCard: (cardId: string) => void;
-  templatesBoardId?: string;
+  templatesBoard?: { id: string; title: string };
 };
 
 const NewCardButton = memo(
@@ -28,18 +27,17 @@ const NewCardButton = memo(
     addCardTemplate,
     deleteCardTemplate,
     showCard,
-    templatesBoardId
+    templatesBoard
   }: Props): JSX.Element => {
     const selectBoardTemplates = useMemo(makeSelectBoardTemplates, []);
-    const cardTemplates: Card[] = useAppSelector((state) => selectBoardTemplates(state, templatesBoardId || ''));
+    const cardTemplates: Card[] = useAppSelector((state) => selectBoardTemplates(state, templatesBoard?.id || ''));
     const buttonRef = useRef<HTMLDivElement>(null);
-    const { pages } = usePages();
 
     const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
-    const boardTitle = templatesBoardId ? pages[templatesBoardId]?.title || 'Untitled' : undefined;
+    const boardTitle = templatesBoard ? templatesBoard.title || 'Untitled' : undefined;
 
-    const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: templatesBoardId || null });
+    const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: templatesBoard?.id || null });
 
     return (
       <>

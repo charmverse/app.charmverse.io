@@ -8,7 +8,6 @@ import React from 'react';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import Link from 'components/common/Link';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
@@ -53,7 +52,6 @@ type Props = {
 
 function ViewHeader(props: Props) {
   const router = useRouter();
-  const { pages, refreshPage } = usePages();
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
@@ -82,7 +80,6 @@ function ViewHeader(props: Props) {
       card
     });
     const newPageId = blocks[0].id;
-    await refreshPage(newPageId);
     props.showCard(newPageId);
   }
 
@@ -223,7 +220,7 @@ function ViewHeader(props: Props) {
                   addCardTemplate={props.addCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}
-                  templatesBoardId={activeBoard?.id}
+                  templatesBoard={activeBoard}
                 />
               )}
             </>

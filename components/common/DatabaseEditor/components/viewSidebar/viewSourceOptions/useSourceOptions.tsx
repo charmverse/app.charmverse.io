@@ -40,8 +40,6 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
 
   const boards = useAppSelector(getBoards);
 
-  const rootBoardPage = pages[rootBoard.id];
-
   const views = useAppSelector(getViews);
 
   async function onSelectLinkedDatabase({ pageId }: { pageId: string }) {
@@ -56,8 +54,8 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       !sourceBoard ||
       !sourcePage ||
       !allowedSourceDatabasePageTypes.includes(sourcePage.type) ||
-      !rootBoardPage ||
-      !rootBoardPage.type.match('linked') ||
+      !rootBoard ||
+      !rootBoard.pageType?.match('linked') ||
       activeView?.fields.linkedSourceId === pageId
     ) {
       return;
@@ -162,7 +160,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
   }
 
   async function onCreateDatabase({ sourceType }: { sourceType?: BoardFields['sourceType'] } = {}) {
-    if (!rootBoardPage || !rootBoardPage.type.match('board')) {
+    if (!rootBoard.pageType?.match('board')) {
       throw new Error('No board page type exists');
     }
 
@@ -171,7 +169,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     const { view } = await createNewDataSource({
       board: boardBlockUpdate,
       updatePage,
-      currentPageType: rootBoardPage.type
+      currentPageType: rootBoard.pageType
     });
     showView(view.id);
     return view;

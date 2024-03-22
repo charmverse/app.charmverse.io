@@ -12,7 +12,6 @@ import { KanbanPageActionsMenuButton } from 'components/common/PageActions/Kanba
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 import { isTouchScreen } from 'lib/utils/browser';
