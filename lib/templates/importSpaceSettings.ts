@@ -36,7 +36,7 @@ export async function importSpaceSettings({
 }: ImportParams & { oldNewRoleIdHashMap: Record<string, string> }): Promise<SpaceImportResult> {
   const { space } = await getImportData(importParams);
   if (!space) {
-    throw new DataNotFoundError(`No space to import`);
+    throw new DataNotFoundError(`No space to import: ${importParams.exportName}`);
   }
 
   const targetSpace = await getSpace(targetSpaceIdOrDomain);

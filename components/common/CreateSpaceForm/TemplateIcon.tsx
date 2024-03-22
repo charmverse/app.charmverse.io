@@ -16,6 +16,7 @@ type SvgComponent = OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
 
 const templateIcons: Record<StaticSpaceTemplateType, SvgComponent> = {
   templateCreator: CreatorIcon,
+  templateGaming: NFTCommunityIcon,
   templateNftCommunity: NFTCommunityIcon,
   templateHackathon: HackathonIcon,
   templateNounishDAO: NounsIcon,
