@@ -43,7 +43,7 @@ export async function getAllUserCredentials({ userId }: { userId: string }): Pro
       log.error(`Error loading Gitcoin Ceramic credentials for user ${userId}`, { error, userId });
       return [];
     }),
-    getAllOnChainAttestations({ wallets })
+    getAllOnChainAttestations({ wallets: testWallets })
   ]).then((data) => data.flat());
 
   return allCredentials.sort((a, b) => b.timeCreated - a.timeCreated);
