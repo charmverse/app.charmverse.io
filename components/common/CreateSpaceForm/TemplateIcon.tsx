@@ -4,6 +4,7 @@ import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 
 import type { StaticSpaceTemplateType } from 'lib/spaces/config';
 import CreatorIcon from 'public/images/template_icons/creator_icon.svg';
+import GamingIcon from 'public/images/template_icons/gaming_icon.svg';
 import GrantRecipientIcon from 'public/images/template_icons/grantee_icon.svg';
 import GrantorIcon from 'public/images/template_icons/grantor_icon.svg';
 import HackathonIcon from 'public/images/template_icons/hacker_icon.svg';
@@ -16,7 +17,7 @@ type SvgComponent = OverridableComponent<SvgIconTypeMap<object, 'svg'>>;
 
 const templateIcons: Record<StaticSpaceTemplateType, SvgComponent> = {
   templateCreator: CreatorIcon,
-  templateGaming: NFTCommunityIcon,
+  templateGaming: GamingIcon,
   templateNftCommunity: NFTCommunityIcon,
   templateHackathon: HackathonIcon,
   templateNounishDAO: NounsIcon,
