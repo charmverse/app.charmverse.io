@@ -22,19 +22,12 @@ type IndexableCredential = {
 async function indexOnChainProposalCredential({
   chainId,
   attestationId,
-  eas,
-  expectedIssuerAddress
+  eas
 }: IndexableCredential & {
   eas: EAS;
   chainId: EasSchemaChain;
-  expectedIssuerAddress?: string;
 }): Promise<IssuedCredential> {
   const attestation = await eas.getAttestation(attestationId);
-  if (expectedIssuerAddress && !lowerCaseEqual(expectedIssuerAddress, attestation.attester)) {
-    throw new InvalidInputError(
-      `Attestation ${attestationId} on chain ${chainId} was issued by ${attestation.attester}, but expected issuer was ${expectedIssuerAddress}`
-    );
-  }
 
   const decodedContent = decodeProposalCredential(attestation.data) as ProposalCredential;
 
