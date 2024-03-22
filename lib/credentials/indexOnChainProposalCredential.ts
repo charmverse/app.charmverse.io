@@ -1,11 +1,18 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { CredentialEventType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
+import { log } from '@charmverse/core/log';
+import type {
+  CredentialEventType,
+  IssuedCredential,
+  PendingSafeTransaction,
+  Prisma
+} from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
+import { sepolia } from 'viem/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -21,14 +28,14 @@ type IndexableCredential = {
   attestationId: string;
 };
 
-async function indexOnChainProposalCredential({
+async function getProposalContentToIndex({
   chainId,
   attestationId,
   eas
 }: IndexableCredential & {
   eas: EAS;
   chainId: EasSchemaChain;
-}): Promise<IssuedCredential> {
+}): Promise<Prisma.IssuedCredentialCreateManyInput | null> {
   const attestation = await eas.getAttestation(attestationId);
 
   const decodedContent = decodeProposalCredential(attestation.data) as ProposalCredential;
@@ -112,22 +119,18 @@ async function indexOnChainProposalCredential({
 
   // If we already indexed this attestation, no need to reindex it
   if (existingCredential) {
-    return existingCredential;
+    return null;
   }
 
-  const issuedCredential = await prisma.issuedCredential.create({
-    data: {
-      credentialEvent,
-      credentialTemplate: { connect: { id: matchingCredentialTemplate.id } },
-      user: { connect: { id: proposal.authors[0].userId } },
-      proposal: { connect: { id: proposal.id } },
-      schemaId: attestation.schema,
-      onchainChainId: chainId,
-      onchainAttestationId: attestationId
-    }
-  });
-
-  return issuedCredential;
+  return {
+    credentialEvent,
+    credentialTemplateId: matchingCredentialTemplate.id,
+    userId: proposal.authors[0].userId,
+    proposalId: proposal.id,
+    schemaId: attestation.schema,
+    onchainChainId: chainId,
+    onchainAttestationId: attestationId
+  };
 }
 
 // Avoid spamming RPC with requests
@@ -138,33 +141,26 @@ export type ProposalCredentialsToIndex = {
   txHash: string;
 };
 
-export async function indexProposalCredentials({
-  chainId,
-  txHash
-}: ProposalCredentialsToIndex): Promise<IssuedCredential[]> {
+export async function indexProposalCredentials({ chainId, txHash }: ProposalCredentialsToIndex): Promise<void> {
   const publicClient = getPublicClient(chainId);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
 
-  const attestationUids = receipt.logs.map((log) => log.data);
+  const attestationUids = receipt.logs.map((_log) => _log.data);
 
   const eas = await getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
 
-  await indexOnChainProposalCredential({ attestationId: attestationUids[0], chainId, eas });
-
-  const issuedCredentials = await Promise.allSettled(
+  const issuedCredentialInputs = await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return indexOnChainProposalCredential({ attestationId: uid, chainId, eas });
+      return getProposalContentToIndex({ attestationId: uid, chainId, eas });
     })
-  ).then((results) =>
-    results
-      .filter((result) => result.status === 'fulfilled')
-      .map((result) => (result as PromiseFulfilledResult<IssuedCredential>).value)
   );
 
-  return issuedCredentials;
+  await prisma.issuedCredential.createMany({
+    data: issuedCredentialInputs.filter((input): input is Prisma.IssuedCredentialCreateManyInput => !!input)
+  });
 }
 
 export type GnosisSafeTransactionToIndex = Pick<
@@ -224,16 +220,49 @@ export async function indexSafeTransaction({
 }: {
   safeTxHash: string;
   chainId: number;
-}): Promise<IssuedCredential[]> {
+}): Promise<void> {
   const apiClient = getSafeApiClient({ chainId });
   const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
 
-  prettyPrint(pendingSafeTransaction.transactionHash);
+  if (!pendingSafeTransaction) {
+    log.info(`Safe transaction ${safeTxHash} not found on chain ${chainId}`);
 
-  return [];
+    await prisma.pendingSafeTransaction.delete({
+      where: {
+        safeTxHash
+      }
+    });
+    return;
+  }
+
+  prettyPrint(pendingSafeTransaction);
+
+  const onchainTxHash = pendingSafeTransaction?.transactionHash;
+
+  if (!onchainTxHash) {
+    log.info(`Safe transaction ${safeTxHash} on chain ${chainId} has not been confirmed yet`);
+    return;
+  }
+
+  const provider = new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
+
+  await indexProposalCredentials({
+    chainId: chainId as EasSchemaChain,
+    txHash: pendingSafeTransaction.transactionHash
+  });
+
+  await prisma.pendingSafeTransaction.update({
+    where: { safeTxHash },
+    data: { processed: true }
+  });
 }
 
 // indexSafeTransaction({
 //   chainId: sepolia.id,
-//   safeTxHash: '0x6773a9797f19a1c7e9f70819024eb29f4c68573fb89c6821d192656f3689a310'
+//   safeTxHash: '0x410992d91c8f58919db7605e8555232497b942f95950a51c0734a1cc6da23883'
+// }).then(console.log);
+
+// indexSafeTransaction({
+//   chainId: sepolia.id,
+//   safeTxHash: '0x6ee2a4967da40389b76a03de7c38a5b45ab48f0fc19baf909387c512207a8841'
 // }).then(console.log);
