@@ -11,11 +11,13 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
-import { trackedSchemas } from 'lib/credentials/external/schemas';
+import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialDataInput } from 'lib/credentials/schemas';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
+
+import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
 
 export function UserCredentialRow({
   credential,
@@ -30,9 +32,10 @@ export function UserCredentialRow({
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
   const { showMessage } = useSnackbar();
-  const schemaInfo = trackedSchemas[credential.chainId as keyof typeof trackedSchemas]?.find(
-    (s) => s.schemaId === credential.schemaId
-  );
+  const schemaInfo = (
+    trackedSchemas[credential.chainId as keyof typeof trackedSchemas] ??
+    trackedCharmverseSchemas[credential.chainId as keyof typeof trackedCharmverseSchemas]
+  )?.find((s) => s.schemaId === credential.schemaId);
   const { user } = useUser();
   const isUserRecipient = user?.wallets.find((wallet) => lowerCaseEqual(wallet.address, credential.recipient));
   const isMutating = isRemoveFavoriteCredentialLoading || isAddFavoriteCredentialLoading;
@@ -91,7 +94,6 @@ export function UserCredentialRow({
   if (credential.type === 'onchain' && !schemaInfo) {
     return null;
   }
-
   const favoriteAndVerificationIconsComponent = (
     <Stack
       flexBasis={isSmallScreen ? undefined : '30%'}
@@ -165,11 +167,24 @@ export function UserCredentialRow({
     <div />
   );
 
+  // Readd this later
+  // const hideAndPublishComponent = (
+  //   <UserCredentialHideAndPublish
+  //     credential={credential}
+  //     isSmallScreen={isSmallScreen}
+  //     isUserRecipient={!!isUserRecipient}
+  //     readOnly={readOnly}
+  //     isMutating={isMutating}
+  //     toggleFavorite={toggleFavorite}
+  //   />
+  // );
+
   if (isSmallScreen) {
     return (
       <Stack gap={1}>
         <Box gap={2} display='flex' alignItems='center' justifyItems='flex-start'>
           {credentialOrganizationComponent}
+
           {favoriteAndVerificationIconsComponent}
         </Box>
         {attestationContentComponent}
@@ -186,6 +201,7 @@ export function UserCredentialRow({
         {attestationContentComponent}
         {favoriteAndVerificationIconsComponent}
       </Stack>
+      {/* {hideAndPublishComponent} */}
     </Stack>
   );
 }

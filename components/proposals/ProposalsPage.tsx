@@ -188,7 +188,7 @@ export function ProposalsPage({ title }: { title: string }) {
               {title}
             </Typography>
 
-            <Box display='flex'>
+            <Box display='flex' justifyContent='space-between'>
               <Box
                 gap={3}
                 sx={{
