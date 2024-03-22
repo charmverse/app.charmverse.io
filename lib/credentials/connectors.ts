@@ -1,18 +1,24 @@
 import { EAS } from '@ethereum-attestation-service/eas-sdk';
-import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 import type { ExternalCredentialChain } from './external/schemas';
 
-export const easSchemaChains = [optimism.id, optimismSepolia.id] as const;
+export const easSchemaMainnetChains = [optimism] as const;
+export const easSchemaTestnetChains = [sepolia, optimismSepolia] as const;
 
-export const defaultCredentialChain = easSchemaChains[0];
+export type EasSchemaChain =
+  | (typeof easSchemaMainnetChains)[number]['id']
+  | (typeof easSchemaTestnetChains)[number]['id'];
 
-export type EasSchemaChain = (typeof easSchemaChains)[number];
+export const easSchemaChains = [...easSchemaMainnetChains, ...easSchemaTestnetChains].map(
+  (c) => c.id
+) as EasSchemaChain[];
 
 type EASConnector = {
   attestationContract: string;
   schemaRegistryContract: string;
   attestationExplorerUrl: string;
+  isTestnet?: boolean;
 };
 
 // See https://github.com/ethereum-attestation-service/eas-contracts
@@ -20,22 +26,32 @@ export const easConnectors: Record<EasSchemaChain | ExternalCredentialChain, EAS
   [optimism.id]: {
     attestationContract: '0x4200000000000000000000000000000000000021',
     schemaRegistryContract: '0x4200000000000000000000000000000000000020',
-    attestationExplorerUrl: 'https://optimism.easscan.org'
-  },
-  [optimismSepolia.id]: {
-    attestationContract: '0x4200000000000000000000000000000000000021',
-    schemaRegistryContract: '0x4200000000000000000000000000000000000020',
-    attestationExplorerUrl: 'https://optimism-sepolia.easscan.org'
+    attestationExplorerUrl: 'https://optimism.easscan.org',
+    isTestnet: false
   },
   [arbitrum.id]: {
     attestationContract: '0xbd75f629a22dc1ced33dda0b68c546a1c035c458',
     schemaRegistryContract: '0xa310da9c5b885e7fb3fba9d66e9ba6df512b78eb',
-    attestationExplorerUrl: 'https://arbitrum.easscan.org'
+    attestationExplorerUrl: 'https://arbitrum.easscan.org',
+    isTestnet: false
   },
   [base.id]: {
     attestationContract: '0x4200000000000000000000000000000000000021',
     schemaRegistryContract: '0x4200000000000000000000000000000000000020',
-    attestationExplorerUrl: 'https://base.easscan.org'
+    attestationExplorerUrl: 'https://base.easscan.org',
+    isTestnet: false
+  },
+  [sepolia.id]: {
+    attestationContract: '0xC2679fBD37d54388Ce493F1DB75320D236e1815e',
+    schemaRegistryContract: '0x0a7E2Ff54e76B8E6659aedc9103FB21c038050D0',
+    attestationExplorerUrl: 'https://sepolia.easscan.org',
+    isTestnet: true
+  },
+  [optimismSepolia.id]: {
+    attestationContract: '0x4200000000000000000000000000000000000021',
+    schemaRegistryContract: '0x4200000000000000000000000000000000000020',
+    attestationExplorerUrl: 'https://optimism-sepolia.easscan.org',
+    isTestnet: true
   }
 };
 

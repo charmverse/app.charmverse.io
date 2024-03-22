@@ -1,18 +1,11 @@
 import type { Space } from '@charmverse/core/prisma';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, FormControlLabel, Grid, Input, Stack, Switch, TextField } from '@mui/material';
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Box, FormControlLabel, Grid, Stack, Switch, TextField } from '@mui/material';
 import { isAddress } from 'viem';
-import { optimism, optimismSepolia } from 'viem/chains';
-import type * as yup from 'yup';
 
-import FieldLabel from 'components/common/form/FieldLabel';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { Typography } from 'components/common/Typography';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
-import { easSchemaChains } from 'lib/credentials/connectors';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import { easSchemaChains, easSchemaMainnetChains } from 'lib/credentials/connectors';
 
 export type UpdateableCredentialProps = Pick<
   Space,
@@ -33,10 +26,11 @@ export function CredentialsOnChainConfig({
 }: Props) {
   const validAddress = !credentialsWallet || isAddress(credentialsWallet);
 
+  const isCharmverseSpace = useIsCharmverseSpace();
+
   return (
     <Grid container display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
       <Grid item>
-        <Box></Box>
         <FormControlLabel
           sx={{
             margin: 0,
@@ -63,21 +57,16 @@ export function CredentialsOnChainConfig({
 
       {useOnchainCredentials && (
         <Grid container item justifyContent='flex-start' alignItems='flex-start'>
-          {' '}
-          {/* Changed alignItems to 'flex-start' to align items to the top */}
           <Grid item xs={4} style={{ minHeight: '72px' }}>
-            {' '}
             {/* Added a minimum height */}
             <InputSearchBlockchain
-              chains={[...easSchemaChains]}
+              chains={isCharmverseSpace ? [...easSchemaChains] : [...easSchemaMainnetChains.map((c) => c.id)]}
               chainId={credentialsChainId as number}
               onChange={(chainId) => onChange({ credentialsChainId: chainId })}
             />
           </Grid>
           <Grid item xs={6} px={2}>
             <Stack style={{ minHeight: '72px' }}>
-              {' '}
-              {/* Added a minimum height */}
               <TextField
                 value={credentialsWallet}
                 onChange={(ev) => {

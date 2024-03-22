@@ -3,6 +3,7 @@ import Safe from '@safe-global/safe-core-sdk';
 import EthersAdapter from '@safe-global/safe-ethers-lib';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
+import { getAddress } from 'viem';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isTruthy } from 'lib/utils/types';
@@ -21,7 +22,7 @@ export function useCreateSafes(safeAddresses: string[]) {
 
     const _safes = await Promise.all(
       safeAddresses.map((safeAddress) =>
-        Safe.create({ ethAdapter, safeAddress }).catch((error) => {
+        Safe.create({ ethAdapter, safeAddress: getAddress(safeAddress) }).catch((error) => {
           log.warn('Error retrieving safe', error.message);
         })
       )
@@ -34,7 +35,7 @@ export function useCreateSafes(safeAddresses: string[]) {
     if (safeAddresses.length && account && signer) {
       loadSafes();
     }
-  }, [account, safeAddresses, signer]);
+  }, [account, safeAddresses.length, signer]);
 
   return safes;
 }

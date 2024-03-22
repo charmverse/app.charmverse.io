@@ -1,14 +1,12 @@
-import { log } from '@charmverse/core/log';
-import { stringUtils } from '@charmverse/core/utilities';
+import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
-import { Box, Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
+import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
-import type { RpcError } from 'viem';
 import { useSwitchNetwork } from 'wagmi';
 
 import { Button } from 'components/common/Button';
-import { Chain, InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
+import { Chain } from 'components/common/form/InputSearchBlockchain';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
@@ -18,7 +16,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
-import { getEasConnector, getOnChainSchemaUrl } from 'lib/credentials/connectors';
+import { getOnChainSchemaUrl } from 'lib/credentials/connectors';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 
@@ -50,8 +48,13 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
 
   const proposalLabel = getFeatureTitle('Proposal');
 
-  const { issuableProposalCredentials, issueAndSaveProposalCredentials, isLoadingIssuableProposalCredentials } =
-    useProposalCredentials();
+  const {
+    issuableProposalCredentials,
+    issueAndSaveProposalCredentials,
+    isLoadingIssuableProposalCredentials,
+    userWalletCanIssueCredentialsForSpace,
+    gnosisSafeForCredentials
+  } = useProposalCredentials();
   const { showMessage } = useSnackbar();
 
   const [publishingCredential, setPublishingCredential] = useState(false);
@@ -99,7 +102,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
       if (err.code === 'ACTION_REJECTED') {
         showMessage('Transaction rejected', 'warning');
       } else {
-        showMessage(err.message ?? 'Error issuing credentials', 'error');
+        showMessage(err.message ?? 'Error issuing credentials', (err as SystemError).severity ?? 'error');
       }
       // Hook handles errors
     } finally {
@@ -107,16 +110,20 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     }
   }
 
-  const userHasCorrectCredentialWallet =
-    !!space?.credentialsWallet && stringUtils.lowerCaseEqual(space?.credentialsWallet, account);
-
-  const disableIssueCredentialsMenu = !issuableProposalCredentials?.length
-    ? 'No credentials to issue'
-    : !account || !signer
-    ? 'Unlock your wallet to issue credentials'
-    : !userHasCorrectCredentialWallet
-    ? `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
-    : undefined;
+  const disableIssueCredentialsMenu =
+    !space?.useOnchainCredentials || !space.credentialsChainId || !space.credentialsWallet
+      ? 'A space admin must set up onchain credentials to use this functionality'
+      : !issuableProposalCredentials?.length
+      ? 'No credentials to issue'
+      : !account || !signer
+      ? 'Unlock your wallet to issue credentials'
+      : !userWalletCanIssueCredentialsForSpace
+      ? gnosisSafeForCredentials
+        ? `You must be connected as one of the owners of the ${gnosisSafeForCredentials.address} Gnosis Safe on ${
+            getChainById(space?.credentialsChainId)?.chainName
+          }`
+        : `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
+      : undefined;
 
   const disableIssueCredentialRows =
     !!disableIssueCredentialsMenu || publishingCredential || chainId !== space?.credentialsChainId;

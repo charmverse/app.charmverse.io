@@ -2,12 +2,9 @@
 import type { AttestationType } from '@charmverse/core/prisma-client';
 import type { Transaction } from '@ethereum-attestation-service/eas-sdk/dist/transaction';
 import type { PopulatedTransaction, Signer } from 'ethers';
-import type { Chain } from 'viem';
-import { optimism, optimismSepolia } from 'viem/chains';
 import { getAddress } from 'viem/utils';
 
 import type { OnChainAttestationInput } from './attestOnchain';
-import type { EasSchemaChain } from './connectors';
 import { getEasInstance } from './connectors';
 import type { CredentialDataInput } from './schemas';
 import { attestationSchemaIds, encodeAttestation } from './schemas';
@@ -17,11 +14,6 @@ export type OnChainMultiAttestationInput<T extends AttestationType = Attestation
   'credentialInputs'
 > & {
   credentialInputs: { recipient: string; data: CredentialDataInput<T> }[];
-};
-
-const chainMap: Record<EasSchemaChain, Chain> = {
-  [optimismSepolia.id]: optimismSepolia,
-  [optimism.id]: optimism
 };
 
 /**
@@ -62,11 +54,11 @@ const ZERO_BYTES32 = '0x00000000000000000000000000000000000000000000000000000000
  *
  * Prepares a transaction which can be broadcast later
  */
-export async function prepareOnChainAttestationTransaction({
+export async function populateOnChainAttestationTransaction({
   credentialInputs,
   type,
   chainId
-}: OnChainMultiAttestationInput): Promise<PopulatedTransaction> {
+}: OnChainMultiAttestationInput): Promise<Required<PopulatedTransaction>> {
   const schemaId = attestationSchemaIds[type];
 
   const eas = getEasInstance(chainId);
@@ -74,7 +66,7 @@ export async function prepareOnChainAttestationTransaction({
   const populatedTransaction = await eas.contract.populateTransaction.multiAttest([
     {
       data: credentialInputs.map(({ data, recipient }) => ({
-        recipient,
+        recipient: getAddress(recipient),
         expirationTime: ZERO_BIGINT,
         revocable: true,
         // We don't currently refer to other attestations
@@ -86,7 +78,7 @@ export async function prepareOnChainAttestationTransaction({
     }
   ]);
 
-  return populatedTransaction;
+  return { ...populatedTransaction, to: eas.contract.address } as Required<PopulatedTransaction>;
 }
 
 // These code snippets provide a quick test to check we can issue credentials onchain ----------
