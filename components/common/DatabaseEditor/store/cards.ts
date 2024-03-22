@@ -348,20 +348,12 @@ type getViewCardsProps = { viewId: string; boardId: string; localFilters?: Filte
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    (state: RootState, props: getViewCardsProps) => {
-      const cards = getCards(state);
-      const board = state.boards.boards[props.boardId];
-      const view = state.views.views[props.viewId];
-      const filter = props.localFilters || view?.fields.filter;
-
-      return {
-        cards,
-        board,
-        view,
-        filter
-      };
-    },
-    ({ cards, board, view, filter }) => {
+    (state: RootState) => getCards(state),
+    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
+    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
+    (state: RootState, props: getViewCardsProps) =>
+      props.localFilters || state.views.views[props.viewId]?.fields.filter,
+    (cards, board, view, filter) => {
       if (!view || !board || !cards) {
         return [];
       }

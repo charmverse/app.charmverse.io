@@ -5,7 +5,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { Constants } from 'lib/databases/constants';
 
 import { TestBlockFactory } from '../test/testBlockFactory';
-import { mockDOM, mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../testUtils';
+import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
 import { Utils } from '../utils';
 
 import CenterPanel from './centerPanel';
@@ -135,22 +135,19 @@ describe('components/centerPanel', () => {
       activeView.fields.viewType = 'board';
       const mockedShowCard = jest.fn();
       const { container } = render(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          wrapDNDIntl(
-            <ReduxProvider store={store}>
-              <CenterPanel
-                currentRootPageId={board.id}
-                showView={jest.fn()}
-                setPage={() => {}}
-                views={[activeView]}
-                board={board}
-                activeView={activeView}
-                readOnly={false}
-                showCard={mockedShowCard}
-              />
-            </ReduxProvider>
-          )
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              currentRootPageId={board.id}
+              showView={jest.fn()}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={mockedShowCard}
+            />
+          </ReduxProvider>
         )
       );
 

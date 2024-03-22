@@ -7,7 +7,7 @@ import { AppThemeProvider } from 'theme/AppThemeProvider';
 import mutator from '../../mutator';
 import type { RootState } from '../../store';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
+import { mockStateStore, wrapDNDIntl } from '../../testUtils';
 
 import Gallery from './gallery';
 
@@ -25,7 +25,9 @@ describe('src/components/gallery/Gallery', () => {
   const activeView = TestBlockFactory.createBoardView(board);
   activeView.fields.sortOptions = [];
   const card = TestBlockFactory.createCard(board);
+  card.id = 'card1';
   const card2 = TestBlockFactory.createCard(board);
+  card2.id = 'card2';
   const state: Partial<RootState> = {
     cards: {
       current: '',
@@ -105,22 +107,19 @@ describe('src/components/gallery/Gallery', () => {
   test('return Gallery and drag and drop card', async () => {
     const { container } = render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card.id, card2.id],
-          <AppThemeProvider>
-            <ReduxProvider store={store}>
-              <Gallery
-                board={board}
-                cards={[card, card2]}
-                activeView={activeView}
-                readOnly={false}
-                addCard={jest.fn()}
-                selectedCardIds={[]}
-                onCardClicked={jest.fn()}
-              />
-            </ReduxProvider>
-          </AppThemeProvider>
-        )
+        <AppThemeProvider>
+          <ReduxProvider store={store}>
+            <Gallery
+              board={board}
+              cards={[card, card2]}
+              activeView={activeView}
+              readOnly={false}
+              addCard={jest.fn()}
+              selectedCardIds={[]}
+              onCardClicked={jest.fn()}
+            />
+          </ReduxProvider>
+        </AppThemeProvider>
       )
     );
     const allGalleryCard = container.querySelectorAll('.GalleryCard');
