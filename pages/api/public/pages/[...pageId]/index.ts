@@ -15,6 +15,7 @@ import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { checkPageContent } from 'lib/security/checkPageContent';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isUUID } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -245,7 +246,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
         where: {
           deletedAt: null,
           id: {
-            in: [card.parentId, card.rootId].filter(Boolean)
+            in: [card.parentId, card.rootId].filter(isTruthy)
           }
         }
       })) as unknown as Board[];

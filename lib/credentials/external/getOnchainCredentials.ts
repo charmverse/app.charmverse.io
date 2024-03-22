@@ -124,13 +124,14 @@ function getTrackedOnChainCredentials({
       return data.attestations.map((attestation: any) => {
         return {
           ...attestation,
+          chainId,
           type: 'onchain',
           content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
             acc[val.name] = val.value.value;
             return acc;
           }, {} as any),
           timeCreated: attestation.timeCreated * 1000,
-          verificationUrl: getOnChainAttestationUrl({ chainId: attestation.chainId, attestationId: attestation.id })
+          verificationUrl: getOnChainAttestationUrl({ chainId, attestationId: attestation.id })
         };
       });
     });

@@ -2,7 +2,7 @@
 import { Mutator } from 'components/common/DatabaseEditor/mutator';
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { ProposalBlocksContextType } from 'hooks/useProposalBlocks';
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type {
   Board,
   IPropertyOption,
@@ -15,8 +15,8 @@ import type { Card } from 'lib/databases/card';
 import type { ProposalBoardBlockFields, ProposalPropertiesField } from 'lib/proposals/blocks/interfaces';
 
 export interface BlockChange {
-  block: Block;
-  newBlock: Block;
+  block: UIBlockWithDetails;
+  newBlock: UIBlockWithDetails;
 }
 
 //

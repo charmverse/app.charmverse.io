@@ -52,7 +52,7 @@ export async function upsertRubricAnswers({ answers, userId, proposalId, evaluat
         parsedScore < answerCriteria.parameters.min ||
         parsedScore > answerCriteria.parameters.max
       ) {
-        throw new InvalidInputError(`Criteria ${answerCriteria.title} requires a number`);
+        throw new InvalidInputError(`Enter a valid score for: ${answerCriteria.title}`);
       }
     }
   }

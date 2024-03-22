@@ -173,10 +173,10 @@ function DraggableTreeNode({
     const focalboardViewId = viewsRecord[item.id];
     if (views && focalboardViewId && item.type.match(/board/) && !views.some((view) => view.id === focalboardViewId)) {
       const firstView = views[0];
-      if (firstView) {
+      if (firstView?.parentId) {
         setViewsRecord((_viewsRecord) => ({
           ..._viewsRecord,
-          [firstView.parentId]: firstView.id
+          [firstView.parentId as string]: firstView.id
         }));
       }
     }

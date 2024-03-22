@@ -8,7 +8,7 @@ import { useRewardBlocks } from 'components/rewards/hooks/useRewardBlocks';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { usePages } from 'hooks/usePages';
-import type { BlockPatch, Block as FBBlock } from 'lib/databases/block';
+import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
@@ -52,7 +52,7 @@ export function useRewardsBoardMutator() {
 
     if (!currentBlock) return;
 
-    const currentFBBlock = blockToFBBlock(currentBlock as RewardBlock);
+    const currentFBBlock = blockToFBBlock(currentBlock);
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
@@ -68,7 +68,7 @@ export function useRewardsBoardMutator() {
     const updatedBlock = await updateBlock(blockInput as unknown as RewardBlockUpdateInput);
     if (!updatedBlock) return;
 
-    const fbBlock = blockToFBBlock(updatedBlock as RewardBlock);
+    const fbBlock = blockToFBBlock(updatedBlock);
     updater([fbBlock]);
   };
 
@@ -90,7 +90,7 @@ export function useRewardsBoardMutator() {
     const updatedBlocks = await updateBlocks(updatedBlockInput as unknown as RewardBlockUpdateInput[]);
     if (!updatedBlocks) return;
 
-    const fbBlocks = (updatedBlocks as RewardBlock[]).map(blockToFBBlock) || [];
+    const fbBlocks = updatedBlocks.map(blockToFBBlock) || [];
     updater(fbBlocks);
   };
 
@@ -100,7 +100,7 @@ export function useRewardsBoardMutator() {
 
     if (!newBlocks) return [];
 
-    const newFBBlocks = (newBlocks as RewardBlock[]).map(blockToFBBlock);
+    const newFBBlocks = newBlocks.map(blockToFBBlock);
     updater(newFBBlocks);
 
     return newFBBlocks;
@@ -111,7 +111,7 @@ export function useRewardsBoardMutator() {
     if (!rootBlocks) return;
 
     const fbBlocks = rootBlocks.map((rootBlock) => ({
-      ...blockToFBBlock(rootBlock as RewardBlock),
+      ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
     }));
     updater(fbBlocks);
@@ -130,7 +130,7 @@ export function useRewardsBoardMutator() {
     const rootBlock = await deleteRewardBlock(blockId);
     if (!rootBlock) return;
 
-    const fbBlock = blockToFBBlock(rootBlock as RewardBlock);
+    const fbBlock = blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   };

@@ -44,13 +44,13 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
 
   const views = useAppSelector(getViews);
 
-  async function onSelectLinkedDatabase({ sourceDatabaseId }: { sourceDatabaseId: string }) {
-    if (!stringUtils.isUUID(sourceDatabaseId)) {
+  async function onSelectLinkedDatabase({ pageId }: { pageId: string }) {
+    if (!stringUtils.isUUID(pageId)) {
       return;
     }
 
-    const sourceBoard = boards[sourceDatabaseId] ?? (await charmClient.getBlock({ blockId: sourceDatabaseId }));
-    const sourcePage = pages[sourceDatabaseId];
+    const sourceBoard = boards[pageId] ?? (await charmClient.getBlock({ blockId: pageId }));
+    const sourcePage = pages[pageId];
 
     if (
       !sourceBoard ||
@@ -58,21 +58,21 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
       !allowedSourceDatabasePageTypes.includes(sourcePage.type) ||
       !rootBoardPage ||
       !rootBoardPage.type.match('linked') ||
-      activeView?.fields.linkedSourceId === sourceDatabaseId
+      activeView?.fields.linkedSourceId === pageId
     ) {
       return;
     }
 
     // We want to get the view from the source database to copy over props such as visible property IDs
-    let relatedSourceView = Object.values(views).find((view) => view.parentId === sourceDatabaseId);
+    let relatedSourceView = Object.values(views).find((view) => view.parentId === sourceBoard.id);
 
     if (!relatedSourceView) {
-      const sourceDbViews = (await charmClient.getViews({ pageId: sourceDatabaseId })) as BoardView[];
+      const sourceDbViews = (await charmClient.getViews({ pageId })) as BoardView[];
       relatedSourceView = sourceDbViews.find((view) => view.type === 'view');
     }
 
     // Load up blocks for the source view so they will appear
-    dispatch(initialDatabaseLoad({ pageId: sourceDatabaseId }));
+    dispatch(initialDatabaseLoad({ pageId }));
 
     const constructedView = createTableView({ board: rootBoard, activeView: relatedSourceView });
 
@@ -82,7 +82,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     constructedView.id = viewId;
     constructedView.title = sourcePage.title ?? '';
     constructedView.fields.viewType = relatedSourceView?.fields.viewType ?? 'table';
-    constructedView.fields.linkedSourceId = sourceDatabaseId;
+    constructedView.fields.linkedSourceId = sourceBoard.id;
     constructedView.fields.sourceType = 'board_page';
     constructedView.fields.groupById = relatedSourceView?.fields.groupById;
     constructedView.fields.visibleOptionIds = relatedSourceView?.fields.visibleOptionIds ?? [];

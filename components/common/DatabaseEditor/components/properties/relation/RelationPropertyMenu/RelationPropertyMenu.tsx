@@ -49,15 +49,15 @@ export function RelationPropertyMenu({
       {showSelectDatabaseMenu ? (
         <LinkCharmVerseDatabase
           placeholder='Link to a database'
-          onSelectLinkedDatabase={({ sourceDatabaseId, pageTitle = 'Untitled' }) => {
+          onSelectLinkedDatabase={({ pageId, pageTitle = 'Untitled' }) => {
             setRelationPropertyData(
               relationPropertyData
                 ? {
                     ...relationPropertyData,
-                    boardId: sourceDatabaseId
+                    boardId: pageId
                   }
                 : {
-                    boardId: sourceDatabaseId,
+                    boardId: pageId,
                     limit: 'multiple_page',
                     relatedPropertyId: null,
                     showOnRelatedBoard: false

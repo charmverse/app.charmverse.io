@@ -1,14 +1,12 @@
-import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BoardFields } from 'lib/databases/board';
-import type { BoardViewFields } from 'lib/databases/boardView';
+import type { BlockWithDetails } from 'lib/databases/block';
+import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
-import { isTruthy } from 'lib/utils/types';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -25,80 +23,34 @@ export const config = {
   }
 };
 
-async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<Block[] | { error: string }>) {
-  const blockId = req.query.id as string;
+async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[] | { error: string }>) {
+  const pageId = req.query.id as string;
+
   const page = await prisma.page.findFirstOrThrow({
     where: {
-      OR: [{ boardId: blockId }, { cardId: blockId }]
+      id: pageId
     },
     select: {
-      id: true
+      boardId: true,
+      cardId: true
     }
   });
 
   const computed = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: page.id,
+    resourceId: pageId,
     userId: req.session.user?.id
   });
 
   if (computed.read !== true) {
     return res.status(404).json({ error: 'page not found' });
   }
-  const blocks = await prisma.block.findMany({
-    where: {
-      OR: [{ id: blockId }, { rootId: blockId }, { parentId: blockId }]
-    }
-  });
 
-  const boardBlocks = blocks.filter((b) => b.type === 'board');
-  const connectedBoardIds = boardBlocks
-    .map((boardBlock) =>
-      (boardBlock.fields as unknown as BoardFields).cardProperties
-        .filter((cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData)
-        .map((cardProperty) => cardProperty.relationData?.boardId)
-    )
-    .flat()
-    .filter(isTruthy);
-  const connectedBoards = await prisma.block.findMany({
-    where: {
-      type: 'board',
-      id: {
-        in: connectedBoardIds
-      }
-    }
-  });
-
-  blocks.push(...connectedBoards);
-
-  const viewsWithLinkedSource = blocks.filter((b) => b.type === 'view' && (b.fields as BoardViewFields).linkedSourceId);
-
-  if (viewsWithLinkedSource.length > 0) {
-    const sourceDatabaseIds = viewsWithLinkedSource.map((b) => (b.fields as BoardViewFields).linkedSourceId as string);
-
-    const linkedDatabaseBlocks = await prisma.block.findMany({
-      where: {
-        OR: [
-          {
-            id: {
-              in: sourceDatabaseIds
-            }
-          },
-          {
-            rootId: {
-              in: sourceDatabaseIds
-            }
-          },
-          {
-            parentId: {
-              in: sourceDatabaseIds
-            }
-          }
-        ]
-      }
-    });
-
-    blocks.push(...linkedDatabaseBlocks);
+  const blockId = page.boardId || page.cardId;
+  if (!blockId) {
+    return res.status(404).json({ error: 'block not found' });
   }
+
+  const { blocks } = await getRelatedBlocks(blockId);
 
   return res.status(200).json(blocks);
 }

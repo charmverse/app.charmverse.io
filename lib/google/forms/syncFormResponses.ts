@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { blockToPrisma, prismaToBlock } from 'lib/databases/block';
 import { createBoard } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
@@ -188,8 +188,8 @@ async function notifyUsers({
 }: {
   spaceId: string;
   pageIds: string[];
-  blocks: Block[];
-  view: Block;
+  blocks: UIBlockWithDetails[];
+  view: UIBlockWithDetails;
 }) {
   relay.broadcast(
     {

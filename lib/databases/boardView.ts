@@ -1,6 +1,6 @@
 import { upperFirst } from 'lodash';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { createFilterGroup } from 'lib/databases/filterGroup';
@@ -39,11 +39,11 @@ export type BoardViewFields = {
   openPageIn?: 'full_page' | 'center_peek';
 };
 
-export type BoardView = Block & {
+export type BoardView = UIBlockWithDetails & {
   fields: BoardViewFields;
 };
 
-function createBoardView(block?: Block): BoardView {
+function createBoardView(block?: UIBlockWithDetails): BoardView {
   const fields: BoardViewFields = {
     viewType: block?.fields.viewType || 'board',
     groupById: block?.fields.groupById,

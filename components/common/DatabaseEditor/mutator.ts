@@ -2,7 +2,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 
 import charmClient from 'charmClient';
-import type { Block, BlockPatch } from 'lib/databases/block';
+import type { UIBlockWithDetails, BlockPatch } from 'lib/databases/block';
 import { createPatchesFromBlocks } from 'lib/databases/block';
 import type {
   Board,
@@ -27,17 +27,17 @@ import undoManager from './undomanager';
 import { Utils } from './utils';
 
 export interface BlockChange {
-  block: Block;
-  newBlock: Block;
+  block: UIBlockWithDetails;
+  newBlock: UIBlockWithDetails;
 }
 
-type BlockUpdater = (blocks: Block[]) => void;
+type BlockUpdater = (blocks: UIBlockWithDetails[]) => void;
 
 export type MutatorUpdaters = {
   patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void>;
-  patchBlocks(blocks: Block[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
-  insertBlock?: (block: Block, updater: BlockUpdater) => Promise<Block[]>;
-  insertBlocks?: (fbBlocks: Block[], updater: BlockUpdater) => Promise<Block[]>;
+  patchBlocks(blocks: UIBlockWithDetails[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void>;
+  insertBlock?: (block: UIBlockWithDetails, updater: BlockUpdater) => Promise<UIBlockWithDetails[]>;
+  insertBlocks?: (fbBlocks: UIBlockWithDetails[], updater: BlockUpdater) => Promise<UIBlockWithDetails[]>;
   deleteBlock?: (blockId: string, updater: BlockUpdater) => Promise<void>;
   deleteBlocks?: (blockIds: string[], updater: BlockUpdater) => Promise<void>;
 };
@@ -110,7 +110,7 @@ export class Mutator {
     }
   }
 
-  async updateBlock(newBlock: Block, oldBlock: Block, description: string): Promise<void> {
+  async updateBlock(newBlock: UIBlockWithDetails, oldBlock: UIBlockWithDetails, description: string): Promise<void> {
     const [updatePatch, undoPatch] = createPatchesFromBlocks(newBlock, oldBlock);
     await undoManager.perform(
       async () => {
@@ -124,7 +124,11 @@ export class Mutator {
     );
   }
 
-  async updateBlocks(newBlocks: Block[], oldBlocks: Block[], description: string): Promise<void> {
+  async updateBlocks(
+    newBlocks: UIBlockWithDetails[],
+    oldBlocks: UIBlockWithDetails[],
+    description: string
+  ): Promise<void> {
     if (newBlocks.length !== oldBlocks.length) {
       throw new Error('new and old blocks must have the same length when updating blocks');
     }
@@ -152,19 +156,19 @@ export class Mutator {
 
   // eslint-disable-next-line no-shadow
   async insertBlock(
-    block: Block,
+    block: UIBlockWithDetails,
     description = 'add',
-    afterRedo?: (block: Block) => Promise<void>,
-    beforeUndo?: (block: Block) => Promise<void>
-  ): Promise<Block> {
+    afterRedo?: (block: UIBlockWithDetails) => Promise<void>,
+    beforeUndo?: (block: UIBlockWithDetails) => Promise<void>
+  ): Promise<UIBlockWithDetails> {
     return undoManager.perform(
       async () => {
         const jsonres = await this.insertBlockApi(block, publishIncrementalUpdate);
-        const newBlock = jsonres[0] as Block;
+        const newBlock = jsonres[0] as UIBlockWithDetails;
         await afterRedo?.(newBlock);
         return newBlock;
       },
-      async (newBlock: Block) => {
+      async (newBlock: UIBlockWithDetails) => {
         await beforeUndo?.(newBlock);
         await this.deleteBlockApi(newBlock.id, publishIncrementalUpdate);
       },
@@ -175,9 +179,9 @@ export class Mutator {
 
   // eslint-disable-next-line no-shadow
   async insertBlocks(
-    blocks: Block[],
+    blocks: UIBlockWithDetails[],
     description = 'add',
-    afterRedo?: (blocks: Block[]) => Promise<void>,
+    afterRedo?: (blocks: UIBlockWithDetails[]) => Promise<void>,
     beforeUndo?: () => Promise<void>
   ) {
     return undoManager.perform(
@@ -186,7 +190,7 @@ export class Mutator {
         await afterRedo?.(newBlocks);
         return newBlocks;
       },
-      async (newBlocks: Block[]) => {
+      async (newBlocks: UIBlockWithDetails[]) => {
         await beforeUndo?.();
         const awaits = [];
         for (const block of newBlocks) {
@@ -200,7 +204,7 @@ export class Mutator {
   }
 
   async deleteBlock(
-    block: Pick<Block, 'type' | 'id'>,
+    block: Pick<UIBlockWithDetails, 'type' | 'id'>,
     description?: string,
     beforeRedo?: () => Promise<void>,
     afterUndo?: () => Promise<void>
@@ -401,13 +405,13 @@ export class Mutator {
       options: []
     };
 
-    const oldBlocks: Block[] = [board];
+    const oldBlocks: UIBlockWithDetails[] = [board];
 
     const newBoard = createBoard({ block: board });
 
     // insert at end of board.fields.cardProperties
     newBoard.fields.cardProperties.push(newTemplate);
-    const changedBlocks: Block[] = [newBoard];
+    const changedBlocks: UIBlockWithDetails[] = [newBoard];
 
     let description = 'add property';
 
@@ -436,10 +440,10 @@ export class Mutator {
       return;
     }
 
-    const oldBlocks: Block[] = [board];
+    const oldBlocks: UIBlockWithDetails[] = [board];
 
     const newBoard = createBoard({ block: board });
-    const changedBlocks: Block[] = [newBoard];
+    const changedBlocks: UIBlockWithDetails[] = [newBoard];
     const index = newBoard.fields.cardProperties.findIndex((o: IPropertyTemplate) => o.id === propertyId);
     if (index === -1) {
       Utils.assertFailure(`Cannot find template with id: ${propertyId}`);
@@ -483,10 +487,10 @@ export class Mutator {
   }
 
   async deleteProperty(board: Board, views: BoardView[], cards: Card[], propertyId: string) {
-    const oldBlocks: Block[] = [board];
+    const oldBlocks: UIBlockWithDetails[] = [board];
 
     const newBoard = createBoard({ block: board });
-    const changedBlocks: Block[] = [newBoard];
+    const changedBlocks: UIBlockWithDetails[] = [newBoard];
     newBoard.fields.cardProperties = board.fields.cardProperties.filter((o: IPropertyTemplate) => o.id !== propertyId);
 
     views.forEach((view) => {
@@ -558,13 +562,13 @@ export class Mutator {
     option: IPropertyOption,
     value: string
   ) {
-    const oldBlocks: Block[] = [board];
+    const oldBlocks: UIBlockWithDetails[] = [board];
 
     const newBoard = createBoard({ block: board });
     const newTemplate = newBoard.fields.cardProperties.find((o: IPropertyTemplate) => o.id === propertyTemplate.id)!;
     const newOption = newTemplate.options.find((o) => o.id === option.id)!;
     newOption.value = value;
-    const changedBlocks: Block[] = [newBoard];
+    const changedBlocks: UIBlockWithDetails[] = [newBoard];
 
     await this.updateBlocks(changedBlocks, oldBlocks, 'rename option');
 
@@ -625,8 +629,8 @@ export class Mutator {
     value?: string | string[] | number,
     description = 'change property'
   ) {
-    const oldBlocks: Block[] = [];
-    const newBlocks: Block[] = [];
+    const oldBlocks: UIBlockWithDetails[] = [];
+    const newBlocks: UIBlockWithDetails[] = [];
 
     cards
       .filter((card) => {
@@ -697,8 +701,8 @@ export class Mutator {
       newTemplate.relationData = relationData;
     }
 
-    const oldBlocks: Block[] = [board];
-    const newBlocks: Block[] = [newBoard];
+    const oldBlocks: UIBlockWithDetails[] = [board];
+    const newBlocks: UIBlockWithDetails[] = [newBoard];
 
     if (propertyTemplate.type !== newType) {
       if (propertyTemplate.type === 'select' || propertyTemplate.type === 'multiSelect') {
@@ -1071,11 +1075,11 @@ export class Mutator {
     asTemplate?: boolean;
     afterRedo?: (newCardId: string) => Promise<void>;
     beforeUndo?: () => Promise<void>;
-  }): Promise<[Block[], string]> {
-    const blocks = await charmClient.getSubtree({ pageId: cardId });
+  }): Promise<[UIBlockWithDetails[], string]> {
+    const blocks = await charmClient.getSubtree({ pageId: cardPage.id });
     const pageDetails = await charmClient.pages.getPage(cardId);
     const [newBlocks, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
-      Block[],
+      UIBlockWithDetails[],
       Card,
       Record<string, string>
     ];
@@ -1102,7 +1106,7 @@ export class Mutator {
     await this.insertBlocks(
       newBlocks,
       description,
-      async (respBlocks: Block[]) => {
+      async (respBlocks: UIBlockWithDetails[]) => {
         const card = respBlocks.find((block) => block.type === 'card');
         if (card) {
           await afterRedo?.(card.id);

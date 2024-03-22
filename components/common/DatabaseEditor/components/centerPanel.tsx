@@ -29,7 +29,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card, CardPage } from 'lib/databases/card';
@@ -323,7 +323,7 @@ function CenterPanel(props: Props) {
         await mutator.insertBlock(
           card,
           'add card',
-          async (block: Block) => {
+          async (block: UIBlockWithDetails) => {
             if (space) {
               await refreshPage(block.id);
             }

@@ -12,11 +12,9 @@ import type {
   RewardBlockInput,
   RewardBlockUpdateInput,
   RewardBlockWithTypedFields,
-  RewardsBoardBlock,
   RewardsBoardFFBlock
 } from 'lib/rewards/blocks/interfaces';
-
-import { getDefaultBoard } from '../components/RewardsBoard/utils/boardData';
+import { isTruthy } from 'lib/utils/types';
 
 import { useRewardsBoard } from './useRewardsBoard';
 
@@ -155,17 +153,15 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
     async (blockIds: string[]) => {
       await deleteRewardBlocks({ blockIds });
 
-      const deletedBlocks = rewardBlocks
-        ?.filter((block) => blockIds.includes(block.id))
-        ?.map((block) => ({ ...block, deletedAt: new Date().getTime() }));
+      const deletedBlocks = rewardBlocks?.filter((block) => blockIds.includes(block.id))?.filter(isTruthy);
 
       if (!deletedBlocks) {
         return [];
       }
 
-      updateBlockCache(deletedBlocks as RewardBlockWithTypedFields[]);
+      updateBlockCache(deletedBlocks);
 
-      return deletedBlocks as RewardBlockWithTypedFields[];
+      return deletedBlocks;
     },
     [deleteRewardBlocks, rewardBlocks, updateBlockCache]
   );
@@ -174,7 +170,7 @@ export function RewardBlocksProvider({ children }: { children: ReactNode }) {
     async (blockId: string) => {
       const deletedBlocks = await deleteBlocks([blockId]);
 
-      return deletedBlocks?.[0] as RewardBlockWithTypedFields;
+      return deletedBlocks?.[0];
     },
     [deleteBlocks]
   );

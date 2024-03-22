@@ -1,9 +1,9 @@
 export function generatePageContentWithInlineDatabaseRefs({
-  inlineDatabaseId,
-  inlineLinkedDatabaseId
+  inlineDBPageId,
+  inlineLinkedDBPageId
 }: {
-  inlineDatabaseId: string;
-  inlineLinkedDatabaseId: string;
+  inlineDBPageId: string;
+  inlineLinkedDBPageId: string;
 }) {
   return {
     type: 'doc',
@@ -19,7 +19,7 @@ export function generatePageContentWithInlineDatabaseRefs({
         ]
       },
       { type: 'paragraph', attrs: { track: [] } },
-      { type: 'inlineDatabase', attrs: { pageId: inlineDatabaseId } },
+      { type: 'inlineDatabase', attrs: { pageId: inlineDBPageId } },
       { type: 'paragraph', attrs: { track: [] } },
       {
         type: 'heading',
@@ -32,7 +32,7 @@ export function generatePageContentWithInlineDatabaseRefs({
         ]
       },
       { type: 'paragraph', attrs: { track: [] } },
-      { type: 'inlineDatabase', attrs: { pageId: inlineLinkedDatabaseId } },
+      { type: 'inlineDatabase', attrs: { pageId: inlineLinkedDBPageId } },
       { type: 'paragraph', attrs: { track: [] } }
     ]
   };
