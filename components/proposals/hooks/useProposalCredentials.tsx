@@ -75,7 +75,9 @@ export function useProposalCredentials() {
           spaceId: space.id,
           credentials: _issuableProposalCredentials.map((ic) => ({
             event: ic.event,
-            proposalId: ic.proposalId
+            proposalId: ic.proposalId,
+            credentialTemplateId: ic.credentialTemplateId,
+            recipientAddress: ic.recipientAddress
           }))
         });
         await refreshIssuableCredentials();

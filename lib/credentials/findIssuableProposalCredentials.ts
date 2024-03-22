@@ -13,8 +13,10 @@ import { arrayUtils } from '@charmverse/core/utilities';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
+import type { TypedPendingGnosisSafeTransaction } from './indexOnChainProposalCredential';
 import type { CredentialDataInput } from './schemas';
 
 export type ProposalWithJoinedData = {
@@ -39,6 +41,12 @@ export type IssuableProposalCredentialContent = {
   event: CredentialEventType;
 };
 
+// A partial subtype to reduce data passed around the system
+export type PartialIssuableProposalCredentialContent = Pick<
+  IssuableProposalCredentialContent,
+  'proposalId' | 'event' | 'credentialTemplateId' | 'recipientAddress'
+>;
+
 /**
  * @existingPendingTransactionEvents - Events with already pending credentials awaiting a Gnosis safe transaction
  */
@@ -50,7 +58,7 @@ type GenerateCredentialsParams = {
       'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
     >[];
   };
-  existingPendingTransactionEvents?: CredentialEventType[];
+  pendingIssuableCredentials?: PartialIssuableProposalCredentialContent[];
 };
 
 const events: CredentialEventType[] = ['proposal_created', 'proposal_approved'];
@@ -58,7 +66,7 @@ const events: CredentialEventType[] = ['proposal_created', 'proposal_approved'];
 export function generateCredentialInputsForProposal({
   proposal,
   space,
-  existingPendingTransactionEvents
+  pendingIssuableCredentials
 }: GenerateCredentialsParams): IssuableProposalCredentialContent[] {
   if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length) {
     return [];
@@ -90,7 +98,14 @@ export function generateCredentialInputsForProposal({
 
     proposal.selectedCredentialTemplates.forEach((credentialTemplateId) => {
       for (const event of issuableEvents) {
-        if (!existingPendingTransactionEvents?.includes(event)) {
+        if (
+          !pendingIssuableCredentials?.some(
+            (pic) =>
+              pic.credentialTemplateId === credentialTemplateId &&
+              pic.event === event &&
+              lowerCaseEqual(pic.recipientAddress, targetWallet)
+          )
+        ) {
           const credentialTemplate = templateMap.get(credentialTemplateId);
 
           const canIssueCredential =
@@ -209,29 +224,32 @@ export async function findSpaceIssuableProposalCredentials({
       }
     },
     select: {
-      credentialEvents: true,
+      credentialContent: true,
       proposalIds: true
     }
   });
 
   const pendingProposalsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
     for (const proposalId of pendingTx.proposalIds) {
+      const pendingProposalCredentials =
+        (pendingTx as TypedPendingGnosisSafeTransaction).credentialContent?.[proposalId] ?? [];
+
       if (!acc[proposalId]) {
         acc[proposalId] = [];
       }
 
-      acc[proposalId].push(...pendingTx.credentialEvents);
+      acc[proposalId].push(...pendingProposalCredentials);
     }
 
     return acc;
-  }, {} as Record<string, CredentialEventType[]>);
+  }, {} as Record<string, PartialIssuableProposalCredentialContent[]>);
 
   return proposals
     .map((p) =>
       generateCredentialInputsForProposal({
         proposal: p as ProposalWithJoinedData,
         space,
-        existingPendingTransactionEvents: pendingProposalsInSafe[p.id]
+        pendingIssuableCredentials: pendingProposalsInSafe[p.id]
       })
     )
     .flat();

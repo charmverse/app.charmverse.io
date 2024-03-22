@@ -1,12 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { CredentialEventType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
+import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
-import { sepolia } from 'wagmi';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -14,7 +13,7 @@ import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
-import type { IssuableProposalCredentialContent } from './findIssuableProposalCredentials';
+import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
 import type { ProposalCredential } from './schemas/proposal';
 import { decodeProposalCredential } from './schemas/proposal';
 
@@ -171,7 +170,11 @@ export async function indexProposalCredentials({
 export type GnosisSafeTransactionToIndex = Pick<
   PendingSafeTransaction,
   'safeTxHash' | 'chainId' | 'safeAddress' | 'spaceId' | 'schemaId'
-> & { credentials: Pick<IssuableProposalCredentialContent, 'proposalId' | 'event'>[] };
+> & { credentials: PartialIssuableProposalCredentialContent[] };
+
+export type TypedPendingGnosisSafeTransaction = Omit<PendingSafeTransaction, 'credentialContent'> & {
+  credentialContent: Record<string, PartialIssuableProposalCredentialContent[]>;
+};
 
 export async function saveGnosisSafeTransactionToIndex({
   chainId,
@@ -181,18 +184,21 @@ export async function saveGnosisSafeTransactionToIndex({
   schemaId,
   spaceId
 }: GnosisSafeTransactionToIndex): Promise<PendingSafeTransaction> {
-  const { proposalIds, credentialEvents } = credentials.reduce(
+  const { proposalIds, credentialContent } = credentials.reduce(
     (acc, val) => {
       acc.proposalIds.push(val.proposalId);
 
-      if (!acc.credentialEvents.includes(val.event)) {
-        acc.credentialEvents.push(val.event);
+      if (!acc.credentialContent[val.proposalId]) {
+        acc.credentialContent[val.proposalId] = [];
       }
+
+      acc.credentialContent[val.proposalId].push(val);
+
       return acc;
     },
     {
       proposalIds: [] as string[],
-      credentialEvents: [] as CredentialEventType[]
+      credentialContent: {} as Record<string, PartialIssuableProposalCredentialContent[]>
     }
   );
 
@@ -203,13 +209,13 @@ export async function saveGnosisSafeTransactionToIndex({
       safeTxHash,
       safeAddress,
       chainId,
-      credentialEvents,
       proposalIds,
-      processed: false
+      processed: false,
+      credentialContent
     }
   });
 
-  return pendingSafeTransactionToIndex;
+  return pendingSafeTransactionToIndex as TypedPendingGnosisSafeTransaction;
 }
 
 export async function indexSafeTransaction({

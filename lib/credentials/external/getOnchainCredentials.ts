@@ -5,7 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
-import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 import { isProdEnv } from 'config/constants';
 
@@ -23,10 +23,16 @@ import { externalCredentialChains, trackedSchemas } from './schemas';
 // For a specific profile, only refresh attestations every half hour
 const defaultEASCacheDuration = 1800;
 
-const graphQlClients: Record<ExternalCredentialChain | (typeof optimismSepolia)['id'], ApolloClient<any>> = {
+const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloClient<any>> = {
   [optimism.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism.easscan.org/graphql',
+    persistForSeconds: defaultEASCacheDuration,
+    skipRedisCache: !isProdEnv
+  }),
+  [sepolia.id]: new ApolloClientWithRedisCache({
+    cacheKeyPrefix: 'optimism-easscan',
+    uri: 'https://optimism-sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
     skipRedisCache: !isProdEnv
   }),
@@ -90,7 +96,7 @@ function getTrackedOnChainCredentials({
   chainId,
   wallets
 }: {
-  chainId: ExternalCredentialChain | EasSchemaChain;
+  chainId: ExternalCredentialChain;
   wallets: string[];
 }): Promise<EASAttestationFromApi[]> {
   const recipient = wallets.map((w) => getAddress(w));
@@ -140,7 +146,7 @@ export async function getAllOnChainAttestations({
   }
 
   const attestations = await Promise.all(
-    (isProdEnv ? externalCredentialChains : [...externalCredentialChains, optimismSepolia.id]).map((chainId) =>
+    externalCredentialChains.map((chainId) =>
       getTrackedOnChainCredentials({ chainId, wallets }).catch((err) => {
         log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
           wallets,
