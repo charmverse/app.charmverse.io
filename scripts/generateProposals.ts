@@ -15,6 +15,7 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
       userId: space.createdBy,
       proposalStatus: 'published',
       authors: [space.createdBy],
+      title: `Proposal ${i}`,
       selectedCredentialTemplateIds ,
       evaluationInputs: [
         {
@@ -69,9 +70,9 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
 //   }
 // }).then(console.log)
 
-const spaceDomain = 'expected-pink-parrotfish'
+const spaceDomain = 'quick-jade-halibut'
 
-generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['25894011-8b37-4bfd-b3e3-1871193f5c91'] })
+generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['40e46dcc-f67a-4926-a250-1eb88752a870'] })
 .then(console.log);
 
 // prisma.proposal.updateMany({

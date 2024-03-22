@@ -77,6 +77,27 @@ describe('findIssuableProposalCredentialIfNecessary', () => {
       }
     });
 
+    await prisma.pendingSafeTransaction.create({
+      data: {
+        chainId: 1,
+        safeAddress: '0x1234',
+        safeTxHash: '0x12345',
+        schemaId: '0x1234',
+        proposalIds: [proposal.id],
+        space: { connect: { id: space.id } },
+        credentialContent: {
+          [proposal.id]: [
+            {
+              credentialTemplateId: secondCredentialTemplate.id,
+              event: 'proposal_created',
+              proposalId: proposal.id,
+              recipientAddress: secondAuthorWalletAddress
+            }
+          ] as PartialIssuableProposalCredentialContent[]
+        }
+      }
+    });
+
     const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
 
     // Missing 1 event from first credential, and both events from second credential
@@ -156,21 +177,6 @@ describe('findIssuableProposalCredentialIfNecessary', () => {
             Description: credentialTemplate.description,
             Name: credentialTemplate.name,
             Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
-            URL: getPagePermalink({ pageId: proposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: proposal.id,
-          recipientUserId: secondAuthor.id,
-          recipientAddress: secondAuthorWalletAddress,
-          credentialTemplateId: secondCredentialTemplate.id,
-          event: 'proposal_created',
-          pageId: proposal.page.id,
-          credential: {
-            Description: secondCredentialTemplate.description,
-            Name: secondCredentialTemplate.name,
-            Organization: secondCredentialTemplate.organization,
             Event: `${proposalCreatedVerb} Proposal`,
             URL: getPagePermalink({ pageId: proposal.page.id })
           }
