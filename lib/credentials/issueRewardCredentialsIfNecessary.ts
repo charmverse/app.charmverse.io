@@ -6,7 +6,6 @@ import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
-import { publishCredentialIssuableEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { signAndPublishCharmverseCredential } from './attestOffchain';
 import type { EasSchemaChain } from './connectors';
@@ -60,7 +59,7 @@ export async function issueRewardCredentialsIfNecessary({
       space: {
         select: {
           id: true,
-          credentialsChainId: true,
+          useOnchainCredentials: true,
           features: true,
           credentialTemplates: {
             where: {
@@ -73,6 +72,10 @@ export async function issueRewardCredentialsIfNecessary({
       }
     }
   });
+
+  if (baseReward.space.useOnchainCredentials) {
+    return;
+  }
 
   if (!baseReward.page) {
     throw new DataNotFoundError(`Reward with id ${rewardId} has no matching page`);
@@ -167,43 +170,20 @@ export async function issueRewardCredentialsIfNecessary({
             Event: eventLabel,
             rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
           };
-
-          if (baseReward.space.credentialsChainId) {
-            await publishCredentialIssuableEvent({
-              spaceId: baseReward.space.id,
-              data: {
-                credential: {
-                  chainId: baseReward.space.credentialsChainId as EasSchemaChain,
-                  type: 'reward',
-                  credentialInputs: {
-                    recipient: targetWallet.address,
-                    data: credentialContent
-                  }
-                },
-                credentialMetadata: {
-                  event,
-                  credentialTemplateId: credentialTemplate.id,
-                  submissionId: credentialTemplate.applicationId,
-                  userId: submitterUserId
-                }
-              }
-            });
-          } else {
-            // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-            await signAndPublishCharmverseCredential({
-              chainId: optimism.id,
-              recipient: targetWallet.address,
-              credential: {
-                type: 'reward',
-                data: credentialContent
-              },
-              credentialTemplateId: credentialTemplate.id,
-              event,
-              recipientUserId: submitterUserId,
-              rewardApplicationId: credentialTemplate.applicationId,
-              pageId: baseReward.page.id
-            });
-          }
+          // Iterate through credentials one at a time so we can ensure they're properly created and tracked
+          await signAndPublishCharmverseCredential({
+            chainId: optimism.id,
+            recipient: targetWallet.address,
+            credential: {
+              type: 'reward',
+              data: credentialContent
+            },
+            credentialTemplateId: credentialTemplate.id,
+            event,
+            recipientUserId: submitterUserId,
+            rewardApplicationId: credentialTemplate.applicationId,
+            pageId: baseReward.page.id
+          });
         }
       } catch (e) {
         log.error('Failed to issue credential', {

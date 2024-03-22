@@ -72,8 +72,8 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
 
 const spaceDomain = 'quick-jade-halibut'
 
-generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['40e46dcc-f67a-4926-a250-1eb88752a870'] })
-.then(console.log);
+// generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['40e46dcc-f67a-4926-a250-1eb88752a870'] })
+// .then(console.log);
 
 // prisma.proposal.updateMany({
 //   where: {
