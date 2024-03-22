@@ -76,11 +76,10 @@ function ViewHeader(props: Props) {
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
-  async function addPageFromTemplate(pageId: string) {
+  async function addCardFromTemplate(card: Card) {
     const [blocks] = await mutator.duplicateCard({
       board: activeBoard as Board,
-      cardId: pageId,
-      cardPage: pages[pageId] as PageMeta
+      card
     });
     const newPageId = blocks[0].id;
     await refreshPage(newPageId);
@@ -220,7 +219,7 @@ function ViewHeader(props: Props) {
               {activeBoard?.fields.sourceType !== 'proposals' && (
                 <NewCardButton
                   addCard={props.addCard}
-                  addCardFromTemplate={addPageFromTemplate}
+                  addCardFromTemplate={addCardFromTemplate}
                   addCardTemplate={props.addCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}

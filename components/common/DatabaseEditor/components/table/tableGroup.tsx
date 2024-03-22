@@ -7,8 +7,6 @@ import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 
-import type { PageListItemsRecord } from '../../interfaces';
-
 import TableGroupHeaderRow from './tableGroupHeaderRow';
 import TableRows from './tableRows';
 

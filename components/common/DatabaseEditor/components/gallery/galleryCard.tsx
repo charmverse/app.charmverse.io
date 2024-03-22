@@ -7,7 +7,6 @@ import { useTrashPages } from 'charmClient/hooks/pages';
 import { hoverIconsStyle } from 'components/common/Icons/hoverIconsStyle';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
@@ -15,7 +14,6 @@ import { Constants } from 'lib/databases/constants';
 import { isTouchScreen } from 'lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';
-import type { PageListItemsRecord } from '../../interfaces';
 import PropertyValueElement from '../propertyValueElement';
 
 const StyledBox = styled(Box)`
@@ -35,11 +33,9 @@ type Props = {
 
 const GalleryCard = React.memo((props: Props) => {
   const { card, board } = props;
-  const { pages } = usePages();
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
   const [isDragging, isOver, cardRef] = useSortable('card', card, !props.readOnly && !isTouchScreen(), props.onDrop);
-  const cardPage = pages[card.id];
 
   const visiblePropertyTemplates = (props.visiblePropertyTemplates || []).filter(
     (property) => property.id !== Constants.titleColumnId
@@ -50,7 +46,7 @@ const GalleryCard = React.memo((props: Props) => {
     className += ' dragover';
   }
 
-  const galleryImageUrl: null | string | undefined = cardPage?.headerImage || cardPage?.galleryImage;
+  const galleryImageUrl = card.galleryImage;
 
   const deleteCard = async () => {
     try {
@@ -60,7 +56,7 @@ const GalleryCard = React.memo((props: Props) => {
     }
   };
 
-  return cardPage ? (
+  return card ? (
     <StyledBox
       className={className}
       onClick={(e: React.MouseEvent) => props.onClick(e, card)}
@@ -68,7 +64,7 @@ const GalleryCard = React.memo((props: Props) => {
       ref={cardRef}
       data-test={`gallery-card-${card.id}`}
     >
-      {!props.readOnly && <KanbanPageActionsMenuButton page={cardPage} onClickDelete={deleteCard} />}
+      {!props.readOnly && <KanbanPageActionsMenuButton page={card} onClickDelete={deleteCard} />}
       {galleryImageUrl && (
         <div className='gallery-image'>
           <img className='ImageElement' src={galleryImageUrl} alt='Gallery item' />
@@ -76,11 +72,9 @@ const GalleryCard = React.memo((props: Props) => {
       )}
       {props.visibleTitle && (
         <div className='gallery-title'>
-          {cardPage?.icon ? (
-            <PageIcon isEditorEmpty={!cardPage?.hasContent} pageType='card' icon={cardPage.icon} />
-          ) : undefined}
+          {card.icon ? <PageIcon isEditorEmpty={!card.hasContent} pageType='card' icon={card.icon} /> : undefined}
           <div key='__title'>
-            {cardPage?.title || <FormattedMessage id='KanbanCard.untitled' defaultMessage='Untitled' />}
+            {card.title || <FormattedMessage id='KanbanCard.untitled' defaultMessage='Untitled' />}
           </div>
         </div>
       )}
@@ -89,8 +83,8 @@ const GalleryCard = React.memo((props: Props) => {
           {visiblePropertyTemplates.map((template) => (
             <PropertyValueElement
               key={template.id}
-              updatedAt={cardPage?.updatedAt.toString() || ''}
-              updatedBy={cardPage?.updatedBy || ''}
+              updatedAt={card.updatedAt.toString() || ''}
+              updatedBy={card.updatedBy || ''}
               board={board}
               readOnly
               card={card}

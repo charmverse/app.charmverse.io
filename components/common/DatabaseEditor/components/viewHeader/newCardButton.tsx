@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { KeyboardArrowDown } from '@mui/icons-material';
 import { ButtonGroup, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -15,7 +14,7 @@ import { useAppSelector } from '../../store/hooks';
 
 type Props = {
   addCard: () => void;
-  addCardFromTemplate: (cardTemplateId: string) => void;
+  addCardFromTemplate: (card: Card) => void;
   addCardTemplate: () => void;
   deleteCardTemplate: (cardTemplateId: string) => void;
   showCard: (cardId: string) => void;
@@ -35,8 +34,6 @@ const NewCardButton = memo(
     const cardTemplates: Card[] = useAppSelector((state) => selectBoardTemplates(state, templatesBoardId || ''));
     const buttonRef = useRef<HTMLDivElement>(null);
     const { pages } = usePages();
-
-    const cardTemplatesPages = cardTemplates.map((c) => pages[c.id]).filter((p) => p !== undefined) as PageMeta[];
 
     const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
 
@@ -62,7 +59,7 @@ const NewCardButton = memo(
           createTemplate={addCardTemplate}
           editTemplate={showCard}
           deleteTemplate={deleteCardTemplate}
-          templates={cardTemplatesPages}
+          templates={cardTemplates}
           anchorEl={buttonRef.current as Element}
           popupState={popupState}
           boardTitle={boardTitle}

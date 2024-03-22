@@ -409,7 +409,7 @@ function PropertyValueElement(props: Props) {
         displayType={displayType}
       />
     );
-  } else if (propertyTemplate.relationData && propertyTemplate.type === 'relation') {
+  } else if (propertyTemplate.type === 'relation') {
     return (
       <RelationPropertyPagesAutocomplete
         boardProperties={board.fields.cardProperties}

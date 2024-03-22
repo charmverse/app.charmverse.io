@@ -8,7 +8,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { useCallback, useMemo } from 'react';
 import { useIntl } from 'react-intl';
 
-import { usePages } from 'hooks/usePages';
 import { useUserPreferences } from 'hooks/useUserPreferences';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
@@ -81,8 +80,6 @@ function CalendarFullView(props: Props): JSX.Element | null {
     initialDate = new Date();
   }
 
-  const { pages } = usePages();
-
   let isEditable = true;
   if (
     readOnly ||
@@ -96,7 +93,6 @@ function CalendarFullView(props: Props): JSX.Element | null {
   const myEventsList = useMemo(
     () =>
       cards.flatMap((card): EventInput[] => {
-        const cardPage = pages[card.id];
         let dateFrom = new Date(card.createdAt || 0);
         let dateTo = new Date(card.createdAt || 0);
         if (dateDisplayProperty && dateDisplayProperty?.type === 'updatedTime') {
@@ -124,22 +120,23 @@ function CalendarFullView(props: Props): JSX.Element | null {
         return [
           {
             id: card.id,
-            title: cardPage?.title || '',
-            extendedProps: { icon: cardPage?.icon },
+            title: card.title || 'Untitled',
+            extendedProps: { icon: card.icon },
             properties: card.fields.properties,
+            updatedAt: card.updatedAt,
             allDay: true,
             start: dateFrom,
             end: dateTo
           }
         ];
       }),
-    [cards, pages, dateDisplayProperty]
+    [cards, dateDisplayProperty]
   );
 
   const renderEventContent = useCallback(
     (eventProps: EventContentArg): JSX.Element | null => {
       const { event } = eventProps;
-      const page = pages[event.id];
+      const card = cards.find((c) => c.id === event.id);
 
       return (
         <div>
@@ -148,28 +145,27 @@ function CalendarFullView(props: Props): JSX.Element | null {
               {event.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
-          {visiblePropertyTemplates.map((template) => {
-            const card = cards.find((o) => o.id === event.id) || cards[0];
-
-            return (
-              <PropertyValueElement
-                board={board}
-                key={template.id}
-                readOnly
-                card={card}
-                updatedAt={page?.updatedAt.toString() ?? ''}
-                updatedBy={page?.updatedBy ?? ''}
-                propertyTemplate={template}
-                showEmptyPlaceholder
-                showTooltip
-                displayType='calendar'
-              />
-            );
-          })}
+          {card &&
+            visiblePropertyTemplates.map((template) => {
+              return (
+                <PropertyValueElement
+                  board={board}
+                  key={template.id}
+                  readOnly
+                  card={card}
+                  updatedAt={card.updatedAt.toString() ?? ''}
+                  updatedBy={card.updatedBy ?? ''}
+                  propertyTemplate={template}
+                  showEmptyPlaceholder
+                  showTooltip
+                  displayType='calendar'
+                />
+              );
+            })}
         </div>
       );
     },
-    [board, cards, visiblePropertyTemplates, intl, pages]
+    [board, cards, visiblePropertyTemplates, intl]
   );
 
   const eventClick = useCallback(

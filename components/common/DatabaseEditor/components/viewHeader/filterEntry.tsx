@@ -38,7 +38,6 @@ import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blo
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
-import type { PageListItemsRecord } from '../../interfaces';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 import { RelatedPagesSelect } from './RelatedPagesSelect';

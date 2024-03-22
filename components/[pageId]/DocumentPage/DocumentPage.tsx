@@ -13,7 +13,7 @@ import { handleImageFileDrop } from 'components/common/CharmEditor/components/@b
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import AddBountyButton from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
+import { AddBountyButton } from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
@@ -395,7 +395,7 @@ function DocumentPageComponent({
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
                     />
-                    <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                    <AddBountyButton readOnly={readOnly} card={card} />
                   </>
                 )}
                 {proposalId && (

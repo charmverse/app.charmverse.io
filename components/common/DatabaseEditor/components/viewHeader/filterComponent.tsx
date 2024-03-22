@@ -18,7 +18,6 @@ import { createFilterClause } from 'lib/databases/filterClause';
 import type { FilterGroup, FilterGroupOperation } from 'lib/databases/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/databases/filterGroup';
 
-import type { PageListItemsRecord } from '../../interfaces';
 import mutator from '../../mutator';
 
 import FilterEntry from './filterEntry';

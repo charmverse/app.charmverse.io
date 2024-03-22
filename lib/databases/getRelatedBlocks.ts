@@ -90,6 +90,8 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       cardId: true,
       boardId: true,
       hasContent: true,
+      galleryImage: true,
+      headerImage: true,
       type: true,
       updatedAt: true,
       updatedBy: true

@@ -18,12 +18,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import type { PageListItem } from 'components/common/PagesList';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import type { UIBlockWithDetails } from 'lib/databases/block';
-import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { Board } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
-import { isTruthy } from 'lib/utils/types';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 

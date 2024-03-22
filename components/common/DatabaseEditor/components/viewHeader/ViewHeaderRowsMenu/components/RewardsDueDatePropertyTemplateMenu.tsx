@@ -1,7 +1,6 @@
 import { Box } from '@mui/material';
 import type { DateTime } from 'luxon';
 
-import { usePages } from 'hooks/usePages';
 import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 
@@ -20,9 +19,8 @@ export function RewardsDueDatePropertyTemplateMenu({
   onAccept: (value: DateTime | null) => void;
   lastChild: boolean;
 }) {
-  const { pages } = usePages();
   const propertyValue = cards[0].fields.properties[propertyTemplate.id] || '';
-  const rewardId = pages[cards[0]?.id]?.bountyId;
+  const rewardId = cards[0].bountyId;
 
   if (!rewardId) {
     return null;
