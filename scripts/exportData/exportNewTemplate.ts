@@ -1,21 +1,12 @@
-import { prisma } from '@charmverse/core/prisma-client';
-import { exportWorkspacePagesToDisk } from 'lib/templates/exportWorkspacePages';
-import { importWorkspacePages } from 'lib/templates/importWorkspacePages';
+import { exportSpaceData } from 'lib/templates/exportSpaceData';
+import { importSpaceData } from 'lib/templates/importSpaceData';
 
-exportWorkspacePagesToDisk({
-  sourceSpaceIdOrDomain: 'cvt-template-gaming',
-  exportName: 'templateGaming'
-}).then(() => console.log('Export complete'));
+// exportSpaceData({
+//   sourceSpaceIdOrDomain: 'standard-crimson-gamefowl',
+//   exportName: 'templateCustomDemo',
+// }).then(() => console.log('Export complete'));
 
-// importWorkspacePages({
-//   targetSpaceIdOrDomain: 'standard-crimson-gamefowl',
-//   exportName: 'templateCustomDemo'
-// }).then(() => console.log('Import complete'));
-
-// prisma.page.deleteMany({
-//   where: {
-//     space: {
-//       domain: 'example-space'
-//     }
-//   }
-// }).then(() => console.log('Cleanup complete'))
+importSpaceData({
+  targetSpaceIdOrDomain: 'example-space',
+  exportName: 'templateCustomDemo'
+}).then(() => console.log('Import complete'));
