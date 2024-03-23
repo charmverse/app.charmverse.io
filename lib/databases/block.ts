@@ -66,22 +66,26 @@ export type UIBlockWithDetails = Block & {
 // cant think of a better word for this.. handle some edge cases with types from the prisma client
 export type PrismaBlockSortOf = Omit<PrismaBlock, 'fields' | 'type'> & { fields: any; type: BlockTypes };
 
-export function createBlock(block?: Partial<Block>): Block {
+export function createBlock(block?: Partial<UIBlockWithDetails>): UIBlockWithDetails {
   const createdAt = block?.createdAt ?? Date.now();
   const updatedAt = block?.updatedAt || createdAt;
   return {
     id: block?.id || v4(),
+    createdAt,
+    createdBy: block?.createdBy || '',
+    deletedAt: block?.deletedAt || null,
+    fields: block?.fields ? { ...block?.fields } : {},
+    galleryImage: block?.galleryImage || '',
+    icon: block?.icon,
+    title: block?.title || '',
+    pageId: block?.pageId,
+    pageType: block?.pageType,
     spaceId: block?.spaceId || '',
     parentId: block?.parentId || '',
     rootId: block?.rootId || '',
-    createdBy: block?.createdBy || '',
-    updatedBy: block?.updatedBy || '',
     type: block?.type || 'unknown',
-    fields: block?.fields ? { ...block?.fields } : {},
-    title: block?.title || '',
-    createdAt,
     updatedAt,
-    deletedAt: block?.deletedAt || null
+    updatedBy: block?.updatedBy || ''
   };
 }
 
@@ -132,9 +136,25 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
 }
 
 // export to BlockUncheckedCreateInput instead of regular Block so that the json 'fields' value is compatible with Prisma ops
-export function blockToPrisma(fbBlock: Block): PrismaBlockSortOf {
+export function blockToPrisma(fbBlock: UIBlockWithDetails): PrismaBlockSortOf {
   return {
     id: fbBlock.id,
+    parentId: fbBlock.parentId || '',
+    rootId: fbBlock.rootId,
+    spaceId: fbBlock.spaceId,
+    updatedBy: fbBlock.updatedBy,
+    createdBy: fbBlock.createdBy,
+    schema: 1,
+    type: fbBlock.type,
+    title: fbBlock.title,
+    fields: fbBlock.fields,
+    deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
+    createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
+  };
+}
+export function blockToPrismaPartial(fbBlock: Partial<UIBlockWithDetails>): Partial<PrismaBlockSortOf> {
+  return {
     parentId: fbBlock.parentId || '',
     rootId: fbBlock.rootId,
     spaceId: fbBlock.spaceId,

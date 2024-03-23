@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/databases/board';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';
+import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 import { upsertBlock } from 'lib/rewards/blocks/upsertBlock';
 import { upsertBlocks } from 'lib/rewards/blocks/upsertBlocks';
 
@@ -19,7 +20,7 @@ describe('reward blocks - updateBlocks', () => {
 
     const textPropertId = v4();
 
-    const propertiesData = {
+    const propertiesData: RewardBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -72,7 +73,7 @@ describe('reward blocks - updateBlocks', () => {
       }
     });
 
-    const propertiesUpdateData = {
+    const propertiesUpdateData: RewardBlockUpdateInput = {
       id: block.id,
       spaceId: space.id,
       title: 'Update',
@@ -92,7 +93,7 @@ describe('reward blocks - updateBlocks', () => {
       }
     };
 
-    const proposalPropertiesUpdateData = {
+    const proposalPropertiesUpdateData: RewardBlockUpdateInput = {
       type: 'card',
       id: reward.id,
       fields: {

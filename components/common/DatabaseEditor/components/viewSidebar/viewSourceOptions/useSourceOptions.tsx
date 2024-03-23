@@ -161,7 +161,7 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
 
   async function onCreateDatabase({ sourceType }: { sourceType?: BoardFields['sourceType'] } = {}) {
     if (!rootBoard.pageType?.match('board')) {
-      throw new Error('No board page type exists');
+      throw new Error(`No board page type exists: ${rootBoard.pageType}`);
     }
 
     const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType } };

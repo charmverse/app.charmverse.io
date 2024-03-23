@@ -36,7 +36,7 @@ export type RewardFields = RewardPropertyValues & { isAssigned?: boolean };
 
 export type RewardBlockInput = {
   id?: string;
-  type: string;
+  type: 'board' | 'view' | 'card';
   spaceId?: string;
   title?: string;
   schema?: number;

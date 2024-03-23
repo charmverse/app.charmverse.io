@@ -96,6 +96,7 @@ export type BoardFields = {
 };
 
 type Board = UIBlockWithDetails & {
+  pageType: Exclude<UIBlockWithDetails['pageType'], undefined>;
   fields: BoardFields;
 };
 
@@ -140,8 +141,8 @@ function createBoard({
   }
 
   return {
+    pageType: 'board',
     ...createBlock(block),
-    type: 'board',
     fields: {
       showDescription: block?.fields?.showDescription ?? false,
       description: block?.fields?.description ?? '',
