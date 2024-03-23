@@ -29,6 +29,9 @@ export type UpdateableSpaceFields = Partial<
     | 'customDomain'
     | 'snapshotDomain'
     | 'enableTestnets'
+    | 'useOnchainCredentials'
+    | 'credentialsChainId'
+    | 'credentialsWallet'
   >
 >;
 
@@ -124,7 +127,10 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       primaryMemberIdentity: updates.primaryMemberIdentity,
       enableTestnets: updates.enableTestnets,
       requireMembersTwoFactorAuth: updates.requireMembersTwoFactorAuth,
-      credentialLogo: updates.credentialLogo
+      credentialLogo: updates.credentialLogo,
+      useOnchainCredentials: updates.useOnchainCredentials,
+      credentialsChainId: updates.credentialsChainId,
+      credentialsWallet: updates.credentialsWallet?.toLowerCase()
     }
   });
 

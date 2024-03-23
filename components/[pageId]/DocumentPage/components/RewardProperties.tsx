@@ -49,7 +49,6 @@ export function RewardProperties(props: {
     }
   }, [initialReward]);
 
-  const { mutate: refreshPagePermissionsList } = useGetPermissions(pageId);
   const { isSpaceMember } = useIsSpaceMember();
 
   const debouncedUpdateReward = useMemo(() => debouncePromise(updateReward, 500), [updateReward]);

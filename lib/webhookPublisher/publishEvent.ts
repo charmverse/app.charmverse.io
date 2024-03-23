@@ -405,17 +405,3 @@ export async function publishCardEvent(context: CardEventContext) {
     }
   }
 }
-
-export type CredentialIssuableContext = {
-  spaceId: string;
-  data: OnChainAttestationInputWithMetadata;
-};
-
-export async function publishCredentialIssuableEvent(context: CredentialIssuableContext) {
-  const space = await getSpaceEntity(context.spaceId);
-  return publishWebhookEvent(context.spaceId, {
-    scope: WebhookEventNames.CredentialIssuable,
-    space,
-    data: context.data
-  });
-}

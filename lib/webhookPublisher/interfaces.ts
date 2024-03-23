@@ -134,9 +134,7 @@ export enum WebhookEventNames {
   DocumentMentionCreated = 'document.mention.created',
   DocumentApplicationCommentCreated = 'document.application_comment.created',
   CardPersonPropertyAssigned = 'card.person_property.assigned',
-  VoteCreated = 'vote.created',
-  // Event specific to credentials
-  CredentialIssuable = 'credential.issuable'
+  VoteCreated = 'vote.created'
 }
 
 export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
@@ -286,10 +284,6 @@ export type WebhookEvent = WebhookEventSharedProps &
         assignedUser: UserEntity;
         personProperty: CardPropertyEntity;
         user: UserEntity;
-      }
-    | {
-        scope: WebhookEventNames.CredentialIssuable;
-        data: OnChainAttestationInputWithMetadata;
       }
   );
 

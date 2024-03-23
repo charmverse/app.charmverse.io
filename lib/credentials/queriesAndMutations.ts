@@ -129,7 +129,7 @@ const GET_CREDENTIALS = gql`
   }
 `;
 
-export async function getCharmverseCredentialsByWallets({
+export async function getCharmverseOffchainCredentialsByWallets({
   wallets
 }: {
   wallets: string[];
