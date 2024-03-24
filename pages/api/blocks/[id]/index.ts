@@ -5,7 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
-import { buildBlockWithDetails } from 'lib/databases/buildBlockWithDetails';
+import { applyPageToBlock } from 'lib/databases/block';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { modifyChildPages } from 'lib/pages/modifyChildPages';
@@ -46,7 +46,7 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     throw new DataNotFoundError('Block not found');
   }
 
-  const result = page ? buildBlockWithDetails(block, page) : (block as BlockWithDetails);
+  const result = page ? applyPageToBlock(block, page) : (block as BlockWithDetails);
 
   return res.status(200).json(result);
 }

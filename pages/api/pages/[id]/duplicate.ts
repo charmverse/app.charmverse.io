@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prismaToBlock } from 'lib/databases/block';
+import { blockToUIBlock, applyPageToBlock } from 'lib/databases/block';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -62,16 +62,8 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
 
   relay.broadcast(
     {
-      type: 'pages_created',
-      payload: result.pages
-    },
-    pageToDuplicate.spaceId
-  );
-
-  relay.broadcast(
-    {
       type: 'blocks_created',
-      payload: result.blocks.map((block) => prismaToBlock(block))
+      payload: result.blocks.map((block, index) => blockToUIBlock(applyPageToBlock(block, result.pages[index])))
     },
     pageToDuplicate.spaceId
   );

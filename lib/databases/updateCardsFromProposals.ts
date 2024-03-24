@@ -8,7 +8,7 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
-import { prismaToBlock } from 'lib/databases/block';
+import { prismaToBlock, blockToUIBlock, applyPageToBlock } from 'lib/databases/block';
 import { extractCardProposalProperties } from 'lib/databases/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/databases/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
@@ -672,14 +672,7 @@ export async function updateCardsFromProposals({
     relay.broadcast(
       {
         type: 'blocks_created',
-        payload: newCards.map((card) => prismaToBlock(card.block))
-      },
-      spaceId
-    );
-    relay.broadcast(
-      {
-        type: 'pages_created',
-        payload: newCards.map((card) => card.page)
+        payload: newCards.map((card) => blockToUIBlock(applyPageToBlock(card.block, card.page)))
       },
       spaceId
     );

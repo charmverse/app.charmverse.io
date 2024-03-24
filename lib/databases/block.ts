@@ -1,8 +1,9 @@
-import type { PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
+import type { PageType, Block as PrismaBlock, Page } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
 import type { OptionalFalseyFields } from 'lib/utils/objects';
+import { replaceS3Domain } from 'lib/utils/url';
 
 // export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
@@ -185,4 +186,54 @@ export function prismaToBlock(block: PrismaBlock): Block {
     createdAt: block.createdAt.getTime(),
     updatedAt: block.updatedAt.getTime()
   };
+}
+
+export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
+  let fields = block.fields as UIBlockWithDetails['fields'];
+  if ('headerImage' in fields) {
+    // reassign fields to avoid mutation error
+    fields = {
+      ...fields,
+      headerImage: replaceS3Domain(fields.headerImage)
+    };
+  }
+  return {
+    ...block,
+    deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
+    createdAt: new Date(block.createdAt).getTime(),
+    updatedAt: new Date(block.updatedAt).getTime(),
+    title: block.title || '',
+    type: block.type as UIBlockWithDetails['type'],
+    fields
+  };
+}
+
+// mutative method, for performance reasons
+export function applyPageToBlock(
+  block: PrismaBlock,
+  page: Pick<
+    Page,
+    | 'title'
+    | 'headerImage'
+    | 'galleryImage'
+    | 'hasContent'
+    | 'updatedBy'
+    | 'updatedAt'
+    | 'type'
+    | 'id'
+    | 'bountyId'
+    | 'icon'
+  >
+): BlockWithDetails {
+  const blockWithDetails = block as BlockWithDetails;
+  blockWithDetails.bountyId = page.bountyId || undefined;
+  blockWithDetails.pageId = page.id;
+  blockWithDetails.icon = page.icon || undefined;
+  blockWithDetails.galleryImage = replaceS3Domain(page.headerImage || page.galleryImage || undefined);
+  blockWithDetails.hasContent = page.hasContent;
+  blockWithDetails.title = page.title || block.title;
+  blockWithDetails.pageType = page.type;
+  blockWithDetails.updatedAt = page.updatedAt;
+  blockWithDetails.updatedBy = page.updatedBy;
+  return blockWithDetails;
 }

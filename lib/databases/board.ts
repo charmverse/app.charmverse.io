@@ -143,6 +143,7 @@ function createBoard({
   return {
     pageType: 'board',
     ...createBlock(block),
+    type: 'board',
     fields: {
       showDescription: block?.fields?.showDescription ?? false,
       description: block?.fields?.description ?? '',

@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import { prismaToBlock } from 'lib/databases/block';
+import { applyPageToBlock, blockToUIBlock, prismaToBlock } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
 import {
@@ -230,9 +230,21 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
           id: {
             in: newBlocks.map((b) => b.id)
           }
+        },
+        include: {
+          page: true
         }
       });
 
+      relay.broadcast(
+        {
+          type: 'blocks_created',
+          payload: blocksToNotify.map((block) =>
+            block.page ? blockToUIBlock(applyPageToBlock(block, block.page)) : prismaToBlock(block)
+          )
+        },
+        space.id
+      );
       relay.broadcast(
         {
           type: 'blocks_created',
@@ -242,7 +254,7 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
       );
     })(),
     (async () => {
-      const createdPages = await getPageMetaList(newBlocks.map((b) => b.id));
+      const createdPages = await getPageMetaList(newBlocks.filter((b) => b.type === 'board').map((b) => b.id));
       if (createdPages.length) {
         relay.broadcast(
           {

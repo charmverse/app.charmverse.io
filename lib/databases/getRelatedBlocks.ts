@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { applyPageToBlock } from 'lib/databases/block';
 import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from './block';
 import type { BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
-import { buildBlockWithDetails } from './buildBlockWithDetails';
 
 type SourceType = 'proposals';
 
@@ -121,7 +121,7 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     .map((block) => {
       const page = pagesMap[block.id];
       if (page) {
-        return buildBlockWithDetails(block, page);
+        return applyPageToBlock(block, page);
       }
       return block as BlockWithDetails;
     })
