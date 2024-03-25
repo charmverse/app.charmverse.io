@@ -103,6 +103,35 @@ export function createProjectYupSchema({
     .concat(yup.object(yupProjectSchemaObject));
 }
 
+export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
+  return {
+    blog: projectWithMembers.blog,
+    communityUrl: projectWithMembers.communityUrl,
+    description: projectWithMembers.description,
+    excerpt: projectWithMembers.excerpt,
+    github: projectWithMembers.github,
+    name: projectWithMembers.name,
+    otherUrl: projectWithMembers.otherUrl,
+    productUrl: projectWithMembers.productUrl,
+    twitter: projectWithMembers.twitter,
+    walletAddress: projectWithMembers.walletAddress,
+    website: projectWithMembers.website,
+    projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
+      return {
+        email: projectMember.email,
+        github: projectMember.github,
+        linkedin: projectMember.linkedin,
+        name: projectMember.name,
+        otherUrl: projectMember.otherUrl,
+        previousProjects: projectMember.previousProjects,
+        telegram: projectMember.telegram,
+        twitter: projectMember.twitter,
+        walletAddress: projectMember.walletAddress
+      };
+    })
+  } as ProjectValues;
+}
+
 export function useProjectForm(options?: {
   defaultValues?: ProjectValues;
   projectWithMembers?: ProjectWithMembers;
@@ -117,32 +146,7 @@ export function useProjectForm(options?: {
     if (!projectWithMembers) {
       return undefined;
     }
-    return {
-      blog: projectWithMembers.blog,
-      communityUrl: projectWithMembers.communityUrl,
-      description: projectWithMembers.description,
-      excerpt: projectWithMembers.excerpt,
-      github: projectWithMembers.github,
-      name: projectWithMembers.name,
-      otherUrl: projectWithMembers.otherUrl,
-      productUrl: projectWithMembers.productUrl,
-      twitter: projectWithMembers.twitter,
-      walletAddress: projectWithMembers.walletAddress,
-      website: projectWithMembers.website,
-      projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
-        return {
-          email: projectMember.email,
-          github: projectMember.github,
-          linkedin: projectMember.linkedin,
-          name: projectMember.name,
-          otherUrl: projectMember.otherUrl,
-          previousProjects: projectMember.previousProjects,
-          telegram: projectMember.telegram,
-          twitter: projectMember.twitter,
-          walletAddress: projectMember.walletAddress
-        };
-      })
-    } as ProjectValues;
+    return convertToProjectValues(projectWithMembers);
   }, [projectWithMembers]);
 
   const form = useForm({

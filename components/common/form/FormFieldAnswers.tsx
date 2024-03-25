@@ -3,8 +3,10 @@ import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+import { Controller, FormProvider } from 'react-hook-form';
 
+import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
+import { useProject } from 'components/settings/projects/hooks/useProject';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';

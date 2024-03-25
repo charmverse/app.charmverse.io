@@ -8,7 +8,7 @@ import { type ProjectEditorFieldConfig, type ProjectUpdatePayload } from 'compon
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
-import { useProjectForm } from './useProjectForm';
+import { useProjectForm, convertToProjectValues } from './useProjectForm';
 
 export function useProject({
   projectId,
@@ -24,15 +24,16 @@ export function useProject({
 
   const form = useProjectForm({
     projectWithMembers,
-    fieldConfig
+    fieldConfig,
+    defaultRequired: true
   });
 
   useEffect(() => {
-    if (projectId) {
-      form.reset(projectWithMembers);
+    if (projectId && projectWithMembers) {
+      form.reset(convertToProjectValues(projectWithMembers));
       form.trigger();
     }
-  }, [projectId, fieldConfig]);
+  }, [projectId]);
 
   const { showMessage } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
@@ -92,7 +93,6 @@ export function useProject({
         }))
       };
       onProjectUpdate(updatePayload);
-
       form.reset(updatePayload, {
         keepDirty: false,
         keepTouched: false
