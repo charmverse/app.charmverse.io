@@ -8,6 +8,7 @@ import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { isTruthy } from 'lib/utils/types';
 
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -55,14 +56,22 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   const block = blocks.find((b) => b.id === blockId);
   if ((block?.fields as BoardFields).sourceType === 'proposals') {
     // Filter blocks based on proposal permissions
-    const permissions = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
+    const permissionsById = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
       spaceId: page.spaceId,
       userId: req.session.user?.id
     });
     // Remmeber to allow normal blocks that do not have a page, like views, to be shown
     const filtered = blocks.filter(
-      (b) => typeof b.syncWithPageId === 'undefined' || !!permissions[b.syncWithPageId]?.view
+      (b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view
     );
+    return res.status(200).json(filtered);
+  } else {
+    const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
+      pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
+      userId: req.session.user?.id
+    });
+    // Remmeber to allow normal blocks that do not have a page, like views, to be shown
+    const filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
     return res.status(200).json(filtered);
   }
 }
