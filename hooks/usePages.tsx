@@ -58,7 +58,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
   const { sendMessage, subscribe } = useWebSocketClient();
   const { trigger: trashPages } = useTrashPages();
-  const pagesDispatched = useRef(false);
   // temporary optimization: load non-card pages first
   const { data: initialPages } = useInitialPagesForSpace(currentSpace?.id);
   const {
