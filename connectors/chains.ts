@@ -9,7 +9,6 @@ import {
   bsc,
   celo,
   fantom,
-  goerli,
   gnosis,
   harmonyOne,
   mainnet,
@@ -85,18 +84,6 @@ export const RPC: Record<string, IChainDetails> = {
     unlockNetwork: true,
     hypersubNetwork: true
   },
-  GOERLI: {
-    ...EVM_DEFAULT,
-    chainId: goerli.id,
-    viem: goerli,
-    chainName: 'Ethereum - Goerli',
-    alchemyUrl: 'https://eth-goerli.g.alchemy.com',
-    rpcUrls: ['https://goerli-light.eth.linkpool.io/'],
-    blockExplorerUrls: ['https://goerli.etherscan.io'],
-    iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
-    testnet: true,
-    shortName: 'gor'
-  },
   SEPOLIA: {
     ...EVM_DEFAULT,
     chainId: sepolia.id,
@@ -157,7 +144,7 @@ export const RPC: Record<string, IChainDetails> = {
     ...EVM_DEFAULT,
     chainId: baseSepolia.id,
     viem: baseSepolia,
-    chainName: 'Base - Goerli Testnet',
+    chainName: 'Base - Sepolia Testnet',
     alchemyUrl: 'https://base-sepolia.g.alchemy.com',
     rpcUrls: ['https://sepolia.base.org'],
     gnosisUrl: 'https://safe-transaction-base-sepolia.safe.global',
