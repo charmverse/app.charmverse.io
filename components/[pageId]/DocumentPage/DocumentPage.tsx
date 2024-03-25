@@ -446,6 +446,7 @@ function DocumentPageComponent({
                   ) : (
                     <ProposalFormFieldAnswers
                       pageId={page.id}
+                      key={projectId}
                       enableComments={proposal.permissions.comment}
                       proposalId={proposal.id}
                       formFields={proposal.form?.formFields ?? []}
