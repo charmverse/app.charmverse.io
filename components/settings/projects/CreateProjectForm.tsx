@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Box, Divider, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -37,6 +37,7 @@ export function CreateProjectForm({
     try {
       const createdProjectWithMember = await createProject(project);
       onSave?.(createdProjectWithMember);
+      setOpen(false);
       mutate(
         (cachedData) => {
           if (!cachedData) {

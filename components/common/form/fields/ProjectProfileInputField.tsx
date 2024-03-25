@@ -1,14 +1,15 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import MuiAddIcon from '@mui/icons-material/Add';
-import { Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { FormProvider } from 'react-hook-form';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import { CreateProjectForm } from 'components/settings/projects/CreateProjectForm';
-import { useGetDefaultProject } from 'components/settings/projects/hooks/useGetDefaultProject';
 import { useProject } from 'components/settings/projects/hooks/useProject';
+import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -19,25 +20,29 @@ function ProjectProfileFormAnswers({
   selectedProject: ProjectWithMembers;
   fieldConfig: ProjectEditorFieldConfig;
 }) {
-  const { isAddingMember, isTeamLead, control, onProjectMemberAdd, onProjectMemberRemove, onProjectUpdate } =
-    useProject({
-      projectId: selectedProject.id,
-      fieldConfig,
-      defaultRequired: true
-    });
+  const { form, isTeamLead } = useProject({ projectWithMembers: selectedProject });
 
   return (
-    <ProjectFormAnswers
-      control={control}
-      defaultRequired
-      onMemberRemove={onProjectMemberRemove}
-      onMemberAdd={onProjectMemberAdd}
-      onChange={onProjectUpdate}
-      isTeamLead={isTeamLead}
-      fieldConfig={fieldConfig}
-      values={selectedProject}
-      disableAddMemberButton={isAddingMember}
-    />
+    <FormProvider {...form}>
+      <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+        <ProjectFormAnswers defaultRequired isTeamLead={isTeamLead} fieldConfig={fieldConfig} />
+      </Box>
+    </FormProvider>
+  );
+}
+
+function CreateProjectFormWithProvider({
+  onCancel,
+  onSave
+}: {
+  onSave: (project: ProjectWithMembers) => void;
+  onCancel: VoidFunction;
+}) {
+  const form = useProjectForm();
+  return (
+    <FormProvider {...form}>
+      <CreateProjectForm isOpen onSave={onSave} onCancel={onCancel} />
+    </FormProvider>
   );
 }
 
@@ -50,7 +55,6 @@ export function ProjectProfileInputField({
   };
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
-  const defaultProject = useGetDefaultProject();
   const { data } = useGetProjects();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(null);
   const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
@@ -103,13 +107,13 @@ export function ProjectProfileInputField({
       </Select>
       {selectedProject && (
         <ProjectProfileFormAnswers
+          key={selectedProject.id}
           selectedProject={selectedProject}
           fieldConfig={formField.fieldConfig as ProjectEditorFieldConfig}
         />
       )}
       {showCreateProjectForm && (
-        <CreateProjectForm
-          project={defaultProject}
+        <CreateProjectFormWithProvider
           onSave={(project) => {
             onChange({ projectId: project.id });
             setShowCreateProjectForm(false);

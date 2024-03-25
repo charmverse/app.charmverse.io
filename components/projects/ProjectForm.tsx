@@ -2,7 +2,7 @@ import { Stack, Typography } from '@mui/material';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 
-import type { ProjectEditorFieldConfig, ProjectFieldConfig, ProjectUpdatePayload, ProjectValues } from './interfaces';
+import type { ProjectEditorFieldConfig } from './interfaces';
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectMemberFields';
 
@@ -43,7 +43,7 @@ export function ProjectFormEditor({
   defaultRequired?: boolean;
 }) {
   return (
-    <Stack gap={2} p={2}>
+    <Stack gap={2}>
       <Typography variant='h6'>Project Info</Typography>
       <ProjectFieldsEditor
         defaultRequired={defaultRequired}
