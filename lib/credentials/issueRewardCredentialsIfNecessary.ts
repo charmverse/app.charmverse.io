@@ -171,7 +171,7 @@ export async function issueRewardCredentialsIfNecessary({
             rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
           };
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-          await signAndPublishCharmverseCredential({
+          await signPublishAndRecordCharmverseCredential({
             chainId: optimism.id,
             recipient: targetWallet.address,
             credential: {

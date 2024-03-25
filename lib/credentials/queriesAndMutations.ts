@@ -271,7 +271,7 @@ export async function getExternalCredentialsByWallets({
       variables: {
         filter: {
           where: {
-            schemaId: { in: [proposalCredentialSchemaId, rewardCredentialSchemaId, externalCredentialSchemaId] },
+            schemaId: { in: [externalCredentialSchemaId] },
             recipient: { in: wallets.map((w) => w.toLowerCase()) },
             issuer: { equalTo: credentialWalletAddress }
           }

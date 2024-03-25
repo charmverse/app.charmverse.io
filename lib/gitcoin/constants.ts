@@ -1,4 +1,6 @@
-export const GITCOIN_SUPPORTED_CHAINS = [1, 5, 10, 250] as const;
+import { endpoints } from './graphql/endpoints';
+
+export const GITCOIN_SUPPORTED_CHAINS = Object.keys(endpoints).map(Number) as (keyof typeof endpoints)[];
 
 export const PROJECT_REGISTRY_ADDRESSES = {
   // MAINNET

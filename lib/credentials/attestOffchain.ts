@@ -12,6 +12,7 @@ import { Wallet, providers } from 'ethers';
 import { v4 as uuid } from 'uuid';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
+import type { GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { isValidChainAddress } from 'lib/tokens/validation';
 
@@ -133,12 +134,17 @@ export async function signCharmverseAttestation({
  * Sign the credential offchain and send to IPFS
  *
  * Only useful for scripts. Prefer signPublishAndRecordCharmverseCredential for production use with existing users
- * */
+ */
 export async function signAndPublishCharmverseCredential({
   chainId,
   credential,
-  recipient
-}: CharmVerseCredentialInput) {
+  recipient,
+  metadata,
+  source
+}: CharmVerseCredentialInput & {
+  source: 'gitcoin' | 'questbook';
+  metadata: Pick<GitcoinProjectDetails, 'projectId' | 'chainId'> & Partial<GitcoinProjectDetails['metadata']>;
+}) {
   const signedCredential = await signCharmverseAttestation({ chainId, credential, recipient });
 
   const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {

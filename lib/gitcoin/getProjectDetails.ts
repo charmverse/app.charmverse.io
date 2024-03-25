@@ -30,6 +30,7 @@ export type ProjectMetadata = {
 
 export type GitcoinProjectDetails = {
   projectId: number;
+  chainId: number;
   metadata: ProjectMetadata;
   owners: Owners;
   metadataUrl: string;
@@ -69,13 +70,14 @@ export async function getProjectDetails({
 
   return {
     projectId,
+    chainId,
     metadata,
     owners: owners.length ? owners : onchainOwners,
     metadataUrl: getIpfsFileUrl(ipfsHash)
   };
 }
 
-async function getProjectOwners(ownerAddresses: Owners, chainId: number) {
+export async function getProjectOwners(ownerAddresses: Owners, chainId: number) {
   const promises = ownerAddresses.map((address) => getSafeOwners({ address, chainId }));
   const results = await Promise.all(promises);
 

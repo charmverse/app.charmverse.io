@@ -6,11 +6,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import type { EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import { getAllOnChainAttestations } from './external/getOnchainCredentials';
 import { getGitcoinCredentialsByWallets } from './getGitcoinCredentialsByWallets';
-import {
-  getCharmverseCredentialsByWallets,
-  getExternalCredentialsByWallets,
-  getCharmverseOffchainCredentialsByWallets
-} from './queriesAndMutations';
+import { getExternalCredentialsByWallets, getCharmverseOffchainCredentialsByWallets } from './queriesAndMutations';
 
 // Use these wallets to return at least 1 of all the tracked credentials
 const testWallets = [
