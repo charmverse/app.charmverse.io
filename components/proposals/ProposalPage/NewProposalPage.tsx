@@ -142,6 +142,7 @@ export function NewProposalPage({
   if (!disabledTooltip && !isProposalFormFieldsValid && (projectField ? !isProposalProjectFieldValid : false)) {
     disabledTooltip = 'Please provide correct values for all proposal form fields';
   }
+
   if (!canCreateProposal) {
     disabledTooltip = 'You do not have permission to create proposal';
   }

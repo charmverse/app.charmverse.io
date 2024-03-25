@@ -13,7 +13,7 @@ import {
 import type { ProjectField } from 'components/projects/ProjectFields';
 import { ProjectFieldProperties } from 'components/projects/ProjectFields';
 import type { ProjectMemberField } from 'components/projects/ProjectMemberFields';
-import { ProjectMemberFieldProperties } from 'components/projects/ProjectMemberFields';
+import { projectMemberFieldProperties } from 'components/projects/ProjectMemberFields';
 
 import { useGetDefaultProject } from './useGetDefaultProject';
 
@@ -70,7 +70,7 @@ export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectEd
     }
   });
 
-  ProjectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
+  projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
     const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
       required: false,
       hidden: false

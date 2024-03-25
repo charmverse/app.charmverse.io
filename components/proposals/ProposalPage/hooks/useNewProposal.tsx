@@ -1,6 +1,6 @@
-import { uuid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import { useCallback, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
@@ -46,7 +46,7 @@ export function useNewProposal({ newProposal }: Props) {
           private: false,
           required: true,
           id: uuid(),
-          fieldConfig: {}
+          fieldConfig: { projectMember: {} }
         } as FormFieldInput
       ]
     : [];

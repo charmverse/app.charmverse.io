@@ -92,6 +92,7 @@ export function useProject({
         }))
       };
       onProjectUpdate(updatePayload);
+
       form.reset(updatePayload, {
         keepDirty: false,
         keepTouched: false

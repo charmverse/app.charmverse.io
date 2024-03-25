@@ -25,7 +25,7 @@ export type ProjectMemberPayload = Pick<
 
 export type ProjectMemberField = keyof ProjectMemberPayload;
 
-export const ProjectMemberFieldProperties: ProjectFieldProperty[] = [
+export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
     label: 'Name'
@@ -100,7 +100,7 @@ export function ProjectMemberFieldAnswers({
       disabled={disabled}
       name={`projectMembers[${projectMemberIndex}]`}
       fieldConfig={fieldConfig}
-      properties={ProjectMemberFieldProperties}
+      properties={projectMemberFieldProperties}
     />
   );
 }
@@ -117,7 +117,7 @@ export function ProjectMemberFieldsEditor({
   return (
     <FieldsEditor
       defaultRequired={defaultRequired}
-      properties={ProjectMemberFieldProperties}
+      properties={projectMemberFieldProperties}
       values={values}
       onChange={onChange}
     />
