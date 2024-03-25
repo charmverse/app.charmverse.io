@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
@@ -11,22 +11,13 @@ import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 
 export function CreateProjectForm({
   onCancel,
-  isOpen,
   onSave
 }: {
   onSave?: (project: ProjectWithMembers) => void;
   onCancel?: VoidFunction;
-  isOpen?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const { trigger: createProject, isMutating } = useCreateProject();
-
-  useEffect(() => {
-    if (isOpen) {
-      setOpen(isOpen);
-    }
-  }, [isOpen]);
-
   const { formState, getValues } = useFormContext<ProjectValues>();
 
   const isValid = formState.isValid;
@@ -70,28 +61,41 @@ export function CreateProjectForm({
   }
 
   return (
-    <Stack gap={2}>
+    <>
       <ProjectFormAnswers defaultRequired={false} fieldConfig={defaultProjectFieldConfig} isTeamLead />
-      <Stack gap={1} flexDirection='row'>
-        <Button
-          disabledTooltip={!isValid ? 'Please fill out all required fields' : ''}
-          disabled={isMutating || !isValid}
-          onClick={saveProject}
-        >
-          Save
-        </Button>
-        <Button
-          disabled={isMutating}
-          variant='outlined'
-          color='error'
-          onClick={() => {
-            setOpen(false);
-            onCancel?.();
-          }}
-        >
-          Cancel
-        </Button>
-      </Stack>
-    </Stack>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          py: 1,
+          px: { xs: 5, md: 0 },
+          position: 'sticky',
+          bottom: '0',
+          background: (theme) => theme.palette.background.paper,
+          borderTop: (theme) => `1px solid ${theme.palette.divider}`
+        }}
+      >
+        <Stack gap={1} flexDirection='row'>
+          <Button
+            disabled={isMutating}
+            variant='outlined'
+            color='error'
+            onClick={() => {
+              setOpen(false);
+              onCancel?.();
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            disabledTooltip={!isValid ? 'Please fill out all required fields' : ''}
+            disabled={isMutating || !isValid}
+            onClick={saveProject}
+          >
+            Save
+          </Button>
+        </Stack>
+      </Box>
+    </>
   );
 }
