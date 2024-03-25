@@ -12,7 +12,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
 }: {
   onChange?: (values: Values) => void;
   values: Values;
-  properties: ProjectFieldProperty<keyof Values & string>[];
+  properties: ProjectFieldProperty[];
   defaultRequired?: boolean;
 }) {
   return (

@@ -1,9 +1,13 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
-import type { Control } from 'react-hook-form';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
-import type { ProjectEditorFieldConfig, ProjectFieldProperty, ProjectValues } from './interfaces';
+import type {
+  ProjectEditorFieldConfig,
+  ProjectFieldConfig,
+  ProjectFieldProperty,
+  ProjectUpdatePayload
+} from './interfaces';
 
 export type ProjectMemberPayload = Pick<
   ProjectMember,
@@ -21,7 +25,7 @@ export type ProjectMemberPayload = Pick<
 
 export type ProjectMemberField = keyof ProjectMemberPayload;
 
-export const ProjectMemberFieldProperties: ProjectFieldProperty<ProjectMemberField>[] = [
+export const ProjectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
     label: 'Name'
@@ -80,35 +84,21 @@ export const projectMemberDefaultValues: ProjectMemberPayload = {
 };
 
 export function ProjectMemberFieldAnswers({
-  onChange,
-  values,
   fieldConfig,
   defaultRequired,
   projectMemberIndex,
-  control
+  disabled
 }: {
-  control: Control<ProjectValues, any>;
   projectMemberIndex: number;
-  fieldConfig?: ProjectEditorFieldConfig['projectMember'];
-  onChange?: (projectMember: ProjectMemberPayload) => void;
-  values: ProjectMemberPayload;
+  fieldConfig?: ProjectFieldConfig;
   defaultRequired?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}
-      control={control}
+      disabled={disabled}
       name={`projectMembers[${projectMemberIndex}]`}
-      onChange={
-        onChange
-          ? (_values) => {
-              onChange?.({
-                ...values,
-                ..._values
-              });
-            }
-          : undefined
-      }
       fieldConfig={fieldConfig}
       properties={ProjectMemberFieldProperties}
     />

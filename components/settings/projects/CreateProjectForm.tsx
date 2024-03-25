@@ -1,46 +1,42 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Divider, Stack } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import { defaultProjectFieldConfig, type ProjectValues, type ProjectWithMembers } from 'components/projects/interfaces';
+import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
+import { defaultProjectFieldConfig } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
-import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
-
-import { useGetDefaultProject } from './hooks/useGetDefaultProject';
-import { useProjectForm } from './hooks/useProjectForm';
 
 export function CreateProjectForm({
   onCancel,
-  project: _project = null,
+  isOpen,
   onSave
 }: {
   onSave?: (project: ProjectWithMembers) => void;
   onCancel?: VoidFunction;
-  project?: ProjectValues | null;
+  isOpen?: boolean;
 }) {
-  const defaultProject = useGetDefaultProject();
-  const [project, setProject] = useState<ProjectValues | null>(_project);
+  const [open, setOpen] = useState(false);
   const { trigger: createProject, isMutating } = useCreateProject();
 
-  const { control, isValid } = useProjectForm({
-    defaultValues: defaultProject,
-    fieldConfig: defaultProjectFieldConfig,
-    defaultRequired: false
-  });
+  useEffect(() => {
+    if (isOpen) {
+      setOpen(isOpen);
+    }
+  }, [isOpen]);
 
+  const { formState, getValues } = useFormContext<ProjectValues>();
+
+  const isValid = formState.isValid;
   const { mutate } = useGetProjects();
 
   async function saveProject() {
-    if (!project) {
-      return;
-    }
-
+    const project = getValues();
     try {
       const createdProjectWithMember = await createProject(project);
       onSave?.(createdProjectWithMember);
-      setProject(null);
       mutate(
         (cachedData) => {
           if (!cachedData) {
@@ -58,70 +54,43 @@ export function CreateProjectForm({
     }
   }
 
-  return (
-    <>
-      {project && (
-        <Box mb={3}>
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-          <ProjectFormAnswers
-            defaultRequired={false}
-            fieldConfig={defaultProjectFieldConfig}
-            onChange={setProject}
-            isTeamLead
-            control={control}
-            onMemberRemove={(memberIndex) => {
-              setProject({
-                ...project,
-                projectMembers: project.projectMembers.filter((_, index) => index !== memberIndex)
-              });
-            }}
-            onMemberAdd={() => {
-              setProject({
-                ...project,
-                projectMembers: [...project.projectMembers, projectMemberDefaultValues]
-              });
-            }}
-            values={project}
-          />
-        </Box>
-      )}
+  if (!open) {
+    return (
+      <Button
+        disabled={isMutating}
+        onClick={() => {
+          setOpen(true);
+        }}
+        startIcon={<AddIcon fontSize='small' />}
+      >
+        Add a project
+      </Button>
+    );
+  }
 
-      {project ? (
-        <Stack gap={1} flexDirection='row'>
-          <Button
-            disabledTooltip={!isValid ? 'Please fill out all required fields' : ''}
-            disabled={isMutating || !isValid}
-            onClick={saveProject}
-          >
-            Save
-          </Button>
-          <Button
-            disabled={isMutating}
-            variant='outlined'
-            color='error'
-            onClick={() => {
-              setProject(null);
-              onCancel?.();
-            }}
-          >
-            Cancel
-          </Button>
-        </Stack>
-      ) : (
+  return (
+    <Stack gap={2}>
+      <ProjectFormAnswers defaultRequired={false} fieldConfig={defaultProjectFieldConfig} isTeamLead />
+      <Stack gap={1} flexDirection='row'>
+        <Button
+          disabledTooltip={!isValid ? 'Please fill out all required fields' : ''}
+          disabled={isMutating || !isValid}
+          onClick={saveProject}
+        >
+          Save
+        </Button>
         <Button
           disabled={isMutating}
+          variant='outlined'
+          color='error'
           onClick={() => {
-            setProject(defaultProject);
+            setOpen(false);
+            onCancel?.();
           }}
-          startIcon={<AddIcon fontSize='small' />}
         >
-          Add a project
+          Cancel
         </Button>
-      )}
-    </>
+      </Stack>
+    </Stack>
   );
 }

@@ -22,7 +22,7 @@ export type ProjectPayload = Pick<
 
 export type ProjectField = keyof ProjectPayload;
 
-export const ProjectFieldProperties: ProjectFieldProperty<ProjectField>[] = [
+export const ProjectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
     label: 'Project Name'
@@ -89,20 +89,17 @@ export const projectDefaultValues = {
 
 export function ProjectFieldAnswers({
   fieldConfig,
-  onChange,
-  control,
-  defaultRequired
+  defaultRequired,
+  disabled
 }: {
-  control: Control<ProjectValues, any>;
-  onChange?: (project: Partial<ProjectPayload>) => void;
+  disabled?: boolean;
   fieldConfig?: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
   return (
     <FieldAnswers
-      control={control}
       defaultRequired={defaultRequired}
-      onChange={onChange}
+      disabled={disabled}
       fieldConfig={fieldConfig}
       properties={ProjectFieldProperties}
     />
