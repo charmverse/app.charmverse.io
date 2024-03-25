@@ -24,13 +24,6 @@ const sourceDatabaseCardsCount = 5;
 // 1 refers to the database definition block
 const totalSourceBlocks = 1 + sourceDatabaseCardsCount + sourceDatabaseViewsCount;
 
-let linkedDatabase: Block;
-let linkedDatabaseViews: Block[];
-const linkedDatabaseViewsCount = 1;
-
-// 1 refers to the database definition block
-const totalLinkedBlocks = 1 + linkedDatabaseViewsCount;
-
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
     isAdmin: true
@@ -70,47 +63,6 @@ beforeAll(async () => {
   expect(database).toBeDefined();
   expect(databaseCards.length).toEqual(sourceDatabaseCardsCount);
   expect(databaseViews.length).toBe(sourceDatabaseViewsCount);
-
-  // Setup linked DB
-  const generatedLinkedDatabase = await generateBoard({
-    createdBy: adminUser.id,
-    spaceId: space.id,
-    views: linkedDatabaseViewsCount,
-    cardCount: 0
-  });
-
-  const generatedLinkedDatabaseBlocks = await prisma.block.findMany({
-    where: {
-      OR: [
-        {
-          id: generatedLinkedDatabase.id
-        },
-        {
-          rootId: generatedLinkedDatabase.id
-        }
-      ]
-    }
-  });
-
-  expect(generatedLinkedDatabaseBlocks).toHaveLength(2);
-
-  linkedDatabase = generatedLinkedDatabaseBlocks.find((b) => b.id === generatedLinkedDatabase.id) as Block;
-  expect(linkedDatabase).toBeDefined();
-
-  const linkedView = generatedLinkedDatabaseBlocks.find((b) => b.type === 'view') as Block;
-  const updatedLinkedView = await prisma.block.update({
-    where: {
-      id: linkedView.id
-    },
-    data: {
-      fields: {
-        ...(linkedView.fields as any),
-        linkedSourceId: generatedDatabase.id
-      }
-    }
-  });
-
-  linkedDatabaseViews = [updatedLinkedView];
 });
 
 describe('GET /api/blocks/[id]/subtree', () => {
@@ -125,27 +77,7 @@ describe('GET /api/blocks/[id]/subtree', () => {
 
     expect(databaseBlocks).toEqual(
       expect.arrayContaining(
-        [database, ...databaseViews, ...databaseCards].map((block) =>
-          expect.objectContaining({ ...block, createdAt: expect.any(String), updatedAt: expect.any(String) })
-        )
-      )
-    );
-  });
-
-  it('Should get all board, view and cards blocks for a database and all blocks for any linked inline databases if a user can access the database, responding 200', async () => {
-    const adminCookie = await loginUser(adminUser.id);
-
-    const foundLinkedDatabaseBlocks = (
-      await request(baseUrl).get(`/api/blocks/${linkedDatabase.id}/subtree`).set('Cookie', adminCookie).expect(200)
-    ).body as Block[];
-
-    expect(foundLinkedDatabaseBlocks).toHaveLength(totalSourceBlocks + totalLinkedBlocks);
-
-    expect(foundLinkedDatabaseBlocks).toEqual(
-      expect.arrayContaining(
-        [database, ...databaseViews, ...databaseCards, linkedDatabase, ...linkedDatabaseViews].map((block) =>
-          expect.objectContaining({ ...block, createdAt: expect.any(String), updatedAt: expect.any(String) })
-        )
+        [database, ...databaseViews, ...databaseCards].map((block) => expect.objectContaining({ id: block.id }))
       )
     );
   });

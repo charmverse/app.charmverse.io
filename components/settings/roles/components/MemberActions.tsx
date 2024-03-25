@@ -9,7 +9,6 @@ import { useState } from 'react';
 import ElementDeleteIcon from 'components/common/form/ElementDeleteIcon';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { StyledListItemText } from 'components/common/StyledListItemText';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useRoles } from 'hooks/useRoles';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -27,7 +26,6 @@ export function MemberActions({
   memberRoleId?: string;
   readOnly?: boolean;
 }) {
-  const { space } = useCurrentSpace();
   const { showMessage } = useSnackbar();
   const { unassignRole } = useRoles();
   const { makeAdmin, makeGuest, makeMember, members, banFromSpace, removeFromSpace, getMemberById } = useMembers();
@@ -40,13 +38,13 @@ export function MemberActions({
   const removedMember = removedMemberId ? getMemberById(removedMemberId) : null;
   const bannedMember = bannedMemberId ? getMemberById(bannedMemberId) : null;
   const closed = deletePopupState.close;
+  const hasMultipleAdmins = members.filter((m) => m.isAdmin).length > 1;
 
   deletePopupState.close = () => {
     setRemovedMemberId(null);
     closed();
   };
 
-  const spaceOwner = space?.createdBy;
   const totalAdmins = members.filter((m) => m.isAdmin).length;
 
   async function removeFromSpaceHandler() {
@@ -79,10 +77,6 @@ export function MemberActions({
 
   async function handleMenuItemClick(action: RoleAction) {
     try {
-      if (!space) {
-        throw new Error('Space not found');
-      }
-
       switch (action) {
         case 'makeAdmin':
           await makeAdmin([member.id]);
@@ -124,10 +118,10 @@ export function MemberActions({
       case 'makeMember':
         return !readOnly;
       case 'removeFromSpace': {
-        return !readOnly && spaceOwner !== member.id;
+        return !readOnly && hasMultipleAdmins;
       }
       case 'banFromSpace': {
-        return !readOnly && spaceOwner !== member.id;
+        return !readOnly && hasMultipleAdmins;
       }
       default:
         return false;

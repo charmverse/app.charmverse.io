@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { Board, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
 import { createBoard } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
@@ -9,15 +9,6 @@ import type { Card } from 'lib/databases/card';
 import { createCard } from 'lib/databases/card';
 import { createFilterClause } from 'lib/databases/filterClause';
 import { createFilterGroup } from 'lib/databases/filterGroup';
-
-import type { CheckboxBlock } from '../blocks/checkboxBlock';
-import { createCheckboxBlock } from '../blocks/checkboxBlock';
-import type { DividerBlock } from '../blocks/dividerBlock';
-import { createDividerBlock } from '../blocks/dividerBlock';
-import type { ImageBlock } from '../blocks/imageBlock';
-import { createImageBlock } from '../blocks/imageBlock';
-import type { TextBlock } from '../blocks/textBlock';
-import { createTextBlock } from '../blocks/textBlock';
 
 class TestBlockFactory {
   static createBoard(): Board {
@@ -139,36 +130,16 @@ class TestBlockFactory {
     return card;
   }
 
-  private static addToCard<BlockType extends Block>(block: BlockType, card: Card, isContent = true): BlockType {
+  private static addToCard<BlockType extends UIBlockWithDetails>(
+    block: BlockType,
+    card: Card,
+    isContent = true
+  ): BlockType {
     block.parentId = card.id;
     block.rootId = card.rootId;
     if (isContent) {
       card.fields.contentOrder.push(block.id);
     }
-    return block;
-  }
-
-  static createText(card: Card): TextBlock {
-    const block = this.addToCard(createTextBlock(), card);
-    block.title = 'title';
-    return block;
-  }
-
-  static createImage(card: Card): ImageBlock {
-    const block = this.addToCard(createImageBlock(), card);
-    block.fields.fileId = 'fileId';
-    return block;
-  }
-
-  static createDivider(card: Card): DividerBlock {
-    const block = this.addToCard(createDividerBlock(), card);
-    block.title = 'title';
-    return block;
-  }
-
-  static createCheckbox(card: Card): CheckboxBlock {
-    const block = this.addToCard(createCheckboxBlock(), card);
-    block.title = 'title';
     return block;
   }
 }

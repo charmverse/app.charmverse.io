@@ -9,7 +9,7 @@ import configureStore from 'redux-mock-store';
 import { v4 } from 'uuid';
 
 import { PagesContext } from 'hooks/usePages';
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import { pageStubToCreate } from 'testing/generatePageStub';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
@@ -82,7 +82,7 @@ export function mockStateStore(middleware: Middleware[], state: unknown): MockSt
 
 export type BlocksById<BlockType> = { [key: string]: BlockType };
 
-export function blocksById<BlockType extends Block>(blocks: BlockType[]): BlocksById<BlockType> {
+export function blocksById<BlockType extends UIBlockWithDetails>(blocks: BlockType[]): BlocksById<BlockType> {
   return blocks.reduce((res, block) => {
     res[block.id] = block;
     return res;

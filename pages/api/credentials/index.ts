@@ -10,7 +10,9 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).get(requireKeys(['userId'], 'query'), getCredentialsController);
 
 async function getCredentialsController(req: NextApiRequest, res: NextApiResponse) {
-  const credentials = await getAllUserCredentials({ userId: req.query.userId as string });
+  const includeTestnets = req.query.includeTestnets === 'true';
+
+  const credentials = await getAllUserCredentials({ userId: req.query.userId as string, includeTestnets });
   return res.status(200).json(credentials);
 }
 

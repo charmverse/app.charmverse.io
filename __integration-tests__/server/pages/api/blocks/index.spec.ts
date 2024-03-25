@@ -1,33 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import type { Space } from '@charmverse/core/prisma';
-import type { Block } from '@charmverse/core/prisma-client';
+import type { Space, User } from '@charmverse/core/prisma';
 import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
-import type { LoggedInUser } from 'models';
+import type { BlockWithDetails } from 'lib/databases/block';
 import type { ServerBlockFields } from 'pages/api/blocks';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateBoard, generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
-let nonAdminUser: LoggedInUser;
-let nonAdminUserSpace: Space;
-let nonAdminCookie: string;
-
-let adminUser: LoggedInUser;
+let adminUser: User;
 let adminUserSpace: Space;
 let adminCookie: string;
 
 beforeAll(async () => {
-  const first = await generateUserAndSpaceWithApiToken(undefined, false);
+  const { user, space } = await generateUserAndSpace();
 
-  nonAdminUser = first.user;
-  nonAdminUserSpace = first.space;
-  nonAdminCookie = await loginUser(nonAdminUser.id);
-
-  const second = await generateUserAndSpaceWithApiToken();
-
-  adminUser = second.user;
-  adminUserSpace = second.space;
+  adminUser = user;
+  adminUserSpace = space;
   adminCookie = await loginUser(adminUser.id);
 });
 
@@ -40,14 +28,13 @@ describe('POST /api/blocks', () => {
       boardPageType: 'board'
     });
 
-    const input: Omit<Block, ServerBlockFields> = {
+    const input: Omit<BlockWithDetails, ServerBlockFields> = {
       createdAt: new Date(),
       deletedAt: null,
       fields: {},
       id: uuid(),
       parentId: board.id,
       rootId: board.id,
-      schema: -1,
       title: 'Example',
       type: 'card',
       updatedAt: new Date()
@@ -60,7 +47,7 @@ describe('POST /api/blocks', () => {
         .set('referer', `http://localhost:3000/${adminUserSpace.domain}`)
         .send([input])
         .expect(201)
-    ).body as Block[];
+    ).body as BlockWithDetails[];
 
     expect(createdBlocks.length).toBe(1);
     expect(createdBlocks[0]).toMatchObject({
@@ -78,14 +65,13 @@ describe('POST /api/blocks', () => {
       boardPageType: 'board'
     });
 
-    const input: Omit<Block, ServerBlockFields> = {
+    const input: Omit<BlockWithDetails, ServerBlockFields> = {
       createdAt: new Date(),
       deletedAt: null,
       fields: {},
       id: uuid(),
       parentId: board.id,
       rootId: board.id,
-      schema: -1,
       title: 'Example',
       type: 'card',
       updatedAt: new Date()

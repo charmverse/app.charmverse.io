@@ -1,5 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { objectUtils } from '@charmverse/core/utilities';
+import { objectUtils, stringUtils } from '@charmverse/core/utilities';
+import { ProposalBoardBlock, ProposalPropertyField } from 'lib/proposals/blocks/interfaces';
+import { ProposalFields } from 'lib/proposals/interfaces';
 import { AggregateResults, aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { writeToSameFolder } from 'lib/utils/file';
@@ -25,6 +27,8 @@ const exportedFormat: Record<ExportKeys, string> = {
   rubricResults: 'Rubric Results'
 };
 
+const exportedCustomProps: string[] = ['Mission']
+
 const separator = ',';
 const cellEnclosure = '"';
 const newLine = '\n';
@@ -32,16 +36,40 @@ const newLine = '\n';
 const headerRows = objectUtils.typedKeys(exportedFormat);
 
 async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
-  throw new Error('This script has not been updated for new proposal flow');
+
+  const customBlocks = await prisma.proposalBlock.findFirstOrThrow({
+    where: {
+      id: "__defaultBoard",
+      space: {
+        domain: domain
+      }
+    }
+  });
+
+  const propertyMap = exportedCustomProps.reduce((acc, propName) => {
+    const property = (customBlocks as ProposalBoardBlock)?.fields.cardProperties.find(prop => prop.name === propName);
+
+    if (!property) {
+      throw new Error(`Property ${propName} not found in board ${customBlocks?.id}`);
+    }
+
+    acc[propName] = property;
+
+    return acc;
+
+  }, {} as Record<string, ProposalPropertyField>);
 
   const proposals = await prisma.proposal.findMany({
     where: {
-      // TODO: Fix this query
-      // evaluationType: 'rubric',
-      // status: {
-      //   in: ['evaluation_closed', 'evaluation_active']
-      // },
+      status: 'published',
+      rubricAnswers: {
+        some: {}
+      },
       page: {
+        createdAt: {
+          gte: new Date('2024-01-01')
+        },
+        type: 'proposal',
         space: {
           domain
         }
@@ -72,7 +100,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     }
   });
 
-  const allContent = [headerRows.map((rowKey) => exportedFormat[rowKey])];
+  const allContent = [[...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps]];
 
   const aggregatedResultsByProposal = proposals.reduce((acc, proposal) => {
     const results = aggregateResults({
@@ -163,7 +191,21 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       }
     });
 
-    return headerRows.map((rowKey) => row[rowKey] as string);
+    exportedCustomProps.forEach((rowKey) => {
+
+      const property = propertyMap[rowKey];
+
+      const rowValue = (p.fields as ProposalFields).properties?.[property.id] as string;
+
+      const value = !rowValue ? '-' : stringUtils.isUUID(rowValue) ? (property.options.find(opt => opt.id === rowValue)?.value ?? '-') : rowValue;
+
+      (row as any)[rowKey] = `${cellEnclosure}${(value as string)
+        .replace(new RegExp(cellEnclosure, 'g'), '')
+        .replace(new RegExp(separator, 'g'), '')
+        .replace(/;/g, ' ')}${cellEnclosure}`;
+    });
+
+    return [...headerRows, ...exportedCustomProps].map((rowKey) => (row as any)[rowKey] as string);
   });
 
   allContent.push(...contentRows);
@@ -178,6 +220,6 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   return textContent;
 }
 
-exportEvaluatedProposalScores({ domain: 'example' }).then(async (csv) => {
+exportEvaluatedProposalScores({ domain: 'op-grants' }).then(async (csv) => {
   await writeToSameFolder({ data: csv, fileName: 'exported.csv' });
 });

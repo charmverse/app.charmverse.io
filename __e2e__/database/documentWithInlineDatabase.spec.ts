@@ -79,8 +79,7 @@ test.beforeAll(async () => {
     addPageContent: true,
     boardPageType: 'inline_board',
     views: 1,
-    cardCount: sourceDatabaseCardCount,
-    parentId: documentPage.id
+    cardCount: sourceDatabaseCardCount
   });
 
   inlineLinkedDatabase = await generateBoard({
@@ -90,8 +89,7 @@ test.beforeAll(async () => {
     boardPageType: 'inline_linked_board',
     views: 1,
     cardCount: 0,
-    linkedSourceId: standaloneDatabase.id,
-    parentId: documentPage.id
+    linkedSourceId: standaloneDatabase.id
   });
 
   await prisma.page.update({
@@ -100,8 +98,8 @@ test.beforeAll(async () => {
     },
     data: {
       content: generatePageContentWithInlineDatabaseRefs({
-        inlineDatabaseId: inlineDatabase.id,
-        inlineLinkedDatabaseId: inlineLinkedDatabase.id
+        inlineDBPageId: inlineDatabase.id,
+        inlineLinkedDBPageId: inlineLinkedDatabase.id
       })
     }
   });

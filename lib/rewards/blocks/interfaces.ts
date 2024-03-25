@@ -1,9 +1,9 @@
-import type { RewardBlock } from '@charmverse/core/prisma-client';
+import type { RewardBlock } from '@charmverse/core/prisma';
 
-import type { Block } from 'lib/databases/block';
+import type { BlockWithDetails } from 'lib/databases/block';
 import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
-import type { Card, CardPropertyValue } from 'lib/databases/card';
+import type { CardPropertyValue } from 'lib/databases/card';
 import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
 import type { ApplicationMeta } from '../interfaces';
@@ -24,7 +24,7 @@ export type RewardsBoardFFBlock = Omit<Board, 'fields' | 'type'> & {
 };
 
 // TODO: Add other block types i.e. view.
-export type RewardBlockWithTypedFields = RewardsBoardBlock | Block;
+export type RewardBlockWithTypedFields = RewardsBoardBlock | BlockWithDetails;
 
 export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | TargetPermissionGroup<'user' | 'role'>[];
 

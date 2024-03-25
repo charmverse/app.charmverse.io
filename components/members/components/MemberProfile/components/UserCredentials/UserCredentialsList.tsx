@@ -6,6 +6,7 @@ import { useGetUserCredentials } from 'charmClient/hooks/credentials';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
 import { UserCredentialRow } from './UserCredentialRow';
@@ -71,7 +72,9 @@ export function UserAllCredentialsList({
 }
 
 export function UserCredentialsList({ userId, readOnly = false }: { readOnly?: boolean; userId: string }) {
-  const { data: userCredentials, error, isLoading } = useGetUserCredentials({ userId });
+  const includeTestnets = useIsCharmverseSpace();
+
+  const { data: userCredentials, error, isLoading } = useGetUserCredentials({ userId, includeTestnets });
   const favoriteCredentials = userCredentials
     ?.filter((credential) => credential.favoriteCredentialId)
     .slice(0, 5)

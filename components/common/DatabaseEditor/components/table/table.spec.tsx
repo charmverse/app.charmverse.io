@@ -278,7 +278,7 @@ describe('components/table/Table extended', () => {
 
     const card2Text = TestBlockFactory.createCard(board);
     card2Text.parentId = card2.id;
-    card2Text.type = 'text';
+    card2Text.type = 'card';
     card2Text.updatedAt = Date.parse('22 Jun 2021 11:23:00');
 
     card2.fields.contentOrder = [card2Text.id];
@@ -444,7 +444,7 @@ describe('components/table/Table extended', () => {
 
     const card1Text = TestBlockFactory.createCard(board);
     card1Text.parentId = card1.id;
-    card1Text.type = 'text';
+    card1Text.type = 'card';
     card1Text.updatedBy = 'user-id-4';
     card1Text.updatedAt = Date.parse('16 Jun 2021 16:22:00');
 

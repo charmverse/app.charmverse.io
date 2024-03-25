@@ -101,10 +101,14 @@ export class CharmverseDatabasePage {
       await prisma.block.createMany({
         data: [
           {
+            schema: 1,
+            parentId: '',
             ...view,
             ...commonBlockData
           },
           {
+            schema: 1,
+            parentId: '',
             ...board,
             ...commonBlockData
           }

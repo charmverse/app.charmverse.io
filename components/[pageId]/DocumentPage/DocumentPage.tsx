@@ -112,7 +112,7 @@ function DocumentPageComponent({
   });
 
   const board = useAppSelector((state) => {
-    if (!card) {
+    if (!card?.parentId) {
       return null;
     }
 

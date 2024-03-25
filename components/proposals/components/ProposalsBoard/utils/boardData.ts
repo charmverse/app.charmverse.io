@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import type { Block } from 'lib/databases/block';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { createBoard } from 'lib/databases/board';
 import { Constants } from 'lib/databases/constants';
@@ -34,7 +34,7 @@ export function getDefaultBoard({
   customOnly?: boolean;
   evaluationStepTitles: string[];
 }) {
-  const block: Partial<Block> = storedBoard
+  const block: UIBlockWithDetails = storedBoard
     ? blockToFBBlock(storedBoard)
     : createBoard({
         block: {

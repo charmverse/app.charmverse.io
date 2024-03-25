@@ -195,8 +195,6 @@ export function mapProposalToCardPage({
   const card: Card<ProposalPropertyValue> = {
     id: proposal.id,
     spaceId: proposalSpaceId,
-    parentId: '',
-    schema: 1,
     title: proposal.title,
     rootId: proposalSpaceId,
     type: 'card' as BlockTypes,
@@ -204,7 +202,6 @@ export function mapProposalToCardPage({
     createdBy: proposal.createdBy,
     createdAt: new Date(proposal.createdAt).getTime(),
     updatedAt: new Date(proposal.updatedAt).getTime(),
-    deletedAt: null,
     fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };
 
