@@ -51,6 +51,7 @@ export type BlockWithDetails = OptionalFalseyFields<
     icon?: string;
     hasContent?: boolean;
     pageType?: PageType;
+    syncWithPageId?: string;
   }
 > &
   Pick<PrismaBlock, RequiredFields> & { fields: Record<string, any>; type: BlockTypes };
@@ -217,6 +218,7 @@ export function applyPageToBlock(
     | 'headerImage'
     | 'galleryImage'
     | 'hasContent'
+    | 'syncWithPageId'
     | 'updatedBy'
     | 'updatedAt'
     | 'type'
@@ -228,6 +230,7 @@ export function applyPageToBlock(
   const blockWithDetails = block as BlockWithDetails;
   blockWithDetails.bountyId = page.bountyId || undefined;
   blockWithDetails.pageId = page.id;
+  blockWithDetails.syncWithPageId = page.syncWithPageId || undefined;
   blockWithDetails.icon = page.icon || undefined;
   blockWithDetails.galleryImage = replaceS3Domain(page.headerImage || page.galleryImage || undefined);
   blockWithDetails.hasContent = page.hasContent;

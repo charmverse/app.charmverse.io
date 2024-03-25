@@ -101,6 +101,7 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       hasContent: true,
       galleryImage: true,
       headerImage: true,
+      syncWithPageId: true,
       type: true,
       updatedAt: true,
       updatedBy: true
