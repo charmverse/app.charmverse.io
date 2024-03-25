@@ -8,6 +8,8 @@ import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
+import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
 import { rewardCharmsForProposal } from 'lib/charms/triggers/rewardCharmsForProposal';
 import { createForm } from 'lib/forms/createForm';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
@@ -17,6 +19,7 @@ import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { generatePagePathFromPathAndTitle } from '../pages';
 
+import { checkProposalProject } from './checkProposalProject';
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getProposalErrors } from './getProposalErrors';
 import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsWithBlockNumber';
@@ -109,6 +112,11 @@ export async function createProposal({
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
   }
+
+  await checkProposalProject({
+    formAnswers,
+    formFields
+  });
 
   // retrieve permissions and apply evaluation ids to reviewers
   evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers }, index) => {

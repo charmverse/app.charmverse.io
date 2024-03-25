@@ -8,6 +8,7 @@ import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issuePropos
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
+import { checkProposalProject } from 'lib/proposals/checkProposalProject';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { publishProposal } from 'lib/proposals/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -105,6 +106,36 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   }
 
   const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
+
+  const proposalForm = await prisma.proposal.findUnique({
+    where: {
+      id: proposalId
+    },
+    select: {
+      formAnswers: {
+        select: {
+          fieldId: true,
+          value: true
+        }
+      },
+      form: {
+        select: {
+          formFields: {
+            select: {
+              fieldConfig: true,
+              id: true,
+              type: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  await checkProposalProject({
+    formAnswers: proposalForm?.formAnswers as FieldAnswerInput[],
+    formFields: proposalForm?.form?.formFields
+  });
 
   await publishProposal({
     proposalId,
