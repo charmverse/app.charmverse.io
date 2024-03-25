@@ -132,9 +132,6 @@ export default function TrashModal({ onClose, isOpen }: { onClose: () => void; i
           });
           return { ..._archivedPages };
         });
-
-        await mutate(`pages/${space.id}`);
-        dispatch(initialDatabaseLoad({ pageId }));
       }
     }
   }

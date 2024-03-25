@@ -306,6 +306,13 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     [mutatePagesList]
   );
 
+  const handleRestoreEvent = useCallback(
+    (value: WebSocketPayload<'pages_restored'>) => {
+      mutatePagesList();
+    },
+    [mutatePagesList]
+  );
+
   useEffect(() => {
     currentSpaceId.current = currentSpace?.id;
   }, [currentSpace]);
@@ -319,12 +326,15 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
     const unsubscribeFromPageDeletes = subscribe('pages_deleted', handleDeleteEvent);
 
+    const unsubscribeFromPageRestores = subscribe('pages_restored', handleRestoreEvent);
+
     return () => {
       unsubscribeFromPageUpdates();
       unsubscribeFromNewPages?.();
       unsubscribeFromPageDeletes();
+      unsubscribeFromPageRestores();
     };
-  }, [spaceRole]);
+  }, [!!spaceRole?.isGuest]);
 
   const value: PagesContext = useMemo(
     () => ({

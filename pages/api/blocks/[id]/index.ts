@@ -8,7 +8,7 @@ import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
 import { applyPageToBlock } from 'lib/databases/block';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -89,7 +89,7 @@ async function deleteBlock(
       throw new ActionNotPermittedError();
     }
 
-    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'trash');
+    const deletedChildPageIds = await trashOrDeletePage(blockId, userId, 'trash');
     deletedCount = deletedChildPageIds.length;
     relay.broadcast(
       {
@@ -142,7 +142,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type }]
+        payload: [{ id: blockId }]
       },
       spaceId
     );
@@ -161,7 +161,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type as BlockTypes }]
+        payload: [{ id: blockId }]
       },
       spaceId
     );

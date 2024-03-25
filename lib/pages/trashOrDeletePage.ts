@@ -2,23 +2,23 @@ import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-export type ChildModificationAction = 'delete' | 'restore' | 'trash';
+type DeleteAction = 'delete' | 'restore' | 'trash';
 
-export async function modifyChildPages(parentId: string, userId: string, action: ChildModificationAction) {
+export async function trashOrDeletePage(pageId: string, userId: string, action: DeleteAction) {
   const { flatChildren } = await resolvePageTree({
-    pageId: parentId,
+    pageId,
     flattenChildren: true,
     includeDeletedPages: true
   });
 
-  const modifiedChildPageIds: string[] = [parentId, ...flatChildren.map((p) => p.id)];
+  const modifiedChildPageIds: string[] = [pageId, ...flatChildren.map((p) => p.id)];
 
   if (action === 'delete') {
     // Only top level page can be proposal page
     await prisma.proposal.deleteMany({
       where: {
         page: {
-          id: parentId
+          id: pageId
         }
       }
     });
