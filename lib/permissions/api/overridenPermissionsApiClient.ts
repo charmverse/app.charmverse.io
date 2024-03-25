@@ -33,17 +33,24 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
 
     pages.bulkComputePagePermissions = async function (args: BulkPagePermissionCompute) {
       // Large list of UUIDs will error out
-      const pagination = 200;
+      const pagination = 350;
 
-      let permissions: BulkPagePermissionFlags = {};
+      const groups = [];
 
       for (let i = 0; i < args.pageIds.length; i += pagination) {
-        const _permissions = await originalBulkComputePagePermissions.apply(this, [
-          withUseProposalPermissionsArgs({ userId: args.userId, pageIds: args.pageIds.slice(i, i + pagination) })
-        ]);
-
-        permissions = Object.assign(permissions, _permissions);
+        groups.push(args.pageIds.slice(i, i + pagination));
       }
+
+      const boundBulkComputePagePermissions = originalBulkComputePagePermissions.bind(this);
+
+      const permissions = await Promise.all(
+        groups.map((pageIdSubset) =>
+          boundBulkComputePagePermissions(
+            withUseProposalPermissionsArgs({ userId: args.userId, pageIds: pageIdSubset })
+          )
+        )
+      ).then((permissionMaps) => permissionMaps.reduce((acc, p) => Object.assign(acc, p), {}));
+
       return permissions;
     };
 
