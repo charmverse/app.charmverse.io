@@ -1,5 +1,9 @@
 import type { PagesRequest } from '@charmverse/core/pages';
-import type { BulkPagePermissionCompute, PermissionCompute, Resource } from '@charmverse/core/permissions';
+import type {
+  BulkPagePermissionCompute,
+  BulkPagePermissionFlags,
+  PermissionCompute
+} from '@charmverse/core/permissions';
 import { PermissionsApiClient } from '@charmverse/core/permissions';
 
 import { permissionsApiAuthKey, permissionsApiUrl } from 'config/constants';
@@ -28,7 +32,18 @@ export class PermissionsApiClientWithPermissionsSwitch extends PermissionsApiCli
     const originalBulkComputePagePermissions = pages.bulkComputePagePermissions;
 
     pages.bulkComputePagePermissions = async function (args: BulkPagePermissionCompute) {
-      const permissions = await originalBulkComputePagePermissions.apply(this, [withUseProposalPermissionsArgs(args)]);
+      // Large list of UUIDs will error out
+      const pagination = 200;
+
+      let permissions: BulkPagePermissionFlags = {};
+
+      for (let i = 0; i < args.pageIds.length; i += pagination) {
+        const _permissions = await originalBulkComputePagePermissions.apply(this, [
+          withUseProposalPermissionsArgs({ userId: args.userId, pageIds: args.pageIds.slice(i, i + pagination) })
+        ]);
+
+        permissions = Object.assign(permissions, _permissions);
+      }
       return permissions;
     };
 
