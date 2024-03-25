@@ -1,5 +1,4 @@
 import type { Project } from '@charmverse/core/prisma-client';
-import type { Control } from 'react-hook-form';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -22,7 +21,7 @@ export type ProjectPayload = Pick<
 
 export type ProjectField = keyof ProjectPayload;
 
-export const ProjectFieldProperties: ProjectFieldProperty[] = [
+export const projectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
     label: 'Project Name'
@@ -101,7 +100,7 @@ export function ProjectFieldAnswers({
       defaultRequired={defaultRequired}
       disabled={disabled}
       fieldConfig={fieldConfig}
-      properties={ProjectFieldProperties}
+      properties={projectFieldProperties}
     />
   );
 }
@@ -118,7 +117,7 @@ export function ProjectFieldsEditor({
   return (
     <FieldsEditor
       defaultRequired={defaultRequired}
-      properties={ProjectFieldProperties}
+      properties={projectFieldProperties}
       values={values}
       onChange={onChange}
     />

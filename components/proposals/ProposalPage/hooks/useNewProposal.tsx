@@ -70,7 +70,8 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectWithMembers,
-    fieldConfig: projectField?.fieldConfig as ProjectEditorFieldConfig
+    fieldConfig: projectField?.fieldConfig as ProjectEditorFieldConfig,
+    defaultRequired: true
   });
 
   useEffect(() => {

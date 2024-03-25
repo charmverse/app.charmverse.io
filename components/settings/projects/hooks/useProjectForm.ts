@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ethers } from 'ethers';
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -11,7 +11,7 @@ import {
   type ProjectWithMembers
 } from 'components/projects/interfaces';
 import type { ProjectField } from 'components/projects/ProjectFields';
-import { ProjectFieldProperties } from 'components/projects/ProjectFields';
+import { projectFieldProperties } from 'components/projects/ProjectFields';
 import type { ProjectMemberField } from 'components/projects/ProjectMemberFields';
 import { projectMemberFieldProperties } from 'components/projects/ProjectMemberFields';
 
@@ -47,12 +47,18 @@ function addMatchersToSchema({
   }
 }
 
-export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectEditorFieldConfig }) {
+export function createProjectYupSchema({
+  fieldConfig,
+  defaultRequired = false
+}: {
+  fieldConfig: ProjectEditorFieldConfig;
+  defaultRequired?: boolean;
+}) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
   const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
-  ProjectFieldProperties.forEach((projectFieldProperty) => {
+  projectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
-      required: false,
+      required: defaultRequired,
       hidden: false
     };
     if (!projectFieldConfig.hidden) {
@@ -72,7 +78,7 @@ export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectEd
 
   projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
     const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
-      required: false,
+      required: defaultRequired,
       hidden: false
     };
     if (!projectMemberFieldConfig.hidden) {
@@ -101,8 +107,9 @@ export function useProjectForm(options?: {
   defaultValues?: ProjectValues;
   projectWithMembers?: ProjectWithMembers;
   fieldConfig?: ProjectEditorFieldConfig;
+  defaultRequired?: boolean;
 }) {
-  const { defaultValues, fieldConfig = defaultProjectFieldConfig, projectWithMembers } = options ?? {};
+  const { defaultRequired, defaultValues, fieldConfig = defaultProjectFieldConfig, projectWithMembers } = options ?? {};
 
   const defaultProjectValues = useGetDefaultProject();
 
@@ -143,7 +150,8 @@ export function useProjectForm(options?: {
     reValidateMode: 'onChange',
     resolver: yupResolver(
       createProjectYupSchema({
-        fieldConfig
+        fieldConfig,
+        defaultRequired
       })
     ),
     criteriaMode: 'all',
