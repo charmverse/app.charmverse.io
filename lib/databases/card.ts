@@ -75,6 +75,7 @@ export function createCard(block?: Partial<UIBlockWithDetails>): Card {
     ...createBlock(block),
     type: 'card',
     fields: {
+      ...block?.fields,
       properties: { ...(block?.fields?.properties || {}) },
       contentOrder,
       headerImage: block?.fields?.headerImage || null
