@@ -2,9 +2,9 @@ import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 import type { KeyedMutator } from 'swr';
 
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 
 import { useProposalsBoardAdapter } from '../ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';

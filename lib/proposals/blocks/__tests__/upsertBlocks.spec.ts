@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 import { getBlocks } from 'lib/proposals/blocks/getBlocks';
 import { upsertBlock } from 'lib/proposals/blocks/upsertBlock';
 import { upsertBlocks } from 'lib/proposals/blocks/upsertBlocks';

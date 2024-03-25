@@ -8,10 +8,8 @@ import { optimism } from 'viem/chains';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { prettyPrint } from 'lib/utils/strings';
-import { publishCredentialIssuableEvent } from 'lib/webhookPublisher/publishEvent';
 
-import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
-import type { EasSchemaChain } from './connectors';
+import { signAndPublishCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels } from './constants';
 import type { CredentialDataInput } from './schemas';
 
@@ -44,9 +42,17 @@ export async function issueProposalCredentialsIfNecessary({
         orderBy: {
           index: 'asc'
         }
+      },
+      space: {
+        select: {
+          useOnchainCredentials: true
+        }
       }
     }
   });
+  if (baseProposal.space.useOnchainCredentials) {
+    return;
+  }
 
   if (baseProposal.status === 'draft') {
     return;
@@ -86,7 +92,6 @@ export async function issueProposalCredentialsIfNecessary({
       space: {
         select: {
           id: true,
-          credentialsChainId: true,
           features: true,
           credentialTemplates: {
             where: {
@@ -181,41 +186,19 @@ export async function issueProposalCredentialsIfNecessary({
             URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
           };
 
-          if (proposalWithSpaceConfig.space.credentialsChainId) {
-            await publishCredentialIssuableEvent({
-              spaceId: proposalWithSpaceConfig.space.id,
-              data: {
-                credential: {
-                  chainId: proposalWithSpaceConfig.space.credentialsChainId as EasSchemaChain,
-                  type: 'proposal',
-                  credentialInputs: {
-                    recipient: targetWallet.address,
-                    data: credentialContent
-                  }
-                },
-                credentialMetadata: {
-                  event,
-                  proposalId,
-                  userId: authorUserId,
-                  credentialTemplateId: credentialTemplate.id
-                }
-              }
-            });
-          } else {
-            await signPublishAndRecordCharmverseCredential({
-              chainId: optimism.id,
-              recipient: targetWallet.address,
-              credential: {
-                type: 'proposal',
-                data: credentialContent
-              },
-              credentialTemplateId: credentialTemplate.id,
-              event,
-              recipientUserId: authorUserId,
-              proposalId,
-              pageId: proposalWithSpaceConfig.page.id
-            });
-          }
+          await signAndPublishCharmverseCredential({
+            chainId: optimism.id,
+            recipient: targetWallet.address,
+            credential: {
+              type: 'proposal',
+              data: credentialContent
+            },
+            credentialTemplateId: credentialTemplate.id,
+            event,
+            recipientUserId: authorUserId,
+            proposalId,
+            pageId: proposalWithSpaceConfig.page.id
+          });
         }
       } catch (e) {
         log.error('Failed to issue credential', {

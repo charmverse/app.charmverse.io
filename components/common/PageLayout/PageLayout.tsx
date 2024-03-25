@@ -16,7 +16,7 @@ import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout'
 import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { FocalboardViewsProvider } from 'hooks/useFocalboardViews';
+import { DatabaseViewsProvider } from 'hooks/useDatabaseViews';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
@@ -187,7 +187,7 @@ function PageLayout({ children }: PageLayoutProps) {
         <CurrentPageFavicon />
       </Head>
       <LayoutContainer data-test='space-page-layout' className='app-content'>
-        <FocalboardViewsProvider>
+        <DatabaseViewsProvider>
           <ProposalBlocksProvider>
             <RewardBlocksProvider>
               <RewardsBoardProvider>
@@ -243,7 +243,7 @@ function PageLayout({ children }: PageLayoutProps) {
               </RewardsBoardProvider>
             </RewardBlocksProvider>
           </ProposalBlocksProvider>
-        </FocalboardViewsProvider>
+        </DatabaseViewsProvider>
       </LayoutContainer>
     </>
   );

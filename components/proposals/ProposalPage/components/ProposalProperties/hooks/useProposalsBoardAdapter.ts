@@ -2,21 +2,21 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo } from 'react';
 
-import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { sortCards } from 'components/common/DatabaseEditor/store/cards';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { BlockTypes } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { BlockTypes } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardPage } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { Constants } from 'lib/databases/constants';
+import { PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -195,8 +195,6 @@ export function mapProposalToCardPage({
   const card: Card<ProposalPropertyValue> = {
     id: proposal.id,
     spaceId: proposalSpaceId,
-    parentId: '',
-    schema: 1,
     title: proposal.title,
     rootId: proposalSpaceId,
     type: 'card' as BlockTypes,
@@ -204,7 +202,6 @@ export function mapProposalToCardPage({
     createdBy: proposal.createdBy,
     createdAt: new Date(proposal.createdAt).getTime(),
     updatedAt: new Date(proposal.updatedAt).getTime(),
-    deletedAt: null,
     fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };
 

@@ -9,8 +9,8 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { trackPageView } from 'charmClient/hooks/track';
-import Dialog from 'components/common/BoardEditor/focalboard/src/components/dialog';
 import { Button } from 'components/common/Button';
+import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import { DialogTitle } from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { FullPageActionsMenuButton } from 'components/common/PageActions/FullPageActionsMenuButton';

@@ -1,8 +1,8 @@
 import { Stack, TextField } from '@mui/material';
 import { useState } from 'react';
 
-import EmojiPicker from 'components/common/BoardEditor/focalboard/src/widgets/emojiPicker';
 import { Button } from 'components/common/Button';
+import EmojiPicker from 'components/common/DatabaseEditor/widgets/emojiPicker';
 import { ImageUploadButton } from 'components/common/ImageSelector/ImageUploadButton';
 import MultiTabs from 'components/common/MultiTabs';
 import { IMAGE_MAX_WIDTH, ResizeType } from 'lib/file/constants';

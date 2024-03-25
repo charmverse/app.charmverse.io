@@ -4,14 +4,13 @@ import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
 
 import charmClient from 'charmClient';
 import { useTrashPages, useInitialPagesForSpace } from 'charmClient/hooks/pages';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
-import { updateCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import type { Block } from 'lib/focalboard/block';
+import mutator from 'components/common/DatabaseEditor/mutator';
+import { updateCards } from 'components/common/DatabaseEditor/store/cards';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
+import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
 import { isTruthy } from 'lib/utils/types';
@@ -32,7 +31,7 @@ export type PagesContext = {
   updatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<void>;
   mutatePage: (updates: PageUpdates, revalidate?: boolean) => Promise<any>;
   mutatePagesRemove: (pageIds: string[], revalidate?: boolean) => void;
-  deletePage: (data: { pageId: string; board?: Block }) => Promise<PageMeta | null | undefined>;
+  deletePage: (data: { pageId: string; board?: UIBlockWithDetails }) => Promise<PageMeta | null | undefined>;
   mutatePagesList: (data: PagesMap<PageMeta>) => Promise<any>;
 };
 
@@ -126,7 +125,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
     }
   }, [data, isLoading]);
 
-  async function deletePage({ pageId, board }: { pageId: string; board?: Block }) {
+  async function deletePage({ pageId, board }: { pageId: string; board?: UIBlockWithDetails }) {
     const page = pages[pageId];
     const totalNonArchivedPages = Object.values(pages).filter(
       (p) => !p?.deletedAt && (p?.type === 'page' || p?.type === 'board' || p?.type === 'card')

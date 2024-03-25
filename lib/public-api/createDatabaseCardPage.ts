@@ -3,7 +3,7 @@ import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { prismaToBlock } from 'lib/focalboard/block';
+import { prismaToBlock } from 'lib/databases/block';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { emptyDocument } from 'lib/prosemirror/constants';

@@ -1,5 +1,5 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { BoardFields } from 'lib/focalboard/board';
+import { prisma } from '@charmverse/core/prisma-client';
+import { BoardFields } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
@@ -30,9 +30,9 @@ async function addDefaultRewardBoardViews() {
             viewIds: defaultRewardViews
           } as any
         }
-      })
+      });
     }
   }
 }
 
-addDefaultRewardBoardViews()
+addDefaultRewardBoardViews();

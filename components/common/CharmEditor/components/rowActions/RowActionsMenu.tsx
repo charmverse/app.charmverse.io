@@ -15,9 +15,9 @@ import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
 
 import charmClient from 'charmClient';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
+import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { isMac } from 'lib/utils/browser';

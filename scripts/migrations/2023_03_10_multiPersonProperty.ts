@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardFields } from 'lib/focalboard/board';
-import { CardFields } from 'lib/focalboard/card';
+import { BoardFields } from 'lib/databases/board';
+import { CardFields } from 'lib/databases/card';
 
 async function multiPersonProperty() {
   const boardPersonPropertyRecord: Record<

@@ -41,7 +41,7 @@ afterAll(() => {
 });
 
 describe('updateSpace', () => {
-  it('should only update the space name, domain and logo', async () => {
+  it('should update the space name, domain and logo', async () => {
     const update: UpdateableSpaceFields = {
       name: 'New Space Name',
       domain: 'new-space-name',
@@ -147,6 +147,48 @@ describe('updateSpace', () => {
 
     expect(updatedSpace.customDomain).toEqual(update.customDomain);
     expect(updatedSpace.snapshotDomain).toEqual(update.snapshotDomain);
+  });
+
+  it('should update the space onchain credential settings', async () => {
+    const update: UpdateableSpaceFields = {
+      useOnchainCredentials: true,
+      credentialsChainId: 10,
+      credentialsWallet: '0x1234567890'
+    };
+
+    const droppedUpdate: Partial<Omit<Space, keyof UpdateableSpaceFields>> = {
+      createdBy: secondUser.id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      id: v4()
+    };
+
+    const space = await prisma.space.create({
+      data: {
+        domain: `space-domain-${v4()}`,
+        name: 'Space Name',
+        spaceImage: 'https://space-logo.png',
+        updatedBy: firstUser.id,
+        publicBountyBoard: true,
+        defaultPublicPages: true,
+        permissionConfigurationMode: 'collaborative',
+        author: {
+          connect: {
+            id: firstUser.id
+          }
+        }
+      }
+    });
+
+    const updatedSpace = await updateSpace(space.id, { ...update, ...droppedUpdate });
+
+    typedKeys(update).forEach((key) => {
+      expect(updatedSpace[key]).toEqual(update[key]);
+    });
+
+    typedKeys(droppedUpdate).forEach((key) => {
+      expect(updatedSpace[key]).not.toEqual(droppedUpdate[key]);
+    });
   });
 
   it('should throw an error if no space ID is provided', async () => {

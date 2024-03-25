@@ -2,8 +2,8 @@
 
 import { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardView } from 'lib/focalboard/boardView';
-import { FilterClause, FilterCondition } from 'lib/focalboard/filterClause';
+import { BoardView } from 'lib/databases/boardView';
+import { FilterClause, FilterCondition } from 'lib/databases/filterClause';
 import { v4 } from 'uuid';
 
 // use this file and run against production to generate api keys

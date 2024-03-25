@@ -5,8 +5,8 @@ import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/mate
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
-import { TextInput } from 'components/common/BoardEditor/components/properties/TextInput';
+import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
+import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';

@@ -2,9 +2,9 @@ import type { PageMeta, PageNode, PageNodeWithChildren, PageWithPermissions } fr
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space } from '@charmverse/core/prisma';
 
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card } from 'lib/focalboard/card';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card } from 'lib/databases/card';
 import type { PagePermissionMeta } from 'lib/permissions/interfaces';
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 

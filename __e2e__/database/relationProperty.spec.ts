@@ -6,8 +6,8 @@ import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { Constants } from 'lib/focalboard/constants';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';

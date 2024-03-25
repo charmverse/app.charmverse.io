@@ -8,16 +8,16 @@ import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import { ViewFilterControl } from 'components/common/BoardEditor/components/ViewFilterControl';
-import { ViewSettingsRow } from 'components/common/BoardEditor/components/ViewSettingsRow';
-import { ViewSortControl } from 'components/common/BoardEditor/components/ViewSortControl';
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import { ToggleViewSidebarButton } from 'components/common/BoardEditor/focalboard/src/components/viewHeader/ToggleViewSidebarButton';
-import ViewSidebar from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/viewSidebar';
-import mutator from 'components/common/BoardEditor/focalboard/src/mutator';
 import { Button } from 'components/common/Button';
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
+import Table from 'components/common/DatabaseEditor/components/table/table';
+import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
+import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';
+import { ViewSettingsRow } from 'components/common/DatabaseEditor/components/ViewSettingsRow';
+import ViewSidebar from 'components/common/DatabaseEditor/components/viewSidebar/viewSidebar';
+import { ViewSortControl } from 'components/common/DatabaseEditor/components/ViewSortControl';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { EmptyStateVideo } from 'components/common/EmptyStateVideo';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -33,7 +33,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { createBoard } from 'lib/focalboard/board';
+import { createBoard } from 'lib/databases/board';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { NewProposalButton } from './components/NewProposalButton';
@@ -188,7 +188,7 @@ export function ProposalsPage({ title }: { title: string }) {
               {title}
             </Typography>
 
-            <Box display='flex'>
+            <Box display='flex' justifyContent='space-between'>
               <Box
                 gap={3}
                 sx={{
