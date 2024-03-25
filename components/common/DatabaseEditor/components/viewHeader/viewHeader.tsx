@@ -24,6 +24,7 @@ import NewCardButton from './newCardButton';
 import { ToggleViewSidebarButton } from './ToggleViewSidebarButton';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import { ViewHeaderRowsMenu } from './ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import ViewHeaderSearch from './viewHeaderSearch';
 import ViewTabs from './viewTabs';
 
 type Props = {
@@ -189,7 +190,7 @@ function ViewHeader(props: Props) {
 
           {/* Search - disabled until we can access page data inside the redux selector */}
 
-          {/* <ViewHeaderSearch/> */}
+          <ViewHeaderSearch />
 
           {/* Link to view embedded table in full - check that at least one view is created */}
           {props.embeddedBoardPath && !!views.length && (

@@ -14,6 +14,7 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
+import { getSearchText } from './searchText';
 
 import type { RootState } from './index';
 
@@ -328,13 +329,13 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
           }
         } else if (propertyTemplate.type === 'multiSelect') {
           // Look up the value of the select option
-          const options = (propertyValue as string[]).map((value) =>
+          const values = (propertyValue as string[]).map((value) =>
             propertyTemplate.options.find((o) => o.id === value)?.value.toLowerCase()
           );
-          if (options?.includes(searchText)) {
+          if (values?.some((value) => value?.includes(searchText))) {
             return true;
           }
-        } else if ((propertyValue as string).toLowerCase().includes(searchText)) {
+        } else if (typeof propertyValue === 'string' && propertyValue.toLowerCase().includes(searchText)) {
           return true;
         }
       }
@@ -351,15 +352,19 @@ export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
     getCards,
     (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
     (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
+    getSearchText,
     (state: RootState, props: getViewCardsProps) =>
       props.localFilters || state.views.views[props.viewId]?.fields.filter,
-    (cards, board, view, filter) => {
+    (cards, board, view, searchText, filter) => {
       if (!view || !board || !cards) {
         return [];
       }
-      const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
+      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
+        result = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
+      }
+      if (searchText) {
+        result = searchFilterCards(result, board, searchText);
       }
       return result;
     }
