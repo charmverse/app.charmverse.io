@@ -629,44 +629,15 @@ export async function updateCardsFromProposals({
     }
   });
 
-  if (updatedPages.length > 0) {
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: updatedPages.map(
-          ({ id, updatedAt, updatedBy, deletedAt, title, hasContent, content, contentText }) => ({
-            id,
-            spaceId,
-            updatedAt,
-            updatedBy,
-            deletedAt,
-            title,
-            hasContent,
-            content,
-            contentText
-          })
-        )
-      },
-      spaceId
-    );
-  }
+  const updatedBlockPayload = [prismaToBlock(boardBlock as any), ...updatedBlocks.map((block) => prismaToBlock(block))];
 
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: [prismaToBlock(boardBlock as any)]
+      payload: updatedBlockPayload
     },
     spaceId
   );
-  if (updatedBlocks.length > 0) {
-    relay.broadcast(
-      {
-        type: 'blocks_updated',
-        payload: updatedBlocks.map((block) => prismaToBlock(block))
-      },
-      spaceId
-    );
-  }
 
   if (newCards.length > 0) {
     relay.broadcast(

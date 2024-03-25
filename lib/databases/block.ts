@@ -5,6 +5,8 @@ import { v4 } from 'uuid';
 import type { OptionalFalseyFields } from 'lib/utils/objects';
 import { replaceS3Domain } from 'lib/utils/url';
 
+import { Constants } from './constants';
+
 // export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
 export type BlockTypes = (typeof blockTypes)[number];
@@ -238,5 +240,10 @@ export function applyPageToBlock(
   blockWithDetails.pageType = page.type;
   blockWithDetails.updatedAt = page.updatedAt;
   blockWithDetails.updatedBy = page.updatedBy;
+  // used for sorting
+  if (blockWithDetails.type === 'card') {
+    blockWithDetails.fields ||= { properties: {} };
+    blockWithDetails.fields.properties[Constants.titleColumnId] = blockWithDetails.title;
+  }
   return blockWithDetails;
 }
