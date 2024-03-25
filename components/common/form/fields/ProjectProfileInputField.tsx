@@ -20,14 +20,12 @@ function ProjectProfileFormAnswers({
   selectedProject: ProjectWithMembers;
   fieldConfig: ProjectEditorFieldConfig;
 }) {
-  const { form, isTeamLead } = useProject({ projectWithMembers: selectedProject });
+  // const { form, isTeamLead } = useProject({ projectId: selectedProject.id, fieldConfig });
 
   return (
-    <FormProvider {...form}>
-      <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-        <ProjectFormAnswers defaultRequired isTeamLead={isTeamLead} fieldConfig={fieldConfig} />
-      </Box>
-    </FormProvider>
+    <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+      <ProjectFormAnswers defaultRequired isTeamLead fieldConfig={fieldConfig} />
+    </Box>
   );
 }
 

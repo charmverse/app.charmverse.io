@@ -1,11 +1,17 @@
+import { uuid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
 import { useCallback, useState } from 'react';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
+import { useFormFields } from 'components/common/form/hooks/useFormFields';
+import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
+import { useProject } from 'components/settings/projects/hooks/useProject';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
+import { emptyDocument } from 'lib/prosemirror/constants';
 
 import type { ProposalPageAndPropertiesInput } from '../NewProposalPage';
 
@@ -27,6 +33,42 @@ export function useNewProposal({ newProposal }: Props) {
   const [formInputs, setFormInputsRaw] = useState<ProposalPageAndPropertiesInput>(
     emptyState({ ...newProposal, userId: user?.id })
   );
+  const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
+
+  const proposalFormFields = isStructured
+    ? formInputs.formFields ?? [
+        {
+          type: 'project_profile',
+          name: '',
+          description: emptyDocument,
+          index: 0,
+          options: [],
+          private: false,
+          required: true,
+          id: uuid(),
+          fieldConfig: {}
+        } as FormFieldInput
+      ]
+    : [];
+
+  const {
+    control: proposalFormFieldControl,
+    isValid: isProposalFormFieldsValid,
+    errors: proposalFormFieldErrors,
+    values,
+    onFormChange
+  } = useFormFields({
+    // Only set the initial state with fields when we are creating a structured proposal
+    fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
+  });
+
+  const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
+  const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
+
+  const { form: projectForm } = useProject({
+    projectId: selectedProjectId,
+    fieldConfig: projectField?.fieldConfig as ProjectEditorFieldConfig
+  });
 
   const setFormInputs = useCallback(
     (partialFormInputs: Partial<ProposalPageAndPropertiesInput>, { fromUser = true }: { fromUser?: boolean } = {}) => {
@@ -93,7 +135,15 @@ export function useNewProposal({ newProposal }: Props) {
     disabledTooltip,
     isCreatingProposal,
     contentUpdated,
-    isFormLoaded
+    isFormLoaded,
+    projectField,
+    isProposalFormFieldsValid,
+    proposalFormFields,
+    projectForm,
+    onFormChange,
+    proposalFormFieldErrors,
+    proposalFormFieldControl,
+    isProposalProjectFieldValid: projectForm.formState.isValid
   };
 }
 

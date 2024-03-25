@@ -47,19 +47,12 @@ function addMatchersToSchema({
   }
 }
 
-export function createProjectYupSchema({
-  fieldConfig,
-  defaultRequired
-}: {
-  defaultRequired?: boolean;
-  fieldConfig: ProjectEditorFieldConfig;
-}) {
+export function createProjectYupSchema({ fieldConfig }: { fieldConfig: ProjectEditorFieldConfig }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
   const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
-
   ProjectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
-      required: !!defaultRequired,
+      required: false,
       hidden: false
     };
     if (!projectFieldConfig.hidden) {
@@ -79,7 +72,7 @@ export function createProjectYupSchema({
 
   ProjectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
     const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
-      required: !!defaultRequired,
+      required: false,
       hidden: false
     };
     if (!projectMemberFieldConfig.hidden) {
@@ -105,17 +98,11 @@ export function createProjectYupSchema({
 }
 
 export function useProjectForm(options?: {
-  defaultRequired?: boolean;
   defaultValues?: ProjectValues;
   projectWithMembers?: ProjectWithMembers;
   fieldConfig?: ProjectEditorFieldConfig;
 }) {
-  const {
-    defaultValues,
-    fieldConfig = defaultProjectFieldConfig,
-    defaultRequired = false,
-    projectWithMembers
-  } = options ?? {};
+  const { defaultValues, fieldConfig = defaultProjectFieldConfig, projectWithMembers } = options ?? {};
 
   const defaultProjectValues = useGetDefaultProject();
 
@@ -153,8 +140,7 @@ export function useProjectForm(options?: {
 
   const yupSchema = useRef(
     createProjectYupSchema({
-      fieldConfig,
-      defaultRequired
+      fieldConfig
     })
   );
 
@@ -162,7 +148,8 @@ export function useProjectForm(options?: {
     defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectValues,
     reValidateMode: 'onChange',
     resolver: yupResolver(yupSchema.current),
-    criteriaMode: 'all'
+    criteriaMode: 'all',
+    mode: 'onChange'
   });
 
   return form;

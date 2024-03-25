@@ -146,6 +146,12 @@ export function useFormFields({
               });
               break;
             }
+            case 'project_profile': {
+              acc[property.id] = yup.object().test('is-required', 'Required', (value) => {
+                return value && 'projectId' in value;
+              });
+              break;
+            }
             default: {
               return acc;
             }

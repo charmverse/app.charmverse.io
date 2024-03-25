@@ -19,7 +19,7 @@ function FieldAnswer({
   property: ProjectFieldProperty;
   fieldConfig?: ProjectFieldConfig;
 }) {
-  const { setValue, control } = useFormContext<ProjectValues>();
+  const { setValue, control, register } = useFormContext<ProjectValues>();
 
   const { field, fieldState } = useController({
     control,
@@ -41,14 +41,7 @@ function FieldAnswer({
       disabled={disabled}
       value={(field.value as string) ?? ''}
       error={fieldState.error?.message}
-      onChange={(e) => {
-        const newValue = e.target.value;
-        setValue(name, newValue, {
-          shouldTouch: true,
-          shouldDirty: true,
-          shouldValidate: true
-        });
-      }}
+      {...register(name)}
     />
   );
 }

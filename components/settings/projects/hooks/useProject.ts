@@ -1,40 +1,43 @@
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo } from 'react';
 
-import { useGetProjects, useUpdateProject } from 'charmClient/hooks/projects';
-import type {
-  ProjectEditorFieldConfig,
-  ProjectUpdatePayload,
-  ProjectWithMembers
-} from 'components/projects/interfaces';
+import charmClient from 'charmClient';
+import type { MaybeString } from 'charmClient/hooks/helpers';
+import { useGetProjects } from 'charmClient/hooks/projects';
+import { type ProjectEditorFieldConfig, type ProjectUpdatePayload } from 'components/projects/interfaces';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 
 import { useProjectForm } from './useProjectForm';
 
 export function useProject({
-  projectWithMembers,
-  defaultRequired,
+  projectId,
   fieldConfig
 }: {
-  projectWithMembers: ProjectWithMembers;
-  defaultRequired?: boolean;
+  projectId: MaybeString;
   fieldConfig?: ProjectEditorFieldConfig;
 }) {
-  const { mutate } = useGetProjects();
+  const { mutate, data: projectsWithMembers } = useGetProjects();
+  const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);
   const { user } = useUser();
-  const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
+  const isTeamLead = projectWithMembers?.projectMembers[0].userId === user?.id;
+
   const form = useProjectForm({
     projectWithMembers,
-    defaultRequired,
     fieldConfig
   });
 
-  const { trigger: updateProject } = useUpdateProject({ projectId: projectWithMembers.id });
+  useEffect(() => {
+    if (projectId) {
+      form.reset(projectWithMembers);
+      form.trigger();
+    }
+  }, [projectId, fieldConfig]);
+
   const { showMessage } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
-    return debounce(updateProject, 300);
-  }, [updateProject]);
+    return debounce(charmClient.updateProject, 300);
+  }, []);
 
   const onProjectUpdate = useCallback(
     async (projectPayload: ProjectUpdatePayload) => {
@@ -42,7 +45,7 @@ export function useProject({
         await debouncedUpdate(projectPayload);
         mutate(
           (projects) => {
-            if (!projects) {
+            if (!projects || !projectWithMembers) {
               return projects;
             }
 
@@ -79,7 +82,7 @@ export function useProject({
   const isValid = form.formState.isValid;
 
   useEffect(() => {
-    if (isDirty && isValid && isTeamLead) {
+    if (isDirty && isValid && isTeamLead && projectWithMembers) {
       const updatePayload = {
         id: projectWithMembers.id,
         ...project,

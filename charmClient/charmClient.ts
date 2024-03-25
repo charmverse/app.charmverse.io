@@ -13,6 +13,7 @@ import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
+import type { ProjectUpdatePayload, ProjectWithMembers } from 'components/projects/interfaces';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
@@ -365,6 +366,10 @@ class CharmClient {
 
   removeProjectMember({ projectId, memberId }: { projectId: string; memberId: string }) {
     return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
+  }
+
+  updateProject(payload: ProjectUpdatePayload) {
+    return http.PUT<ProjectWithMembers>(`/api/projects/${payload.id}`, payload);
   }
 }
 

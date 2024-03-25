@@ -13,7 +13,7 @@ import { useProject } from './hooks/useProject';
 import { useProjectForm } from './hooks/useProjectForm';
 
 function ProjectRowFormAnswers({ projectWithMembers }: { projectWithMembers: ProjectWithMembers }) {
-  const { form, isTeamLead } = useProject({ projectWithMembers });
+  const { form, isTeamLead } = useProject({ projectId: projectWithMembers.id });
 
   return (
     <FormProvider {...form}>
