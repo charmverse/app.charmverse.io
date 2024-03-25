@@ -8,14 +8,16 @@ export const externalCredentialSchemaDefinition = 'string Name,string EcosystemU
 
 export type ExternalCredential = {
   Name: string;
-  EcosystemURL: string;
+  GrantRound: string;
+  ProposalURL: string;
 };
 
-export function encodeExternalCredential({ Name, EcosystemURL }: ExternalCredential) {
+export function encodeExternalCredential({ Name, ProposalURL, GrantRound }: ExternalCredential) {
   const encoder = new SchemaEncoder(externalCredentialSchemaDefinition);
   const encodedData = encoder.encodeData([
     { name: 'Name', value: Name, type: 'string' },
-    { name: 'EcosystemURL', value: EcosystemURL, type: 'string' }
+    { name: 'GrantRound', value: GrantRound, type: 'string' },
+    { name: 'EcosystemURL', value: ProposalURL, type: 'string' }
   ] as TypedSchemaItem<ExternalCredential>[]);
 
   return encodedData;

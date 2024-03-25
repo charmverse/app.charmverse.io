@@ -138,13 +138,8 @@ export async function signCharmverseAttestation({
 export async function signAndPublishCharmverseCredential({
   chainId,
   credential,
-  recipient,
-  metadata,
-  source
-}: CharmVerseCredentialInput & {
-  source: 'gitcoin' | 'questbook';
-  metadata: Pick<GitcoinProjectDetails, 'projectId' | 'chainId'> & Partial<GitcoinProjectDetails['metadata']>;
-}) {
+  recipient
+}: CharmVerseCredentialInput) {
   const signedCredential = await signCharmverseAttestation({ chainId, credential, recipient });
 
   const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
