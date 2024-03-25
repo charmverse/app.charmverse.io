@@ -2,11 +2,12 @@ import { log } from '@charmverse/core/log';
 import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-import { useGetProjects } from 'charmClient/hooks/projects';
+import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
+import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
+import { useGetDefaultProject } from 'components/settings/projects/hooks/useGetDefaultProject';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -27,7 +28,7 @@ export function useNewProposal({ newProposal }: Props) {
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
-
+  const { trigger: createProject } = useCreateProject();
   const [contentUpdated, setContentUpdated] = useState(false);
   // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
   const [isFormLoaded, setIsFormLoaded] = useState(false);
@@ -67,6 +68,7 @@ export function useNewProposal({ newProposal }: Props) {
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
   const { data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === selectedProjectId);
+  const defaultProjectValues = useGetDefaultProject();
 
   const projectForm = useProjectForm({
     projectWithMembers,
@@ -77,6 +79,8 @@ export function useNewProposal({ newProposal }: Props) {
   useEffect(() => {
     if (selectedProjectId) {
       projectForm.reset(projectWithMembers);
+    } else {
+      projectForm.reset(defaultProjectValues);
     }
   }, [selectedProjectId]);
 
@@ -92,6 +96,11 @@ export function useNewProposal({ newProposal }: Props) {
   );
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
+    // Create a project if the proposal has a project field
+    let createdProject: ProjectWithMembers | undefined;
+    if (projectField) {
+      createdProject = await createProject(projectForm.getValues());
+    }
     log.info('[user-journey] Create a proposal');
     if (currentSpace) {
       const result = await createProposalTrigger({
@@ -106,7 +115,15 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
-        formFields: formInputs.formFields,
+        formFields: formInputs.formFields?.map((formField) => {
+          if (formField.type === 'project_profile' && createdProject) {
+            return {
+              ...formField,
+              value: { projectId: createdProject.id }
+            };
+          }
+          return formField;
+        }),
         evaluations: formInputs.evaluations,
         spaceId: currentSpace.id,
         fields: formInputs.fields,

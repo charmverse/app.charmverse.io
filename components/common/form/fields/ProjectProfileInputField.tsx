@@ -2,47 +2,12 @@ import type { FormField } from '@charmverse/core/prisma-client';
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { FormProvider } from 'react-hook-form';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
 import { ProjectFormAnswers } from 'components/projects/ProjectForm';
-import { CreateProjectForm } from 'components/settings/projects/CreateProjectForm';
-import { useProject } from 'components/settings/projects/hooks/useProject';
-import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 
 import type { FormFieldValue } from '../interfaces';
-
-function ProjectProfileFormAnswers({
-  selectedProject,
-  fieldConfig
-}: {
-  selectedProject: ProjectWithMembers;
-  fieldConfig: ProjectEditorFieldConfig;
-}) {
-  // const { form, isTeamLead } = useProject({ projectId: selectedProject.id, fieldConfig });
-
-  return (
-    <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-      <ProjectFormAnswers defaultRequired isTeamLead fieldConfig={fieldConfig} />
-    </Box>
-  );
-}
-
-function CreateProjectFormWithProvider({
-  onCancel,
-  onSave
-}: {
-  onSave: (project: ProjectWithMembers) => void;
-  onCancel: VoidFunction;
-}) {
-  const form = useProjectForm();
-  return (
-    <FormProvider {...form}>
-      <CreateProjectForm isOpen onSave={onSave} onCancel={onCancel} />
-    </FormProvider>
-  );
-}
 
 export function ProjectProfileInputField({
   onChange,
@@ -83,7 +48,10 @@ export function ProjectProfileInputField({
             setShowCreateProjectForm(false);
           }
         }}
-        renderValue={() => {
+        renderValue={(value) => {
+          if (value === 'ADD_PROFILE') {
+            return <Typography>Add a new project profile</Typography>;
+          }
           if (!selectedProject) {
             return <Typography>Select a project profile</Typography>;
           }
@@ -103,24 +71,15 @@ export function ProjectProfileInputField({
           </Stack>
         </MenuItem>
       </Select>
-      {selectedProject && (
-        <ProjectProfileFormAnswers
-          key={selectedProject.id}
-          selectedProject={selectedProject}
-          fieldConfig={formField.fieldConfig as ProjectEditorFieldConfig}
-        />
-      )}
-      {showCreateProjectForm && (
-        <CreateProjectFormWithProvider
-          onSave={(project) => {
-            onChange({ projectId: project.id });
-            setShowCreateProjectForm(false);
-          }}
-          onCancel={() => {
-            onChange({ projectId: '' });
-            setShowCreateProjectForm(false);
-          }}
-        />
+      {(showCreateProjectForm || selectedProject) && (
+        <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+          <ProjectFormAnswers
+            defaultRequired
+            key={selectedProject?.id ?? 'new-project'}
+            fieldConfig={formField.fieldConfig as ProjectEditorFieldConfig}
+            isTeamLead
+          />
+        </Box>
       )}
     </Stack>
   );
