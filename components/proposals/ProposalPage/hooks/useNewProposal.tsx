@@ -1,12 +1,13 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+import { useGetProjects } from 'charmClient/hooks/projects';
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
-import { useProject } from 'components/settings/projects/hooks/useProject';
+import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -64,11 +65,19 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
+  const { data: projectsWithMembers } = useGetProjects();
+  const projectWithMembers = projectsWithMembers?.find((project) => project.id === selectedProjectId);
 
-  const { form: projectForm } = useProject({
-    projectId: selectedProjectId,
+  const projectForm = useProjectForm({
+    projectWithMembers,
     fieldConfig: projectField?.fieldConfig as ProjectEditorFieldConfig
   });
+
+  useEffect(() => {
+    if (selectedProjectId) {
+      projectForm.reset(projectWithMembers);
+    }
+  }, [selectedProjectId]);
 
   const setFormInputs = useCallback(
     (partialFormInputs: Partial<ProposalPageAndPropertiesInput>, { fromUser = true }: { fromUser?: boolean } = {}) => {

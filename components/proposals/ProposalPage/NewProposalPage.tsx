@@ -139,7 +139,11 @@ export function NewProposalPage({
   // console.log('fieldConfig', projectField?.fieldConfig);
 
   let disabledTooltip = _disabledTooltip;
-  if (!disabledTooltip && !isProposalFormFieldsValid && (projectField ? !isProposalProjectFieldValid : false)) {
+  if (
+    !disabledTooltip &&
+    (!isProposalFormFieldsValid ||
+      (projectField && formInputs.type !== 'proposal_template' ? !isProposalProjectFieldValid : false))
+  ) {
     disabledTooltip = 'Please provide correct values for all proposal form fields';
   }
 

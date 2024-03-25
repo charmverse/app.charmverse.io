@@ -138,16 +138,14 @@ export function useProjectForm(options?: {
     } as ProjectValues;
   }, [projectWithMembers]);
 
-  const yupSchema = useRef(
-    createProjectYupSchema({
-      fieldConfig
-    })
-  );
-
   const form = useForm({
     defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectValues,
     reValidateMode: 'onChange',
-    resolver: yupResolver(yupSchema.current),
+    resolver: yupResolver(
+      createProjectYupSchema({
+        fieldConfig
+      })
+    ),
     criteriaMode: 'all',
     mode: 'onChange'
   });
