@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { readContract } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -30,7 +31,7 @@ const schema = yup.object({
         .test('isContract', 'Invalid contract or chain', async (value, context) => {
           try {
             if (context.parent.check === 'builder') {
-              await readContract({
+              await readContract(wagmiConfig, {
                 address: value,
                 chainId: Number(context.parent.chain),
                 abi: ercAbi,
@@ -58,7 +59,7 @@ const schema = yup.object({
         .test('isHat', 'Invalid hat id', async (value, context) => {
           try {
             const hatId = BigInt(value);
-            const supply = await readContract({
+            const supply = await readContract(wagmiConfig, {
               address: hatsProtocolContractAddress,
               chainId: Number(context.parent.chain),
               abi: hatsProtocolAbi,

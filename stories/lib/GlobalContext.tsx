@@ -4,6 +4,7 @@ import { development, LensProvider } from '@lens-protocol/react-web';
 import { bindings } from '@lens-protocol/wagmi';
 import { Paper } from '@mui/material';
 import type { Store } from '@reduxjs/toolkit';
+import { wagmiConfig } from 'connectors/config';
 import { useRef, type ReactNode } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { spaces } from 'stories/lib/mockData';
@@ -19,7 +20,7 @@ import { UserProvider } from 'hooks/useUser';
 const space = spaces[0];
 
 const lensConfig: LensConfig = {
-  bindings: bindings(),
+  bindings: bindings(wagmiConfig),
   environment: development
 };
 

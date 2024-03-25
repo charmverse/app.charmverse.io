@@ -55,8 +55,7 @@ import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
 import { handlers } from './mockApi';
-import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
+import { WagmiConfig, http, createConfig, mainnet } from 'wagmi';
 
 // Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
 initialize({
@@ -114,9 +113,11 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
-const { publicClient } = configureChains([mainnet], [publicProvider()]);
 export const wagmiConfig = createConfig({
-  publicClient
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http()
+  }
 });
 
 export const globalProviders = (Story, context) => {

@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { fetchToken } from '@wagmi/core';
+import { getToken } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -29,7 +30,7 @@ const schema = yup.object({
 
           if (chain && check === 'customToken') {
             try {
-              await fetchToken({
+              await getToken(wagmiConfig, {
                 address: value,
                 chainId: Number(chain)
               });
