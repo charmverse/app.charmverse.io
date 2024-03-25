@@ -31,7 +31,6 @@ export function useProject({
   useEffect(() => {
     if (projectId && projectWithMembers) {
       form.reset(convertToProjectValues(projectWithMembers));
-      form.trigger();
     }
   }, [projectId]);
 

@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
@@ -11,10 +11,12 @@ import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 
 export function CreateProjectForm({
   onCancel,
-  onSave
+  onSave,
+  onAddProject
 }: {
   onSave?: (project: ProjectWithMembers) => void;
   onCancel?: VoidFunction;
+  onAddProject?: VoidFunction;
 }) {
   const [open, setOpen] = useState(false);
   const { trigger: createProject, isMutating } = useCreateProject();
@@ -52,6 +54,7 @@ export function CreateProjectForm({
         disabled={isMutating}
         onClick={() => {
           setOpen(true);
+          onAddProject?.();
         }}
         startIcon={<AddIcon fontSize='small' />}
       >
