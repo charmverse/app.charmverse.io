@@ -5,7 +5,7 @@ import type { TypedSchemaItem } from './interfaces';
 export const externalCredentialSchemaId = '0x2ef0994b8591628ce92321818843f3851f461a6721dbed3d80d031441aeb6e52';
 
 export const externalCredentialSchemaDefinition =
-  'string Name,string ProjectId,string Event,string Date,string GrantRound,string Source,string GrantUrl,string URL';
+  'string Name,string ProjectId,string Event,string Date,string GrantRound,string Source,string GrantURL,string URL';
 
 export type ExternalCredential = {
   Name: string;
@@ -21,9 +21,9 @@ export type ExternalCredential = {
 export function encodeExternalCredential({
   Name,
   ProjectId,
-  GrantRound,
   Event,
   Date,
+  GrantRound,
   Source,
   GrantURL,
   URL
@@ -32,9 +32,9 @@ export function encodeExternalCredential({
   const encodedData = encoder.encodeData([
     { name: 'Name', value: Name, type: 'string' },
     { name: 'ProjectId', value: ProjectId, type: 'string' },
-    { name: 'GrantRound', value: GrantRound, type: 'string' },
     { name: 'Event', value: Event, type: 'string' },
     { name: 'Date', value: Date, type: 'string' },
+    { name: 'GrantRound', value: GrantRound, type: 'string' },
     { name: 'Source', value: Source, type: 'string' },
     { name: 'GrantURL', value: GrantURL, type: 'string' },
     { name: 'URL', value: URL, type: 'string' }
