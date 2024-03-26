@@ -1,4 +1,4 @@
-import type { FormField } from '@charmverse/core/prisma';
+import type { Block, FormField } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
@@ -21,19 +21,12 @@ export async function setDatabaseProposalProperties({
 }: {
   boardId: string;
   cardProperties: IPropertyTemplate[];
-}): Promise<Board> {
-  const [boardBlock, boardPage] = await Promise.all([
-    prisma.block.findUniqueOrThrow({
-      where: {
-        id: boardId
-      }
-    }),
-    prisma.page.findFirstOrThrow({
-      where: {
-        boardId
-      }
-    })
-  ]);
+}): Promise<Block> {
+  const boardBlock = await prisma.block.findUniqueOrThrow({
+    where: {
+      id: boardId
+    }
+  });
   const boardFields = boardBlock.fields as unknown as BoardFields;
 
   if (boardFields.sourceType !== 'proposals') {
@@ -127,7 +120,7 @@ export async function setDatabaseProposalProperties({
     }
   });
 
-  return prismaToUIBlock(updatedBoardBlock, boardPage) as Board;
+  return updatedBoardBlock;
 }
 
 function getBoardProperties({

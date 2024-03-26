@@ -97,6 +97,13 @@ describe('GET /api/blocks/[id]', () => {
     expect(cardBlock).toMatchObject(
       expect.objectContaining({
         ...databaseCards[0],
+        fields: expect.objectContaining({
+          ...(databaseCards[0].fields as any),
+          properties: {
+            ...(databaseCards[0].fields as any).properties,
+            __title: expect.any(String)
+          }
+        }),
         createdAt: expect.any(String),
         updatedAt: expect.any(String)
       })

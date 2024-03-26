@@ -25,7 +25,7 @@ import { relay } from 'lib/websockets/relay';
 import { createCardPage } from '../pages/createCardPage';
 
 import { proposalPropertyTypesList } from './board';
-import type { IPropertyTemplate, BoardFields } from './board';
+import type { IPropertyTemplate, Board, BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
 import type { CardFields, CardPropertyValue } from './card';
 import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
@@ -155,10 +155,18 @@ export async function updateCardsFromProposals({
 
   const boardBlockFields = (proposalBoardBlock as null | { fields: BoardFields })?.fields;
 
-  const boardBlock = await setDatabaseProposalProperties({
-    boardId,
-    cardProperties: []
-  });
+  const [dbBlock, boardPage] = await Promise.all([
+    setDatabaseProposalProperties({
+      boardId,
+      cardProperties: []
+    }),
+    prisma.page.findFirstOrThrow({
+      where: {
+        boardId
+      }
+    })
+  ]);
+  const boardBlock = prismaToUIBlock(dbBlock, boardPage) as Board;
 
   const boardBlockCardPropertiesRecord: Record<string, IPropertyTemplate> = {};
 
