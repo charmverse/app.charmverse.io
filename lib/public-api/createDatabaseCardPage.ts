@@ -3,7 +3,7 @@ import type { Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { blockToUIBlock, applyPageToBlock } from 'lib/databases/block';
+import { prismaToUIBlock } from 'lib/databases/block';
 import { createPage } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -135,7 +135,7 @@ export async function createDatabaseCardPage({
   relay.broadcast(
     {
       type: 'blocks_created',
-      payload: [blockToUIBlock(applyPageToBlock(createdCard.cardBlock, createdCard.page))]
+      payload: [prismaToUIBlock(createdCard.cardBlock, createdCard.page)]
     },
     createdCard.cardBlock.spaceId
   );

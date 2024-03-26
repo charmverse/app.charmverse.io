@@ -8,7 +8,7 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
-import { prismaToBlock, blockToUIBlock, applyPageToBlock } from 'lib/databases/block';
+import { prismaToUIBlock } from 'lib/databases/block';
 import { extractCardProposalProperties } from 'lib/databases/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/databases/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
@@ -366,8 +366,7 @@ export async function updateCardsFromProposals({
   /**
    * Case for cards that are linked to a proposal page and need to be updated
    */
-  const updatedPages: Page[] = [];
-  const updatedBlocks: Block[] = [];
+  const updatedCards: { page: Page; block: Block }[] = [];
   const newCards: { page: Page; block: Block }[] = [];
 
   const proposalIds = proposalPagesLite.map((p) => p.proposal?.id).filter(isTruthy);
@@ -534,8 +533,7 @@ export async function updateCardsFromProposals({
 
               return { updatedCardPage: updatedPage, updatedCardBlock: updatedBlock };
             });
-            updatedPages.push(updatedCardPage);
-            updatedBlocks.push(updatedCardBlock);
+            updatedCards.push({ block: updatedCardBlock, page: updatedCardPage });
           }
 
           // Don't create new cards from archived cards
@@ -629,7 +627,7 @@ export async function updateCardsFromProposals({
     }
   });
 
-  const updatedBlockPayload = [prismaToBlock(boardBlock as any), ...updatedBlocks.map((block) => prismaToBlock(block))];
+  const updatedBlockPayload = [boardBlock, ...updatedCards.map(({ block, page }) => prismaToUIBlock(block, page))];
 
   relay.broadcast(
     {
@@ -643,7 +641,7 @@ export async function updateCardsFromProposals({
     relay.broadcast(
       {
         type: 'blocks_created',
-        payload: newCards.map((card) => blockToUIBlock(applyPageToBlock(card.block, card.page)))
+        payload: newCards.map((card) => prismaToUIBlock(card.block, card.page))
       },
       spaceId
     );
@@ -685,6 +683,6 @@ export async function updateCardsFromProposals({
   return {
     created: newCards.length,
     deleted: orphanPageIds.length,
-    updated: updatedPages.length
+    updated: updatedCards.length
   };
 }

@@ -11,6 +11,21 @@ import { Constants } from './constants';
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
 export type BlockTypes = (typeof blockTypes)[number];
 
+type PageFields = Pick<
+  Page,
+  | 'title'
+  | 'headerImage'
+  | 'galleryImage'
+  | 'hasContent'
+  | 'syncWithPageId'
+  | 'updatedBy'
+  | 'updatedAt'
+  | 'type'
+  | 'id'
+  | 'bountyId'
+  | 'icon'
+>;
+
 export type BlockPatch = {
   spaceId?: string;
   parentId?: string;
@@ -174,6 +189,7 @@ export function blockToPrismaPartial(fbBlock: Partial<UIBlockWithDetails>): Part
   };
 }
 
+// use this method for blocks like views that do not have a page
 export function prismaToBlock(block: PrismaBlock): Block {
   return {
     id: block.id,
@@ -189,6 +205,10 @@ export function prismaToBlock(block: PrismaBlock): Block {
     createdAt: block.createdAt.getTime(),
     updatedAt: block.updatedAt.getTime()
   };
+}
+
+export function prismaToUIBlock(block: PrismaBlock, page: PageFields): UIBlockWithDetails {
+  return blockToUIBlock(applyPageToBlock(block, page));
 }
 
 export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
@@ -212,23 +232,7 @@ export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
 }
 
 // mutative method, for performance reasons
-export function applyPageToBlock(
-  block: PrismaBlock,
-  page: Pick<
-    Page,
-    | 'title'
-    | 'headerImage'
-    | 'galleryImage'
-    | 'hasContent'
-    | 'syncWithPageId'
-    | 'updatedBy'
-    | 'updatedAt'
-    | 'type'
-    | 'id'
-    | 'bountyId'
-    | 'icon'
-  >
-): BlockWithDetails {
+export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWithDetails {
   const blockWithDetails = block as BlockWithDetails;
   blockWithDetails.bountyId = page.bountyId || undefined;
   blockWithDetails.pageId = page.id;

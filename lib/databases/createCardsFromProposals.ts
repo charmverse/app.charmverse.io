@@ -4,7 +4,7 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { prismaToBlock, blockToUIBlock, applyPageToBlock } from 'lib/databases/block';
+import { prismaToBlock, prismaToUIBlock } from 'lib/databases/block';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
@@ -225,7 +225,7 @@ export async function createCardsFromProposals({
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(boardBlock as any))
+      payload: updatedViewBlocks.map(prismaToBlock).concat(boardBlock)
     },
     spaceId
   );
@@ -336,7 +336,7 @@ export async function createCardsFromProposals({
     relay.broadcast(
       {
         type: 'blocks_created',
-        payload: cards.map((card) => blockToUIBlock(applyPageToBlock(card.block, card.page)))
+        payload: cards.map((card) => prismaToUIBlock(card.block, card.page))
       },
       spaceId
     );

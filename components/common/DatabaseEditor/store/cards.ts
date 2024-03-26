@@ -27,15 +27,12 @@ type CardsState = {
 };
 
 function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; card: Card }) {
-  // dont add a card if it doesnt exist, the user may not have access to it
-  if (cards[card.id]) {
-    const cardTitle = card.title || cards[card.id]?.title;
-    const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
-    cardAfterUpdate.title = cardTitle;
-    cards[card.id] = cardAfterUpdate;
-    if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
-      cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
-    }
+  const cardTitle = card.title || cards[card.id]?.title;
+  const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
+  cardAfterUpdate.title = cardTitle;
+  cards[card.id] = cardAfterUpdate;
+  if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
+    cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
   }
 }
 
