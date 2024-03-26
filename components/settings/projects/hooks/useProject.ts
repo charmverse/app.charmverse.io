@@ -21,7 +21,7 @@ export function useProject({
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);
   const { user } = useUser();
   const isTeamLead = projectWithMembers?.projectMembers[0].userId === user?.id;
-
+  const hasProjectWithMembers = !!projectWithMembers;
   const form = useProjectForm({
     projectWithMembers,
     fieldConfig,
@@ -32,7 +32,7 @@ export function useProject({
     if (projectId && projectWithMembers) {
       form.reset(convertToProjectValues(projectWithMembers));
     }
-  }, [projectId]);
+  }, [projectId, hasProjectWithMembers]);
 
   const { showMessage } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
@@ -101,6 +101,7 @@ export function useProject({
 
   return {
     form,
-    isTeamLead
+    isTeamLead,
+    projectWithMembers
   };
 }

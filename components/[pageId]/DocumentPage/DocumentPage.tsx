@@ -251,7 +251,7 @@ function DocumentPageComponent({
   }
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
-  const { form } = useProject({
+  const { form, projectWithMembers } = useProject({
     projectId,
     fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig
   });
