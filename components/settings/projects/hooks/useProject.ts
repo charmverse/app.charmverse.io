@@ -15,7 +15,7 @@ export function useProject({
   fieldConfig
 }: {
   projectId: MaybeString;
-  fieldConfig?: ProjectEditorFieldConfig;
+  fieldConfig: ProjectEditorFieldConfig;
 }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);

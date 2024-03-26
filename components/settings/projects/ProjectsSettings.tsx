@@ -30,7 +30,8 @@ function ProjectRow({
   const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
   const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
-    projectWithMembers
+    projectWithMembers,
+    fieldConfig: defaultProjectFieldConfig
   });
   const { mutate } = useGetProjects();
 
@@ -132,7 +133,9 @@ function ProjectRow({
 export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
   const { data: projectsWithMembers } = useGetProjects();
-  const form = useProjectForm();
+  const form = useProjectForm({
+    fieldConfig: defaultProjectFieldConfig
+  });
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
 
   return (

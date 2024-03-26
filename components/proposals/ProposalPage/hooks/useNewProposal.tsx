@@ -12,6 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { defaultProjectFieldConfig } from 'lib/projects/constants';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
@@ -39,21 +40,7 @@ export function useNewProposal({ newProposal }: Props) {
   );
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
 
-  const proposalFormFields = isStructured
-    ? formInputs.formFields ?? [
-        {
-          type: 'project_profile',
-          name: '',
-          description: emptyDocument,
-          index: 0,
-          options: [],
-          private: false,
-          required: true,
-          id: uuid(),
-          fieldConfig: { projectMember: {} }
-        } as FormFieldInput
-      ]
-    : [];
+  const proposalFormFields = (isStructured ? formInputs.formFields : []) as FormFieldInput[];
 
   const {
     control: proposalFormFieldControl,
@@ -74,7 +61,7 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectWithMembers,
-    fieldConfig: projectField?.fieldConfig as ProjectEditorFieldConfig,
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig,
     defaultRequired: true
   });
 
@@ -197,6 +184,8 @@ function emptyState({
   userId,
   ...inputs
 }: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
+  const isStructured = inputs.proposalType === 'structured' || !!inputs.formId;
+
   return {
     createdAt: new Date().toISOString(),
     proposalType: 'free_form',
@@ -211,6 +200,21 @@ function emptyState({
     selectedCredentialTemplates: [],
     fields: { properties: {}, enableRewards: true },
     ...inputs,
+    formFields: isStructured
+      ? [
+          {
+            type: 'project_profile',
+            name: '',
+            description: emptyDocument,
+            index: 0,
+            options: [],
+            private: false,
+            required: true,
+            id: uuid(),
+            fieldConfig: { projectMember: {} }
+          } as FormFieldInput
+        ]
+      : [],
     // leave authors empty for proposals
     authors: inputs.type !== 'proposal_template' && userId ? [userId] : []
   };

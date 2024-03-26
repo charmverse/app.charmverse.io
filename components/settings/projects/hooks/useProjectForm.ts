@@ -1,16 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { ethers } from 'ethers';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import {
-  projectFieldProperties,
-  projectMemberFieldProperties,
-  defaultProjectFieldConfig
-} from 'lib/projects/constants';
+import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/constants';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type {
   ProjectField,
@@ -135,17 +131,26 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
   } as ProjectValues;
 }
 
-export function useProjectForm(options?: {
+export function useProjectForm(options: {
   defaultValues?: ProjectValues;
   projectWithMembers?: ProjectWithMembers;
-  fieldConfig?: ProjectEditorFieldConfig;
+  fieldConfig: ProjectEditorFieldConfig;
   defaultRequired?: boolean;
 }) {
-  const { defaultRequired, defaultValues, fieldConfig = defaultProjectFieldConfig, projectWithMembers } = options ?? {};
+  const { defaultRequired, defaultValues, fieldConfig, projectWithMembers } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
 
   const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
+
+  const yupSchema = useRef(yup.object());
+
+  useEffect(() => {
+    yupSchema.current = createProjectYupSchema({
+      fieldConfig,
+      defaultRequired
+    });
+  }, [fieldConfig, defaultRequired]);
 
   const defaultProjectWithMembers = useMemo(() => {
     if (!projectWithMembers) {
@@ -157,12 +162,7 @@ export function useProjectForm(options?: {
   const form = useForm({
     defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectValues,
     reValidateMode: 'onChange',
-    resolver: yupResolver(
-      createProjectYupSchema({
-        fieldConfig,
-        defaultRequired
-      })
-    ),
+    resolver: yupResolver(yupSchema.current),
     criteriaMode: 'all',
     mode: 'onChange'
   });
