@@ -2,11 +2,17 @@
 import type { AttestationType } from '@charmverse/core/prisma';
 
 import type { ExternalCredential } from './external';
-import { encodeExternalCredential, externalCredentialSchemaId } from './external';
+import { encodeExternalCredential, externalCredentialSchemaDefinition, externalCredentialSchemaId } from './external';
 import type { ProposalCredential } from './proposal';
 import { encodeProposalCredential, proposalCredentialSchemaId, proposalCredentialSchemaDefinition } from './proposal';
 import type { RewardCredential } from './reward';
 import { encodeRewardCredential, rewardCredentialSchemaId, rewardCredentialSchemaDefinition } from './reward';
+
+export const allSupportedSchemas = [
+  proposalCredentialSchemaDefinition,
+  rewardCredentialSchemaDefinition,
+  externalCredentialSchemaDefinition
+];
 
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
