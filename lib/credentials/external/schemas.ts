@@ -11,10 +11,11 @@ export type ExternalCredentialChain = (typeof externalCredentialChains)[number];
 /**
  * Utility for configuration relating to the schema
  * @fields specific fields of the attestation we want to show the user
+ * @issuers list of issuers that we should filter for
  */
 export type TrackedSchemaParams = {
   schemaId: string;
-  issuers: string[];
+  issuers?: string[];
   title: string;
   organization: string;
   iconUrl: string;
@@ -54,11 +55,8 @@ const optimismRetroPgfContributionSchema: TrackedSchemaParams = {
   ]
 };
 
-const charmverseWalletAddress = '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07';
-
 const optimismCharmverseProposalSchema: TrackedSchemaParams = {
   schemaId: proposalCredentialSchemaId,
-  issuers: [charmverseWalletAddress],
   title: 'Proposal',
   organization: 'CharmVerse',
   iconUrl: charmverseLogo,
@@ -67,7 +65,6 @@ const optimismCharmverseProposalSchema: TrackedSchemaParams = {
 
 const optimismCharmverseRewardSchema: TrackedSchemaParams = {
   schemaId: rewardCredentialSchemaId,
-  issuers: [charmverseWalletAddress],
   title: 'Reward',
   organization: 'CharmVerse',
   iconUrl: charmverseLogo,
@@ -118,6 +115,7 @@ export const trackedSchemas: Record<ExternalCredentialChain, TrackedSchemaParams
 };
 
 export const trackedCharmverseSchemas: Record<EasSchemaChain, TrackedSchemaParams[]> = {
+  [arbitrum.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
   [optimismSepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
   [optimism.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
   [sepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema]
