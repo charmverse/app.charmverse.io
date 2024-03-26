@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getAddress } from 'viem';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
-import { attestationSchemaIds } from 'lib/credentials/schemas';
 
 import { GITCOIN_SUPPORTED_CHAINS } from './constants';
 import { getProjectOwners } from './getProjectDetails';
@@ -21,40 +20,55 @@ export async function createOffchainCredentialsForProjects() {
       const approvedStatusSnapshot = application.statusSnapshots?.find((s) => String(s.status) === '1');
       const approvedSnapshotDate = new Date((Number(approvedStatusSnapshot?.timestamp) || 0) * 1000).toISOString();
       const credentialDate = approvedStatusSnapshot ? approvedSnapshotDate : new Date().toISOString();
+      const roundUrl = `https://explorer.gitcoin.co/#/round/${chainId}/${application.round.id}`;
+
+      const metadataPayload = {
+        name: metadata.application.project.title,
+        round: metadata.round.name,
+        proposalUrl: `${roundUrl}/${application.applicationIndex}`,
+        createdAt: metadata.application.project.createdAt,
+        twitter: metadata.application.project.projectTwitter,
+        website: metadata.application.project.website,
+        github: metadata.application.project.userGithub,
+        applicationId: application.id
+      };
 
       for (const owner of owners) {
         const externalProject = await prisma.externalProject.create({
           data: {
-            round: metadata.round.name,
-            schemaId: attestationSchemaIds.external,
             recipient: '0x5A4d8d2F5de4D6ae29A91EE67E3adAedb53B0081',
             source: 'gitcoin',
-            metadata
+            metadata: metadataPayload
           }
         });
 
-        const credential = await signAndPublishCharmverseCredential({
-          credential: {
-            type: 'external',
-            data: {
-              Name: metadata.application.project.title,
-              ProjectId: externalProject.id,
-              Source: 'Gitcoin',
-              Event: 'Approved',
-              GrantRound: metadata.round.name.trim(),
-              Date: credentialDate,
-              GrantURL: `https://explorer.gitcoin.co/#/round/${chainId}/${application.round.id}`,
-              URL: `https://explorer.gitcoin.co/#/round/${chainId}/${application.round.id}/${application.applicationIndex}`
-            }
-          },
-          chainId: 10,
-          recipient: owner
-        });
+        try {
+          await signAndPublishCharmverseCredential({
+            credential: {
+              type: 'external',
+              data: {
+                Name: metadata.application.project.title,
+                ProjectId: externalProject.id,
+                Source: 'Gitcoin',
+                Event: 'Approved',
+                GrantRound: metadata.round.name.trim(),
+                Date: credentialDate,
+                GrantURL: roundUrl,
+                URL: `${roundUrl}/${application.applicationIndex}`
+              }
+            },
+            chainId: 10,
+            recipient: owner
+          });
 
-        log.info(
-          `External credential created for Gitcoin round application id ${application.id} and chain id ${chainId}`,
-          credential
-        );
+          log.info(
+            `External credential created for Gitcoin round application id ${application.id} and chain id ${chainId}`
+          );
+        } catch (err) {
+          log.debug(
+            `Failed to create external credential for Gitcoin round application id ${application.id} and chain id ${chainId}`
+          );
+        }
       }
     }
   }

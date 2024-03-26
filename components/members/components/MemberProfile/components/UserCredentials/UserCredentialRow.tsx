@@ -75,7 +75,7 @@ export function UserCredentialRow({
         credential.schemaId === externalCredentialSchemaId &&
         'GrantRound' in charmCredential
       ? {
-          title: `Project - ${charmCredential.Name}`,
+          title: charmCredential.Name,
           subtitle: ['Gitcoin Round', charmCredential.GrantRound],
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
@@ -161,13 +161,11 @@ export function UserCredentialRow({
           {credentialInfo.title}
         </Typography>
         {typeof credentialInfo.subtitle === 'string' ? (
-          <Typography variant='caption' fontWeight='bold'>
-            {credentialInfo.subtitle}
-          </Typography>
+          <Typography variant='caption'>{credentialInfo.subtitle}</Typography>
         ) : (
           <>
             {credentialInfo.subtitle.map((sub) => (
-              <Typography variant='caption' fontWeight='bold' key={sub}>
+              <Typography variant='caption' key={sub}>
                 {sub}
               </Typography>
             ))}
