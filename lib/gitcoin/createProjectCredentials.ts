@@ -1,5 +1,5 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
 import { log } from '@charmverse/core/log';
+import { prisma } from '@charmverse/core/prisma-client';
 import { getAddress } from 'viem';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
@@ -20,14 +20,14 @@ export async function createOffchainCredentialsForProjects() {
       const owners = await getProjectOwners([recepient], chainId);
       const approvedStatusSnapshot = application.statusSnapshots?.find((s) => String(s.status) === '1');
       const approvedSnapshotDate = new Date((Number(approvedStatusSnapshot?.timestamp) || 0) * 1000).toISOString();
-      const applicationEndedDate = new Date(Number(application.round.applicationsEndTime) * 1000).toISOString();
+      const credentialDate = approvedStatusSnapshot ? approvedSnapshotDate : new Date().toISOString();
 
       for (const owner of owners) {
         const externalProject = await prisma.externalProject.create({
           data: {
             round: metadata.round.name,
             schemaId: attestationSchemaIds.external,
-            recipient: owner,
+            recipient: '0x5A4d8d2F5de4D6ae29A91EE67E3adAedb53B0081',
             source: 'gitcoin',
             metadata
           }
@@ -39,12 +39,12 @@ export async function createOffchainCredentialsForProjects() {
             data: {
               Name: metadata.application.project.title,
               ProjectId: externalProject.id,
-              GrantRound: metadata.round.name,
               Source: 'Gitcoin',
               Event: 'Approved',
-              Date: approvedStatusSnapshot ? approvedSnapshotDate : applicationEndedDate,
-              GrantURL: `https://explorer.gitcoin.co/${chainId}/${application.round.id}`,
-              URL: `https://explorer.gitcoin.co/${chainId}/${application.round.id}/${application.applicationIndex}`
+              GrantRound: metadata.round.name.trim(),
+              Date: credentialDate,
+              GrantURL: `https://explorer.gitcoin.co/#/round/${chainId}/${application.round.id}`,
+              URL: `https://explorer.gitcoin.co/#/round/${chainId}/${application.round.id}/${application.applicationIndex}`
             }
           },
           chainId: 10,

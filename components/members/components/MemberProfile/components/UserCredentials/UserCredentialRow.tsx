@@ -60,7 +60,7 @@ export function UserCredentialRow({
   const charmCredential = credential.content as CredentialDataInput;
   const credentialInfo: {
     title: string;
-    subtitle: string;
+    subtitle: string | string[];
     iconUrl: string;
     attestationContent: { name: string; value: string }[];
   } =
@@ -71,19 +71,14 @@ export function UserCredentialRow({
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
-      : credential.type === 'charmverse' && credential.schemaId === externalCredentialSchemaId
+      : credential.type === 'charmverse' &&
+        credential.schemaId === externalCredentialSchemaId &&
+        'GrantRound' in charmCredential
       ? {
-          title: charmCredential.Name,
-          subtitle: 'Grant Round',
+          title: `Project - ${charmCredential.Name}`,
+          subtitle: ['Gitcoin Round', charmCredential.GrantRound],
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
-        }
-      : credential.type === 'charmverse'
-      ? {
-          title: charmCredential.Name,
-          subtitle: 'Gitcoin Round',
-          iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
-          attestationContent: [{ name: 'Event', value: 'Proposal approved' }]
         }
       : credential.type === 'gitcoin'
       ? {
@@ -129,7 +124,7 @@ export function UserCredentialRow({
           <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
         </Link>
       )}
-      {isUserRecipient && !readOnly && (
+      {isUserRecipient && !readOnly && credential.schemaId !== externalCredentialSchemaId && (
         <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
           <div>
             <IconButton sx={{ p: 0 }} size='small' onClick={toggleFavorite} disabled={isMutating}>
@@ -165,9 +160,19 @@ export function UserCredentialRow({
         <Typography variant='body1' fontWeight='bold'>
           {credentialInfo.title}
         </Typography>
-        <Typography variant='caption' fontWeight='bold'>
-          {credentialInfo.subtitle}
-        </Typography>
+        {typeof credentialInfo.subtitle === 'string' ? (
+          <Typography variant='caption' fontWeight='bold'>
+            {credentialInfo.subtitle}
+          </Typography>
+        ) : (
+          <>
+            {credentialInfo.subtitle.map((sub) => (
+              <Typography variant='caption' fontWeight='bold' key={sub}>
+                {sub}
+              </Typography>
+            ))}
+          </>
+        )}
       </Box>
     </>
   );
