@@ -86,4 +86,49 @@ describe('GET /api/blocks/[id]/subtree', () => {
     const outsideUserCookie = await loginUser(outsideUser.id);
     await request(baseUrl).get(`/api/blocks/${database.id}/subtree`).set('Cookie', outsideUserCookie).expect(404);
   });
+
+  // This test uses public permissions to enable access to cards
+  it('Should return only the pages a user can access', async () => {
+    const sharedDatabase = await generateBoard({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      views: sourceDatabaseViewsCount,
+      cardCount: sourceDatabaseCardsCount,
+      permissions: [
+        {
+          permissionLevel: 'full_access',
+          public: true
+        }
+      ]
+    });
+    const outsideUserCookie = await loginUser(outsideUser.id);
+    const cards = await prisma.block.findMany({
+      where: {
+        rootId: sharedDatabase.id,
+        type: 'card'
+      }
+    });
+
+    // sanity check
+    expect(cards).toHaveLength(sourceDatabaseCardsCount);
+
+    // remove access to one of the cards
+    await prisma.pagePermission.delete({
+      where: {
+        public_pageId: {
+          pageId: cards[0].id,
+          public: true
+        }
+      }
+    });
+
+    const databaseBlocks = (
+      await request(baseUrl)
+        .get(`/api/blocks/${sharedDatabase.id}/subtree`)
+        .set('Cookie', outsideUserCookie)
+        .expect(200)
+    ).body as Block[];
+    const cardBlocks = databaseBlocks.filter((b) => b.type === 'card');
+    expect(cardBlocks).toHaveLength(cards.length - 1);
+  });
 });
