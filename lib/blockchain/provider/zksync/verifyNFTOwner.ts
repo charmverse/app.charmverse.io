@@ -1,3 +1,5 @@
+import ERC721_ABI from 'abis/ERC721.json';
+
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { getClient } from './client';
@@ -17,10 +19,14 @@ export async function verifyNFTOwner({
   tokenId: number | string;
   chainId: SupportedChainId;
 }): Promise<boolean> {
-  const client = getClient({ chainId });
+  const { client } = getClient({ chainId });
 
-  const contract = client.getNftContract(contractAddress);
+  const owner = await client.readContract({
+    abi: ERC721_ABI,
+    address: contractAddress as `0x${string}`,
+    functionName: 'ownerOf',
+    args: [BigInt(tokenId || 1).toString()]
+  });
 
-  const owner = await contract.functions.ownerOf(tokenId).then((data) => data.owner);
-  return ownerAddresses.some((a) => lowerCaseEqual(a, owner));
+  return ownerAddresses.some((a) => lowerCaseEqual(a, owner as string));
 }
