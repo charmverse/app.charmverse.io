@@ -9,6 +9,7 @@ import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -35,8 +36,9 @@ export function useNewProposal({ newProposal }: Props) {
   const [contentUpdated, setContentUpdated] = useState(false);
   // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
   const [isFormLoaded, setIsFormLoaded] = useState(false);
+  const isCharmverseSpace = useIsCharmverseSpace();
   const [formInputs, setFormInputsRaw] = useState<ProposalPageAndPropertiesInput>(
-    emptyState({ ...newProposal, userId: user?.id })
+    emptyState({ ...newProposal, userId: user?.id, isCharmverseSpace })
   );
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
 
@@ -182,10 +184,12 @@ export function useNewProposal({ newProposal }: Props) {
 
 function emptyState({
   userId,
+  isCharmverseSpace,
   ...inputs
-}: Partial<ProposalPageAndPropertiesInput> & { userId?: string } = {}): ProposalPageAndPropertiesInput {
+}: (Partial<ProposalPageAndPropertiesInput> & { userId?: string }) & {
+  isCharmverseSpace: boolean;
+}): ProposalPageAndPropertiesInput {
   const isStructured = inputs.proposalType === 'structured' || !!inputs.formId;
-
   return {
     createdAt: new Date().toISOString(),
     proposalType: 'free_form',
@@ -203,7 +207,7 @@ function emptyState({
     formFields: isStructured
       ? [
           {
-            type: 'project_profile',
+            type: isCharmverseSpace ? 'project_profile' : 'short_text',
             name: '',
             description: emptyDocument,
             index: 0,
@@ -211,7 +215,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: { projectMember: {} }
+            fieldConfig: isCharmverseSpace ? { projectMember: {} } : null
           } as FormFieldInput
         ]
       : [],

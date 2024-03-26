@@ -23,6 +23,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -88,7 +89,7 @@ function ExpandedFormField({
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
-
+  const isCharmverseSpace = useIsCharmverseSpace();
   // Auto focus on title text field when expanded
   useEffect(() => {
     if (titleTextFieldRef.current && shouldFocus) {
@@ -103,6 +104,10 @@ function ExpandedFormField({
     }
 
     return formFieldTypes.filter((_formFieldType) => {
+      if (!isCharmverseSpace && _formFieldType === 'project_profile') {
+        return false;
+      }
+
       const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
       if (nonDuplicateFieldType) {
         return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
@@ -110,7 +115,7 @@ function ExpandedFormField({
 
       return true;
     });
-  }, [formFieldTypeFrequencyCount, formFieldType]);
+  }, [formFieldTypeFrequencyCount, formFieldType, isCharmverseSpace]);
 
   return (
     <>
