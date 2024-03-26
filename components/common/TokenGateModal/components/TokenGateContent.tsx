@@ -18,7 +18,6 @@ export function TokenGateContent() {
   if (displayedPage === 'collectables') {
     return <TokenGateCollectables />;
   }
-
   if (displayedPage === 'tokens') {
     return <TokenGateTokens />;
   }
