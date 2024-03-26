@@ -26,9 +26,8 @@ export async function createOffchainCredentialsForProjects() {
         name: metadata.application.project.title,
         round: metadata.round.name,
         proposalUrl: `${roundUrl}/${application.applicationIndex}`,
-        createdAt: metadata.application.project.createdAt,
-        twitter: metadata.application.project.projectTwitter,
         website: metadata.application.project.website,
+        twitter: metadata.application.project.projectTwitter,
         github: metadata.application.project.userGithub,
         applicationId: application.id
       };
@@ -36,7 +35,7 @@ export async function createOffchainCredentialsForProjects() {
       for (const owner of owners) {
         const externalProject = await prisma.externalProject.create({
           data: {
-            recipient: '0x5A4d8d2F5de4D6ae29A91EE67E3adAedb53B0081',
+            recipient: owner,
             source: 'gitcoin',
             metadata: metadataPayload
           }
@@ -51,7 +50,7 @@ export async function createOffchainCredentialsForProjects() {
                 ProjectId: externalProject.id,
                 Source: 'Gitcoin',
                 Event: 'Approved',
-                GrantRound: metadata.round.name.trim(),
+                GrantRound: metadata.round.name,
                 Date: credentialDate,
                 GrantURL: roundUrl,
                 URL: `${roundUrl}/${application.applicationIndex}`
