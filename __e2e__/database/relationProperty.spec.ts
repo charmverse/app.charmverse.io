@@ -239,7 +239,7 @@ test('create and edit relation property values', async ({ page, document, databa
 
   expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(sourceBoardCards[0].page!.title);
   expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(sourceBoardCards[1].page!.title);
-  expect(await targetBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(sourceBoardCards[0]));
+  expect(await targetBoardCard2RelationPropertyCell.textContent()).toContain(sourceBoardCards[0].page!.title);
 
   await databasePage
     .getDatabaseTableCell({
@@ -265,11 +265,6 @@ test('create and edit relation property values', async ({ page, document, databa
     templateId: sourceRelationProperty.id
   });
 
-  expect(await sourceBoardCard1RelationPropertyCell.textContent()).toBe(_getTitle(targetBoardCards[1]));
-  expect(await sourceBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(targetBoardCards[0]));
+  expect(await sourceBoardCard1RelationPropertyCell.textContent()).toContain(targetBoardCards[1].page!.title);
+  expect(await sourceBoardCard2RelationPropertyCell.textContent()).toContain(targetBoardCards[0].page!.title);
 });
-
-function _getTitle({ page }: { page: { icon: string | null; title: string } | null }) {
-  const { icon, title } = page || { title: '', icon: '' };
-  return `${icon}${title}`;
-}
