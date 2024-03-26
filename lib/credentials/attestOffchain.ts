@@ -12,7 +12,6 @@ import { Wallet, providers } from 'ethers';
 import { v4 as uuid } from 'uuid';
 
 import { credentialsWalletPrivateKey } from 'config/constants';
-import type { GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { isValidChainAddress } from 'lib/tokens/validation';
 

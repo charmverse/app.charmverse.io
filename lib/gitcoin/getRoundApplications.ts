@@ -14,10 +14,15 @@ type Application = {
   applicationIndex: number;
   round: {
     id: string;
+    applicationsEndTime: string;
     roundMetaPtr: {
       pointer: string;
     };
   };
+  statusSnapshots: {
+    status: number;
+    timestamp: string;
+  }[];
   metaPtr: {
     pointer: string;
   };

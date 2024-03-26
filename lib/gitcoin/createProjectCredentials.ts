@@ -18,29 +18,37 @@ export async function createOffchainCredentialsForProjects() {
       const metadata = application.metadata;
       const recepient = getAddress(metadata.application.recipient);
       const owners = await getProjectOwners([recepient], chainId);
+      const approvedStatusSnapshot = application.statusSnapshots?.find((s) => String(s.status) === '1');
+      const approvedSnapshotDate = new Date((Number(approvedStatusSnapshot?.timestamp) || 0) * 1000).toISOString();
+      const applicationEndedDate = new Date(Number(application.round.applicationsEndTime) * 1000).toISOString();
 
       for (const owner of owners) {
+        const externalProject = await prisma.externalProject.create({
+          data: {
+            round: metadata.round.name,
+            schemaId: attestationSchemaIds.external,
+            recipient: owner,
+            source: 'gitcoin',
+            metadata
+          }
+        });
+
         const credential = await signAndPublishCharmverseCredential({
           credential: {
             type: 'external',
             data: {
               Name: metadata.application.project.title,
+              ProjectId: externalProject.id,
               GrantRound: metadata.round.name,
-              ProposalURL: `https://explorer.gitcoin.co/${chainId}/${application.round.id}/${application.applicationIndex}`
+              Source: 'Gitcoin',
+              Event: 'Approved',
+              Date: approvedStatusSnapshot ? approvedSnapshotDate : applicationEndedDate,
+              GrantURL: `https://explorer.gitcoin.co/${chainId}/${application.round.id}`,
+              URL: `https://explorer.gitcoin.co/${chainId}/${application.round.id}/${application.applicationIndex}`
             }
           },
           chainId: 10,
           recipient: owner
-        });
-
-        await prisma.externalProject.create({
-          data: {
-            round: metadata.round.name,
-            schemaId: attestationSchemaIds.external,
-            recipient: credential.recipient,
-            source: 'gitcoin',
-            metadata
-          }
         });
 
         log.info(

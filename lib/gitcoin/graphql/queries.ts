@@ -7,8 +7,13 @@ export const getRoundApplicationsQuery = gql`
       status
       statusDescription
       applicationIndex
+      statusSnapshots {
+        status
+        timestamp
+      }
       round {
         id
+        applicationsEndTime
         roundMetaPtr {
           pointer
         }
