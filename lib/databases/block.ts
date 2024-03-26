@@ -243,6 +243,7 @@ export function applyPageToBlock(
   // used for sorting
   if (blockWithDetails.type === 'card') {
     blockWithDetails.fields ||= { properties: {} };
+    blockWithDetails.fields.properties ||= {};
     blockWithDetails.fields.properties[Constants.titleColumnId] = blockWithDetails.title;
   }
   return blockWithDetails;
