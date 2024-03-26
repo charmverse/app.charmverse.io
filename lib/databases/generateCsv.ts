@@ -5,6 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
+import { baseUrl } from 'config/constants';
 import { CardFilter } from 'lib/databases/cardFilter';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -30,10 +31,12 @@ export async function loadAndGenerateCsv({
 
   const { targetPage, flatChildren } = await resolvePageTree({ pageId: databaseId, flattenChildren: true });
 
+  const pageIds = flatChildren.map((c) => c.id);
+
   const accessibleCardIds = await permissionsApiClient.pages
     .bulkComputePagePermissions({
       userId,
-      pageIds: flatChildren.map((c) => c.id)
+      pageIds
     })
     .then((permissions) =>
       Object.entries(permissions)
@@ -329,6 +332,8 @@ export function getCSVColumns({
     ) {
       const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
       columns.push(multiSelectValue);
+    } else if (propertyTemplate.type === 'proposalUrl') {
+      columns.push(`${baseUrl}${encodeText(displayValue as string)}`);
     } else {
       // Export as string
       columns.push(`"${encodeText(displayValue as string)}"`);

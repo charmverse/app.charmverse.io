@@ -374,17 +374,12 @@ export const makeSelectCardsFromBoard = () =>
 
 export const makeSelectBoardTemplates = () =>
   createSelector(
-    (state: RootState, boardId: string) => {
-      const cards = getTemplates(state);
-      return {
-        cards,
-        boardId
-      };
-    },
-    ({ cards, boardId }) => {
-      if (!cards) {
+    getTemplates,
+    (state, boardId) => boardId,
+    (templates, boardId) => {
+      if (!templates) {
         return [];
       }
-      return Object.values(cards).filter((c) => c.parentId === boardId) as Card[];
+      return Object.values(templates).filter((c) => c.parentId === boardId) as Card[];
     }
   );
