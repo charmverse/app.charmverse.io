@@ -75,7 +75,7 @@ test('create and edit relation property values', async ({ page, document, databa
     }
   });
 
-  const connectedBoardPage = await generateBoard({
+  const targetBoardPage = await generateBoard({
     createdBy: spaceUser.id,
     spaceId: space.id,
     boardTitle: 'Connected Board',
@@ -91,9 +91,9 @@ test('create and edit relation property values', async ({ page, document, databa
     }
   });
 
-  const connectedBoardCards = await prisma.block.findMany({
+  const targetBoardCards = await prisma.block.findMany({
     where: {
-      parentId: connectedBoardPage.id,
+      parentId: targetBoardPage.id,
       type: 'card'
     },
     select: {
@@ -133,7 +133,7 @@ test('create and edit relation property values', async ({ page, document, databa
   expect(relationPropertyType).toBeVisible();
   await relationPropertyType.click();
   await databasePage.page.keyboard.type('Connected Board');
-  await databasePage.linkedDatabaseOption({ sourceBoardId: connectedBoardPage.id }).click();
+  await databasePage.linkedDatabaseOption({ sourceBoardId: targetBoardPage.id }).click();
   await databasePage.getShowOnRelatedBoardButton().click();
   await databasePage.getAddRelationButton().click();
 
@@ -153,16 +153,15 @@ test('create and edit relation property values', async ({ page, document, databa
     (field: IPropertyTemplate) => field.type === 'relation'
   );
 
-  await databasePage
-    .getDatabaseTableCell({
-      cardId: sourceBoardCards[0].id,
-      templateId: sourceRelationProperty.id
-    })
-    .click();
+  const tableCell = databasePage.getDatabaseTableCell({
+    cardId: sourceBoardCards[0].id,
+    templateId: sourceRelationProperty.id
+  });
+  await tableCell.click();
 
-  await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[0].id}`).click();
-  await databasePage.page.waitForTimeout(100);
-  await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[1].id}`).click();
+  await databasePage.page.locator(`data-test=page-option-${targetBoardCards[0].id}`).click();
+  await tableCell.click(); // the menu hides for some reason, altho this doesnt happen in dev mode
+  await databasePage.page.locator(`data-test=page-option-${targetBoardCards[1].id}`).click();
 
   await databasePage.page.locator("div[role='presentation']").click();
   await databasePage
@@ -172,11 +171,11 @@ test('create and edit relation property values', async ({ page, document, databa
     })
     .click();
 
-  await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[0].id}`).click();
+  await databasePage.page.locator(`data-test=page-option-${targetBoardCards[0].id}`).click();
 
-  const connectedBoard = await prisma.block.findUniqueOrThrow({
+  const targetBoard = await prisma.block.findUniqueOrThrow({
     where: {
-      id: connectedBoardPage.id
+      id: targetBoardPage.id
     },
     select: {
       id: true,
@@ -184,13 +183,13 @@ test('create and edit relation property values', async ({ page, document, databa
     }
   });
 
-  const connectedRelationProperty = (connectedBoard.fields as any).cardProperties.find(
+  const connectedRelationProperty = (targetBoard.fields as any).cardProperties.find(
     (field: IPropertyTemplate) => field.type === 'relation'
   );
 
-  const connectedBoardView = await prisma.block.findFirstOrThrow({
+  const targetBoardView = await prisma.block.findFirstOrThrow({
     where: {
-      parentId: connectedBoardPage.id,
+      parentId: targetBoardPage.id,
       type: 'view'
     },
     select: {
@@ -201,50 +200,50 @@ test('create and edit relation property values', async ({ page, document, databa
 
   await prisma.block.update({
     where: {
-      id: connectedBoardView.id
+      id: targetBoardView.id
     },
     data: {
       fields: {
-        ...(connectedBoardView.fields as any),
-        visiblePropertyIds: [...(connectedBoardView.fields as any).visiblePropertyIds, connectedRelationProperty.id]
+        ...(targetBoardView.fields as any),
+        visiblePropertyIds: [...(targetBoardView.fields as any).visiblePropertyIds, connectedRelationProperty.id]
       }
     }
   });
 
   await prisma.block.update({
     where: {
-      id: connectedBoardView.id
+      id: targetBoardView.id
     },
     data: {
       fields: {
-        ...(connectedBoardView.fields as any),
-        visiblePropertyIds: [...(connectedBoardView.fields as any).visiblePropertyIds, connectedRelationProperty.id]
+        ...(targetBoardView.fields as any),
+        visiblePropertyIds: [...(targetBoardView.fields as any).visiblePropertyIds, connectedRelationProperty.id]
       }
     }
   });
 
   await document.goToPage({
     domain: space.domain,
-    path: connectedBoardPage.path
+    path: targetBoardPage.path
   });
 
-  const connectedBoardCard1RelationPropertyCell = databasePage.getDatabaseTableCell({
-    cardId: connectedBoardCards[0].id,
+  const targetBoardCard1RelationPropertyCell = databasePage.getDatabaseTableCell({
+    cardId: targetBoardCards[0].id,
     templateId: connectedRelationProperty.id
   });
 
-  const connectedBoardCard2RelationPropertyCell = databasePage.getDatabaseTableCell({
-    cardId: connectedBoardCards[1].id,
+  const targetBoardCard2RelationPropertyCell = databasePage.getDatabaseTableCell({
+    cardId: targetBoardCards[1].id,
     templateId: connectedRelationProperty.id
   });
 
-  expect(await connectedBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[0]));
-  expect(await connectedBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[1]));
-  expect(await connectedBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(sourceBoardCards[0]));
+  expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[0]));
+  expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[1]));
+  expect(await targetBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(sourceBoardCards[0]));
 
   await databasePage
     .getDatabaseTableCell({
-      cardId: connectedBoardCards[0].id,
+      cardId: targetBoardCards[0].id,
       templateId: connectedRelationProperty.id
     })
     .click();
@@ -266,8 +265,8 @@ test('create and edit relation property values', async ({ page, document, databa
     templateId: sourceRelationProperty.id
   });
 
-  expect(await sourceBoardCard1RelationPropertyCell.textContent()).toBe(_getTitle(connectedBoardCards[1]));
-  expect(await sourceBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(connectedBoardCards[0]));
+  expect(await sourceBoardCard1RelationPropertyCell.textContent()).toBe(_getTitle(targetBoardCards[1]));
+  expect(await sourceBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(targetBoardCards[0]));
 });
 
 function _getTitle({ page }: { page: { icon: string | null; title: string } | null }) {

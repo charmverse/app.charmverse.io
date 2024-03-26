@@ -192,7 +192,9 @@ function PagesAutocompleteBase({
         multiple
         getOptionLabel={(option) => option.title} // prevent errors in console
         noOptionsText='No pages found'
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+        }}
         openOnFocus
         options={sortedCards}
         renderInput={(params) => (
