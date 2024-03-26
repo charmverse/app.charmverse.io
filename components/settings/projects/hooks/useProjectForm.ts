@@ -4,18 +4,21 @@ import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { useMembers } from 'hooks/useMembers';
+import { useUser } from 'hooks/useUser';
 import {
-  defaultProjectFieldConfig,
-  type ProjectEditorFieldConfig,
-  type ProjectValues,
-  type ProjectWithMembers
-} from 'components/projects/interfaces';
-import type { ProjectField } from 'components/projects/ProjectFields';
-import { projectFieldProperties } from 'components/projects/ProjectFields';
-import type { ProjectMemberField } from 'components/projects/ProjectMemberFields';
-import { projectMemberFieldProperties } from 'components/projects/ProjectMemberFields';
-
-import { useGetDefaultProject } from './useGetDefaultProject';
+  projectFieldProperties,
+  projectMemberFieldProperties,
+  defaultProjectFieldConfig
+} from 'lib/projects/constants';
+import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
+import type {
+  ProjectField,
+  ProjectMemberField,
+  ProjectEditorFieldConfig,
+  ProjectWithMembers,
+  ProjectValues
+} from 'lib/projects/interfaces';
 
 function addMatchersToSchema({
   fieldType,
@@ -139,8 +142,10 @@ export function useProjectForm(options?: {
   defaultRequired?: boolean;
 }) {
   const { defaultRequired, defaultValues, fieldConfig = defaultProjectFieldConfig, projectWithMembers } = options ?? {};
+  const { user } = useUser();
+  const { membersRecord } = useMembers();
 
-  const defaultProjectValues = useGetDefaultProject();
+  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
 
   const defaultProjectWithMembers = useMemo(() => {
     if (!projectWithMembers) {

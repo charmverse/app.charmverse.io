@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { ProjectUpdatePayload, ProjectWithMembers } from 'components/projects/interfaces';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
+import type { ProjectWithMembers, ProjectUpdatePayload } from 'lib/projects/interfaces';
 import { updateProject } from 'lib/projects/updateProject';
 import { withSessionRoute } from 'lib/session/withSession';
 

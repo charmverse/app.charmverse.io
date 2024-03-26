@@ -1,8 +1,8 @@
 import { Stack, Typography } from '@mui/material';
 
 import FieldLabel from 'components/common/form/FieldLabel';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 
-import type { ProjectEditorFieldConfig } from './interfaces';
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectMemberFields';
 

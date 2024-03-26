@@ -3,8 +3,7 @@ import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-
-import type { ProjectFieldConfig, ProjectFieldProperty, ProjectValues } from '../interfaces';
+import type { ProjectValues, ProjectFieldProperty, ProjectFieldConfig } from 'lib/projects/interfaces';
 
 function FieldAnswer({
   property,
@@ -19,7 +18,7 @@ function FieldAnswer({
   property: ProjectFieldProperty;
   fieldConfig?: ProjectFieldConfig;
 }) {
-  const { setValue, control, register } = useFormContext<ProjectValues>();
+  const { control, register } = useFormContext<ProjectValues>();
 
   const { field, fieldState } = useController({
     control,

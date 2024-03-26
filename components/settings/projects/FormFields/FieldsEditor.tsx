@@ -1,8 +1,7 @@
 import { Stack, Switch, Typography } from '@mui/material';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-
-import type { ProjectFieldProperty } from '../interfaces';
+import type { ProjectFieldProperty } from 'lib/projects/interfaces';
 
 export function FieldsEditor<Values extends Record<string, any> = Record<string, any>>({
   onChange,

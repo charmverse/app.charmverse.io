@@ -1,7 +1,7 @@
 import type { ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
+import { projectMemberDefaultValues } from './constants';
 
 export async function addProjectMember({
   projectId,

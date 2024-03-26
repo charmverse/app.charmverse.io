@@ -1,10 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createProject } from 'lib/projects/createProject';
 import { getProjects } from 'lib/projects/getProjects';
+import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });

@@ -13,7 +13,6 @@ import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
-import type { ProjectUpdatePayload, ProjectWithMembers } from 'components/projects/interfaces';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
@@ -24,6 +23,7 @@ import type { FailedImportsError } from 'lib/notion/types';
 import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
+import type { ProjectUpdatePayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';

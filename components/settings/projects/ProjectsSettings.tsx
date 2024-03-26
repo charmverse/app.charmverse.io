@@ -6,10 +6,11 @@ import { FormProvider } from 'react-hook-form';
 import { useGetProjects, useUpdateProject } from 'charmClient/hooks/projects';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
-import { defaultProjectFieldConfig, type ProjectWithMembers } from 'components/projects/interfaces';
-import { ProjectFormAnswers } from 'components/projects/ProjectForm';
 import Legend from 'components/settings/Legend';
+import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
+import { defaultProjectFieldConfig } from 'lib/projects/constants';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { CreateProjectForm } from './CreateProjectForm';
 import { useProjectForm } from './hooks/useProjectForm';

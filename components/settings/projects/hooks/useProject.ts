@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo } from 'react';
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetProjects } from 'charmClient/hooks/projects';
-import { type ProjectEditorFieldConfig, type ProjectUpdatePayload } from 'components/projects/interfaces';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import type { ProjectEditorFieldConfig, ProjectUpdatePayload } from 'lib/projects/interfaces';
 
 import { useProjectForm, convertToProjectValues } from './useProjectForm';
 

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
-import { ProjectFormEditor } from 'components/projects/ProjectForm';
+import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 
 export function ProjectFormEditorComponent() {
   const [projectRequiredValues, setProjectRequiredValues] = useState<ProjectEditorFieldConfig>({

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProjectUpdatePayload, ProjectWithMembers } from 'components/projects/interfaces';
+import type { ProjectUpdatePayload, ProjectWithMembers } from './interfaces';
 
 export async function updateProject({
   userId,

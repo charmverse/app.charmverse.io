@@ -1,11 +1,10 @@
-import type { FormField } from '@charmverse/core/prisma-client';
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
-import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
-import { ProjectFormAnswers } from 'components/projects/ProjectForm';
+import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
+import type { ProjectWithMembers, ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -13,8 +12,9 @@ export function ProjectProfileInputField({
   onChange,
   formField
 }: {
-  formField: Pick<FormField, 'fieldConfig'> & {
+  formField: {
     value?: FormFieldValue;
+    fieldConfig?: ProjectEditorFieldConfig;
   };
   onChange: (updatedValue: FormFieldValue) => void;
 }) {

@@ -22,8 +22,8 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
-import { ProjectFormEditor } from 'components/projects/ProjectForm';
+import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utils/react';
@@ -201,9 +201,9 @@ function ExpandedFormField({
         <ProjectFormEditor
           defaultRequired
           values={
-            (formField.fieldConfig as ProjectEditorFieldConfig) ?? {
+            (formField.fieldConfig ?? {
               projectMember: {}
-            }
+            }) as ProjectEditorFieldConfig
           }
           onChange={(fieldConfig) => {
             updateFormField({

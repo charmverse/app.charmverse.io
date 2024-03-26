@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
+import type { ProjectValues, ProjectWithMembers } from './interfaces';
 
 export async function createProject(payload: { userId: string; project: ProjectValues }): Promise<ProjectWithMembers> {
   if (payload.project.projectMembers.length === 0) {

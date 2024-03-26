@@ -3,7 +3,6 @@ import type { FormField } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { ProjectValues } from 'components/projects/interfaces';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 

@@ -8,6 +8,7 @@ import { Controller } from 'react-hook-form';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -164,7 +165,7 @@ export function FormFieldAnswersControlled({
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
                     formField={{
-                      fieldConfig: formField.fieldConfig,
+                      fieldConfig: formField.fieldConfig as ProjectEditorFieldConfig,
                       value: field.value
                     }}
                     onChange={(projectFormValues) => {

@@ -1,13 +1,17 @@
-import { projectDefaultValues } from 'components/projects/ProjectFields';
-import { projectMemberDefaultValues } from 'components/projects/ProjectMemberFields';
-import { useMembers } from 'hooks/useMembers';
-import { useUser } from 'hooks/useUser';
+import type { Member } from 'lib/members/interfaces';
+import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-export function useGetDefaultProject() {
-  const { user } = useUser();
-  const { membersRecord } = useMembers();
+import { projectDefaultValues, projectMemberDefaultValues } from './constants';
+import type { ProjectValues } from './interfaces';
 
+export function getDefaultProjectValues({
+  membersRecord,
+  user
+}: {
+  user: LoggedInUser | null;
+  membersRecord: Record<string, Member>;
+}): ProjectValues {
   const currentMember = membersRecord[user!.id];
   const primaryWallet = user?.wallets.find((wallet) => wallet.id === user?.primaryWalletId) ?? user?.wallets[0];
   const userEmail =

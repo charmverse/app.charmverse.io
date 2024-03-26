@@ -2,8 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
 import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 
 export async function checkProposalProject({
   formFields,

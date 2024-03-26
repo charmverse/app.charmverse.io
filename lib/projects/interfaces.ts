@@ -1,7 +1,37 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 
-import type { ProjectPayload } from './ProjectFields';
-import type { ProjectMemberPayload } from './ProjectMemberFields';
+export type ProjectPayload = Pick<
+  Project,
+  | 'name'
+  | 'excerpt'
+  | 'description'
+  | 'twitter'
+  | 'website'
+  | 'github'
+  | 'blog'
+  | 'productUrl'
+  | 'communityUrl'
+  | 'otherUrl'
+  | 'walletAddress'
+>;
+
+export type ProjectField = keyof ProjectPayload;
+
+export type ProjectMemberPayload = Pick<
+  ProjectMember,
+  | 'email'
+  | 'github'
+  | 'linkedin'
+  | 'name'
+  | 'otherUrl'
+  | 'previousProjects'
+  | 'telegram'
+  | 'twitter'
+  | 'walletAddress'
+  | 'warpcast'
+>;
+
+export type ProjectMemberField = keyof ProjectMemberPayload;
 
 export type ProjectFieldConfig = Partial<
   Record<
@@ -35,15 +65,4 @@ export type ProjectFieldProperty = {
 
 export type ProjectWithMembers = Project & {
   projectMembers: ProjectMember[];
-};
-
-export const defaultProjectFieldConfig = {
-  name: {
-    required: true
-  },
-  projectMember: {
-    name: {
-      required: true
-    }
-  }
 };

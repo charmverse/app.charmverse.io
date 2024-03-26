@@ -8,8 +8,6 @@ import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
-import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
 import { rewardCharmsForProposal } from 'lib/charms/triggers/rewardCharmsForProposal';
 import { createForm } from 'lib/forms/createForm';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';

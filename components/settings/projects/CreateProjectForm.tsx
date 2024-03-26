@@ -5,9 +5,9 @@ import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import type { ProjectValues, ProjectWithMembers } from 'components/projects/interfaces';
-import { defaultProjectFieldConfig } from 'components/projects/interfaces';
-import { ProjectFormAnswers } from 'components/projects/ProjectForm';
+import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
+import { defaultProjectFieldConfig } from 'lib/projects/constants';
+import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces';
 
 export function CreateProjectForm({
   onCancel,

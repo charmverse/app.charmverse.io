@@ -19,7 +19,6 @@ import CardDetailProperties from 'components/common/DatabaseEditor/components/ca
 import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import type { ProjectEditorFieldConfig } from 'components/projects/interfaces';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
@@ -35,6 +34,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';

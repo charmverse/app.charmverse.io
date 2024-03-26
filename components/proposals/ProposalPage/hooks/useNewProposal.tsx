@@ -1,17 +1,18 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'components/projects/interfaces';
-import { useGetDefaultProject } from 'components/settings/projects/hooks/useGetDefaultProject';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
+import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -68,7 +69,9 @@ export function useNewProposal({ newProposal }: Props) {
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
   const { data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === selectedProjectId);
-  const defaultProjectValues = useGetDefaultProject();
+  const { membersRecord } = useMembers();
+
+  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
 
   const projectForm = useProjectForm({
     projectWithMembers,

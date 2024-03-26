@@ -126,7 +126,7 @@ export function ControlledFormFieldsEditor({
         private: false,
         required: true,
         id: fieldId,
-        fieldConfig: {}
+        fieldConfig: null
       }
     ]);
 
