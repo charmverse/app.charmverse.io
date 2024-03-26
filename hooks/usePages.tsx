@@ -8,12 +8,9 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { useTrashPages, useInitialPagesForSpace } from 'charmClient/hooks/pages';
 import mutator from 'components/common/DatabaseEditor/mutator';
-import { updateCards } from 'components/common/DatabaseEditor/store/cards';
-import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
 import { untitledPage } from 'lib/pages/untitledPage';
-import { isTruthy } from 'lib/utils/types';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { useCurrentSpace } from './useCurrentSpace';
@@ -55,7 +52,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const currentSpaceId = useRef<undefined | string>();
   const router = useRouter();
   const { user } = useUser();
-  const dispatch = useAppDispatch();
   const { sendMessage, subscribe } = useWebSocketClient();
   const { trigger: trashPages } = useTrashPages();
   // temporary optimization: load non-card pages first
@@ -229,15 +225,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
 
             return pageMap;
           }, {});
-
-          const cardPages = Object.values(pagesToUpdate)
-            .filter(isTruthy)
-            .filter((page) => page.type === 'card');
-
-          if (cardPages.length) {
-            dispatch(updateCards(cardPages.map((page) => ({ id: page.id, title: page.title }))));
-          }
-
           return {
             ..._existingPages,
             ...pagesToUpdate
@@ -256,16 +243,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       const newPages = value.reduce<PagesMap>((pageMap, page) => {
         if (page.spaceId === currentSpaceId.current) {
           pageMap[page.id] = page;
-          if (page.type === 'card') {
-            dispatch(
-              updateCards([
-                {
-                  id: page.id,
-                  title: page.title
-                }
-              ])
-            );
-          }
         }
         return pageMap;
       }, {});

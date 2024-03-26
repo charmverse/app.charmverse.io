@@ -247,8 +247,8 @@ export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWit
   // used for sorting
   if (blockWithDetails.type === 'card') {
     blockWithDetails.fields ||= { properties: {} };
-    blockWithDetails.fields.properties ||= {};
-    blockWithDetails.fields.properties[Constants.titleColumnId] = blockWithDetails.title;
+    // blockWithDetails.fields.properties ||= {};
+    // blockWithDetails.fields.properties[Constants.titleColumnId] = blockWithDetails.title;
   }
   return blockWithDetails;
 }
