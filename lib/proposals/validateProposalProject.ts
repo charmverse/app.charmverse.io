@@ -5,7 +5,7 @@ import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/in
 import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
 import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 
-export async function checkProposalProject({
+export async function validateProposalProject({
   formFields,
   formAnswers
 }: {

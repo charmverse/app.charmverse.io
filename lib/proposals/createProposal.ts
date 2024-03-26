@@ -17,13 +17,13 @@ import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { generatePagePathFromPathAndTitle } from '../pages';
 
-import { checkProposalProject } from './checkProposalProject';
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getProposalErrors } from './getProposalErrors';
 import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsWithBlockNumber';
 import type { VoteSettings } from './interfaces';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
+import { validateProposalProject } from './validateProposalProject';
 
 type PageProps = Partial<
   Pick<
@@ -111,10 +111,12 @@ export async function createProposal({
     throw new InvalidInputError(errors.join('\n'));
   }
 
-  await checkProposalProject({
-    formAnswers,
-    formFields
-  });
+  if (!isDraft) {
+    await validateProposalProject({
+      formAnswers,
+      formFields
+    });
+  }
 
   // retrieve permissions and apply evaluation ids to reviewers
   evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers }, index) => {

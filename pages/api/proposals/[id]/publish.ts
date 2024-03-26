@@ -8,9 +8,9 @@ import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issuePropos
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { checkProposalProject } from 'lib/proposals/checkProposalProject';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { publishProposal } from 'lib/proposals/publishProposal';
+import { validateProposalProject } from 'lib/proposals/validateProposalProject';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -132,7 +132,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     }
   });
 
-  await checkProposalProject({
+  await validateProposalProject({
     formAnswers: proposalForm?.formAnswers as FieldAnswerInput[],
     formFields: proposalForm?.form?.formFields
   });
