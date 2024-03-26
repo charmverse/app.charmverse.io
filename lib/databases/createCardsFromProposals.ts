@@ -231,14 +231,6 @@ export async function createCardsFromProposals({
     })
   );
 
-  relay.broadcast(
-    {
-      type: 'blocks_updated',
-      payload: updatedViewBlocks.map(prismaToBlock).concat(boardBlock)
-    },
-    spaceId
-  );
-
   const cards: { page: Page; block: Block }[] = [];
 
   for (const pageProposal of pageProposals) {
@@ -340,6 +332,14 @@ export async function createCardsFromProposals({
     });
     cards.push(_card);
   }
+
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: updatedViewBlocks.map(prismaToBlock).concat(boardBlock)
+    },
+    spaceId
+  );
 
   if (cards.length > 0) {
     relay.broadcast(
