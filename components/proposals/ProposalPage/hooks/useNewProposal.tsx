@@ -121,8 +121,13 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
-        formFields: formInputs.formFields?.map((formField) => {
-          if (formField.type === 'project_profile' && projectId) {
+        formFields: formInputs.formFields,
+        evaluations: formInputs.evaluations,
+        spaceId: currentSpace.id,
+        fields: formInputs.fields,
+        formId: formInputs.formId,
+        formAnswers: formInputs.formAnswers?.map((formField) => {
+          if (formField.fieldId === projectField?.id && projectId) {
             return {
               ...formField,
               value: { projectId }
@@ -130,11 +135,6 @@ export function useNewProposal({ newProposal }: Props) {
           }
           return formField;
         }),
-        evaluations: formInputs.evaluations,
-        spaceId: currentSpace.id,
-        fields: formInputs.fields,
-        formId: formInputs.formId,
-        formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId!,
         isDraft,
         selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
