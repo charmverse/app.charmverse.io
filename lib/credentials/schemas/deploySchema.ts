@@ -10,6 +10,8 @@ import { getCharmverseSigner } from '../getCharmverseSigner';
 
 import { externalCredentialSchemaDefinition } from './external';
 
+import { allSupportedSchemas } from '.';
+
 async function deploySchema({ schema, chainId }: { schema: string; chainId: EasSchemaChain }) {
   const connector = getEasConnector(chainId);
 
@@ -51,8 +53,19 @@ async function deploySchema({ schema, chainId }: { schema: string; chainId: EasS
   }
 }
 
+// Used when we want to add a new schema to schemas we support
+// Make sure schema is also included in allSupportedSchemas in lib/credentials/schemas/index.ts
 async function deploySchemaAcrossChains({ schema }: { schema: string }) {
   for (const chainId of easSchemaChains) {
+    log.info(`Deploying schema...`);
+    await deploySchema({ schema, chainId });
+  }
+}
+
+// Used when we want to add a new schema to schemas we support
+// lib/credentials/schemas/index.ts
+async function deploySchemasOnNewChain({ chainId }: { chainId: EasSchemaChain }) {
+  for (const schema of allSupportedSchemas) {
     log.info(`Deploying schema...`);
     await deploySchema({ schema, chainId });
   }
