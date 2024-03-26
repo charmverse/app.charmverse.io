@@ -3,11 +3,13 @@ import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
+import type { PublicClient } from 'viem';
 import { zkSync, zkSyncTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
 
 import { GET } from 'adapters/http';
 import type { NFTData } from 'lib/blockchain/getNFTs';
+import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { supportedNetworks, type SupportedChainId } from './config';
@@ -39,20 +41,17 @@ class ZkSyncApiClient {
 
   chainId: SupportedChainId;
 
+  client: PublicClient;
+
   constructor({ chainId }: { chainId: SupportedChainId }) {
     if (!supportedNetworks.includes(chainId)) {
       throw new Error(`Unsupported chain id: ${chainId}`);
     }
-    this.rpcUrl = (
-      chainId === zkSync.id ? getChainById(zkSync.id)?.rpcUrls[0] : getChainById(zkSyncTestnet.id)?.rpcUrls[0]
-    ) as string;
+    this.rpcUrl = getChainById(chainId)?.rpcUrls[0] as string;
     this.chainId = chainId;
     this.provider = new Provider(this.rpcUrl, chainId);
     this.blockExplorerUrl = chainId === zkSync.id ? ZK_MAINNET_BLOCK_EXPLORER : ZK_TESTNET_BLOCK_EXPLORER;
-  }
-
-  getNftContract(contractAddress: string) {
-    return new ethers.Contract(contractAddress, ERC721_ABI, this.provider);
+    this.client = getPublicClient(chainId);
   }
 
   async getNFTInfo({
@@ -64,7 +63,13 @@ class ZkSyncApiClient {
     tokenId: number | string;
     walletId?: string | null;
   }): Promise<NFTData> {
-    const result = await this.getNftContract(contractAddress).tokenURI(tokenId);
+    const result = (await this.client.readContract({
+      abi: ERC721_ABI,
+      address: contractAddress as `0x${string}`,
+      functionName: 'tokenURI',
+      account: walletId as `0x${string}`,
+      args: [BigInt(tokenId || 1).toString()]
+    })) as string;
 
     const resultSource = await result.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
