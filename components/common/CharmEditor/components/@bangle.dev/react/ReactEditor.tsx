@@ -1,5 +1,5 @@
 import { history } from '@bangle.dev/base-components';
-import { EditorState } from '@bangle.dev/pm';
+import { EditorState, NodeSelection } from '@bangle.dev/pm';
 import type { Plugin } from '@bangle.dev/pm';
 import { objectUid } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
@@ -145,6 +145,26 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
     }
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
+
+  useEffect(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash && editor && !isLoadingRef.current) {
+      let nodePos: number | undefined;
+      editor.view.state.doc.descendants((node, pos) => {
+        if (node.attrs.id === hash) {
+          nodePos = pos;
+          return false;
+        }
+      });
+
+      const domNode = document.getElementById(hash);
+      if (domNode && nodePos !== undefined) {
+        editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
+        domNode.scrollIntoView();
+        window.history.replaceState({}, '', window.location.href.split('#')[0]);
+      }
+    }
+  }, [isLoadingRef.current]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {
