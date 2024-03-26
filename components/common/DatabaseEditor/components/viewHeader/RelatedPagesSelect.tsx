@@ -1,9 +1,12 @@
 import { Autocomplete, Typography } from '@mui/material';
+import { useMemo, useEffect } from 'react';
 
-import { useGetSubtree } from 'charmClient/hooks/blocks';
 import type { Card } from 'lib/databases/card';
 import { isTruthy } from 'lib/utils/types';
 
+import { makeSelectCardsFromBoard } from '../../store/cards';
+import { initialDatabaseLoad } from '../../store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { RelationPageListItemsContainer } from '../properties/PagesAutocomplete';
 
 type Props = {
@@ -13,10 +16,18 @@ type Props = {
 };
 
 export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
-  const { blocks, isLoading } = useGetSubtree(boardPageId);
+  const selectCardsFromBoard = useMemo(makeSelectCardsFromBoard, []);
+  const cards = useAppSelector((state) => selectCardsFromBoard(state, boardPageId || ''));
+  const dispatch = useAppDispatch();
+  // Load database if necessary
+  useEffect(() => {
+    // only load board if there are no cards yet (assuming that means it is not loaded yet)
+    if (boardPageId && cards.length === 0) {
+      dispatch(initialDatabaseLoad({ pageId: boardPageId }));
+    }
+  }, [dispatch, boardPageId, cards.length]);
 
-  const options =
-    blocks.filter((block) => block.type === 'card' && block.parentId === boardPageId).map((b) => b.id) || [];
+  const options = cards.map((b) => b.id) || [];
 
   return (
     <Autocomplete
@@ -24,7 +35,6 @@ export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
       multiple
       value={value}
       onChange={(e, newValue) => onChange(newValue)}
-      loading={isLoading}
       options={options}
       renderInput={(params) => {
         const cardIds = Array.isArray(params.inputProps.value) ? params.inputProps.value : [];
@@ -36,7 +46,7 @@ export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
           <RelationPageListItemsContainer
             cards={cardIds
               .map((cardId) => {
-                return blocks?.find((card) => card.id === cardId) as Card | undefined;
+                return cards.find((card) => card.id === cardId) as Card | undefined;
               })
               .filter(isTruthy)}
           />
@@ -45,25 +55,3 @@ export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
     />
   );
 }
-
-/* {pageListItems.map((pageListItem) => {
-        return (
-          <MenuItem
-            key={pageListItem.id}
-            value={pageListItem.id}
-            selected={!!filter.values.find((selectedPageListItemId) => selectedPageListItemId === pageListItem.id)}
-          >
-            <ListItemIcon>
-              <PageIcon
-                icon={pageListItem.icon}
-                isEditorEmpty={!pageListItem.hasContent}
-                pageType={pageListItem.type}
-              />
-            </ListItemIcon>
-            <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-              {pageListItem.title ? pageListItem.title : 'Untitled'}
-            </PageTitle>
-          </MenuItem>
-        );
-      })}
-    </Autocomplete> */

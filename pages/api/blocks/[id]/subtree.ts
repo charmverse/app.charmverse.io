@@ -66,6 +66,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
     );
     return res.status(200).json(filtered);
   } else {
+    const x = Math.random();
     const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
       pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
       userId: req.session.user?.id

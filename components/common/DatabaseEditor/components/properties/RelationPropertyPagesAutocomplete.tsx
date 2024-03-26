@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useGetSubtree } from 'charmClient/hooks/blocks';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
@@ -6,14 +6,15 @@ import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { PropertyValueDisplayType } from '../../interfaces';
 import { makeSelectBoard } from '../../store/boards';
 import { makeSelectCardsFromBoard } from '../../store/cards';
-import { useAppSelector } from '../../store/hooks';
+import { initialDatabaseLoad } from '../../store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 import { PagesAutocomplete } from './PagesAutocomplete';
 
 export function RelationPropertyPagesAutocomplete({
   onChange,
   propertyTemplate,
-  selectedPageListItemIds,
+  value,
   readOnly,
   wrapColumn,
   displayType = 'details',
@@ -22,7 +23,7 @@ export function RelationPropertyPagesAutocomplete({
   showCard
 }: {
   propertyTemplate: IPropertyTemplate;
-  selectedPageListItemIds: string[];
+  value: string | string[];
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
   onChange: (cardIds: string[]) => void;
@@ -36,6 +37,22 @@ export function RelationPropertyPagesAutocomplete({
   const cards = useAppSelector((state) => selectCardsFromBoard(state, boardId));
   const selectBoard = useMemo(makeSelectBoard, []);
   const board = useAppSelector((state) => selectBoard(state, boardId));
+  const dispatch = useAppDispatch();
+
+  const selectedBlockIds = useMemo(() => {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    return value ? [value] : [];
+  }, [value]);
+
+  // Load database if necessary
+  useEffect(() => {
+    // only load board if there are no cards yet (assuming that means it is not loaded yet)
+    if (boardId && cards.length === 0) {
+      dispatch(initialDatabaseLoad({ pageId: boardId }));
+    }
+  }, [dispatch, boardId, cards.length]);
 
   return (
     <PagesAutocomplete
@@ -43,7 +60,7 @@ export function RelationPropertyPagesAutocomplete({
       multiple={propertyTemplate.relationData?.limit !== 'single_page'}
       showCard={showCard}
       onChange={onChange}
-      value={selectedPageListItemIds}
+      value={selectedBlockIds}
       cards={cards}
       readOnly={readOnly}
       wrapColumn={wrapColumn}

@@ -267,7 +267,7 @@ export function PropertyTemplateMenu({
                 });
               }}
               propertyTemplate={propertyTemplate}
-              selectedPageListItemIds={(propertyValue ?? []) as string[]}
+              value={propertyValue as string[]}
               wrapColumn={false}
             />
           </Box>

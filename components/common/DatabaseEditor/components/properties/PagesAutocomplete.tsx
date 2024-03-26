@@ -190,6 +190,7 @@ function PagesAutocompleteBase({
         groupBy={(option) => (selected[option.id] ? 'Linked page' : 'Link another page')}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
+        getOptionLabel={(option) => option.title} // prevent errors in console
         noOptionsText='No pages found'
         onClose={() => setIsOpen(false)}
         openOnFocus
@@ -206,7 +207,7 @@ function PagesAutocompleteBase({
               endAdornment: board ? (
                 <Stack flexDirection='row'>
                   <Typography variant='subtitle1' color='secondary' mr={0.5}>
-                    In
+                    in
                   </Typography>
                   <StyledRelatedPage
                     onClick={() => {
@@ -249,27 +250,34 @@ function PagesAutocompleteBase({
                 }
               }}
             >
-              <Stack flexDirection='row' gap={0.5}>
+              <Stack flexDirection='row'>
                 <ListItemIcon>
                   <PageIcon icon={card.icon} isEditorEmpty={!card.hasContent} pageType='card' />
                 </ListItemIcon>
-                <PageTitle hasContent={!card.title} sx={{ fontWeight: 'bold' }}>
-                  {card.title || 'Untitled'}
-                </PageTitle>
+                <PageTitle hasContent={!card.title}>{card.title || 'Untitled'}</PageTitle>
               </Stack>
               {selected[card.id] ? (
                 <Tooltip title='Unlink page'>
-                  <RemoveIcon
-                    fontSize='small'
-                    color='secondary'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onChange(selectedCardIds.filter((v) => v !== card.id));
-                    }}
-                  />
+                  <span>
+                    <IconButton
+                      size='small'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChange(selectedCardIds.filter((v) => v !== card.id));
+                      }}
+                    >
+                      <RemoveIcon fontSize='small' color='secondary' />
+                    </IconButton>
+                  </span>
                 </Tooltip>
               ) : (
-                <AddIcon fontSize='small' color='secondary' />
+                <Tooltip title='Link page'>
+                  <span>
+                    <IconButton size='small'>
+                      <AddIcon fontSize='small' color='secondary' />
+                    </IconButton>
+                  </span>
+                </Tooltip>
               )}
             </MenuItem>
           );

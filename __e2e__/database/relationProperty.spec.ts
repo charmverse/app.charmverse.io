@@ -37,7 +37,7 @@ test.beforeAll(async () => {
   space = generated.space;
 });
 
-test.skip('create and edit relation property values', async ({ page, document, databasePage }) => {
+test('create and edit relation property values', async ({ page, document, databasePage }) => {
   // Arrange ------------------
   const sourceBoardPage = await generateBoard({
     createdBy: spaceUser.id,
@@ -60,7 +60,18 @@ test.skip('create and edit relation property values', async ({ page, document, d
       type: 'card'
     },
     select: {
-      id: true
+      id: true,
+      page: {
+        select: {
+          icon: true,
+          title: true
+        }
+      }
+    },
+    orderBy: {
+      page: {
+        title: 'asc'
+      }
     }
   });
 
@@ -86,7 +97,18 @@ test.skip('create and edit relation property values', async ({ page, document, d
       type: 'card'
     },
     select: {
-      id: true
+      id: true,
+      page: {
+        select: {
+          icon: true,
+          title: true
+        }
+      }
+    },
+    orderBy: {
+      page: {
+        title: 'asc'
+      }
     }
   });
 
@@ -139,7 +161,7 @@ test.skip('create and edit relation property values', async ({ page, document, d
     .click();
 
   await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[0].id}`).click();
-  await databasePage.page.waitForTimeout(250);
+  await databasePage.page.waitForTimeout(100);
   await databasePage.page.locator(`data-test=page-option-${connectedBoardCards[1].id}`).click();
 
   await databasePage.page.locator("div[role='presentation']").click();
@@ -189,6 +211,18 @@ test.skip('create and edit relation property values', async ({ page, document, d
     }
   });
 
+  await prisma.block.update({
+    where: {
+      id: connectedBoardView.id
+    },
+    data: {
+      fields: {
+        ...(connectedBoardView.fields as any),
+        visiblePropertyIds: [...(connectedBoardView.fields as any).visiblePropertyIds, connectedRelationProperty.id]
+      }
+    }
+  });
+
   await document.goToPage({
     domain: space.domain,
     path: connectedBoardPage.path
@@ -204,8 +238,9 @@ test.skip('create and edit relation property values', async ({ page, document, d
     templateId: connectedRelationProperty.id
   });
 
-  expect(await connectedBoardCard1RelationPropertyCell.textContent()).toBe('📚Source Card 2🍻Source Card 1');
-  expect(await connectedBoardCard2RelationPropertyCell.textContent()).toBe('🍻Source Card 1');
+  expect(await connectedBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[0]));
+  expect(await connectedBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[1]));
+  expect(await connectedBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(sourceBoardCards[0]));
 
   await databasePage
     .getDatabaseTableCell({
@@ -231,6 +266,11 @@ test.skip('create and edit relation property values', async ({ page, document, d
     templateId: sourceRelationProperty.id
   });
 
-  expect(await sourceBoardCard1RelationPropertyCell.textContent()).toBe('📚Connected Card 2');
-  expect(await sourceBoardCard2RelationPropertyCell.textContent()).toBe('🍻Connected Card 1');
+  expect(await sourceBoardCard1RelationPropertyCell.textContent()).toBe(_getTitle(connectedBoardCards[1]));
+  expect(await sourceBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(connectedBoardCards[0]));
 });
+
+function _getTitle({ page }: { page: { icon: string | null; title: string } | null }) {
+  const { icon, title } = page || { title: '', icon: '' };
+  return `${icon}${title}`;
+}

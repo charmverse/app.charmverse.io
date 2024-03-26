@@ -413,9 +413,7 @@ function PropertyValueElement(props: Props) {
     return (
       <RelationPropertyPagesAutocomplete
         propertyTemplate={propertyTemplate}
-        selectedPageListItemIds={
-          typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []
-        }
+        value={propertyValue as string | string[]}
         showCard={props.showCard}
         displayType={displayType}
         emptyPlaceholderContent={emptyDisplayValue}
