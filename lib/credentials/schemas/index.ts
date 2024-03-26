@@ -8,8 +8,6 @@ import { encodeProposalCredential, proposalCredentialSchemaId, proposalCredentia
 import type { RewardCredential } from './reward';
 import { encodeRewardCredential, rewardCredentialSchemaId, rewardCredentialSchemaDefinition } from './reward';
 
-export const allSchemaDefinitions = [proposalCredentialSchemaDefinition, rewardCredentialSchemaDefinition];
-
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
   reward: 'Reward',

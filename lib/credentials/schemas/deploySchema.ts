@@ -1,14 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
-import { arbitrum, optimismSepolia } from 'viem/chains';
+import { getChainById } from 'connectors/chains';
 
 import { prettyPrint } from 'lib/utils/strings';
 
 import type { EasSchemaChain } from '../connectors';
-import { getEasConnector, getOnChainSchemaUrl } from '../connectors';
+import { easSchemaChains, getEasConnector, getOnChainSchemaUrl } from '../connectors';
 import { getCharmverseSigner } from '../getCharmverseSigner';
 
-import { allSchemaDefinitions } from './index';
+import { externalCredentialSchemaDefinition } from './external';
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
@@ -25,29 +25,41 @@ async function deploySchema({ schema, chainId }: { schema: string; chainId: EasS
     throw new Error('Schema must be deployed with CharmVerse Credentials Wallet');
   }
 
+  const fullChainName = `${getChainById(chainId)?.chainName} - ${chainId}`;
+
   schemaRegistry.connect(signer);
-
-  const nonce = (await signer.provider?.getTransactionCount(signerAddress)) ?? 0;
-
-  const populatedTx = await schemaRegistry.contract.populateTransaction.register(schema, NULL_ADDRESS, true, {
-    nonce: nonce + 1
-  });
-
-  await (await signer.sendTransaction(populatedTx)).wait();
 
   // SchemaUID is deterministic
   const schemaUid = getSchemaUID(schema, NULL_ADDRESS, true);
 
+  const deployedSchema = await schemaRegistry.getSchema({ uid: schemaUid }).catch((err) => {
+    log.info(`Schema not found on ${fullChainName}`);
+  });
+
   const schemaUrl = getOnChainSchemaUrl({ chainId, schemaId: schemaUid });
 
-  log.info(`Schema ${schema} deployed at ${schemaUrl}`);
-}
+  if (deployedSchema) {
+    log.info(`Schema already exists at ${schemaUrl}`);
+  } else {
+    log.info('Creating schema');
 
-async function deployAllSchemas({ chainId }: { chainId: EasSchemaChain }) {
-  for (const schemaDefinition of allSchemaDefinitions) {
-    log.info(`Deploying schema ${prettyPrint(schemaDefinition)}...`);
-    await deploySchema({ schema: schemaDefinition, chainId });
+    await schemaRegistry.register({
+      schema,
+      resolverAddress: NULL_ADDRESS,
+      revocable: true
+    });
+
+    log.info(`Schema ${schema} deployed at ${schemaUrl}`);
   }
 }
 
-deployAllSchemas({ chainId: arbitrum.id }).then(log.info);
+async function deploySchemaAcrossChains({ schema }: { schema: string }) {
+  for (const chainId of easSchemaChains) {
+    log.info(`Deploying schema...`);
+    await deploySchema({ schema, chainId });
+  }
+}
+
+// deploySchemaAcrossChains({
+//   schema: externalCredentialSchemaDefinition
+// }).then(log.info);
