@@ -32,7 +32,7 @@ const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloCli
   }),
   [sepolia.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
-    uri: 'https://optimism-sepolia.easscan.org/graphql',
+    uri: 'https://sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
     skipRedisCache: !isProdEnv
   }),
@@ -97,7 +97,7 @@ function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | Ea
   wallets,
   schemas
 }: {
-  schemas: Record<Chain, { schemaId: string; issuers: string[] }[]>;
+  schemas: Record<Chain, { schemaId: string; issuers?: string[] }[]>;
   chainId: Chain;
   wallets: string[];
 }): Promise<EASAttestationFromApi[]> {
@@ -108,9 +108,7 @@ function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | Ea
       schemaId: {
         equals: _schema.schemaId
       },
-      attester: {
-        in: _schema.issuers
-      },
+      attester: _schema.issuers ? { in: _schema.issuers } : undefined,
       recipient: { in: recipient }
     }))
   };

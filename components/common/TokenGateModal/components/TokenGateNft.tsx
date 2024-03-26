@@ -1,4 +1,5 @@
 import { MenuItem, Select } from '@mui/material';
+import { use, useEffect } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -14,10 +15,21 @@ export function TokenGateNft() {
   const {
     register,
     watch,
+    setValue,
+    getValues,
     formState: { errors }
   } = useFormContext<FormValues>();
   const check = watch('check');
   const collectableOption = watch('collectableOption');
+
+  useEffect(() => {
+    if (check === 'group') {
+      const quantity = getValues('quantity');
+      if (!quantity) {
+        setValue('quantity', '1', { shouldValidate: true });
+      }
+    }
+  }, [check, collectableOption, getValues]);
 
   return (
     <>

@@ -7,6 +7,9 @@ import { getTokensAccessControlConditions } from '../utils/getTokensAccessContro
 import { TokenGateFooter } from './TokenGateFooter';
 import { TokenGateTokenFields } from './TokenGateTokensFields';
 
+/**
+ * ERC-20 tokens
+ */
 export function TokenGateTokens() {
   const { setDisplayedPage, handleTokenGate } = useTokenGateModal();
   const methods = useTokensForm();
