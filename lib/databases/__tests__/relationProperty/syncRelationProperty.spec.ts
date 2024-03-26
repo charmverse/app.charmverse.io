@@ -210,10 +210,9 @@ describe('syncRelationProperty', () => {
       board1CardPages[0].id
     ]);
 
-    expect((updatedBoard2Cards[1].fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id,
-      board1CardPages[1].id
-    ]);
+    expect((updatedBoard2Cards[1].fields as any).properties[connectedRelationProperty.id].sort()).toStrictEqual(
+      [board1CardPages[0].id, board1CardPages[1].id].sort()
+    );
 
     expect((updatedBoard2Cards[2].fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
       board1CardPages[1].id
