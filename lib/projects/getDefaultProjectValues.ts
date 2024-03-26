@@ -12,7 +12,7 @@ export function getDefaultProjectValues({
   user: LoggedInUser | null;
   membersRecord: Record<string, Member>;
 }): ProjectValues {
-  const currentMember = membersRecord[user!.id];
+  const currentMember = user ? membersRecord[user.id] : null;
   const primaryWallet = user?.wallets.find((wallet) => wallet.id === user?.primaryWalletId) ?? user?.wallets[0];
   const userEmail =
     user?.email ?? ((user?.verifiedEmails.length ? user.verifiedEmails[0].email : undefined) as string | undefined);
