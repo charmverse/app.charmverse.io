@@ -15,3 +15,5 @@ export const credentialEventLabels: Partial<Record<CredentialEventType, LabelFn>
   proposal_approved: (map) => `${map('Proposal')} ${proposalApprovedVerb}`,
   reward_submission_approved: (map) => `${map('Reward')} submission ${rewardSubmissionApprovedVerb}`
 };
+
+export const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';

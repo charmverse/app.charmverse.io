@@ -13,6 +13,7 @@ import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialDataInput } from 'lib/credentials/schemas';
+import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
@@ -67,6 +68,13 @@ export function UserCredentialRow({
       ? {
           title: charmCredential.Name,
           subtitle: charmCredential.Organization,
+          iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+        }
+      : credential.type === 'charmverse' && credential.schemaId === externalCredentialSchemaId
+      ? {
+          title: charmCredential.Name,
+          subtitle: 'Grant Round',
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }

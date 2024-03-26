@@ -1,16 +1,14 @@
 import { log } from '@charmverse/core/log';
 import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
-
-import { prettyPrint } from 'lib/utils/strings';
+import { optimism } from 'viem/chains';
 
 import type { EasSchemaChain } from '../connectors';
 import { easSchemaChains, getEasConnector, getOnChainSchemaUrl } from '../connectors';
+import { NULL_ADDRESS } from '../constants';
 import { getCharmverseSigner } from '../getCharmverseSigner';
 
 import { externalCredentialSchemaDefinition } from './external';
-
-const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 async function deploySchema({ schema, chainId }: { schema: string; chainId: EasSchemaChain }) {
   const connector = getEasConnector(chainId);
@@ -36,7 +34,7 @@ async function deploySchema({ schema, chainId }: { schema: string; chainId: EasS
     log.info(`Schema not found on ${fullChainName}`);
   });
 
-  const schemaUrl = getOnChainSchemaUrl({ chainId, schemaId: schemaUid });
+  const schemaUrl = getOnChainSchemaUrl({ chainId, schema: schemaUid });
 
   if (deployedSchema) {
     log.info(`Schema already exists at ${schemaUrl}`);
@@ -63,3 +61,10 @@ async function deploySchemaAcrossChains({ schema }: { schema: string }) {
 // deploySchemaAcrossChains({
 //   schema: externalCredentialSchemaDefinition
 // }).then(log.info);
+
+log.info(
+  getOnChainSchemaUrl({
+    chainId: optimism.id,
+    schema: externalCredentialSchemaDefinition
+  })
+);
