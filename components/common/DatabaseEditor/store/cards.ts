@@ -21,7 +21,7 @@ import type { RootState } from './index';
 const allChains = getChainList({ enableTestnets: true });
 
 type CardsState = {
-  current: string;
+  // current: string;
   cards: { [key: string]: Card };
   templates: { [key: string]: Card };
 };
@@ -42,14 +42,10 @@ function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; 
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: {
-    current: '',
     cards: {},
     templates: {}
   } as CardsState,
   reducers: {
-    setCurrent: (state, action: PayloadAction<string>) => {
-      state.current = action.payload;
-    },
     addCard: (state, action: PayloadAction<Card>) => {
       state.cards[action.payload.id] = action.payload;
     },
@@ -100,7 +96,7 @@ const cardsSlice = createSlice({
   }
 });
 
-export const { updateCards, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
+export const { updateCards, addCard, addTemplate, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
 const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;

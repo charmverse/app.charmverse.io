@@ -30,7 +30,6 @@ describe('src/components/gallery/Gallery', () => {
   card2.id = 'card2';
   const state: Partial<RootState> = {
     cards: {
-      current: '',
       cards: {
         [card.id]: card,
         [card2.id]: card2

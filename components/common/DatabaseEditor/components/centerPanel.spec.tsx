@@ -4,6 +4,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import { Constants } from 'lib/databases/constants';
 
+import type { RootState } from '../store';
 import { TestBlockFactory } from '../test/testBlockFactory';
 import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
 import { Utils } from '../utils';
@@ -44,24 +45,36 @@ describe('components/centerPanel', () => {
   card2.id = '2';
   card2.title = 'card2';
   card2.fields.properties = { id: 'property_value_id_1' };
-  const state = {
+  const state: RootState = {
     boards: {
       current: board.id,
       boards: {
         [board.id]: board
-      }
-    },
-    users: {
-      workspaceUsers: {}
+      },
+      templates: {}
     },
     cards: {
-      templates: [card1, card2],
-      cards: [card1, card2]
+      templates: {
+        [card1.id]: card1,
+        [card2.id]: card2
+      },
+      cards: {
+        [card1.id]: card1,
+        [card2.id]: card2
+      }
+    },
+    language: { value: 'en-us' },
+    loadingState: {
+      loaded: true
+    },
+    searchText: {
+      value: ''
     },
     views: {
       views: {
         [activeView.id]: activeView
       },
+      loadedBoardViews: {},
       current: activeView.id
     }
   };
