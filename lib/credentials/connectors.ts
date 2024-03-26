@@ -3,7 +3,7 @@ import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains'
 
 import type { ExternalCredentialChain } from './external/schemas';
 
-export const easSchemaMainnetChains = [optimism] as const;
+export const easSchemaMainnetChains = [optimism, arbitrum] as const;
 export const easSchemaTestnetChains = [sepolia, optimismSepolia] as const;
 
 export type EasSchemaChain =
