@@ -237,8 +237,8 @@ test('create and edit relation property values', async ({ page, document, databa
     templateId: connectedRelationProperty.id
   });
 
-  expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[0]));
-  expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(_getTitle(sourceBoardCards[1]));
+  expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(sourceBoardCards[0].page!.title);
+  expect(await targetBoardCard1RelationPropertyCell.textContent()).toContain(sourceBoardCards[1].page!.title);
   expect(await targetBoardCard2RelationPropertyCell.textContent()).toBe(_getTitle(sourceBoardCards[0]));
 
   await databasePage
