@@ -26,16 +26,6 @@ type CardsState = {
   templates: { [key: string]: Card };
 };
 
-function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; card: Card }) {
-  const cardTitle = card.title || cards[card.id]?.title;
-  const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
-  cardAfterUpdate.title = cardTitle;
-  cards[card.id] = cardAfterUpdate;
-  if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
-    cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
-  }
-}
-
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: {
@@ -58,10 +48,10 @@ const cardsSlice = createSlice({
           const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
           state.templates[card.id] = cardAfterUpdate;
         } else {
-          updateCardTitleProperty({
-            card: card as Card,
-            cards: state.cards
-          });
+          const cardTitle = card.title || state.cards[card.id]?.title;
+          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
+          cardAfterUpdate.title = cardTitle;
+          state.cards[card.id] = cardAfterUpdate;
         }
       }
     },

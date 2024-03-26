@@ -66,7 +66,7 @@ class CardFilter {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
     let value = card.fields.properties[filter.propertyId] as CardPropertyValue | undefined;
 
-    if (filter.propertyId === '__title') {
+    if (filter.propertyId === Constants.titleColumnId) {
       value = card.title.toLowerCase();
     }
     if (!value) {

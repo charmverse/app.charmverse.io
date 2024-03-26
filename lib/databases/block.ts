@@ -245,10 +245,10 @@ export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWit
   blockWithDetails.updatedAt = page.updatedAt;
   blockWithDetails.updatedBy = page.updatedBy;
   // used for sorting
-  if (blockWithDetails.type === 'card') {
-    blockWithDetails.fields ||= { properties: {} };
-    // blockWithDetails.fields.properties ||= {};
-    // blockWithDetails.fields.properties[Constants.titleColumnId] = blockWithDetails.title;
-  }
+  // if (blockWithDetails.type === 'card') {
+  //   blockWithDetails.fields ||= { properties: {} };
+  // blockWithDetails.fields.properties ||= {};
+  // blockWithDetails.fields.properties[Constants.titleColumnId] = blockWithDetails.title;
+  // }
   return blockWithDetails;
 }

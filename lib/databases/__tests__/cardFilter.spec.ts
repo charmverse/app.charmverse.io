@@ -17,7 +17,7 @@ describe('src/cardFilter', () => {
   board.rootId = '1';
   const card1 = TestBlockFactory.createCard(board);
   card1.id = '1';
-  card1.title = 'card1';
+  card1.title = 'Page Title';
   card1.fields.properties.propertyId = 'Status';
   const filterClause = createFilterClause({
     propertyId: 'propertyId',
@@ -25,8 +25,6 @@ describe('src/cardFilter', () => {
     values: ['Status'],
     filterId: v4()
   });
-
-  card1.fields.properties[Constants.titleColumnId] = 'Page Title';
 
   describe('verify isClauseMet method', () => {
     test('should be true with is_not_empty clause', () => {
