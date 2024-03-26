@@ -20,7 +20,7 @@ export function CreateProjectForm({
 }) {
   const [open, setOpen] = useState(false);
   const { trigger: createProject, isMutating } = useCreateProject();
-  const { formState, getValues } = useFormContext<ProjectValues>();
+  const { formState, getValues, reset } = useFormContext<ProjectValues>();
 
   const isValid = formState.isValid;
   const { mutate } = useGetProjects();
@@ -84,6 +84,7 @@ export function CreateProjectForm({
             variant='outlined'
             color='error'
             onClick={() => {
+              reset();
               setOpen(false);
               onCancel?.();
             }}

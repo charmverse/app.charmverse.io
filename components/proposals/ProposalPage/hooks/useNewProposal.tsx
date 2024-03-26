@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
+import charmClient from 'charmClient';
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
@@ -12,7 +13,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectEditorFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -65,13 +66,11 @@ export function useNewProposal({ newProposal }: Props) {
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
+  const { data: projectsWithMembers } = useGetProjects();
+
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
-  const { data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === selectedProjectId);
-  const { membersRecord } = useMembers();
-
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
 
   const projectForm = useProjectForm({
     projectWithMembers,
@@ -79,6 +78,8 @@ export function useNewProposal({ newProposal }: Props) {
     defaultRequired: true
   });
 
+  const { membersRecord } = useMembers();
+  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
   useEffect(() => {
     if (selectedProjectId) {
       projectForm.reset(projectWithMembers);
@@ -100,9 +101,24 @@ export function useNewProposal({ newProposal }: Props) {
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     // Create a project if the proposal has a project field
-    let createdProject: ProjectWithMembers | undefined;
-    if (projectField) {
-      createdProject = await createProject(projectForm.getValues());
+    let projectId: string | undefined;
+    const projectValues = projectForm.getValues();
+    if (projectField && formInputs.type === 'proposal') {
+      if (!selectedProjectId) {
+        const createdProject = await createProject(projectValues);
+        projectId = createdProject.id;
+      } else if (projectWithMembers) {
+        await charmClient.updateProject({
+          id: projectWithMembers.id,
+          ...projectValues,
+          projectMembers: projectWithMembers.projectMembers.map((member, index) => ({
+            ...member,
+            ...projectValues.projectMembers[index],
+            id: member.id
+          }))
+        });
+        projectId = projectWithMembers.id;
+      }
     }
     log.info('[user-journey] Create a proposal');
     if (currentSpace) {
@@ -119,10 +135,10 @@ export function useNewProposal({ newProposal }: Props) {
           type: formInputs.type
         },
         formFields: formInputs.formFields?.map((formField) => {
-          if (formField.type === 'project_profile' && createdProject) {
+          if (formField.type === 'project_profile' && projectId) {
             return {
               ...formField,
-              value: { projectId: createdProject.id }
+              value: { projectId }
             };
           }
           return formField;
