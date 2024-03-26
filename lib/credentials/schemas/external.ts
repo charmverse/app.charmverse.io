@@ -2,7 +2,7 @@ import { SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 
 import type { TypedSchemaItem } from './interfaces';
 
-export const externalCredentialSchemaId = '0x2c315de4489ed6e189e609179383d279ccde1653b63d88b6cb9334a07defa61c'; // @TODO Update this
+export const externalCredentialSchemaId = '0x2ef0994b8591628ce92321818843f3851f461a6721dbed3d80d031441aeb6e52';
 
 export const externalCredentialSchemaDefinition =
   'string Name,string ProjectId,string Event,string Date,string GrantRound,string Source,string GrantUrl,string URL';
