@@ -378,7 +378,7 @@ function TableRow(props: Props) {
   );
 }
 
-function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: Card[] }) {
+function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean; subPages?: Card[] }) {
   return (
     <>
       <TableRow
@@ -388,9 +388,9 @@ function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: Card
         setIsExpanded={props.subPages ? props.setIsExpanded : undefined}
       />
       {props.isExpanded &&
-        (props.subPages?.length === 0
+        (!subPages || subPages?.length === 0
           ? props.emptySubPagesPlaceholder
-          : props.subPages?.map((subPage) => (
+          : subPages?.map((subPage) => (
               <ExpandableTableRow
                 key={subPage.id}
                 {...props}
