@@ -68,7 +68,6 @@ export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps
     pageId: isDocumentPath ? node.attrs.id : null
   });
   const isProposalTemplate = node.attrs?.type === 'proposal_template';
-
   let pageTitle = '';
   if (staticPage) {
     pageTitle = mappedFeatures[staticPage.feature]?.title;
@@ -77,7 +76,7 @@ export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps
     pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage.title || 'Untitled'}`;
   } else if (forumCategoryPage) {
     pageTitle = `${getFeatureTitle('Forum')} > ${forumCategoryPage?.name || 'Untitled'}`;
-  } else if (!isLoading) {
+  } else if (!isLoading || documentPage) {
     if (documentPage) {
       if (documentPage.type === 'proposal_template') {
         pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage.title || 'Untitled'}`;

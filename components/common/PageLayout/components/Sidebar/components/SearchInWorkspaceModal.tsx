@@ -1,7 +1,5 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import { ListItem, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Popper from '@mui/material/Popper';

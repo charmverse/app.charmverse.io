@@ -15,6 +15,6 @@ export function useGetPageMetaFromCache({ pageId }: { pageId?: string | null }):
     !pageFromPagesContext && pageId ? pageId : null
   );
   const documentPage = sourcePage || pageFromPagesContext;
-  const isLoading = Boolean(pageId && isPageLoading && loadingPages);
+  const isLoading = Boolean(pageId && (isPageLoading || loadingPages));
   return { page: documentPage, isLoading };
 }

@@ -5,6 +5,7 @@ import { useMemo } from 'react';
 import { useGetSearchPages } from 'charmClient/hooks/pages';
 
 import { useCurrentSpace } from './useCurrentSpace';
+import { useDebouncedValue } from './useDebouncedValue';
 import { usePages } from './usePages';
 
 export type SearchResultItem = {
@@ -23,14 +24,15 @@ export function useSearchPages({ search, limit }: { search: string; limit?: numb
 } {
   const { space } = useCurrentSpace();
   const { pages } = usePages();
+  const searchDebounced = useDebouncedValue(search, 200);
   const { data, isLoading, isValidating } = useGetSearchPages({
     // dont query if search is empty
-    spaceId: search && space?.id,
-    search,
+    spaceId: searchDebounced && space?.id,
+    search: searchDebounced,
     limit
   });
   const results = useMemo(() => {
-    return search
+    return searchDebounced
       ? (data || [])?.map((page) => ({
           title: page.title || 'Untitled',
           breadcrumb: _getBreadcrumb(page, pages),
@@ -40,7 +42,7 @@ export function useSearchPages({ search, limit }: { search: string; limit?: numb
           id: page.id
         }))
       : [];
-  }, [data, pages, search]);
+  }, [data, pages, searchDebounced]);
   return { isLoading, isValidating, results };
 }
 
