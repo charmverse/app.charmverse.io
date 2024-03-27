@@ -81,6 +81,33 @@ describe('GET /api/blocks/[id]/subtree', () => {
     );
   });
 
+  it('Should not return a deleted card block', async () => {
+    const adminCookie = await loginUser(adminUser.id);
+
+    const cardToDelete = await prisma.page.update({
+      where: {
+        id: databaseCards[0].id
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${database.id}/subtree`).set('Cookie', adminCookie).expect(200)
+    ).body as Block[];
+
+    expect(databaseBlocks).toHaveLength(totalSourceBlocks - 1);
+
+    expect(databaseBlocks).toEqual(
+      expect.arrayContaining(
+        [database, ...databaseViews, ...databaseCards]
+          .filter((c) => c.id !== cardToDelete.id)
+          .map((block) => expect.objectContaining({ id: block.id }))
+      )
+    );
+  });
+
   it('Should fail if the user cannot access the database, responding 404', async () => {
     const outsideUser = await testUtilsUser.generateUser();
     const outsideUserCookie = await loginUser(outsideUser.id);
