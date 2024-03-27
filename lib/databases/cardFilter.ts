@@ -67,9 +67,8 @@ class CardFilter {
     let value = card.fields.properties[filter.propertyId] as CardPropertyValue | undefined;
 
     if (filter.propertyId === Constants.titleColumnId) {
-      value = card.title.toLowerCase();
-    }
-    if (!value) {
+      value = card.title?.toLowerCase() ?? '';
+    } else if (!value) {
       switch (filterProperty?.type) {
         case 'updatedBy': {
           value = card.updatedBy;
