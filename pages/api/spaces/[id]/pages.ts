@@ -1,6 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta, PagesRequest } from '@charmverse/core/pages';
-import type { Prisma } from '@charmverse/core/prisma';
+import type { Prisma, PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -37,44 +37,13 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     filter,
     search
   });
-
-  const pagesQuery = {
-    spaceId,
-    OR: [
-      {
-        id: {
-          in: accessiblePageIds
-        }
-      }
-    ]
-  } as Prisma.PageWhereInput;
-
-  // ------ Add proposal template to pages query if user has access to at least 1 since all templates share same logic ------
-  // ------ vvv Delete code below when pages search optimisation completes vvv ------
-  const proposalTemplate = await prisma.page.findFirst({
+  const pages: PageMeta[] = await prisma.page.findMany({
     where: {
       spaceId,
-      type: 'proposal_template'
-    }
-  });
-
-  if (proposalTemplate) {
-    const proposalTemplatePermissions = await permissionsApiClient.pages.computePagePermissions({
-      resourceId: proposalTemplate.id,
-      userId
-    });
-
-    if (proposalTemplatePermissions.read) {
-      pagesQuery.OR!.push({
-        // Load in proposal templates
-        type: 'proposal_template'
-      });
-    }
-  }
-  // ------ ^^^ Delete code above when pages search optimisation completes ^^^ ------
-
-  const pages: PageMeta[] = await prisma.page.findMany({
-    where: pagesQuery,
+      id: {
+        in: accessiblePageIds
+      }
+    },
     select: {
       id: true,
       deletedAt: true,
