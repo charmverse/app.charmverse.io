@@ -61,7 +61,7 @@ type Block = {
 type RequiredFields = 'id' | 'spaceId' | 'rootId' | 'createdBy' | 'updatedBy' | 'createdAt' | 'updatedAt';
 
 export type BlockWithDetails = OptionalFalseyFields<
-  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | 'schema' | RequiredFields> & {
+  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | RequiredFields> & {
     pageId?: string;
     bountyId?: string;
     galleryImage?: string;
