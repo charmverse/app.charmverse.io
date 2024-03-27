@@ -2,6 +2,7 @@ import type { FormField } from '@charmverse/core/prisma-client';
 import { useMemo } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
+import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import type { FormFieldValue } from 'components/common/form/interfaces';
@@ -29,7 +30,9 @@ export function ProposalFormFieldAnswers({
     proposalId
   });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId });
-
+  const { refreshProposal } = useProposal({
+    proposalId
+  });
   const isLoading = isLoadingAnswers || !formFields;
 
   const fields = useMemo(
@@ -60,6 +63,7 @@ export function ProposalFormFieldAnswers({
         };
       })
     });
+    await refreshProposal();
   };
 
   if (isLoading) {

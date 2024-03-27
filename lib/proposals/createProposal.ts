@@ -23,6 +23,7 @@ import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsW
 import type { VoteSettings } from './interfaces';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
+import { validateProposalProject } from './validateProposalProject';
 
 type PageProps = Partial<
   Pick<
@@ -108,6 +109,13 @@ export async function createProposal({
 
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
+  }
+
+  if (!isDraft) {
+    await validateProposalProject({
+      formAnswers,
+      formFields
+    });
   }
 
   // retrieve permissions and apply evaluation ids to reviewers

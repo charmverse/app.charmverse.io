@@ -5,6 +5,7 @@ import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
+import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 import { v4 as uuid } from 'uuid';
 
@@ -12,7 +13,7 @@ import { useForumPost } from 'charmClient/hooks/forum';
 import { useGetPage } from 'charmClient/hooks/pages';
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
-import { DocumentColumnLayout, DocumentColumn } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
+import { DocumentColumn, DocumentColumnLayout } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import PageBanner from 'components/[pageId]/DocumentPage/components/PageBanner';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
@@ -20,8 +21,8 @@ import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/Page
 import { ProposalSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/ProposalSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
-import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
@@ -29,7 +30,7 @@ import { focusEventName } from 'components/common/CharmEditor/constants';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { FormFieldAnswersControlled } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
-import { getInitialFormFieldValue, useFormFields } from 'components/common/form/hooks/useFormFields';
+import { getInitialFormFieldValue } from 'components/common/form/hooks/useFormFields';
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
@@ -42,10 +43,8 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
-import type { ProposalTemplateMeta } from 'lib/proposals/getProposalTemplates';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
-import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
@@ -107,7 +106,15 @@ export function NewProposalPage({
     disabledTooltip: _disabledTooltip,
     isCreatingProposal,
     isFormLoaded,
-    createProposal
+    createProposal,
+    isProposalFormFieldsValid,
+    isProposalProjectFieldValid,
+    projectField,
+    proposalFormFieldControl,
+    projectForm,
+    proposalFormFieldErrors,
+    proposalFormFields,
+    onFormChange
   } = useNewProposal({
     newProposal: { type: proposalPageType, proposalType }
   });
@@ -122,35 +129,19 @@ export function NewProposalPage({
   const canCreateProposal = !spacePermissions || !!spacePermissions[0]?.createProposals;
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const pendingRewards = formInputs.fields?.pendingRewards || [];
-  const proposalFormFields = isStructured
-    ? formInputs.formFields ?? [
-        {
-          type: 'short_text',
-          name: '',
-          description: emptyDocument,
-          index: 0,
-          options: [],
-          private: false,
-          required: true,
-          id: uuid()
-        } as FormFieldInput
-      ]
-    : [];
 
-  const {
-    control: proposalFormFieldControl,
-    isValid: isProposalFormFieldsValid,
-    errors: proposalFormFieldErrors,
-    onFormChange
-  } = useFormFields({
-    // Only set the initial state with fields when we are creating a structured proposal
-    fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
-  });
+  // console.log('isValid', form.formState.isValid);
+  // console.log('fieldConfig', projectField?.fieldConfig);
 
   let disabledTooltip = _disabledTooltip;
-  if (!disabledTooltip && !isProposalFormFieldsValid) {
+  if (
+    !disabledTooltip &&
+    (!isProposalFormFieldsValid ||
+      (projectField && formInputs.type !== 'proposal_template' ? !isProposalProjectFieldValid : false))
+  ) {
     disabledTooltip = 'Please provide correct values for all proposal form fields';
   }
+
   if (!canCreateProposal) {
     disabledTooltip = 'You do not have permission to create proposal';
   }
@@ -169,6 +160,7 @@ export function NewProposalPage({
     id: template.proposalId,
     title: template.title
   }));
+
   const { pages } = usePages();
 
   const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
@@ -462,28 +454,30 @@ export function NewProposalPage({
                         }}
                       />
                     ) : (
-                      <FormFieldAnswersControlled
-                        control={proposalFormFieldControl}
-                        enableComments={false}
-                        errors={proposalFormFieldErrors}
-                        onFormChange={(updatedFormFields) => {
-                          setFormInputs({
-                            formAnswers: formAnswersRef.current?.map((formAnswer) => {
-                              const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
+                      <FormProvider {...projectForm}>
+                        <FormFieldAnswersControlled
+                          control={proposalFormFieldControl}
+                          enableComments={false}
+                          errors={proposalFormFieldErrors}
+                          onFormChange={(updatedFormFields) => {
+                            setFormInputs({
+                              formAnswers: formAnswersRef.current?.map((formAnswer) => {
+                                const updatedFormField = updatedFormFields.find((f) => f.id === formAnswer.fieldId);
 
-                              if (!updatedFormField) {
-                                return formAnswer;
-                              }
-                              return {
-                                ...formAnswer,
-                                value: updatedFormField.value
-                              };
-                            })
-                          });
-                          onFormChange(updatedFormFields);
-                        }}
-                        formFields={proposalFormFields}
-                      />
+                                if (!updatedFormField) {
+                                  return formAnswer;
+                                }
+                                return {
+                                  ...formAnswer,
+                                  value: updatedFormField.value
+                                };
+                              })
+                            });
+                            onFormChange(updatedFormFields);
+                          }}
+                          formFields={proposalFormFields}
+                        />
+                      </FormProvider>
                     )
                   ) : (
                     <CharmEditor
@@ -592,12 +586,12 @@ export function NewProposalPage({
               evaluations
             });
           }}
-          onChangeRewardSettings={(values) => {
+          onChangeRewardSettings={(_values) => {
             setFormInputs({
               ...formInputs,
               fields: {
                 ...formInputs.fields,
-                ...values
+                ..._values
               }
             });
           }}

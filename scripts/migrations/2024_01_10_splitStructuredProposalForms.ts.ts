@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from '@charmverse/core/prisma-client';
 import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { createForm } from 'lib/forms/createForm';

@@ -540,7 +540,7 @@ export function SpaceSettings({
           <Box
             sx={{
               py: 1,
-              px: { xs: 5, md: 10 },
+              px: { xs: 5, md: 3 },
               position: 'sticky',
               bottom: '0',
               background: (theme) => theme.palette.background.paper,
