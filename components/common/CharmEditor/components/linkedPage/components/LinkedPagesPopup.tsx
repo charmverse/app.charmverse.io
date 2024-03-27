@@ -24,7 +24,7 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 // not sure why we needed to filter this list, leaving it for now - Mar, 2024
 // const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
 
-function _LinkedPagesPopup({ pluginKey, pageId }: { pluginKey: PluginKey<NestedPagePluginState>; pageId: string }) {
+function _LinkedPagesPopup({ pluginKey, pageId }: { pluginKey: PluginKey<NestedPagePluginState>; pageId?: string }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey) as NestedPagePluginState;
   const { triggerText, counter, show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
@@ -43,11 +43,11 @@ function _LinkedPagesPopup({ pluginKey, pageId }: { pluginKey: PluginKey<NestedP
   return (
     <PopoverMenu container={tooltipContentDOM} isOpen={isVisible} onClose={onClose} width={460}>
       <GroupLabel>Select a page</GroupLabel>
-      <PagesListWithContext counter={counter} triggerText={triggerText} pageId={pageId} onSelectPage={onSelectPage} />
+      <PagesMenu counter={counter} triggerText={triggerText} pageId={pageId} onSelectPage={onSelectPage} />
     </PopoverMenu>
   );
 }
-function PagesListWithContext({
+function PagesMenu({
   counter,
   triggerText,
   onSelectPage,
@@ -55,7 +55,7 @@ function PagesListWithContext({
 }: {
   counter: number;
   triggerText: string;
-  pageId: string;
+  pageId?: string;
   onSelectPage: (pageId: string, type: PageListItem['type'], path: string) => void;
 }) {
   const { rootPages } = useRootPages();

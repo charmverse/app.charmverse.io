@@ -20,7 +20,7 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<MentionPluginState>; pageId: string }) {
+export function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<MentionPluginState>; pageId?: string }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
@@ -31,7 +31,7 @@ export function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<Men
 
 const DEFAULT_ITEM_LIMIT = 5;
 
-function MentionsMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId: string }) {
+function MentionsMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId?: string }) {
   const { members } = useMembers();
   const { rootPages } = useRootPages();
   const { roles = [] } = useRoles();
