@@ -1,6 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 import type { PluginKey } from 'prosemirror-state';
-import { useCallback, memo, useEffect, useMemo } from 'react';
+import { useCallback, memo, useEffect, useMemo, useState } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import type { PageListItem } from 'components/common/PagesList';
@@ -60,7 +60,9 @@ function PagesListWithContext({
   const { pages } = usePages();
   const { categories } = useForumCategories();
   const { mappedFeatures } = useSpaceFeatures();
-  const { results: searchResults } = useSearchPages({ search: triggerText, limit: 50 });
+  const { results: searchResults, isValidating } = useSearchPages({ search: triggerText, limit: 50 });
+  // keep track of static results, only update if isValidating is false
+  const [filteredPages, setFilteredPages] = useState<PageListItem[]>([]);
 
   const staticPages: PageListItem[] = useMemo(() => {
     return STATIC_PAGES.map((page) => {
@@ -90,16 +92,18 @@ function PagesListWithContext({
       }));
   }, [categories, triggerText]);
 
-  const allPages: PageListItem[] = useMemo(() => {
-    const filteredStaticPages = staticPages.filter((option) => {
-      return option.title.toLowerCase().includes(triggerText.toLowerCase());
-    });
-    return [...searchResults, ...filteredStaticPages, ...filteredCategoryPages];
-  }, [searchResults, filteredCategoryPages, staticPages, triggerText]);
+  useEffect(() => {
+    if (!isValidating) {
+      const filteredStaticPages = staticPages.filter((option) => {
+        return option.title.toLowerCase().includes(triggerText.toLowerCase());
+      });
+      setFilteredPages([...searchResults, ...filteredStaticPages, ...filteredCategoryPages]);
+    }
+  }, [isValidating, triggerText, searchResults, staticPages, filteredCategoryPages]);
 
-  const filteredPages = useMemo(() => {
+  const options = useMemo(() => {
     if (triggerText) {
-      return sortList({ triggerText, list: allPages });
+      return sortList({ triggerText, list: filteredPages });
     }
     // show default list (root pages from sidebar)
     const rootPages = Object.values(pages)
@@ -107,9 +111,9 @@ function PagesListWithContext({
       .filter(isTruthy)
       .sort((a, b) => a.index - b.index);
     return [...staticPages, ...rootPages];
-  }, [triggerText, pages, allPages, staticPages]);
+  }, [triggerText, pages, filteredPages, staticPages]);
 
-  const totalItems = filteredPages.length;
+  const totalItems = options.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
 
   useEffect(() => {
