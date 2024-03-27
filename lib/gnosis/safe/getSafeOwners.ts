@@ -18,7 +18,7 @@ export async function getSafeOwners({
       functionName: 'getOwners'
     });
 
-    return owners;
+    return owners.map((o) => o.toLowerCase() as `0x${string}`);
   } catch (e) {
     return null;
   }
