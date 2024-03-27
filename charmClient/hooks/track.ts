@@ -27,6 +27,7 @@ export function useTrackPageView(page: Omit<PageEventMap['page_view'], 'spaceId'
       trackPageView({
         spaceId: currentSpace.id,
         spaceDomain: currentSpace.domain,
+        spaceCustomDomain: currentSpace.customDomain,
         ...page
       });
     }
