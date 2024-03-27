@@ -45,7 +45,6 @@ export function PagesList({
       </Typography>
     );
   }
-
   return (
     <div style={style}>
       {pages.map((page, pageIndex) => (
