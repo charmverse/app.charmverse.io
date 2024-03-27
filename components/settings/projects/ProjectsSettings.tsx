@@ -92,7 +92,7 @@ function ProjectRow({
         }}
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography>{projectWithMembers.name}</Typography>
+          <Typography data-test={`project-title-${projectWithMembers.id}`}>{projectWithMembers.name}</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormProvider {...form}>
@@ -121,6 +121,7 @@ function ProjectRow({
             disabledTooltip={!form.formState.isValid ? 'Please fill out all required fields' : ''}
             disabled={isMutating || !form.formState.isValid || !form.formState.isDirty}
             onClick={onUpdateProject}
+            data-test='save-project-button'
           >
             Save
           </Button>

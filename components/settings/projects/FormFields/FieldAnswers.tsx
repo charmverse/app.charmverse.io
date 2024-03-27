@@ -40,6 +40,7 @@ function FieldAnswer({
       disabled={disabled}
       value={(field.value as string) ?? ''}
       error={fieldState.error?.message}
+      data-test={`project-field-${name}`}
       {...register(name)}
     />
   );

@@ -96,6 +96,7 @@ export function CreateProjectForm({
             disabledTooltip={!isValid ? 'Please fill out all required fields' : ''}
             disabled={isMutating || !isValid}
             onClick={saveProject}
+            data-test='save-new-project-button'
           >
             Save
           </Button>
