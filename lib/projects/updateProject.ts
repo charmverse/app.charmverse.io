@@ -9,7 +9,25 @@ export async function updateProject({
   userId: string;
   payload: ProjectUpdatePayload;
 }): Promise<ProjectWithMembers> {
-  const [projects, ...projectMembers] = await prisma.$transaction([
+  const existingProject = await prisma.project.findUniqueOrThrow({
+    where: {
+      id: payload.id
+    },
+    select: {
+      projectMembers: {
+        select: {
+          id: true
+        }
+      }
+    }
+  });
+  const existingProjectMemberIds = existingProject.projectMembers.map((member) => member.id);
+  const payloadProjectMemberIds = payload.projectMembers.map((member) => member.id);
+  const deletedProjectMembersIds = existingProjectMemberIds.filter(
+    (memberId) => !payloadProjectMemberIds.includes(memberId)
+  );
+
+  const [projects, , ...projectMembers] = await prisma.$transaction([
     prisma.project.update({
       where: {
         id: payload.id
@@ -26,6 +44,13 @@ export async function updateProject({
         demoUrl: payload.demoUrl,
         twitter: payload.twitter,
         website: payload.website
+      }
+    }),
+    prisma.projectMember.deleteMany({
+      where: {
+        id: {
+          in: deletedProjectMembersIds
+        }
       }
     }),
     ...payload.projectMembers.map((member) =>

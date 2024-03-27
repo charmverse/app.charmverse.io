@@ -10,6 +10,7 @@ export async function createProject(payload: { userId: string; project: ProjectV
 
   const project = payload.project;
   const projectLeadMember = project.projectMembers[0];
+  const extraMembers = project.projectMembers.slice(1);
 
   const createdProjectWithMembers = await prisma.project.create({
     data: {
@@ -35,7 +36,7 @@ export async function createProject(payload: { userId: string; project: ProjectV
               userId: payload.userId,
               ...projectLeadMember
             },
-            ...project.projectMembers.slice(1).map((member) => ({
+            ...extraMembers.map((member) => ({
               updatedBy: payload.userId,
               ...member
             }))

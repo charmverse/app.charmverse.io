@@ -54,10 +54,10 @@ export function useProject({
                 return {
                   ..._project,
                   ...projectPayload,
-                  projectMembers: _project.projectMembers.map((projectMember, index) => {
+                  projectMembers: projectPayload.projectMembers.map((projectMember, index) => {
                     return {
-                      ...projectMember,
-                      ...projectPayload.projectMembers[index]
+                      ..._project.projectMembers[index],
+                      ...projectMember
                     };
                   })
                 };

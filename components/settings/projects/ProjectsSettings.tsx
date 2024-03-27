@@ -40,10 +40,9 @@ function ProjectRow({
     const updatedProject = {
       ...projectValues,
       id: projectWithMembers.id,
-      projectMembers: projectWithMembers.projectMembers.map((member, index) => ({
-        ...member,
-        ...projectValues.projectMembers[index],
-        id: member.id
+      projectMembers: projectValues.projectMembers.map((member, index) => ({
+        ...projectWithMembers.projectMembers[index],
+        ...member
       }))
     };
 
