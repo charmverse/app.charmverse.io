@@ -1,4 +1,4 @@
-import type { ProjectFieldProperty, ProjectMemberPayload, ProjectPayload } from './interfaces';
+import type { ProjectFieldProperty, ProjectMemberPayload, ProjectPayload, ProjectValues } from './interfaces';
 
 export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
@@ -92,7 +92,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
     label: 'Blog'
   },
   {
-    field: 'productUrl',
+    field: 'demoUrl',
     label: 'Product or Demo URL'
   },
   {
@@ -121,6 +121,11 @@ export const projectDefaultValues: ProjectPayload = {
   communityUrl: '',
   otherUrl: '',
   walletAddress: ''
+};
+
+export const defaultProjectValues: ProjectValues = {
+  ...projectDefaultValues,
+  projectMembers: [projectMemberDefaultValues]
 };
 
 export const defaultProjectFieldConfig = {

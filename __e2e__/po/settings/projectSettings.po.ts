@@ -18,8 +18,19 @@ export class ProjectSettings extends SettingsModal {
     this.saveProjectButton = page.locator('data-test=save-project-button');
   }
 
-  fillProjectField({ content, fieldName }: { fieldName: string; content: string }) {
-    return this.page.locator(`data-test=project-field-${fieldName} >> input`).first().fill(content);
+  fillProjectField({
+    content,
+    fieldName,
+    textArea = false
+  }: {
+    textArea?: boolean;
+    fieldName: string;
+    content: string;
+  }) {
+    return this.page
+      .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
+      .first()
+      .fill(content);
   }
 
   clickProject({ projectId }: { projectId: string }) {

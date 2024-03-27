@@ -7,6 +7,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 
+import { useGetProjects } from 'charmClient/hooks/projects';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -255,6 +256,8 @@ function DocumentPageComponent({
     projectId,
     fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig
   });
+
+  const { data } = useGetProjects();
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 

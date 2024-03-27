@@ -41,6 +41,7 @@ export function ProjectMemberFieldsEditor({
       properties={projectMemberFieldProperties}
       values={values}
       onChange={onChange}
+      isProjectMember
     />
   );
 }

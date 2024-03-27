@@ -55,7 +55,7 @@ export function useNewProposal({ newProposal }: Props) {
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
-  const { data: projectsWithMembers } = useGetProjects();
+  const { data: projectsWithMembers, mutate } = useGetProjects();
 
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
@@ -97,7 +97,7 @@ export function useNewProposal({ newProposal }: Props) {
         const createdProject = await createProject(projectValues);
         projectId = createdProject.id;
       } else if (projectWithMembers) {
-        await charmClient.updateProject({
+        const updatedProjectValues = {
           id: projectWithMembers.id,
           ...projectValues,
           projectMembers: projectWithMembers.projectMembers.map((member, index) => ({
@@ -105,7 +105,9 @@ export function useNewProposal({ newProposal }: Props) {
             ...projectValues.projectMembers[index],
             id: member.id
           }))
-        });
+        };
+        await charmClient.updateProject(updatedProjectValues);
+        mutate();
         projectId = projectWithMembers.id;
       }
     }

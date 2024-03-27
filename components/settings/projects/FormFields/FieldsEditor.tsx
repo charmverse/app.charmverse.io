@@ -7,12 +7,14 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
   onChange,
   values,
   properties,
-  defaultRequired
+  defaultRequired,
+  isProjectMember
 }: {
   onChange?: (values: Values) => void;
   values: Values;
   properties: ProjectFieldProperty[];
   defaultRequired?: boolean;
+  isProjectMember?: boolean;
 }) {
   return (
     <Stack display='flex' flexDirection='column' gap={2}>
@@ -24,7 +26,11 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
           return null;
         }
         return (
-          <Stack gap={1} key={property.label}>
+          <Stack
+            gap={1}
+            key={property.label}
+            data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-container`}
+          >
             <TextInputField
               label={property.label}
               multiline={property.multiline}
@@ -48,6 +54,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
                         }
                       });
                     }}
+                    data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-hidden-toggle`}
                   />
                   <Typography>Hidden</Typography>
                 </Stack>
@@ -66,6 +73,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
                         }
                       });
                     }}
+                    data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-required-toggle`}
                   />
                   <Typography>Required</Typography>
                 </Stack>

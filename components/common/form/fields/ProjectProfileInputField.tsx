@@ -48,6 +48,7 @@ export function ProjectProfileInputField({
             setShowCreateProjectForm(false);
           }
         }}
+        data-test='project-profile-select'
         renderValue={(value) => {
           if (value === 'ADD_PROFILE') {
             return <Typography>Add a new project profile</Typography>;
@@ -59,12 +60,12 @@ export function ProjectProfileInputField({
         }}
       >
         {data?.map((project) => (
-          <MenuItem value={project.id} key={project.id}>
+          <MenuItem data-test={`project-option-${project.id}`} value={project.id} key={project.id}>
             <Typography>{project.name}</Typography>
           </MenuItem>
         ))}
         <Divider />
-        <MenuItem value='ADD_PROFILE'>
+        <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
           <Stack flexDirection='row' alignItems='center' gap={0.05}>
             <MuiAddIcon fontSize='small' />
             <Typography>Add a new project profile</Typography>
