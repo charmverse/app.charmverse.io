@@ -111,7 +111,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
     github: projectWithMembers.github,
     name: projectWithMembers.name,
     otherUrl: projectWithMembers.otherUrl,
-    productUrl: projectWithMembers.productUrl,
+    demoUrl: projectWithMembers.demoUrl,
     twitter: projectWithMembers.twitter,
     walletAddress: projectWithMembers.walletAddress,
     website: projectWithMembers.website,

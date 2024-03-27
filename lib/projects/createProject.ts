@@ -21,7 +21,7 @@ export async function createProject(payload: { userId: string; project: ProjectV
       communityUrl: project.communityUrl,
       github: project.github,
       otherUrl: project.otherUrl,
-      productUrl: project.productUrl,
+      demoUrl: project.demoUrl,
       twitter: project.twitter,
       website: project.website,
       createdBy: payload.userId,

@@ -9,7 +9,7 @@ export type ProjectPayload = Pick<
   | 'website'
   | 'github'
   | 'blog'
-  | 'productUrl'
+  | 'demoUrl'
   | 'communityUrl'
   | 'otherUrl'
   | 'walletAddress'

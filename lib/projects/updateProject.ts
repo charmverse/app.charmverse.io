@@ -23,7 +23,7 @@ export async function updateProject({
         communityUrl: payload.communityUrl,
         github: payload.github,
         otherUrl: payload.otherUrl,
-        productUrl: payload.productUrl,
+        demoUrl: payload.demoUrl,
         twitter: payload.twitter,
         website: payload.website
       }

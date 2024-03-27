@@ -117,7 +117,7 @@ export const projectDefaultValues: ProjectPayload = {
   website: '',
   github: '',
   blog: '',
-  productUrl: '',
+  demoUrl: '',
   communityUrl: '',
   otherUrl: '',
   walletAddress: ''

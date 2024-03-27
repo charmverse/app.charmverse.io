@@ -56,6 +56,7 @@ export function CreateProjectForm({
           setOpen(true);
           onAddProject?.();
         }}
+        data-test='add-project-button'
         startIcon={<AddIcon fontSize='small' />}
       >
         Add a project
