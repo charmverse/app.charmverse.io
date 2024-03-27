@@ -93,6 +93,7 @@ function PagesListWithContext({
   }, [categories, triggerText]);
 
   useEffect(() => {
+    // to reduce jumping, dont update results if we are waiting for a response from the backend
     if (!isValidating) {
       const filteredStaticPages = staticPages.filter((option) => {
         return option.title.toLowerCase().includes(triggerText.toLowerCase());
