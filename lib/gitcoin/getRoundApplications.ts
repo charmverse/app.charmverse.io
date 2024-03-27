@@ -43,21 +43,25 @@ type RoundMetadata = {
 };
 
 type ApplicationWithMetadata = Application & {
-  metadata: { application: ApplicationMetadata['application']; round: RoundMetadata };
+  metadata: ProjectMetadata & { roundName: string; recipient: string };
 };
 
-export async function getRoundApplications(chainId: ChainId) {
+export async function getRoundApplications(chainId: ChainId, startDate?: number) {
   const client = createGraphqlClient(endpoints[chainId]);
 
   const { data } = await client.query<{ roundApplications: Application[] }>({
-    query: getRoundApplicationsQuery
-    // @TODO find a way to get more then 1000 rounds
+    query: getRoundApplicationsQuery,
+    variables: {
+      startDate
+    }
   });
   return data?.roundApplications;
 }
 
 export async function getRoundApplicationsWithMeta(chainId: ChainId) {
-  const applications = await getRoundApplications(chainId);
+  const yesterday = yesterdayUnixTimestamp();
+  const startDate = Math.round(yesterday);
+  const applications = await getRoundApplications(chainId, startDate);
   const updatedApplications: ApplicationWithMetadata[] = [];
 
   for (const application of applications) {
@@ -70,12 +74,18 @@ export async function getRoundApplicationsWithMeta(chainId: ChainId) {
       updatedApplications.push({
         ...application,
         metadata: {
-          application: applicationMetadata.application,
-          round: roundMetadata
+          roundName: roundMetadata.name,
+          recipient: applicationMetadata.application.recipient,
+          ...applicationMetadata.application.project
         }
       });
     }
   }
 
   return updatedApplications;
+}
+
+function yesterdayUnixTimestamp() {
+  const yesterday = new Date().getTime() - 24 * 60 * 60 * 1000;
+  return yesterday / 1000;
 }
