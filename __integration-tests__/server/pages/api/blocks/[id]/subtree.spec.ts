@@ -102,7 +102,7 @@ describe('GET /api/blocks/[id]/subtree', () => {
     expect(databaseBlocks).toEqual(
       expect.arrayContaining(
         [database, ...databaseViews, ...databaseCards]
-          .filter((c) => c.id === cardToDelete.id)
+          .filter((c) => c.id !== cardToDelete.id)
           .map((block) => expect.objectContaining({ id: block.id }))
       )
     );
