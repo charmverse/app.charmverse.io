@@ -385,7 +385,7 @@ function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean
         {...props}
         subRowsEmptyValueContent={props.isNested ? props.subRowsEmptyValueContent : undefined}
         isExpanded={props.isExpanded}
-        setIsExpanded={props.subPages ? props.setIsExpanded : undefined}
+        setIsExpanded={subPages ? props.setIsExpanded : undefined}
       />
       {props.isExpanded &&
         (!subPages || subPages?.length === 0
