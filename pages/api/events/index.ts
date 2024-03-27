@@ -18,6 +18,10 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
 
   const { event: eventName, ...eventPayload } = request;
 
+  if (typeof eventName !== 'string') {
+    throw new InvalidInputError(`Invalid eventName: ${eventName}`);
+  }
+
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = uuid();
     await req.session.save();
