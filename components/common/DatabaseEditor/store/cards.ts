@@ -305,8 +305,10 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
             return true;
           }
         } else if (propertyTemplate.type === 'multiSelect') {
+          const valueArray =
+            typeof propertyValue === 'string' ? [propertyValue] : Array.isArray(propertyValue) ? propertyValue : [];
           // Look up the value of the select option
-          const values = (propertyValue as string[]).map((value) =>
+          const values = valueArray.map((value) =>
             propertyTemplate.options.find((o) => o.id === value)?.value.toLowerCase()
           );
           if (values?.some((value) => value?.includes(searchText))) {
