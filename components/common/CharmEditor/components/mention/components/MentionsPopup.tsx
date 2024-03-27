@@ -20,18 +20,18 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function _MentionsPopup({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
+export function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<MentionPluginState>; pageId: string }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
-    return <MentionsMenu pluginKey={pluginKey} />;
+    return <MentionsMenu pageId={pageId} pluginKey={pluginKey} />;
   }
   return null;
 }
 
 const DEFAULT_ITEM_LIMIT = 5;
 
-function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
+function MentionsMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId: string }) {
   const { members } = useMembers();
   const { rootPages } = useRootPages();
   const { roles = [] } = useRoles();
@@ -63,7 +63,8 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
 
   const pageOptions = useMemo(() => {
     if (triggerText) {
-      return searchResult;
+      // exclude this page from results
+      return searchResult.filter((r) => r.id !== pageId);
     }
     return rootPages;
   }, [triggerText, searchResult, rootPages]);
@@ -178,7 +179,7 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
         <PagesList
           activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1}
           pages={visibleFilteredPages}
-          onSelectPage={(pageId) => onSelectMention(pageId, 'page')}
+          onSelectPage={(_pageId) => onSelectMention(_pageId, 'page')}
         />
 
         {!showAllPages && hiddenPagesCount > 0 && (
