@@ -7,6 +7,7 @@ import {
   Box,
   IconButton,
   ListItemIcon,
+  ListItemText,
   MenuItem,
   Stack,
   TextField,
@@ -43,7 +44,6 @@ const StyledStack = styled(Stack)`
   align-items: center;
   overflow-x: hidden;
   cursor: pointer;
-  gap: ${({ theme }) => theme.spacing(0.25)};
 `;
 
 const StyledRelatedPage = styled(Stack)`
@@ -84,9 +84,7 @@ export function RelationPageListItemsContainer({
         return (
           <StyledStack key={card.id} onClick={() => onClick?.(card.id)}>
             <PageIcon icon={card.icon} isEditorEmpty={!card.hasContent} pageType={card.type} />
-            <PageTitle hasContent={!card.title} sx={{ fontWeight: 'bold' }}>
-              {card.title || 'Untitled'}
-            </PageTitle>
+            <PageTitle hasContent={!card.title}>{card.title || 'Untitled'}</PageTitle>
 
             {!readOnly && onRemove && (
               <IconButton sx={{ ml: 1 }} size='small' onClick={() => onRemove(card.id)}>
@@ -187,7 +185,7 @@ function PagesAutocompleteBase({
         disableClearable
         forcePopupIcon={false}
         fullWidth
-        groupBy={(option) => (selected[option.id] ? 'Linked page' : 'Link another page')}
+        groupBy={(option) => (selected[option.id] ? 'Linked' : 'Link another page')}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
         getOptionLabel={(option) => option.title} // prevent errors in console
@@ -252,15 +250,14 @@ function PagesAutocompleteBase({
                 }
               }}
             >
-              <Stack flexDirection='row'>
-                <ListItemIcon>
-                  <PageIcon icon={card.icon} isEditorEmpty={!card.hasContent} pageType='card' />
-                </ListItemIcon>
-                <PageTitle hasContent={!card.title}>{card.title || 'Untitled'}</PageTitle>
-              </Stack>
+              <ListItemIcon>
+                <PageIcon icon={card.icon} isEditorEmpty={!card.hasContent} pageType='card' />
+              </ListItemIcon>
+              <ListItemText>{card.title || 'Untitled'}</ListItemText>
+
               {selected[card.id] ? (
                 <Tooltip title='Unlink page'>
-                  <span>
+                  <ListItemIcon>
                     <IconButton
                       size='small'
                       onClick={(e) => {
@@ -270,15 +267,15 @@ function PagesAutocompleteBase({
                     >
                       <RemoveIcon fontSize='small' color='secondary' />
                     </IconButton>
-                  </span>
+                  </ListItemIcon>
                 </Tooltip>
               ) : (
                 <Tooltip title='Link page'>
-                  <span>
+                  <ListItemIcon>
                     <IconButton size='small'>
                       <AddIcon fontSize='small' color='secondary' />
                     </IconButton>
-                  </span>
+                  </ListItemIcon>
                 </Tooltip>
               )}
             </MenuItem>

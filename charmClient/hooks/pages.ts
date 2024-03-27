@@ -16,7 +16,3 @@ export function useGetPage(pageId?: string | null) {
 export function useGetPageMeta(pageId?: string | null) {
   return useGET<PageMetaLite>(pageId ? `/api/pages/${pageId}` : null, { meta: true });
 }
-
-export function useInitialPagesForSpace(spaceId?: string) {
-  return useGETImmutable<PageMeta[]>(spaceId ? `/api/spaces/${spaceId}/pages` : null, { filter: 'not_card' });
-}

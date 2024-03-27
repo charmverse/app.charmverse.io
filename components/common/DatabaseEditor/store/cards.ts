@@ -44,13 +44,12 @@ const cardsSlice = createSlice({
         if (card.deletedAt) {
           delete state.cards[card.id];
           delete state.templates[card.id];
-        } else if (card.fields?.isTemplate) {
+          // also check state.templates in case this is from pages_meta_updated
+        } else if (card.fields?.isTemplate || state.templates[card.id]) {
           const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
           state.templates[card.id] = cardAfterUpdate;
         } else {
-          const cardTitle = card.title || state.cards[card.id]?.title;
           const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
-          cardAfterUpdate.title = cardTitle;
           state.cards[card.id] = cardAfterUpdate;
         }
       }
@@ -324,22 +323,21 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
   });
 }
 
-type getViewCardsProps = { viewId: string; boardId: string; localFilters?: FilterGroup | null };
+type getViewCardsProps = { viewId?: string; boardId: string; localFilters?: FilterGroup | null };
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
     getCards,
     (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
-    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
     getSearchText,
     (state: RootState, props: getViewCardsProps) =>
-      props.localFilters || state.views.views[props.viewId]?.fields.filter,
-    (cards, board, view, searchText, filter) => {
-      if (!view || !board || !cards) {
+      props.localFilters || (props.viewId && state.views.views[props.viewId]?.fields.filter) || null,
+    (cards, board, searchText, filter) => {
+      if (!board || !cards) {
         return [];
       }
       let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
-      if (view.fields.filter) {
+      if (filter) {
         result = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
       }
       if (searchText) {

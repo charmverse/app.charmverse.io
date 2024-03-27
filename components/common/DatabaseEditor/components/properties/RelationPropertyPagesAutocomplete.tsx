@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react';
 
-import { useGetSubtree } from 'charmClient/hooks/blocks';
-import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 import { makeSelectBoard } from '../../store/boards';

@@ -15,8 +15,11 @@ import type { ConnectionEvent } from 'components/common/CharmEditor/components/f
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import { AddBountyButton } from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
+import { makeSelectBoard } from 'components/common/DatabaseEditor/store/boards';
+import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
 import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/views';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
@@ -111,30 +114,17 @@ function DocumentPageComponent({
     return state.cards.cards[page.id] ?? state.cards.templates[page.id];
   });
 
-  const board = useAppSelector((state) => {
-    if (!card?.parentId) {
-      return null;
-    }
-
-    return state.boards.boards[card.parentId];
-  });
-
-  const cards = useAppSelector((state) => {
-    return board
-      ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-          (c) => c.parentId === board.id
-        )
-      : [];
-  });
-
-  const boardViews = useAppSelector((state) => {
-    if (board) {
-      return Object.values(state.views.views).filter((view) => view.parentId === board.id);
-    }
-    return [];
-  });
-
-  const activeBoardView = boardViews[0];
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const selectSortedViews = useMemo(makeSelectSortedViews, []);
+  const board = useAppSelector((state) => selectBoard(state, card?.parentId ?? ''));
+  const boardViews = useAppSelector((state) => selectSortedViews(state, board?.id || ''));
+  const cards = useAppSelector((state) =>
+    selectViewCardsSortedFilteredAndGrouped(state, {
+      boardId: board?.id || '',
+      viewId: ''
+    })
+  );
 
   const showPageBanner =
     page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
@@ -390,7 +380,6 @@ function DocumentPageComponent({
                       card={card}
                       showCard={_showCard}
                       cards={cards}
-                      activeView={activeBoardView}
                       views={boardViews}
                       readOnly={readOnly}
                       pageUpdatedAt={page.updatedAt.toString()}
