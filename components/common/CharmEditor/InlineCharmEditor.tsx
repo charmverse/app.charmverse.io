@@ -14,7 +14,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
-import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import EmojiSuggest from './components/emojiSuggest/EmojiPopup';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import { plugins as emojiPlugins } from './components/emojiSuggest/emojiSuggest.plugins';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
