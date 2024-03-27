@@ -120,7 +120,9 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
   }, {});
 
   const validBlocks = blocks
-    .map((block) => {
+    .map((block, i) => {
+      // @ts-ignore this field can be dropped from the DB
+      block.schema = undefined;
       const page = pagesMap[block.id];
       if (page) {
         return removeFalseyFields(applyPageToBlock(block, page)) as BlockWithDetails;
@@ -129,6 +131,5 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     })
     // remove orphan blocks
     .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
-
   return { blocks: validBlocks, source };
 }

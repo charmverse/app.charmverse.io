@@ -47,7 +47,6 @@ type Block = {
   createdBy: string;
   updatedBy: string;
 
-  // schema: number;
   type: BlockTypes;
   title: string;
   fields: Record<string, any>;
@@ -61,7 +60,7 @@ type Block = {
 type RequiredFields = 'id' | 'spaceId' | 'rootId' | 'createdBy' | 'updatedBy' | 'createdAt' | 'updatedAt';
 
 export type BlockWithDetails = OptionalFalseyFields<
-  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | RequiredFields> & {
+  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | 'schema' | RequiredFields> & {
     pageId?: string;
     bountyId?: string;
     galleryImage?: string;

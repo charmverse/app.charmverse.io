@@ -40,8 +40,8 @@ export function removeFalseyFields<T extends object>(obj: T): OptionalFalseyFiel
   const result = obj as OptionalFalseyFields<T>;
   for (const [key, value] of Object.entries(result)) {
     if (value === null || obj[key as keyof T] === '') {
-      delete result[key as keyof T];
+      delete obj[key as keyof T];
     }
   }
-  return result;
+  return obj;
 }
