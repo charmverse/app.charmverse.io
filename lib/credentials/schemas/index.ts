@@ -1,21 +1,28 @@
 // 1. Loan Officer Schema used by Financial Institution for verifying a loan officer
 import type { AttestationType } from '@charmverse/core/prisma';
 
+import { externalCredentialSchemaDefinition, externalCredentialSchemaId } from './external';
 import type { ProposalCredential } from './proposal';
 import { encodeProposalCredential, proposalCredentialSchemaId, proposalCredentialSchemaDefinition } from './proposal';
 import type { RewardCredential } from './reward';
 import { encodeRewardCredential, rewardCredentialSchemaId, rewardCredentialSchemaDefinition } from './reward';
 
-export const allSchemaDefinitions = [proposalCredentialSchemaDefinition, rewardCredentialSchemaDefinition];
+export const allSchemaDefinitions = [
+  proposalCredentialSchemaDefinition,
+  rewardCredentialSchemaDefinition,
+  externalCredentialSchemaDefinition
+];
 
 export const credentialLabels: Record<AttestationType, string> = {
   proposal: 'Proposal',
-  reward: 'Reward'
+  reward: 'Reward',
+  external: 'External'
 };
 
 export const attestationSchemaIds: Record<AttestationType, string> = {
   proposal: proposalCredentialSchemaId,
-  reward: rewardCredentialSchemaId
+  reward: rewardCredentialSchemaId,
+  external: externalCredentialSchemaId
 };
 
 export type CredentialDataInput<T extends AttestationType = AttestationType> = T extends 'proposal'
