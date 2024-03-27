@@ -67,7 +67,12 @@ describe('getRelatedBlocks', () => {
     const dbBlock = blocks.find((b) => b.id === database.id);
 
     expect(dbBlock).toEqual(
-      expect.objectContaining({ ...database, createdAt: expect.any(Date), updatedAt: expect.any(Date) })
+      expect.objectContaining({
+        ...database,
+        deletedAt: undefined,
+        createdAt: expect.any(Date),
+        updatedAt: expect.any(Date)
+      })
     );
   });
 

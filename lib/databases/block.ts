@@ -13,17 +13,18 @@ export type BlockTypes = (typeof blockTypes)[number];
 
 type PageFields = Pick<
   Page,
-  | 'title'
-  | 'headerImage'
+  | 'bountyId'
+  | 'deletedAt'
   | 'galleryImage'
   | 'hasContent'
+  | 'headerImage'
+  | 'icon'
+  | 'id'
   | 'syncWithPageId'
+  | 'title'
+  | 'type'
   | 'updatedBy'
   | 'updatedAt'
-  | 'type'
-  | 'id'
-  | 'bountyId'
-  | 'icon'
 >;
 
 export type BlockPatch = {
@@ -233,6 +234,7 @@ export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
 // mutative method, for performance reasons
 export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWithDetails {
   const blockWithDetails = block as BlockWithDetails;
+  blockWithDetails.deletedAt = page.deletedAt || undefined;
   blockWithDetails.bountyId = page.bountyId || undefined;
   blockWithDetails.pageId = page.id;
   blockWithDetails.syncWithPageId = page.syncWithPageId || undefined;
