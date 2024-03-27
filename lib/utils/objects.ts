@@ -32,8 +32,11 @@ export type OptionalFalseyFields<T> = {
     : T[K];
 };
 
-// mutative method
-export function removeFalseyFields<T extends object, U extends keyof T>(obj: T): OptionalFalseyFields<T> {
+// mutative method, an optimizer to reduce the size of the payload when returning pages or blocks
+// One issue with the types is that we can't infer if a string value will be empty or not, so we have to make it optional
+// This breaks fields like "id" which always have a value
+// See BlockWithDetails for an example of how to use this
+export function removeFalseyFields<T extends object>(obj: T): OptionalFalseyFields<T> {
   const result = obj as OptionalFalseyFields<T>;
   for (const [key, value] of Object.entries(result)) {
     if (value === null || obj[key as keyof T] === '') {

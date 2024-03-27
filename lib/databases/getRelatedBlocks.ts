@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { applyPageToBlock } from 'lib/databases/block';
+import { removeFalseyFields } from 'lib/utils/objects';
 import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from './block';
@@ -122,9 +123,9 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
     .map((block) => {
       const page = pagesMap[block.id];
       if (page) {
-        return applyPageToBlock(block, page);
+        return removeFalseyFields(applyPageToBlock(block, page)) as BlockWithDetails;
       }
-      return block as BlockWithDetails;
+      return removeFalseyFields(block) as BlockWithDetails;
     })
     // remove orphan blocks
     .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');

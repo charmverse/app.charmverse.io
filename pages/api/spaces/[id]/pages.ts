@@ -10,6 +10,7 @@ import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { removeFalseyFields } from 'lib/utils/objects';
 import { replaceS3Domain } from 'lib/utils/url';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -75,11 +76,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     page.galleryImage = replaceS3Domain(page.galleryImage);
     page.headerImage = replaceS3Domain(page.headerImage);
     page.icon = replaceS3Domain(page.icon);
-    for (const [key, value] of Object.entries(page)) {
-      if (value === null || page[key as keyof PageMeta] === '') {
-        delete page[key as keyof PageMeta];
-      }
-    }
+    removeFalseyFields(page);
   });
 
   const createdPages: PageMeta[] = [];
