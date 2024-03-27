@@ -102,16 +102,10 @@ function PropertyOptions(props: LayoutOptionsProps) {
 
   const { hiddenProperties, visibleProperties } = useMemo(() => {
     const propertyIds = properties.map((property) => property.id);
-    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>(
-      (__propertiesRecord, property) => {
-        __propertiesRecord[property.id] = property;
-        return __propertiesRecord;
-      },
-      {
-        // Always include __title column as its not present by default
-        [Constants.titleColumnId]: titleProperty
-      }
-    );
+    const _propertiesRecord = properties.reduce<Record<string, IPropertyTemplate>>((__propertiesRecord, property) => {
+      __propertiesRecord[property.id] = property;
+      return __propertiesRecord;
+    }, {});
 
     const _visibleProperties = visiblePropertyIdsWithTitle
       .map((visiblePropertyId) => _propertiesRecord[visiblePropertyId])

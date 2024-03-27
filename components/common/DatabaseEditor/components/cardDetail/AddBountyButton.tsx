@@ -4,23 +4,21 @@ import { FormattedMessage } from 'react-intl';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
+import type { Card } from 'lib/databases/card';
 
-import { AddAPropertyButton } from '../../properties/AddAProperty';
+import { AddAPropertyButton } from '../properties/AddAProperty';
 
 type Props = {
   readOnly: boolean;
-  cardId: string;
+  card: Card;
 };
 
-export default function AddBountyAction({ readOnly, cardId }: Props) {
+export function AddBountyButton({ readOnly, card }: Props) {
   const router = useRouter();
-  const { pages } = usePages();
   const [spacePermissions] = useCurrentSpacePermissions();
   const isSharedPage = router.route.startsWith('/share');
-  const cardPage = pages[cardId];
   const { getFeatureTitle } = useSpaceFeatures();
 
   const { user } = useUser();
@@ -28,15 +26,15 @@ export default function AddBountyAction({ readOnly, cardId }: Props) {
 
   const { setCreatingInlineReward, creatingInlineReward } = useRewards();
 
-  const hasReward = !!cardPage?.bountyId;
+  const hasReward = !!card?.bountyId;
   const canAddBounty =
     spacePermissions?.createBounty &&
     !isSharedPage &&
-    cardPage &&
+    card &&
     !hasReward &&
     !creatingInlineReward &&
     !readOnly &&
-    cardPage.type.match('template') === null &&
+    card.pageType?.match('template') === null &&
     spacePermissions?.createBounty &&
     space &&
     user;

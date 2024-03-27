@@ -28,19 +28,20 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
     (page?.permissionFlags.edit_content === false && editMode !== 'suggesting') || editMode === 'viewing';
 
   useEffect(() => {
-    if (page) {
+    if (page && currentSpace) {
       trackPageView({
         type: page.type,
         pageId: page.id,
         spaceId: page.spaceId,
-        spaceDomain: currentSpace?.domain
+        spaceDomain: currentSpace.domain,
+        spaceCustomDomain: currentSpace.customDomain
       });
       setCurrentPageId(page.id);
     }
     return () => {
       resetPageProps();
     };
-  }, [page?.id]);
+  }, [page?.id, !!currentSpace]);
 
   // reset page id on unmount
   useEffect(() => {

@@ -218,19 +218,11 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 <div
                   class="octo-icontitle"
                 >
-                  <div>
-                    <div
-                      class="css-1s68mph"
-                    >
-                      <img
-                        src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                      />
-                    </div>
-                  </div>
+                  <div />
                   <div
                     class="octo-titletext"
                   >
-                    Page id1
+                    title
                   </div>
                 </div>
                 <div
@@ -273,19 +265,11 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                 <div
                   class="octo-icontitle"
                 >
-                  <div>
-                    <div
-                      class="css-1s68mph"
-                    >
-                      <img
-                        src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                      />
-                    </div>
-                  </div>
+                  <div />
                   <div
                     class="octo-titletext"
                   >
-                    Page id2
+                    title
                   </div>
                 </div>
                 <div
@@ -326,7 +310,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
             <a
               class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
               draggable="false"
-              href="/test-space/undefined"
+              href="/test-space/id3"
             >
               <div
                 class="KanbanCard MuiBox-root css-1oaiypi"
@@ -362,7 +346,7 @@ exports[`src/component/kanban/kanban return kanban and click on KanbanCalculatio
                   <div
                     class="octo-titletext"
                   >
-                    Untitled
+                    title
                   </div>
                 </div>
                 <div
@@ -650,19 +634,11 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 <div
                   class="octo-icontitle"
                 >
-                  <div>
-                    <div
-                      class="css-1s68mph"
-                    >
-                      <img
-                        src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                      />
-                    </div>
-                  </div>
+                  <div />
                   <div
                     class="octo-titletext"
                   >
-                    Page id1
+                    title
                   </div>
                 </div>
                 <div
@@ -705,19 +681,11 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 <div
                   class="octo-icontitle"
                 >
-                  <div>
-                    <div
-                      class="css-1s68mph"
-                    >
-                      <img
-                        src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                      />
-                    </div>
-                  </div>
+                  <div />
                   <div
                     class="octo-titletext"
                   >
-                    Page id2
+                    title
                   </div>
                 </div>
                 <div
@@ -790,19 +758,11 @@ exports[`src/component/kanban/kanban should match snapshot 1`] = `
                 <div
                   class="octo-icontitle"
                 >
-                  <div>
-                    <div
-                      class="css-1s68mph"
-                    >
-                      <img
-                        src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                      />
-                    </div>
-                  </div>
+                  <div />
                   <div
                     class="octo-titletext"
                   >
-                    Page id3
+                    title
                   </div>
                 </div>
                 <div

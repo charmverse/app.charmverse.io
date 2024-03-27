@@ -28,7 +28,7 @@ export type ProposalPropertyValues = { properties: ProposalPropertiesField };
 
 export type ProposalBlockInput = {
   id?: string;
-  type: string;
+  type: 'board' | 'card';
   spaceId?: string;
   title?: string;
   schema?: number;

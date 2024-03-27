@@ -54,7 +54,7 @@ describe('components/viewHeader/newCardButton', () => {
       wrapIntl(
         <ReduxProvider store={store}>
           <NewCardButton
-            templatesBoardId='board-id-1'
+            templatesBoard={{ id: 'board-id-1', title: '' }}
             deleteCardTemplate={jest.fn()}
             showCard={jest.fn()}
             addCard={jest.fn()}
@@ -72,7 +72,7 @@ describe('components/viewHeader/newCardButton', () => {
       wrapIntl(
         <ReduxProvider store={store}>
           <NewCardButton
-            templatesBoardId='board-id-1'
+            templatesBoard={{ id: 'board-id-1', title: '' }}
             deleteCardTemplate={jest.fn()}
             showCard={jest.fn()}
             addCard={mockFunction}
@@ -96,7 +96,7 @@ describe('components/viewHeader/newCardButton', () => {
       wrapIntl(
         <ReduxProvider store={store}>
           <NewCardButton
-            templatesBoardId='board-id-2'
+            templatesBoard={{ id: 'board-id-2', title: '' }}
             deleteCardTemplate={jest.fn()}
             showCard={jest.fn()}
             addCard={jest.fn()}

@@ -12,7 +12,7 @@ import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import type { Board, BoardGroup, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import { createBoardView } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 
 import mutator from '../../mutator';
@@ -28,7 +28,7 @@ import TableRows from './tableRows';
 type Props = {
   selectedCardIds: string[];
   board: Board;
-  cardPages: CardPage[];
+  cards: Card[];
   activeView: BoardView;
   views: BoardView[];
   visibleGroups: BoardGroup[];
@@ -72,7 +72,7 @@ const TableRowsContainer = forwardRef<HTMLDivElement, { children: ReactNode }>((
 function Table(props: Props): JSX.Element {
   const {
     board,
-    cardPages,
+    cards,
     activeView,
     visibleGroups,
     groupByProperty,
@@ -209,8 +209,8 @@ function Table(props: Props): JSX.Element {
     const { selectedCardIds } = props;
     const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
     const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
-    const cardsById = cardPages.reduce<{ [key: string]: Card }>((acc, card) => {
-      acc[card.card.id] = card.card;
+    const cardsById = cards.reduce<{ [key: string]: Card }>((acc, card) => {
+      acc[card.id] = card;
       return acc;
     }, {});
     const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
@@ -244,8 +244,8 @@ function Table(props: Props): JSX.Element {
       }
 
       let cardOrder = hasSort
-        ? cardPages.map((o) => o.card.id)
-        : Array.from(new Set([...activeView.fields.cardOrder, ...cardPages.map((o) => o.card.id)]));
+        ? cards.map((o) => o.id)
+        : Array.from(new Set([...activeView.fields.cardOrder, ...cards.map((o) => o.id)]));
 
       const destIndex = cardOrder.indexOf(dstCardID);
       cardOrder = cardOrder.filter((id) => !draggedCardIds.includes(id));
@@ -273,11 +273,9 @@ function Table(props: Props): JSX.Element {
         cardOrder.splice(destIndex, 0, ...draggedCardIds);
       } else {
         // Find index of first group item
-        const firstCard = cardPages.find(
-          ({ card }) => card.fields.properties[activeView.fields.groupById!] === groupID
-        );
+        const firstCard = cards.find((card) => card.fields.properties[activeView.fields.groupById!] === groupID);
         if (firstCard) {
-          cardOrder.splice(cardOrder.indexOf(firstCard.card.id), 0, ...draggedCardIds);
+          cardOrder.splice(cardOrder.indexOf(firstCard.id), 0, ...draggedCardIds);
         } else {
           // if not found, this is the only item in group.
           return;
@@ -300,7 +298,7 @@ function Table(props: Props): JSX.Element {
         );
       });
     },
-    [cardPages, props.selectedCardIds, groupByProperty]
+    [cards, props.selectedCardIds, groupByProperty]
   );
 
   const onDropToCard = async (srcCard: Card, dstCard: Card) => {
@@ -323,7 +321,7 @@ function Table(props: Props): JSX.Element {
       <div className='octo-table-body'>
         <TableHeaders
           board={board}
-          cards={cardPages.map((c) => c.card)}
+          cards={cards}
           activeView={activeView}
           views={views}
           offset={offset}
@@ -375,7 +373,7 @@ function Table(props: Props): JSX.Element {
                 board={board}
                 activeView={activeView}
                 columnRefs={columnRefs}
-                cardPages={cardPages}
+                cards={cards}
                 selectedCardIds={props.selectedCardIds}
                 readOnly={readOnly || !!readOnlyRows}
                 cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -420,7 +418,7 @@ function Table(props: Props): JSX.Element {
         {!props.hideCalculations && (
           <CalculationRow
             board={board}
-            cards={cardPages.map((c) => c.card)}
+            cards={cards}
             activeView={activeView}
             resizingColumn={resizingColumn}
             offset={offset}

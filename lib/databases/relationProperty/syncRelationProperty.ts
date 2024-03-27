@@ -55,31 +55,17 @@ export async function syncRelationProperty(
     }
   });
 
-  const sourceBoardCardPages = sourceBoardCards.length
-    ? await prisma.page.findMany({
-        where: {
-          id: {
-            in: sourceBoardCards.map((c) => c.id)
-          }
-        },
-        select: {
-          id: true
-        }
-      })
-    : [];
-
   const connectedBoardCardsRelatedCardsRecord: Record<string, string[]> = {};
 
-  for (const boardCard of sourceBoardCards) {
-    const boardCardPage = sourceBoardCardPages.find((p) => p.id === boardCard.id);
-    const boardCardProperties = (boardCard.fields as unknown as CardFields).properties;
-    const boardCardRelationPropertyValue = boardCardProperties[sourceRelationProperty.id] as string[] | null;
-    if (boardCardPage && boardCardRelationPropertyValue) {
+  for (const card of sourceBoardCards) {
+    const cardProperties = (card.fields as unknown as CardFields).properties;
+    const boardCardRelationPropertyValue = cardProperties[sourceRelationProperty.id] as string[] | null;
+    if (boardCardRelationPropertyValue) {
       boardCardRelationPropertyValue.forEach((connectedCardId) => {
         if (!connectedBoardCardsRelatedCardsRecord[connectedCardId]) {
-          connectedBoardCardsRelatedCardsRecord[connectedCardId] = [boardCardPage.id];
+          connectedBoardCardsRelatedCardsRecord[connectedCardId] = [card.id];
         } else {
-          connectedBoardCardsRelatedCardsRecord[connectedCardId].push(boardCardPage.id);
+          connectedBoardCardsRelatedCardsRecord[connectedCardId].push(card.id);
         }
       });
     }

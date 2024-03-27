@@ -2,9 +2,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSelector, createSlice } from '@reduxjs/toolkit';
 
 import type { Board } from 'lib/databases/board';
-import { isTruthy } from 'lib/utils/types';
 
-import { getCards } from './cards';
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
 
 import type { RootState } from './index';

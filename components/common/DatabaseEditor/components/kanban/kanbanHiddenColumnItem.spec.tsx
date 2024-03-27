@@ -11,7 +11,7 @@ import { pageStubToCreate } from 'testing/generatePageStub';
 
 import Mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
+import { wrapDNDIntl } from '../../testUtils';
 
 import KanbanHiddenColumnItem from './kanbanHiddenColumnItem';
 
@@ -32,45 +32,21 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
 
   const group = {
     option,
-    cardPages: [
-      {
-        card,
-        page: pageStubToCreate({ spaceId: v4(), createdBy: v4(), id: card.id, path: card.id }) as PageMeta
-      }
-    ],
     cards: [card]
   };
 
   test('should match snapshot', () => {
     const { container } = render(
-      wrapPagesProvider(
-        card.id,
-        wrapDNDIntl(
-          <KanbanHiddenColumnItem
-            activeView={activeView}
-            group={group}
-            readOnly={false}
-            onDrop={jest.fn()}
-            intl={intl}
-          />
-        )
+      wrapDNDIntl(
+        <KanbanHiddenColumnItem activeView={activeView} group={group} readOnly={false} onDrop={jest.fn()} intl={intl} />
       )
     );
     expect(container).toMatchSnapshot();
   });
   test('should match snapshot readonly', () => {
     const { container } = render(
-      wrapPagesProvider(
-        card.id,
-        wrapDNDIntl(
-          <KanbanHiddenColumnItem
-            activeView={activeView}
-            group={group}
-            readOnly={true}
-            onDrop={jest.fn()}
-            intl={intl}
-          />
-        )
+      wrapDNDIntl(
+        <KanbanHiddenColumnItem activeView={activeView} group={group} readOnly={true} onDrop={jest.fn()} intl={intl} />
       )
     );
     expect(container).toMatchSnapshot();

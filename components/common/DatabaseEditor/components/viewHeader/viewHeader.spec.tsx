@@ -1,9 +1,9 @@
 import { render } from '@testing-library/react';
-import React from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import '@testing-library/jest-dom';
 
+import type { RootState } from '../../store';
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { mockStateStore, wrapDNDIntl } from '../../testUtils';
 
@@ -29,17 +29,32 @@ jest.mock('next/router', () => ({
 }));
 
 describe('components/viewHeader/viewHeader', () => {
-  const state = {
+  const state: RootState = {
     boards: {
-      current: board
+      current: board.id,
+      boards: {
+        [board.id]: board
+      },
+      templates: {}
     },
     cards: {
-      templates: [card]
+      templates: {
+        [card.id]: card
+      },
+      cards: {}
+    },
+    language: { value: 'en-us' },
+    loadingState: {
+      loaded: true
+    },
+    searchText: {
+      value: ''
     },
     views: {
       views: {
         boardView: activeView
       },
+      loadedBoardViews: {},
       current: 'boardView'
     }
   };

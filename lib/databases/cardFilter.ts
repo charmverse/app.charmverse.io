@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { IPropertyTemplate } from 'lib/databases/board';
-import type { Card } from 'lib/databases/card';
+import type { Card, CardPropertyValue } from 'lib/databases/card';
 import { propertyConfigs } from 'lib/databases/filterClause';
 import type {
   NumberDataTypeConditions,
@@ -64,41 +64,45 @@ class CardFilter {
 
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
-    const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
-    const proposalEvaluationType = proposalEvaluationTypeProperty
-      ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
-      : null;
-    let value = card.fields.properties[filter.propertyId] ?? [];
-    switch (filterProperty?.type) {
-      case 'updatedBy': {
-        value = card.updatedBy;
-        break;
-      }
-      case 'createdBy': {
-        value = card.createdBy;
-        break;
-      }
-      case 'createdTime': {
-        value = card.createdAt;
-        break;
-      }
-      case 'updatedTime': {
-        value = card.updatedAt;
-        break;
-      }
-      default: {
-        break;
+    let value = card.fields.properties[filter.propertyId] as CardPropertyValue | undefined;
+
+    if (filter.propertyId === Constants.titleColumnId) {
+      value = card.title.toLowerCase();
+    }
+    if (!value) {
+      switch (filterProperty?.type) {
+        case 'updatedBy': {
+          value = card.updatedBy;
+          break;
+        }
+        case 'createdBy': {
+          value = card.createdBy;
+          break;
+        }
+        case 'createdTime': {
+          value = card.createdAt;
+          break;
+        }
+        case 'updatedTime': {
+          value = card.updatedAt;
+          break;
+        }
+        default: {
+          break;
+        }
       }
     }
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
-    const valueArray = (Array.isArray(value) ? value : [value]).map((v: string | number | Record<'id', string>) => {
-      // In some cases we get an object with an id as value
-      if (typeof v === 'object' && 'id' in v) {
-        return v.id as string;
-      }
+    const valueArray = (Array.isArray(value) ? value : value ? [value] : []).map(
+      (v: string | number | Record<'id', string>) => {
+        // In some cases we get an object with an id as value
+        if (typeof v === 'object' && 'id' in v) {
+          return v.id as string;
+        }
 
-      return v.toString();
-    });
+        return v.toString();
+      }
+    );
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
@@ -192,6 +196,10 @@ class CardFilter {
           case 'does_not_contain': {
             let contains = false;
             if (filterProperty.type === 'proposalStatus') {
+              const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
+              const proposalEvaluationType = proposalEvaluationTypeProperty
+                ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
+                : null;
               contains =
                 valueArray.length !== 0 &&
                 !!proposalEvaluationType &&

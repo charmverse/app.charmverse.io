@@ -21,12 +21,12 @@ export const publishIncrementalUpdate = async (blocks: UIBlockWithDetails[]) => 
   });
 };
 
-export const publishDeletes = async (blocks: (Pick<UIBlockWithDetails, 'id'> & { type: string })[]) => {
+export const publishDeletes = async (blocks: Pick<UIBlockWithDetails, 'id'>[]) => {
   store.dispatch((dispatch) => {
     batch(() => {
-      dispatch(deleteBoards(blocks.filter((b) => b.type === 'board')));
-      dispatch(deleteViews(blocks.filter((b) => b.type === 'view')));
-      dispatch(deleteCards(blocks.filter((b) => b.type === 'card')));
+      dispatch(deleteBoards(blocks));
+      dispatch(deleteViews(blocks));
+      dispatch(deleteCards(blocks));
     });
   });
 };

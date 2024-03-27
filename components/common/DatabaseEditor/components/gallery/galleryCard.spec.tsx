@@ -1,11 +1,10 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider as ReduxProvider } from 'react-redux';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 
-import mutator from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
+import { mockStateStore, wrapDNDIntl } from '../../testUtils';
 
 import GalleryCard from './galleryCard';
 
@@ -54,28 +53,25 @@ describe('src/components/gallery/GalleryCard', () => {
     test('should match snapshot', () => {
       const { container } = render(
         wrapDNDIntl(
-          wrapPagesProvider(
-            [card.id],
-            <ReduxProvider store={store}>
-              <GalleryCard
-                board={board}
-                card={card}
-                onClick={jest.fn()}
-                visiblePropertyTemplates={[
-                  {
-                    id: card.id,
-                    name: 'testTemplateProperty',
-                    type: 'text',
-                    options: [{ id: '1', value: 'testValue', color: 'blue' }]
-                  }
-                ]}
-                visibleTitle={true}
-                isSelected={true}
-                readOnly={false}
-                onDrop={jest.fn()}
-              />
-            </ReduxProvider>
-          )
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[
+                {
+                  id: card.id,
+                  name: 'testTemplateProperty',
+                  type: 'text',
+                  options: [{ id: '1', value: 'testValue', color: 'blue' }]
+                }
+              ]}
+              visibleTitle={true}
+              isSelected={true}
+              readOnly={false}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
         )
       );
       expect(container).toMatchSnapshot();
@@ -84,21 +80,18 @@ describe('src/components/gallery/GalleryCard', () => {
       const mockedOnClick = jest.fn();
       const { container } = render(
         wrapDNDIntl(
-          wrapPagesProvider(
-            [card.id],
-            <ReduxProvider store={store}>
-              <GalleryCard
-                board={board}
-                card={card}
-                onClick={mockedOnClick}
-                visiblePropertyTemplates={[]}
-                visibleTitle={true}
-                isSelected={true}
-                readOnly={false}
-                onDrop={jest.fn()}
-              />
-            </ReduxProvider>
-          )
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={mockedOnClick}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              readOnly={false}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
         )
       );
       const galleryCardElement = container.querySelector('.GalleryCard');
@@ -109,21 +102,18 @@ describe('src/components/gallery/GalleryCard', () => {
     test('return GalleryCard and delete card', async () => {
       const { container } = render(
         wrapDNDIntl(
-          wrapPagesProvider(
-            [card.id],
-            <ReduxProvider store={store}>
-              <GalleryCard
-                board={board}
-                card={card}
-                onClick={jest.fn()}
-                visiblePropertyTemplates={[]}
-                visibleTitle={true}
-                isSelected={true}
-                readOnly={false}
-                onDrop={jest.fn()}
-              />
-            </ReduxProvider>
-          )
+          <ReduxProvider store={store}>
+            <GalleryCard
+              board={board}
+              card={card}
+              onClick={jest.fn()}
+              visiblePropertyTemplates={[]}
+              visibleTitle={true}
+              isSelected={true}
+              readOnly={false}
+              onDrop={jest.fn()}
+            />
+          </ReduxProvider>
         )
       );
 

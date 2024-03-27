@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createContext, useContext } from 'react';
 
 import type { BoardView } from 'lib/databases/boardView';
-import type { CardPage, Card } from 'lib/databases/card';
+import type { Card } from 'lib/databases/card';
 import type { RewardsBoardFFBlock } from 'lib/rewards/blocks/interfaces';
 
 import { useRewardsBoardAdapter } from './useRewardsBoardAdapter';
@@ -10,7 +10,6 @@ import { useRewardsBoardAdapter } from './useRewardsBoardAdapter';
 type RewardsBoardContextType = {
   board: RewardsBoardFFBlock;
   cards: Card[];
-  cardPages: CardPage[];
   activeView: BoardView;
   views: BoardView[];
 };

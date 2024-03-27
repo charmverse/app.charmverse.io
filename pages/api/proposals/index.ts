@@ -5,13 +5,11 @@ import nc from 'next-connect';
 import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { CreateProposalInput } from 'lib/proposals/createProposal';
 import { createProposal } from 'lib/proposals/createProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
-import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 

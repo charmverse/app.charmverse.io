@@ -1,3 +1,4 @@
+import SearchIcon from '@mui/icons-material/Search';
 import debounce from 'lodash/debounce';
 import { useRouter } from 'next/router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -7,6 +8,7 @@ import { FormattedMessage, useIntl } from 'react-intl';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { getSearchText, setSearchText } from '../../store/searchText';
 import Button from '../../widgets/buttons/button';
+import IconButton from '../../widgets/buttons/iconButton';
 import Editable from '../../widgets/editable';
 
 function ViewHeaderSearch(): JSX.Element {
@@ -80,9 +82,11 @@ function ViewHeaderSearch(): JSX.Element {
     );
   }
   return (
-    <Button onClick={() => setIsSearching(true)}>
-      <FormattedMessage id='ViewHeader.search' defaultMessage='Search' />
-    </Button>
+    <IconButton
+      style={{ width: '32px' }}
+      onClick={() => setIsSearching(true)}
+      icon={<SearchIcon color='secondary' fontSize='small' />}
+    />
   );
 }
 

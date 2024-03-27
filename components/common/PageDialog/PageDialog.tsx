@@ -16,6 +16,7 @@ import Dialog from 'components/common/DatabaseEditor/components/dialog';
 import type { PageDialogContext } from 'components/common/PageDialog/hooks/usePageDialog';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePage } from 'hooks/usePage';
 import { usePages } from 'hooks/usePages';
 import debouncePromise from 'lib/utils/debouncePromise';
@@ -38,15 +39,15 @@ interface Props {
   hideToolsMenu?: boolean;
   applicationContext?: PageDialogContext;
   showCard?: (cardId: string | null) => void;
-  showParentChip?: boolean;
+  currentBoardId?: string; // the board we are looking at, to determine if we should show the parent chip
 }
-
 function PageDialogBase(props: Props) {
-  const { hideToolsMenu = false, showParentChip, pageId, readOnly, showCard, applicationContext } = props;
+  const { hideToolsMenu = false, currentBoardId, pageId, readOnly, showCard, applicationContext } = props;
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
   const router = useRouter();
+  const { space } = useCurrentSpace();
   const { setCurrentPageId } = useCurrentPage();
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
 
@@ -83,10 +84,16 @@ function PageDialogBase(props: Props) {
   }, [!!contentType]);
 
   useEffect(() => {
-    if (page?.id) {
-      trackPageView({ spaceId: page.spaceId, pageId: page.id, type: page.type, spaceDomain: domain });
+    if (page?.id && space) {
+      trackPageView({
+        spaceId: page.spaceId,
+        pageId: page.id,
+        type: page.type,
+        spaceDomain: domain,
+        spaceCustomDomain: space.customDomain
+      });
     }
-  }, [page?.id]);
+  }, [page?.id, space?.customDomain]);
 
   function close() {
     popupState.close();
@@ -177,7 +184,7 @@ function PageDialogBase(props: Props) {
     >
       {page && contentType === 'page' && (
         <DocumentPage
-          showParentChip={showParentChip}
+          showParentChip={currentBoardId !== page.parentId} // show parent chip if parent is not the current board
           showCard={showCard}
           insideModal
           page={page}
