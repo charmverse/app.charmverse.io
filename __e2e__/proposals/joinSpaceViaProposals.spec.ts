@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { expect } from '__e2e__/testWithFixtures';
 import { test } from '__e2e__/utils/test';
 
 import { baseUrl } from 'testing/mockApiCall';
@@ -189,7 +190,9 @@ test('Try to create a proposal from a linked proposal template / user from outsi
   await documentPage.goToPage({ domain: space.domain, path: pageReferencingTemplate.path });
 
   // User won't have the proposal template showing
-  await documentPage.getLinkedPage(template.id).click();
+  const pageLink = documentPage.getLinkedPage(template.id);
+  await expect(await documentPage.getLinkedPage(template.id).textContent()).toContain('No access');
+  await pageLink.click();
 
   await page.waitForURL(`${baseUrl}/join?domain=${space.domain}`);
 });
@@ -250,7 +253,9 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
 
   await documentPage.goToPage({ domain: space.domain, path: pageReferencingTemplate.path });
 
-  await documentPage.getLinkedPage(template.id).click();
+  const pageLink = documentPage.getLinkedPage(template.id);
+  await expect(await documentPage.getLinkedPage(template.id).textContent()).toContain(template.title);
+  await pageLink.click();
 
   const newUser = await generateUser({});
 

@@ -67,19 +67,26 @@ export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps
   const { page: documentPage, isLoading } = useGetPageMetaFromCache({
     pageId: isDocumentPath ? node.attrs.id : null
   });
-  const isProposalTemplate = documentPage?.type === 'proposal_template';
+  const isProposalTemplate = node.attrs?.type === 'proposal_template';
 
   let pageTitle = '';
   if (staticPage) {
     pageTitle = mappedFeatures[staticPage.feature]?.title;
-  } else if (isProposalTemplate) {
-    pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage?.title || 'Untitled'}`;
-  } else if (documentPage) {
-    pageTitle = documentPage?.title || 'Untitled';
+  } else if (isProposalTemplate && documentPage?.type === 'proposal_template') {
+    // dont show this title if user does not have access to proposal template
+    pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage.title || 'Untitled'}`;
   } else if (forumCategoryPage) {
     pageTitle = `${getFeatureTitle('Forum')} > ${forumCategoryPage?.name || 'Untitled'}`;
   } else if (!isLoading) {
-    pageTitle = 'No access';
+    if (documentPage) {
+      if (documentPage.type === 'proposal_template') {
+        pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage.title || 'Untitled'}`;
+      } else {
+        pageTitle = documentPage.title || 'Untitled';
+      }
+    } else {
+      pageTitle = 'No access';
+    }
   }
 
   const pageId = node.attrs.id || staticPage?.path || forumCategoryPage?.id;
