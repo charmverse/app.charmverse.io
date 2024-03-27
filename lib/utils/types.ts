@@ -30,3 +30,8 @@ export type OptionalNullable<T> = T extends any[]
       [K in keyof PickNotNullable<T>]: OptionalNullable<T[K]>;
     }
   : T;
+
+// export type RequiredFields<T, K extends keyof T> = {
+//   T in K;
+//   [P in K]-?: T[P];
+// };

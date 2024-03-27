@@ -2,14 +2,15 @@ import { v4 } from 'uuid';
 
 import type { PropertyType } from 'lib/databases/board';
 import { getBlocks } from 'lib/proposals/blocks/getBlocks';
+import type { ProposalBlockInput, ProposalBlockUpdateInput } from 'lib/proposals/blocks/interfaces';
 import { upsertBlock } from 'lib/proposals/blocks/upsertBlock';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('proposal blocks - upsertBlock', () => {
   it('Should update properties block', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
-    const propertiesData = {
+    const propertiesData: ProposalBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -40,7 +41,7 @@ describe('proposal blocks - upsertBlock', () => {
       spaceId: space.id
     });
 
-    const propertiesUpdateData = {
+    const propertiesUpdateData: ProposalBlockUpdateInput = {
       id: block.id,
       spaceId: space.id,
       title: 'Update',
@@ -72,9 +73,9 @@ describe('proposal blocks - upsertBlock', () => {
   });
 
   it('Should update properties block if it already exists', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
-    const propertiesData = {
+    const propertiesData: ProposalBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -99,7 +100,7 @@ describe('proposal blocks - upsertBlock', () => {
       }
     };
 
-    const propertiesData2 = {
+    const propertiesData2: ProposalBlockInput = {
       spaceId: space.id,
       title: 'Properties 2',
       type: 'board',
@@ -137,7 +138,7 @@ describe('proposal blocks - upsertBlock', () => {
     });
 
     expect(properties2.id).toEqual(properties.id);
-    expect(properties2.fields).toMatchObject(propertiesData2.fields);
+    expect(properties2.fields).toMatchObject(propertiesData2.fields!);
 
     const blocks = await getBlocks({
       spaceId: space.id

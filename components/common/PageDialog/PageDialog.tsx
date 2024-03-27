@@ -38,11 +38,11 @@ interface Props {
   hideToolsMenu?: boolean;
   applicationContext?: PageDialogContext;
   showCard?: (cardId: string | null) => void;
-  showParentChip?: boolean;
+  currentBoardId?: string; // the board we are looking at, to determine if we should show the parent chip
 }
 
 function PageDialogBase(props: Props) {
-  const { hideToolsMenu = false, showParentChip, pageId, readOnly, showCard, applicationContext } = props;
+  const { hideToolsMenu = false, currentBoardId, pageId, readOnly, showCard, applicationContext } = props;
 
   const mounted = useRef(false);
   const popupState = usePopupState({ variant: 'popover', popupId: 'page-dialog' });
@@ -177,7 +177,7 @@ function PageDialogBase(props: Props) {
     >
       {page && contentType === 'page' && (
         <DocumentPage
-          showParentChip={showParentChip}
+          showParentChip={currentBoardId !== page.parentId} // show parent chip if parent is not the current board
           showCard={showCard}
           insideModal
           page={page}

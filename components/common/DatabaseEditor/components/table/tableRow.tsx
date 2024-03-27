@@ -19,7 +19,7 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card, CardWithRelations } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utils/browser';
@@ -31,18 +31,16 @@ import Button from '../../widgets/buttons/button';
 import { TextInput } from '../properties/TextInput';
 import PropertyValueElement from '../propertyValueElement';
 
-export type CardPageWithCustomIcon = CardPage & {
+export type CardPageWithCustomIcon = Card & {
   customIcon?: ReactElement | null;
   subPages?: CardPageWithCustomIcon[];
 };
 
 type Props = {
   hasContent?: boolean;
-  isStructuredProposal?: boolean;
   board: Board;
   activeView: BoardView;
-  card: Card;
-  cardPage: PageActionMeta;
+  card: CardWithRelations;
   pageIcon?: string | null;
   pageTitle: string;
   isSelected: boolean;
@@ -68,8 +66,6 @@ type Props = {
   emptySubPagesPlaceholder?: ReactNode;
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
-  proposal?: CardPage['proposal'];
-  reward?: CardPage['reward'];
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -105,13 +101,11 @@ export const columnWidth = (
 function TableRow(props: Props) {
   const cardRef = useRef<HTMLDivElement>(null);
   const {
-    cardPage,
+    card,
     hasContent,
     board,
-    isStructuredProposal,
     activeView,
     columnRefs,
-    card,
     pageIcon,
     pageTitle,
     pageUpdatedAt,
@@ -124,9 +118,7 @@ function TableRow(props: Props) {
     isNested,
     subRowsEmptyValueContent,
     isChecked,
-    setCheckedIds,
-    proposal,
-    reward
+    setCheckedIds
   } = props;
   const { showError } = useSnackbar();
 
@@ -325,7 +317,7 @@ function TableRow(props: Props) {
                   )}
                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
-                      isStructuredProposal={isStructuredProposal}
+                      isStructuredProposal={card.isStructuredProposal}
                       isEditorEmpty={!hasContent}
                       pageType={card.customIconType === 'reward' ? 'bounty' : 'page'}
                       icon={pageIcon}
@@ -335,7 +327,7 @@ function TableRow(props: Props) {
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>
-                  <Button onClick={() => props.showCard(props.card.id || '', props.card.parentId)}>
+                  <Button onClick={() => props.showCard(card.id || '', card.parentId)}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>
                 </div>
@@ -362,10 +354,7 @@ function TableRow(props: Props) {
             <PropertyValueElement
               showCard={(cardId) => cardId && props.showCard(cardId)}
               readOnly={props.readOnly || Boolean(isNested)}
-              syncWithPageId={cardPage?.syncWithPageId}
               card={card}
-              proposal={proposal}
-              reward={reward}
               board={board}
               showEmptyPlaceholder={false}
               propertyTemplate={template}
@@ -381,12 +370,7 @@ function TableRow(props: Props) {
         );
       })}
       {!props.readOnly && (
-        <PageActionsMenu
-          onClickDelete={handleDeleteCard}
-          anchorEl={anchorEl}
-          setAnchorEl={setAnchorEl}
-          page={cardPage}
-        />
+        <PageActionsMenu onClickDelete={handleDeleteCard} anchorEl={anchorEl} setAnchorEl={setAnchorEl} page={card} />
       )}
       {/* empty column for actions on header row */}
       <div className='octo-table-cell' style={{ flexGrow: 1, borderRight: '0 none' }}></div>
@@ -394,7 +378,7 @@ function TableRow(props: Props) {
   );
 }
 
-function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: CardPage[] }) {
+function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: Card[] }) {
   return (
     <>
       <TableRow
@@ -408,13 +392,11 @@ function ExpandableTableRow(props: Props & { isNested?: boolean; subPages?: Card
           ? props.emptySubPagesPlaceholder
           : props.subPages?.map((subPage) => (
               <ExpandableTableRow
-                key={subPage.card.id}
+                key={subPage.id}
                 {...props}
-                pageTitle={subPage.page.title}
-                pageUpdatedAt={subPage.page.updatedAt.toISOString()}
-                card={subPage.card}
-                cardPage={subPage.page}
-                subPages={subPage.subPages}
+                pageTitle={subPage.title}
+                pageUpdatedAt={new Date(subPage.updatedAt).toISOString()}
+                card={subPage}
                 indentTitle={30}
                 isNested
                 // Don't allow subrows to be selected

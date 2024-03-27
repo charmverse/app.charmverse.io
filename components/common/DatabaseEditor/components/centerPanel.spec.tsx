@@ -4,8 +4,9 @@ import { Provider as ReduxProvider } from 'react-redux';
 
 import { Constants } from 'lib/databases/constants';
 
+import type { RootState } from '../store';
 import { TestBlockFactory } from '../test/testBlockFactory';
-import { mockDOM, mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../testUtils';
+import { mockDOM, mockStateStore, wrapDNDIntl } from '../testUtils';
 import { Utils } from '../utils';
 
 import CenterPanel from './centerPanel';
@@ -44,24 +45,36 @@ describe('components/centerPanel', () => {
   card2.id = '2';
   card2.title = 'card2';
   card2.fields.properties = { id: 'property_value_id_1' };
-  const state = {
+  const state: RootState = {
     boards: {
       current: board.id,
       boards: {
         [board.id]: board
-      }
-    },
-    users: {
-      workspaceUsers: {}
+      },
+      templates: {}
     },
     cards: {
-      templates: [card1, card2],
-      cards: [card1, card2]
+      templates: {
+        [card1.id]: card1,
+        [card2.id]: card2
+      },
+      cards: {
+        [card1.id]: card1,
+        [card2.id]: card2
+      }
+    },
+    language: { value: 'en-us' },
+    loadingState: {
+      loaded: true
+    },
+    searchText: {
+      value: ''
     },
     views: {
       views: {
         [activeView.id]: activeView
       },
+      loadedBoardViews: {},
       current: activeView.id
     }
   };
@@ -137,22 +150,19 @@ describe('components/centerPanel', () => {
       activeView.fields.viewType = 'board';
       const mockedShowCard = jest.fn();
       const { container } = render(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          wrapDNDIntl(
-            <ReduxProvider store={store}>
-              <CenterPanel
-                currentRootPageId={board.id}
-                showView={jest.fn()}
-                setPage={() => {}}
-                views={[activeView]}
-                board={board}
-                activeView={activeView}
-                readOnly={false}
-                showCard={mockedShowCard}
-              />
-            </ReduxProvider>
-          )
+        wrapDNDIntl(
+          <ReduxProvider store={store}>
+            <CenterPanel
+              currentRootPageId={board.id}
+              showView={jest.fn()}
+              setPage={() => {}}
+              views={[activeView]}
+              board={board}
+              activeView={activeView}
+              readOnly={false}
+              showCard={mockedShowCard}
+            />
+          </ReduxProvider>
         )
       );
 

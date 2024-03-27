@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import { prismaToBlock } from 'lib/databases/block';
+import { prismaToUIBlock, prismaToBlock } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
 import {
@@ -223,37 +223,41 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     ...cardPageQueries
   ]);
 
-  await Promise.all([
-    (async () => {
-      const blocksToNotify = await prisma.block.findMany({
-        where: {
-          id: {
-            in: newBlocks.map((b) => b.id)
-          }
-        }
-      });
-
-      relay.broadcast(
-        {
-          type: 'blocks_created',
-          payload: blocksToNotify.map((block) => prismaToBlock(block))
-        },
-        space.id
-      );
-    })(),
-    (async () => {
-      const createdPages = await getPageMetaList(newBlocks.map((b) => b.id));
-      if (createdPages.length) {
-        relay.broadcast(
-          {
-            type: 'pages_created',
-            payload: createdPages
-          },
-          space.id
-        );
+  const blocksToNotify = await prisma.block.findMany({
+    where: {
+      id: {
+        in: newBlocks.map((b) => b.id)
       }
-    })()
-  ]);
+    },
+    include: {
+      page: true
+    }
+  });
+  const boardIds = blocksToNotify.filter((b) => b.type === 'board').map((b) => b.id);
+  const boardPages = boardIds.length ? await getPageMetaList(boardIds) : [];
+
+  relay.broadcast(
+    {
+      type: 'blocks_created',
+      payload: blocksToNotify.map((block) => {
+        const blockPage = block.page || boardPages.find((p) => p.id === block.id);
+        if (blockPage) {
+          return prismaToUIBlock(block, blockPage);
+        }
+        return prismaToBlock(block);
+      })
+    },
+    space.id
+  );
+  if (boardPages.length) {
+    relay.broadcast(
+      {
+        type: 'pages_created',
+        payload: boardPages
+      },
+      space.id
+    );
+  }
 
   return res.status(201).json(newBlocks);
 }
@@ -275,13 +279,17 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
   });
 
   // validate access to the space
+  const spaceIds: Record<string, boolean> = {};
   await Promise.all(
     blocks.map(async (block) => {
       const dbBlock = dbBlocks.find((b) => b.id === block.id);
       const spaceId = block.spaceId ?? dbBlock?.spaceId;
-      const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
-      if (error) {
-        throw new UnauthorisedActionError();
+      if (!spaceIds[spaceId]) {
+        const { error } = await hasAccessToSpace({ userId: req.session.user.id, spaceId });
+        if (error) {
+          throw new UnauthorisedActionError();
+        }
+        spaceIds[spaceId] = true;
       }
     })
   );
@@ -311,7 +319,7 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
   return res.status(200).json(updatedBlocks as BlockWithDetails[]);
 }
 
-async function deleteBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[]>) {
+async function deleteBlocks(req: NextApiRequest, res: NextApiResponse) {
   const queryBlockIds = (req.query.blockIds ?? []) as string[];
   const blockIds = typeof queryBlockIds === 'string' ? [queryBlockIds] : queryBlockIds;
   const userId = req.session.user.id as string | undefined;

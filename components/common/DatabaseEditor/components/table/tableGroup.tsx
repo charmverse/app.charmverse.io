@@ -7,8 +7,6 @@ import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 
-import type { PageListItemsRecord } from '../../interfaces';
-
 import TableGroupHeaderRow from './tableGroupHeaderRow';
 import TableRows from './tableRows';
 
@@ -81,7 +79,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           board={board}
           activeView={activeView}
           columnRefs={props.columnRefs}
-          cardPages={group.cardPages}
+          cards={group.cards}
           selectedCardIds={props.selectedCardIds}
           readOnly={props.readOnly}
           cardIdToFocusOnRender={props.cardIdToFocusOnRender}

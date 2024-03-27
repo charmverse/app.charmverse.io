@@ -132,11 +132,3 @@ export const getCurrentBoardViews = createSelector(
       .map((v) => createBoardView(v));
   }
 );
-
-export const getCurrentView = createSelector(
-  getViews,
-  (state: RootState) => state.views.current,
-  (views, viewId) => {
-    return views[viewId];
-  }
-);

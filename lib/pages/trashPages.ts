@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import type { AbstractWebsocketBroadcaster } from 'lib/websockets/interfaces';
 
-import { modifyChildPages } from './modifyChildPages';
+import { trashOrDeletePage } from './trashOrDeletePage';
 
 export async function trashPages({
   trash,
@@ -21,7 +21,7 @@ export async function trashPages({
   const modifiedChildPageIds: string[] = [];
 
   for (const pageId of pageIds) {
-    modifiedChildPageIds.push(...(await modifyChildPages(pageId, userId, trash ? 'trash' : 'restore')));
+    modifiedChildPageIds.push(...(await trashOrDeletePage(pageId, userId, trash ? 'trash' : 'restore')));
     trackUserAction(trash ? 'archive_page' : 'restore_page', { userId, spaceId, pageId });
     log.info(`User ${trash ? 'trashed' : 'restored'} a page`, {
       pageIds: modifiedChildPageIds,
@@ -47,6 +47,16 @@ export async function trashPages({
     },
     spaceId
   );
+
+  if (trash) {
+    relay.broadcast(
+      {
+        type: 'blocks_deleted',
+        payload: modifiedChildPageIds.map((id) => ({ id }))
+      },
+      spaceId
+    );
+  }
 
   return { modifiedChildPageIds };
 }

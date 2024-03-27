@@ -76,7 +76,7 @@ describe('components/table/Table', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[]}
+          cards={[]}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -104,7 +104,7 @@ describe('components/table/Table', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[]}
+          cards={[]}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -133,10 +133,10 @@ describe('components/table/Table', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[]}
+          cards={[]}
           board={board}
           activeView={{ ...view, fields: { ...view.fields, groupById: 'property1' } } as BoardView}
-          visibleGroups={[{ option: { id: '', value: 'test', color: '' }, cardPages: [], cards: [] }]}
+          visibleGroups={[{ option: { id: '', value: 'test', color: '' }, cards: [] }]}
           groupByProperty={{
             id: '',
             name: 'Property 1',
@@ -220,26 +220,7 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[
-            {
-              card: card1,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card1.id,
-                path: card1.id
-              }) as PageMeta
-            },
-            {
-              card: card2,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card2.id,
-                path: card2.id
-              }) as PageMeta
-            }
-          ]}
+          cards={[card1, card2]}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -310,26 +291,7 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[
-            {
-              card: card1,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card1.id,
-                path: card1.id
-              }) as PageMeta
-            },
-            {
-              card: card2,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card2.id,
-                path: card2.id
-              }) as PageMeta
-            }
-          ]}
+          cards={[card1, card2]}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -388,26 +350,7 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[
-            {
-              card: card1,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card1.id,
-                path: card1.id
-              }) as PageMeta
-            },
-            {
-              card: card2,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card2.id,
-                path: card2.id
-              }) as PageMeta
-            }
-          ]}
+          cards={[card1, card2]}
           board={board}
           activeView={view}
           visibleGroups={[]}
@@ -484,26 +427,7 @@ describe('components/table/Table extended', () => {
     const component = wrapDNDIntl(
       <ReduxProvider store={store}>
         <Table
-          cardPages={[
-            {
-              card: card1,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card1.id,
-                path: card1.id
-              }) as PageMeta
-            },
-            {
-              card: card2,
-              page: pageStubToCreate({
-                createdBy: 'user-id-1',
-                spaceId: 'space-id-1',
-                id: card2.id,
-                path: card2.id
-              }) as PageMeta
-            }
-          ]}
+          cards={[card1, card2]}
           board={board}
           activeView={view}
           visibleGroups={[]}

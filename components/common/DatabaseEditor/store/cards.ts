@@ -4,54 +4,37 @@ import { getChainList } from 'connectors/chains';
 
 import type { Board } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card } from 'lib/databases/card';
 import { CardFilter } from 'lib/databases/cardFilter';
 import { Constants } from 'lib/databases/constants';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { Member } from 'lib/members/interfaces';
 import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
-import type { PageListItemsRecord } from '../interfaces';
 import { Utils } from '../utils';
 
 import { blockLoad, initialDatabaseLoad } from './databaseBlocksLoad';
+import { getSearchText } from './searchText';
 
 import type { RootState } from './index';
 
 const allChains = getChainList({ enableTestnets: true });
 
 type CardsState = {
-  current: string;
+  // current: string;
   cards: { [key: string]: Card };
   templates: { [key: string]: Card };
 };
 
-function updateCardTitleProperty({ card, cards }: { cards: CardsState['cards']; card: Card }) {
-  const cardTitle = card.title || cards[card.id]?.title;
-  const cardAfterUpdate = Object.assign(cards[card.id] || {}, card);
-  cardAfterUpdate.title = cardTitle;
-  cards[card.id] = cardAfterUpdate;
-  if (cardAfterUpdate.fields && cardAfterUpdate.fields.properties) {
-    cardAfterUpdate.fields.properties[Constants.titleColumnId] = cardAfterUpdate.title || '';
-  }
-}
-
 const cardsSlice = createSlice({
   name: 'cards',
   initialState: {
-    current: '',
     cards: {},
     templates: {}
   } as CardsState,
   reducers: {
-    setCurrent: (state, action: PayloadAction<string>) => {
-      state.current = action.payload;
-    },
     addCard: (state, action: PayloadAction<Card>) => {
-      updateCardTitleProperty({
-        card: action.payload,
-        cards: state.cards
-      });
+      state.cards[action.payload.id] = action.payload;
     },
     addTemplate: (state, action: PayloadAction<Card>) => {
       state.templates[action.payload.id] = action.payload;
@@ -65,10 +48,10 @@ const cardsSlice = createSlice({
           const cardAfterUpdate = Object.assign(state.templates[card.id] || {}, card);
           state.templates[card.id] = cardAfterUpdate;
         } else {
-          updateCardTitleProperty({
-            card: card as Card,
-            cards: state.cards
-          });
+          const cardTitle = card.title || state.cards[card.id]?.title;
+          const cardAfterUpdate = Object.assign(state.cards[card.id] || {}, card);
+          cardAfterUpdate.title = cardTitle;
+          state.cards[card.id] = cardAfterUpdate;
         }
       }
     },
@@ -84,10 +67,7 @@ const cardsSlice = createSlice({
       state.cards = state.cards ?? {};
       const block = action.payload;
       if (block.type === 'card') {
-        updateCardTitleProperty({
-          card: block as Card,
-          cards: state.cards
-        });
+        state.cards[block.id] = block as Card;
       }
     });
 
@@ -96,22 +76,21 @@ const cardsSlice = createSlice({
         if (block.type === 'card' && block.fields.isTemplate) {
           state.templates[block.id] = block as Card;
         } else if (block.type === 'card' && !block.fields.isTemplate) {
-          updateCardTitleProperty({
-            card: block as Card,
-            cards: state.cards
-          });
+          state.cards[block.id] = block as Card;
         }
       }
     });
   }
 });
 
-export const { updateCards, addCard, addTemplate, setCurrent, deleteCards } = cardsSlice.actions;
+export const { updateCards, addCard, addTemplate, deleteCards } = cardsSlice.actions;
 export const { reducer } = cardsSlice;
 
-export const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
+const getCards = (state: RootState): { [key: string]: Card } => state.cards.cards;
 
-export const getSortedCards = createSelector(getCards, (cards) => {
+export const getAllCards = createSelector(getCards, (cards) => cards);
+
+const getSortedCards = createSelector(getCards, (cards) => {
   return Object.values(cards).sort((a, b) => a.title.localeCompare(b.title)) as Card[];
 });
 
@@ -123,12 +102,9 @@ export function getCard(cardId: string): (state: RootState) => Card | undefined 
   };
 }
 
-function titleOrCreatedOrder(
-  cardA: { card: { createdAt: number }; page: { title: string } },
-  cardB: { card: { createdAt: number }; page: { title: string } }
-) {
-  const aValue = cardA.page.title;
-  const bValue = cardB.page.title;
+function titleOrCreatedOrder(cardA: { createdAt: number; title: string }, cardB: { createdAt: number; title: string }) {
+  const aValue = cardA.title;
+  const bValue = cardB.title;
 
   if (aValue && bValue && aValue.localeCompare) {
     return aValue.localeCompare(bValue);
@@ -143,12 +119,12 @@ function titleOrCreatedOrder(
   }
 
   // If both cards are untitled, use the create date
-  return new Date(cardA.card.createdAt).getTime() - new Date(cardB.card.createdAt).getTime();
+  return new Date(cardA.createdAt).getTime() - new Date(cardB.createdAt).getTime();
 }
 
-function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
-  const indexA = activeView.fields.cardOrder.indexOf(cardA.card.id);
-  const indexB = activeView.fields.cardOrder.indexOf(cardB.card.id);
+function manualOrder(activeView: BoardView, cardA: Card, cardB: Card) {
+  const indexA = activeView.fields.cardOrder.indexOf(cardA.id);
+  const indexB = activeView.fields.cardOrder.indexOf(cardB.id);
 
   if (indexA < 0 && indexB < 0) {
     return titleOrCreatedOrder(cardA, cardB);
@@ -160,25 +136,25 @@ function manualOrder(activeView: BoardView, cardA: CardPage, cardB: CardPage) {
 }
 
 export function sortCards(
-  cardPages: CardPage[],
+  cards: Card[],
   board: Pick<Board, 'fields'>,
   activeView: BoardView,
   members: Record<string, Member>,
-  relationPropertiesCardsRecord: PageListItemsRecord,
+  cardTitles: Record<string, { title: string }>,
   localSort?: ISortOption[] | null
-): CardPage[] {
+): Card[] {
   if (!activeView) {
-    return cardPages;
+    return cards;
   }
 
   const { sortOptions: globalSortOptions } = activeView.fields;
   const sortOptions = localSort || globalSortOptions;
 
   if (sortOptions?.length < 1) {
-    return cardPages.sort((a, b) => manualOrder(activeView, a, b));
+    return cards.sort((a, b) => manualOrder(activeView, a, b));
   }
 
-  let sortedCards = cardPages;
+  let sortedCards = cards;
   for (const sortOption of sortOptions) {
     if (sortOption.propertyId === Constants.titleColumnId) {
       Utils.log('Sort by title');
@@ -194,15 +170,15 @@ export function sortCards(
         return sortedCards;
       }
       sortedCards = sortedCards.sort((a, b) => {
-        let aValue = a.card.fields.properties[sortPropertyId] || '';
-        let bValue = b.card.fields.properties[sortPropertyId] || '';
+        let aValue = a.fields.properties[sortPropertyId] || '';
+        let bValue = b.fields.properties[sortPropertyId] || '';
 
         if (template.type === 'createdBy') {
-          aValue = members[a.card.createdBy]?.username || '';
-          bValue = members[b.card.createdBy]?.username || '';
+          aValue = members[a.createdBy]?.username || '';
+          bValue = members[b.createdBy]?.username || '';
         } else if (template.type === 'updatedBy') {
-          aValue = members[a.page.updatedBy]?.username || '';
-          bValue = members[b.page.updatedBy]?.username || '';
+          aValue = members[a.updatedBy]?.username || '';
+          bValue = members[b.updatedBy]?.username || '';
         } else if (template.type === 'date') {
           if (typeof aValue !== 'number') {
             aValue = aValue === '' ? '' : JSON.parse(aValue as string).from;
@@ -212,15 +188,8 @@ export function sortCards(
             bValue = bValue === '' ? '' : JSON.parse(bValue as string).from;
           }
         } else if (template.type === 'relation') {
-          const pageListItems = relationPropertiesCardsRecord[template.id] ?? [];
-          const aPageListItems = Array.isArray(aValue)
-            ? aValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
-            : [];
-          const bPageListItems = Array.isArray(bValue)
-            ? bValue.map((pageId) => pageListItems.find((pageListItem) => pageListItem.id === pageId)?.title)
-            : [];
-          aValue = aPageListItems.join(', ');
-          bValue = bPageListItems.join(', ');
+          aValue = Array.isArray(aValue) ? aValue.map((pageId) => cardTitles[pageId]?.title || '').join() : '';
+          bValue = Array.isArray(bValue) ? bValue.map((pageId) => cardTitles[pageId]?.title || '').join() : '';
         }
 
         let result = 0;
@@ -244,9 +213,9 @@ export function sortCards(
             result = Number(aValue) - Number(bValue);
           }
         } else if (template.type === 'createdTime') {
-          result = a.card.createdAt - b.card.createdAt;
+          result = a.createdAt - b.createdAt;
         } else if (template.type === 'updatedTime') {
-          result = a.card.updatedAt - b.card.updatedAt;
+          result = a.updatedAt - b.updatedAt;
         } else if (template.type === 'checkbox') {
           // aValue will be true or empty string
           if (aValue) {
@@ -337,13 +306,13 @@ function searchFilterCards(cards: Card[], board: Board, searchTextRaw: string): 
           }
         } else if (propertyTemplate.type === 'multiSelect') {
           // Look up the value of the select option
-          const options = (propertyValue as string[]).map((value) =>
+          const values = (propertyValue as string[]).map((value) =>
             propertyTemplate.options.find((o) => o.id === value)?.value.toLowerCase()
           );
-          if (options?.includes(searchText)) {
+          if (values?.some((value) => value?.includes(searchText))) {
             return true;
           }
-        } else if ((propertyValue as string).toLowerCase().includes(searchText)) {
+        } else if (typeof propertyValue === 'string' && propertyValue.toLowerCase().includes(searchText)) {
           return true;
         }
       }
@@ -357,28 +326,36 @@ type getViewCardsProps = { viewId: string; boardId: string; localFilters?: Filte
 
 export const makeSelectViewCardsSortedFilteredAndGrouped = () =>
   createSelector(
-    (state: RootState, props: getViewCardsProps) => {
-      const cards = getCards(state);
-      const board = state.boards.boards[props.boardId];
-      const view = state.views.views[props.viewId];
-      const filter = props.localFilters || view?.fields.filter;
-
-      return {
-        cards,
-        board,
-        view,
-        filter
-      };
-    },
-    ({ cards, board, view, filter }) => {
+    getCards,
+    (state: RootState, props: getViewCardsProps) => state.boards.boards[props.boardId],
+    (state: RootState, props: getViewCardsProps) => state.views.views[props.viewId],
+    getSearchText,
+    (state: RootState, props: getViewCardsProps) =>
+      props.localFilters || state.views.views[props.viewId]?.fields.filter,
+    (cards, board, view, searchText, filter) => {
       if (!view || !board || !cards) {
         return [];
       }
-      const result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
+      let result = Object.values(cards).filter((c) => c.parentId === board.id) as Card[];
       if (view.fields.filter) {
-        return CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
+        result = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, result);
+      }
+      if (searchText) {
+        result = searchFilterCards(result, board, searchText);
       }
       return result;
+    }
+  );
+
+export const makeSelectCardsFromBoard = () =>
+  createSelector(
+    getCards,
+    (state: RootState, boardId: string) => boardId,
+    (cards, boardId) => {
+      if (!cards) {
+        return [];
+      }
+      return Object.values(cards).filter((c) => c.parentId === boardId);
     }
   );
 

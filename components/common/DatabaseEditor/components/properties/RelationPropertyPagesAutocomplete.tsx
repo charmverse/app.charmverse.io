@@ -1,56 +1,70 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import type { PageListItem } from 'components/common/PagesList';
-import { usePages } from 'hooks/usePages';
-import type { IPropertyTemplate } from 'lib/databases/board';
-import { getRelationPropertiesCardsRecord } from 'lib/databases/getRelationPropertiesCardsRecord';
-import { isTruthy } from 'lib/utils/types';
+import { useGetSubtree } from 'charmClient/hooks/blocks';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
+import { makeSelectBoard } from '../../store/boards';
+import { makeSelectCardsFromBoard } from '../../store/cards';
+import { initialDatabaseLoad } from '../../store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 import { PagesAutocomplete } from './PagesAutocomplete';
 
 export function RelationPropertyPagesAutocomplete({
   onChange,
   propertyTemplate,
-  selectedPageListItemIds,
+  value,
   readOnly,
   wrapColumn,
   displayType = 'details',
   emptyPlaceholderContent = 'Empty',
   showEmptyPlaceholder = true,
-  boardProperties,
   showCard
 }: {
   propertyTemplate: IPropertyTemplate;
-  selectedPageListItemIds: string[];
+  value: string | string[];
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
-  onChange: (pageListItemIds: string[]) => void;
+  onChange: (cardIds: string[]) => void;
   wrapColumn?: boolean;
   emptyPlaceholderContent?: string;
   showEmptyPlaceholder?: boolean;
-  boardProperties: IPropertyTemplate[];
   showCard?: (cardId: string | null, isTemplate?: boolean) => void;
 }) {
-  const { pages } = usePages();
-  const relationPropertiesCardsRecord = useMemo(() => {
-    return getRelationPropertiesCardsRecord({
-      pages: Object.values(pages),
-      properties: boardProperties
-    });
-  }, [pages, boardProperties]);
+  const boardId = propertyTemplate.relationData?.boardId || '';
+  const selectCardsFromBoard = useMemo(makeSelectCardsFromBoard, []);
+  const cards = useAppSelector((state) => selectCardsFromBoard(state, boardId));
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const board = useAppSelector((state) => selectBoard(state, boardId));
+  const dispatch = useAppDispatch();
+
+  const selectedBlockIds = useMemo(() => {
+    if (Array.isArray(value)) {
+      return value;
+    }
+    return value ? [value] : [];
+  }, [value]);
+
+  // Load database if necessary
+  useEffect(() => {
+    // only load board if there are no cards yet (assuming that means it is not loaded yet)
+    if (boardId && cards.length === 0) {
+      dispatch(initialDatabaseLoad({ pageId: boardId }));
+    }
+  }, [dispatch, boardId, cards.length]);
 
   return (
     <PagesAutocomplete
+      board={board}
+      multiple={propertyTemplate.relationData?.limit !== 'single_page'}
       showCard={showCard}
       onChange={onChange}
-      selectedPageListItems={selectedPageListItemIds.map((id) => pages[id]).filter(isTruthy) as PageListItem[]}
-      pageListItems={relationPropertiesCardsRecord[propertyTemplate.id] ?? []}
+      value={selectedBlockIds}
+      cards={cards}
       readOnly={readOnly}
       wrapColumn={wrapColumn}
       displayType={displayType}
-      relationTemplate={propertyTemplate}
       emptyPlaceholderContent={emptyPlaceholderContent}
       showEmptyPlaceholder={showEmptyPlaceholder}
       variant='standard'

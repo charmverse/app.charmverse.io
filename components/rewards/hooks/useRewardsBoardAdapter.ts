@@ -10,9 +10,8 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
-import type { BlockTypes } from 'lib/databases/block';
 import type { BoardView, IViewType } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card, CardWithRelations } from 'lib/databases/card';
 import { CardFilter } from 'lib/databases/cardFilter';
 import { Constants } from 'lib/databases/constants';
 import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
@@ -33,14 +32,14 @@ import {
   REWARD_APPLICANTS_COUNT,
   REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
-import type { RewardFields, RewardFieldsProp } from 'lib/rewards/blocks/interfaces';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
-export type BoardReward = { id?: string } & RewardFieldsProp;
+export type BoardReward = { id?: string; fields: RewardFields };
 
 export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
@@ -106,14 +105,14 @@ export function useRewardsBoardAdapter() {
     return boardView;
   }, [views, activeViewId, space?.id]);
 
-  const cardPages = useMemo(() => {
+  const sortedCards = useMemo(() => {
     let cards = (rewards || [])
       .map((reward) => {
         const page = getRewardPage(reward.id);
         if (!page || !space) return null;
 
         return {
-          ...mapRewardToCardPage({
+          ...mapRewardToCard({
             reward,
             spaceId: space.id,
             rewardPage: page,
@@ -123,19 +122,16 @@ export function useRewardsBoardAdapter() {
             id: reward.id,
             rewardType: getRewardType(reward)
           }
-        } as CardPage;
+        } as CardWithRelations;
       })
       .filter(isTruthy);
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (activeView.fields.filter && board) {
-      const cardsRaw = cards.map((cp) => cp.card);
-      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cardsRaw).map(
-        (c) => c.id
-      );
+      const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards).map((c) => c.id);
 
-      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
     }
     const sortedCardPages = board
       ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
@@ -153,13 +149,9 @@ export function useRewardsBoardAdapter() {
     space
   ]);
 
-  // each reward with fields reflects a card
-  const cards = cardPages.map((cp) => cp.card);
-
   return {
     board,
-    cards,
-    cardPages,
+    cards: sortedCards,
     activeView,
     views,
     refreshRewards: mutateRewards
@@ -167,17 +159,32 @@ export function useRewardsBoardAdapter() {
 }
 
 // build mock card from reward and page data
-export function mapRewardToCardPage({
+export function mapRewardToCard({
   reward,
   rewardPage,
   spaceId,
   members
 }: {
-  reward: BoardReward | RewardWithUsers;
-  rewardPage?: CardPage['page'] & { createdAt: string | Date; createdBy: string };
+  reward:
+    | Pick<BoardReward, 'fields' | 'id'>
+    | Pick<
+        RewardWithUsers,
+        | 'applications'
+        | 'fields'
+        | 'id'
+        | 'assignedSubmitters'
+        | 'dueDate'
+        | 'maxSubmissions'
+        | 'reviewers'
+        | 'rewardAmount'
+        | 'rewardToken'
+        | 'customReward'
+        | 'status'
+      >;
+  rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
   members?: Record<string, Member>;
-}): CardPage {
+}): CardWithRelations {
   const rewardFields = (reward.fields || { properties: {} }) as RewardFields;
   const validApplications =
     reward && 'applications' in reward
@@ -207,7 +214,7 @@ export function mapRewardToCardPage({
         )?.toString()
       : '-',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
-    [REWARDER_BLOCK_ID]: (reward && 'createdBy' in reward && [reward.createdBy]) || '',
+    [REWARDER_BLOCK_ID]: (rewardPage?.createdBy && [rewardPage.createdBy]) || '',
     // focalboard component expects a timestamp
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
     [CREATED_AT_ID]:
@@ -222,72 +229,51 @@ export function mapRewardToCardPage({
     [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 
-  // Create dummy rewardPage for new rewards
-  const _rewardPage: CardPage['page'] = rewardPage || {
-    id: '',
-    // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-    bountyId: null,
-    hasContent: false,
-    icon: null,
-    type: 'bounty',
-    syncWithPageId: null,
-    path: '',
-    proposalId: null,
-    title: '',
-    updatedAt: new Date(),
-    updatedBy: ''
-  };
-
-  const card: Card = {
+  const card: CardWithRelations = {
     // use page id as card id - kanban board is based on usePages
-    id: _rewardPage.id,
+    id: rewardPage?.id || '',
     spaceId,
-    parentId: '',
-    title: _rewardPage.title || '',
+    pageId: rewardPage?.id || '',
+    title: rewardPage?.title || '',
     rootId: spaceId,
-    type: 'card' as BlockTypes,
-    updatedBy: _rewardPage.updatedBy,
+    type: 'card' as const,
+    updatedBy: rewardPage?.updatedBy || '',
     createdBy: rewardPage?.createdBy || '',
-    createdAt: rewardPage?.createdAt ? new Date(rewardPage.createdAt).getTime() : 0,
-    updatedAt: _rewardPage.updatedAt ? new Date(_rewardPage.updatedAt).getTime() : 0,
-    deletedAt: null,
+    createdAt: rewardPage?.createdAt ? new Date(rewardPage.createdAt).getTime() : Date.now(),
+    updatedAt: rewardPage?.updatedAt ? new Date(rewardPage.updatedAt).getTime() : Date.now(),
     fields: { ...rewardFields, contentOrder: [] } as any,
-    customIconType: 'reward'
-  };
-
-  return {
-    card,
-    page: _rewardPage,
+    customIconType: 'reward',
     subPages:
       rewardPage && reward && 'applications' in reward
         ? reward.applications
             .filter((application) => (members ? members[application.createdBy] : true))
             .map((application) =>
-              mapApplicationToCardPage({
+              mapApplicationToCard({
                 application,
-                rewardPage,
-                reward,
+                rewardId: reward.id,
+                spaceId,
                 members
               })
             )
         : undefined
   };
+
+  return card;
 }
 
 // build mock card from reward and page data
-function mapApplicationToCardPage({
+function mapApplicationToCard({
   application,
-  rewardPage,
-  reward,
+  rewardId,
+  spaceId,
   members
 }: {
   application: ApplicationMeta;
-  rewardPage: CardPage['page'];
-  reward: RewardWithUsers;
+  rewardId: string;
   members?: Record<string, Member>;
+  spaceId: string;
 }) {
   const applicationFields = { properties: {} };
-  const applicationSpaceId = reward.spaceId;
 
   applicationFields.properties = {
     ...applicationFields.properties,
@@ -301,35 +287,21 @@ function mapApplicationToCardPage({
     [REWARD_APPLICANTS_COUNT]: null
   };
 
+  const authorName = members?.[application.createdBy]?.username;
   const card: Card = {
     id: application.id || '',
-    spaceId: applicationSpaceId,
-    parentId: reward.id,
-    title: '',
-    rootId: applicationSpaceId,
-    type: 'card' as BlockTypes,
+    spaceId,
+    parentId: rewardId,
+    title: `Application ${authorName ? `from ${authorName}` : ''}`,
+    rootId: spaceId,
+    type: 'card' as const,
     customIconType: 'applicationStatus',
     updatedBy: application.createdBy || '',
     createdBy: application.createdBy || '',
     createdAt: application.createdAt ? new Date(application.createdAt).getTime() : 0,
     updatedAt: application.updatedAt ? new Date(application.updatedAt).getTime() : 0,
-    deletedAt: null,
     fields: { ...applicationFields, contentOrder: [] }
   };
-  const authorName = members?.[application.createdBy]?.username;
-  const applicationPage: CardPage['page'] = {
-    id: application.id || '',
-    bountyId: rewardPage?.id || '',
-    title: `Application ${authorName ? `from ${authorName}` : ''}`,
-    type: 'bounty',
-    updatedAt: new Date(application.updatedAt),
-    hasContent: false,
-    icon: null,
-    path: application.id,
-    proposalId: null,
-    syncWithPageId: null,
-    updatedBy: application.createdBy
-  };
 
-  return { card, page: applicationPage };
+  return card;
 }

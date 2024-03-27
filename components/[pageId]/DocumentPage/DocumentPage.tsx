@@ -13,7 +13,7 @@ import { handleImageFileDrop } from 'components/common/CharmEditor/components/@b
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import AddBountyButton from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
+import { AddBountyButton } from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
@@ -146,6 +146,7 @@ function DocumentPageComponent({
   const isRewardsPage = router.pathname === '/[domain]/rewards';
   const _showParentChip =
     showParentChip ?? !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
+
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
   const hideCardDetails = isRewardsPage && page.bountyId;
@@ -395,7 +396,7 @@ function DocumentPageComponent({
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
                     />
-                    <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                    <AddBountyButton readOnly={readOnly} card={card} />
                   </>
                 )}
                 {proposalId && (

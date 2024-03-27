@@ -5,10 +5,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
-import { buildBlockWithDetails } from 'lib/databases/buildBlockWithDetails';
+import { applyPageToBlock } from 'lib/databases/block';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { relay } from 'lib/websockets/relay';
@@ -46,7 +46,7 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     throw new DataNotFoundError('Block not found');
   }
 
-  const result = page ? buildBlockWithDetails(block, page) : (block as BlockWithDetails);
+  const result = page ? applyPageToBlock(block, page) : (block as BlockWithDetails);
 
   return res.status(200).json(result);
 }
@@ -89,7 +89,7 @@ async function deleteBlock(
       throw new ActionNotPermittedError();
     }
 
-    const deletedChildPageIds = await modifyChildPages(blockId, userId, 'trash');
+    const deletedChildPageIds = await trashOrDeletePage(blockId, userId, 'trash');
     deletedCount = deletedChildPageIds.length;
     relay.broadcast(
       {
@@ -142,7 +142,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type }]
+        payload: [{ id: blockId }]
       },
       spaceId
     );
@@ -161,7 +161,7 @@ async function deleteBlock(
     relay.broadcast(
       {
         type: 'blocks_deleted',
-        payload: [{ id: blockId, type: rootBlock.type as BlockTypes }]
+        payload: [{ id: blockId }]
       },
       spaceId
     );

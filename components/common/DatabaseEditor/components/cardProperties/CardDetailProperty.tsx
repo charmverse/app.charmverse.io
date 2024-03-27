@@ -114,7 +114,6 @@ export function CardDetailProperty({
       <PropertyValueElement
         showCard={showCard}
         readOnly={readOnly}
-        syncWithPageId={syncWithPageId}
         card={card}
         board={board}
         updatedAt={pageUpdatedAt}

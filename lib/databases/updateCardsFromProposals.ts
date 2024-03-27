@@ -8,7 +8,7 @@ import type {
 import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
-import { prismaToBlock } from 'lib/databases/block';
+import { prismaToUIBlock } from 'lib/databases/block';
 import { extractCardProposalProperties } from 'lib/databases/extractCardProposalProperties';
 import { extractDatabaseProposalProperties } from 'lib/databases/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
@@ -25,7 +25,7 @@ import { relay } from 'lib/websockets/relay';
 import { createCardPage } from '../pages/createCardPage';
 
 import { proposalPropertyTypesList } from './board';
-import type { IPropertyTemplate, BoardFields } from './board';
+import type { IPropertyTemplate, Board, BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
 import type { CardFields, CardPropertyValue } from './card';
 import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
@@ -155,10 +155,18 @@ export async function updateCardsFromProposals({
 
   const boardBlockFields = (proposalBoardBlock as null | { fields: BoardFields })?.fields;
 
-  const boardBlock = await setDatabaseProposalProperties({
-    boardId,
-    cardProperties: []
-  });
+  const [dbBlock, boardPage] = await Promise.all([
+    setDatabaseProposalProperties({
+      boardId,
+      cardProperties: []
+    }),
+    prisma.page.findFirstOrThrow({
+      where: {
+        boardId
+      }
+    })
+  ]);
+  const boardBlock = prismaToUIBlock(dbBlock, boardPage) as Board;
 
   const boardBlockCardPropertiesRecord: Record<string, IPropertyTemplate> = {};
 
@@ -366,8 +374,7 @@ export async function updateCardsFromProposals({
   /**
    * Case for cards that are linked to a proposal page and need to be updated
    */
-  const updatedPages: Page[] = [];
-  const updatedBlocks: Block[] = [];
+  const updatedCards: { page: Page; block: Block }[] = [];
   const newCards: { page: Page; block: Block }[] = [];
 
   const proposalIds = proposalPagesLite.map((p) => p.proposal?.id).filter(isTruthy);
@@ -534,8 +541,7 @@ export async function updateCardsFromProposals({
 
               return { updatedCardPage: updatedPage, updatedCardBlock: updatedBlock };
             });
-            updatedPages.push(updatedCardPage);
-            updatedBlocks.push(updatedCardBlock);
+            updatedCards.push({ block: updatedCardBlock, page: updatedCardPage });
           }
 
           // Don't create new cards from archived cards
@@ -629,57 +635,21 @@ export async function updateCardsFromProposals({
     }
   });
 
-  if (updatedPages.length > 0) {
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: updatedPages.map(
-          ({ id, updatedAt, updatedBy, deletedAt, title, hasContent, content, contentText }) => ({
-            id,
-            spaceId,
-            updatedAt,
-            updatedBy,
-            deletedAt,
-            title,
-            hasContent,
-            content,
-            contentText
-          })
-        )
-      },
-      spaceId
-    );
-  }
+  const updatedBlockPayload = [boardBlock, ...updatedCards.map(({ block, page }) => prismaToUIBlock(block, page))];
 
   relay.broadcast(
     {
       type: 'blocks_updated',
-      payload: [prismaToBlock(boardBlock as any)]
+      payload: updatedBlockPayload
     },
     spaceId
   );
-  if (updatedBlocks.length > 0) {
-    relay.broadcast(
-      {
-        type: 'blocks_updated',
-        payload: updatedBlocks.map((block) => prismaToBlock(block))
-      },
-      spaceId
-    );
-  }
 
   if (newCards.length > 0) {
     relay.broadcast(
       {
         type: 'blocks_created',
-        payload: newCards.map((card) => prismaToBlock(card.block))
-      },
-      spaceId
-    );
-    relay.broadcast(
-      {
-        type: 'pages_created',
-        payload: newCards.map((card) => card.page)
+        payload: newCards.map((card) => prismaToUIBlock(card.block, card.page))
       },
       spaceId
     );
@@ -721,6 +691,6 @@ export async function updateCardsFromProposals({
   return {
     created: newCards.length,
     deleted: orphanPageIds.length,
-    updated: updatedPages.length
+    updated: updatedCards.length
   };
 }
