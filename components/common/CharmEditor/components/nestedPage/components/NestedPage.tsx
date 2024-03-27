@@ -72,7 +72,7 @@ export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeV
 
   // retrieve the page directly if we are waiting for pages to load
   const { data: sourcePage, isLoading: isPageLoading } = useGetPageMeta(
-    !pageFromPagesContext && isDocumentPath && node.attrs.id
+    !pageFromPagesContext && isDocumentPath ? node.attrs.id : null
   );
 
   const documentPage = sourcePage || pageFromPagesContext;
