@@ -43,7 +43,7 @@ export default function Mention({ node }: NodeViewProps) {
 
   const isDocumentPath = attrs.type === 'page';
   const { page, isLoading } = useGetPageMetaFromCache({
-    pageId: isDocumentPath ? node.attrs.id : null
+    pageId: isDocumentPath ? node.attrs.value : null
   });
 
   let value: ReactNode = null;

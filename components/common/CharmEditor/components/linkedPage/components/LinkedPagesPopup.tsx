@@ -5,10 +5,9 @@ import { useCallback, memo, useEffect, useMemo, useState } from 'react';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import type { PageListItem } from 'components/common/PagesList';
 import { PagesList } from 'components/common/PagesList';
-import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
+import { useRootPages } from 'hooks/useRootPages';
 import { useSearchPages } from 'hooks/useSearchPages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { STATIC_PAGES } from 'lib/features/constants';
@@ -57,7 +56,7 @@ function PagesListWithContext({
   triggerText: string;
   onSelectPage: (pageId: string, type: PageListItem['type'], path: string) => void;
 }) {
-  const { pages } = usePages();
+  const { rootPages } = useRootPages();
   const { categories } = useForumCategories();
   const { mappedFeatures } = useSpaceFeatures();
   const { results: searchResults, isValidating } = useSearchPages({ search: triggerText, limit: 50 });
@@ -107,12 +106,8 @@ function PagesListWithContext({
       return sortList({ triggerText, list: filteredPages });
     }
     // show default list (root pages from sidebar)
-    const rootPages = Object.values(pages)
-      .filter((page) => page && !page.parentId && (page.type === 'board' || page.type === 'page'))
-      .filter(isTruthy)
-      .sort((a, b) => a.index - b.index);
     return [...staticPages, ...rootPages];
-  }, [triggerText, pages, filteredPages, staticPages]);
+  }, [triggerText, rootPages, filteredPages, staticPages]);
 
   const totalItems = options.length;
   const activeItemIndex = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;

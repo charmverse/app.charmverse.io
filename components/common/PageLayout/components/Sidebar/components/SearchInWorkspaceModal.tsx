@@ -16,12 +16,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import type { SearchResultItem } from 'hooks/useSearchPages';
 import { useSearchPages } from 'hooks/useSearchPages';
 
-enum ResultType {
-  page = 'page',
-  bounty = 'bounty'
-}
-
-// eslint-disable-next-line
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
     margintop: 0px;
@@ -101,7 +95,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
       setSearchString(newInputValue);
     } else {
       setExpandPageList(true);
-      setSearchString(newInputValue);
+      setSearchString(newInputValue.trim()?.toLocaleLowerCase());
     }
   }
 
