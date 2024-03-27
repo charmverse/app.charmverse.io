@@ -13,7 +13,7 @@ import { useMemo, useCallback, useEffect, useState } from 'react';
 
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
-import type { NestedPagePluginState } from '../../nestedPage';
+import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import { GroupLabel } from '../../PopoverMenu';
 import { useInlinePaletteItems, useInlinePaletteQuery } from '../hooks';
 import { PaletteItem, PALETTE_ITEM_REGULAR_TYPE } from '../paletteItem';
