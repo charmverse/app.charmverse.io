@@ -8,10 +8,10 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ModifyChildPagesResponse, PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
-import { modifyChildPages } from 'lib/pages/modifyChildPages';
+import type { TrashOrDeletePageResponse, PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
 import { generatePageQuery } from 'lib/pages/server/generatePageQuery';
 import { updatePage } from 'lib/pages/server/updatePage';
+import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { convertDoc } from 'lib/prosemirror/conversions/convertOldListNodes';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -197,7 +197,7 @@ async function updatePageHandler(req: NextApiRequest, res: NextApiResponse) {
   return res.status(200).send(updatedPage);
 }
 
-async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
+async function deletePage(req: NextApiRequest, res: NextApiResponse<TrashOrDeletePageResponse>) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 
@@ -219,7 +219,7 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     throw new ActionNotPermittedError('You are not allowed to delete this page.');
   }
 
-  const modifiedChildPageIds = await modifyChildPages(pageId, userId, 'delete');
+  const modifiedChildPageIds = await trashOrDeletePage(pageId, userId, 'delete');
 
   updateTrackPageProfile(pageId);
 
@@ -230,6 +230,15 @@ async function deletePage(req: NextApiRequest, res: NextApiResponse<ModifyChildP
     },
     pageToDelete.spaceId
   );
+
+  relay.broadcast(
+    {
+      type: 'blocks_deleted',
+      payload: modifiedChildPageIds.map((id) => ({ id }))
+    },
+    pageToDelete.spaceId
+  );
+
   trackUserAction('delete_page', { userId, pageId, spaceId: pageToDelete.spaceId });
 
   log.info('User deleted a page', {

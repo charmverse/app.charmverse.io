@@ -10,7 +10,7 @@ import { useLocalStorage } from 'hooks/useLocalStorage';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
-import type { Card, CardPage } from 'lib/databases/card';
+import type { Card, CardWithRelations } from 'lib/databases/card';
 
 import TableRow from './tableRow';
 
@@ -18,7 +18,7 @@ type Props = {
   board: Board;
   activeView: BoardView;
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
-  cardPages: readonly CardPage[];
+  cards: readonly CardWithRelations[];
   offset: number;
   resizingColumn: string;
   selectedCardIds: string[];
@@ -40,7 +40,7 @@ type Props = {
 function TableRows(props: Props): JSX.Element {
   const {
     board,
-    cardPages: allCardPages,
+    cards: allCards,
     activeView,
     onDeleteCard,
     expandSubRowsOnLoad,
@@ -48,9 +48,13 @@ function TableRows(props: Props): JSX.Element {
     setCheckedIds,
     checkedIds = []
   } = props;
-  const hasSubPages = allCardPages.some((cardPage) => cardPage.subPages?.length);
+  const hasSubPages = allCards.some((card) => card.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const { data: cardPages, hasNextPage, showNextPage } = usePaginatedData(allCardPages as CardPage[], { pageSize });
+  const {
+    data: cardsInView,
+    hasNextPage,
+    showNextPage
+  } = usePaginatedData(allCards as CardWithRelations[], { pageSize });
 
   const [collapsedCardIds = [], setCollapsedCardIds] = useLocalStorage<string[]>(
     hasSubPages && props.rowExpansionLocalStoragePrefix
@@ -71,10 +75,10 @@ function TableRows(props: Props): JSX.Element {
     await charmClient.pages.updatePage({ id: cardId, title });
 
     if (saveType === 'onEnter') {
-      const card = cardPages.find((c) => c.card.id === cardId);
-      if (card && cardPages.length > 0 && cardPages[cardPages.length - 1] === card) {
+      const card = cardsInView.find((c) => c.id === cardId);
+      if (card && cardsInView.length > 0 && cardsInView[cardsInView.length - 1] === card) {
         props.addCard(
-          activeView.fields.groupById ? (card.card.fields.properties[activeView.fields.groupById!] as string) : ''
+          activeView.fields.groupById ? (card.fields.properties[activeView.fields.groupById!] as string) : ''
         );
       }
     }
@@ -90,22 +94,19 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardPages.map(({ page, proposal, card, subPages, isStructuredProposal, reward }) => (
+      {cardsInView.map((card) => (
         <TableRow
           key={card.id + card.updatedAt}
           board={board}
           activeView={activeView}
           card={card}
-          reward={reward}
-          proposal={proposal}
-          isStructuredProposal={isStructuredProposal}
-          hasContent={page.hasContent}
+          hasContent={card.hasContent}
           isSelected={props.selectedCardIds.includes(card.id)}
           focusOnMount={props.cardIdToFocusOnRender === card.id}
-          pageIcon={page.icon}
-          pageTitle={page.title || ''}
-          pageUpdatedAt={page.updatedAt.toString()}
-          pageUpdatedBy={page.updatedBy}
+          pageIcon={card.icon}
+          pageTitle={card.title || ''}
+          pageUpdatedAt={card.updatedAt.toString()}
+          pageUpdatedBy={card.updatedBy}
           onClick={props.onCardClicked}
           saveTitle={saveTitle}
           showCard={props.showCard}
@@ -115,15 +116,14 @@ function TableRows(props: Props): JSX.Element {
           offset={props.offset}
           resizingColumn={props.resizingColumn}
           columnRefs={props.columnRefs}
-          cardPage={page}
           readOnlyTitle={props.readOnlyTitle}
-          subPages={subPages}
+          subPages={card.subPages}
           expandSubRowsOnLoad={expandSubRowsOnLoad}
           setIsExpanded={setIsExpanded}
           setCheckedIds={setCheckedIds}
-          isChecked={checkedIds.includes(page.id)}
+          isChecked={checkedIds.includes(card.id)}
           emptySubPagesPlaceholder={
-            page.bountyId ? (
+            card.reward ? (
               <Box
                 p={1}
                 pl={5}
@@ -131,7 +131,7 @@ function TableRows(props: Props): JSX.Element {
                 justifyContent='flex-start'
                 style={{ backgroundColor: 'var(--input-bg)' }}
               >
-                <NewWorkButton color='secondary' rewardId={page.bountyId} addIcon variant='text' buttonSize='small' />
+                <NewWorkButton color='secondary' rewardId={card.reward.id} addIcon variant='text' buttonSize='small' />
               </Box>
             ) : null
           }

@@ -1,10 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { FormField } from '@charmverse/core/prisma-client';
+import type { FormField, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import { checkFormFieldErrors } from 'lib/proposals/getProposalErrors';
 import { isUUID } from 'lib/utils/strings';
 
 export async function upsertProposalFormFields({
@@ -76,7 +76,8 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required
+            required,
+            fieldConfig: field.fieldConfig as Prisma.InputJsonValue
           },
           update: {
             type: field.type,
@@ -85,7 +86,8 @@ export async function upsertProposalFormFields({
             index: field.index,
             options: field.options,
             private: field.private,
-            required
+            required,
+            fieldConfig: field.fieldConfig as Prisma.InputJsonValue
           }
         });
       })

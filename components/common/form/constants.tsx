@@ -1,5 +1,6 @@
 import type { FormFieldType } from '@charmverse/core/prisma-client';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import ArrowDropDownCircleIcon from '@mui/icons-material/ArrowDropDownCircle';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
@@ -16,6 +17,7 @@ import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
 
 export const formFieldTypes = [
+  'project_profile',
   'short_text',
   'long_text',
   'number',
@@ -32,6 +34,8 @@ export const formFieldTypes = [
   'file'
 ] as FormFieldType[];
 
+export const nonDuplicateFieldTypes = ['project_profile'] as FormFieldType[];
+
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
   email: 'Email',
@@ -46,7 +50,8 @@ export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   url: 'URL',
   wallet: 'Wallet Address',
   image: 'Image',
-  file: 'File'
+  file: 'File',
+  project_profile: 'Project Profile'
 };
 
 export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
@@ -63,7 +68,8 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   label: <TextFieldsIcon fontSize='small' />,
   person: <PersonIcon fontSize='small' />,
   image: <ImageIcon fontSize='small' />,
-  file: <AttachFileIcon fontSize='small' />
+  file: <AttachFileIcon fontSize='small' />,
+  project_profile: <AccountBoxIcon fontSize='small' />
 };
 
 export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
@@ -80,5 +86,6 @@ export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
   label: 'Your answer',
   person: 'Select one or more people',
   image: 'Upload an image',
-  file: 'Upload a file'
+  file: 'Upload a file',
+  project_profile: 'Fill up project profile'
 };

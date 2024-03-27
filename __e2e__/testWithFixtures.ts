@@ -17,6 +17,7 @@ import { PagesSidebarPage } from './po/pagesSiderbar.po';
 import { ProposalPage } from './po/proposalPage.po';
 import { ProposalsListPage } from './po/proposalsList.po';
 import { RewardPage } from './po/rewardPage.po';
+import { ProjectSettings } from './po/settings/projectSettings.po';
 import { SettingsModal } from './po/settings/settings.po';
 import { ApiSettings } from './po/settings/spaceApiSettings.po';
 import { PermissionSettings } from './po/settings/spacePermissionSettings.po';
@@ -52,6 +53,7 @@ type Fixtures = {
   signUpPage: SignUpPage;
   spacesDropdown: SpacesDropdown;
   tokenGatePage: TokenGatePage;
+  projectSettings: ProjectSettings;
 };
 
 // Used for reusing a Page Object Model, but scoped to a part of the screen
@@ -84,6 +86,7 @@ export const test = base.extend<Fixtures>({
   spaceProfileSettings: async ({ page }, use) => use(new SpaceProfileSettings(page)),
   signUpPage: async ({ page }, use) => use(new SignUpPage(page)),
   spacesDropdown: async ({ page }, use) => use(new SpacesDropdown(page)),
-  tokenGatePage: async ({ page }, use) => use(new TokenGatePage(page))
+  tokenGatePage: async ({ page }, use) => use(new TokenGatePage(page)),
+  projectSettings: async ({ page }, use) => use(new ProjectSettings(page))
 });
 export { chromium, expect } from '@playwright/test';

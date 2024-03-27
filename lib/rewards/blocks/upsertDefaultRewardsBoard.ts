@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { blockToPrisma } from 'lib/databases/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 

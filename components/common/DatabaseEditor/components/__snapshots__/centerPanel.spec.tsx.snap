@@ -115,6 +115,23 @@ exports[`components/centerPanel return centerPanel and click on card to show car
               >
                 Sort
               </button>
+              <button
+                class="Button IconButton css-w119tu"
+                style="width: 32px;"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                  data-testid="SearchIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
+                  />
+                </svg>
+              </button>
               <div
                 class="MuiBox-root css-jw1lpn"
                 data-test="view-header-actions-menu"
@@ -318,19 +335,11 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         <div
                           class="octo-icontitle"
                         >
-                          <div>
-                            <div
-                              class="css-1s68mph"
-                            >
-                              <img
-                                src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                              />
-                            </div>
-                          </div>
+                          <div />
                           <div
                             class="octo-titletext"
                           >
-                            Page 1
+                            card1
                           </div>
                         </div>
                         <div
@@ -373,19 +382,11 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                         <div
                           class="octo-icontitle"
                         >
-                          <div>
-                            <div
-                              class="css-1s68mph"
-                            >
-                              <img
-                                src="https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/1f4da.svg"
-                              />
-                            </div>
-                          </div>
+                          <div />
                           <div
                             class="octo-titletext"
                           >
-                            Page 2
+                            card2
                           </div>
                         </div>
                         <div
@@ -825,6 +826,23 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
               >
                 Sort
               </button>
+              <button
+                class="Button IconButton css-w119tu"
+                style="width: 32px;"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                  data-testid="SearchIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
+                  />
+                </svg>
+              </button>
               <div
                 class="MuiBox-root css-jw1lpn"
                 data-test="view-header-actions-menu"
@@ -896,6 +914,62 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
             <div
               class="Gallery"
             >
+              <div
+                class="GalleryCard MuiBox-root css-1oaiypi"
+                data-test="gallery-card-1"
+                draggable="true"
+                style="opacity: 1;"
+              >
+                <div
+                  data-testid="page-actions-context-menu"
+                >
+                  <button
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                    tabindex="0"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                      data-testid="MoreHorizIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div
+                class="GalleryCard MuiBox-root css-1oaiypi"
+                data-test="gallery-card-2"
+                draggable="true"
+                style="opacity: 1;"
+              >
+                <div
+                  data-testid="page-actions-context-menu"
+                >
+                  <button
+                    class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                    tabindex="0"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                      data-testid="MoreHorizIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
               <div
                 class="octo-gallery-new"
               >
@@ -1213,6 +1287,23 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
               >
                 Sort
               </button>
+              <button
+                class="Button IconButton css-w119tu"
+                style="width: 32px;"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                  data-testid="SearchIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
+                  />
+                </svg>
+              </button>
               <div
                 class="MuiBox-root css-jw1lpn"
                 data-test="view-header-actions-menu"
@@ -1303,11 +1394,11 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                     class="KanbanCalculation"
                   >
                     <button
-                      title="0"
+                      title="2"
                       type="button"
                     >
                       <span>
-                        0
+                        2
                       </span>
                     </button>
                   </div>
@@ -1381,6 +1472,100 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   <div
                     class="octo-board-column"
                   >
+                    <a
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      draggable="false"
+                      href="/test-space/1"
+                    >
+                      <div
+                        class="KanbanCard MuiBox-root css-1oaiypi"
+                        data-test="kanban-card-1"
+                        draggable="true"
+                        style="opacity: 1;"
+                      >
+                        <div
+                          data-testid="page-actions-context-menu"
+                        >
+                          <button
+                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                            tabindex="0"
+                            type="button"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                              data-testid="MoreHorizIcon"
+                              focusable="false"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                        <div
+                          class="octo-icontitle"
+                        >
+                          <div />
+                          <div
+                            class="octo-titletext"
+                          >
+                            card1
+                          </div>
+                        </div>
+                        <div
+                          class="MuiStack-root css-1qh2y1i-MuiStack-root"
+                        />
+                      </div>
+                    </a>
+                    <a
+                      class="MuiTypography-root MuiTypography-inherit MuiLink-root MuiLink-underlineNone css-uufjfw-MuiTypography-root-MuiLink-root"
+                      draggable="false"
+                      href="/test-space/2"
+                    >
+                      <div
+                        class="KanbanCard MuiBox-root css-1oaiypi"
+                        data-test="kanban-card-2"
+                        draggable="true"
+                        style="opacity: 1;"
+                      >
+                        <div
+                          data-testid="page-actions-context-menu"
+                        >
+                          <button
+                            class="MuiButtonBase-root MuiIconButton-root MuiIconButton-colorInherit MuiIconButton-sizeSmall icons css-1t9kyav-MuiButtonBase-root-MuiIconButton-root"
+                            tabindex="0"
+                            type="button"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                              data-testid="MoreHorizIcon"
+                              focusable="false"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m12 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m-6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                        <div
+                          class="octo-icontitle"
+                        >
+                          <div />
+                          <div
+                            class="octo-titletext"
+                          >
+                            card2
+                          </div>
+                        </div>
+                        <div
+                          class="MuiStack-root css-1qh2y1i-MuiStack-root"
+                        />
+                      </div>
+                    </a>
                     <button
                       class="MuiButtonBase-root MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-disableElevation MuiButton-root MuiButton-text MuiButton-textSecondary MuiButton-sizeSmall MuiButton-textSizeSmall MuiButton-disableElevation css-csouv9-MuiButtonBase-root-MuiButton-root"
                       tabindex="0"
@@ -1813,6 +1998,23 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
               >
                 Sort
               </button>
+              <button
+                class="Button IconButton css-w119tu"
+                style="width: 32px;"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+                  data-testid="SearchIcon"
+                  focusable="false"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
+                  />
+                </svg>
+              </button>
               <div
                 class="MuiBox-root css-jw1lpn"
                 data-test="view-header-actions-menu"
@@ -1891,6 +2093,26 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   class="octo-table-header TableHeaders"
                   id="mainBoardHeader"
                 >
+                  <span
+                    class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall disable-drag-selection css-sh8a4w-MuiButtonBase-root-MuiCheckbox-root"
+                  >
+                    <input
+                      class="PrivateSwitchBase-input css-1m9pwf3"
+                      data-indeterminate="false"
+                      type="checkbox"
+                    />
+                    <svg
+                      aria-hidden="true"
+                      class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                      data-testid="CheckBoxOutlineBlankOutlinedIcon"
+                      focusable="false"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M19 5v14H5V5zm0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2"
+                      />
+                    </svg>
+                  </span>
                   <div
                     class="octo-table-cell header-cell disable-drag-selection"
                     draggable="true"
@@ -2010,7 +2232,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                         type="button"
                       >
                         <span>
-                          0
+                          2
                         </span>
                       </button>
                       <div
@@ -2053,6 +2275,234 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                         </svg>
                       </button>
                     </div>
+                    <div
+                      class="TableRow octo-table-row"
+                      data-test="database-row-1"
+                      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+                    >
+                      <div
+                        class="MuiStack-root css-1v111ru-MuiStack-root"
+                      >
+                        <div
+                          class="icons row-actions"
+                          draggable="true"
+                          style="padding: 0px;"
+                        >
+                          <div
+                            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                              data-testid="DragIndicatorIcon"
+                              focusable="false"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <span
+                          class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall table-row-checkbox disable-drag-selection css-bfzfnf-MuiButtonBase-root-MuiCheckbox-root"
+                        >
+                          <input
+                            class="PrivateSwitchBase-input css-1m9pwf3"
+                            data-indeterminate="false"
+                            type="checkbox"
+                          />
+                          <svg
+                            aria-hidden="true"
+                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                            data-testid="CheckBoxOutlineBlankIcon"
+                            focusable="false"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                      <div
+                        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+                      >
+                        <div
+                          style="display: flex; width: 100%;"
+                        >
+                          <div
+                            class="octo-icontitle"
+                            style="align-self: flex-start; align-items: flex-start;"
+                          >
+                            <div
+                              class="css-1s68mph"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                                data-testid="InsertDriveFileOutlinedIcon"
+                                focusable="false"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                                />
+                              </svg>
+                            </div>
+                            <div
+                              style="width: 100%; height: 100%;"
+                            >
+                              <div
+                                style="height: 100%;"
+                              >
+                                <div
+                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                                  spellcheck="true"
+                                >
+                                  <input
+                                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                                    placeholder="Untitled"
+                                    type="text"
+                                    value="card1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="open-button"
+                            data-test="database-open-button-1"
+                          >
+                            <button
+                              type="button"
+                            >
+                              <span>
+                                Open
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="octo-table-cell"
+                        style="flex-grow: 1;"
+                      />
+                    </div>
+                    <div
+                      class="TableRow octo-table-row"
+                      data-test="database-row-2"
+                      style="background-color: transparent; z-index: 85; opacity: 1; cursor: move;"
+                    >
+                      <div
+                        class="MuiStack-root css-1v111ru-MuiStack-root"
+                      >
+                        <div
+                          class="icons row-actions"
+                          draggable="true"
+                          style="padding: 0px;"
+                        >
+                          <div
+                            class="charm-drag-handle disable-drag-selection MuiBox-root css-0"
+                          >
+                            <svg
+                              aria-hidden="true"
+                              class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeMedium css-d1t9d3-MuiSvgIcon-root"
+                              data-testid="DragIndicatorIcon"
+                              focusable="false"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M11 18c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2m-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m6 4c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2m0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2m0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2"
+                              />
+                            </svg>
+                          </div>
+                        </div>
+                        <span
+                          class="MuiButtonBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall PrivateSwitchBase-root MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall MuiCheckbox-root MuiCheckbox-colorPrimary MuiCheckbox-sizeSmall table-row-checkbox disable-drag-selection css-bfzfnf-MuiButtonBase-root-MuiCheckbox-root"
+                        >
+                          <input
+                            class="PrivateSwitchBase-input css-1m9pwf3"
+                            data-indeterminate="false"
+                            type="checkbox"
+                          />
+                          <svg
+                            aria-hidden="true"
+                            class="MuiSvgIcon-root MuiSvgIcon-fontSizeSmall css-qolhez-MuiSvgIcon-root"
+                            data-testid="CheckBoxOutlineBlankIcon"
+                            focusable="false"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
+                            />
+                          </svg>
+                        </span>
+                      </div>
+                      <div
+                        class="octo-table-cell title-cell MuiBox-root css-v7v99c"
+                      >
+                        <div
+                          style="display: flex; width: 100%;"
+                        >
+                          <div
+                            class="octo-icontitle"
+                            style="align-self: flex-start; align-items: flex-start;"
+                          >
+                            <div
+                              class="css-1s68mph"
+                            >
+                              <svg
+                                aria-hidden="true"
+                                class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
+                                data-testid="InsertDriveFileOutlinedIcon"
+                                focusable="false"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8zM6 20V4h7v5h5v11z"
+                                />
+                              </svg>
+                            </div>
+                            <div
+                              style="width: 100%; height: 100%;"
+                            >
+                              <div
+                                style="height: 100%;"
+                              >
+                                <div
+                                  class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                                  spellcheck="true"
+                                >
+                                  <input
+                                    class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                                    placeholder="Untitled"
+                                    type="text"
+                                    value="card2"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div
+                            class="open-button"
+                            data-test="database-open-button-2"
+                          >
+                            <button
+                              type="button"
+                            >
+                              <span>
+                                Open
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <div
+                        class="octo-table-cell"
+                        style="flex-grow: 1;"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div
@@ -2076,7 +2526,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                     <span
                       class="calculationValue"
                     >
-                      0
+                      2
                     </span>
                   </div>
                 </div>

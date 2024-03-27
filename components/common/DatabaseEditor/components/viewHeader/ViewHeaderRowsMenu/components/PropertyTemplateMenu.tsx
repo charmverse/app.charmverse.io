@@ -258,7 +258,6 @@ export function PropertyTemplateMenu({
         <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
           <Box px={1}>
             <RelationPropertyPagesAutocomplete
-              boardProperties={board.fields.cardProperties}
               displayType='table'
               onChange={(pageListItemIds) => {
                 onRelationPropertyChange({
@@ -268,7 +267,7 @@ export function PropertyTemplateMenu({
                 });
               }}
               propertyTemplate={propertyTemplate}
-              selectedPageListItemIds={(propertyValue ?? []) as string[]}
+              value={propertyValue as string[]}
               wrapColumn={false}
             />
           </Box>

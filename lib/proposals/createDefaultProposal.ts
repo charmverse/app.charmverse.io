@@ -81,8 +81,8 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
             group: 'user',
             id: userId
           }
-        ],
-        [Constants.titleColumnId]: 'Getting Started'
+        ]
+        // [Constants.titleColumnId]: 'Getting Started'
       }
     }
   });

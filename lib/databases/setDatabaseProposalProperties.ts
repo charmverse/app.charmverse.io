@@ -1,10 +1,11 @@
-import type { FormField } from '@charmverse/core/prisma';
+import type { Block, FormField } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { Board, IPropertyTemplate } from 'lib/databases/board';
+import { prismaToUIBlock } from 'lib/databases/block';
+import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
@@ -20,14 +21,15 @@ export async function setDatabaseProposalProperties({
 }: {
   boardId: string;
   cardProperties: IPropertyTemplate[];
-}): Promise<Board> {
-  const boardBlock = (await prisma.block.findUniqueOrThrow({
+}): Promise<Block> {
+  const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     }
-  })) as any as Board;
+  });
+  const boardFields = boardBlock.fields as unknown as BoardFields;
 
-  if (boardBlock.fields.sourceType !== 'proposals') {
+  if (boardFields.sourceType !== 'proposals') {
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
 
@@ -101,12 +103,12 @@ export async function setDatabaseProposalProperties({
   const boardProperties = getBoardProperties({
     evaluationStepTitles: Array.from(evaluationStepTitles),
     formFields,
-    boardBlock,
     cardProperties,
+    currentCardProperties: boardFields.cardProperties,
     rubricStepTitles: Array.from(rubricStepTitles)
   });
 
-  return prisma.block.update({
+  const updatedBoardBlock = await prisma.block.update({
     where: {
       id: boardBlock.id
     },
@@ -116,11 +118,13 @@ export async function setDatabaseProposalProperties({
         cardProperties: boardProperties
       }
     }
-  }) as any as Board;
+  });
+
+  return updatedBoardBlock;
 }
 
-export function getBoardProperties({
-  boardBlock,
+function getBoardProperties({
+  currentCardProperties = [],
   formFields = [],
   evaluationStepTitles = [],
   cardProperties = [],
@@ -129,10 +133,10 @@ export function getBoardProperties({
   rubricStepTitles?: string[];
   cardProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
-  boardBlock: Board;
+  currentCardProperties: IPropertyTemplate[];
   formFields?: FormField[];
 }) {
-  const boardProperties = boardBlock.fields.cardProperties ?? [];
+  const boardProperties = [...currentCardProperties];
 
   const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });

@@ -18,7 +18,6 @@ import { createFilterClause } from 'lib/databases/filterClause';
 import type { FilterGroup, FilterGroupOperation } from 'lib/databases/filterGroup';
 import { createFilterGroup, isAFilterGroupInstance } from 'lib/databases/filterGroup';
 
-import type { PageListItemsRecord } from '../../interfaces';
 import mutator from '../../mutator';
 
 import FilterEntry from './filterEntry';
@@ -26,7 +25,6 @@ import FilterEntry from './filterEntry';
 type Props = {
   properties: IPropertyTemplate[];
   activeView: BoardView;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 const StyledFilterComponent = styled(Box)`
@@ -129,7 +127,6 @@ const FilterComponent = React.memo((props: Props) => {
                 conditionClicked={conditionClicked}
                 filter={filter}
                 currentFilter={currentFilter}
-                relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
               />
             </Stack>
           ))}

@@ -17,7 +17,6 @@ import { PageDialog } from 'components/common/PageDialog/PageDialog';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useDatabaseViews } from 'hooks/useDatabaseViews';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 
 /**
@@ -45,8 +44,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { setViewsRecord } = useDatabaseViews();
   const readOnlyBoard = readOnly || !pagePermissions?.edit_content;
-  const { pages } = usePages();
-  const shownCardPage = Object.values(pages).find((_page) => _page?.cardId === shownCardId);
+
   useEffect(() => {
     if (typeof router.query.cardId === 'string') {
       setShownCardId(router.query.cardId);
@@ -131,7 +129,7 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
         navigateToSpacePath(`/${cardId}`);
       }
     },
-    [router.query, activeView, pages]
+    [router.query, activeView]
   );
 
   const showView = useCallback(
@@ -148,42 +146,42 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     [router.query]
   );
 
-  if (board) {
-    return (
-      <>
-        <div data-test='database-page' className='focalboard-body full-page'>
-          <DbViewSettingsProvider>
-            <CenterPanel
-              currentRootPageId={page.id}
-              readOnly={Boolean(readOnlyBoard)}
-              board={board}
-              setPage={setPage}
-              pageIcon={page.icon}
-              showCard={showCard}
-              showView={showView}
-              activeView={activeView || undefined}
-              views={boardViews}
-              page={page}
-            />
-            {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
-              <PageDialog
-                showCard={showCard}
-                key={shownCardId}
-                pageId={shownCardId}
-                onClose={() => {
-                  showCard(null);
-                }}
-                showParentChip={shownCardPage?.parentId !== page.id}
-                readOnly={readOnly}
-              />
-            )}
-          </DbViewSettingsProvider>
-        </div>
-        {/** include the root portal for focalboard's popup */}
-        <DatabasePortal />
-      </>
-    );
+  if (!board) {
+    return null;
   }
 
-  return null;
+  return (
+    <>
+      <div data-test='database-page' className='focalboard-body full-page'>
+        <DbViewSettingsProvider>
+          <CenterPanel
+            currentRootPageId={page.id}
+            readOnly={Boolean(readOnlyBoard)}
+            board={board}
+            setPage={setPage}
+            pageIcon={page.icon}
+            showCard={showCard}
+            showView={showView}
+            activeView={activeView || undefined}
+            views={boardViews}
+            page={page}
+          />
+          {typeof shownCardId === 'string' && shownCardId.length !== 0 && (
+            <PageDialog
+              showCard={showCard}
+              key={shownCardId}
+              pageId={shownCardId}
+              onClose={() => {
+                showCard(null);
+              }}
+              currentBoardId={board.id}
+              readOnly={readOnly}
+            />
+          )}
+        </DbViewSettingsProvider>
+      </div>
+      {/** include the root portal for focalboard's popup */}
+      <DatabasePortal />
+    </>
+  );
 }

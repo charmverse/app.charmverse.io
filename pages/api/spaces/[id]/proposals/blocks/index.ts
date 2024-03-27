@@ -47,7 +47,6 @@ async function getProposalBlocksHandler(req: NextApiRequest, res: NextApiRespons
       throw new NotFoundError();
     }
   }
-
   const proposalBlocks = await getBlocks({
     spaceId,
     ids: blockId ? [blockId] : undefined
