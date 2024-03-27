@@ -2,7 +2,8 @@ import { useGetPageMeta } from 'charmClient/hooks/pages';
 import { usePages } from 'hooks/usePages';
 import type { PageMetaLite } from 'lib/pages/interfaces';
 
-export function useGetPageDetails({ pageId }: { pageId?: string | null }): {
+// get page meta from usePages if it exists, otherwise fetch it
+export function useGetPageMetaFromCache({ pageId }: { pageId?: string | null }): {
   isLoading: boolean;
   page?: PageMetaLite;
 } {

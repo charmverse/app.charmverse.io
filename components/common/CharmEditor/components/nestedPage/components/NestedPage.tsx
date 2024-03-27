@@ -10,7 +10,7 @@ import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import type { PageMetaLite } from 'lib/pages/interfaces';
 
-import { useGetPageDetails } from '../../../hooks/useGetPageDetails';
+import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
 import { enableDragAndDrop } from '../../../utils';
 import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
 import { useEditorViewContext } from '../../@bangle.dev/react/hooks';
@@ -64,7 +64,7 @@ export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const isDocumentPath = !forumCategoryPage && !staticPage;
-  const { page: documentPage, isLoading } = useGetPageDetails({
+  const { page: documentPage, isLoading } = useGetPageMetaFromCache({
     pageId: isDocumentPath ? node.attrs.id : null
   });
   const isProposalTemplate = documentPage?.type === 'proposal_template';

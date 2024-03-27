@@ -11,7 +11,7 @@ import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
 import { isUUID } from 'lib/utils/strings';
 
-import { useGetPageDetails } from '../../../hooks/useGetPageDetails';
+import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
 import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
@@ -42,7 +42,7 @@ export default function Mention({ node }: NodeViewProps) {
   const { space } = useCurrentSpace();
 
   const isDocumentPath = attrs.type === 'page';
-  const { page, isLoading } = useGetPageDetails({
+  const { page, isLoading } = useGetPageMetaFromCache({
     pageId: isDocumentPath ? node.attrs.id : null
   });
 
