@@ -6,7 +6,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef } fr
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useTrashPages, useInitialPagesForSpace } from 'charmClient/hooks/pages';
+import { useTrashPages } from 'charmClient/hooks/pages';
 import mutator from 'components/common/DatabaseEditor/mutator';
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { PagesMap, PageUpdates } from 'lib/pages/interfaces';
@@ -54,8 +54,6 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   const { user } = useUser();
   const { sendMessage, subscribe } = useWebSocketClient();
   const { trigger: trashPages } = useTrashPages();
-  // temporary optimization: load non-card pages first
-  const { data: initialPages } = useInitialPagesForSpace(currentSpace?.id);
   const {
     data,
     mutate: mutatePagesList,
@@ -79,17 +77,8 @@ export function PagesProvider({ children }: { children: ReactNode }) {
   );
 
   const pages = useMemo<PagesMap>(() => {
-    if (data) {
-      return data;
-    }
-    if (initialPages) {
-      return initialPages.reduce<PagesMap>((acc, page) => {
-        acc[page.id] = page;
-        return acc;
-      }, {});
-    }
-    return {};
-  }, [data, initialPages]);
+    return data || {};
+  }, [data]);
 
   const _setPages: Dispatch<SetStateAction<PagesMap>> = (_pages) => {
     let updatedData: PagesContext['pages'] = {};
