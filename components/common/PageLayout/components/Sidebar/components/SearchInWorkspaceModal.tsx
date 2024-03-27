@@ -1,5 +1,3 @@
-import { log } from '@charmverse/core/log';
-import type { PageMeta } from '@charmverse/core/pages';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
@@ -11,28 +9,20 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { useState } from 'react';
 
-import charmClient from 'charmClient';
 import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePages } from 'hooks/usePages';
-import debouncePromise from 'lib/utils/debouncePromise';
+import { PageIcon } from 'components/common/PageIcon';
+import { useCharmRouter } from 'hooks/useCharmRouter';
+import type { SearchResultItem } from 'hooks/useSearchPages';
+import { useSearchPages } from 'hooks/useSearchPages';
 
 enum ResultType {
   page = 'page',
   bounty = 'bounty'
 }
 
-type SearchResultItem = {
-  name: string;
-  link: string;
-  type: ResultType;
-  path?: string;
-  id: string;
-};
 // eslint-disable-next-line
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
@@ -100,43 +90,21 @@ type SearchInWorkspaceModalProps = {
   isOpen: boolean;
 };
 
-const debouncedSearch = debouncePromise(getSearchResults, 200);
-
 export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
-  const router = useRouter();
-  const { pages } = usePages();
-  const { space } = useCurrentSpace();
+  const { navigateToSpacePath } = useCharmRouter();
   const [expandPageList, setExpandPageList] = useState(false);
-  const [options, setOptions] = useState<SearchResultItem[]>([]);
+  const [searchString, setSearchString] = useState('');
+  const { results: options } = useSearchPages({ search: searchString, limit: 50 });
 
   function onChange(event: SyntheticEvent<Element>, newInputValue: string) {
-    if (!space) {
-      setExpandPageList(false);
-      return;
-    }
-
     if (newInputValue.trim() === '') {
-      setOptions([]);
       setExpandPageList(false);
-      return;
+      setSearchString(newInputValue);
+    } else {
+      setExpandPageList(true);
+      setSearchString(newInputValue);
     }
-
-    setExpandPageList(true);
-    debouncedSearch({
-      query: newInputValue,
-      spaceId: space.id,
-      spaceDomain: router.query.domain as string,
-      pages
-    })
-      .then((results) => {
-        if (results) {
-          setOptions(results);
-        }
-      })
-      .catch((err) => {
-        log.error('Error searching for pages', err);
-      });
   }
 
   return (
@@ -151,11 +119,11 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         onInputChange={onChange}
         onChange={(_e, item) => {
           if (item) {
-            router.push((item as SearchResultItem).link);
+            navigateToSpacePath((item as SearchResultItem).path);
             close();
           }
         }}
-        getOptionLabel={(option) => (typeof option === 'object' ? option.name : option)}
+        getOptionLabel={(option) => (typeof option === 'object' ? option.title : option)}
         open={expandPageList}
         disablePortal
         disableClearable
@@ -163,17 +131,13 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         filterOptions={(x) => x}
         PopperComponent={StyledPopper}
         renderOption={(listItemProps, option: SearchResultItem, state) => {
-          const matches = match(option.name, state.inputValue, { insideWords: true });
-          const parts = parse(option.name, matches);
+          const matches = match(option.title, state.inputValue, { insideWords: true });
+          const parts = parse(option.title, matches);
 
           return (
             <StyledListItem {...listItemProps} key={option.id}>
               <Stack direction='row' spacing={1}>
-                {option.type === ResultType.page ? (
-                  <InsertDriveFileOutlinedIcon fontSize='small' style={{ marginTop: '2px' }} />
-                ) : (
-                  <BountyIcon fontSize='small' style={{ marginTop: '2px' }} />
-                )}
+                <PageIcon icon={option.icon} isEditorEmpty={false} pageType={option.type} />
                 <Stack>
                   <StyledTypographyPage>
                     {parts.map((part: { text: string; highlight: boolean }) => {
@@ -189,7 +153,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
                       );
                     })}
                   </StyledTypographyPage>
-                  {option.path && <StyledTypographyPath>{option.path}</StyledTypographyPath>}
+                  {option.breadcrumb && <StyledTypographyPath>{option.breadcrumb}</StyledTypographyPath>}
                 </Stack>
               </Stack>
             </StyledListItem>
@@ -216,39 +180,4 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
       />
     </Modal>
   );
-}
-
-function getSearchResults(params: {
-  spaceDomain: string;
-  spaceId: string;
-  query: string;
-  pages: Record<string, PageMeta | undefined>;
-}): Promise<SearchResultItem[]> {
-  return charmClient.pages.searchPages(params.spaceId, params.query, 50).then((pages) => {
-    return pages.map((page) => ({
-      name: page.title || 'Untitled',
-      path: getPagePath(page, params.pages),
-      link: `/${params.spaceDomain}/${page.path}`,
-      type: ResultType.page,
-      id: page.id
-    }));
-  });
-}
-
-function getPagePath(
-  page: PageMeta,
-  pages: { [id: string]: { parentId?: string | null; title: string } | undefined }
-): string {
-  const pathElements: string[] = [];
-  let currentPage: { parentId?: string | null; title: string } | undefined = { ...page };
-
-  while (currentPage && currentPage.parentId) {
-    const pageId: string = currentPage.parentId;
-    currentPage = pages[pageId];
-    if (currentPage) {
-      pathElements.unshift(currentPage.title || 'Untitled');
-    }
-  }
-
-  return pathElements.join(' / ');
 }
