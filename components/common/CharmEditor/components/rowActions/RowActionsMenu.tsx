@@ -10,13 +10,11 @@ import LinkIcon from '@mui/icons-material/Link';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
-import { useRouter } from 'next/router';
 import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
 import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
 import { useCopyToClipboard } from 'usehooks-ts';
-import { v4 } from 'uuid';
 
 import charmClient from 'charmClient';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
@@ -25,7 +23,8 @@ import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { getAbsolutePath, isMac } from 'lib/utils/browser';
+import { isMac } from 'lib/utils/browser';
+import { slugify } from 'lib/utils/strings';
 
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
@@ -85,12 +84,9 @@ function Component({ menuState }: { menuState: PluginState }) {
     const node = topPos.node();
 
     if (node && node.type.name === 'heading') {
-      const nodeId = node.attrs.id ?? v4();
-      if (node.attrs.id !== nodeId) {
-        view.dispatch(view.state.tr.setNodeMarkup(topPos.pos - 1, undefined, { ...node.attrs, id: nodeId }));
-      }
+      const text = node.textContent;
 
-      copyFn(`${window.location.href}#${nodeId}`)
+      copyFn(`${window.location.href.split('#')[0]}#${slugify(text)}`)
         .then(() => {
           showMessage('Link copied to clipboard', 'success');
         })

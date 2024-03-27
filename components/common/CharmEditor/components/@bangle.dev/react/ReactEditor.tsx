@@ -25,6 +25,7 @@ import { useUser } from 'hooks/useUser';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utils/browser';
+import { slugify } from 'lib/utils/strings';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
@@ -151,13 +152,13 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     if (hash && editor && !isLoadingRef.current) {
       let nodePos: number | undefined;
       editor.view.state.doc.descendants((node, pos) => {
-        if (node.attrs.id === hash) {
+        if (node.type.name === 'heading' && slugify(node.textContent) === hash) {
           nodePos = pos;
           return false;
         }
       });
 
-      const domNode = document.getElementById(hash);
+      const domNode = nodePos ? (editor.view.domAtPos(nodePos)?.node as HTMLElement) : null;
       if (domNode && nodePos !== undefined) {
         editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
         domNode.scrollIntoView();

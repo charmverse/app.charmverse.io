@@ -4,7 +4,6 @@ import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import { NodeSelection } from 'prosemirror-state';
 import { useCallback, useEffect, useState } from 'react';
-import { v4 } from 'uuid';
 
 import Link from 'components/common/Link';
 
@@ -83,7 +82,7 @@ export function TableOfContents({ view }: CharmNodeViewProps) {
 
     view.state.doc.descendants((node, pos) => {
       if (node.type.name === 'heading') {
-        const id = node.attrs.id ?? v4();
+        const id = `heading-${headings.length + 1}`;
         if (node.attrs.id !== id) {
           transaction.setNodeMarkup(pos, undefined, {
             ...node.attrs,
