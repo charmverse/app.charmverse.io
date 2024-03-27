@@ -7,7 +7,7 @@ import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePages } from 'hooks/usePages';
 import { useUser } from 'hooks/useUser';
 
-import useNestedPage from '../nestedPage/hooks/useNestedPage';
+import { useAddNestedPage } from '../nestedPage/hooks/useAddNestedPage';
 import type { NestedPagePluginState } from '../nestedPage/nestedPage.interfaces';
 
 import { items as advancedBlocks } from './editorItems/advancedBlocks';
@@ -30,7 +30,7 @@ export function useEditorItems({
   linkedPagePluginKey?: PluginKey<NestedPagePluginState>;
   pageId?: string;
 }) {
-  const { addNestedPage } = useNestedPage(pageId);
+  const { addNestedPage } = useAddNestedPage(pageId);
   const { space } = useCurrentSpace();
   const { user } = useUser();
   const { pages } = usePages();

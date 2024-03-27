@@ -20,18 +20,18 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function MentionSuggest({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
+export function _MentionsPopup({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
-    return <MentionSuggestMenu pluginKey={pluginKey} />;
+    return <MentionsMenu pluginKey={pluginKey} />;
   }
   return null;
 }
 
 const DEFAULT_ITEM_LIMIT = 5;
 
-function MentionSuggestMenu({ pluginKey }: { pluginKey: PluginKey }) {
+function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const { members } = useMembers();
   const { roles = [] } = useRoles();
   const view = useEditorViewContext();
@@ -242,4 +242,4 @@ function filterByUsername(member: Member, searchText: string) {
   return member.username.toLowerCase().match(searchText);
 }
 
-export default memo(MentionSuggest);
+export const MentionsPopup = memo(_MentionsPopup);

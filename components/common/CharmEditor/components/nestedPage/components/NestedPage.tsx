@@ -1,21 +1,19 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
 
-import { useGetPageMeta } from 'charmClient/hooks/pages';
-import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
 import { useForumCategories } from 'hooks/useForumCategories';
-import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { StaticPage } from 'lib/features/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import type { PageMetaLite } from 'lib/pages/interfaces';
 
+import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
 import { enableDragAndDrop } from '../../../utils';
+import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
+import { useEditorViewContext } from '../../@bangle.dev/react/hooks';
 import { pageNodeDropPluginKey } from '../../prosemirror/prosemirror-dropcursor/dropcursor';
 
 export const StyledLink = styled(Link)`
@@ -58,37 +56,37 @@ function resetPageNodeDropPluginState(view: EditorView) {
   }
 }
 
-export default function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
+export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const view = useEditorViewContext();
-  const { pages, loadingPages } = usePages();
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
 
   const forumCategoryPage = categories.find((c) => c.id === node.attrs.id && node.attrs.type === 'forum_category');
   const staticPage = STATIC_PAGES.find((c) => c.path === node.attrs.path && node.attrs.type === c.path);
   const isDocumentPath = !forumCategoryPage && !staticPage;
-  const isProposalTemplate = node.attrs.type === 'proposal_template';
-  const pageFromPagesContext = pages[node.attrs.id];
-
-  // retrieve the page directly if we are waiting for pages to load
-  const { data: sourcePage, isLoading: isPageLoading } = useGetPageMeta(
-    !pageFromPagesContext && isDocumentPath && node.attrs.id
-  );
-
-  const documentPage = sourcePage || pageFromPagesContext;
-  const isLoading = isPageLoading && loadingPages;
+  const { page: documentPage, isLoading } = useGetPageMetaFromCache({
+    pageId: isDocumentPath ? node.attrs.id : null
+  });
+  const isProposalTemplate = node.attrs?.type === 'proposal_template';
 
   let pageTitle = '';
   if (staticPage) {
     pageTitle = mappedFeatures[staticPage.feature]?.title;
-  } else if (isProposalTemplate) {
-    pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage?.title || 'Untitled'}`;
-  } else if (documentPage) {
-    pageTitle = documentPage?.title || 'Untitled';
+  } else if (isProposalTemplate && documentPage?.type === 'proposal_template') {
+    // dont show this title if user does not have access to proposal template
+    pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage.title || 'Untitled'}`;
   } else if (forumCategoryPage) {
     pageTitle = `${getFeatureTitle('Forum')} > ${forumCategoryPage?.name || 'Untitled'}`;
   } else if (!isLoading) {
-    pageTitle = 'No access';
+    if (documentPage) {
+      if (documentPage.type === 'proposal_template') {
+        pageTitle = `Submit ${getFeatureTitle('Proposal')} > ${documentPage.title || 'Untitled'}`;
+      } else {
+        pageTitle = documentPage.title || 'Untitled';
+      }
+    } else {
+      pageTitle = 'No access';
+    }
   }
 
   const pageId = node.attrs.id || staticPage?.path || forumCategoryPage?.id;

@@ -17,7 +17,7 @@ const StyledPopper = styled(Popper)`
   z-index: var(--z-index-modal);
 `;
 
-export default function EmojiSuggest({ pluginKey }: { pluginKey: PluginKey }) {
+export function EmojiPopup({ pluginKey }: { pluginKey: PluginKey }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey);
 

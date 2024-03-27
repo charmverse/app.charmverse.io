@@ -23,7 +23,7 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 
 const linkablePageTypes: PageType[] = ['card', 'board', 'page', 'bounty', 'proposal', 'linked_board'];
 
-function LinkedPagesList({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
+function _LinkedPagesPopup({ pluginKey }: { pluginKey: PluginKey<NestedPagePluginState> }) {
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey) as NestedPagePluginState;
   const { triggerText, counter, show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
@@ -142,4 +142,4 @@ function sortList<T extends { title: string; originalTitle?: string }>({
     .map(({ item }) => item);
 }
 
-export default memo(LinkedPagesList);
+export const LinkedPagesPopup = memo(_LinkedPagesPopup);
