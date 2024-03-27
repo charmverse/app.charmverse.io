@@ -39,7 +39,8 @@ type Props = {
 
 const defaultEventValues: Record<AttestationType, CredentialEventType[]> = {
   proposal: ['proposal_created', 'proposal_approved'],
-  reward: ['reward_submission_approved']
+  reward: ['reward_submission_approved'],
+  external: ['proposal_approved']
 };
 
 function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCredentialTemplateType, onClose }: Props) {
