@@ -218,4 +218,40 @@ describe('components/table/TableRow', () => {
     const { container } = render(component);
     expect(container).toMatchSnapshot();
   });
+
+  test('should match snapshots with a nested row', async () => {
+    view.fields.visiblePropertyIds = ['property1', 'property2'];
+    const cardWithRows = {
+      ...card,
+      subPages: [{ ...card, id: 'sub-page' }]
+    };
+
+    const store = mockStore(state);
+    const component = wrapDNDIntl(
+      <ReduxProvider store={store}>
+        <TableRow
+          board={board}
+          card={cardWithRows}
+          subPages={[{ ...card, id: 'sub-page' }]}
+          activeView={view}
+          isExpanded={true}
+          isNested={true}
+          isSelected={false}
+          focusOnMount={false}
+          pageUpdatedBy='user-1'
+          pageTitle='Page Title'
+          pageUpdatedAt={date}
+          saveTitle={jest.fn()}
+          showCard={jest.fn()}
+          readOnly={false}
+          offset={0}
+          resizingColumn='property1'
+          columnRefs={new Map()}
+          onDrop={jest.fn()}
+        />
+      </ReduxProvider>
+    );
+    const { container } = render(component);
+    expect(container).toMatchSnapshot();
+  });
 });
