@@ -10,7 +10,7 @@ import { pageStubToCreate } from 'testing/generatePageStub';
 
 import { mutator } from '../../mutator';
 import { TestBlockFactory } from '../../test/testBlockFactory';
-import { mockDOM, mockStateStore, wrapDNDIntl, wrapPagesProvider } from '../../testUtils';
+import { mockDOM, mockStateStore, wrapDNDIntl } from '../../testUtils';
 import { Utils } from '../../utils';
 
 import Kanban from './kanban';
@@ -90,74 +90,39 @@ describe('src/component/kanban/kanban', () => {
   const visibleGroups: BoardGroup[] = [
     {
       option: optionQ1,
-      cards: [card1, card2],
-      cardPages: [
-        {
-          card: card1,
-          page: pageStubToCreate({
-            id: card1.id,
-            createdBy: 'user-id-1',
-            spaceId: 'space-id-1',
-            path: card1.id
-          }) as PageMeta
-        },
-        {
-          card: card2,
-          page: pageStubToCreate({
-            id: card2.id,
-            createdBy: 'user-id-1',
-            spaceId: 'space-id-1',
-            path: card2.id
-          }) as PageMeta
-        }
-      ]
+      cards: [card1, card2]
     },
     {
       option: optionQ2,
-      cards: [card3],
-      cardPages: [
-        {
-          card: card3,
-          page: pageStubToCreate({
-            id: card3.id,
-            createdBy: 'user-id-1',
-            spaceId: 'space-id-1',
-            path: card3.id
-          }) as PageMeta
-        }
-      ]
+      cards: [card3]
     }
   ];
 
   const hiddenGroups: BoardGroup[] = [
     {
       option: optionQ3,
-      cards: [],
-      cardPages: []
+      cards: []
     }
   ];
 
   test('should match snapshot', () => {
     const { container } = render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card1.id, card2.id, card3.id],
-          <ReduxProvider store={store}>
-            <Kanban
-              board={board}
-              activeView={activeView}
-              cards={[card1, card2, card3]}
-              groupByProperty={groupProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={[]}
-              readOnly={false}
-              onCardClicked={jest.fn()}
-              addCard={jest.fn()}
-              showCard={jest.fn()}
-            />
-          </ReduxProvider>
-        )
+        <ReduxProvider store={store}>
+          <Kanban
+            board={board}
+            activeView={activeView}
+            cards={[card1, card2, card3]}
+            groupByProperty={groupProperty}
+            visibleGroups={visibleGroups}
+            hiddenGroups={hiddenGroups}
+            selectedCardIds={[]}
+            readOnly={false}
+            onCardClicked={jest.fn()}
+            addCard={jest.fn()}
+            showCard={jest.fn()}
+          />
+        </ReduxProvider>
       )
     );
     expect(container).toMatchSnapshot();
@@ -166,24 +131,21 @@ describe('src/component/kanban/kanban', () => {
   test('return kanban and drag card to other card ', async () => {
     const { container } = render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          <ReduxProvider store={store}>
-            <Kanban
-              board={board}
-              activeView={activeView}
-              cards={[card1, card2]}
-              groupByProperty={groupProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={[]}
-              readOnly={false}
-              onCardClicked={jest.fn()}
-              addCard={jest.fn()}
-              showCard={jest.fn()}
-            />
-          </ReduxProvider>
-        )
+        <ReduxProvider store={store}>
+          <Kanban
+            board={board}
+            activeView={activeView}
+            cards={[card1, card2]}
+            groupByProperty={groupProperty}
+            visibleGroups={visibleGroups}
+            hiddenGroups={hiddenGroups}
+            selectedCardIds={[]}
+            readOnly={false}
+            onCardClicked={jest.fn()}
+            addCard={jest.fn()}
+            showCard={jest.fn()}
+          />
+        </ReduxProvider>
       )
     );
 
@@ -204,24 +166,21 @@ describe('src/component/kanban/kanban', () => {
   test('return kanban and change card column', async () => {
     const { container } = render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          <ReduxProvider store={store}>
-            <Kanban
-              board={board}
-              activeView={activeView}
-              cards={[card1, card2]}
-              groupByProperty={groupProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={[]}
-              readOnly={false}
-              onCardClicked={jest.fn()}
-              addCard={jest.fn()}
-              showCard={jest.fn()}
-            />
-          </ReduxProvider>
-        )
+        <ReduxProvider store={store}>
+          <Kanban
+            board={board}
+            activeView={activeView}
+            cards={[card1, card2]}
+            groupByProperty={groupProperty}
+            visibleGroups={visibleGroups}
+            hiddenGroups={hiddenGroups}
+            selectedCardIds={[]}
+            readOnly={false}
+            onCardClicked={jest.fn()}
+            addCard={jest.fn()}
+            showCard={jest.fn()}
+          />
+        </ReduxProvider>
       )
     );
 
@@ -242,24 +201,21 @@ describe('src/component/kanban/kanban', () => {
   test('return kanban and change card column to hidden column', async () => {
     const { container } = render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          <ReduxProvider store={store}>
-            <Kanban
-              board={board}
-              activeView={activeView}
-              cards={[card1, card2]}
-              groupByProperty={groupProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={[]}
-              readOnly={false}
-              onCardClicked={jest.fn()}
-              addCard={jest.fn()}
-              showCard={jest.fn()}
-            />
-          </ReduxProvider>
-        )
+        <ReduxProvider store={store}>
+          <Kanban
+            board={board}
+            activeView={activeView}
+            cards={[card1, card2]}
+            groupByProperty={groupProperty}
+            visibleGroups={visibleGroups}
+            hiddenGroups={hiddenGroups}
+            selectedCardIds={[]}
+            readOnly={false}
+            onCardClicked={jest.fn()}
+            addCard={jest.fn()}
+            showCard={jest.fn()}
+          />
+        </ReduxProvider>
       )
     );
 
@@ -281,24 +237,21 @@ describe('src/component/kanban/kanban', () => {
     const mockedAddCard = jest.fn();
     render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          <ReduxProvider store={store}>
-            <Kanban
-              board={board}
-              activeView={activeView}
-              cards={[card1, card2]}
-              groupByProperty={groupProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={[]}
-              readOnly={false}
-              onCardClicked={jest.fn()}
-              addCard={mockedAddCard}
-              showCard={jest.fn()}
-            />
-          </ReduxProvider>
-        )
+        <ReduxProvider store={store}>
+          <Kanban
+            board={board}
+            activeView={activeView}
+            cards={[card1, card2]}
+            groupByProperty={groupProperty}
+            visibleGroups={visibleGroups}
+            hiddenGroups={hiddenGroups}
+            selectedCardIds={[]}
+            readOnly={false}
+            onCardClicked={jest.fn()}
+            addCard={mockedAddCard}
+            showCard={jest.fn()}
+          />
+        </ReduxProvider>
       )
     );
     const allButtonsNew = screen.getAllByRole('button', { name: 'New' });
@@ -310,24 +263,21 @@ describe('src/component/kanban/kanban', () => {
   test('return kanban and click on KanbanCalculationMenu', () => {
     const { container } = render(
       wrapDNDIntl(
-        wrapPagesProvider(
-          [card1.id, card2.id],
-          <ReduxProvider store={store}>
-            <Kanban
-              board={board}
-              activeView={activeView}
-              cards={[card1, card2]}
-              groupByProperty={groupProperty}
-              visibleGroups={visibleGroups}
-              hiddenGroups={hiddenGroups}
-              selectedCardIds={[]}
-              readOnly={false}
-              onCardClicked={jest.fn()}
-              addCard={jest.fn()}
-              showCard={jest.fn()}
-            />
-          </ReduxProvider>
-        )
+        <ReduxProvider store={store}>
+          <Kanban
+            board={board}
+            activeView={activeView}
+            cards={[card1, card2]}
+            groupByProperty={groupProperty}
+            visibleGroups={visibleGroups}
+            hiddenGroups={hiddenGroups}
+            selectedCardIds={[]}
+            readOnly={false}
+            onCardClicked={jest.fn()}
+            addCard={jest.fn()}
+            showCard={jest.fn()}
+          />
+        </ReduxProvider>
       )
     );
     const buttonKanbanCalculation = screen.getByRole('button', { name: '2' });

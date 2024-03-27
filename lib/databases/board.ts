@@ -5,7 +5,7 @@ import { createBlock } from 'lib/databases/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
-import type { Card, CardPage } from './card';
+import type { Card } from './card';
 
 export const proposalPropertyTypesList = [
   'proposalUrl',
@@ -96,6 +96,7 @@ export type BoardFields = {
 };
 
 type Board = UIBlockWithDetails & {
+  pageType: Exclude<UIBlockWithDetails['pageType'], undefined>;
   fields: BoardFields;
 };
 
@@ -140,6 +141,7 @@ function createBoard({
   }
 
   return {
+    pageType: 'board',
     ...createBlock(block),
     type: 'board',
     fields: {
@@ -159,7 +161,6 @@ function createBoard({
 type BoardGroup = {
   option: IPropertyOption;
   cards: Card[];
-  cardPages: CardPage[];
 };
 
 export { createBoard };

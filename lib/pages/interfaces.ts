@@ -14,7 +14,7 @@ export type PageWithPermissionsMeta = Page & {
 
 export type PageWithChildren = PageNodeWithChildren<PageWithPermissions>;
 
-export interface ModifyChildPagesResponse {
+export interface TrashOrDeletePageResponse {
   pageIds: string[];
 }
 

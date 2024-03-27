@@ -344,17 +344,9 @@ export function NewProposalPage({
     }
   }, [hasSource]);
 
-  // watch for changes in isTemplate
+  // watch for changes in isTemplate, which can change by using "Add proposal" from the sidebar
   useEffect(() => {
-    if (isTemplate) {
-      setFormInputs(
-        {
-          type: 'proposal_template',
-          proposalTemplateId: null
-        },
-        { fromUser: false }
-      );
-    } else {
+    if (!isTemplate) {
       setFormInputs(
         {
           type: 'proposal'

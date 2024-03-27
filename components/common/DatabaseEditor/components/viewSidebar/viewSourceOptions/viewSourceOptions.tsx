@@ -13,7 +13,6 @@ import useSWRMutation from 'swr/mutation';
 import charmClient from 'charmClient';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookEndpoint } from 'config/constants';
-import { usePages } from 'hooks/usePages';
 import type { Board, DataSourceType } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 
@@ -48,12 +47,9 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     showView
   });
 
-  const { pages } = usePages();
-
   const rootDatabaseId = rootBoard.id;
 
-  const rootBoardPage = pages[rootBoard.id];
-  const rootIsLinkedBoard = !!String(rootBoardPage?.type).match('linked');
+  const rootIsLinkedBoard = !!String(rootBoard?.pageType).match('linked');
 
   const linkedSourceId = activeView?.fields.linkedSourceId;
 

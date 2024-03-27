@@ -12,7 +12,6 @@ import { KanbanPageActionsMenuButton } from 'components/common/PageActions/Kanba
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { usePages } from 'hooks/usePages';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 import { isTouchScreen } from 'lib/utils/browser';
@@ -77,10 +76,8 @@ const KanbanCard = React.memo((props: Props) => {
   }
 
   const router = useRouter();
-  const { pages } = usePages();
-  const cardPage = pages[card.id];
-  const domain = router.query.domain || /^\/share\/(.*)\//.exec(router.asPath)?.[1];
-  const fullPageUrl = `/${domain}/${cardPage?.path}`;
+  const domain = router.query.domain;
+  const fullPageUrl = `/${domain}/${card.id}`;
   const { trigger: trashPages } = useTrashPages();
 
   const [showConfirmationDialogBox, setShowConfirmationDialogBox] = useState<boolean>(false);
@@ -134,16 +131,14 @@ const KanbanCard = React.memo((props: Props) => {
           }}
           data-test={`kanban-card-${card.id}`}
         >
-          {!props.readOnly && <KanbanPageActionsMenuButton page={cardPage} onClickDelete={deleteCard} />}
+          {!props.readOnly && <KanbanPageActionsMenuButton page={card} onClickDelete={deleteCard} />}
 
           <div className='octo-icontitle'>
             <div>
-              {cardPage?.icon ? (
-                <PageIcon isEditorEmpty={!cardPage.hasContent} pageType='page' icon={cardPage.icon} />
-              ) : undefined}
+              {card?.icon ? <PageIcon isEditorEmpty={!card.hasContent} pageType='page' icon={card.icon} /> : undefined}
             </div>
             <div key='__title' className='octo-titletext'>
-              {cardPage?.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
+              {card.title || intl.formatMessage({ id: 'KanbanCard.untitled', defaultMessage: 'Untitled' })}
             </div>
           </div>
           <Stack gap={0.5}>
@@ -153,9 +148,8 @@ const KanbanCard = React.memo((props: Props) => {
                 board={board}
                 readOnly
                 card={card}
-                syncWithPageId={cardPage?.syncWithPageId}
-                updatedAt={cardPage?.updatedAt.toString() || ''}
-                updatedBy={cardPage?.updatedBy || ''}
+                updatedAt={card.updatedAt.toString() || ''}
+                updatedBy={card.updatedBy || ''}
                 propertyTemplate={template}
                 showEmptyPlaceholder={false}
                 displayType='kanban'
@@ -163,7 +157,7 @@ const KanbanCard = React.memo((props: Props) => {
               />
             ))}
           </Stack>
-          {!props.hideLinkedBounty && cardPage?.bountyId && <RewardMetadata bountyId={cardPage?.bountyId} />}
+          {!props.hideLinkedBounty && card.bountyId && <RewardMetadata bountyId={card.bountyId} />}
         </StyledBox>
       </Link>
       {showConfirmationDialogBox && (

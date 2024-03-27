@@ -10,6 +10,7 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 import { ArchiveProposalAction } from './ArchiveProposalAction';
 import { CopyPageLinkAction } from './CopyPageLinkAction';
@@ -17,12 +18,12 @@ import { DuplicatePageAction } from './DuplicatePageAction';
 import { PublishProposalAction } from './PublishProposalAction';
 
 export type PageActionMeta = {
-  proposalId: string | null;
+  proposalId?: string | null;
   type?: PageType;
   id: string;
-  updatedAt: Date;
+  updatedAt: Date | number;
   updatedBy: string;
-  path: string;
+  path?: string;
   syncWithPageId?: string | null;
 };
 
@@ -53,8 +54,11 @@ export function PageActionsMenu({
     postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });
 
+  const pagePath = `/${page.path || page.id}`;
+  const updatedAt = typeof page.updatedAt === 'number' ? new Date(page.updatedAt) : page.updatedAt;
+
   function getPageLink() {
-    return `${window.location.origin}/${router.query.domain}/${page.path}`;
+    return getAbsolutePath(pagePath, router.query.domain as string | undefined);
   }
 
   function onClickOpenInNewTab() {
@@ -108,7 +112,7 @@ export function PageActionsMenu({
           pagePermissions={pagePermissions}
         />
       )}
-      <CopyPageLinkAction path={`/${page.path}`} />
+      <CopyPageLinkAction path={pagePath} />
       <MenuItem dense onClick={onClickOpenInNewTab}>
         <ListItemIcon>
           <LaunchIcon fontSize='small' />
@@ -127,7 +131,7 @@ export function PageActionsMenu({
             Last edited by <strong>{member.username}</strong>
           </Typography>
           <Typography variant='caption' color='secondary'>
-            at <strong>{formatDateTime(page.updatedAt)}</strong>
+            at <strong>{formatDateTime(updatedAt)}</strong>
           </Typography>
         </Stack>
       )}

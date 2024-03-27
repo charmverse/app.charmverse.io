@@ -15,9 +15,10 @@ export type CardFields<V = CardPropertyValue> = {
   contentOrder: (string | string[])[];
 };
 
-export type Card<V = CardPropertyValue> = UIBlockWithDetails & {
+export type Card<V = CardPropertyValue> = Omit<UIBlockWithDetails, 'type'> & {
   fields: CardFields<V>;
   customIconType?: 'applicationStatus' | 'reward';
+  type: 'card';
 };
 
 export type CardPageProposal = {
@@ -36,29 +37,14 @@ export type CardPageReward = {
   rewardType: RewardType;
 };
 
-export type CardPage<V = CardPropertyValue> = {
-  subPages?: CardPage<V>[];
-  card: Card<V>;
-  page: Pick<
-    PageMeta,
-    | 'hasContent'
-    | 'icon'
-    | 'id'
-    | 'path'
-    | 'title'
-    | 'bountyId'
-    | 'proposalId'
-    | 'syncWithPageId'
-    | 'type'
-    | 'updatedAt'
-    | 'updatedBy'
-  >;
+export type CardWithRelations<V = CardPropertyValue> = Card<V> & {
+  subPages?: Card<V>[];
   proposal?: CardPageProposal;
   reward?: CardPageReward;
   isStructuredProposal?: boolean;
 };
 
-export function createCard(block?: Partial<UIBlockWithDetails>): Card {
+export function createCard(block?: Partial<UIBlockWithDetails>): Omit<Card, 'pageId'> {
   const contentOrder: (string | string[])[] = [];
   const contentIds = block?.fields?.contentOrder?.filter((id: any) => id !== null);
 

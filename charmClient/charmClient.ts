@@ -20,7 +20,7 @@ import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
 import type { ProjectUpdatePayload, ProjectWithMembers } from 'lib/projects/interfaces';
@@ -143,7 +143,7 @@ class CharmClient {
   }
 
   deletePageForever(pageId: string) {
-    return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
+    return http.DELETE<TrashOrDeletePageResponse>(`/api/pages/${pageId}`);
   }
 
   favoritePage(pageId: string) {

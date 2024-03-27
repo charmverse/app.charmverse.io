@@ -82,7 +82,7 @@ export function RewardsPage({ title }: { title: string }) {
 
   const isAdmin = useIsAdmin();
 
-  const { board: activeBoard, views, cardPages, activeView, cards } = useRewardsBoardAndBlocks();
+  const { board: activeBoard, views, cards, activeView } = useRewardsBoardAndBlocks();
 
   const [showSidebar, setShowSidebar] = useState(false);
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
@@ -97,14 +97,18 @@ export function RewardsPage({ title }: { title: string }) {
     return _groupByProperty;
   }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
 
-  const { visible: visibleGroups, hidden: hiddenGroups } = activeView
-    ? getVisibleAndHiddenGroups(
-        cardPages,
-        activeView.fields.visibleOptionIds,
-        activeView.fields.hiddenOptionIds,
-        groupByProperty
-      )
-    : { visible: [], hidden: [] };
+  const { visible: visibleGroups, hidden: hiddenGroups } = useMemo(
+    () =>
+      activeView
+        ? getVisibleAndHiddenGroups(
+            cards,
+            activeView.fields.visibleOptionIds,
+            activeView.fields.hiddenOptionIds,
+            groupByProperty
+          )
+        : { visible: [], hidden: [] },
+    [activeView, cards, groupByProperty]
+  );
 
   useRewardsBoardMutator();
 
@@ -370,7 +374,7 @@ export function RewardsPage({ title }: { title: string }) {
                     checkedIds={checkedIds}
                     board={activeBoard}
                     activeView={activeView}
-                    cardPages={cardPages}
+                    cards={cards}
                     groupByProperty={groupByProperty}
                     views={views}
                     visibleGroups={[]}

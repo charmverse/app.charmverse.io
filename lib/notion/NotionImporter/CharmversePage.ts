@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { PageObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
+import { blockToPrisma } from 'lib/databases/block';
 import { createCard } from 'lib/databases/card';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
@@ -115,9 +116,8 @@ export class CharmversePage {
           : null;
 
         await prisma.block.create({
-          data: {
+          data: blockToPrisma({
             parentId: '',
-            schema: 1,
             ...createCard({
               title: notionPageTitle,
               id: this.charmversePageId,
@@ -134,10 +134,9 @@ export class CharmversePage {
               createdBy: this.notionPage.userId,
               updatedBy: this.notionPage.userId
             }),
-            deletedAt: null,
-            createdAt: new Date(),
-            updatedAt: new Date()
-          }
+            createdAt: new Date().getTime(),
+            updatedAt: new Date().getTime()
+          })
         });
       }
 

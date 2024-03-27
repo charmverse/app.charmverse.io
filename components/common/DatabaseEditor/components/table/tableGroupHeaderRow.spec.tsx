@@ -20,8 +20,7 @@ const boardTreeNoGroup = {
     value: '',
     color: 'propColorTurquoise'
   },
-  cards: [],
-  cardPages: []
+  cards: []
 };
 
 const boardTreeGroup = {
@@ -30,8 +29,7 @@ const boardTreeGroup = {
     value: 'value 1',
     color: 'propColorTurquoise'
   },
-  cards: [],
-  cardPages: []
+  cards: []
 };
 
 test('should match snapshot, no groups', async () => {

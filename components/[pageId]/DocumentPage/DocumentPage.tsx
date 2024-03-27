@@ -7,7 +7,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 
-import { useGetProjects } from 'charmClient/hooks/projects';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -15,10 +14,13 @@ import { handleImageFileDrop } from 'components/common/CharmEditor/components/@b
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import AddBountyButton from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
+import { AddBountyButton } from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
+import { makeSelectBoard } from 'components/common/DatabaseEditor/store/boards';
+import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
 import { blockLoad, databaseViewsLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
+import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/views';
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
@@ -116,30 +118,17 @@ function DocumentPageComponent({
     return state.cards.cards[page.id] ?? state.cards.templates[page.id];
   });
 
-  const board = useAppSelector((state) => {
-    if (!card?.parentId) {
-      return null;
-    }
-
-    return state.boards.boards[card.parentId];
-  });
-
-  const cards = useAppSelector((state) => {
-    return board
-      ? [...Object.values(state.cards.cards), ...Object.values(state.cards.templates)].filter(
-          (c) => c.parentId === board.id
-        )
-      : [];
-  });
-
-  const boardViews = useAppSelector((state) => {
-    if (board) {
-      return Object.values(state.views.views).filter((view) => view.parentId === board.id);
-    }
-    return [];
-  });
-
-  const activeBoardView = boardViews[0];
+  const selectBoard = useMemo(makeSelectBoard, []);
+  const selectViewCardsSortedFilteredAndGrouped = useMemo(makeSelectViewCardsSortedFilteredAndGrouped, []);
+  const selectSortedViews = useMemo(makeSelectSortedViews, []);
+  const board = useAppSelector((state) => selectBoard(state, card?.parentId ?? ''));
+  const boardViews = useAppSelector((state) => selectSortedViews(state, board?.id || ''));
+  const cards = useAppSelector((state) =>
+    selectViewCardsSortedFilteredAndGrouped(state, {
+      boardId: board?.id || '',
+      viewId: ''
+    })
+  );
 
   const showPageBanner =
     page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
@@ -151,6 +140,7 @@ function DocumentPageComponent({
   const isRewardsPage = router.pathname === '/[domain]/rewards';
   const _showParentChip =
     showParentChip ?? !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
+
   const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
   const hideCardDetails = isRewardsPage && page.bountyId;
@@ -250,16 +240,15 @@ function DocumentPageComponent({
     // TODO: use a ref passed down instead
     document.querySelector(`.bangle-editor-core[data-page-id="${page.id}"]`)?.dispatchEvent(focusEvent);
   }
+
+  const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
+
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
-  const { form, projectWithMembers } = useProject({
+  const { form } = useProject({
     projectId,
     fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig
   });
-
-  const { data } = useGetProjects();
-
-  const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
 
   return (
     <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
@@ -407,13 +396,12 @@ function DocumentPageComponent({
                         card={card}
                         showCard={_showCard}
                         cards={cards}
-                        activeView={activeBoardView}
                         views={boardViews}
                         readOnly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
                         pageUpdatedBy={page.updatedBy}
                       />
-                      <AddBountyButton readOnly={readOnly} cardId={page.id} />
+                      <AddBountyButton readOnly={readOnly} card={card} />
                     </>
                   )}
                   {proposalId && (
@@ -450,7 +438,6 @@ function DocumentPageComponent({
                   ) : (
                     <ProposalFormFieldAnswers
                       pageId={page.id}
-                      key={projectId}
                       enableComments={proposal.permissions.comment}
                       proposalId={proposal.id}
                       formFields={proposal.form?.formFields ?? []}
