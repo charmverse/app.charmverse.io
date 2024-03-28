@@ -77,7 +77,11 @@ export async function createCardPage(
       path: getPagePath(),
       type: 'card',
       title: pageInfo.title || '',
-      parentId: pageInfo.boardId,
+      parent: {
+        connect: {
+          id: pageInfo.boardId
+        }
+      },
       id: cardBlock.id,
       space: {
         connect: {

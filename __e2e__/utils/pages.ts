@@ -24,6 +24,13 @@ export function generatePage(
           id: options.createdBy
         }
       },
+      parent: options.parentId
+        ? {
+            connect: {
+              id: options.parentId
+            }
+          }
+        : undefined,
       space: {
         connect: {
           id: options.spaceId
@@ -36,7 +43,6 @@ export function generatePage(
             }
           }
         : undefined,
-      parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null,
       diffs: options.content
