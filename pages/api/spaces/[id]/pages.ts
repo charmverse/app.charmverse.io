@@ -25,6 +25,8 @@ export const config = {
   }
 };
 
+// A list of page types that do not appear in the sidebar, and therefore their children should not either
+// Note we dont need to include board page type, since cards are not returned in this endpoint
 const pageTypesHiddenFromSidebar: PageType[] = ['bounty', 'card', 'proposal'];
 
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
