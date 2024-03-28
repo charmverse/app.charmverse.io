@@ -49,6 +49,10 @@ function ProjectRow({
 
       updateProject(updatedProject);
 
+      form.reset(updatedProject, {
+        keepDirty: false
+      });
+
       mutate(
         (projects) => {
           if (!projects || !projectWithMembers) {
@@ -77,7 +81,6 @@ function ProjectRow({
         }
       );
     } else if (user) {
-      // TODO: updatedProjectWithMembers leaves out the team Lead from the projectMembers array
       const updatedProjectWithMembers = form.getValues();
       const updatedProjectMemberUserIds = updatedProjectWithMembers.projectMembers.map((member) => member.userId);
       const deletedProjectMember = projectWithMembers.projectMembers.find((member) => {
@@ -92,19 +95,18 @@ function ProjectRow({
           memberId: deletedProjectMember.id,
           projectId: projectWithMembers.id
         });
-        mutate((projects) => {
-          if (!projects || !projectWithMembers) {
-            return projects;
-          }
-
-          return projects.filter((_project) => {
-            if (_project.id === projectWithMembers.id) {
-              return false;
+        mutate(
+          (projects) => {
+            if (!projects || !projectWithMembers) {
+              return projects;
             }
 
-            return true;
-          });
-        });
+            return projects.filter((_project) => _project.id !== projectWithMembers.id);
+          },
+          {
+            revalidate: false
+          }
+        );
       }
     }
     onClose();
@@ -118,6 +120,7 @@ function ProjectRow({
           if (expanded) {
             onExpand();
           } else {
+            form.reset();
             onClose();
           }
         }}
