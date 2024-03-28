@@ -16,8 +16,8 @@ export async function getProjectMemberCreateTransaction({
   userId: string;
   projectMember: ProjectValues['projectMembers'][number];
 }) {
-  const walletAddress = projectMember.walletAddress ?? '';
-  const email = projectMember.email ?? '';
+  const walletAddress = projectMember.walletAddress;
+  const email = projectMember.email;
 
   let connectedUserId: string | undefined;
 
@@ -91,8 +91,8 @@ export async function getProjectMemberCreateTransaction({
     prisma.projectMember.create({
       data: {
         name: projectMember.name,
-        email: projectMember.email ?? '',
-        walletAddress: projectMember.walletAddress ?? '',
+        email: projectMember.email,
+        walletAddress: projectMember.walletAddress,
         twitter: projectMember.twitter,
         warpcast: projectMember.warpcast,
         github: projectMember.github,
