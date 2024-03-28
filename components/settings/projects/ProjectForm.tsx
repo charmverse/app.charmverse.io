@@ -52,7 +52,7 @@ export function ProjectFormAnswers({
             <Stack key={`project-member-${index.toString()}`}>
               <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
                 <Typography variant='h6'>Team member</Typography>
-                {isTeamLead || projectMember.userId === user?.id ? (
+                {isTeamLead ? (
                   <DeleteOutlineOutlinedIcon
                     fontSize='small'
                     color='error'

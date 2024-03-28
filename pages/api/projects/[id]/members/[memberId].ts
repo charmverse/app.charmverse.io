@@ -4,8 +4,6 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deleteProjectMember } from 'lib/projects/deleteProjectMember';
-import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces';
-import { updateProject } from 'lib/projects/updateProject';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
