@@ -74,4 +74,6 @@ export interface PublicPageResponse {
 }
 
 // This type, for the most part, is used for showing links to pages in the UI
-export type PageMetaLite = Pick<Page, 'id' | 'title' | 'icon' | 'path' | 'type' | 'hasContent'>;
+type RequiredMetaFields = Pick<Page, 'id' | 'path' | 'type'>;
+type OptionalMetaFields = Partial<Pick<Page, 'title' | 'icon' | 'path' | 'type' | 'hasContent'>>;
+export type PageMetaLite = RequiredMetaFields & OptionalMetaFields;

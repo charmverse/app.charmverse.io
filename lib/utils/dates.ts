@@ -91,6 +91,28 @@ export const getRelativeTimeInThePast = (date: Date): string => {
   }
 };
 
+// For grouping search results: today, yesterday, past week, past 30 days, older
+export const getRelativeDateInThePast = (date: Date): string => {
+  const now = new Date();
+  const diff = now.getTime() - date.getTime();
+  const toSec = Math.round(diff / 1000);
+  const toMin = Math.round(toSec / 60);
+  const toHour = Math.round(toMin / 60);
+
+  switch (true) {
+    case toSec < 60:
+      return 'just now';
+    case toMin < 60:
+      return `${toMin}m ago`;
+    case toHour < 24:
+      return `${toHour}h ago`;
+    case toHour >= 24 && now.getFullYear() - date.getFullYear() === 0:
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+    default:
+      return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+};
+
 export function coerceToMilliseconds(timestamp: DateInput): number {
   if (typeof timestamp === 'number' && timestamp.toString().length <= 10) {
     return timestamp * 1000;

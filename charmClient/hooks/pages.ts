@@ -28,3 +28,7 @@ export function useGetSearchPages({
 }) {
   return useGETImmutable<PageMeta[]>(spaceId && search ? `/api/spaces/${spaceId}/pages` : null, { search, limit });
 }
+
+export function useGetRecentHistory({ spaceId, limit }: { spaceId?: string; limit?: number }) {
+  return useGETImmutable<PageMeta[]>(spaceId ? `/api/pages/recent-history` : null, { spaceId, limit });
+}
