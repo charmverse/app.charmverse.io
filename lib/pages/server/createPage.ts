@@ -11,11 +11,24 @@ export function createPage<T = Page>({
   data,
   include,
   tx = prisma
-}: Prisma.PageCreateArgs & { tx?: Prisma.TransactionClient }): PrismaPromise<T> {
+}:
+  | { data: Prisma.PageCreateInput; tx?: Prisma.TransactionClient; include?: Prisma.PageInclude }
+  | (Prisma.PageCreateArgs & { tx?: Prisma.TransactionClient })): PrismaPromise<T> {
   const hasContent = data.content ? !checkIsContentEmpty(data.content as PageContent) : false;
-  const createArgs: Prisma.PageCreateArgs = {
+
+  // this is one of the two formats to pass in data
+  const plainDataInput = data as Prisma.PageCreateArgs['data'];
+
+  const createArgs: { data: Prisma.PageCreateInput } = {
     data: {
       ...data,
+      // apply parent based on the type of input we're using with Prisma
+      // @ts-ignore
+      parentId: data.author ? undefined : data.parentId,
+      // @ts-ignore
+      parent:
+        data.parent ||
+        (data.author && plainDataInput.parentId ? { connect: { id: plainDataInput.parentId } } : undefined),
       hasContent,
       galleryImage: extractPreviewImage(data.content as PageContent)
     },
@@ -26,7 +39,7 @@ export function createPage<T = Page>({
     createArgs.data.diffs = {
       create: generateFirstDiff({
         // We should be receiving the data from one of these
-        createdBy: data.createdBy ?? (data.author?.connect?.id as string),
+        createdBy: plainDataInput.createdBy ?? (data.author?.connect?.id as string),
         content: data.content
       })
     };
@@ -34,3 +47,14 @@ export function createPage<T = Page>({
 
   return tx.page.create(createArgs) as unknown as PrismaPromise<T>;
 }
+
+// const createArgs: { data: Prisma.PageCreateInput } = {
+//   data: {
+//     ...data,
+
+//     parent: parentId ? { connect: { id: parentId } } : undefined,
+//     hasContent,
+//     galleryImage: extractPreviewImage(data.content as PageContent)
+//   },
+//   include
+// };
