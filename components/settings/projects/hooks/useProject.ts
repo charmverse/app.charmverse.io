@@ -6,6 +6,7 @@ import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { defaultProjectValues } from 'lib/projects/constants';
 import type { ProjectFieldConfig, ProjectValues } from 'lib/projects/interfaces';
 
 import { useProjectForm, convertToProjectValues } from './useProjectForm';
@@ -25,6 +26,10 @@ export function useProject({ projectId, fieldConfig }: { projectId: MaybeString;
   useEffect(() => {
     if (projectId && projectWithMembers) {
       form.reset(convertToProjectValues(projectWithMembers));
+    }
+    // Reset form state with default project values if no project is selected
+    else if (!projectId) {
+      form.reset(defaultProjectValues);
     }
   }, [projectId, hasProjectWithMembers]);
 
