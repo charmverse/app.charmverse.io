@@ -9,7 +9,7 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { prettyPrint } from 'lib/utils/strings';
 
-import { signAndPublishCharmverseCredential } from './attestOffchain';
+import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels } from './constants';
 import type { CredentialDataInput } from './schemas';
 
@@ -186,7 +186,7 @@ export async function issueProposalCredentialsIfNecessary({
             URL: getPagePermalink({ pageId: proposalWithSpaceConfig.page.id })
           };
 
-          await signAndPublishCharmverseCredential({
+          await signPublishAndRecordCharmverseCredential({
             chainId: optimism.id,
             recipient: targetWallet.address,
             credential: {

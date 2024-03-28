@@ -106,7 +106,7 @@ export function PageIcon({
       );
     } else if (pageType === 'board' || pageType === 'inline_board' || pageType === 'inline_linked_board') {
       iconComponent = <StyledDatabaseIcon />;
-    } else if (pageType === 'proposal' || pageType === 'proposals') {
+    } else if (pageType === 'proposal' || pageType === 'proposal_template' || pageType === 'proposals') {
       iconComponent = <ProposalIcon />;
     } else if (pageType === 'rewards' || pageType === 'bounty') {
       iconComponent = <BountyIcon />;

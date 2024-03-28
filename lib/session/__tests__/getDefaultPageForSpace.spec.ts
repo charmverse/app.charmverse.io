@@ -132,7 +132,7 @@ describe('getDefaultPageForSpace()', () => {
     expect(url).toEqual(`/${space.domain}/${page.path}%20?id=123`);
   });
 
-  it('should not include subdomain when going to custom domain', async () => {
+  it('should not include subdomain when visiting custom domain', async () => {
     const customDomain = 'work.charmverse.fyi';
     const { space, user } = await generateUserAndSpace({
       spaceCustomDomain: customDomain

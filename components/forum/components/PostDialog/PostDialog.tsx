@@ -110,11 +110,17 @@ export function PostDialog({ post, isLoading, spaceId, onClose, newPostCategory 
   }, []);
 
   useEffect(() => {
-    if (spaceId && post?.id) {
-      trackPageView({ spaceId, postId: post.id, type: 'post', spaceDomain: space?.domain });
+    if (spaceId && post?.id && space) {
+      trackPageView({
+        spaceId,
+        postId: post.id,
+        type: 'post',
+        spaceDomain: space.domain,
+        spaceCustomDomain: space.customDomain
+      });
       setFormInputs(post);
     }
-  }, [post?.id]);
+  }, [post?.id, !!space]);
 
   return (
     <>

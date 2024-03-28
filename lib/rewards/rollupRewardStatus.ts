@@ -23,14 +23,14 @@ export async function rollupRewardStatus({ rewardId }: { rewardId: string }): Pr
     }
   });
 
-  const capReached = countRemainingSubmissionSlots({
+  const remainingSlots = countRemainingSubmissionSlots({
     applications: reward.applications,
     limit: reward.maxSubmissions
   });
 
   let newStatus: RewardStatus | null = null;
 
-  if (capReached) {
+  if (remainingSlots === null || remainingSlots > 0) {
     newStatus = 'open';
   } else {
     const submissionSummary = countValueOccurrences<ApplicationStatus>(reward.applications, 'status');

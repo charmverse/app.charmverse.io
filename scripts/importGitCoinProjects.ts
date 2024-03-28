@@ -56,7 +56,7 @@ async function importGitCoinProjects() {
       continue;
     }
 
-    const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
+    const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i });
 
     if (projectDetails !== null) {
       const name = projectDetails.metadata.title;
@@ -312,7 +312,7 @@ export async function updateCreatedAt() {
     const projectId = Number(row[0]) || null;
     const createdAt = row[11] || null;
     if (projectId && !createdAt) {
-      const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i, provider });
+      const projectDetails = await getProjectDetails({ chainId: CHAIN_ID, projectId: i });
       if (!projectDetails) {
         continue;
       }

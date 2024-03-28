@@ -7,7 +7,7 @@ import { useState } from 'react';
 
 import { MenuButton } from 'components/common/CharmEditor/components/floatingMenu/Icon';
 
-import InlineCommandPalette from '../inlinePalette/components/InlineCommandPalette';
+import InlineCommandPalette from './components/InlineCommandPalette';
 
 type Props = {
   pluginKey: PluginKey;

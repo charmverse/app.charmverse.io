@@ -29,7 +29,7 @@ import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPriceNodeView } from './components/cryptoPrice/CryptoPriceNodeView';
-import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
 import { FarcasterFrameNodeView } from './components/farcasterFrame/components/FarcasterFrameNodeView';
 import type { FrontendParticipant } from './components/fiduswriter/collab';
 import { getSelectedChanges } from './components/fiduswriter/state_plugins/track';
@@ -42,9 +42,10 @@ import { InlineCommentThread } from './components/inlineComment/components/Inlin
 import { InlineDatabase } from './components/inlineDatabase/components/InlineDatabase';
 import InlineCommandPalette from './components/inlinePalette/components/InlineCommandPalette';
 import { LinksPopup } from './components/link/LinksPopup';
-import LinkedPagesList from './components/linkedPage/components/LinkedPagesList';
-import { Mention, MentionSuggest } from './components/mention/components';
-import NestedPage from './components/nestedPage/components/NestedPage';
+import { LinkedPage } from './components/linkedPage/components/LinkedPage';
+import { LinkedPagesPopup } from './components/linkedPage/components/LinkedPagesPopup';
+import { Mention, MentionsPopup } from './components/mention/components';
+import { NestedPage } from './components/nestedPage/components/NestedPage';
 import { NFTNodeView } from './components/nft/NFTNodeView';
 import type { CharmNodeViewProps } from './components/nodeView/nodeView';
 import ResizablePDF from './components/pdf/ResizablePDF';
@@ -488,7 +489,7 @@ function CharmEditor({
             return <NestedPage {...props} />;
           }
           case 'linkedPage': {
-            return <NestedPage isLinkedPage {...props} />;
+            return <LinkedPage {...props} />;
           }
           case 'pdf': {
             return <ResizablePDF {...allProps} />;
@@ -535,9 +536,9 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
-      {!disableMention && <MentionSuggest pluginKey={mentionPluginKey} />}
-      <LinkedPagesList pluginKey={linkedPagePluginKey} />
-      <EmojiSuggest pluginKey={emojiPluginKey} />
+      {!disableMention && <MentionsPopup pageId={pageId} pluginKey={mentionPluginKey} />}
+      <LinkedPagesPopup pageId={pageId} pluginKey={linkedPagePluginKey} />
+      <EmojiPopup pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette
         linkedPagePluginKey={linkedPagePluginKey}

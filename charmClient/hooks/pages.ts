@@ -16,3 +16,15 @@ export function useGetPage(pageId?: string | null) {
 export function useGetPageMeta(pageId?: string | null) {
   return useGET<PageMetaLite>(pageId ? `/api/pages/${pageId}` : null, { meta: true });
 }
+
+export function useGetSearchPages({
+  spaceId,
+  search,
+  limit = 50
+}: {
+  spaceId?: string;
+  search: string;
+  limit?: number;
+}) {
+  return useGETImmutable<PageMeta[]>(spaceId && search ? `/api/spaces/${spaceId}/pages` : null, { search, limit });
+}

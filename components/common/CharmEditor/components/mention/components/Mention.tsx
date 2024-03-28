@@ -2,7 +2,6 @@ import styled from '@emotion/styled';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import type { NodeViewProps } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
@@ -12,6 +11,8 @@ import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
 import { isUUID } from 'lib/utils/strings';
 
+import { useGetPageMetaFromCache } from '../../../hooks/useGetPageMetaFromCache';
+import type { NodeViewProps } from '../../@bangle.dev/core/node-view';
 import type { MentionSpecSchemaAttrs } from '../mention.specs';
 
 const MentionContainer = styled(Link)`
@@ -36,14 +37,17 @@ export default function Mention({ node }: NodeViewProps) {
   const { showUserProfile } = useMemberProfileDialog();
   const attrs = node.attrs as MentionSpecSchemaAttrs;
   const { getMemberById } = useMembers();
-  const { pages } = usePages();
   const member = getMemberById(attrs.value);
   const { roles } = useRoles();
   const { space } = useCurrentSpace();
 
+  const isDocumentPath = attrs.type === 'page';
+  const { page, isLoading } = useGetPageMetaFromCache({
+    pageId: isDocumentPath ? node.attrs.value : null
+  });
+
   let value: ReactNode = null;
   if (attrs.type === 'page') {
-    const page = pages[attrs.value];
     const href =
       page?.type === 'proposal_template'
         ? `/${space?.domain}/proposals/new?template=${page.id}`

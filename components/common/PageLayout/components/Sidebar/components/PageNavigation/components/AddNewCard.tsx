@@ -6,7 +6,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { createCard } from 'lib/databases/card';
 
-import { AddIconButton } from './Sidebar/components/AddIconButton';
+import { AddIconButton } from '../../AddIconButton';
 
 function AddNewCard({ pageId }: { pageId: string }) {
   const { updateURLQuery } = useCharmRouter();
