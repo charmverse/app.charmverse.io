@@ -306,6 +306,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
                     isAssigned: false,
                     properties: {
                       __limit: '',
+                      __title: '',
                       __rewarder: '',
                       __available: '-',
                       __createdAt: '',
@@ -519,6 +520,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
                     isAssigned: false,
                     properties: {
                       __limit: '',
+                      __title: '',
                       __rewarder: '',
                       __available: '-',
                       __createdAt: '',
