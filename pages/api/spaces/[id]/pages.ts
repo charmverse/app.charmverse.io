@@ -1,11 +1,12 @@
 import { log } from '@charmverse/core/log';
-import type { PageMeta, PagesRequest } from '@charmverse/core/pages';
+import type { PagesRequest } from '@charmverse/core/pages';
 import type { Prisma, PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch } from 'lib/middleware';
+import type { PageMeta } from 'lib/pages/interfaces';
 import { createPage } from 'lib/pages/server/createPage';
 import { untitledPage } from 'lib/pages/untitledPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -24,6 +25,8 @@ export const config = {
   }
 };
 
+const pageTypesHiddenFromSidebar: PageType[] = ['card', 'proposal', 'bounty'];
+
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const userId = req.session?.user?.id;
 
@@ -37,7 +40,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     filter,
     search
   });
-  const pages: PageMeta[] = await prisma.page.findMany({
+  const pages = await prisma.page.findMany({
     where: {
       spaceId,
       id: {
@@ -67,7 +70,12 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       hasContent: true,
       galleryImage: true,
       syncWithPageId: true,
-      sourceTemplateId: true
+      sourceTemplateId: true,
+      parent: {
+        select: {
+          type: true
+        }
+      }
     }
   });
 
@@ -75,9 +83,13 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     page.galleryImage = replaceS3Domain(page.galleryImage);
     page.headerImage = replaceS3Domain(page.headerImage);
     page.icon = replaceS3Domain(page.icon);
+    // hide children of pages that do not belong in the sidebar
+    if (page.parent?.type && pageTypesHiddenFromSidebar.includes(page.parent.type)) {
+      (page as PageMeta).hideFromSidebar = true;
+    }
     for (const [key, value] of Object.entries(page)) {
-      if (value === null || page[key as keyof PageMeta] === '') {
-        delete page[key as keyof PageMeta];
+      if (value === null || page[key as keyof typeof page] === '') {
+        delete page[key as keyof typeof page];
       }
     }
   });
