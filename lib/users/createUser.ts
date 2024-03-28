@@ -28,7 +28,7 @@ export async function createUserFromWallet(
     return user;
   } catch (_) {
     // ignore error, it just means user was not found
-    const ens: string | null = await getENSName(address);
+    const ens = await getENSName(address);
     const userPath = shortWalletAddress(address).replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
 

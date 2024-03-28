@@ -1,4 +1,4 @@
-import type { ProjectFieldProperty, ProjectMemberPayload, ProjectPayload, ProjectValues } from './interfaces';
+import type { ProjectFieldConfig, ProjectFieldProperty, ProjectValues } from './interfaces';
 
 export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
@@ -44,19 +44,6 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
     rows: 3
   }
 ];
-
-export const projectMemberDefaultValues: ProjectMemberPayload = {
-  name: '',
-  walletAddress: '',
-  email: '',
-  twitter: '',
-  warpcast: '',
-  github: '',
-  linkedin: '',
-  telegram: '',
-  otherUrl: '',
-  previousProjects: ''
-};
 
 export const projectFieldProperties: ProjectFieldProperty[] = [
   {
@@ -109,7 +96,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export const projectDefaultValues: ProjectPayload = {
+export const defaultProjectValues: ProjectValues = {
   name: '',
   excerpt: '',
   description: '',
@@ -120,12 +107,21 @@ export const projectDefaultValues: ProjectPayload = {
   demoUrl: '',
   communityUrl: '',
   otherUrl: '',
-  walletAddress: ''
-};
-
-export const defaultProjectValues: ProjectValues = {
-  ...projectDefaultValues,
-  projectMembers: [projectMemberDefaultValues]
+  walletAddress: '',
+  projectMembers: [
+    {
+      name: '',
+      walletAddress: '',
+      email: '',
+      twitter: '',
+      warpcast: '',
+      github: '',
+      linkedin: '',
+      telegram: '',
+      otherUrl: '',
+      previousProjects: ''
+    }
+  ]
 };
 
 export const defaultProjectFieldConfig = {
@@ -137,4 +133,4 @@ export const defaultProjectFieldConfig = {
       required: true
     }
   }
-};
+} as ProjectFieldConfig;

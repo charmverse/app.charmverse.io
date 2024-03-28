@@ -3,7 +3,7 @@ import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { ProjectValues, ProjectFieldProperty, ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectValues, ProjectFieldProperty, FieldConfig } from 'lib/projects/interfaces';
 
 function FieldAnswer({
   property,
@@ -16,7 +16,7 @@ function FieldAnswer({
   name: Path<ProjectValues>;
   defaultRequired?: boolean;
   property: ProjectFieldProperty;
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig?: FieldConfig;
 }) {
   const { control, register } = useFormContext<ProjectValues>();
 
@@ -56,7 +56,7 @@ export function FieldAnswers({
   disabled?: boolean;
   name?: string;
   defaultRequired?: boolean;
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig?: FieldConfig;
   properties: ProjectFieldProperty[];
 }) {
   return (

@@ -1,5 +1,5 @@
 import { projectFieldProperties } from 'lib/projects/constants';
-import type { ProjectEditorFieldConfig, ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectFieldConfig } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -10,7 +10,7 @@ export function ProjectFieldAnswers({
   disabled
 }: {
   disabled?: boolean;
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig?: FieldConfig;
   defaultRequired?: boolean;
 }) {
   return (
@@ -25,18 +25,18 @@ export function ProjectFieldAnswers({
 
 export function ProjectFieldsEditor({
   onChange,
-  values,
+  fieldConfig,
   defaultRequired
 }: {
   defaultRequired?: boolean;
-  onChange?: (value: Omit<ProjectEditorFieldConfig, 'members'>) => void;
-  values: Omit<ProjectEditorFieldConfig, 'members'>;
+  onChange?: (value: Omit<ProjectFieldConfig, 'members'>) => void;
+  fieldConfig: Omit<ProjectFieldConfig, 'members'>;
 }) {
   return (
     <FieldsEditor
       defaultRequired={defaultRequired}
       properties={projectFieldProperties}
-      values={values}
+      fieldConfig={fieldConfig}
       onChange={onChange}
     />
   );

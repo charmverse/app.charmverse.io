@@ -14,8 +14,8 @@ import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import { getFilledProjectValues } from 'lib/projects/getFilledProjectValues';
+import type { ProjectFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -63,12 +63,12 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectWithMembers,
-    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig,
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectFieldConfig,
     defaultRequired: true
   });
 
   const { membersRecord } = useMembers();
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectValues = useMemo(() => getFilledProjectValues({ user, membersRecord }), [user, membersRecord]);
   useEffect(() => {
     if (selectedProjectId) {
       projectForm.reset(projectWithMembers);
@@ -90,13 +90,15 @@ export function useNewProposal({ newProposal }: Props) {
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     // Create a project if the proposal has a project field
-    let projectId: string | undefined;
+    let projectId: string | undefined = projectWithMembers?.id;
     const projectValues = projectForm.getValues();
     if (projectField && formInputs.type === 'proposal') {
       if (!selectedProjectId) {
         const createdProject = await createProject(projectValues);
         projectId = createdProject.id;
-      } else if (projectWithMembers) {
+      }
+      // Make sure the current user is a team lead before updating the project
+      else if (projectWithMembers && user?.id === projectWithMembers.projectMembers[0].userId) {
         const updatedProjectValues = {
           id: projectWithMembers.id,
           ...projectValues,
@@ -106,9 +108,8 @@ export function useNewProposal({ newProposal }: Props) {
             id: member.id
           }))
         };
-        await charmClient.updateProject(updatedProjectValues);
+        await charmClient.updateProject(projectWithMembers.id, updatedProjectValues);
         mutate();
-        projectId = projectWithMembers.id;
       }
     }
     log.info('[user-journey] Create a proposal');

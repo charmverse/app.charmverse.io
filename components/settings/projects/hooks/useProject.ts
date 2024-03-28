@@ -6,17 +6,12 @@ import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectEditorFieldConfig, ProjectUpdatePayload } from 'lib/projects/interfaces';
+import { defaultProjectValues } from 'lib/projects/constants';
+import type { ProjectFieldConfig, ProjectValues } from 'lib/projects/interfaces';
 
 import { useProjectForm, convertToProjectValues } from './useProjectForm';
 
-export function useProject({
-  projectId,
-  fieldConfig
-}: {
-  projectId: MaybeString;
-  fieldConfig: ProjectEditorFieldConfig;
-}) {
+export function useProject({ projectId, fieldConfig }: { projectId: MaybeString; fieldConfig: ProjectFieldConfig }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);
   const { user } = useUser();
@@ -32,15 +27,19 @@ export function useProject({
     if (projectId && projectWithMembers) {
       form.reset(convertToProjectValues(projectWithMembers));
     }
+    // Reset form state with default project values if no project is selected
+    else if (!projectId) {
+      form.reset(defaultProjectValues);
+    }
   }, [projectId, hasProjectWithMembers]);
 
   const { showMessage } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
-    return debounce(charmClient.updateProject, 300);
-  }, []);
+    return debounce((projectPayload) => projectId && charmClient.updateProject(projectId, projectPayload), 300);
+  }, [projectId]);
 
   const onProjectUpdate = useCallback(
-    async (projectPayload: ProjectUpdatePayload) => {
+    async (projectPayload: ProjectValues) => {
       try {
         await debouncedUpdate(projectPayload);
         mutate(
@@ -54,10 +53,10 @@ export function useProject({
                 return {
                   ..._project,
                   ...projectPayload,
-                  projectMembers: _project.projectMembers.map((projectMember, index) => {
+                  projectMembers: projectPayload.projectMembers.map((projectMember, index) => {
                     return {
-                      ...projectMember,
-                      ...projectPayload.projectMembers[index]
+                      ..._project.projectMembers[index],
+                      ...projectMember
                     };
                   })
                 };

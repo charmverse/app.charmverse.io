@@ -23,7 +23,7 @@ import type { FailedImportsError } from 'lib/notion/types';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { ProjectUpdatePayload, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectValues, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
@@ -368,8 +368,8 @@ class CharmClient {
     return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
   }
 
-  updateProject(payload: ProjectUpdatePayload) {
-    return http.PUT<ProjectWithMembers>(`/api/projects/${payload.id}`, payload);
+  updateProject(projectId: string, payload: ProjectValues) {
+    return http.PUT<ProjectWithMembers>(`/api/projects/${projectId}`, payload);
   }
 }
 

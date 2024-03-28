@@ -12,7 +12,11 @@ export async function getProjects({ userId }: { userId: string }): Promise<Proje
       }
     },
     include: {
-      projectMembers: true
+      projectMembers: {
+        orderBy: {
+          createdAt: 'asc'
+        }
+      }
     }
   });
 
