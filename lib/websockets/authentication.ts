@@ -7,6 +7,7 @@ import type { Socket } from 'socket.io';
 
 import { ActionNotPermittedError } from 'lib/middleware';
 import { authSecret } from 'lib/session/authSecret';
+import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 import type { SealedUserId } from 'lib/websockets/interfaces';
 
@@ -58,5 +59,5 @@ function getSessionFromSocket(socket: Socket) {
   const req = new IncomingMessage();
   req.headers = socket.handshake.headers;
   const res = new ServerResponse(req);
-  return getIronSession(req, res, getIronOptions());
+  return getIronSession<SessionData>(req, res, getIronOptions());
 }
