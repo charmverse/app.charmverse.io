@@ -159,7 +159,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
                         key={`${option.id}-${part.text}${part.highlight}`}
                         style={{
                           fontWeight: 600,
-                          color: part.highlight ? 'var(--primary-text)' : 'var(--secondary-text)'
+                          backgroundColor: part.highlight ? 'var(--bg-yellow)' : 'transparent'
                         }}
                       >
                         {part.text}
