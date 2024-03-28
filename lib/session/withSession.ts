@@ -1,4 +1,3 @@
-import Cookies from 'cookies';
 import { getIronSession } from 'iron-session';
 import type {
   GetServerSidePropsContext,
