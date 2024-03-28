@@ -50,7 +50,7 @@ export type ProjectFieldConfig = FieldConfig & {
 export type ProjectValues = ProjectPayload & {
   // project member with id is for updates existing project members
   // project member without id is for creating new project members
-  projectMembers: (ProjectMemberPayload & { id?: string })[];
+  projectMembers: (ProjectMemberPayload & { id?: string; userId?: string })[];
 };
 
 export type ProjectFieldProperty = {

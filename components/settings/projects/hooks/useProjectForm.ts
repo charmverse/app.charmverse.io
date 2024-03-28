@@ -127,7 +127,8 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
         telegram: projectMember.telegram,
         twitter: projectMember.twitter,
         walletAddress: projectMember.walletAddress,
-        id: projectMember.id
+        id: projectMember.id,
+        userId: projectMember.userId
       };
     })
   } as ProjectValues;

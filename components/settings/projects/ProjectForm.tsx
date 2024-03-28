@@ -1,10 +1,11 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { useUser } from 'hooks/useUser';
 import { defaultProjectValues } from 'lib/projects/constants';
 import type { ProjectFieldConfig, ProjectValues } from 'lib/projects/interfaces';
 
@@ -22,6 +23,7 @@ export function ProjectFormAnswers({
 }) {
   const { getValues, setValue } = useFormContext<ProjectValues>();
   const projectValues = getValues();
+  const { user } = useUser();
   const extraProjectMembers = projectValues.projectMembers.slice(1);
   return (
     <Stack gap={2} width='100%'>
@@ -44,25 +46,27 @@ export function ProjectFormAnswers({
               my: 1
             }}
           />
-          {extraProjectMembers.map((_, index) => (
+          {extraProjectMembers.map((projectMember, index) => (
             <Stack key={`project-member-${index.toString()}`}>
               <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
-                <Typography variant='h6'>Add a team member</Typography>
-                <DeleteOutlineOutlinedIcon
-                  fontSize='small'
-                  color='error'
-                  onClick={() => {
-                    setValue(
-                      'projectMembers',
-                      extraProjectMembers.filter((__, i) => i !== index + 1),
-                      {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                        shouldTouch: true
-                      }
-                    );
-                  }}
-                />
+                <Typography variant='h6'>Team member</Typography>
+                {isTeamLead || projectMember.userId === user?.id ? (
+                  <DeleteOutlineOutlinedIcon
+                    fontSize='small'
+                    color='error'
+                    onClick={() => {
+                      setValue(
+                        'projectMembers',
+                        extraProjectMembers.filter((__, i) => i !== index + 1),
+                        {
+                          shouldValidate: true,
+                          shouldDirty: true,
+                          shouldTouch: true
+                        }
+                      );
+                    }}
+                  />
+                ) : null}
               </Stack>
               <ProjectMemberFieldAnswers
                 projectMemberIndex={index + 1}
@@ -79,22 +83,27 @@ export function ProjectFormAnswers({
           />
         </>
       ) : null}
-      <Button
+      <Box
         sx={{
           mb: 2,
           width: 'fit-content'
         }}
-        startIcon={<AddIcon fontSize='small' />}
-        onClick={() => {
-          setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true
-          });
-        }}
       >
-        Add a team member
-      </Button>
+        <Button
+          disabled={!isTeamLead}
+          disabledTooltip='Only the team lead can add team members'
+          startIcon={<AddIcon fontSize='small' />}
+          onClick={() => {
+            setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
+              shouldValidate: true,
+              shouldDirty: true,
+              shouldTouch: true
+            });
+          }}
+        >
+          Add a team member
+        </Button>
+      </Box>
     </Stack>
   );
 }

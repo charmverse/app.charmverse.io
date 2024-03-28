@@ -21,7 +21,7 @@ export async function getProjectMemberCreateTransaction({
       where: {
         OR: [
           {
-            address: walletAddress
+            address: walletAddress.toLowerCase()
           },
           {
             ensname: walletAddress
