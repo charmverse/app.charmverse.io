@@ -1,7 +1,7 @@
 import { prisma } from "@charmverse/core/prisma-client";
 import { FormFieldInput } from "components/common/form/interfaces";
 import { upsertProposalFormFields } from "lib/proposals/form/upsertProposalFormFields";
-
+import {formFields} from './form'
 
 
 
@@ -25,8 +25,6 @@ async function restoreFormFromLogs({pagePath, spaceDomain, inputs}: {pagePath: s
 
   if (!page.proposal?.form) {
     throw new Error('Proposal does not have a form');
-  } else if (inputs.some(i => !!i.formId && i.formId !== page.proposal!.form!.id)) {
-    throw new Error('Some inputs belong to a different form');
   }
 
   await upsertProposalFormFields({
@@ -37,8 +35,10 @@ async function restoreFormFromLogs({pagePath, spaceDomain, inputs}: {pagePath: s
   console.log('Form restored successfully with', inputs.length, 'fields')
 }
 
-// restoreFormFromLogs({
-//   pagePath: 'proposal-form-45254537868421485',
-//   inputs: input as any,
-//   spaceDomain: 'cvt-calm-indigo-mouse'
-// }).then(console.log)
+restoreFormFromLogs({
+  pagePath: 'proposal-form-5212482570918344',
+  inputs: formFields as any,
+  spaceDomain: 'coloured-tomato-gibbon'
+}).then(console.log)
+
+// prisma.formField.deleteMany({}).then(console.log)
