@@ -25,7 +25,7 @@ describe('createProject', () => {
   it('should create a project with members and connect with users', async () => {
     const { user: projectTeamLead } = await testUtilsUser.generateUserAndSpace();
     const walletAddressUser = await testUtilsUser.generateUser();
-    const walletAddressUserAddress = randomETHWallet().address;
+    const walletAddressUserAddress = randomETHWallet().address.toLowerCase();
     const verifiedEmailUser = await testUtilsUser.generateUser();
     const googleAccountUser = await testUtilsUser.generateUser();
     const verifiedEmailUserEmail = `${v4()}@gmail.com`;
@@ -159,6 +159,7 @@ describe('createProject', () => {
     expect(createdProjectWithMembers.projectMembers[0].userId).toBe(projectTeamLead.id);
     expect(createdProjectWithMembers.projectMembers[0].walletAddress).toBe(projectTeamLeadWalletAddress);
 
+    expect(walletAddressUser.claimed).toBe(false);
     expect(createdProjectWithMembers.projectMembers[1].teamLead).toBe(false);
     expect(createdProjectWithMembers.projectMembers[1].userId).toBe(walletAddressUser.id);
     expect(createdProjectWithMembers.projectMembers[1].walletAddress).toBe(walletAddressUserAddress);
