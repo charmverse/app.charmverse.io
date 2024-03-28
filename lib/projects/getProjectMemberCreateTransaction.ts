@@ -1,5 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getENSName } from 'lib/blockchain';
+import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
+import { shortWalletAddress } from 'lib/utils/blockchain';
+import { uid } from 'lib/utils/strings';
+
 import type { ProjectValues } from './interfaces';
 
 export async function getProjectMemberCreateTransaction({
@@ -16,25 +21,7 @@ export async function getProjectMemberCreateTransaction({
 
   let connectedUserId: string | undefined;
 
-  if (walletAddress) {
-    const userWallet = await prisma.userWallet.findFirst({
-      where: {
-        OR: [
-          {
-            address: walletAddress.toLowerCase()
-          },
-          {
-            ensname: walletAddress
-          }
-        ]
-      },
-      select: {
-        userId: true
-      }
-    });
-
-    connectedUserId = userWallet?.userId;
-  } else if (email) {
+  if (email) {
     const googleAccount = await prisma.googleAccount.findFirst({
       where: {
         email
@@ -55,6 +42,48 @@ export async function getProjectMemberCreateTransaction({
         }
       });
       connectedUserId = verifiedEmail?.userId;
+    }
+  }
+
+  if (!connectedUserId && walletAddress) {
+    const userWallet = await prisma.userWallet.findFirst({
+      where: {
+        OR: [
+          {
+            address: walletAddress.toLowerCase()
+          },
+          {
+            ensname: walletAddress
+          }
+        ]
+      },
+      select: {
+        userId: true
+      }
+    });
+
+    if (userWallet) {
+      connectedUserId = userWallet.userId;
+    } else {
+      const ens: string | null = await getENSName(walletAddress);
+      const userPath = shortWalletAddress(walletAddress).replace('…', '-');
+      const isUserPathAvailable = await isProfilePathAvailable(userPath);
+
+      const walletUser = await prisma.user.create({
+        data: {
+          username: ens ?? shortWalletAddress(walletAddress.toLowerCase()),
+          identityType: 'Wallet',
+          path: isUserPathAvailable ? userPath : uid(),
+          wallets: {
+            create: {
+              address: walletAddress.toLowerCase(),
+              ensname: ens
+            }
+          },
+          claimed: false
+        }
+      });
+      connectedUserId = walletUser.id;
     }
   }
 

@@ -19,7 +19,7 @@ export async function createProject(payload: { userId: string; project: ProjectV
       description: project.description,
       excerpt: project.excerpt,
       name: project.name,
-      walletAddress: project.walletAddress,
+      walletAddress: project.walletAddress.toLowerCase(),
       blog: project.blog,
       communityUrl: project.communityUrl,
       github: project.github,

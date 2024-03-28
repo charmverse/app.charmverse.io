@@ -55,7 +55,7 @@ export async function updateProject({
           data: {
             name: projectMember.name,
             email: projectMember.email,
-            walletAddress: projectMember.walletAddress,
+            walletAddress: projectMember.walletAddress.toLowerCase(),
             twitter: projectMember.twitter,
             warpcast: projectMember.warpcast,
             github: projectMember.github,
@@ -89,7 +89,7 @@ export async function updateProject({
         description: payload.description,
         excerpt: payload.excerpt,
         name: payload.name,
-        walletAddress: payload.walletAddress,
+        walletAddress: payload.walletAddress.toLowerCase(),
         blog: payload.blog,
         communityUrl: payload.communityUrl,
         github: payload.github,

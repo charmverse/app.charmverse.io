@@ -119,4 +119,48 @@ describe('createProject', () => {
     expect(createdProjectWithMembers.projectMembers[3].userId).toBe(verifiedEmailUser.id);
     expect(createdProjectWithMembers.projectMembers[3].email).toBe(verifiedEmailUserEmail);
   });
+
+  it('should create a project with members and connect with newly created users if no user with wallet address exists', async () => {
+    const { user: projectTeamLead } = await testUtilsUser.generateUserAndSpace();
+    const walletAddressUserAddress = randomETHWallet().address.toLowerCase();
+    const projectTeamLeadWalletAddress = randomETHWallet().address.toLowerCase();
+
+    const createdProjectWithMembers = await createProject({
+      project: {
+        ...defaultProjectValues,
+        blog: 'https://blog.com',
+        projectMembers: [
+          {
+            ...defaultProjectValues.projectMembers[0],
+            walletAddress: projectTeamLeadWalletAddress
+          },
+          {
+            ...defaultProjectValues.projectMembers[0],
+            walletAddress: walletAddressUserAddress
+          }
+        ]
+      },
+      userId: projectTeamLead.id
+    });
+
+    const walletAddressUser = await prisma.user.findFirstOrThrow({
+      where: {
+        identityType: 'Wallet',
+        wallets: {
+          some: {
+            address: walletAddressUserAddress
+          }
+        }
+      }
+    });
+
+    expect(createdProjectWithMembers.blog).toBe('https://blog.com');
+    expect(createdProjectWithMembers.projectMembers[0].teamLead).toBe(true);
+    expect(createdProjectWithMembers.projectMembers[0].userId).toBe(projectTeamLead.id);
+    expect(createdProjectWithMembers.projectMembers[0].walletAddress).toBe(projectTeamLeadWalletAddress);
+
+    expect(createdProjectWithMembers.projectMembers[1].teamLead).toBe(false);
+    expect(createdProjectWithMembers.projectMembers[1].userId).toBe(walletAddressUser.id);
+    expect(createdProjectWithMembers.projectMembers[1].walletAddress).toBe(walletAddressUserAddress);
+  });
 });

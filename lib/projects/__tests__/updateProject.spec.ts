@@ -11,16 +11,18 @@ describe('updateProject', () => {
   it('should update a project with members and connect with new users', async () => {
     const { user: projectTeamLead } = await testUtilsUser.generateUserAndSpace();
     const projectTeamLeadEmail = `${v4()}@gmail.com`;
-    const projectTeamLeadAddress = randomETHWallet().address;
+    const projectTeamLeadAddress = randomETHWallet().address.toLowerCase();
 
     const walletAddressUser = await testUtilsUser.generateUser();
-    const walletAddressUserAddress = randomETHWallet().address;
-    const updatedWalletAddressUserAddress = randomETHWallet().address;
+    const walletAddressUserAddress = randomETHWallet().address.toLowerCase();
+    const updatedWalletAddressUserAddress = randomETHWallet().address.toLowerCase();
 
     const verifiedEmailUser = await testUtilsUser.generateUser();
     const googleAccountUser = await testUtilsUser.generateUser();
     const verifiedEmailUserEmail = `${v4()}@gmail.com`;
     const googleAccountUserEmail = `${v4()}@gmail.com`;
+
+    const newWalletUserAddress = randomETHWallet().address.toLowerCase();
 
     await prisma.user.update({
       where: {
@@ -137,6 +139,13 @@ describe('updateProject', () => {
           {
             ...defaultProjectValues.projectMembers[0],
             email: googleAccountUserEmail
+          },
+          // Add new user with wallet address
+          {
+            ...defaultProjectValues.projectMembers[0],
+            name: 'New Wallet Project Member',
+            walletAddress: newWalletUserAddress,
+            email: ''
           }
         ]
       }
@@ -166,5 +175,21 @@ describe('updateProject', () => {
     expect(updatedProjectWithMembers.projectMembers[2].teamLead).toBe(false);
     expect(updatedProjectWithMembers.projectMembers[2].userId).toBe(googleAccountUser.id);
     expect(updatedProjectWithMembers.projectMembers[2].email).toBe(googleAccountUserEmail);
+
+    // A new user will be created and added to project member
+    const newWalletUser = await prisma.user.findFirstOrThrow({
+      where: {
+        wallets: {
+          some: {
+            address: newWalletUserAddress
+          }
+        }
+      }
+    });
+
+    expect(newWalletUser.claimed).toBe(false);
+    expect(updatedProjectWithMembers.projectMembers[3].teamLead).toBe(false);
+    expect(updatedProjectWithMembers.projectMembers[3].userId).toBe(newWalletUser.id);
+    expect(updatedProjectWithMembers.projectMembers[3].walletAddress).toBe(newWalletUserAddress);
   });
 });
