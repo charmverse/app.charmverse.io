@@ -72,6 +72,9 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
   }
 
+  const isHeadingNode =
+    menuState.rowPos !== undefined ? view.state.doc.resolve(menuState.rowPos)?.node()?.type.name === 'heading' : false;
+
   async function copyLinkToBlock() {
     const rowPosition = menuState.rowPos;
     if (rowPosition === undefined) {
@@ -79,18 +82,18 @@ function Component({ menuState }: { menuState: PluginState }) {
       return null;
     }
 
-    // calculate the node at the mouse position. do it on click in case the content has changed
     const topPos = view.state.doc.resolve(rowPosition);
     const node = topPos.node();
 
     if (node && node.type.name === 'heading') {
       const text = node.textContent;
 
-      copyFn(`${window.location.href.split('#')[0]}#${slugify(text)}`)
-        .then(() => {
-          showMessage('Link copied to clipboard', 'success');
-        })
-        .catch(() => {});
+      const url = new URL(window.location.href);
+      url.hash = '';
+      const urlWithoutHash = url.toString();
+      copyFn(`${urlWithoutHash}#${slugify(text)}`).then(() => {
+        showMessage('Link copied to clipboard', 'success');
+      });
     }
     popupState.close();
   }
@@ -198,12 +201,14 @@ function Component({ menuState }: { menuState: PluginState }) {
           </ListItemIcon>
           <ListItemText primary='Duplicate' />
         </ListItemButton>
-        <ListItemButton onClick={copyLinkToBlock} dense>
-          <ListItemIcon>
-            <LinkIcon color='secondary' />
-          </ListItemIcon>
-          <ListItemText primary='Copy link to block' />
-        </ListItemButton>
+        {isHeadingNode && (
+          <ListItemButton onClick={copyLinkToBlock} dense>
+            <ListItemIcon>
+              <LinkIcon color='secondary' />
+            </ListItemIcon>
+            <ListItemText primary='Copy link to block' />
+          </ListItemButton>
+        )}
       </Menu>
     </>
   );

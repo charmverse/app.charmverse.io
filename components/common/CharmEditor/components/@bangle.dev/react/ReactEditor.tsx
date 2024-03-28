@@ -162,7 +162,6 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       if (domNode && nodePos !== undefined) {
         editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
         domNode.scrollIntoView();
-        window.history.replaceState({}, '', window.location.href.split('#')[0]);
       }
     }
   }, [isLoadingRef.current]);

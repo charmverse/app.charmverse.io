@@ -21,9 +21,9 @@ export function fancyTrimWords(_text: string = '', maxWords: number = 40) {
 
 export function slugify(text: string) {
   return text
-    .trim()
     .toLowerCase()
     .replace(/[^a-z0-9-\s]/g, '')
+    .trim()
     .replace(/\s+/g, '-');
 }
 
