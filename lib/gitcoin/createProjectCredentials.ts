@@ -4,6 +4,7 @@ import { getAddress } from 'viem';
 import { optimism } from 'viem/chains';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
+import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
 
 import { GITCOIN_SUPPORTED_CHAINS } from './constants';
 import { getProjectOwners } from './getProjectDetails';
@@ -22,7 +23,7 @@ export async function createOffchainCredentialsForProjects() {
       const credentialDate = approvedStatusSnapshot ? approvedSnapshotDate : new Date().toISOString();
       const roundUrl = `https://explorer.gitcoin.co/#/round/${chainId}/${application.round.id}`;
 
-      const metadataPayload = {
+      const metadataPayload: ExternalProjectMetadata = {
         name: metadata.title,
         round: metadata.roundName,
         proposalUrl: `${roundUrl}/${application.applicationIndex}`,

@@ -18,6 +18,18 @@ export type ExternalCredential = {
   URL: string;
 };
 
+// Metadata for external projects table
+export type ExternalProjectMetadata = {
+  name: string;
+  round?: string;
+  proposalId: string;
+  proposalUrl: string;
+  website?: string;
+  twitter?: string;
+  github?: string;
+  email?: string;
+};
+
 export function encodeExternalCredential({
   Name,
   ProjectId,
