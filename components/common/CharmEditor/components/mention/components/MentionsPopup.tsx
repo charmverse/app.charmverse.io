@@ -1,4 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import { MoreHoriz } from '@mui/icons-material';
 import { Divider, ListItemIcon, MenuItem, Typography, Box } from '@mui/material';
 import type { PluginKey } from 'prosemirror-state';
@@ -8,8 +7,9 @@ import { useEditorViewContext, usePluginState } from 'components/common/CharmEdi
 import { PagesList } from 'components/common/PagesList';
 import UserDisplay from 'components/common/UserDisplay';
 import { useMembers } from 'hooks/useMembers';
-import { usePages } from 'hooks/usePages';
 import { useRoles } from 'hooks/useRoles';
+import { useRootPages } from 'hooks/useRootPages';
+import { useSearchPages } from 'hooks/useSearchPages';
 import type { Member } from 'lib/members/interfaces';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 import { sanitizeForRegex } from 'lib/utils/strings';
@@ -20,24 +20,24 @@ import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';
 
-export function _MentionsPopup({ pluginKey }: { pluginKey: PluginKey<MentionPluginState> }) {
+export function _MentionsPopup({ pluginKey, pageId }: { pluginKey: PluginKey<MentionPluginState>; pageId?: string }) {
   const { suggestTooltipKey } = usePluginState(pluginKey) as MentionPluginState;
   const { show: isVisible } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
   if (isVisible) {
-    return <MentionsMenu pluginKey={pluginKey} />;
+    return <MentionsMenu pageId={pageId} pluginKey={pluginKey} />;
   }
   return null;
 }
 
 const DEFAULT_ITEM_LIMIT = 5;
 
-function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
+function MentionsMenu({ pluginKey, pageId }: { pluginKey: PluginKey; pageId?: string }) {
   const { members } = useMembers();
+  const { rootPages } = useRootPages();
   const { roles = [] } = useRoles();
   const view = useEditorViewContext();
   const { tooltipContentDOM, suggestTooltipKey } = usePluginState(pluginKey);
   const { show: isVisible, triggerText, counter } = usePluginState(suggestTooltipKey) as SuggestTooltipPluginState;
-  const { pages } = usePages();
   const onSelectMention = useCallback(
     (value: string, type: string) => {
       selectMention(pluginKey, value, type)(view.state, view.dispatch, view);
@@ -49,22 +49,25 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   const [showAllMembers, setShowAllMembers] = useState(false);
   const [showAllPages, setShowAllPages] = useState(false);
   const [showAllRoles, setShowAllRoles] = useState(false);
-  const searchText = sanitizeForRegex(triggerText).toLowerCase();
+  const searchText = useMemo(() => {
+    return sanitizeForRegex(triggerText).trim().toLowerCase();
+  }, [triggerText]);
+  const { results: searchResult } = useSearchPages({ search: searchText, limit: 50 });
   const filteredMembers = useMemo(
     () =>
       searchText.length !== 0
         ? members.filter((member) => filterByUsername(member, searchText) || filterByDiscordName(member, searchText))
         : members,
-    [members, searchText, searchText]
+    [members, searchText]
   );
 
-  const filteredPages = useMemo<PageMeta[]>(
-    () =>
-      Object.values(pages).filter(
-        (page) => page && !page.deletedAt && (!triggerText || page.title?.toLowerCase().startsWith(searchText))
-      ) as PageMeta[],
-    [pages, searchText]
-  );
+  const pageOptions = useMemo(() => {
+    if (triggerText) {
+      // exclude this page from results
+      return searchResult.filter((r) => r.id !== pageId);
+    }
+    return rootPages;
+  }, [triggerText, searchResult, rootPages]);
 
   const filteredRoles = useMemo<{ name: string; id: string }[]>(
     () =>
@@ -83,14 +86,14 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
   );
 
   const visibleFilteredMembers = showAllMembers ? filteredMembers : filteredMembers.slice(0, DEFAULT_ITEM_LIMIT);
-  const visibleFilteredPages = showAllPages ? filteredPages : filteredPages.slice(0, DEFAULT_ITEM_LIMIT);
+  const visibleFilteredPages = showAllPages ? pageOptions : pageOptions.slice(0, DEFAULT_ITEM_LIMIT);
   const visibleFilteredRoles = showAllRoles ? filteredRoles : filteredRoles.slice(0, DEFAULT_ITEM_LIMIT);
-  const totalItems = filteredRoles.length + filteredMembers.length + filteredPages.length;
+  const totalItems = filteredRoles.length + filteredMembers.length + pageOptions.length;
   const roundedCounter = (counter < 0 ? (counter % totalItems) + totalItems : counter) % totalItems;
   const selectedGroup =
     roundedCounter < filteredMembers.length
       ? 'members'
-      : roundedCounter < filteredMembers.length + filteredPages.length
+      : roundedCounter < filteredMembers.length + pageOptions.length
       ? 'pages'
       : 'roles';
 
@@ -99,7 +102,7 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
       ? roundedCounter
       : selectedGroup === 'pages'
       ? roundedCounter - filteredMembers.length
-      : roundedCounter - filteredMembers.length - filteredPages.length;
+      : roundedCounter - filteredMembers.length - pageOptions.length;
 
   function showAllMembersToggle() {
     setShowAllMembers(true);
@@ -113,7 +116,7 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
     setShowAllRoles(true);
   }
 
-  const hiddenPagesCount = filteredPages.length - DEFAULT_ITEM_LIMIT;
+  const hiddenPagesCount = pageOptions.length - DEFAULT_ITEM_LIMIT;
   const hiddenMembersCount = filteredMembers.length - DEFAULT_ITEM_LIMIT;
   const hiddenRolesCount = filteredRoles.length - DEFAULT_ITEM_LIMIT;
 
@@ -176,7 +179,7 @@ function MentionsMenu({ pluginKey }: { pluginKey: PluginKey }) {
         <PagesList
           activeItemIndex={selectedGroup === 'pages' ? activeItemIndex : -1}
           pages={visibleFilteredPages}
-          onSelectPage={(pageId) => onSelectMention(pageId, 'page')}
+          onSelectPage={(_pageId) => onSelectMention(_pageId, 'page')}
         />
 
         {!showAllPages && hiddenPagesCount > 0 && (

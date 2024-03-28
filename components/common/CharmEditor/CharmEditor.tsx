@@ -536,8 +536,8 @@ function CharmEditor({
         disableNestedPage={disableNestedPage}
         pageId={pageId}
       />
-      {!disableMention && <MentionsPopup pluginKey={mentionPluginKey} />}
-      <LinkedPagesPopup pluginKey={linkedPagePluginKey} />
+      {!disableMention && <MentionsPopup pageId={pageId} pluginKey={mentionPluginKey} />}
+      <LinkedPagesPopup pageId={pageId} pluginKey={linkedPagePluginKey} />
       <EmojiPopup pluginKey={emojiPluginKey} />
       {!readOnly && !disableRowHandles && <RowActionsMenu pluginKey={actionsPluginKey} />}
       <InlineCommandPalette

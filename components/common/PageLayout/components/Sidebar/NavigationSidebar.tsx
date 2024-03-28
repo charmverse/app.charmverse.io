@@ -30,13 +30,13 @@ import { useUser } from 'hooks/useUser';
 import type { NewPageInput } from 'lib/pages';
 import { addPageAndRedirect } from 'lib/pages';
 
-import { SearchInWorkspaceModal } from '../SearchInWorkspaceModal';
 import TrashModal from '../TrashModal';
 
 import { FeatureLink } from './components/FeatureLink';
 import { NotificationUpdates } from './components/NotificationsPopover';
 import PageNavigation from './components/PageNavigation';
 import NewPageMenu from './components/PageNavigation/components/NewPageMenu';
+import { SearchInWorkspaceModal } from './components/SearchInWorkspaceModal';
 import { SectionName } from './components/SectionName';
 import { sidebarItemStyles, SidebarLink } from './components/SidebarButton';
 import SidebarSubmenu from './components/SidebarSubmenu';

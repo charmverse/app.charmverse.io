@@ -32,10 +32,10 @@ import { usePages } from 'hooks/usePages';
 import { greyColor2 } from 'theme/colors';
 
 import { PageIcon } from '../../../../../../PageIcon';
-import AddNewCard from '../../../../AddNewCard';
 import PageTitle from '../../../../PageTitle';
 import { StyledIconButton } from '../../AddIconButton';
 
+import AddNewCard from './AddNewCard';
 import NewPageMenu from './NewPageMenu';
 import TreeItemContent from './TreeItemContent';
 

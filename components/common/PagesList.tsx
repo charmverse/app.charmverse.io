@@ -1,7 +1,5 @@
 import type { Page } from '@charmverse/core/prisma';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import MenuItem from '@mui/material/MenuItem';
-import Typography from '@mui/material/Typography';
+import { ListItemText, ListItemIcon, MenuItem, Typography } from '@mui/material';
 
 import type { PagePathType } from 'components/common/PageIcon';
 import { PageIcon } from 'components/common/PageIcon';
@@ -47,7 +45,6 @@ export function PagesList({
       </Typography>
     );
   }
-
   return (
     <div style={style}>
       {pages.map((page, pageIndex) => (
@@ -64,9 +61,7 @@ export function PagesList({
           <ListItemIcon>
             <PageIcon icon={page.icon} isEditorEmpty={!page.hasContent} pageType={page.type} />
           </ListItemIcon>
-          <PageTitle hasContent={!page.title} sx={{ fontWeight: 'bold' }}>
-            {page.title ? page.title : 'Untitled'}
-          </PageTitle>
+          <ListItemText>{page.title ? page.title : 'Untitled'}</ListItemText>
         </MenuItem>
       ))}
     </div>
