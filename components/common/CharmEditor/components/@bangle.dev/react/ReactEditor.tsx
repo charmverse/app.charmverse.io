@@ -29,6 +29,7 @@ import { slugify } from 'lib/utils/strings';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
+import { scrollIntoHeadingNode } from '../../heading';
 import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
@@ -148,21 +149,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
   useEffect(() => {
-    const hash = window.location.hash.slice(1);
-    if (hash && editor && !isLoadingRef.current) {
-      let nodePos: number | undefined;
-      editor.view.state.doc.descendants((node, pos) => {
-        if (node.type.name === 'heading' && slugify(node.textContent) === hash) {
-          nodePos = pos;
-          return false;
-        }
+    if (editor && !isLoadingRef.current) {
+      scrollIntoHeadingNode({
+        editor
       });
-
-      const domNode = nodePos ? (editor.view.domAtPos(nodePos)?.node as HTMLElement) : null;
-      if (domNode && nodePos !== undefined) {
-        editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
-        domNode.scrollIntoView();
-      }
     }
   }, [isLoadingRef.current]);
 
