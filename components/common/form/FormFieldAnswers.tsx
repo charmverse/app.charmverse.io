@@ -48,6 +48,7 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
+  proposalId?: string;
 };
 
 const StyledStack = styled(Stack)`
@@ -84,6 +85,7 @@ export function FormFieldAnswersControlled({
   errors,
   onFormChange,
   pageId,
+  proposalId,
   threads = {}
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
@@ -164,6 +166,7 @@ export function FormFieldAnswersControlled({
               render={({ field }) =>
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
+                    disabled={disabled}
                     formField={{
                       fieldConfig: formField.fieldConfig as ProjectFieldConfig,
                       value: field.value
@@ -177,6 +180,7 @@ export function FormFieldAnswersControlled({
                         }
                       ]);
                     }}
+                    proposalId={proposalId}
                   />
                 ) : (
                   <FieldTypeRenderer

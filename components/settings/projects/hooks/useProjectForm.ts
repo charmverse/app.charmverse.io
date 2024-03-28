@@ -136,7 +136,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
 
 export function useProjectForm(options: {
   defaultValues?: ProjectValues;
-  projectWithMembers?: ProjectWithMembers;
+  projectWithMembers?: ProjectWithMembers | null;
   fieldConfig: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
