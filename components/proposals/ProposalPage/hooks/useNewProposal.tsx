@@ -90,13 +90,15 @@ export function useNewProposal({ newProposal }: Props) {
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     // Create a project if the proposal has a project field
-    let projectId: string | undefined;
+    let projectId: string | undefined = projectWithMembers?.id;
     const projectValues = projectForm.getValues();
     if (projectField && formInputs.type === 'proposal') {
       if (!selectedProjectId) {
         const createdProject = await createProject(projectValues);
         projectId = createdProject.id;
-      } else if (projectWithMembers) {
+      }
+      // Make sure the current user is a team lead before updating the project
+      else if (projectWithMembers && user?.id === projectWithMembers.projectMembers[0].userId) {
         const updatedProjectValues = {
           id: projectWithMembers.id,
           ...projectValues,
@@ -108,7 +110,6 @@ export function useNewProposal({ newProposal }: Props) {
         };
         await charmClient.updateProject(projectWithMembers.id, updatedProjectValues);
         mutate();
-        projectId = projectWithMembers.id;
       }
     }
     log.info('[user-journey] Create a proposal');

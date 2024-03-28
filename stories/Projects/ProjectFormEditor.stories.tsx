@@ -11,7 +11,7 @@ export function ProjectFormEditorComponent() {
 
   return (
     <GlobalContext>
-      <ProjectFormEditor values={projectRequiredValues} onChange={setProjectRequiredValues} />
+      <ProjectFormEditor fieldConfig={projectRequiredValues} onChange={setProjectRequiredValues} />
     </GlobalContext>
   );
 }

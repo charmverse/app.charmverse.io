@@ -15,11 +15,13 @@ import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectM
 export function ProjectFormAnswers({
   fieldConfig,
   isTeamLead,
-  defaultRequired
+  defaultRequired,
+  hideTeamMembers = false
 }: {
   fieldConfig?: ProjectFieldConfig;
   isTeamLead: boolean;
   defaultRequired?: boolean;
+  hideTeamMembers?: boolean;
 }) {
   const { getValues, setValue } = useFormContext<ProjectValues>();
   const projectValues = getValues();
@@ -39,7 +41,7 @@ export function ProjectFormAnswers({
         defaultRequired={defaultRequired}
         fieldConfig={fieldConfig?.projectMember}
       />
-      {extraProjectMembers.length ? (
+      {!hideTeamMembers && extraProjectMembers.length ? (
         <>
           <Divider
             sx={{
@@ -83,38 +85,40 @@ export function ProjectFormAnswers({
           />
         </>
       ) : null}
-      <Box
-        sx={{
-          mb: 2,
-          width: 'fit-content'
-        }}
-      >
-        <Button
-          disabled={!isTeamLead}
-          disabledTooltip='Only the team lead can add team members'
-          startIcon={<AddIcon fontSize='small' />}
-          onClick={() => {
-            setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
-              shouldValidate: true,
-              shouldDirty: true,
-              shouldTouch: true
-            });
+      {!hideTeamMembers && (
+        <Box
+          sx={{
+            mb: 2,
+            width: 'fit-content'
           }}
         >
-          Add a team member
-        </Button>
-      </Box>
+          <Button
+            disabled={!isTeamLead}
+            disabledTooltip='Only the team lead can add team members'
+            startIcon={<AddIcon fontSize='small' />}
+            onClick={() => {
+              setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true
+              });
+            }}
+          >
+            Add a team member
+          </Button>
+        </Box>
+      )}
     </Stack>
   );
 }
 
 export function ProjectFormEditor({
   onChange,
-  values,
+  fieldConfig,
   defaultRequired
 }: {
   onChange?: (project: ProjectFieldConfig) => void;
-  values: ProjectFieldConfig;
+  fieldConfig: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
   return (
@@ -122,14 +126,14 @@ export function ProjectFormEditor({
       <Typography variant='h6'>Project Info</Typography>
       <ProjectFieldsEditor
         defaultRequired={defaultRequired}
-        fieldConfig={values}
+        fieldConfig={fieldConfig}
         onChange={
           onChange === undefined
             ? undefined
-            : (fieldConfig) => {
+            : (_fieldConfig) => {
                 onChange?.({
-                  ...values,
-                  ...fieldConfig
+                  ...fieldConfig,
+                  ..._fieldConfig
                 });
               }
         }
@@ -140,13 +144,13 @@ export function ProjectFormEditor({
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldsEditor
         defaultRequired={defaultRequired}
-        fieldConfig={values?.projectMember}
+        fieldConfig={fieldConfig?.projectMember}
         onChange={
           onChange === undefined
             ? undefined
             : (memberFieldConfig) => {
                 onChange?.({
-                  ...values,
+                  ...fieldConfig,
                   projectMember: memberFieldConfig
                 });
               }
