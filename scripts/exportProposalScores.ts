@@ -234,6 +234,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   return textContent;
 }
 
+// Retrieve a list of proposal page ids based on a board property
 async function _getPageIdsFromDatabase() {
   const board = await prisma.block.findFirstOrThrow({
     where: {
