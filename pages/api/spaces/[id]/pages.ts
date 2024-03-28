@@ -25,7 +25,14 @@ export const config = {
   }
 };
 
-const pageTypesHiddenFromSidebar: PageType[] = ['card', 'proposal', 'bounty'];
+const pageTypesHiddenFromSidebar: PageType[] = [
+  'bounty',
+  'board',
+  'card',
+  'inline_board',
+  'inline_linked_board',
+  'proposal'
+];
 
 async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
   const userId = req.session?.user?.id;
