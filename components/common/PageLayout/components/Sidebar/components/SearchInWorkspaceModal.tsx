@@ -143,7 +143,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         onInputChange={onChange}
         onChange={(_e, item) => {
           if (item) {
-            navigateToSpacePath((item as SearchResultItem).path);
+            navigateToSpacePath(`/${(item as SearchResultItem).path}`);
             close();
           }
         }}

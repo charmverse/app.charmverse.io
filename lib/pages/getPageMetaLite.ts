@@ -14,6 +14,6 @@ export function getPageMetaLite(page: PageFields): PageMetaLite {
     hasContent: page.hasContent,
     type: page.type,
     icon: page.icon,
-    path: page.path ?? `/${page.id}`
+    path: page.path ?? page.id
   };
 }

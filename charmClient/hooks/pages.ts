@@ -31,5 +31,9 @@ export function useGetSearchPages({
 }
 
 export function useGetRecentHistory({ spaceId, limit }: { spaceId?: string; limit?: number }) {
-  return useGETImmutable<PageViewMeta[]>(spaceId ? `/api/pages/recent-history` : null, { spaceId, limit });
+  return useGET<PageViewMeta[]>(
+    spaceId ? `/api/pages/recent-history` : null,
+    { spaceId, limit },
+    { revalidateOnFocus: false, revalidateOnReconnect: false }
+  );
 }

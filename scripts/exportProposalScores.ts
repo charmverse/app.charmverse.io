@@ -27,7 +27,7 @@ const exportedFormat: Record<ExportKeys, string> = {
   rubricResults: 'Rubric Results'
 };
 
-const exportedCustomProps: string[] = ['Mission']
+const exportedCustomProps: string[] = ['Mission'];
 
 const separator = ',';
 const cellEnclosure = '"';
@@ -36,10 +36,9 @@ const newLine = '\n';
 const headerRows = objectUtils.typedKeys(exportedFormat);
 
 async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
-
   const customBlocks = await prisma.proposalBlock.findFirstOrThrow({
     where: {
-      id: "__defaultBoard",
+      id: '__defaultBoard',
       space: {
         domain: domain
       }
@@ -47,7 +46,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   });
 
   const propertyMap = exportedCustomProps.reduce((acc, propName) => {
-    const property = (customBlocks as ProposalBoardBlock)?.fields.cardProperties.find(prop => prop.name === propName);
+    const property = (customBlocks as ProposalBoardBlock)?.fields.cardProperties.find((prop) => prop.name === propName);
 
     if (!property) {
       throw new Error(`Property ${propName} not found in board ${customBlocks?.id}`);
@@ -56,7 +55,6 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     acc[propName] = property;
 
     return acc;
-
   }, {} as Record<string, ProposalPropertyField>);
 
   const proposals = await prisma.proposal.findMany({
@@ -99,6 +97,8 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       }
     }
   });
+
+  console.log('Found', proposals.length, 'proposals to export');
 
   const allContent = [[...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps]];
 
@@ -192,12 +192,15 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     });
 
     exportedCustomProps.forEach((rowKey) => {
-
       const property = propertyMap[rowKey];
 
       const rowValue = (p.fields as ProposalFields).properties?.[property.id] as string;
 
-      const value = !rowValue ? '-' : stringUtils.isUUID(rowValue) ? (property.options.find(opt => opt.id === rowValue)?.value ?? '-') : rowValue;
+      const value = !rowValue
+        ? '-'
+        : stringUtils.isUUID(rowValue)
+        ? property.options.find((opt) => opt.id === rowValue)?.value ?? '-'
+        : rowValue;
 
       (row as any)[rowKey] = `${cellEnclosure}${(value as string)
         .replace(new RegExp(cellEnclosure, 'g'), '')

@@ -46,7 +46,7 @@ export function useSearchPages({ search, limit }: { search: string; limit?: numb
         list: data.map((page) => ({
           title: page.title || 'Untitled',
           breadcrumb: getBreadcrumb(page, pages),
-          path: `/${page.path}`,
+          path: page.path,
           icon: page.icon,
           type: page.type,
           id: page.id
