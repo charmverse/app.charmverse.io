@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { applyPageToBlock } from 'lib/databases/block';
 import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from './block';
 import type { BoardFields } from './board';
 import type { BoardViewFields } from './boardView';
-import { buildBlockWithDetails } from './buildBlockWithDetails';
 
 type SourceType = 'proposals';
 
@@ -20,22 +20,31 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
   const boardBlocks = blocks.filter((b) => b.type === 'board');
   const connectedBoardIds = boardBlocks
     .map((boardBlock) =>
-      (boardBlock.fields as unknown as BoardFields).cardProperties
-        .filter((cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData)
-        .map((cardProperty) => cardProperty.relationData?.boardId)
+      (boardBlock.fields as unknown as BoardFields).cardProperties.map(
+        (cardProperty) => cardProperty.type === 'relation' && cardProperty.relationData?.boardId
+      )
     )
     .flat()
     .filter(isTruthy);
-  const connectedBoards = await prisma.block.findMany({
+
+  const relationalBlocks = await prisma.block.findMany({
     where: {
-      type: 'board',
-      id: {
-        in: connectedBoardIds
-      }
+      OR: [
+        {
+          id: {
+            in: connectedBoardIds
+          }
+        },
+        {
+          rootId: {
+            in: connectedBoardIds
+          }
+        }
+      ]
     }
   });
 
-  blocks.push(...connectedBoards);
+  blocks.push(...relationalBlocks);
 
   const viewsWithLinkedSource = blocks.filter((b) => b.type === 'view' && (b.fields as BoardViewFields).linkedSourceId);
 
@@ -83,11 +92,17 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       ]
     },
     select: {
+      deletedAt: true,
       id: true,
       icon: true,
       title: true,
+      bountyId: true,
       cardId: true,
       boardId: true,
+      hasContent: true,
+      galleryImage: true,
+      headerImage: true,
+      syncWithPageId: true,
       type: true,
       updatedAt: true,
       updatedBy: true
@@ -96,16 +111,24 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
 
   let source: SourceType | undefined;
 
+  const pagesMap = pages.reduce<Record<string, (typeof pages)[number]>>((acc, page) => {
+    const id = page.cardId || page.boardId;
+    if (id) {
+      acc[id] = page;
+    }
+    return acc;
+  }, {});
+
   const validBlocks = blocks
     .map((block) => {
-      const page = pages.find((p) => p.cardId === block.id || p.boardId === block.id);
+      const page = pagesMap[block.id];
       if (page) {
-        return buildBlockWithDetails(block, page);
+        return applyPageToBlock(block, page);
       }
       return block as BlockWithDetails;
     })
-    // remove orphan blocks
-    .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
+    // remove orphan and deleted blocks
+    .filter((block) => !block.deletedAt && (!!block.pageId || block.type === 'view' || block.type === 'board'));
 
   return { blocks: validBlocks, source };
 }

@@ -1,5 +1,6 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
+import { useFormContext } from 'react-hook-form';
 
 import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
@@ -33,6 +34,8 @@ export function ProposalStickyFooter({
     // refreshProposal();
   }
 
+  const projectForm = useFormContext();
+
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
@@ -50,12 +53,18 @@ export function ProposalStickyFooter({
     requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
 
+  const isProjectFormValid = proposal.projectId ? projectForm.formState.isValid : true;
+
   return (
     <StickyFooterContainer>
       <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
         <Button
-          disabledTooltip={disabledTooltip}
-          disabled={!!disabledTooltip}
+          disabledTooltip={
+            disabledTooltip || !isProjectFormValid
+              ? 'Please fill out all required project fields before publishing'
+              : undefined
+          }
+          disabled={!!disabledTooltip || !isProjectFormValid}
           data-test='complete-draft-button'
           loading={isMutating}
           onClick={onClick}

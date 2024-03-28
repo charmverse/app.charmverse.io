@@ -38,19 +38,6 @@ export function GlobalComponents() {
     if (currentSpace) {
       await mutate(getPagesListCacheKey(currentSpace.id));
       mutate(`archived-pages-${currentSpace.id}`);
-      // This is required to make the delete page banner go away
-      setPages((_pages) => {
-        if (_pages) {
-          payload.forEach(({ id: pageId }) => {
-            const page = _pages[pageId];
-            if (page) {
-              page.deletedAt = null;
-            }
-          });
-        }
-
-        return _pages;
-      });
     }
   };
 

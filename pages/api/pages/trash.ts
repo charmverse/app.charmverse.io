@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import type { ModifyChildPagesResponse } from 'lib/pages';
+import type { TrashOrDeletePageResponse } from 'lib/pages';
 import { trashPages } from 'lib/pages/trashPages';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -18,7 +18,7 @@ handler
   .use(requireKeys(['pageIds', 'trash'], 'body'))
   .put(togglePageArchiveStatus);
 
-async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse<ModifyChildPagesResponse>) {
+async function togglePageArchiveStatus(req: NextApiRequest, res: NextApiResponse<TrashOrDeletePageResponse>) {
   const { trash, pageIds } = req.body as { trash: boolean; pageIds: string[] };
   const userId = req.session.user.id;
 

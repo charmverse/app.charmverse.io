@@ -2,8 +2,9 @@ import type { UIBlockWithDetails, BlockWithDetails } from 'lib/databases/block';
 import { replaceS3Domain } from 'lib/utils/url';
 import type { ServerBlockFields } from 'pages/api/blocks';
 
-export async function fixBlocks(blocks: UIBlockWithDetails[]): Promise<UIBlockWithDetails[]> {
-  const OctoUtils = (await import('components/common/DatabaseEditor/octoUtils')).OctoUtils;
+import { OctoUtils } from '../octoUtils';
+
+export function fixBlocks(blocks: UIBlockWithDetails[]): UIBlockWithDetails[] {
   // Hydrate is important, as it ensures that each block is complete to the current model
   const fixedBlocks = OctoUtils.hydrateBlocks(blocks);
   return fixedBlocks;

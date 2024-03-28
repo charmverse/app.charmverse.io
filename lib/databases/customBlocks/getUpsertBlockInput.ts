@@ -1,11 +1,14 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { Block, Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
+import type { Prisma, PrismaTransactionClient } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import { blockToPrisma, blockToPrismaPartial } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { createBoard } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
+import type { ProposalBlockInput, ProposalBlockUpdateInput } from 'lib/proposals/blocks/interfaces';
+import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
 export function getUpsertBlockInput({
   data: upsertData,
@@ -13,7 +16,7 @@ export function getUpsertBlockInput({
   spaceId,
   createOnly = false
 }: {
-  data: Board | BoardView | Block;
+  data: Board | BoardView | ProposalBlockInput | ProposalBlockUpdateInput | RewardBlockInput | RewardBlockUpdateInput;
   userId: string;
   spaceId: string;
   tx?: PrismaTransactionClient;
@@ -41,29 +44,23 @@ export function getUpsertBlockInput({
     },
     update: createOnly
       ? {}
-      : {
+      : blockToPrismaPartial({
           ...data,
           spaceId,
-          fields: (data.fields || {}) as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue,
-          updatedBy: userId,
-          deletedAt: data.deletedAt ? new Date(data.deletedAt) : undefined,
-          createdAt: data.createdAt ? new Date(data.createdAt) : undefined,
-          updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined
-        },
-    create: {
+          updatedBy: userId
+        }),
+    create: blockToPrisma({
       id,
       ...data,
       spaceId,
-      deletedAt: undefined,
-      createdAt: undefined,
-      updatedAt: undefined,
       rootId: rootId || spaceId,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
       createdBy: userId,
       updatedBy: userId,
       parentId: data.parentId || '',
       title: data.title || '',
-      schema: 1,
-      fields: upsertFields as unknown as Prisma.JsonNullValueInput | Prisma.InputJsonValue
-    }
+      fields: upsertFields || {}
+    })
   };
 }

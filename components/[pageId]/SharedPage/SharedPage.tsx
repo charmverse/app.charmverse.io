@@ -39,14 +39,15 @@ export function SharedPage({ publicPage }: Props) {
     }
   }, [publicPage, isLoadingRewards]);
 
-  async function onLoad(_publicPage: PublicPageResponse) {
+  async function onLoad(_publicPage: PublicPageResponse, spaceDomain: string, spaceCustomDomain: string | null) {
     const { page: rootPage, cards, boards, views } = _publicPage;
 
     trackPageView({
       type: rootPage.type,
       pageId: rootPage.id,
       spaceId: rootPage.spaceId,
-      spaceDomain: space?.domain
+      spaceDomain,
+      spaceCustomDomain
     });
 
     setPageTitle(rootPage.title);
@@ -65,14 +66,14 @@ export function SharedPage({ publicPage }: Props) {
   }
 
   useEffect(() => {
-    if (publicPage) {
-      onLoad(publicPage);
+    if (publicPage && space) {
+      onLoad(publicPage, space.domain, space.customDomain);
     }
 
     return () => {
       setCurrentPageId('');
     };
-  }, [publicPage?.page.id]);
+  }, [publicPage?.page.id, !!space]);
 
   const currentPage = publicPage?.page ?? pages?.[basePageId];
 

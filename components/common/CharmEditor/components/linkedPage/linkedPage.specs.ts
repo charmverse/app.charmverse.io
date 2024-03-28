@@ -1,8 +1,7 @@
 import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
-
+import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
 import { encloseNestedPage } from '../nestedPage/nestedPage.utils';
 

@@ -75,8 +75,8 @@ export function NewProposalButton() {
     navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
   }
 
-  function createFromTemplate(pageId: string) {
-    navigateToSpacePath(`/proposals/new`, { template: pageId });
+  function createFromTemplate(template: TemplateItem) {
+    navigateToSpacePath(`/proposals/new`, { template: template.id });
   }
 
   function duplicateTemplate(pageId: string) {

@@ -21,10 +21,6 @@ export class PagesApi {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { archived: true });
   }
 
-  searchPages(spaceId: string, search: string, limit?: number) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { search, limit });
-  }
-
   getPage(pageId: string, spaceId?: string) {
     return http.GET<PageWithContent>(`/api/pages/${pageId}`, { spaceId });
   }

@@ -31,7 +31,7 @@ import { spec as listItemSpec } from './components/listItemNew/listItemSpecs';
 import { spec as markSpec } from './components/listItemNew/markSpec';
 import { spec as orderedListItemSpec } from './components/listItemNew/orderedListSpecs';
 import { mentionSpecs } from './components/mention';
-import { nestedPageSpec } from './components/nestedPage';
+import { nestedPageSpec } from './components/nestedPage/nestedPage.specs';
 import * as nft from './components/nft/nft.specs';
 import * as orderedList from './components/orderedList';
 import { spec as paragraphSpec } from './components/paragraph/paragraph';

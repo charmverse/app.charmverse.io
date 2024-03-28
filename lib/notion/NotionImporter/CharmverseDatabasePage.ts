@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { DatabaseObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 import { v4 } from 'uuid';
 
+import { blockToPrisma } from 'lib/databases/block';
 import { createBoard } from 'lib/databases/board';
 import { createBoardView } from 'lib/databases/boardView';
 
@@ -79,8 +80,8 @@ export class CharmverseDatabasePage {
         createdBy: this.notionPage.userId,
         updatedBy: this.notionPage.userId,
         deletedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime()
       };
 
       // Optimistically create the page
@@ -100,18 +101,16 @@ export class CharmverseDatabasePage {
 
       await prisma.block.createMany({
         data: [
-          {
-            schema: 1,
+          blockToPrisma({
             parentId: '',
             ...view,
             ...commonBlockData
-          },
-          {
-            schema: 1,
+          }),
+          blockToPrisma({
             parentId: '',
             ...board,
             ...commonBlockData
-          }
+          })
         ]
       });
 

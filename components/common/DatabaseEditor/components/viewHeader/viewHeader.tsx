@@ -8,7 +8,6 @@ import React from 'react';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import Link from 'components/common/Link';
-import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
@@ -25,6 +24,7 @@ import NewCardButton from './newCardButton';
 import { ToggleViewSidebarButton } from './ToggleViewSidebarButton';
 import ViewHeaderDisplayByMenu from './viewHeaderDisplayByMenu';
 import { ViewHeaderRowsMenu } from './ViewHeaderRowsMenu/ViewHeaderRowsMenu';
+import ViewHeaderSearch from './viewHeaderSearch';
 import ViewTabs from './viewTabs';
 
 type Props = {
@@ -53,7 +53,6 @@ type Props = {
 
 function ViewHeader(props: Props) {
   const router = useRouter();
-  const { pages, refreshPage } = usePages();
   const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
@@ -76,14 +75,12 @@ function ViewHeader(props: Props) {
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
   const withSortBy = activeView?.fields.viewType !== 'calendar';
 
-  async function addPageFromTemplate(pageId: string) {
+  async function addCardFromTemplate(card: Card) {
     const [blocks] = await mutator.duplicateCard({
       board: activeBoard as Board,
-      cardId: pageId,
-      cardPage: pages[pageId] as PageMeta
+      card
     });
     const newPageId = blocks[0].id;
-    await refreshPage(newPageId);
     props.showCard(newPageId);
   }
 
@@ -193,7 +190,7 @@ function ViewHeader(props: Props) {
 
           {/* Search - disabled until we can access page data inside the redux selector */}
 
-          {/* <ViewHeaderSearch/> */}
+          <ViewHeaderSearch />
 
           {/* Link to view embedded table in full - check that at least one view is created */}
           {props.embeddedBoardPath && !!views.length && (
@@ -220,11 +217,11 @@ function ViewHeader(props: Props) {
               {activeBoard?.fields.sourceType !== 'proposals' && (
                 <NewCardButton
                   addCard={props.addCard}
-                  addCardFromTemplate={addPageFromTemplate}
+                  addCardFromTemplate={addCardFromTemplate}
                   addCardTemplate={props.addCardTemplate}
                   showCard={props.showCard}
                   deleteCardTemplate={deleteCardTemplate}
-                  templatesBoardId={activeBoard?.id}
+                  templatesBoard={activeBoard}
                 />
               )}
             </>

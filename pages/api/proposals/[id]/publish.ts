@@ -10,6 +10,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { publishProposal } from 'lib/proposals/publishProposal';
+import { validateProposalProject } from 'lib/proposals/validateProposalProject';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -105,6 +106,36 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   }
 
   const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
+
+  const proposalForm = await prisma.proposal.findUnique({
+    where: {
+      id: proposalId
+    },
+    select: {
+      formAnswers: {
+        select: {
+          fieldId: true,
+          value: true
+        }
+      },
+      form: {
+        select: {
+          formFields: {
+            select: {
+              fieldConfig: true,
+              id: true,
+              type: true
+            }
+          }
+        }
+      }
+    }
+  });
+
+  await validateProposalProject({
+    formAnswers: proposalForm?.formAnswers as FieldAnswerInput[],
+    formFields: proposalForm?.form?.formFields
+  });
 
   await publishProposal({
     proposalId,

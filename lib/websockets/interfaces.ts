@@ -39,7 +39,7 @@ type BlocksCreated = {
 
 type BlocksDeleted = {
   type: 'blocks_deleted';
-  payload: Resource<Pick<UIBlockWithDetails, 'type'>>[];
+  payload: Resource[];
 };
 
 type PagesMetaUpdated = {

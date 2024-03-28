@@ -1,4 +1,4 @@
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import { validateAnswers } from 'lib/forms/validateAnswers';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utils/types';
@@ -92,20 +92,4 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
     default:
       return false;
   }
-}
-
-export function checkFormFieldErrors(formFields: FormFieldInput[]): string | undefined {
-  if (formFields.length === 0) {
-    return 'Form fields are required for structured proposals';
-  } else if (formFields.some((formField) => !formField.name)) {
-    return 'Form fields must have a name';
-  } else if (
-    formFields.some(
-      (formField) =>
-        (formField.type === 'select' || formField.type === 'multiselect') && (formField.options ?? []).length === 0
-    )
-  ) {
-    return 'Select fields must have at least one option';
-  }
-  return undefined;
 }

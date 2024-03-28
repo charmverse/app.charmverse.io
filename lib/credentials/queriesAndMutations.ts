@@ -10,6 +10,7 @@ import type { EasSchemaChain } from './connectors';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from './external/getOnchainCredentials';
 import type { ExternalCredentialChain } from './external/schemas';
 import type { CredentialData } from './schemas';
+import { externalCredentialSchemaId } from './schemas/external';
 import { proposalCredentialSchemaId } from './schemas/proposal';
 import { rewardCredentialSchemaId } from './schemas/reward';
 
@@ -249,4 +250,43 @@ export async function getCharmverseOffchainCredentialsByWallets({
         };
       })
   );
+}
+
+export async function getExternalCredentialsByWallets({
+  wallets
+}: {
+  wallets: string[];
+}): Promise<EASAttestationWithFavorite[]> {
+  if (typeof credentialsWalletPrivateKey !== 'string') {
+    return [];
+  }
+  const credentialWalletAddress = new Wallet(credentialsWalletPrivateKey).address.toLowerCase();
+  if (!wallets.length) {
+    return [];
+  }
+
+  const externalCredentials: EASAttestationFromApi[] = await ceramicGraphQlClient
+    .query({
+      query: GET_CREDENTIALS,
+      variables: {
+        filter: {
+          where: {
+            schemaId: { in: [externalCredentialSchemaId] },
+            recipient: { in: wallets.map((w) => w.toLowerCase()) },
+            issuer: { equalTo: credentialWalletAddress }
+          }
+        }
+      }
+      // For now, let's refetch each time and rely on http endpoint-level caching
+      // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
+    })
+    .then(({ data }) => data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
+
+  return externalCredentials.map((credential) => ({
+    ...credential,
+    iconUrl: null,
+    favoriteCredentialId: null,
+    index: -1,
+    issuedCredentialId: undefined
+  }));
 }

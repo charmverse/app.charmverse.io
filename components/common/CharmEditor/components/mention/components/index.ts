@@ -1,4 +1,4 @@
 import Mention from './Mention';
-import MentionSuggest from './MentionSuggest';
+import { MentionsPopup } from './MentionsPopup';
 
-export { Mention, MentionSuggest };
+export { Mention, MentionsPopup };

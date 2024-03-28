@@ -7,6 +7,7 @@ import {
   Box,
   IconButton,
   ListItemIcon,
+  ListItemText,
   MenuItem,
   Stack,
   TextField,
@@ -18,11 +19,9 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { PageIcon } from 'components/common/PageIcon';
 import PageTitle from 'components/common/PageLayout/components/PageTitle';
-import type { PageListItem } from 'components/common/PagesList';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { usePages } from 'hooks/usePages';
-import type { IPropertyTemplate } from 'lib/databases/board';
-import { isTruthy } from 'lib/utils/types';
+import type { Board } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 
 import type { PropertyValueDisplayType } from '../../interfaces';
 
@@ -31,7 +30,7 @@ import { PopupFieldWrapper } from './PopupFieldWrapper';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 import { StyledUserPropertyContainer } from './UserAndRoleSelect';
 
-const StyledAutocomplete = styled(Autocomplete<PageListItem & { selected: boolean }, true, boolean>)`
+const StyledAutocomplete = styled(Autocomplete<Card, true, boolean>)`
   min-width: 150px;
   .MuiAutocomplete-inputRoot {
     gap: 4px;
@@ -45,7 +44,6 @@ const StyledStack = styled(Stack)`
   align-items: center;
   overflow-x: hidden;
   cursor: pointer;
-  gap: ${({ theme }) => theme.spacing(0.25)};
 `;
 
 const StyledRelatedPage = styled(Stack)`
@@ -71,27 +69,25 @@ const StyledRelatedPage = styled(Stack)`
 
 export function RelationPageListItemsContainer({
   readOnly,
-  pageListItems,
+  cards,
   onRemove,
   onClick
 }: {
   readOnly?: boolean;
-  pageListItems: PageListItem[];
+  cards: Pick<Card, 'id' | 'icon' | 'hasContent' | 'title' | 'type'>[];
   onRemove?: (id: string) => void;
   onClick?: (id: string) => void;
 }) {
   return (
     <>
-      {pageListItems.map((pageListItem) => {
+      {cards.map((card) => {
         return (
-          <StyledStack key={pageListItem.id} onClick={() => onClick?.(pageListItem.id)}>
-            <PageIcon icon={pageListItem.icon} isEditorEmpty={!pageListItem.hasContent} pageType={pageListItem.type} />
-            <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-              {pageListItem.title || 'Untitled'}
-            </PageTitle>
+          <StyledStack key={card.id} onClick={() => onClick?.(card.id)}>
+            <PageIcon icon={card.icon} isEditorEmpty={!card.hasContent} pageType={card.type} />
+            <PageTitle hasContent={!card.title}>{card.title || 'Untitled'}</PageTitle>
 
             {!readOnly && onRemove && (
-              <IconButton sx={{ ml: 1 }} size='small' onClick={() => onRemove(pageListItem.id)}>
+              <IconButton sx={{ ml: 1 }} size='small' onClick={() => onRemove(card.id)}>
                 <CloseIcon
                   sx={{
                     fontSize: 14
@@ -109,56 +105,47 @@ export function RelationPageListItemsContainer({
 }
 
 function PagesAutocompleteBase({
+  board,
   onChange,
-  selectedPageListItems: _selectedPageListItems,
-  pageListItems,
+  value: selectedCardIds,
+  cards,
   readOnly,
   wrapColumn,
   displayType = 'details',
   emptyPlaceholderContent = 'Empty',
   showEmptyPlaceholder = true,
   variant = 'standard',
-  relationTemplate,
+  multiple,
   showCard
 }: {
-  relationTemplate: IPropertyTemplate;
+  board?: Board;
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
-  pageListItems: PageListItem[];
-  selectedPageListItems: PageListItem[];
+  cards: Card[];
+  value: string[];
   onChange: (pageListItemIds: string[]) => void;
   wrapColumn?: boolean;
   emptyPlaceholderContent?: string;
   showEmptyPlaceholder?: boolean;
   variant?: 'outlined' | 'standard';
+  multiple: boolean;
   showCard?: (cardId: string | null) => void;
 }) {
   const { navigateToSpacePath } = useCharmRouter();
-  const selectionLimit = relationTemplate.relationData?.limit ?? 'single_page';
-  const { pages } = usePages();
-  const connectedBoard = relationTemplate.relationData?.boardId
-    ? pages[relationTemplate.relationData.boardId]
-    : undefined;
   const [isOpen, setIsOpen] = useState(false);
 
-  const { sortedPages, selectedPageListItems } = useMemo(() => {
-    const __selectedPageListItems = (
-      selectionLimit === 'single_page' ? _selectedPageListItems.slice(0, 1) : _selectedPageListItems
-    ).map((selectedPage) => ({ ...selectedPage, selected: true }));
-    const selectedPageIds = __selectedPageListItems.map((v) => v.id);
-
-    return {
-      selectedPageListItems: __selectedPageListItems,
-      sortedPages: pageListItems
-        .filter(isTruthy)
-        .map((pageA) => ({ ...pageA, selected: selectedPageIds.includes(pageA.id) }))
-        .sort(
-          (pageA, pageB) =>
-            (pageB.selected ? 1 : 0) - (pageA.selected ? 1 : 0) ||
-            ((pageA.title || 'Untitled') > (pageB.title || 'Untitled') ? 1 : -1)
-        )
-    };
-  }, [pageListItems, _selectedPageListItems, selectionLimit]);
+  const { sortedCards, selected, selectedCards } = useMemo(() => {
+    const _selected = selectedCardIds.reduce<Record<string, boolean>>((acc, id) => {
+      acc[id] = true;
+      return acc;
+    }, {});
+    const _selectedCards = cards.filter((card) => _selected[card.id]);
+    const _sortedCards: Card[] = [...cards].sort(
+      (cardA, cardB) =>
+        (_selected[cardB.id] ? 1 : 0) - (_selected[cardA.id] ? 1 : 0) || (cardA.title > cardB.title ? 1 : -1)
+    );
+    return { selected: _selected, selectedCards: _selectedCards, sortedCards: _sortedCards };
+  }, [cards, selectedCardIds]);
 
   const onClickToEdit = useCallback(() => {
     if (!readOnly) {
@@ -176,12 +163,12 @@ function PagesAutocompleteBase({
       onClick={onClickToEdit}
     >
       <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={1}>
-        {selectedPageListItems.length === 0 ? (
+        {selectedCardIds.length === 0 ? (
           showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
         ) : (
           <RelationPageListItemsContainer
             readOnly={readOnly}
-            pageListItems={selectedPageListItems}
+            cards={selectedCards}
             // only showCard if its in readOnly mode since we need to open the select field in non readOnly mode
             onClick={readOnly ? showCard : undefined}
           />
@@ -198,43 +185,38 @@ function PagesAutocompleteBase({
         disableClearable
         forcePopupIcon={false}
         fullWidth
-        groupBy={(option) => (option.selected ? 'Linked page' : 'Link another page')}
+        groupBy={(option) => (selected[option.id] ? 'Linked' : 'Link another page')}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         multiple
+        getOptionLabel={(option) => option.title} // prevent errors in console
         noOptionsText='No pages found'
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          setIsOpen(false);
+        }}
         openOnFocus
-        options={sortedPages}
+        options={sortedCards}
         renderInput={(params) => (
           <TextField
             {...params}
             autoFocus={variant === 'standard'}
             size='small'
-            value={selectedPageListItems}
+            // value={selectedCards}
             placeholder='Link a page'
             InputProps={{
               ...params.InputProps,
-              endAdornment: connectedBoard ? (
+              endAdornment: board ? (
                 <Stack flexDirection='row'>
                   <Typography variant='subtitle1' color='secondary' mr={0.5}>
-                    In
+                    in
                   </Typography>
                   <StyledRelatedPage
                     onClick={() => {
-                      navigateToSpacePath(`/${connectedBoard.path}`);
+                      navigateToSpacePath(`/${board.id}`);
                     }}
                   >
-                    <PageIcon
-                      size='small'
-                      icon={connectedBoard.icon}
-                      isEditorEmpty={!connectedBoard.hasContent}
-                      pageType={connectedBoard.type}
-                    />
-                    <PageTitle
-                      hasContent={!connectedBoard.title}
-                      sx={{ fontWeight: 'bold', maxWidth: 250, flexGrow: 1 }}
-                    >
-                      {connectedBoard.title || 'Untitled'}
+                    <PageIcon size='small' icon={board.icon} pageType='board' />
+                    <PageTitle sx={{ fontWeight: 'bold', maxWidth: 250, flexGrow: 1 }}>
+                      {board.title || 'Untitled'}
                     </PageTitle>
                   </StyledRelatedPage>
                 </Stack>
@@ -244,11 +226,11 @@ function PagesAutocompleteBase({
             variant={variant}
           />
         )}
-        renderOption={(props, pageListItem) => {
+        renderOption={(props, card) => {
           return (
             <MenuItem
-              key={pageListItem.id}
-              data-test={`page-option-${pageListItem.id}`}
+              key={card.id}
+              data-test={`page-option-${card.id}`}
               sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -257,49 +239,51 @@ function PagesAutocompleteBase({
                 flexDirection: 'row'
               }}
               onClick={() => {
-                if (!pageListItem.selected) {
-                  if (selectionLimit === 'single_page') {
-                    return onChange([pageListItem.id]);
+                if (!selected[card.id]) {
+                  if (multiple) {
+                    return onChange([card.id, ...Object.keys(selected)]);
                   } else {
-                    return onChange([pageListItem, ...selectedPageListItems].map((v) => v.id));
+                    return onChange([card.id]);
                   }
                 } else {
-                  showCard?.(pageListItem.id);
+                  showCard?.(card.id);
                 }
               }}
             >
-              <Stack flexDirection='row' gap={0.5}>
-                <ListItemIcon>
-                  <PageIcon
-                    icon={pageListItem.icon}
-                    isEditorEmpty={!pageListItem.hasContent}
-                    pageType={pageListItem.type}
-                  />
-                </ListItemIcon>
-                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-                  {pageListItem.title || 'Untitled'}
-                </PageTitle>
-              </Stack>
-              {pageListItem.selected ? (
+              <ListItemIcon>
+                <PageIcon icon={card.icon} isEditorEmpty={!card.hasContent} pageType='card' />
+              </ListItemIcon>
+              <ListItemText>{card.title || 'Untitled'}</ListItemText>
+
+              {selected[card.id] ? (
                 <Tooltip title='Unlink page'>
-                  <RemoveIcon
-                    fontSize='small'
-                    color='secondary'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onChange(selectedPageListItems.filter((v) => v.id !== pageListItem.id).map((v) => v.id));
-                    }}
-                  />
+                  <ListItemIcon>
+                    <IconButton
+                      size='small'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onChange(selectedCardIds.filter((v) => v !== card.id));
+                      }}
+                    >
+                      <RemoveIcon fontSize='small' color='secondary' />
+                    </IconButton>
+                  </ListItemIcon>
                 </Tooltip>
               ) : (
-                <AddIcon fontSize='small' color='secondary' />
+                <Tooltip title='Link page'>
+                  <ListItemIcon>
+                    <IconButton size='small'>
+                      <AddIcon fontSize='small' color='secondary' />
+                    </IconButton>
+                  </ListItemIcon>
+                </Tooltip>
               )}
             </MenuItem>
           );
         }}
         renderTags={() => null}
         disabled={!!readOnly}
-        value={selectedPageListItems}
+        value={selectedCards}
       />
     </StyledUserPropertyContainer>
   );

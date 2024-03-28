@@ -23,8 +23,6 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
 import { DatePicker } from 'components/common/DatePicker';
-import { PageIcon } from 'components/common/PageIcon';
-import PageTitle from 'components/common/PageLayout/components/PageTitle';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
@@ -38,12 +36,11 @@ import { getPropertyName } from 'lib/databases/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
-import { isTruthy } from 'lib/utils/types';
 import { focalboardColorsMap } from 'theme/colors';
 
-import type { PageListItemsRecord } from '../../interfaces';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
-import { RelationPageListItemsContainer } from '../properties/PagesAutocomplete';
+
+import { RelatedPagesSelect } from './RelatedPagesSelect';
 
 type Props = {
   properties: IPropertyTemplate[];
@@ -51,7 +48,6 @@ type Props = {
   filter: FilterClause;
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 };
 
 function formatCondition(condition: string) {
@@ -84,14 +80,12 @@ function FilterPropertyValue({
   properties,
   filter: initialFilter,
   changeViewFilter,
-  currentFilter,
-  relationPropertiesCardsRecord
+  currentFilter
 }: {
   filter: FilterClause;
   properties: IPropertyTemplate[];
   changeViewFilter: (filterGroup: FilterGroup) => void;
   currentFilter: FilterGroup;
-  relationPropertiesCardsRecord: PageListItemsRecord;
 }) {
   const [filter, setFilter] = useState(initialFilter);
   const { space } = useCurrentSpace();
@@ -151,6 +145,15 @@ function FilterPropertyValue({
 
   const updateMultiSelectValue = (e: SelectChangeEvent<string[]>) => {
     const values = e.target.value as string[];
+    const newFilterValue = {
+      ...filter,
+      values
+    };
+    setFilter(newFilterValue);
+    updatePropertyValueDebounced(currentFilter, newFilterValue);
+  };
+
+  const updateMultiSelect = (values: string[]) => {
     const newFilterValue = {
       ...filter,
       values
@@ -270,52 +273,12 @@ function FilterPropertyValue({
         </Select>
       );
     } else if (property.type === 'relation') {
-      const pageListItems = relationPropertiesCardsRecord[property.id];
       return (
-        <Select<string[]>
-          size='small'
-          multiple
-          displayEmpty
+        <RelatedPagesSelect
           value={filter.values}
-          onChange={updateMultiSelectValue}
-          renderValue={(pageListItemIds) => {
-            return pageListItemIds.length === 0 ? (
-              <Typography color='secondary' fontSize='small'>
-                Select a page
-              </Typography>
-            ) : (
-              <RelationPageListItemsContainer
-                pageListItems={pageListItemIds
-                  .map((pageListItemId) => {
-                    const pageListItem = pageListItems.find((_pageListItem) => _pageListItem.id === pageListItemId);
-                    return pageListItem;
-                  })
-                  .filter(isTruthy)}
-              />
-            );
-          }}
-        >
-          {pageListItems.map((pageListItem) => {
-            return (
-              <MenuItem
-                key={pageListItem.id}
-                value={pageListItem.id}
-                selected={!!filter.values.find((selectedPageListItemId) => selectedPageListItemId === pageListItem.id)}
-              >
-                <ListItemIcon>
-                  <PageIcon
-                    icon={pageListItem.icon}
-                    isEditorEmpty={!pageListItem.hasContent}
-                    pageType={pageListItem.type}
-                  />
-                </ListItemIcon>
-                <PageTitle hasContent={!pageListItem.title} sx={{ fontWeight: 'bold' }}>
-                  {pageListItem.title ? pageListItem.title : 'Untitled'}
-                </PageTitle>
-              </MenuItem>
-            );
-          })}
-        </Select>
+          boardPageId={property.relationData?.boardId}
+          onChange={updateMultiSelect}
+        />
       );
     } else {
       return (
@@ -561,7 +524,6 @@ function FilterEntry(props: Props) {
         </PopupState>
         <FilterPropertyValue
           filter={filter}
-          relationPropertiesCardsRecord={props.relationPropertiesCardsRecord}
           properties={properties}
           changeViewFilter={changeViewFilter}
           currentFilter={currentFilter}

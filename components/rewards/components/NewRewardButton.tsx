@@ -130,8 +130,8 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       <TemplatesMenu
         isLoading={isLoading}
         templates={templates?.map((tpl) => tpl.page) ?? []}
-        addPageFromTemplate={(pageId) => {
-          const template = templates?.find((tpl) => tpl.page.id === pageId);
+        addPageFromTemplate={(page) => {
+          const template = templates?.find((tpl) => tpl.page.id === page.id);
           if (template) {
             createRewardFromTemplate(template);
           }

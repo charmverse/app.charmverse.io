@@ -1060,25 +1060,23 @@ export class Mutator {
   // Duplicate
 
   async duplicateCard({
-    cardId,
+    card,
     board,
     description = 'duplicate card',
     asTemplate = false,
     afterRedo,
-    beforeUndo,
-    cardPage
+    beforeUndo
   }: {
-    cardId: string;
+    card: Card;
     board: Board;
-    cardPage: PageMeta;
     description?: string;
     asTemplate?: boolean;
     afterRedo?: (newCardId: string) => Promise<void>;
     beforeUndo?: () => Promise<void>;
   }): Promise<[UIBlockWithDetails[], string]> {
-    const blocks = await charmClient.getSubtree({ pageId: cardPage.id });
-    const pageDetails = await charmClient.pages.getPage(cardId);
-    const [newBlocks, newCard] = OctoUtils.duplicateBlockTree(blocks, cardId) as [
+    const blocks = await charmClient.getSubtree({ pageId: card.pageId! });
+    const pageDetails = card.pageId ? await charmClient.pages.getPage(card.pageId) : null;
+    const [newBlocks, newCard] = OctoUtils.duplicateBlockTree(blocks, card.id) as [
       UIBlockWithDetails[],
       Card,
       Record<string, string>
@@ -1087,7 +1085,7 @@ export class Mutator {
     Utils.log(`duplicateCard: duplicating ${newBlocks.length} blocks`);
     if (asTemplate === newCard.fields.isTemplate) {
       // Copy template
-      newCard.title = `${cardPage.title} copy`;
+      newCard.title = `${card.title} copy`;
     } else if (asTemplate) {
       // Template from card
       newCard.title = 'New card template';
@@ -1098,18 +1096,18 @@ export class Mutator {
     newCard.fields.isTemplate = asTemplate;
     newCard.rootId = board.id;
     newCard.parentId = board.id;
-    newCard.fields.icon = cardPage.icon || undefined;
-    newCard.fields.headerImage = cardPage.headerImage || undefined;
-    newCard.fields.content = pageDetails.content;
-    newCard.fields.contentText = pageDetails.contentText;
+    newCard.fields.icon = card.icon || undefined;
+    newCard.fields.headerImage = pageDetails?.headerImage || undefined;
+    newCard.fields.content = pageDetails?.content;
+    newCard.fields.contentText = pageDetails?.contentText;
 
     await this.insertBlocks(
       newBlocks,
       description,
       async (respBlocks: UIBlockWithDetails[]) => {
-        const card = respBlocks.find((block) => block.type === 'card');
-        if (card) {
-          await afterRedo?.(card.id);
+        const _card = respBlocks.find((block) => block.type === 'card');
+        if (_card) {
+          await afterRedo?.(_card.id);
         } else {
           Utils.logError('card not found for opening.');
         }

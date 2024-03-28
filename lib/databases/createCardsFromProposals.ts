@@ -4,7 +4,7 @@ import type { Block, Page, ProposalRubricCriteria, ProposalRubricCriteriaAnswer 
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
-import { prismaToBlock } from 'lib/databases/block';
+import { prismaToBlock, prismaToUIBlock } from 'lib/databases/block';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
@@ -17,7 +17,8 @@ import { relay } from 'lib/websockets/relay';
 
 import { createCardPage } from '../pages/createCardPage';
 
-import { proposalPropertyTypesList, type BoardFields } from './board';
+import type { Board, BoardFields } from './board';
+import { proposalPropertyTypesList } from './board';
 import type { BoardViewFields } from './boardView';
 import type { CardPropertyValue } from './card';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
@@ -144,10 +145,18 @@ export async function createCardsFromProposals({
     }
   });
 
-  const boardBlock = await setDatabaseProposalProperties({
-    boardId,
-    cardProperties: proposalBoardBlock?.fields.cardProperties ?? []
-  });
+  const [dbBlock, boardPage] = await Promise.all([
+    setDatabaseProposalProperties({
+      boardId,
+      cardProperties: proposalBoardBlock?.fields.cardProperties ?? []
+    }),
+    prisma.page.findFirstOrThrow({
+      where: {
+        boardId
+      }
+    })
+  ]);
+  const boardBlock = prismaToUIBlock(dbBlock, boardPage) as Board;
 
   const views = await prisma.block.findMany({
     where: {
@@ -220,14 +229,6 @@ export async function createCardsFromProposals({
         }
       });
     })
-  );
-
-  relay.broadcast(
-    {
-      type: 'blocks_updated',
-      payload: updatedViewBlocks.map(prismaToBlock).concat(prismaToBlock(boardBlock as any))
-    },
-    spaceId
   );
 
   const cards: { page: Page; block: Block }[] = [];
@@ -332,18 +333,19 @@ export async function createCardsFromProposals({
     cards.push(_card);
   }
 
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: updatedViewBlocks.map(prismaToBlock).concat(boardBlock)
+    },
+    spaceId
+  );
+
   if (cards.length > 0) {
     relay.broadcast(
       {
         type: 'blocks_created',
-        payload: cards.map((card) => prismaToBlock(card.block))
-      },
-      spaceId
-    );
-    relay.broadcast(
-      {
-        type: 'pages_created',
-        payload: cards.map((card) => card.page)
+        payload: cards.map((card) => prismaToUIBlock(card.block, card.page))
       },
       spaceId
     );

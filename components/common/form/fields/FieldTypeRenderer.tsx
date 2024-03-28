@@ -21,6 +21,8 @@ type TextInputConfig = {
 
 type TextProps = {
   type: Exclude<FieldType, 'select' | 'multiselect'>;
+  rows?: number;
+  maxRows?: number;
 } & FieldProps &
   ControlFieldProps;
 
@@ -44,7 +46,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'phone':
       case 'short_text':
       case 'wallet': {
-        return <TextInputField rows={1} maxRows={1} {...fieldProps} ref={ref} multiline />;
+        return <TextInputField {...fieldProps} ref={ref} multiline />;
       }
       case 'long_text': {
         return <CharmEditorInputField {...fieldProps} />;
