@@ -28,7 +28,6 @@ describe('createProject', () => {
     const walletAddressUserAddress = randomETHWallet().address;
     const verifiedEmailUser = await testUtilsUser.generateUser();
     const googleAccountUser = await testUtilsUser.generateUser();
-
     const verifiedEmailUserEmail = `${v4()}@gmail.com`;
     const googleAccountUserEmail = `${v4()}@gmail.com`;
 

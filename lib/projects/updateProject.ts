@@ -80,7 +80,7 @@ export async function updateProject({
     }
   }
 
-  const [projects, , ...projectMembers] = await prisma.$transaction([
+  await prisma.$transaction([
     prisma.project.update({
       where: {
         id: projectId
@@ -109,8 +109,14 @@ export async function updateProject({
     ...projectMemberTransactions
   ]);
 
-  return {
-    ...projects,
-    projectMembers
-  };
+  const projectWithMembers = await prisma.project.findUniqueOrThrow({
+    where: {
+      id: projectId
+    },
+    include: {
+      projectMembers: true
+    }
+  });
+
+  return projectWithMembers;
 }
