@@ -3,6 +3,7 @@ import type { PageType } from '@charmverse/core/prisma';
 import { useMemo } from 'react';
 
 import { useGetSearchPages } from 'charmClient/hooks/pages';
+import { stringSimilarity } from 'lib/utils/strings';
 
 import { useCurrentSpace } from './useCurrentSpace';
 import { useDebouncedValue } from './useDebouncedValue';
@@ -32,16 +33,17 @@ export function useSearchPages({ search, limit }: { search: string; limit?: numb
     limit
   });
   const results = useMemo(() => {
-    return searchDebounced
-      ? (data || [])?.map((page) => ({
-          title: page.title || 'Untitled',
-          breadcrumb: _getBreadcrumb(page, pages),
-          path: `/${page.path}`,
-          icon: page.icon,
-          type: page.type,
-          id: page.id
-        }))
-      : [];
+    return sortList({
+      triggerText: searchDebounced,
+      list: (searchDebounced ? data || [] : [])?.map((page) => ({
+        title: page.title || 'Untitled',
+        breadcrumb: _getBreadcrumb(page, pages),
+        path: `/${page.path}`,
+        icon: page.icon,
+        type: page.type,
+        id: page.id
+      }))
+    });
   }, [data, pages, searchDebounced]);
   return { isLoading, isValidating, results };
 }
@@ -62,4 +64,20 @@ function _getBreadcrumb(
   }
 
   return pathElements.join(' / ');
+}
+
+export function sortList<T extends { title: string; originalTitle?: string }>({
+  triggerText,
+  list
+}: {
+  triggerText: string;
+  list: T[];
+}): T[] {
+  return list
+    .map((item) => ({
+      item,
+      similarity: stringSimilarity(item.originalTitle || item.title, triggerText)
+    }))
+    .sort((a, b) => b.similarity - a.similarity)
+    .map(({ item }) => item);
 }
