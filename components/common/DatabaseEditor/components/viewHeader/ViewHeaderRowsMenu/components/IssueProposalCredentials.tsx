@@ -152,7 +152,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
             sx={{ color: 'black' }}
             href={getOnChainSchemaUrl({
               chainId: space.credentialsChainId as EasSchemaChain,
-              schemaId: proposalCredentialSchemaId
+              schema: proposalCredentialSchemaId
             })}
           >
             <Chain info={chain} />

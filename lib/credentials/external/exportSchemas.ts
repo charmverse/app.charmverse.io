@@ -77,7 +77,7 @@ async function dumpSchemas() {
         loadSchema({ chainId, schemaId: _schema.schemaId }).then((_loadedSchema) => ({
           ..._schema,
           schema: _loadedSchema.schema,
-          url: getOnChainSchemaUrl({ chainId, schemaId: _loadedSchema.uid })
+          url: getOnChainSchemaUrl({ chainId, schema: _loadedSchema.uid })
         }))
       )
     );

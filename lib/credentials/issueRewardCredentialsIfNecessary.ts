@@ -7,7 +7,7 @@ import { optimism } from 'viem/chains';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
 
-import { signAndPublishCharmverseCredential } from './attestOffchain';
+import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
 import type { CredentialDataInput } from './schemas';
@@ -171,7 +171,7 @@ export async function issueRewardCredentialsIfNecessary({
             rewardURL: getSubmissionPagePermalink({ submissionId: credentialTemplate.applicationId })
           };
           // Iterate through credentials one at a time so we can ensure they're properly created and tracked
-          await signAndPublishCharmverseCredential({
+          await signPublishAndRecordCharmverseCredential({
             chainId: optimism.id,
             recipient: targetWallet.address,
             credential: {
