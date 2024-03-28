@@ -57,8 +57,8 @@ function PagesMenu({
   const { rootPages } = useRootPages();
   const { categories } = useForumCategories();
   const { mappedFeatures } = useSpaceFeatures();
-  const { results: searchResults, isValidating } = useSearchPages({ search: triggerText, limit: 50 });
-  // keep track of static results, only update if isValidating is false
+  const { results: searchResults, isLoading } = useSearchPages({ search: triggerText, limit: 50 });
+  // keep track of static results, only update if isLoading is false
   const [filteredPages, setFilteredPages] = useState<PageListItem[]>([]);
 
   const staticPages: PageListItem[] = useMemo(() => {
@@ -92,7 +92,7 @@ function PagesMenu({
 
   useEffect(() => {
     // to reduce jumping, dont update results if we are waiting for a response from the backend
-    if (!isValidating) {
+    if (!isLoading) {
       const filteredStaticPages = staticPages.filter((option) => {
         return option.title.toLowerCase().includes(triggerText.toLowerCase());
       });
@@ -109,7 +109,7 @@ function PagesMenu({
         })
       );
     }
-  }, [isValidating, pageId, triggerText, searchResults, staticPages, filteredCategoryPages]);
+  }, [isLoading, pageId, triggerText, searchResults, staticPages, filteredCategoryPages]);
 
   const options = useMemo(() => {
     if (triggerText) {

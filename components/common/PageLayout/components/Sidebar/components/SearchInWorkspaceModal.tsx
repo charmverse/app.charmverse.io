@@ -1,31 +1,38 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { ListItem, Typography } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import { ListItem, ListItemText, ListItemIcon, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Popper from '@mui/material/Popper';
-import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import type { SyntheticEvent } from 'react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
+import { useGetRecentHistory } from 'charmClient/hooks/pages';
+import LoadingComponent from 'components/common/LoadingComponent';
+import { Modal, ModalPosition } from 'components/common/Modal';
 import { PageIcon } from 'components/common/PageIcon';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import type { SearchResultItem } from 'hooks/useSearchPages';
-import { useSearchPages } from 'hooks/useSearchPages';
+import { useSearchPages, getBreadcrumb } from 'hooks/useSearchPages';
+import { getRelativeDateInThePast } from 'lib/utils/dates';
 
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
-    margintop: 0px;
-    paddingright: 0px !important;
+    border-bottom: 1px solid var(--input-border);
   }
   label: {
     transform: inherit;
   }
   .MuiAutocomplete-endAdornment {
     display: none;
+  }
+  & .MuiAutocomplete-clearIndicator {
+    color: '#000 !important';
   }
 `;
 
@@ -37,23 +44,22 @@ const StyledPopper = styled(Popper)`
   & > .MuiPaper-root {
     box-shadow: none;
   }
+  // group label
+  & .MuiListSubheader-root {
+    line-height: 2em;
+  }
+  // the container of each group
+  .MuiAutocomplete-groupUl {
+    margin-bottom: 16px;
+  }
+  & .MuiAutocomplete-listbox {
+    padding-left: 3px;
+    padding-right: 3px;
+  }
 `;
 
 const StyledListItem = styled(ListItem)`
   &.MuiAutocomplete-option {
-    padding-left: 0px;
-    padding-right: ${({ theme }) => theme.spacing(2)};
-    flex-direction: column;
-    align-items: start;
-    color: ${({ theme }) => theme.palette.secondary.main};
-    display: flex;
-    gap: 5px;
-    font-size: 17px;
-    font-weight: 400;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid ${({ theme }) => theme.palette.gray.main};
-
     &:hover,
     &.Mui-focused {
       color: inherit;
@@ -61,20 +67,21 @@ const StyledListItem = styled(ListItem)`
   }
 `;
 
-const baseLine = css`
+const StyledTypographyPage = styled(Typography)`
+  font-size: 14px;
   max-width: 450px;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
 `;
 
-const StyledTypographyPage = styled(Typography)`
-  ${baseLine}
-`;
-
 const StyledTypographyPath = styled(Typography)`
-  ${baseLine}
-  font-style: italic;
+  color: var(--secondary-text);
+  display: inline;
+  font-size: 0.8em;
+  &::before {
+    content: ' — ';
+  }
 `;
 
 type SearchInWorkspaceModalProps = {
@@ -85,25 +92,50 @@ type SearchInWorkspaceModalProps = {
 export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { close, isOpen } = props;
   const { navigateToSpacePath } = useCharmRouter();
-  const [expandPageList, setExpandPageList] = useState(false);
   const [searchString, setSearchString] = useState('');
-  const { results: options } = useSearchPages({ search: searchString, limit: 50 });
+  const { space } = useCurrentSpace();
+  const { pages } = usePages();
+  const { data: recentHistoryData, isLoading: isLoadingHistory } = useGetRecentHistory({
+    spaceId: isOpen ? space?.id : undefined
+  });
+  const { results, isLoading: isLoadingSearch } = useSearchPages({ search: searchString, limit: 50 });
+
+  const showLoading = isLoadingHistory || (isLoadingSearch && results.length === 0);
 
   function onChange(event: SyntheticEvent<Element>, newInputValue: string) {
-    if (newInputValue.trim() === '') {
-      setExpandPageList(false);
-      setSearchString(newInputValue);
-    } else {
-      setExpandPageList(true);
-      setSearchString(newInputValue.trim()?.toLocaleLowerCase());
-    }
+    setSearchString(newInputValue.trim()?.toLocaleLowerCase());
   }
 
+  const recentHistory: SearchResultItem[] = useMemo(() => {
+    return (
+      recentHistoryData?.map((page) => ({
+        id: page.id,
+        path: page.path,
+        title: page.title || 'Untitled',
+        group: getRelativeDateInThePast(page.lastViewedAt),
+        breadcrumb: getBreadcrumb(page, pages),
+        icon: page.icon,
+        type: page.type
+      })) || []
+    );
+  }, [recentHistoryData]);
+
+  const options: SearchResultItem[] = searchString ? results : recentHistory;
+  // group history by date
+  const groupBy = searchString ? undefined : (option: SearchResultItem) => option.group || '';
+
+  useEffect(() => {
+    if (!isOpen) {
+      // clear results when modal clsoes
+      setSearchString('');
+    }
+  }, [isOpen]);
+
   return (
-    <Modal open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
-      <DialogTitle onClose={close}>Quick Find</DialogTitle>
+    <Modal noPadding open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
       <StyledAutocomplete
         options={options}
+        loading={showLoading}
         noOptionsText='No search results'
         autoComplete
         clearOnBlur={false}
@@ -111,12 +143,13 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         onInputChange={onChange}
         onChange={(_e, item) => {
           if (item) {
-            navigateToSpacePath((item as SearchResultItem).path);
+            navigateToSpacePath(`/${(item as SearchResultItem).path}`);
             close();
           }
         }}
         getOptionLabel={(option) => (typeof option === 'object' ? option.title : option)}
-        open={expandPageList}
+        groupBy={groupBy}
+        open
         disablePortal
         disableClearable
         // disable filtering when doing async search (see MUI docs)
@@ -128,44 +161,42 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
 
           return (
             <StyledListItem {...listItemProps} key={option.id}>
-              <Stack direction='row' spacing={1}>
+              <ListItemIcon>
                 <PageIcon icon={option.icon} isEditorEmpty={false} pageType={option.type} />
-                <Stack>
-                  <StyledTypographyPage>
-                    {parts.map((part: { text: string; highlight: boolean }) => {
-                      return (
-                        <span
-                          key={`${option.id}-${part.text}${part.highlight}`}
-                          style={{
-                            fontWeight: part.highlight ? 700 : 400
-                          }}
-                        >
-                          {part.text}
-                        </span>
-                      );
-                    })}
-                  </StyledTypographyPage>
+              </ListItemIcon>
+              <ListItemText>
+                <StyledTypographyPage>
+                  {parts.map((part: { text: string; highlight: boolean }) => {
+                    return (
+                      <span
+                        key={`${option.id}-${part.text}${part.highlight}`}
+                        style={{
+                          fontWeight: 600,
+                          backgroundColor: part.highlight ? 'var(--bg-yellow)' : 'transparent'
+                        }}
+                      >
+                        {part.text}
+                      </span>
+                    );
+                  })}
                   {option.breadcrumb && <StyledTypographyPath>{option.breadcrumb}</StyledTypographyPath>}
-                </Stack>
-              </Stack>
+                </StyledTypographyPage>
+              </ListItemText>
             </StyledListItem>
           );
         }}
         renderInput={(params) => (
           <TextField
             {...params}
-            placeholder='Search inside the space'
+            placeholder={`Search ${space?.name || ''}...`}
             variant='standard'
-            size='small'
             autoFocus={true}
             InputProps={{
               ...params.InputProps,
-              type: 'search'
-            }}
-            sx={{
-              '& .MuiAutocomplete-clearIndicator': {
-                color: '#000 !important'
-              }
+              disableUnderline: true,
+              startAdornment: <SearchIcon color='secondary' sx={{ mx: 1 }} />,
+              type: 'search',
+              sx: { p: '8px !important', fontSize: '18px' }
             }}
           />
         )}
