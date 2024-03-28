@@ -9,7 +9,10 @@ export function useRootPages() {
   const rootPages = useMemo(
     () =>
       Object.values(pages)
-        .filter((page) => page && !page.parentId && (page.type === 'board' || page.type === 'page'))
+        .filter(
+          (page) =>
+            page && !page.parentId && (page.type === 'board' || page.type === 'linked_board' || page.type === 'page')
+        )
         .filter(isTruthy)
         .sort((a, b) => a.index - b.index),
     [pages]
