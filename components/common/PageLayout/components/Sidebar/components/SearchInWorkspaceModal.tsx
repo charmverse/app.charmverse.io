@@ -23,12 +23,16 @@ import { getRelativeDateInThePast } from 'lib/utils/dates';
 
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
+    border-bottom: 1px solid var(--input-border);
   }
   label: {
     transform: inherit;
   }
   .MuiAutocomplete-endAdornment {
     display: none;
+  }
+  & .MuiAutocomplete-clearIndicator {
+    color: '#000 !important';
   }
 `;
 
@@ -94,7 +98,9 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { data: recentHistoryData, isLoading: isLoadingHistory } = useGetRecentHistory({
     spaceId: isOpen ? space?.id : undefined
   });
-  const { results } = useSearchPages({ search: searchString, limit: 50 });
+  const { results, isLoading: isLoadingSearch } = useSearchPages({ search: searchString, limit: 50 });
+
+  const showLoading = isLoadingHistory || (isLoadingSearch && results.length === 0);
 
   function onChange(event: SyntheticEvent<Element>, newInputValue: string) {
     setSearchString(newInputValue.trim()?.toLocaleLowerCase());
@@ -117,6 +123,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const options: SearchResultItem[] = searchString ? results : recentHistory;
   // group history by date
   const groupBy = searchString ? undefined : (option: SearchResultItem) => option.group || '';
+
   useEffect(() => {
     if (!isOpen) {
       // clear results when modal clsoes
@@ -128,7 +135,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
     <Modal noPadding open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
       <StyledAutocomplete
         options={options}
-        loading={isLoadingHistory}
+        loading={showLoading}
         noOptionsText='No search results'
         autoComplete
         clearOnBlur={false}
@@ -186,14 +193,10 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
             autoFocus={true}
             InputProps={{
               ...params.InputProps,
+              disableUnderline: true,
               startAdornment: <SearchIcon color='secondary' sx={{ mx: 1 }} />,
               type: 'search',
               sx: { p: '8px !important', fontSize: '18px' }
-            }}
-            sx={{
-              '& .MuiAutocomplete-clearIndicator': {
-                color: '#000 !important'
-              }
             }}
           />
         )}
