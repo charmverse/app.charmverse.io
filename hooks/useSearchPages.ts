@@ -1,6 +1,5 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { PageType } from '@charmverse/core/prisma';
-import { useMemo } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useGetSearchPages } from 'charmClient/hooks/pages';
 import { stringSimilarity } from 'lib/utils/strings';
@@ -22,31 +21,42 @@ export type SearchResultItem = {
 export function useSearchPages({ search, limit }: { search: string; limit?: number }): {
   results: SearchResultItem[];
   isLoading: boolean;
-  isValidating: boolean;
 } {
   const { space } = useCurrentSpace();
   const { pages } = usePages();
   const searchDebounced = useDebouncedValue(search, 200);
-  const { data, isLoading, isValidating } = useGetSearchPages({
+  const [results, setResults] = useState<SearchResultItem[]>([]);
+  // note that isLoading is set to true each time the search changes, because it leads to a new URL and new key
+  const { data, isLoading: isBackendLoading } = useGetSearchPages({
     // dont query if search is empty
     spaceId: searchDebounced && space?.id,
     search: searchDebounced,
     limit
   });
-  const results = useMemo(() => {
-    return sortList({
-      triggerText: searchDebounced,
-      list: (searchDebounced ? data || [] : [])?.map((page) => ({
-        title: page.title || 'Untitled',
-        breadcrumb: getBreadcrumb(page, pages),
-        path: `/${page.path}`,
-        icon: page.icon,
-        type: page.type,
-        id: page.id
-      }))
-    });
-  }, [data, pages, searchDebounced]);
-  return { isLoading, isValidating, results };
+
+  // when search string changes, data is undefined and isLoading is false for some reason at first
+  const isLoading = Boolean(isBackendLoading || (searchDebounced && !data));
+
+  useEffect(() => {
+    if (!searchDebounced) {
+      setResults([]);
+    } else if (data) {
+      const _results = sortList({
+        triggerText: searchDebounced,
+        list: data.map((page) => ({
+          title: page.title || 'Untitled',
+          breadcrumb: getBreadcrumb(page, pages),
+          path: `/${page.path}`,
+          icon: page.icon,
+          type: page.type,
+          id: page.id
+        }))
+      });
+      setResults(_results);
+    }
+  }, [data, pages, searchDebounced, setResults]);
+
+  return { isLoading, results };
 }
 
 export function getBreadcrumb(

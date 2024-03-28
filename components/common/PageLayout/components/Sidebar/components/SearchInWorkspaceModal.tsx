@@ -11,6 +11,7 @@ import type { SyntheticEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRecentHistory } from 'charmClient/hooks/pages';
+import LoadingComponent from 'components/common/LoadingComponent';
 import { Modal, ModalPosition } from 'components/common/Modal';
 import { PageIcon } from 'components/common/PageIcon';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -90,7 +91,9 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const [searchString, setSearchString] = useState('');
   const { space } = useCurrentSpace();
   const { pages } = usePages();
-  const { data: recentHistoryData } = useGetRecentHistory({ spaceId: isOpen ? space?.id : undefined });
+  const { data: recentHistoryData, isLoading: isLoadingHistory } = useGetRecentHistory({
+    spaceId: isOpen ? space?.id : undefined
+  });
   const { results } = useSearchPages({ search: searchString, limit: 50 });
 
   function onChange(event: SyntheticEvent<Element>, newInputValue: string) {
@@ -125,6 +128,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
     <Modal noPadding open={isOpen} onClose={close} position={ModalPosition.top} style={{ height: '100%' }} size='large'>
       <StyledAutocomplete
         options={options}
+        loading={isLoadingHistory}
         noOptionsText='No search results'
         autoComplete
         clearOnBlur={false}
