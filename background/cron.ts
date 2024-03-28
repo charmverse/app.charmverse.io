@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
 
 import { updateMixpanelProfilesTask } from 'background/tasks/updateMixpanelProfilesTask';
+import { createOffchainCredentialsForExternalProjects } from 'lib/credentials/createOffchainCredentialsForExternalProjects';
 
 import app from './healthCheck/app';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
@@ -41,6 +42,9 @@ cron.schedule('0 1 * * *', updateMixpanelProfilesTask);
 
 // Sync summon space roles every day at midnight
 cron.schedule('0 0 * * *', syncSummonSpacesRoles);
+
+// Create external eas credentials for Gitcoin and Questbook every day at midnight
+// cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
 const port = process.env.PORT || 4000;
 

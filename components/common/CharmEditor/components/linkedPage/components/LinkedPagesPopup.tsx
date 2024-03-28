@@ -1,4 +1,3 @@
-import type { PageType } from '@charmverse/core/prisma';
 import type { PluginKey } from 'prosemirror-state';
 import { useCallback, memo, useEffect, useMemo, useState } from 'react';
 
@@ -6,15 +5,12 @@ import { useEditorViewContext, usePluginState } from 'components/common/CharmEdi
 import type { PageListItem } from 'components/common/PagesList';
 import { PagesList } from 'components/common/PagesList';
 import { useForumCategories } from 'hooks/useForumCategories';
-import { usePages } from 'hooks/usePages';
 import { useRootPages } from 'hooks/useRootPages';
-import { useSearchPages } from 'hooks/useSearchPages';
+import { useSearchPages, sortList } from 'hooks/useSearchPages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
-import { stringSimilarity } from 'lib/utils/strings';
-import { isTruthy } from 'lib/utils/types';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
 import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
@@ -83,11 +79,12 @@ function PagesMenu({
       .filter((option) => {
         return option.name.toLowerCase().includes(triggerText.toLowerCase());
       })
-      .map((page) => ({
-        id: page.id,
-        path: page.path || '',
+      .map((option) => ({
+        id: option.id,
+        path: option.path || '',
         hasContent: true,
-        title: `Category > ${page.name}`,
+        originalTitle: option.name,
+        title: `Category > ${option.name}`,
         type: 'forum_category',
         icon: null
       }));
@@ -99,18 +96,24 @@ function PagesMenu({
       const filteredStaticPages = staticPages.filter((option) => {
         return option.title.toLowerCase().includes(triggerText.toLowerCase());
       });
-      setFilteredPages([
-        // filter out this page
-        ...searchResults.filter((r) => r.id !== pageId),
-        ...filteredStaticPages,
-        ...filteredCategoryPages
-      ]);
+      setFilteredPages(
+        // sort pages with static and category
+        sortList({
+          triggerText,
+          list: [
+            // filter out this page
+            ...searchResults.filter((r) => r.id !== pageId),
+            ...filteredStaticPages,
+            ...filteredCategoryPages
+          ]
+        })
+      );
     }
-  }, [isValidating, triggerText, searchResults, staticPages, filteredCategoryPages]);
+  }, [isValidating, pageId, triggerText, searchResults, staticPages, filteredCategoryPages]);
 
   const options = useMemo(() => {
     if (triggerText) {
-      return sortList({ triggerText, list: filteredPages });
+      return filteredPages;
     }
     // show default list (root pages from sidebar)
     return [...staticPages, ...rootPages];
@@ -126,23 +129,7 @@ function PagesMenu({
     }
   }, [activeItemIndex]);
 
-  return <PagesList activeItemIndex={activeItemIndex} pages={filteredPages} onSelectPage={onSelectPage} />;
-}
-
-function sortList<T extends { title: string; originalTitle?: string }>({
-  triggerText,
-  list
-}: {
-  triggerText: string;
-  list: T[];
-}): T[] {
-  return list
-    .map((item) => ({
-      item,
-      similarity: stringSimilarity(item.originalTitle || item.title, triggerText)
-    }))
-    .sort((a, b) => b.similarity - a.similarity)
-    .map(({ item }) => item);
+  return <PagesList activeItemIndex={activeItemIndex} pages={options} onSelectPage={onSelectPage} />;
 }
 
 export const LinkedPagesPopup = memo(_LinkedPagesPopup);
