@@ -29,6 +29,7 @@ export async function getRecentHistory({
       page: {
         select: {
           id: true,
+          parentId: true,
           title: true,
           hasContent: true,
           type: true,

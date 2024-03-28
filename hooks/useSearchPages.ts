@@ -38,7 +38,7 @@ export function useSearchPages({ search, limit }: { search: string; limit?: numb
       triggerText: searchDebounced,
       list: (searchDebounced ? data || [] : [])?.map((page) => ({
         title: page.title || 'Untitled',
-        breadcrumb: _getBreadcrumb(page, pages),
+        breadcrumb: getBreadcrumb(page, pages),
         path: `/${page.path}`,
         icon: page.icon,
         type: page.type,
@@ -49,12 +49,12 @@ export function useSearchPages({ search, limit }: { search: string; limit?: numb
   return { isLoading, isValidating, results };
 }
 
-function _getBreadcrumb(
-  page: PageMeta,
-  pages: { [id: string]: { parentId?: string | null; title: string } | undefined }
+export function getBreadcrumb(
+  page: { parentId?: string | null; title?: string },
+  pages: { [id: string]: { parentId?: string | null; title?: string } | undefined }
 ): string {
   const pathElements: string[] = [];
-  let currentPage: { parentId?: string | null; title: string } | undefined = { ...page };
+  let currentPage: { parentId?: string | null; title?: string } | undefined = { ...page };
 
   while (currentPage && currentPage.parentId) {
     const pageId: string = currentPage.parentId;

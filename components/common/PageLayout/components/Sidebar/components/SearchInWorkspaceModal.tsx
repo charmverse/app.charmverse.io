@@ -11,12 +11,13 @@ import type { SyntheticEvent } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRecentHistory } from 'charmClient/hooks/pages';
-import { Modal, DialogTitle, ModalPosition } from 'components/common/Modal';
+import { Modal, ModalPosition } from 'components/common/Modal';
 import { PageIcon } from 'components/common/PageIcon';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { usePages } from 'hooks/usePages';
 import type { SearchResultItem } from 'hooks/useSearchPages';
-import { useSearchPages } from 'hooks/useSearchPages';
+import { useSearchPages, getBreadcrumb } from 'hooks/useSearchPages';
 import { getRelativeDateInThePast } from 'lib/utils/dates';
 
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
@@ -88,6 +89,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   const { navigateToSpacePath } = useCharmRouter();
   const [searchString, setSearchString] = useState('');
   const { space } = useCurrentSpace();
+  const { pages } = usePages();
   const { data: recentHistoryData } = useGetRecentHistory({ spaceId: isOpen ? space?.id : undefined });
   const { results } = useSearchPages({ search: searchString, limit: 50 });
 
@@ -102,7 +104,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
         path: page.path,
         title: page.title || 'Untitled',
         group: getRelativeDateInThePast(page.lastViewedAt),
-        breadcrumb: page.path,
+        breadcrumb: getBreadcrumb(page, pages),
         icon: page.icon,
         type: page.type
       })) || []
