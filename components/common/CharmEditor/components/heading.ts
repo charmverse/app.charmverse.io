@@ -1,4 +1,4 @@
-import type { Command, EditorState, Node, Schema } from '@bangle.dev/pm';
+import type { Command, EditorState, Node, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
 import { keymap, NodeSelection, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import {
   copyEmptyCommand,
@@ -7,6 +7,7 @@ import {
   jumpToStartOfNode,
   moveNode
 } from '@bangle.dev/pm-commands';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
@@ -187,7 +188,7 @@ export function insertEmptyParaBelow() {
   });
 }
 
-export function scrollIntoHeadingNode({ editor }: { editor: BangleEditor }) {
+export function scrollIntoHeadingNode({ editor, pluginKey }: { editor: BangleEditor; pluginKey: PluginKey }) {
   const hash = window.location.hash.slice(1);
 
   if (hash) {
@@ -203,6 +204,7 @@ export function scrollIntoHeadingNode({ editor }: { editor: BangleEditor }) {
     if (domNode && nodePos !== undefined) {
       editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
       setTimeout(() => {
+        selectionTooltip.hideSelectionTooltip(pluginKey)(editor.view.state, editor.view.dispatch, editor.view);
         // Need to get the dom node again because the node might have been re-rendered
         (editor.view.domAtPos(nodePos!)?.node as HTMLElement).scrollIntoView({
           behavior: 'smooth',

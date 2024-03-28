@@ -69,6 +69,7 @@ interface BangleEditorProps<PluginMetadata = any> extends CoreBangleEditorProps<
   pageType?: PageType | 'post';
   postId?: string;
   threadIds?: string[];
+  floatingMenuPluginKey?: PluginKey;
   setCharmEditorView?: (view: EditorView | null) => void;
 }
 
@@ -76,6 +77,7 @@ const warningText = 'You have unsaved changes. Please confirm changes.';
 
 export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, BangleEditorProps>(function ReactEditor(
   {
+    floatingMenuPluginKey,
     inline = false,
     pageId,
     state,
@@ -149,9 +151,10 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
   useEffect(() => {
-    if (editor && !isLoadingRef.current) {
+    if (editor && !isLoadingRef.current && floatingMenuPluginKey) {
       scrollIntoHeadingNode({
-        editor
+        editor,
+        pluginKey: floatingMenuPluginKey
       });
     }
   }, [isLoadingRef.current]);

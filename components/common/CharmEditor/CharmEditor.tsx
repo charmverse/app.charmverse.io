@@ -398,6 +398,7 @@ function CharmEditor({
       linksPluginKey={linksPluginKey}
       onParticipantUpdate={onParticipantUpdate}
       trackChanges
+      floatingMenuPluginKey={floatingMenuPluginKey}
       readOnly={readOnly}
       enableComments={enableComments}
       onConnectionEvent={onConnectionEvent}
