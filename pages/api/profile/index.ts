@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 
 import { deleteBeehiivSubscription } from 'lib/beehiiv/deleteBeehiivSubscription';
 import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
+import { getENSName } from 'lib/blockchain';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
@@ -22,6 +23,7 @@ import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
+import { prepopulateUserProfile } from 'lib/users/prepopulateUserProfile';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import type { LoggedInUser } from 'models';
 
@@ -36,6 +38,19 @@ async function createUser(req: NextApiRequest, res: NextApiResponse<LoggedInUser
 
   try {
     user = await getUserProfile('addresses', message.address);
+    // If user already exists but not claimed
+    if (user.claimed === false) {
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          claimed: true
+        }
+      });
+      const ens = await getENSName(message.address);
+      await prepopulateUserProfile(user, ens);
+    }
   } catch {
     const cookiesToParse = req.cookies as Record<SignupCookieType, string>;
 

@@ -65,7 +65,7 @@ export async function getProjectMemberCreateTransaction({
     if (userWallet) {
       connectedUserId = userWallet.userId;
     } else {
-      const ens: string | null = await getENSName(walletAddress);
+      const ens = await getENSName(walletAddress);
       const userPath = shortWalletAddress(walletAddress).replace('…', '-');
       const isUserPathAvailable = await isProfilePathAvailable(userPath);
 
