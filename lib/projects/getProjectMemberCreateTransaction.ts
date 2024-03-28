@@ -45,7 +45,7 @@ export async function getProjectMemberCreateTransaction({
     });
     connectedUserId = googleAccount?.userId;
 
-    if (!userId) {
+    if (!connectedUserId) {
       const verifiedEmail = await prisma.verifiedEmail.findFirst({
         where: {
           email
