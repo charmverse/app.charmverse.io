@@ -1,11 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils, stringUtils } from '@charmverse/core/utilities';
+import { BoardFields } from 'lib/databases/board';
 import { ProposalBoardBlock, ProposalPropertyField } from 'lib/proposals/blocks/interfaces';
 import { ProposalFields } from 'lib/proposals/interfaces';
 import { AggregateResults, aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { writeToSameFolder } from 'lib/utils/file';
 import { isNumber } from 'lib/utils/numbers';
+import { isTruthy } from 'lib/utils/types';
 
 type ExportedProposal = {
   proposalUrl: string;
@@ -57,19 +59,28 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     return acc;
   }, {} as Record<string, ProposalPropertyField>);
 
+  const pageIds = await _getPageIdsFromDatabase();
+
   const proposals = await prisma.proposal.findMany({
+    // where: {
+    //   status: 'published',
+    //   rubricAnswers: {
+    //     some: {}
+    //   },
+    //   page: {
+    //     createdAt: {
+    //       gte: new Date('2024-01-01')
+    //     },
+    //     type: 'proposal',
+    //     space: {
+    //       domain
+    //     }
+    //   }
+    // },
     where: {
-      status: 'published',
-      rubricAnswers: {
-        some: {}
-      },
       page: {
-        createdAt: {
-          gte: new Date('2024-01-01')
-        },
-        type: 'proposal',
-        space: {
-          domain
+        id: {
+          in: pageIds
         }
       }
     },
@@ -223,6 +234,33 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   return textContent;
 }
 
+async function _getPageIdsFromDatabase() {
+  const board = await prisma.block.findFirstOrThrow({
+    where: {
+      id: '209510e1-898a-41ac-b03f-acbbdc94c311'
+    }
+  });
+  const cards = await prisma.block.findMany({
+    where: {
+      parentId: board.id,
+      type: 'card'
+    },
+    include: {
+      page: true
+    }
+  });
+  const property = (board.fields as unknown as BoardFields).cardProperties.find((prop) => prop.name === 'R1 Final');
+  const yesOption = property?.options.find((opt) => opt.value === 'Yes');
+  if (!yesOption || !property) {
+    throw new Error('cannot find property or option');
+  }
+  return cards
+    .filter((card) => (card.fields as CardFields).properties[property.id] === yesOption.id)
+    .map((card) => card.page?.syncWithPageId)
+    .filter(isTruthy);
+}
+
+import { CardFields } from 'lib/databases/card';
 exportEvaluatedProposalScores({ domain: 'op-grants' }).then(async (csv) => {
   await writeToSameFolder({ data: csv, fileName: 'exported.csv' });
 });
