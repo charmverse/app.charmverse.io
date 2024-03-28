@@ -196,7 +196,11 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
         type: cardFields.isTemplate ? 'card_template' : 'card',
         headerImage: cardFields.headerImage,
         contentText: cardFields.contentText || '',
-        parentId: cardBlock.parentId,
+        parent: {
+          connect: {
+            id: cardBlock.parentId
+          }
+        },
         updatedAt: cardBlock.updatedAt,
         content: cardFields.content ?? undefined,
         permissions: {
