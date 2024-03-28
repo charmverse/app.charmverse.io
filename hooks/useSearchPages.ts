@@ -11,6 +11,7 @@ import { usePages } from './usePages';
 
 export type SearchResultItem = {
   icon?: string | null;
+  group?: string; // for grouping results, eg. by date
   path: string;
   title: string;
   type: PageType;

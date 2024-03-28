@@ -605,7 +605,7 @@ function CenterPanel(props: Props) {
                 {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
                   <InlineViewTitle
                     key={activePage.id + activePage.title}
-                    pageTitle={activePage.title}
+                    pageTitle={activePage.title || ''}
                     readOnly={props.readOnly}
                     setPage={props.setPage}
                   />
