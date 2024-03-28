@@ -2,10 +2,10 @@ import type { Member } from 'lib/members/interfaces';
 import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
-import { projectDefaultValues, projectMemberDefaultValues } from './constants';
+import { defaultProjectValues } from './constants';
 import type { ProjectValues } from './interfaces';
 
-export function getDefaultProjectValues({
+export function getFilledProjectValues({
   membersRecord,
   user
 }: {
@@ -19,10 +19,10 @@ export function getDefaultProjectValues({
   const telegramUsername = (user?.telegramUser?.account as unknown as Partial<TelegramAccount>)?.username;
 
   return {
-    ...projectDefaultValues,
+    ...defaultProjectValues,
     projectMembers: [
       {
-        ...projectMemberDefaultValues,
+        ...defaultProjectValues.projectMembers[0],
         email: userEmail ?? '',
         twitter: currentMember?.profile?.social?.twitterURL ?? '',
         telegram: telegramUsername ?? '',

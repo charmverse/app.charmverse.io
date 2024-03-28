@@ -6,17 +6,11 @@ import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectEditorFieldConfig, ProjectUpdatePayload } from 'lib/projects/interfaces';
+import type { ProjectFieldConfig, ProjectValues } from 'lib/projects/interfaces';
 
 import { useProjectForm, convertToProjectValues } from './useProjectForm';
 
-export function useProject({
-  projectId,
-  fieldConfig
-}: {
-  projectId: MaybeString;
-  fieldConfig: ProjectEditorFieldConfig;
-}) {
+export function useProject({ projectId, fieldConfig }: { projectId: MaybeString; fieldConfig: ProjectFieldConfig }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);
   const { user } = useUser();
@@ -36,11 +30,11 @@ export function useProject({
 
   const { showMessage } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
-    return debounce(charmClient.updateProject, 300);
-  }, []);
+    return debounce((projectPayload) => projectId && charmClient.updateProject(projectId, projectPayload), 300);
+  }, [projectId]);
 
   const onProjectUpdate = useCallback(
-    async (projectPayload: ProjectUpdatePayload) => {
+    async (projectPayload: ProjectValues) => {
       try {
         await debouncedUpdate(projectPayload);
         mutate(

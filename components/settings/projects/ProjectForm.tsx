@@ -5,8 +5,8 @@ import { useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
-import { projectMemberDefaultValues } from 'lib/projects/constants';
-import type { ProjectEditorFieldConfig, ProjectValues } from 'lib/projects/interfaces';
+import { defaultProjectValues } from 'lib/projects/constants';
+import type { ProjectFieldConfig, ProjectValues } from 'lib/projects/interfaces';
 
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectMemberFields';
@@ -16,7 +16,7 @@ export function ProjectFormAnswers({
   isTeamLead,
   defaultRequired
 }: {
-  fieldConfig?: ProjectEditorFieldConfig;
+  fieldConfig?: ProjectFieldConfig;
   isTeamLead: boolean;
   defaultRequired?: boolean;
 }) {
@@ -86,7 +86,7 @@ export function ProjectFormAnswers({
         }}
         startIcon={<AddIcon fontSize='small' />}
         onClick={() => {
-          setValue('projectMembers', [...projectValues.projectMembers, projectMemberDefaultValues], {
+          setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
             shouldValidate: true,
             shouldDirty: true,
             shouldTouch: true
@@ -104,8 +104,8 @@ export function ProjectFormEditor({
   values,
   defaultRequired
 }: {
-  onChange?: (project: ProjectEditorFieldConfig) => void;
-  values: ProjectEditorFieldConfig;
+  onChange?: (project: ProjectFieldConfig) => void;
+  values: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
   return (
@@ -113,7 +113,7 @@ export function ProjectFormEditor({
       <Typography variant='h6'>Project Info</Typography>
       <ProjectFieldsEditor
         defaultRequired={defaultRequired}
-        values={values}
+        fieldConfig={values}
         onChange={
           onChange === undefined
             ? undefined
@@ -131,7 +131,7 @@ export function ProjectFormEditor({
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldsEditor
         defaultRequired={defaultRequired}
-        values={values?.projectMember}
+        fieldConfig={values?.projectMember}
         onChange={
           onChange === undefined
             ? undefined

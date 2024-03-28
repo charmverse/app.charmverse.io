@@ -14,8 +14,8 @@ import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import { getFilledProjectValues } from 'lib/projects/getFilledProjectValues';
+import type { ProjectFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -63,12 +63,12 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectWithMembers,
-    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig,
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectFieldConfig,
     defaultRequired: true
   });
 
   const { membersRecord } = useMembers();
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectValues = useMemo(() => getFilledProjectValues({ user, membersRecord }), [user, membersRecord]);
   useEffect(() => {
     if (selectedProjectId) {
       projectForm.reset(projectWithMembers);
@@ -106,7 +106,7 @@ export function useNewProposal({ newProposal }: Props) {
             id: member.id
           }))
         };
-        await charmClient.updateProject(updatedProjectValues);
+        await charmClient.updateProject(projectWithMembers.id, updatedProjectValues);
         mutate();
         projectId = projectWithMembers.id;
       }

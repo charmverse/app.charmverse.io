@@ -7,11 +7,11 @@ import * as yup from 'yup';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/constants';
-import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
+import { getFilledProjectValues } from 'lib/projects/getFilledProjectValues';
 import type {
   ProjectField,
   ProjectMemberField,
-  ProjectEditorFieldConfig,
+  ProjectFieldConfig,
   ProjectWithMembers,
   ProjectValues
 } from 'lib/projects/interfaces';
@@ -50,7 +50,7 @@ export function createProjectYupSchema({
   fieldConfig,
   defaultRequired = false
 }: {
-  fieldConfig: ProjectEditorFieldConfig;
+  fieldConfig: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
@@ -117,6 +117,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
     website: projectWithMembers.website,
     projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
       return {
+        warpcast: projectMember.warpcast,
         email: projectMember.email,
         github: projectMember.github,
         linkedin: projectMember.linkedin,
@@ -125,7 +126,8 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
         previousProjects: projectMember.previousProjects,
         telegram: projectMember.telegram,
         twitter: projectMember.twitter,
-        walletAddress: projectMember.walletAddress
+        walletAddress: projectMember.walletAddress,
+        id: projectMember.id
       };
     })
   } as ProjectValues;
@@ -134,14 +136,14 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
 export function useProjectForm(options: {
   defaultValues?: ProjectValues;
   projectWithMembers?: ProjectWithMembers;
-  fieldConfig: ProjectEditorFieldConfig;
+  fieldConfig: ProjectFieldConfig;
   defaultRequired?: boolean;
 }) {
   const { defaultRequired, defaultValues, fieldConfig, projectWithMembers } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
 
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectValues = useMemo(() => getFilledProjectValues({ user, membersRecord }), [user, membersRecord]);
 
   const yupSchema = useRef(yup.object());
 

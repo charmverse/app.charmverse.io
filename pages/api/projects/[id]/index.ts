@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { ProjectWithMembers, ProjectUpdatePayload } from 'lib/projects/interfaces';
+import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces';
 import { updateProject } from 'lib/projects/updateProject';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -12,7 +12,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).put(updateProjectController);
 
 async function updateProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers>) {
-  const projectUpdatePayload = req.body as ProjectUpdatePayload;
+  const projectUpdatePayload = req.body as ProjectValues;
   const projectId = req.query.id as string;
   const projectLead = await prisma.projectMember.findFirst({
     where: {
@@ -28,6 +28,7 @@ async function updateProjectController(req: NextApiRequest, res: NextApiResponse
 
   const updatedProjectWithMembers = await updateProject({
     userId: req.session.user.id,
+    projectId,
     payload: projectUpdatePayload
   });
   return res.status(201).json(updatedProjectWithMembers);

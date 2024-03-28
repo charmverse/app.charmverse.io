@@ -28,8 +28,8 @@ export function CreateProjectForm({
   async function saveProject() {
     const project = getValues();
     try {
-      const createdProjectWithMember = await createProject(project);
-      onSave?.(createdProjectWithMember);
+      const createdProjectWithMembers = await createProject(project);
+      onSave?.(createdProjectWithMembers);
       setOpen(false);
       mutate(
         (cachedData) => {
@@ -37,7 +37,7 @@ export function CreateProjectForm({
             return cachedData;
           }
 
-          return [...cachedData, createdProjectWithMember];
+          return [...cachedData, createdProjectWithMembers];
         },
         {
           revalidate: false

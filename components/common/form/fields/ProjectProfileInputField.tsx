@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
-import type { ProjectWithMembers, ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectWithMembers, ProjectFieldConfig } from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -14,7 +14,7 @@ export function ProjectProfileInputField({
 }: {
   formField: {
     value?: FormFieldValue;
-    fieldConfig?: ProjectEditorFieldConfig;
+    fieldConfig?: ProjectFieldConfig;
   };
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
@@ -77,7 +77,7 @@ export function ProjectProfileInputField({
           <ProjectFormAnswers
             defaultRequired
             key={selectedProject?.id ?? 'new-project'}
-            fieldConfig={formField.fieldConfig as ProjectEditorFieldConfig}
+            fieldConfig={formField.fieldConfig as ProjectFieldConfig}
             isTeamLead
           />
         </Box>

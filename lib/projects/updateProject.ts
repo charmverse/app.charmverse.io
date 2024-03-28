@@ -1,36 +1,89 @@
+import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProjectUpdatePayload, ProjectWithMembers } from './interfaces';
+import { getProjectMemberCreateTransaction } from './getProjectMemberCreateTransaction';
+import type { ProjectValues, ProjectWithMembers } from './interfaces';
 
 export async function updateProject({
   userId,
-  payload
+  payload,
+  projectId
 }: {
+  projectId: string;
   userId: string;
-  payload: ProjectUpdatePayload;
+  payload: ProjectValues;
 }): Promise<ProjectWithMembers> {
   const existingProject = await prisma.project.findUniqueOrThrow({
     where: {
-      id: payload.id
+      id: projectId
     },
     select: {
       projectMembers: {
         select: {
+          walletAddress: true,
+          email: true,
           id: true
         }
       }
     }
   });
-  const existingProjectMemberIds = existingProject.projectMembers.map((member) => member.id);
-  const payloadProjectMemberIds = payload.projectMembers.map((member) => member.id);
-  const deletedProjectMembersIds = existingProjectMemberIds.filter(
+
+  const existingProjectMembersRecord = existingProject.projectMembers.reduce<
+    Record<string, Pick<ProjectMember, 'walletAddress' | 'email' | 'id'>>
+  >(
+    (acc, projectMember) => ({
+      ...acc,
+      [projectMember.id]: projectMember
+    }),
+    {}
+  );
+
+  const payloadProjectMemberIds = payload.projectMembers.map((projectMember) => projectMember.id);
+  const deletedProjectMembersIds = Object.keys(existingProjectMembersRecord).filter(
     (memberId) => !payloadProjectMemberIds.includes(memberId)
   );
+
+  const projectMemberTransactions: Prisma.Prisma__ProjectMemberClient<ProjectMember, never>[] = [];
+
+  for (const projectMember of payload.projectMembers) {
+    if (projectMember.id && existingProjectMembersRecord[projectMember.id]) {
+      projectMemberTransactions.push(
+        prisma.projectMember.update({
+          where: {
+            id: projectMember.id
+          },
+          data: {
+            name: projectMember.name,
+            email: projectMember.email,
+            walletAddress: projectMember.walletAddress,
+            twitter: projectMember.twitter,
+            warpcast: projectMember.warpcast,
+            github: projectMember.github,
+            linkedin: projectMember.linkedin,
+            telegram: projectMember.telegram,
+            otherUrl: projectMember.otherUrl,
+            previousProjects: projectMember.previousProjects,
+            updatedBy: userId
+          }
+        })
+      );
+    } else {
+      projectMemberTransactions.push(
+        (
+          await getProjectMemberCreateTransaction({
+            projectId,
+            userId,
+            projectMember
+          })
+        )()
+      );
+    }
+  }
 
   const [projects, , ...projectMembers] = await prisma.$transaction([
     prisma.project.update({
       where: {
-        id: payload.id
+        id: projectId
       },
       data: {
         description: payload.description,
@@ -53,26 +106,7 @@ export async function updateProject({
         }
       }
     }),
-    ...payload.projectMembers.map((member) =>
-      prisma.projectMember.update({
-        where: {
-          id: member.id
-        },
-        data: {
-          name: member.name,
-          email: member.email,
-          walletAddress: member.walletAddress,
-          twitter: member.twitter,
-          warpcast: member.warpcast,
-          github: member.github,
-          linkedin: member.linkedin,
-          telegram: member.telegram,
-          otherUrl: member.otherUrl,
-          previousProjects: member.previousProjects,
-          updatedBy: userId
-        }
-      })
-    )
+    ...projectMemberTransactions
   ]);
 
   return {
