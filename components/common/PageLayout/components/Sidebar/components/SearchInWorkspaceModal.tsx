@@ -1,7 +1,7 @@
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import SearchIcon from '@mui/icons-material/Search';
-import { ListItem, ListItemText, ListItemIcon, MenuItem, Typography } from '@mui/material';
+import { ListItem, ListItemText, ListItemIcon, Typography } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import Popper from '@mui/material/Popper';
 import TextField from '@mui/material/TextField';
@@ -17,6 +17,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { SearchResultItem } from 'hooks/useSearchPages';
 import { useSearchPages } from 'hooks/useSearchPages';
+import { getRelativeDateInThePast } from 'lib/utils/dates';
 
 const StyledAutocomplete = styled(Autocomplete<SearchResultItem, boolean | undefined, boolean>)`
   .MuiInput-root {
@@ -36,6 +37,18 @@ const StyledPopper = styled(Popper)`
 
   & > .MuiPaper-root {
     box-shadow: none;
+  }
+  // group label
+  & .MuiListSubheader-root {
+    line-height: 2em;
+  }
+  // the container of each group
+  .MuiAutocomplete-groupUl {
+    margin-bottom: 16px;
+  }
+  & .MuiAutocomplete-listbox {
+    padding-left: 3px;
+    padding-right: 3px;
   }
 `;
 
@@ -82,12 +95,13 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
     setSearchString(newInputValue.trim()?.toLocaleLowerCase());
   }
 
-  const recentHistory = useMemo(() => {
+  const recentHistory: SearchResultItem[] = useMemo(() => {
     return (
       recentHistoryData?.map((page) => ({
         id: page.id,
         path: page.path,
-        title: page.title,
+        title: page.title || 'Untitled',
+        group: getRelativeDateInThePast(page.lastViewedAt),
         breadcrumb: page.path,
         icon: page.icon,
         type: page.type
@@ -96,7 +110,8 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
   }, [recentHistoryData]);
 
   const options: SearchResultItem[] = searchString ? results : recentHistory;
-
+  // group history by date
+  const groupBy = searchString ? undefined : (option: SearchResultItem) => option.group || '';
   useEffect(() => {
     if (!isOpen) {
       // clear results when modal clsoes
@@ -120,6 +135,7 @@ export function SearchInWorkspaceModal(props: SearchInWorkspaceModalProps) {
           }
         }}
         getOptionLabel={(option) => (typeof option === 'object' ? option.title : option)}
+        groupBy={groupBy}
         open
         disablePortal
         disableClearable

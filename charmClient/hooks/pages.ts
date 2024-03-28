@@ -1,6 +1,7 @@
 import type { PageMeta } from '@charmverse/core/pages';
 
 import type { TrashOrDeletePageResponse } from 'lib/pages';
+import type { PageViewMeta } from 'lib/pages/getRecentHistory';
 import type { PageWithContent, PageMetaLite } from 'lib/pages/interfaces';
 
 import { useGET, useGETImmutable, usePUT } from './helpers';
@@ -30,5 +31,5 @@ export function useGetSearchPages({
 }
 
 export function useGetRecentHistory({ spaceId, limit }: { spaceId?: string; limit?: number }) {
-  return useGETImmutable<PageMeta[]>(spaceId ? `/api/pages/recent-history` : null, { spaceId, limit });
+  return useGETImmutable<PageViewMeta[]>(spaceId ? `/api/pages/recent-history` : null, { spaceId, limit });
 }
