@@ -57,7 +57,7 @@ export function ProjectFormAnswers({
                     onClick={() => {
                       setValue(
                         'projectMembers',
-                        extraProjectMembers.filter((__, i) => i !== index + 1),
+                        projectValues.projectMembers.filter((_, i) => i !== index + 1),
                         {
                           shouldValidate: true,
                           shouldDirty: true,

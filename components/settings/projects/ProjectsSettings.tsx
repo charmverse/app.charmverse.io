@@ -3,6 +3,7 @@ import { Accordion, AccordionDetails, AccordionSummary, Box, Typography } from '
 import { useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 
+import charmClient from 'charmClient';
 import { useGetProjects, useUpdateProject } from 'charmClient/hooks/projects';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
@@ -34,47 +35,78 @@ function ProjectRow({
     fieldConfig: defaultProjectFieldConfig
   });
   const { mutate } = useGetProjects();
-
   function onUpdateProject() {
-    const projectValues = form.getValues();
-    const updatedProject = {
-      ...projectValues,
-      id: projectWithMembers.id,
-      projectMembers: projectValues.projectMembers.map((member, index) => ({
-        ...projectWithMembers.projectMembers[index],
-        ...member
-      }))
-    };
+    if (isTeamLead) {
+      const projectValues = form.getValues();
+      const updatedProject = {
+        ...projectValues,
+        id: projectWithMembers.id,
+        projectMembers: projectValues.projectMembers.map((member, index) => ({
+          ...projectWithMembers.projectMembers[index],
+          ...member
+        }))
+      };
 
-    updateProject(updatedProject);
+      updateProject(updatedProject);
 
-    mutate(
-      (projects) => {
-        if (!projects || !projectWithMembers) {
-          return projects;
-        }
-
-        return projects.map((_project) => {
-          if (_project.id === projectWithMembers.id) {
-            return {
-              ..._project,
-              ...updatedProject,
-              projectMembers: _project.projectMembers.map((projectMember, index) => {
-                return {
-                  ...projectMember,
-                  ...updatedProject.projectMembers[index]
-                };
-              })
-            };
+      mutate(
+        (projects) => {
+          if (!projects || !projectWithMembers) {
+            return projects;
           }
 
-          return _project;
+          return projects.map((_project) => {
+            if (_project.id === projectWithMembers.id) {
+              return {
+                ..._project,
+                ...updatedProject,
+                projectMembers: _project.projectMembers.map((projectMember, index) => {
+                  return {
+                    ...projectMember,
+                    ...updatedProject.projectMembers[index]
+                  };
+                })
+              };
+            }
+
+            return _project;
+          });
+        },
+        {
+          revalidate: false
+        }
+      );
+    } else if (user) {
+      // TODO: updatedProjectWithMembers leaves out the team Lead from the projectMembers array
+      const updatedProjectWithMembers = form.getValues();
+      const updatedProjectMemberUserIds = updatedProjectWithMembers.projectMembers.map((member) => member.userId);
+      const deletedProjectMember = projectWithMembers.projectMembers.find((member) => {
+        if (member.userId === user.id && !updatedProjectMemberUserIds.includes(user.id)) {
+          return member;
+        }
+        return null;
+      });
+
+      if (deletedProjectMember) {
+        charmClient.removeProjectMember({
+          memberId: deletedProjectMember.id,
+          projectId: projectWithMembers.id
         });
-      },
-      {
-        revalidate: false
+        mutate((projects) => {
+          if (!projects || !projectWithMembers) {
+            return projects;
+          }
+
+          return projects.filter((_project) => {
+            if (_project.id === projectWithMembers.id) {
+              return false;
+            }
+
+            return true;
+          });
+        });
       }
-    );
+    }
     onClose();
   }
 

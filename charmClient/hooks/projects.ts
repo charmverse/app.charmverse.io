@@ -1,4 +1,4 @@
-import { useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
+import { useDELETE, useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
 import type { ProjectValues, ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function useCreateProject() {
@@ -11,8 +11,4 @@ export function useGetProjects() {
 
 export function useUpdateProject(projectId: string) {
   return usePUT<ProjectValues, ProjectWithMembers>(`/api/projects/${projectId}`);
-}
-
-export function useAddProjectMember({ projectId }: { projectId: string }) {
-  return usePOST<undefined, ProjectWithMembers['projectMembers'][number]>(`/api/projects/${projectId}/members`);
 }
