@@ -182,6 +182,31 @@ export function FormFieldAnswersControlled({
                         }
                       ]);
                     }}
+                    inputEndAdornment={
+                      pageId &&
+                      formField.formFieldAnswer &&
+                      user && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            left: '100%',
+                            ml: {
+                              md: 1,
+                              xs: 0.5
+                            }
+                          }}
+                        >
+                          <FormFieldAnswerComment
+                            formFieldAnswer={formField.formFieldAnswer}
+                            pageId={pageId}
+                            formFieldName='Project profile'
+                            disabled={disabled}
+                            fieldAnswerThreads={fieldAnswerThreads}
+                            enableComments={enableComments}
+                          />
+                        </Box>
+                      )
+                    }
                     proposalId={proposalId}
                   />
                 ) : (

@@ -18,8 +18,10 @@ export function ProjectProfileInputField({
   formField,
   disabled,
   proposalId,
-  isDraft
+  isDraft,
+  inputEndAdornment
 }: {
+  inputEndAdornment?: React.ReactNode;
   isDraft?: boolean;
   disabled?: boolean;
   formField: {
@@ -36,7 +38,13 @@ export function ProjectProfileInputField({
   }
 
   return (
-    <BaseProjectProfileInputField isDraft={isDraft} formField={formField} onChange={onChange} disabled={disabled} />
+    <BaseProjectProfileInputField
+      inputEndAdornment={inputEndAdornment}
+      isDraft={isDraft}
+      formField={formField}
+      onChange={onChange}
+      disabled={disabled}
+    />
   );
 }
 
@@ -70,18 +78,20 @@ export function ReadonlyProjectProfileInputField({
 
   return (
     <Stack gap={1} width='100%'>
-      <Select
-        disabled
-        displayEmpty
-        value={selectedProject?.id}
-        data-test='project-profile-select'
-        renderValue={() => {
-          if (!selectedProject) {
-            return <Typography>No project profile selected</Typography>;
-          }
-          return selectedProject.name;
-        }}
-      />
+      <Stack flexDirection='row' gap={1}>
+        <Select
+          disabled
+          displayEmpty
+          value={selectedProject?.id}
+          data-test='project-profile-select'
+          renderValue={() => {
+            if (!selectedProject) {
+              return <Typography>No project profile selected</Typography>;
+            }
+            return selectedProject.name;
+          }}
+        />
+      </Stack>
       {selectedProject && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
           <FormProvider {...form}>
@@ -97,7 +107,8 @@ export function BaseProjectProfileInputField({
   formField,
   onChange,
   disabled,
-  isDraft
+  isDraft,
+  inputEndAdornment
 }: {
   isDraft?: boolean;
   onChange: (updatedValue: FormFieldValue) => void;
@@ -106,6 +117,7 @@ export function BaseProjectProfileInputField({
     fieldConfig?: ProjectFieldConfig;
   };
   disabled?: boolean;
+  inputEndAdornment?: React.ReactNode;
 }) {
   const { user } = useUser();
   const { data } = useGetProjects();
@@ -126,48 +138,54 @@ export function BaseProjectProfileInputField({
 
   return (
     <Stack gap={1} width='100%' mb={1}>
-      <Select
-        disabled={disabled}
-        displayEmpty
-        value={selectedProject?.id}
-        onChange={(e) => {
-          const projectId = e.target.value as string;
-          if (projectId === 'ADD_PROFILE') {
-            onChange({ projectId: '' });
-            setShowCreateProjectForm(true);
-          } else {
-            onChange({ projectId });
-            setShowCreateProjectForm(false);
-          }
-        }}
-        data-test='project-profile-select'
-        renderValue={(value) => {
-          if (value === 'ADD_PROFILE') {
-            return <Typography>Add a new project profile</Typography>;
-          }
-          if (!selectedProject) {
-            return <Typography>Select a project profile</Typography>;
-          }
-          return selectedProject.name;
-        }}
-      >
-        {data?.map((project) => (
-          <MenuItem data-test={`project-option-${project.id}`} value={project.id} key={project.id}>
-            <Typography>{project.name}</Typography>
-          </MenuItem>
-        ))}
-        {isDraft !== false && (
-          <>
-            <Divider />
-            <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
-              <Stack flexDirection='row' alignItems='center' gap={0.05}>
-                <MuiAddIcon fontSize='small' />
-                <Typography>Add a new project profile</Typography>
-              </Stack>
+      <Stack flexDirection='row' gap={1} alignItems='center'>
+        <Select
+          sx={{
+            width: '100%'
+          }}
+          disabled={disabled}
+          displayEmpty
+          value={selectedProject?.id}
+          onChange={(e) => {
+            const projectId = e.target.value as string;
+            if (projectId === 'ADD_PROFILE') {
+              onChange({ projectId: '' });
+              setShowCreateProjectForm(true);
+            } else {
+              onChange({ projectId });
+              setShowCreateProjectForm(false);
+            }
+          }}
+          data-test='project-profile-select'
+          renderValue={(value) => {
+            if (value === 'ADD_PROFILE') {
+              return <Typography>Add a new project profile</Typography>;
+            }
+            if (!selectedProject) {
+              return <Typography>Select a project profile</Typography>;
+            }
+            return selectedProject.name;
+          }}
+        >
+          {data?.map((project) => (
+            <MenuItem data-test={`project-option-${project.id}`} value={project.id} key={project.id}>
+              <Typography>{project.name}</Typography>
             </MenuItem>
-          </>
-        )}
-      </Select>
+          ))}
+          {isDraft !== false && (
+            <>
+              <Divider />
+              <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
+                <Stack flexDirection='row' alignItems='center' gap={0.05}>
+                  <MuiAddIcon fontSize='small' />
+                  <Typography>Add a new project profile</Typography>
+                </Stack>
+              </MenuItem>
+            </>
+          )}
+        </Select>
+        {inputEndAdornment}
+      </Stack>
       {(showCreateProjectForm || selectedProject) && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
           <ProjectFormAnswers
