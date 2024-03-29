@@ -118,7 +118,6 @@ export function NewProposalButton() {
         pageActions={({ pageId, proposalId }) => (
           <>
             <MenuItem
-              data-test={`template-menu-edit-${pageId}`}
               onClick={() => {
                 editTemplate(pageId);
               }}
@@ -134,6 +133,7 @@ export function NewProposalButton() {
             />
 
             <MenuItem
+              data-test='duplicate-template-button'
               onClick={() => {
                 duplicateTemplate(pageId);
               }}
