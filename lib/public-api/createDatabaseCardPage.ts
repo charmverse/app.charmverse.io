@@ -118,7 +118,11 @@ export async function createDatabaseCardPage({
         path: getPagePath(),
         type: 'card',
         title: pageTitle,
-        parentId: databaseWithSchema.id,
+        parent: {
+          connect: {
+            id: databaseWithSchema.id
+          }
+        },
         id: cardBlock.id,
         space: {
           connect: {

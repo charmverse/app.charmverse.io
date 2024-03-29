@@ -100,7 +100,11 @@ export function getCardsAndPages(data: GoogleFormInput): CharmVerseModelOutput {
       title: `Response`,
       type: 'card_synced',
       contentText: '',
-      parentId: rootId, // important to inherit permissions
+      parent: {
+        connect: {
+          id: rootId // important to inherit permissions
+        }
+      },
       path: getPagePath(),
       updatedAt: prismaBlock.updatedAt,
       permissions: {

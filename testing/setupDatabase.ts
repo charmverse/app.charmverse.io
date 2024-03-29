@@ -691,6 +691,13 @@ export function createPage(
           id: options.spaceId as string
         }
       },
+      parent: options.parentId
+        ? {
+            connect: {
+              id: options.parentId
+            }
+          }
+        : undefined,
       permissions: options.pagePermissions
         ? {
             createMany: {
@@ -698,7 +705,6 @@ export function createPage(
             }
           }
         : undefined,
-      parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null,
       additionalPaths: options.additionalPaths
