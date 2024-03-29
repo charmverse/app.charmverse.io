@@ -61,7 +61,7 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
   const projectProfileValue = answersToSave.find((a) => a.type === 'project_profile')?.value as { projectId: string };
   const projectFormField = form.formFields.find((f) => f.type === 'project_profile');
   let isValidProjectValues = true;
-  if (projectProfileValue.projectId && projectFormField) {
+  if (projectProfileValue?.projectId && projectFormField) {
     const projectWithMembers = await prisma.project.findUnique({
       where: { id: projectProfileValue.projectId },
       include: {

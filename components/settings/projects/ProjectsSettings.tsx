@@ -276,7 +276,7 @@ export function ProjectsSettings() {
         </Typography>
         <Button
           size='small'
-          id='new-workflow-btn'
+          data-test='add-project-button'
           onClick={() => {
             setOpenedAccordion(null);
             setIsCreateProjectFormOpen(true);
