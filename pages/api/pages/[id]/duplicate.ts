@@ -71,6 +71,14 @@ async function duplicatePageRoute(req: NextApiRequest, res: NextApiResponse<Dupl
     pageToDuplicate.spaceId
   );
 
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: result.pages
+    },
+    pageToDuplicate.spaceId
+  );
+
   return res.status(200).send(result);
 }
 
