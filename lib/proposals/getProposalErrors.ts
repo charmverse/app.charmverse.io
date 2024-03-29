@@ -70,7 +70,7 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
     case 'feedback':
       return false;
     case 'rubric':
-      return !evaluation.title
+      return !evaluation.title.trim()
         ? 'Title is required for rubric criteria'
         : evaluation.reviewers.length === 0
         ? `Reviewers are required for the "${evaluation.title}" step`
