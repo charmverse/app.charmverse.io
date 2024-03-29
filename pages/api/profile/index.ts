@@ -7,14 +7,12 @@ import { v4 } from 'uuid';
 
 import { deleteBeehiivSubscription } from 'lib/beehiiv/deleteBeehiivSubscription';
 import { registerBeehiivSubscription } from 'lib/beehiiv/registerBeehiivSubscription';
-import { getENSName } from 'lib/blockchain';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import { updateGuildRolesForUser } from 'lib/guild-xyz/server/updateGuildRolesForUser';
 import { deleteLoopsContact } from 'lib/loopsEmail/deleteLoopsContact';
 import { registerLoopsContact } from 'lib/loopsEmail/registerLoopsContact';
 import { updateTrackUserProfile } from 'lib/metrics/mixpanel/updateTrackUserProfile';
 import { extractSignupAnalytics } from 'lib/metrics/mixpanel/utilsSignup';
-import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import type { SignupCookieType } from 'lib/metrics/userAcquisition/interfaces';
 import { signupCookieNames } from 'lib/metrics/userAcquisition/interfaces';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
@@ -23,7 +21,6 @@ import { removeOldCookieFromResponse } from 'lib/session/removeOldCookie';
 import { withSessionRoute } from 'lib/session/withSession';
 import { createOrGetUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
-import { prepopulateUserProfile } from 'lib/users/prepopulateUserProfile';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
 import type { LoggedInUser } from 'models';
 

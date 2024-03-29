@@ -35,6 +35,11 @@ export async function createOrGetUserFromWallet(
 
   try {
     const user = await getUserProfile('addresses', lowercaseAddress);
+    existingUser = {
+      isNew: false,
+      user
+    };
+
     if (user.claimed === false) {
       await prisma.user.update({
         where: {
@@ -47,11 +52,8 @@ export async function createOrGetUserFromWallet(
         }
       });
       newlySignedUser = user;
+      existingUser.isNew = true;
     }
-    existingUser = {
-      isNew: false,
-      user
-    };
   } catch (_) {
     // ignore error, it just means user was not found
     const ens = await getENSName(address);

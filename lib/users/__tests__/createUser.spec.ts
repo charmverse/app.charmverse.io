@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
@@ -27,6 +28,10 @@ jest.mock('lib/blockchain/getENSName', () => {
   };
 });
 
+jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
+  trackUserAction: jest.fn()
+}));
+
 afterAll(async () => {
   jest.resetModules();
 });
@@ -38,6 +43,7 @@ describe('createOrGetUserFromWallet', () => {
 
     const { isNew, user } = await createOrGetUserFromWallet({ address });
     expect(isNew).toBe(false);
+    expect(trackUserAction as any).toHaveBeenCalledTimes(1);
     expect(user.wallets.length).toBe(1);
   });
 
@@ -48,12 +54,11 @@ describe('createOrGetUserFromWallet', () => {
       where: { id: userId },
       data: { claimed: false }
     });
-
     await createOrGetUserFromWallet({ address });
     const user = await prisma.user.findUniqueOrThrow({
       where: { id: userId }
     });
-
+    expect(trackUserAction as any).toBeCalledWith('sign_up', { userId, identityType: 'Wallet' });
     expect(user.claimed).toBe(true);
   });
 });
