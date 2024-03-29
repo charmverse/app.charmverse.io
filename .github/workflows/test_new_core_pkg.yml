@@ -96,9 +96,9 @@ jobs:
           echo "network ${{ job.services.postgres.network }}"
           docker run -d --name permissions-api  \
                      -h permissions-api \
-                     -p "3001:3001"     \
+                     -p "3337:3337"     \
                      -e HOST=0.0.0.0    \
-                     -e PORT=3001       \
+                     -e PORT=3337       \
                      -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
                      --network "${{ job.services.postgres.network }}"  \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
@@ -109,7 +109,7 @@ jobs:
             docker ps
             docker logs permissions-api
             docker inspect permissions-api
-            curl localhost:3001/api/health && {
+            curl localhost:3337/api/health && {
               echo "permission api container is up..."
               break
             }

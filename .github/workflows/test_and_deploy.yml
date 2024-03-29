@@ -148,9 +148,9 @@ jobs:
           echo "network ${{ job.services.postgres.network }}"
           docker run -d --name permissions-api  \
                      -h permissions-api \
-                     -p "3001:3001"     \
+                     -p "3337:3337"     \
                      -e HOST=0.0.0.0    \
-                     -e PORT=3001       \
+                     -e PORT=3337       \
                      -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
                      --network "${{ job.services.postgres.network }}"  \
                      -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
@@ -158,7 +158,7 @@ jobs:
                      node --experimental-specifier-resolution=node ./dist/main.js
 
           sleep_loop_ct=0
-          until curl localhost:3001/api/health || [[ $sleep_loop_ct > 30 ]]; do
+          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             docker ps
             docker logs permissions-api
             docker inspect permissions-api
@@ -238,9 +238,9 @@ jobs:
           echo "network ${{ job.services.postgres.network }}"
           docker run -d --name permissions-api  \
                       -h permissions-api \
-                      -p "3001:3001"     \
+                      -p "3337:3337"     \
                       -e HOST=0.0.0.0    \
-                      -e PORT=3001       \
+                      -e PORT=3337       \
                       -v $PWD/nodes_modules/@charmverse/core:/apps/node_modules/@charmverse/core \
                       --network "${{ job.services.postgres.network }}"  \
                       -e DATABASE_URL=postgres://postgres:postgres@postgres:5432/charmversetest  \
@@ -248,7 +248,7 @@ jobs:
                       node --experimental-specifier-resolution=node ./dist/main.js
 
           sleep_loop_ct=0
-          until curl localhost:3001/api/health || [[ $sleep_loop_ct > 30 ]]; do
+          until curl localhost:3337/api/health || [[ $sleep_loop_ct > 30 ]]; do
             docker ps
             docker logs permissions-api
             docker inspect permissions-api
