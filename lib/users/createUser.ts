@@ -2,9 +2,9 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { isTestEnv } from 'config/constants';
 import { getENSName } from 'lib/blockchain/getENSName';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
+import { logSignupViaWallet } from 'lib/metrics/postToDiscord';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { sessionUserRelations } from 'lib/session/config';
 import { postUserCreate } from 'lib/users/postUserCreate';
@@ -17,15 +17,41 @@ import { prepopulateUserProfile } from './prepopulateUserProfile';
 
 type UserProps = { address?: string; email?: string; id?: string; avatar?: string; skipTracking?: boolean };
 
-export async function createUserFromWallet(
+export async function createOrGetUserFromWallet(
   { id = v4(), address = randomETHWalletAddress(), email, avatar, skipTracking }: UserProps = {},
   signupAnalytics: Partial<SignupAnalytics> = {}
-): Promise<LoggedInUser> {
+): Promise<{
+  user: LoggedInUser;
+  isNew: boolean;
+}> {
   const lowercaseAddress = address.toLowerCase();
+
+  let newlySignedUser: LoggedInUser | undefined;
+
+  let existingUser: {
+    user: LoggedInUser;
+    isNew: boolean;
+  };
 
   try {
     const user = await getUserProfile('addresses', lowercaseAddress);
-    return user;
+    if (user.claimed === false) {
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          claimed: true,
+          email,
+          avatar
+        }
+      });
+      newlySignedUser = user;
+    }
+    existingUser = {
+      isNew: false,
+      user
+    };
   } catch (_) {
     // ignore error, it just means user was not found
     const ens = await getENSName(address);
@@ -50,16 +76,38 @@ export async function createUserFromWallet(
       include: sessionUserRelations
     });
 
-    try {
-      await prepopulateUserProfile(newUser, ens);
-    } catch (error) {
-      log.error('Error while prepopulating user profile', { error, userId: newUser.id });
-    }
+    existingUser = {
+      isNew: true,
+      user: newUser
+    };
 
-    if (!skipTracking) {
-      postUserCreate({ user: newUser, identityType: 'Wallet', signupAnalytics });
-    }
-
-    return newUser;
+    newlySignedUser = newUser;
   }
+
+  if (newlySignedUser) {
+    const ens = await getENSName(address);
+    try {
+      await prepopulateUserProfile(newlySignedUser, ens);
+    } catch (error) {
+      log.error('Error while prepopulating user profile', { error, userId: newlySignedUser.id });
+    }
+
+    if (newlySignedUser.identityType === 'Wallet') {
+      logSignupViaWallet();
+    }
+
+    if (!skipTracking && newlySignedUser.identityType) {
+      postUserCreate({ user: newlySignedUser, identityType: newlySignedUser.identityType, signupAnalytics });
+    }
+  }
+
+  return existingUser;
+}
+
+export async function createUserFromWallet(
+  { id = v4(), address = randomETHWalletAddress(), email, avatar, skipTracking }: UserProps = {},
+  signupAnalytics: Partial<SignupAnalytics> = {}
+): Promise<LoggedInUser> {
+  const { user } = await createOrGetUserFromWallet({ id, address, email, avatar, skipTracking }, signupAnalytics);
+  return user;
 }
