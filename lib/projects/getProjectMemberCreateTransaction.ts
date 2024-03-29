@@ -1,4 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { getENSName } from 'lib/blockchain';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
@@ -6,6 +7,96 @@ import { shortWalletAddress } from 'lib/utils/blockchain';
 import { uid } from 'lib/utils/strings';
 
 import type { ProjectValues } from './interfaces';
+
+async function getOrCreateUserByWallet(walletAddress: string) {
+  const user = await prisma.userWallet.findFirst({
+    where: {
+      OR: [
+        {
+          address: walletAddress.toLowerCase()
+        },
+        {
+          ensname: walletAddress
+        }
+      ]
+    },
+    select: {
+      userId: true
+    }
+  });
+
+  if (user) {
+    return user.userId;
+  }
+
+  const ens = await getENSName(walletAddress);
+  const userPath = shortWalletAddress(walletAddress).replace('…', '-');
+  const isUserPathAvailable = await isProfilePathAvailable(userPath);
+
+  const walletUser = await prisma.user.create({
+    data: {
+      username: ens ?? shortWalletAddress(walletAddress.toLowerCase()),
+      identityType: 'Wallet',
+      path: isUserPathAvailable ? userPath : uid(),
+      wallets: {
+        create: {
+          address: walletAddress.toLowerCase(),
+          ensname: ens
+        }
+      },
+      claimed: false
+    }
+  });
+
+  return walletUser.id;
+}
+
+async function getOrCreateUserByEmail(email: string) {
+  const googleAccount = await prisma.googleAccount.findFirst({
+    where: {
+      email
+    },
+    select: {
+      userId: true
+    }
+  });
+
+  if (googleAccount) {
+    return googleAccount.userId;
+  }
+
+  const verifiedEmail = await prisma.verifiedEmail.findFirst({
+    where: {
+      email
+    },
+    select: {
+      userId: true
+    }
+  });
+
+  if (verifiedEmail) {
+    return verifiedEmail.userId;
+  }
+
+  const user = await prisma.user.create({
+    data: {
+      username: email,
+      claimed: false,
+      path: stringUtils.uid(),
+      identityType: 'VerifiedEmail',
+      email,
+      verifiedEmails: {
+        create: {
+          email,
+          avatarUrl: '',
+          name: email
+        }
+      }
+    }
+  });
+
+  return user.id;
+}
 
 export async function getProjectMemberCreateTransaction({
   projectId,
@@ -21,69 +112,16 @@ export async function getProjectMemberCreateTransaction({
 
   let connectedUserId: string | undefined;
 
-  if (email) {
-    const googleAccount = await prisma.googleAccount.findFirst({
-      where: {
-        email
-      },
-      select: {
-        userId: true
-      }
-    });
-    connectedUserId = googleAccount?.userId;
-
+  if (!email && !walletAddress) {
+    connectedUserId = undefined;
+  } else if (walletAddress && !email) {
+    connectedUserId = await getOrCreateUserByWallet(walletAddress);
+  } else if (!walletAddress && email) {
+    connectedUserId = await getOrCreateUserByEmail(email);
+  } else if (walletAddress && email) {
+    connectedUserId = await getOrCreateUserByWallet(walletAddress);
     if (!connectedUserId) {
-      const verifiedEmail = await prisma.verifiedEmail.findFirst({
-        where: {
-          email
-        },
-        select: {
-          userId: true
-        }
-      });
-      connectedUserId = verifiedEmail?.userId;
-    }
-  }
-
-  if (!connectedUserId && walletAddress) {
-    const userWallet = await prisma.userWallet.findFirst({
-      where: {
-        OR: [
-          {
-            address: walletAddress.toLowerCase()
-          },
-          {
-            ensname: walletAddress
-          }
-        ]
-      },
-      select: {
-        userId: true
-      }
-    });
-
-    if (userWallet) {
-      connectedUserId = userWallet.userId;
-    } else {
-      const ens = await getENSName(walletAddress);
-      const userPath = shortWalletAddress(walletAddress).replace('…', '-');
-      const isUserPathAvailable = await isProfilePathAvailable(userPath);
-
-      const walletUser = await prisma.user.create({
-        data: {
-          username: ens ?? shortWalletAddress(walletAddress.toLowerCase()),
-          identityType: 'Wallet',
-          path: isUserPathAvailable ? userPath : uid(),
-          wallets: {
-            create: {
-              address: walletAddress.toLowerCase(),
-              ensname: ens
-            }
-          },
-          claimed: false
-        }
-      });
-      connectedUserId = walletUser.id;
+      connectedUserId = await getOrCreateUserByEmail(email);
     }
   }
 

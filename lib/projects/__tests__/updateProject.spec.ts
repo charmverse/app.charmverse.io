@@ -23,6 +23,8 @@ describe('updateProject', () => {
     const googleAccountUserEmail = `${v4()}@gmail.com`;
 
     const newWalletUserAddress = randomETHWallet().address.toLowerCase();
+    const newGoogleAccountUserEmail = `${v4()}@gmail.com`;
+    const newVerifiedEmailUserEmail = `${v4()}@gmail.com`;
 
     await prisma.user.update({
       where: {
@@ -146,6 +148,18 @@ describe('updateProject', () => {
             name: 'New Wallet Project Member',
             walletAddress: newWalletUserAddress,
             email: ''
+          },
+          // Add new user with google account
+          {
+            ...defaultProjectValues.projectMembers[0],
+            name: 'New Google Account Project Member',
+            email: newGoogleAccountUserEmail
+          },
+          // Add new user with verified email
+          {
+            ...defaultProjectValues.projectMembers[0],
+            name: 'New Verified Email Project Member',
+            email: newVerifiedEmailUserEmail
           }
         ]
       }
@@ -191,5 +205,35 @@ describe('updateProject', () => {
     expect(updatedProjectWithMembers.projectMembers[3].teamLead).toBe(false);
     expect(updatedProjectWithMembers.projectMembers[3].userId).toBe(newWalletUser.id);
     expect(updatedProjectWithMembers.projectMembers[3].walletAddress).toBe(newWalletUserAddress);
+
+    const newGoogleAccountUser = await prisma.user.findFirstOrThrow({
+      where: {
+        verifiedEmails: {
+          some: {
+            email: newGoogleAccountUserEmail
+          }
+        }
+      }
+    });
+    expect(newGoogleAccountUser.claimed).toBe(false);
+    expect(newGoogleAccountUser.identityType).toBe('VerifiedEmail');
+    expect(updatedProjectWithMembers.projectMembers[4].teamLead).toBe(false);
+    expect(updatedProjectWithMembers.projectMembers[4].userId).toBe(newGoogleAccountUser.id);
+    expect(updatedProjectWithMembers.projectMembers[4].email).toBe(newGoogleAccountUserEmail);
+
+    const newVerifiedEmailUser = await prisma.user.findFirstOrThrow({
+      where: {
+        verifiedEmails: {
+          some: {
+            email: newVerifiedEmailUserEmail
+          }
+        }
+      }
+    });
+    expect(newVerifiedEmailUser.claimed).toBe(false);
+    expect(newVerifiedEmailUser.identityType).toBe('VerifiedEmail');
+    expect(updatedProjectWithMembers.projectMembers[5].teamLead).toBe(false);
+    expect(updatedProjectWithMembers.projectMembers[5].userId).toBe(newVerifiedEmailUser.id);
+    expect(updatedProjectWithMembers.projectMembers[5].email).toBe(newVerifiedEmailUserEmail);
   });
 });
