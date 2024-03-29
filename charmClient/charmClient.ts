@@ -375,6 +375,21 @@ class CharmClient {
   getProposalProject(proposalId: string) {
     return http.GET<ProjectWithMembers | null>(`/api/proposals/${proposalId}/project`);
   }
+
+  updateProjectMember({
+    projectId,
+    memberId,
+    payload
+  }: {
+    projectId: string;
+    memberId: string;
+    payload: ProjectValues['projectMembers'][0];
+  }) {
+    return http.PUT<ProjectWithMembers['projectMembers'][number]>(
+      `/api/projects/${projectId}/members/${memberId}`,
+      payload
+    );
+  }
 }
 
 const charmClient = new CharmClient();

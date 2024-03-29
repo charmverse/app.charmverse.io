@@ -4,17 +4,40 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deleteProjectMember } from 'lib/projects/deleteProjectMember';
+import type { ProjectValues, ProjectWithMembers } from 'lib/projects/interfaces';
+import { updateProjectMember } from 'lib/projects/updateProjectMember';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).delete(deleteProjectMemberController);
+handler.use(requireUser).delete(deleteProjectMemberController).put(updateProjectMemberController);
+
+async function updateProjectMemberController(
+  req: NextApiRequest,
+  res: NextApiResponse<ProjectWithMembers['projectMembers'][number]>
+) {
+  const userId = req.session.user.id;
+  const projectMemberId = req.query.memberId as string;
+  await prisma.projectMember.findFirstOrThrow({
+    where: {
+      id: projectMemberId,
+      userId
+    }
+  });
+  const projectMemberValues = req.body as ProjectValues['projectMembers'][0];
+
+  const projectMember = await updateProjectMember({
+    projectMemberValues
+  });
+
+  return res.status(200).send(projectMember);
+}
 
 async function deleteProjectMemberController(req: NextApiRequest, res: NextApiResponse) {
   const userId = req.session.user.id;
   const projectId = req.query.id as string;
   const projectMemberId = req.query.memberId as string;
-  const projectLead = await prisma.project.findUniqueOrThrow({
+  const project = await prisma.project.findUniqueOrThrow({
     where: {
       id: projectId
     },
@@ -28,8 +51,8 @@ async function deleteProjectMemberController(req: NextApiRequest, res: NextApiRe
     }
   });
 
-  const isUserProjectLead = projectLead.projectMembers.find((member) => member.userId === userId)?.teamLead;
-  const isUserProjectMember = projectLead.projectMembers.find((member) => member.userId === userId);
+  const isUserProjectLead = project.projectMembers.find((member) => member.userId === userId)?.teamLead;
+  const isUserProjectMember = project.projectMembers.find((member) => member.userId === userId);
 
   if (!isUserProjectLead && !isUserProjectMember) {
     throw new ActionNotPermittedError('You are not allowed to delete project member');

@@ -82,8 +82,8 @@ function ProjectRow({
   }
 
   function onUpdateProject() {
+    const projectValues = form.getValues();
     if (isTeamLead) {
-      const projectValues = form.getValues();
       const updatedProject = {
         ...projectValues,
         id: projectWithMembers.id,
@@ -126,6 +126,46 @@ function ProjectRow({
           revalidate: false
         }
       );
+    } else {
+      const projectMemberValue = projectValues.projectMembers.find((member) => member.userId === user?.id);
+      if (!projectMemberValue || !projectMemberValue.id) {
+        return;
+      }
+
+      charmClient
+        .updateProjectMember({
+          memberId: projectMemberValue.id,
+          payload: projectMemberValue,
+          projectId: projectWithMembers.id
+        })
+        .then((updatedProjectMember) => {
+          mutate(
+            (projects) => {
+              if (!projects || !projectWithMembers) {
+                return projects;
+              }
+
+              return projects.map((_project) => {
+                if (_project.id === projectWithMembers.id) {
+                  return {
+                    ..._project,
+                    projectMembers: _project.projectMembers.map((projectMember) => {
+                      if (projectMember.userId === user?.id) {
+                        return updatedProjectMember;
+                      }
+                      return projectMember;
+                    })
+                  };
+                }
+
+                return _project;
+              });
+            },
+            {
+              revalidate: false
+            }
+          );
+        });
     }
     onClose();
   }

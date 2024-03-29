@@ -27,6 +27,7 @@ export function ProjectFormAnswers({
   const projectValues = getValues();
   const { user } = useUser();
   const extraProjectMembers = projectValues.projectMembers.slice(1);
+
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
@@ -72,7 +73,7 @@ export function ProjectFormAnswers({
               </Stack>
               <ProjectMemberFieldAnswers
                 projectMemberIndex={index + 1}
-                disabled={!isTeamLead}
+                disabled={!(isTeamLead || projectMember.userId === user?.id)}
                 defaultRequired={defaultRequired}
                 fieldConfig={fieldConfig?.projectMember}
               />
