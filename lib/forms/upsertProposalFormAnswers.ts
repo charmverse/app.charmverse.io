@@ -4,7 +4,9 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
 import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import { createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
 import { validateAnswers } from 'lib/forms/validateAnswers';
+import type { ProjectFieldConfig } from 'lib/projects/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
 export type RubricAnswerUpsert = {
@@ -57,6 +59,29 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
   }
 
   const projectProfileValue = answersToSave.find((a) => a.type === 'project_profile')?.value as { projectId: string };
+  const projectFormField = form.formFields.find((f) => f.type === 'project_profile');
+  let isValidProjectValues = true;
+  if (projectProfileValue.projectId && projectFormField) {
+    const projectWithMembers = await prisma.project.findUnique({
+      where: { id: projectProfileValue.projectId },
+      include: {
+        projectMembers: true
+      }
+    });
+    const yupSchema = createProjectYupSchema({
+      fieldConfig: projectFormField.fieldConfig as ProjectFieldConfig,
+      defaultRequired: true
+    });
+    try {
+      yupSchema.validateSync(projectWithMembers, { abortEarly: true });
+    } catch (_) {
+      isValidProjectValues = false;
+    }
+  }
+
+  if (!isValidProjectValues) {
+    throw new InvalidInputError(`Invalid project profile values`);
+  }
 
   const res = await prisma.$transaction([
     ...answersToSave.map((a) => {
