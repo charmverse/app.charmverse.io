@@ -17,8 +17,10 @@ export function ProjectProfileInputField({
   onChange,
   formField,
   disabled,
-  proposalId
+  proposalId,
+  isDraft
 }: {
+  isDraft?: boolean;
   disabled?: boolean;
   formField: {
     value?: FormFieldValue;
@@ -33,7 +35,9 @@ export function ProjectProfileInputField({
     return <ReadonlyProjectProfileInputField fieldConfig={formField.fieldConfig} proposalId={proposalId} />;
   }
 
-  return <BaseProjectProfileInputField formField={formField} onChange={onChange} disabled={disabled} />;
+  return (
+    <BaseProjectProfileInputField isDraft={isDraft} formField={formField} onChange={onChange} disabled={disabled} />
+  );
 }
 
 export function ReadonlyProjectProfileInputField({
@@ -92,8 +96,10 @@ export function ReadonlyProjectProfileInputField({
 export function BaseProjectProfileInputField({
   formField,
   onChange,
-  disabled
+  disabled,
+  isDraft
 }: {
+  isDraft?: boolean;
   onChange: (updatedValue: FormFieldValue) => void;
   formField: {
     value?: FormFieldValue;
@@ -119,7 +125,7 @@ export function BaseProjectProfileInputField({
   }, [data, formField.value]);
 
   return (
-    <Stack gap={1} width='100%'>
+    <Stack gap={1} width='100%' mb={1}>
       <Select
         disabled={disabled}
         displayEmpty
@@ -150,13 +156,17 @@ export function BaseProjectProfileInputField({
             <Typography>{project.name}</Typography>
           </MenuItem>
         ))}
-        <Divider />
-        <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
-          <Stack flexDirection='row' alignItems='center' gap={0.05}>
-            <MuiAddIcon fontSize='small' />
-            <Typography>Add a new project profile</Typography>
-          </Stack>
-        </MenuItem>
+        {isDraft !== false && (
+          <>
+            <Divider />
+            <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
+              <Stack flexDirection='row' alignItems='center' gap={0.05}>
+                <MuiAddIcon fontSize='small' />
+                <Typography>Add a new project profile</Typography>
+              </Stack>
+            </MenuItem>
+          </>
+        )}
       </Select>
       {(showCreateProjectForm || selectedProject) && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
