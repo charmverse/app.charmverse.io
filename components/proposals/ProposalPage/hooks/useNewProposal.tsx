@@ -88,6 +88,8 @@ export function useNewProposal({ newProposal }: Props) {
     [setFormInputsRaw]
   );
 
+  const isDirty = projectForm.formState.isDirty;
+
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     // Create a project if the proposal has a project field
     let projectId: string | undefined = projectWithMembers?.id;
@@ -95,7 +97,7 @@ export function useNewProposal({ newProposal }: Props) {
     // Make sure the form is dirty before either updating or creating the project
     // We allow saving draft without a project or a valid project
     // This guard will make sure we don't create empty projects when saving drafts
-    if (projectField && formInputs.type === 'proposal' && projectForm.formState.isDirty) {
+    if (projectField && formInputs.type === 'proposal' && isDirty) {
       if (!selectedProjectId) {
         const createdProject = await createProject(projectValues);
         projectId = createdProject.id;
