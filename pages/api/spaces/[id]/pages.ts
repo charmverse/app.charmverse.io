@@ -42,6 +42,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
     filter,
     search
   });
+
   const pages = await prisma.page.findMany({
     where: {
       spaceId,

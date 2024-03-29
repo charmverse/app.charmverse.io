@@ -36,13 +36,11 @@ export function generatePage(
           id: options.spaceId
         }
       },
-      permissions: options.pagePermissions
-        ? {
-            createMany: {
-              data: options.pagePermissions || [{ spaceId: options.spaceId, permissionLevel: 'full_access' }]
-            }
-          }
-        : undefined,
+      permissions: {
+        createMany: {
+          data: options.pagePermissions || [{ spaceId: options.spaceId, permissionLevel: 'full_access' }]
+        }
+      },
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null,
       diffs: options.content
