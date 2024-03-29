@@ -420,8 +420,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalsListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
     await proposalPage.waitForNewProposalPage(space.domain);
 
-    const workflowSelectTextContent = await proposalPage.templateSelect.textContent();
-    expect(workflowSelectTextContent).toBe(savedProposalTemplate.title);
+    await expect(proposalPage.templateSelect).toHaveText(savedProposalTemplate.title);
 
     // We only need to use to title. The content should come through from the template
     await expect(proposalPage.documentTitleInput).toBeVisible();
