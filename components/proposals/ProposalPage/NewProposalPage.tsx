@@ -39,7 +39,6 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
@@ -160,10 +159,6 @@ export function NewProposalPage({
     id: template.proposalId,
     title: template.title
   }));
-
-  const { pages } = usePages();
-
-  const proposalTemplatePage = formInputs.proposalTemplateId ? pages[formInputs.proposalTemplateId] : null;
 
   const readOnlySelectedCredentialTemplates = sourceTemplate?.selectedCredentialTemplates && !isAdmin;
 
@@ -409,7 +404,7 @@ export function NewProposalPage({
                               <Box display='flex' flex={1}>
                                 <TemplateSelect
                                   options={templatePageOptions}
-                                  value={proposalTemplatePage ?? null}
+                                  value={formInputs.proposalTemplateId}
                                   onChange={(page) => {
                                     if (page === null) {
                                       clearTemplate();
