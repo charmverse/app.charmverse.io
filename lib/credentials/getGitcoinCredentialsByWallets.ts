@@ -35,7 +35,11 @@ type ScoreItem = {
 
 const cachedTime = 60 * 60 * 1000; // 1 hour
 
-export async function getGitcoinPassportScore(wallet: string) {
+export async function getGitcoinPassportScore(wallet: string): Promise<ScoreItem | null> {
+  if (!process.env.GITCOIN_API_KEY) {
+    log.debug('Ignore gitcoin request, no api key provided');
+    return null;
+  }
   const registryScore = await http
     .GET<ScoreItem>(`${GITCOIN_SCORER_BASE_URL}/registry/score/${GITCOIN_SCORER_ID}/${wallet}`, undefined, {
       credentials: 'omit',
@@ -66,8 +70,9 @@ export async function getGitcoinPassportScore(wallet: string) {
         headers: GITCOIN_API_HEADERS
       }
     )
-    .catch(() => {
+    .catch((error) => {
       log.error('Error submitting wallet for passport score', {
+        error,
         wallet
       });
       return null;
