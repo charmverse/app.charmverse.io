@@ -443,6 +443,7 @@ function DocumentPageComponent({
                       formFields={proposal.form?.formFields ?? []}
                       readOnly={!proposal.permissions.edit}
                       threads={threads}
+                      projectWithMembers={proposal.project}
                       isDraft={proposal?.status === 'draft'}
                     />
                   )

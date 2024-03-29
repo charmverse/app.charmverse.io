@@ -10,10 +10,6 @@ export class ProjectsApi {
     return http.PUT<ProjectWithMembers>(`/api/projects/${projectId}`, payload);
   }
 
-  getProposalProject(proposalId: string) {
-    return http.GET<ProjectWithMembers | null>(`/api/proposals/${proposalId}/project`);
-  }
-
   updateProjectMember({
     projectId,
     memberId,

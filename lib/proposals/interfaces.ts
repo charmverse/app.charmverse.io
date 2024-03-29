@@ -14,7 +14,7 @@ import type {
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
-import type { ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { ProposalPropertiesField } from './blocks/interfaces';
@@ -74,4 +74,5 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
     id: string;
     formFields: TypedFormField[] | null;
   } | null;
+  project?: ProjectWithMembers;
 };

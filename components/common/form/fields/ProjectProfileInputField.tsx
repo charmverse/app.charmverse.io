@@ -1,10 +1,9 @@
 import MuiAddIcon from '@mui/icons-material/Add';
-import { Box, Chip, Divider, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { ValidationError } from 'yup';
 
-import charmClient from 'charmClient';
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
@@ -18,7 +17,7 @@ export function ProjectProfileInputField({
   onChange,
   formField,
   disabled,
-  proposalId,
+  projectWithMembers,
   isDraft,
   inputEndAdornment
 }: {
@@ -29,27 +28,21 @@ export function ProjectProfileInputField({
     value?: FormFieldValue;
     fieldConfig?: ProjectFieldConfig;
   };
-  proposalId?: string;
+  projectWithMembers?: ProjectWithMembers;
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
   const { user } = useUser();
-  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(null);
+  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(projectWithMembers ?? null);
   const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
   const { data: projectsWithMembers } = useGetProjects();
   const projectId = (formField.value as { projectId: string })?.projectId;
   const { reset } = useFormContext();
 
   useEffect(() => {
-    if (proposalId) {
-      // This is necessary to show the correct project values for a public proposal
-      charmClient.projects.getProposalProject(proposalId).then((projectWithMembers) => {
-        if (projectWithMembers) {
-          setSelectedProject(projectWithMembers);
-          reset(convertToProjectValues(projectWithMembers));
-        }
-      });
+    if (projectWithMembers) {
+      reset(convertToProjectValues(projectWithMembers));
     }
-  }, [proposalId]);
+  }, [!!projectWithMembers]);
 
   const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
 
@@ -75,7 +68,7 @@ export function ProjectProfileInputField({
           sx={{
             width: '100%'
           }}
-          key={`${proposalId}.${projectId}`}
+          key={projectId}
           // only proposal author is able to change the project profile, not even team lead can change it
           disabled={disabled}
           displayEmpty

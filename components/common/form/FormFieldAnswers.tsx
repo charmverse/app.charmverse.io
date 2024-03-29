@@ -8,7 +8,7 @@ import { Controller } from 'react-hook-form';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -48,7 +48,7 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
-  proposalId?: string;
+  projectWithMembers?: ProjectWithMembers;
 };
 
 const StyledStack = styled(Stack)`
@@ -85,7 +85,7 @@ export function FormFieldAnswersControlled({
   errors,
   onFormChange,
   pageId,
-  proposalId,
+  projectWithMembers,
   isDraft,
   threads = {}
 }: FormFieldAnswersProps & {
@@ -207,7 +207,7 @@ export function FormFieldAnswersControlled({
                         </Box>
                       )
                     }
-                    proposalId={proposalId}
+                    projectWithMembers={projectWithMembers}
                   />
                 ) : (
                   <FieldTypeRenderer

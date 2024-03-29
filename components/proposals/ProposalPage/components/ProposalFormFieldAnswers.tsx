@@ -7,6 +7,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
 export function ProposalFormFieldAnswers({
@@ -16,7 +17,8 @@ export function ProposalFormFieldAnswers({
   readOnly,
   pageId,
   threads,
-  isDraft
+  isDraft,
+  projectWithMembers
 }: {
   readOnly?: boolean;
   enableComments: boolean;
@@ -25,6 +27,7 @@ export function ProposalFormFieldAnswers({
   pageId: string;
   threads: Record<string, ThreadWithComments | undefined>;
   isDraft?: boolean;
+  projectWithMembers?: ProjectWithMembers;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
     proposalId
@@ -81,7 +84,7 @@ export function ProposalFormFieldAnswers({
       isDraft={isDraft}
       // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
       key={isDraft ? 'draft' : 'published'}
-      proposalId={proposalId}
+      projectWithMembers={projectWithMembers}
     />
   );
 }

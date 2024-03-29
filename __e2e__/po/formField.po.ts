@@ -68,6 +68,11 @@ export class FormField extends DocumentPage {
     return this.page.locator(`data-test=project-${fieldName}-field-container >> data-test=field-label`).textContent();
   }
 
+  async getProjectOption(projectId: string) {
+    await this.page.locator('data-test=project-profile-select').click();
+    return this.page.locator(`data-test=project-option-${projectId}`);
+  }
+
   async clickProjectOption(projectId: string) {
     await this.page.locator('data-test=project-profile-select').click();
     await this.page.locator(`data-test=project-option-${projectId}`).click();
