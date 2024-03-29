@@ -13,6 +13,7 @@ handler.get(getProjectController);
 
 async function getProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers | null>) {
   const proposalId = req.query.id as string;
+  const userId = req.session.user.id;
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
@@ -33,7 +34,8 @@ async function getProjectController(req: NextApiRequest, res: NextApiResponse<Pr
 
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const pagePermissions = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: proposal.page!.id
+    resourceId: proposal.page!.id,
+    userId
   });
 
   if (!pagePermissions.read) {

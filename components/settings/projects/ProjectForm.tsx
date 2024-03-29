@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
@@ -16,8 +16,10 @@ export function ProjectFormAnswers({
   fieldConfig,
   isTeamLead,
   defaultRequired,
-  hideTeamMembers = false
+  hideTeamMembers = false,
+  disabled
 }: {
+  disabled?: boolean;
   fieldConfig?: ProjectFieldConfig;
   isTeamLead: boolean;
   defaultRequired?: boolean;
@@ -31,14 +33,18 @@ export function ProjectFormAnswers({
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
-      <ProjectFieldAnswers defaultRequired={defaultRequired} disabled={!isTeamLead} fieldConfig={fieldConfig} />
+      <ProjectFieldAnswers
+        defaultRequired={defaultRequired}
+        disabled={!isTeamLead || disabled}
+        fieldConfig={fieldConfig}
+      />
       <Typography variant='h6' mt={2}>
         Team Info
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
       <ProjectMemberFieldAnswers
         projectMemberIndex={0}
-        disabled={!isTeamLead}
+        disabled={!isTeamLead || disabled}
         defaultRequired={defaultRequired}
         fieldConfig={fieldConfig?.projectMember}
       />
@@ -54,9 +60,8 @@ export function ProjectFormAnswers({
               <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
                 <Typography variant='h6'>Team member</Typography>
                 {isTeamLead ? (
-                  <DeleteOutlineOutlinedIcon
-                    fontSize='small'
-                    color='error'
+                  <IconButton
+                    disabled={disabled}
                     onClick={() => {
                       setValue(
                         'projectMembers',
@@ -68,12 +73,14 @@ export function ProjectFormAnswers({
                         }
                       );
                     }}
-                  />
+                  >
+                    <DeleteOutlineOutlinedIcon fontSize='small' color='error' />
+                  </IconButton>
                 ) : null}
               </Stack>
               <ProjectMemberFieldAnswers
                 projectMemberIndex={index + 1}
-                disabled={!(isTeamLead || projectMember.userId === user?.id)}
+                disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
                 defaultRequired={defaultRequired}
                 fieldConfig={fieldConfig?.projectMember}
               />
@@ -94,7 +101,7 @@ export function ProjectFormAnswers({
           }}
         >
           <Button
-            disabled={!isTeamLead}
+            disabled={!isTeamLead || disabled}
             disabledTooltip='Only the team lead can add team members'
             startIcon={<AddIcon fontSize='small' />}
             onClick={() => {
