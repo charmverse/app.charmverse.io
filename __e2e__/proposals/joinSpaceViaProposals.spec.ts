@@ -191,7 +191,7 @@ test('Try to create a proposal from a linked proposal template / user from outsi
 
   // User won't have the proposal template showing
   const pageLink = documentPage.getLinkedPage(template.id);
-  await expect(await documentPage.getLinkedPage(template.id).textContent()).toContain('No access');
+  await expect(documentPage.getLinkedPage(template.id)).toHaveText('No access');
   await pageLink.click();
 
   await page.waitForURL(`${baseUrl}/join?domain=${space.domain}`);
@@ -254,7 +254,7 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
   await documentPage.goToPage({ domain: space.domain, path: pageReferencingTemplate.path });
 
   const pageLink = documentPage.getLinkedPage(template.id);
-  await expect(await documentPage.getLinkedPage(template.id).textContent()).toContain(template.title);
+  await expect(documentPage.getLinkedPage(template.id)).toHaveText(template.title);
   await pageLink.click();
 
   const newUser = await generateUser({});
