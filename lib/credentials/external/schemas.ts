@@ -1,5 +1,6 @@
-import { arbitrum, base, optimism, optimismSepolia } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
+import type { EasSchemaChain } from '../connectors';
 import { proposalCredentialSchemaId } from '../schemas/proposal';
 import { rewardCredentialSchemaId } from '../schemas/reward';
 
@@ -10,10 +11,11 @@ export type ExternalCredentialChain = (typeof externalCredentialChains)[number];
 /**
  * Utility for configuration relating to the schema
  * @fields specific fields of the attestation we want to show the user
+ * @issuers list of issuers that we should filter for
  */
 export type TrackedSchemaParams = {
   schemaId: string;
-  issuers: string[];
+  issuers?: string[];
   title: string;
   organization: string;
   iconUrl: string;
@@ -53,11 +55,8 @@ const optimismRetroPgfContributionSchema: TrackedSchemaParams = {
   ]
 };
 
-const charmverseWalletAddress = '0x8Bc704386DCE0C4f004194684AdC44Edf6e85f07';
-
 const optimismCharmverseProposalSchema: TrackedSchemaParams = {
   schemaId: proposalCredentialSchemaId,
-  issuers: [charmverseWalletAddress],
   title: 'Proposal',
   organization: 'CharmVerse',
   iconUrl: charmverseLogo,
@@ -66,7 +65,6 @@ const optimismCharmverseProposalSchema: TrackedSchemaParams = {
 
 const optimismCharmverseRewardSchema: TrackedSchemaParams = {
   schemaId: rewardCredentialSchemaId,
-  issuers: [charmverseWalletAddress],
   title: 'Reward',
   organization: 'CharmVerse',
   iconUrl: charmverseLogo,
@@ -110,16 +108,17 @@ const arbitrumDevfolioOnchainCredentialAttestationSchema: TrackedSchemaParams = 
 //   title: 'Cheer'
 // };
 
-export const trackedSchemas: Record<ExternalCredentialChain | (typeof optimismSepolia)['id'], TrackedSchemaParams[]> = {
-  [optimism.id]: [
-    optimismRetroPgfBadgeHolderSchema,
-    optimismRetroPgfContributionSchema,
-    optimismCharmverseProposalSchema,
-    optimismCharmverseRewardSchema
-  ],
-  [optimismSepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+export const trackedSchemas: Record<ExternalCredentialChain, TrackedSchemaParams[]> = {
+  [optimism.id]: [optimismRetroPgfBadgeHolderSchema, optimismRetroPgfContributionSchema],
   [base.id]: [baseVerifiedAccountSchema],
   [arbitrum.id]: [arbitrumDevfolioQuadraticVotingAttestationSchema, arbitrumDevfolioOnchainCredentialAttestationSchema]
+};
+
+export const trackedCharmverseSchemas: Record<EasSchemaChain, TrackedSchemaParams[]> = {
+  [arbitrum.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+  [optimismSepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+  [optimism.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema],
+  [sepolia.id]: [optimismCharmverseProposalSchema, optimismCharmverseRewardSchema]
 };
 
 /**

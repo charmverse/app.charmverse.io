@@ -2,7 +2,6 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { isTestEnv } from 'config/constants';
 import { getENSName } from 'lib/blockchain/getENSName';
 import type { SignupAnalytics } from 'lib/metrics/mixpanel/interfaces/UserEvent';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
@@ -28,7 +27,12 @@ export async function createUserFromWallet(
     return user;
   } catch (_) {
     // ignore error, it just means user was not found
-    const ens: string | null = await getENSName(address);
+    let ens: string | null = null;
+    try {
+      ens = await getENSName(address);
+    } catch (error) {
+      log.warn('Could not retrieve ENS while creating a user', { error });
+    }
     const userPath = shortWalletAddress(address).replace('…', '-');
     const isUserPathAvailable = await isProfilePathAvailable(userPath);
 

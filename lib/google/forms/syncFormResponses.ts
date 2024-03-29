@@ -2,10 +2,10 @@ import { log } from '@charmverse/core/log';
 import type { Block as PrismaBlock } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { Block } from 'lib/focalboard/block';
-import { blockToPrisma, prismaToBlock } from 'lib/focalboard/block';
-import { createBoard } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { UIBlockWithDetails } from 'lib/databases/block';
+import { blockToPrisma, prismaToBlock, prismaToUIBlock } from 'lib/databases/block';
+import { createBoard } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
 import { generateFirstDiff } from 'lib/pages/server/generateFirstDiff';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { WrongStateError } from 'lib/utils/errors';
@@ -148,7 +148,7 @@ export async function syncFormResponses({
     spaceId: board.spaceId,
     view: prismaToBlock(view),
     pageIds,
-    blocks: [board, ...cards.map((card) => prismaToBlock(card))]
+    blocks: [board, ...cards.map((card, index) => prismaToUIBlock(card, pages[index] as any))]
   });
 
   // export for testing
@@ -188,8 +188,8 @@ async function notifyUsers({
 }: {
   spaceId: string;
   pageIds: string[];
-  blocks: Block[];
-  view: Block;
+  blocks: UIBlockWithDetails[];
+  view: UIBlockWithDetails;
 }) {
   relay.broadcast(
     {

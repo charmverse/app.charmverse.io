@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -9,7 +9,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
-import { mapRewardToCardPage } from '../../hooks/useRewardsBoardAdapter';
+import { mapRewardToCard } from '../../hooks/useRewardsBoardAdapter';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
 
 import { usePropertiesMutator } from './hooks/useRewardsMutator';
@@ -32,14 +32,13 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
   // card from current reward
   const rewardPage = getRewardPage(reward?.id);
   const card =
-    reward &&
     space &&
-    mapRewardToCardPage({
+    mapRewardToCard({
       reward,
       rewardPage,
       spaceId: space.id,
       members: membersRecord
-    }).card;
+    });
 
   const boardCustomProperties = useMemo(() => {
     if (board) {

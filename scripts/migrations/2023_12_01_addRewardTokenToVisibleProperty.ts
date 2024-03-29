@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { BoardViewFields } from 'lib/focalboard/boardView';
-import { DEFAULT_BOARD_VIEW_BLOCK_ID, DEFAULT_CALENDAR_VIEW_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
+import { BoardViewFields } from 'lib/databases/boardView';
+import { DEFAULT_BOARD_VIEW_BLOCK_ID, DEFAULT_CALENDAR_VIEW_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 import { REWARD_AMOUNT } from 'lib/rewards/blocks/constants';
 
 export async function addRewardTokenToVisibleProperty() {
@@ -39,7 +39,7 @@ export async function addRewardTokenToVisibleProperty() {
               visiblePropertyIds: [...visiblePropertyIds, REWARD_AMOUNT]
             }
           }
-        })
+        });
       }
     } catch (err) {
       console.log(`Error updating reward board block ${rewardBoardBlock.spaceId}`, err);

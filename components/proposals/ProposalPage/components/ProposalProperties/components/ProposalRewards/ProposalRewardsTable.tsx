@@ -5,9 +5,9 @@ import { uniqBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
 import { ContextMenu } from 'components/common/ContextMenu';
+import Table from 'components/common/DatabaseEditor/components/table/table';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
@@ -19,12 +19,12 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
-import { mapRewardToCardPage } from 'components/rewards/hooks/useRewardsBoardAdapter';
+import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { CardPage } from 'lib/focalboard/card';
+import type { CardWithRelations } from 'lib/databases/card';
 import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
@@ -96,7 +96,7 @@ export function ProposalRewardsTable({
     () => rewardIds.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy),
     [rewardIds, allRewards]
   );
-  const cardPages = useMemo(
+  const cards = useMemo(
     () =>
       publishedRewards.length > 0
         ? getCardsFromPublishedRewards(publishedRewards, pages)
@@ -219,7 +219,7 @@ export function ProposalRewardsTable({
       <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
         <div className='BoardComponent drag-area-container'>
           <DatabaseStickyHeader>
-            <Box display={cardPages.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
+            <Box display={cards.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
               <Box my={1}>
                 <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
               </Box>
@@ -232,7 +232,7 @@ export function ProposalRewardsTable({
           </DatabaseStickyHeader>
           {loadingData ? (
             <LoadingComponent height={500} isLoading />
-          ) : cardPages.length ? (
+          ) : cards.length ? (
             <Box className='container-container'>
               <Stack>
                 <Box width='100%' mb={1}>
@@ -242,7 +242,7 @@ export function ProposalRewardsTable({
                     setSelectedPropertyId={() => {}}
                     board={boardBlock!}
                     activeView={tableView}
-                    cardPages={cardPages}
+                    cards={cards}
                     views={[]}
                     visibleGroups={[]}
                     selectedCardIds={[]}
@@ -310,47 +310,31 @@ export function ProposalRewardsTable({
   );
 }
 
-function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spaceId?: string): CardPage[] {
+function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spaceId?: string): CardWithRelations[] {
   return pendingRewards.map(({ reward, page, draftId }) => {
-    return mapRewardToCardPage({
+    return mapRewardToCard({
       spaceId: spaceId || '',
       reward: {
-        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
         // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
         assignedSubmitters: [],
-        allowMultipleApplications: false,
-        allowedSubmitterRoles: [],
-        approveSubmitters: false,
         chainId: null,
-        createdAt: new Date(),
-        createdBy: '',
         customReward: null,
         fields: { properties: {} },
         dueDate: null,
         id: draftId,
         maxSubmissions: null,
-        proposalId: null,
         reviewers: [],
         rewardAmount: null,
         rewardToken: null,
-        spaceId: '',
         status: 'open',
-        submissionsLocked: false,
-        suggestedBy: null,
-        updatedAt: new Date(),
         ...reward
       } as BoardReward,
       rewardPage: {
-        // add fields to satisfy PageMeta type. TODO: We dont need all fields on PageMeta for cards
-        bountyId: null,
         createdAt: new Date(),
         createdBy: '',
         icon: null,
         type: 'bounty',
-        syncWithPageId: null,
         path: '',
-        proposalId: null,
-        hasContent: true,
         title: '',
         updatedAt: new Date(),
         updatedBy: '',
@@ -361,7 +345,7 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
   });
 }
 
-function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMap): CardPage[] {
+function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMap): CardWithRelations[] {
   return (
     rewards
       // dont pass in applications or the expanded arrow icons will appear in tableRow
@@ -370,7 +354,7 @@ function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMa
         if (!page) {
           return null;
         }
-        return mapRewardToCardPage({
+        return mapRewardToCard({
           spaceId: page.spaceId,
           reward: {
             ...reward,
@@ -380,6 +364,6 @@ function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMa
         });
       })
       .filter(isTruthy)
-      .sort((a, b) => (b.page.updatedAt > a.page.updatedAt ? 1 : -1))
+      .sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1))
   );
 }

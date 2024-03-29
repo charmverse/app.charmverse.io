@@ -90,7 +90,11 @@ async function convertFolderContent({
 
   typedPrismaCreateInput.updatedBy = authorId;
 
-  typedPrismaCreateInput.parentId = parentPageId;
+  if (parentPageId) {
+    typedPrismaCreateInput.parent = {
+      connect: { id: parentPageId }
+    };
+  }
 
   // Re-add this once we re-create a formal relationship for a page and its children
   // typedPrismaCreateInput.parentPage = parentPageId ? {

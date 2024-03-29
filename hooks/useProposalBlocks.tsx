@@ -6,7 +6,7 @@ import * as http from 'adapters/http';
 import { useGetProposalBlocks, useUpdateProposalBlocks } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type {
   ProposalBlockInput,

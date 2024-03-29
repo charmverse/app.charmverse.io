@@ -1,16 +1,16 @@
 import { v4 } from 'uuid';
 
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
-import type { Block } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import { createBoard } from 'lib/focalboard/board';
-import { Constants } from 'lib/focalboard/constants';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
+import type { UIBlockWithDetails } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import { createBoard } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
 import {
   EVALUATION_STATUS_LABELS,
   proposalDbProperties,
   proposalStatusColors
-} from 'lib/focalboard/proposalDbProperties';
-import { createTableView } from 'lib/focalboard/tableView';
+} from 'lib/databases/proposalDbProperties';
+import { createTableView } from 'lib/databases/tableView';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -34,7 +34,7 @@ export function getDefaultBoard({
   customOnly?: boolean;
   evaluationStepTitles: string[];
 }) {
-  const block: Partial<Block> = storedBoard
+  const block: UIBlockWithDetails = storedBoard
     ? blockToFBBlock(storedBoard)
     : createBoard({
         block: {

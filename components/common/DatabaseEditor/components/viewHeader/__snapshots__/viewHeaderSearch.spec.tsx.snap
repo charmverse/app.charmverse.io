@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`components/viewHeader/ViewHeaderSearch return input after click on search button 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <input
+      class="Editable undefined"
+      placeholder="Search text"
+      value=""
+    />
+  </span>
+</div>
+`;
+
+exports[`components/viewHeader/ViewHeaderSearch return search menu 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <button
+      class="Button IconButton css-w119tu"
+      style="width: 32px;"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="MuiSvgIcon-root MuiSvgIcon-colorSecondary MuiSvgIcon-fontSizeSmall css-fq32bd-MuiSvgIcon-root"
+        data-testid="SearchIcon"
+        focusable="false"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14"
+        />
+      </svg>
+    </button>
+  </span>
+</div>
+`;
+
+exports[`components/viewHeader/ViewHeaderSearch search text after input after click on search button and search text 1`] = `
+<div>
+  <span
+    class="variable variable"
+  >
+    <input
+      class="Editable undefined"
+      placeholder="Search text"
+      title="Hello"
+      value="Hello"
+    />
+  </span>
+</div>
+`;

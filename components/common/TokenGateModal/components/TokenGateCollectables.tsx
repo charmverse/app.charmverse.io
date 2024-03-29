@@ -13,6 +13,9 @@ import { collectableOptions } from '../utils/utils';
 import { TokenGateCollectableFields } from './TokenGateCollectableFields';
 import { TokenGateFooter } from './TokenGateFooter';
 
+/**
+ * ERC-721, ERC-1155, POAPS, Unlock Protocol, Hypersub
+ */
 export function TokenGateCollectables() {
   const { setDisplayedPage, flow, handleTokenGate } = useTokenGateModal();
 

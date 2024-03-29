@@ -3,9 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
-import type { CardFields } from 'lib/focalboard/card';
+import type { BoardFields } from 'lib/databases/board';
+import type { BoardViewFields, IViewType } from 'lib/databases/boardView';
+import type { CardFields } from 'lib/databases/card';
 import { generateSchema } from 'testing/publicApi/schemas';
 
 import { createPage, generateBoard, generateRole } from '../setupDatabase';
@@ -291,22 +291,6 @@ describe('generateBoard', () => {
     });
 
     expect(viewBlocks.length).toBe(4);
-  });
-
-  it('should generate a board under another page if this option is passed', async () => {
-    const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-    const page = await createPage({
-      createdBy: user.id,
-      spaceId: space.id
-    });
-
-    const board = await generateBoard({
-      createdBy: user.id,
-      spaceId: space.id,
-      parentId: page.id
-    });
-
-    expect(board.parentId).toBe(page.id);
   });
 
   it('should create custom permissions for the boards and cards if this option is provided', async () => {

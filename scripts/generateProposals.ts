@@ -6,7 +6,7 @@ import { randomIntFromInterval } from 'lib/utils/random';
 const minRubricScore = 0;
 const maxRubricScore = 20;
 
-async function generateRubricProposals({ spaceIdOrDomain, amount }: { spaceIdOrDomain: string; amount: number }) {
+async function generateRubricProposals({ spaceIdOrDomain, amount, complete, selectedCredentialTemplateIds }: { spaceIdOrDomain: string; amount: number; complete?: boolean; selectedCredentialTemplateIds?: string[] }) {
   const space = await getSpace(spaceIdOrDomain);
 
   for (let i = 0; i < amount; i++) {
@@ -15,6 +15,8 @@ async function generateRubricProposals({ spaceIdOrDomain, amount }: { spaceIdOrD
       userId: space.createdBy,
       proposalStatus: 'published',
       authors: [space.createdBy],
+      title: `Proposal ${i}`,
+      selectedCredentialTemplateIds ,
       evaluationInputs: [
         {
           evaluationType: 'rubric',
@@ -26,7 +28,8 @@ async function generateRubricProposals({ spaceIdOrDomain, amount }: { spaceIdOrD
               description: 'test',
               parameters: { type: 'range', min: minRubricScore, max: maxRubricScore }
             }
-          ]
+          ],
+          result: complete ? 'pass' : undefined
         }
       ]
     });
@@ -67,4 +70,18 @@ async function generateRubricProposals({ spaceIdOrDomain, amount }: { spaceIdOrD
 //   }
 // }).then(console.log)
 
-generateRubricProposals({ amount: 15, spaceIdOrDomain: 'urgent-teal-piranha' });
+const spaceDomain = 'quick-jade-halibut'
+
+// generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['40e46dcc-f67a-4926-a250-1eb88752a870'] })
+// .then(console.log);
+
+// prisma.proposal.updateMany({
+//   where: {
+//     space: {
+//       domain: spaceDomain
+//     }
+//   },
+//   data: {
+//     selectedCredentialTemplates: ["aabfa1de-df4d-4c3a-9799-251f4343f708"]
+//   }
+// }).then(console.log)

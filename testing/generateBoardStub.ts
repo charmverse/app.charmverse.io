@@ -1,10 +1,10 @@
 import type { Block, Page, PagePermission, PageType, Prisma } from '@charmverse/core/prisma';
 import { v4 } from 'uuid';
 
-import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/focalboard/board';
-import type { BoardViewFields, IViewType } from 'lib/focalboard/boardView';
-import type { CardFields } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
+import type { BoardViewFields, IViewType } from 'lib/databases/boardView';
+import type { CardFields } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utils/objects';
 
@@ -28,7 +28,6 @@ export type CustomBoardProps = {
 export function boardWithCardsArgs({
   createdBy,
   spaceId,
-  parentId,
   cardCount = 2,
   addPageContent,
   views = 1,
@@ -42,7 +41,6 @@ export function boardWithCardsArgs({
 }: {
   createdBy: string;
   spaceId: string;
-  parentId?: string;
   cardCount?: number;
   addPageContent?: boolean;
   views?: number;
@@ -75,7 +73,6 @@ export function boardWithCardsArgs({
     icon: '📝',
     path: `page-${v4()}`,
     isTemplate: false,
-    parentId,
     spaceId,
     type: boardPageType ?? 'board',
     boardId,
@@ -387,6 +384,15 @@ export function boardWithCardsArgs({
           id: createdBy
         }
       },
+      card:
+        page.type === 'card'
+          ? {
+              connect: {
+                id: page.id
+              }
+            }
+          : undefined,
+      boardId: page.type.includes('board') ? page.id : undefined,
       space: {
         connect: {
           id: spaceId

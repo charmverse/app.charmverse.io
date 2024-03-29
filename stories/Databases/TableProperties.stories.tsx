@@ -4,11 +4,11 @@ import type { MockStoreEnhanced } from 'redux-mock-store';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
-import Table from 'components/common/BoardEditor/focalboard/src/components/table/table';
-import type { RootState } from 'components/common/BoardEditor/focalboard/src/store';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
-import { createTableView } from 'lib/focalboard/tableView';
+import Table from 'components/common/DatabaseEditor/components/table/table';
+import type { RootState } from 'components/common/DatabaseEditor/store';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
+import type { IPropertyTemplate } from 'lib/databases/board';
+import { createTableView } from 'lib/databases/tableView';
 import { createMockBoard, createMockCard } from 'testing/mocks/block';
 import { createMockPage } from 'testing/mocks/page';
 import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
@@ -139,10 +139,7 @@ export function DatabaseTableView() {
           onCardClicked={voidFunction}
           selectedCardIds={[]}
           visibleGroups={[]}
-          cardPages={[
-            { card: card1, page: page1 },
-            { card: card2, page: page2 }
-          ]}
+          cards={[card1, card2]}
         />
       </div>
     </GlobalContext>

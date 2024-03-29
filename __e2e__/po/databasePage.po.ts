@@ -1,6 +1,6 @@
 import { selectors } from '@playwright/test';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 
 import { GlobalPage } from './global.po';
 

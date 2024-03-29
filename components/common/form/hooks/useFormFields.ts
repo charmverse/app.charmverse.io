@@ -146,6 +146,12 @@ export function useFormFields({
               });
               break;
             }
+            case 'project_profile': {
+              acc[property.id] = yup.object().test('is-required', 'Required', (value) => {
+                return value && 'projectId' in value;
+              });
+              break;
+            }
             default: {
               return acc;
             }
@@ -170,7 +176,7 @@ export function useFormFields({
   }
 
   useEffect(() => {
-    // set form values onece fields are defined
+    // set form values once fields are defined
     if (fields) {
       reset(getFormFieldMap(fields), {
         keepDirty: false,

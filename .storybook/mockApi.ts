@@ -1,6 +1,6 @@
 import { rest } from 'msw';
-import type { BlockCountInfo } from 'lib/spaces/getSpaceBlockCount';
-import { getDefaultWorkflows } from 'lib/proposal/workflows/defaultWorkflows';
+import type { BlockCountInfo } from '../lib/spaces/getSpaceBlockCount';
+import { getDefaultWorkflows } from '../lib/proposals/workflows/defaultWorkflows';
 import type { SpacePermissionFlags } from '../lib/permissions/spaces';
 
 import {
@@ -45,7 +45,7 @@ const spaceHandlers = {
     return res(ctx.json(spaces));
   }),
   spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
-    const result: BlockCountInfo = { count: 1000 };
+    const result: Partial<BlockCountInfo> = { count: 1000 };
     return res(ctx.json(result));
   })
 };
@@ -61,7 +61,7 @@ const proposalHandlers = {
     return res(ctx.json(proposalTemplates));
   }),
   proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
-    return res(ctx.json(getDefaultWorkflows(req.params.spaceId)));
+    return res(ctx.json(getDefaultWorkflows(req.params.spaceId as string)));
   })
 };
 

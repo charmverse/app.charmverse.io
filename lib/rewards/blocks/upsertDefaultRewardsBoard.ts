@@ -1,7 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { BoardFields, IPropertyTemplate } from 'lib/focalboard/board';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/focalboard/customBlocks/constants';
+import { blockToPrisma } from 'lib/databases/block';
+import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 
 import { upsertBlock } from './upsertBlock';
 import {

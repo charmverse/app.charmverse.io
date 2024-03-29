@@ -3,9 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { SyncRelationPropertyPayload } from 'lib/focalboard/relationProperty/syncRelationProperty';
-import { syncRelationProperty } from 'lib/focalboard/relationProperty/syncRelationProperty';
+import { prismaToBlock } from 'lib/databases/block';
+import type { SyncRelationPropertyPayload } from 'lib/databases/relationProperty/syncRelationProperty';
+import { syncRelationProperty } from 'lib/databases/relationProperty/syncRelationProperty';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';

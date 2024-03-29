@@ -9,7 +9,7 @@ import { useRef, type ReactNode } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { spaces } from 'stories/lib/mockData';
 
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
 import { CurrentSpaceContext, type ICurrentSpaceContext } from 'hooks/useCurrentSpace';
 import { MemberPropertiesProvider } from 'hooks/useMemberProperties';
 import { MembersProvider } from 'hooks/useMembers';

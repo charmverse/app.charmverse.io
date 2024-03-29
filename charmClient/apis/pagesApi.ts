@@ -3,7 +3,7 @@ import type { Page, PageComment, ProfileItem } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateCommentInput, UpdateCommentInput } from 'lib/comments';
-import type { FilterGroup } from 'lib/focalboard/filterGroup';
+import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { PageWithContent } from 'lib/pages/interfaces';
@@ -19,10 +19,6 @@ export class PagesApi {
 
   getArchivedPages(spaceId: string) {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { archived: true });
-  }
-
-  searchPages(spaceId: string, search: string, limit?: number) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { search, limit });
   }
 
   getPage(pageId: string, spaceId?: string) {

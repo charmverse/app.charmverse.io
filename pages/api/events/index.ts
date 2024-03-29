@@ -18,6 +18,10 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
 
   const { event: eventName, ...eventPayload } = request;
 
+  if (typeof eventName !== 'string') {
+    throw new InvalidInputError(`Invalid eventName: ${eventName}`);
+  }
+
   if (!req.session.anonymousUserId) {
     req.session.anonymousUserId = uuid();
     await req.session.save();
@@ -30,14 +34,11 @@ async function trackHandler(req: NextApiRequest, res: NextApiResponse<{ success:
     eventPayload.isAnonymous = true;
   }
 
-  // backwards compatibility - can delete after December 14
-  const _eventName = eventName ?? req.query.event;
-
-  if (!userId || !_eventName) {
+  if (!userId) {
     throw new InvalidInputError('Invalid track data');
   }
 
-  trackUserAction(_eventName, { ...eventPayload, userId });
+  trackUserAction(eventName, { ...eventPayload, userId });
 
   try {
     await recordDatabaseEvent({

@@ -15,7 +15,10 @@ export type FormFieldValue =
       content: PageContent;
       contentText: string;
     }
-  | UploadedFileInfo;
+  | UploadedFileInfo
+  | {
+      projectId: string;
+    };
 
 export type ControlFieldProps<T extends FormFieldValue = FormFieldValue> = {
   onChange?: (value: any) => void;
@@ -47,7 +50,7 @@ export type FieldProps = {
 
 export type FormFieldInput = Pick<
   FormField,
-  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type'
+  'id' | 'description' | 'name' | 'index' | 'required' | 'private' | 'type' | 'fieldConfig'
 > & {
   options?: SelectOptionType[];
 };

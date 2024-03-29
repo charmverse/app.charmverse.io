@@ -6,7 +6,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { v4 as uuid } from 'uuid';
 
 import { getDefaultEvaluation, getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
-import { defaultWorkflowTitle, getDefaultWorkflows } from 'lib/proposals/workflows/defaultWorkflows';
+import { defaultWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
 
 import { loginBrowserUser } from '../utils/mocks';
 
@@ -45,7 +45,8 @@ const testValues: Record<TestedFormFieldTypes, string> = {
   email: 'test@charmverse.io',
   wallet: '0x888888CfAebbEd5554c3F36BfBD233f822e9455f',
   date: '2022-12-31',
-  label: 'Label'
+  label: 'Label',
+  project_profile: 'Project profile'
 };
 
 test.beforeAll(async () => {

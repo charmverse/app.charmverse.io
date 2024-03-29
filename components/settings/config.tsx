@@ -34,6 +34,7 @@ export type UserSettingsSection = (typeof accountSettingsSections)[number];
 export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
   { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
+  { icon: <AccountCircleIcon fontSize='small' />, path: 'projects', label: 'My Projects' },
   {
     icon: <CharmsLogo />,
     path: 'charms',

@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { DragIndicator } from '@mui/icons-material';
 import { Box, Card, Typography } from '@mui/material';
 
-import { useSortable } from 'components/common/BoardEditor/focalboard/src/hooks/sortable';
+import { useSortable } from 'components/common/DatabaseEditor/hooks/sortable';
 
 import { evaluationIcons } from '../constants';
 

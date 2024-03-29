@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { ClickAwayListener, Collapse, Stack } from '@mui/material';
 
-import { DatabaseSidebarHeader } from 'components/common/BoardEditor/focalboard/src/components/viewSidebar/databaseSidebarHeader';
+import { DatabaseSidebarHeader } from 'components/common/DatabaseEditor/components/viewSidebar/databaseSidebarHeader';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 
 import { AddMemberPropertyButton } from '../AddMemberPropertyButton';

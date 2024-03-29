@@ -1,7 +1,6 @@
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type {
   ApiPageKey,
-  Block,
   FavoritePage,
   InviteLink,
   Page,
@@ -13,17 +12,18 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
-import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/BoardEditor/utils/blockUtils';
+import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
-import type { BlockPatch, Block as FBBlock } from 'lib/focalboard/block';
+import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
 import type { FailedImportsError } from 'lib/notion/types';
-import type { ModifyChildPagesResponse, PageLink } from 'lib/pages';
+import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
+import type { ProjectUpdatePayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
@@ -143,7 +143,7 @@ class CharmClient {
   }
 
   deletePageForever(pageId: string) {
-    return http.DELETE<ModifyChildPagesResponse>(`/api/pages/${pageId}`);
+    return http.DELETE<TrashOrDeletePageResponse>(`/api/pages/${pageId}`);
   }
 
   favoritePage(pageId: string) {
@@ -202,27 +202,27 @@ class CharmClient {
     return http.POST<{ importedRolesCount: number }>('/api/guild-xyz/importRoles', payload);
   }
 
-  getBlock({ blockId }: { blockId: string }): Promise<FBBlock> {
-    return http.GET<Block>(`/api/blocks/${blockId}`).then(blockToFBBlock);
+  getBlock({ blockId }: { blockId: string }) {
+    return http.GET<BlockWithDetails>(`/api/blocks/${blockId}`).then(blockToFBBlock);
   }
 
-  getSubtree({ pageId }: { pageId: string }): Promise<FBBlock[]> {
+  getSubtree({ pageId }: { pageId: string }) {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/subtree`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/subtree`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
   getViews({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/views`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/views`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
 
   getComments({ pageId }: { pageId: string }): Promise<FBBlock[]> {
     return http
-      .GET<Block[]>(`/api/blocks/${pageId}/comments`)
+      .GET<BlockWithDetails[]>(`/api/blocks/${pageId}/comments`)
       .then((blocks) => blocks.map(blockToFBBlock))
       .then((blocks) => fixBlocks(blocks));
   }
@@ -232,14 +232,16 @@ class CharmClient {
   }
 
   async deleteBlock(blockId: string, updater: BlockUpdater): Promise<void> {
-    const { rootBlock } = await http.DELETE<{ deletedCount: number; rootBlock: Block }>(`/api/blocks/${blockId}`);
+    const { rootBlock } = await http.DELETE<{ deletedCount: number; rootBlock: BlockWithDetails }>(
+      `/api/blocks/${blockId}`
+    );
     const fbBlock = blockToFBBlock(rootBlock);
     fbBlock.deletedAt = new Date().getTime();
     updater([fbBlock]);
   }
 
   async deleteBlocks(blockIds: string[], updater: BlockUpdater): Promise<void> {
-    const rootBlocks = await http.DELETE<Block[]>(`/api/blocks`, { blockIds });
+    const rootBlocks = await http.DELETE<BlockWithDetails[]>(`/api/blocks`, { blockIds });
     const fbBlocks = rootBlocks.map((rootBlock) => ({
       ...blockToFBBlock(rootBlock),
       deletedAt: new Date().getTime()
@@ -249,28 +251,28 @@ class CharmClient {
 
   async insertBlocks(fbBlocks: FBBlock[], updater: BlockUpdater): Promise<FBBlock[]> {
     const blocksInput = fbBlocks.map(fbBlockToBlock);
-    const newBlocks = await http.POST<Block[]>('/api/blocks', blocksInput);
+    const newBlocks = await http.POST<BlockWithDetails[]>('/api/blocks', blocksInput);
     const newFBBlocks = newBlocks.map(blockToFBBlock);
     updater(newFBBlocks);
     return newFBBlocks;
   }
 
   async patchBlock(blockId: string, blockPatch: BlockPatch, updater: BlockUpdater): Promise<void> {
-    const currentFBBlock: FBBlock = blockToFBBlock(await http.GET<Block>(`/api/blocks/${blockId}`));
+    const currentFBBlock: FBBlock = blockToFBBlock(await http.GET<BlockWithDetails>(`/api/blocks/${blockId}`));
     const { deletedFields = [], updatedFields = {}, ...updates } = blockPatch;
     const fbBlockInput = Object.assign(currentFBBlock, updates, {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
     const blockInput = fbBlockToBlock(fbBlockInput);
-    const updatedBlocks = await http.PUT<Block[]>('/api/blocks', [blockInput]);
+    const updatedBlocks = await http.PUT<BlockWithDetails[]>('/api/blocks', [blockInput]);
     const fbBlock = blockToFBBlock(updatedBlocks[0]);
     updater([fbBlock]);
   }
 
   async updateBlock(blockInput: FBBlock) {
     const newBlock = fbBlockToBlock(blockInput);
-    return http.PUT<Block[]>('/api/blocks', [newBlock]);
+    return http.PUT<BlockWithDetails[]>('/api/blocks', [newBlock]);
   }
 
   async patchBlocks(_blocks: FBBlock[], blockPatches: BlockPatch[], updater: BlockUpdater): Promise<void> {
@@ -283,7 +285,7 @@ class CharmClient {
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
-    const updatedBlocks = await http.PUT<Block[]>('/api/blocks', updatedBlockInput);
+    const updatedBlocks = await http.PUT<BlockWithDetails[]>('/api/blocks', updatedBlockInput);
     const fbBlocks = updatedBlocks.map(blockToFBBlock);
     updater(fbBlocks);
   }
@@ -360,6 +362,14 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
+  }
+
+  removeProjectMember({ projectId, memberId }: { projectId: string; memberId: string }) {
+    return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
+  }
+
+  updateProject(payload: ProjectUpdatePayload) {
+    return http.PUT<ProjectWithMembers>(`/api/projects/${payload.id}`, payload);
   }
 }
 

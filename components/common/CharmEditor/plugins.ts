@@ -31,7 +31,7 @@ import * as listItem from './components/listItem/listItem';
 import { plugins as listPlugins } from './components/listItemNew/listItemPlugins';
 import { plugins as markdownPlugins } from './components/markdown/markdown.plugins';
 import { mentionPluginKeyName, mentionPlugins } from './components/mention';
-import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage';
+import { nestedPagePlugins, pageNodeDropPlugin } from './components/nestedPage/nestedPage.plugins';
 import * as nft from './components/nft/nft.plugins';
 import { plugins as paragraphPlugins } from './components/paragraph/paragraph';
 import * as pasteChecker from './components/pasteChecker/pasteChecker';

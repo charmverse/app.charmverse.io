@@ -55,6 +55,7 @@ export async function validateTokenGateCondition(
     // ERC1155 With Token Id
     case condition.type === 'ERC1155' && !!contractAddress && !!condition.tokenIds[0]: {
       const tokenId = BigInt(condition.tokenIds[0] || 1);
+
       const ownedNumberOfNFTs = await publicClient.readContract({
         abi: erc1155Abi,
         address: contractAddress,

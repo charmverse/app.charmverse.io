@@ -4,14 +4,15 @@ import type { Signer } from 'ethers';
 
 import { PROJECT_REGISTRY_ADDRESSES } from 'lib/gitcoin/constants';
 
-import ProjectRegistryAbi from './abi/ProjectRegistry.json';
+import { ProjectRegistryAbi } from './abi/ProjectRegistry';
+import type { ChainId } from './projectsCount';
 
 export function getProjectRegistryContract({
   providerOrSigner,
   chainId
 }: {
   providerOrSigner: Provider | Signer;
-  chainId: number;
+  chainId: ChainId;
 }): Contract {
   const address = PROJECT_REGISTRY_ADDRESSES[chainId];
 

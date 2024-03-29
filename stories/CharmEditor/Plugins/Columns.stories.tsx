@@ -2,7 +2,7 @@ import { Paper } from '@mui/material';
 import { Provider } from 'react-redux';
 
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
-import { mockStateStore } from 'components/common/BoardEditor/focalboard/src/testUtils';
+import { mockStateStore } from 'components/common/DatabaseEditor/testUtils';
 import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { renderEditorWithContent } from '../renderEditor';

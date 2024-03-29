@@ -28,7 +28,8 @@ export async function createForm(fields: FormFieldInput[]) {
           index: field.index,
           options: field.options,
           private: field.private,
-          required: field.required
+          required: field.required,
+          fieldConfig: field.fieldConfig as any
         }
       });
     })

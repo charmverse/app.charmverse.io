@@ -9,6 +9,7 @@ import { useEffect, useState, useMemo } from 'react';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isTruthy } from 'lib/utils/types';
+import type { NestedDataTest } from 'testing/e2eType';
 
 interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
   onChange?: (chainId: number) => void;
@@ -78,12 +79,7 @@ export function InputSearchBlockchain({
       autoHighlight
       size='small'
       getOptionLabel={(option) => `${option.chainName}`}
-      renderOption={(props, option) => (
-        <Box data-test={`select-chain-${option.chainId}`} component='li' sx={{ display: 'flex', gap: 1 }} {...props}>
-          <IconLogo src={option.iconUrl} />
-          <Box component='span'>{option.chainName}</Box>
-        </Box>
-      )}
+      renderOption={(props, option) => <Chain info={option} dataTest={`select-chain-${option.chainId}`} {...props} />}
       renderInput={(params) => (
         <TextField
           {...params}
@@ -105,6 +101,19 @@ function IconLogo({ src, ...props }: { src?: string } & BoxProps) {
   return (
     <Box width='1em' height='1em' display='flex' justifyContent='center' {...props}>
       <img src={src} style={{ height: '1em', marginRight: '0.5em' }} />
+    </Box>
+  );
+}
+
+export function Chain({
+  info,
+  dataTest,
+  ...props
+}: { info: Pick<IChainDetails, 'chainName' | 'iconUrl'> } & NestedDataTest) {
+  return (
+    <Box data-test={dataTest} component='li' sx={{ display: 'flex', gap: 1, alignItems: 'center' }} {...props}>
+      <IconLogo src={info.iconUrl} />
+      <Box component='span'>{info.chainName}</Box>
     </Box>
   );
 }

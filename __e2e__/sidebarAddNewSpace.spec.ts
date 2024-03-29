@@ -69,8 +69,7 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
     // check sidebar space name
-    const sidebarSpaceName = await page.locator('data-test=sidebar-space-name').textContent();
-    expect(sidebarSpaceName).toBe(createdSpace.domain);
+    await expect(page.locator('data-test=sidebar-space-name')).toHaveText(createdSpace.domain);
 
     // Create and verify 2nd space
     await spaceMenuBtn.click();
@@ -88,7 +87,6 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
-    const sidebarSpaceName2 = await page.locator('data-test=sidebar-space-name').textContent();
-    expect(sidebarSpaceName2).toBe(uniqueDomainName2);
+    await expect(page.locator('data-test=sidebar-space-name')).toHaveText(uniqueDomainName2);
   });
 });

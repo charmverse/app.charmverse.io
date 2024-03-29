@@ -14,8 +14,8 @@ import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/
 import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { BoardFields } from 'lib/focalboard/board';
-import type { BoardViewFields } from 'lib/focalboard/boardView';
+import type { BoardFields } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
 import { getSpace } from 'lib/spaces/getSpace';
 
 import { getImportData } from './getImportData';
@@ -36,7 +36,7 @@ export async function importSpaceSettings({
 }: ImportParams & { oldNewRoleIdHashMap: Record<string, string> }): Promise<SpaceImportResult> {
   const { space } = await getImportData(importParams);
   if (!space) {
-    throw new DataNotFoundError(`No space to import`);
+    throw new DataNotFoundError(`No space to import: ${importParams.exportName}`);
   }
 
   const targetSpace = await getSpace(targetSpaceIdOrDomain);
