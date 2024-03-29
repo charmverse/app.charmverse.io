@@ -30,7 +30,7 @@ export function getProposalErrors({
   if (isDraft) {
     return errors;
   }
-  if (!page.title) {
+  if (!page.title?.trim()) {
     errors.push('Title is required');
   }
   if (!proposal.workflowId) {
