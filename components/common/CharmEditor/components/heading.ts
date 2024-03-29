@@ -204,13 +204,11 @@ export function scrollIntoHeadingNode({ editor, pluginKey }: { editor: BangleEdi
     if (domNode && nodePos !== undefined) {
       editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
       setTimeout(() => {
+        // Need to reference the domNode again because the node might have been re-rendered
+        const _domNode = editor.view.domAtPos(nodePos!)?.node as HTMLElement;
         selectionTooltip.hideSelectionTooltip(pluginKey)(editor.view.state, editor.view.dispatch, editor.view);
-        // Need to get the dom node again because the node might have been re-rendered
-        (editor.view.domAtPos(nodePos!)?.node as HTMLElement).scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 0);
+        document.querySelector('.document-print-container')?.scrollTo(0, _domNode.offsetTop);
+      }, 500);
     }
   }
 }
