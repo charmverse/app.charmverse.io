@@ -35,7 +35,10 @@ export function useProject({ projectId, fieldConfig }: { projectId: MaybeString;
 
   const { showMessage } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
-    return debounce((projectPayload) => projectId && charmClient.updateProject(projectId, projectPayload), 300);
+    return debounce(
+      (projectPayload) => projectId && charmClient.projects.updateProject(projectId, projectPayload),
+      300
+    );
   }, [projectId]);
 
   const onProjectUpdate = useCallback(

@@ -46,6 +46,7 @@ import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
+import { ProjectsApi } from './apis/projectsApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { PublicProfileApi } from './apis/publicProfileApi';
 import { RewardsApi } from './apis/rewardsApi';
@@ -109,6 +110,8 @@ class CharmClient {
   rewards = new RewardsApi();
 
   credentials = new CredentialsApi();
+
+  projects = new ProjectsApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
@@ -362,33 +365,6 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
-  }
-
-  removeProjectMember({ projectId, memberId }: { projectId: string; memberId: string }) {
-    return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
-  }
-
-  updateProject(projectId: string, payload: ProjectValues) {
-    return http.PUT<ProjectWithMembers>(`/api/projects/${projectId}`, payload);
-  }
-
-  getProposalProject(proposalId: string) {
-    return http.GET<ProjectWithMembers | null>(`/api/proposals/${proposalId}/project`);
-  }
-
-  updateProjectMember({
-    projectId,
-    memberId,
-    payload
-  }: {
-    projectId: string;
-    memberId: string;
-    payload: ProjectValues['projectMembers'][0];
-  }) {
-    return http.PUT<ProjectWithMembers['projectMembers'][number]>(
-      `/api/projects/${projectId}/members/${memberId}`,
-      payload
-    );
   }
 }
 

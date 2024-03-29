@@ -62,7 +62,7 @@ function ProjectRow({
     const deletedProjectMember = projectWithMembers.projectMembers.find((member) => member.userId === user?.id);
 
     if (deletedProjectMember) {
-      await charmClient.removeProjectMember({
+      await charmClient.projects.removeProjectMember({
         memberId: deletedProjectMember.id,
         projectId: projectWithMembers.id
       });
@@ -132,7 +132,7 @@ function ProjectRow({
         return;
       }
 
-      charmClient
+      charmClient.projects
         .updateProjectMember({
           memberId: projectMemberValue.id,
           payload: projectMemberValue,

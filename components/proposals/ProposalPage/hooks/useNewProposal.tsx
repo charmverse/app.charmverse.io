@@ -111,7 +111,7 @@ export function useNewProposal({ newProposal }: Props) {
             id: member.id
           }))
         };
-        await charmClient.updateProject(projectWithMembers.id, updatedProjectValues);
+        await charmClient.projects.updateProject(projectWithMembers.id, updatedProjectValues);
         mutate();
       }
     }

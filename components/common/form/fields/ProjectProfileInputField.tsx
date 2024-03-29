@@ -59,7 +59,7 @@ export function ReadonlyProjectProfileInputField({
 
   useEffect(() => {
     if (proposalId) {
-      charmClient.getProposalProject(proposalId).then((projectWithMembers) => {
+      charmClient.projects.getProposalProject(proposalId).then((projectWithMembers) => {
         setSelectedProject(projectWithMembers);
       });
     }
