@@ -14,6 +14,7 @@ import { prettyPrint } from 'lib/utils/strings';
 import { ProposalEvaluationInput, createProposal } from 'lib/proposals/createProposal';
 import { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
 import { addUserToSpace } from 'testing/utils/spaces';
+import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
 
 function readCSV(filename: string) {
 
@@ -45,7 +46,7 @@ function readCSV(filename: string) {
 }
 
 async function importApplications({templatePath, spaceDomain, filename}: {templatePath: string; spaceDomain: string; filename: string}): Promise<void> {
-  const data = await readCSV(filename);
+  const data = (await readCSV(filename)).slice(18);
 
   const formProposal = await prisma.proposal.findFirstOrThrow({
     where: {
@@ -99,11 +100,11 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
     return {
       id: uuid(),
       index,
-      reviewers: templateStep.reviewers.map(r => ({roleId: r.id, userId: r.userId, systemRole: r.systemRole})),
+      reviewers: templateStep.reviewers.map(r => ({roleId: r.roleId, userId: r.userId, systemRole: r.systemRole})),
       rubricCriteria: templateStep.rubricCriteria.map(c => ({parameters: c.parameters, title:c.title, type: c.type, description: c.description})),
       title: templateStep.title,
       type: templateStep.type,
-      voteSettings: templateStep.voteSettings
+      voteSettings: templateStep.voteSettings,
     } as ProposalEvaluationInput
   });
 
@@ -116,6 +117,7 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
     return acc;
   }, {} as Record<string, FormField>);
 
+  // for (let i=0; i< 5; i++) {
 
   for (let i=0; i< data.length; i++) {
     const  userAnswers = data[i];
@@ -162,7 +164,7 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
       }
     });
 
-    if (user?.spaceRoles.length === 0) {
+    if (user && !user.spaceRoles.length) {
       await addUserToSpace({userId: user.id, spaceId: formProposal.spaceId})
     }
 
@@ -195,8 +197,6 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
       })
     }
 
-    await addUserToSpace({userId: user.id, spaceId: formProposal.spaceId})
-
     let proposal = await prisma.proposal.findFirst({
       where: {
         formId,
@@ -210,15 +210,13 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
       }
     });  
 
-    console.log('Found proposal', !!proposal)
-
     if (!proposal) {
 
       const createdProposal = await createProposal({
         userId: user.id,
         formId,
         authors: [user.id],
-        evaluations: [],
+        evaluations: populatedWorkflowSteps,
         spaceId: formProposal.spaceId,
         workflowId: formProposal.workflowId!,
         proposalTemplateId: formProposal.page!.id,
@@ -238,7 +236,7 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
 
     const selectValueModifiers: Record<string, SelectOptionType[]> = {}
 
-    const answers: FieldAnswerInput[] = Object.entries(userAnswers).map(([key, value]) => {
+    const answers: FieldAnswerInput[] = await Promise.all(Object.entries(userAnswers).map(async([key, value]) => {
 
       const field = formQuestions[key.toLowerCase().trim()];
       let populatedValue = value;
@@ -261,13 +259,23 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
         } else {
           populatedValue = matchingOption.id;
         }
+      } else if (field.type === 'long_text') {
+        const parsedContent = await parseMarkdown(value);
+        populatedValue = {
+          content: parsedContent,
+          contentText: value
+        } as any
+      } else if (field.type === 'file' && value) {
+        populatedValue = {
+          url: value
+        } as any
       }
 
       return {
         fieldId: field.id,
         value: populatedValue
       }
-    });
+    }));
 
     const fieldsToModify = Object.keys(selectValueModifiers);
 
@@ -288,9 +296,11 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
       proposalId: proposal.id,
       answers
     })
+
+    console.log('Processed', i+1, 'proposals / ', data.length);
   }
 }
 
-importApplications({templatePath: 'proposal-form-5212482570918344', spaceDomain: 'coloured-tomato-gibbon', filename: 'Copy of Aptos grants wave 18 & 19 - Data To Upload.csv'}).then(console.log)
+importApplications({templatePath: 'general-grant-application-13916139412961637', spaceDomain: 'aptos-grants', filename: 'Copy of Aptos grants wave 18 & 19 - Data To Upload.csv'}).then(console.log)
 
 // prisma.page.deleteMany({where: {space: {domain: 'coloured-tomato-gibbon'}, type: 'proposal'}}).then(console.log)
