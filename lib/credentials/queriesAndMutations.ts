@@ -158,7 +158,11 @@ export async function getCharmverseOffchainCredentialsByWallets({
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
     })
-    .then(({ data }) => data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
+    .then((response) =>
+      response
+        ? response.data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node))
+        : Promise.reject(new Error('Unknown error'))
+    );
 
   const credentialIds = charmverseCredentials.map((c) => c.id);
 
@@ -280,7 +284,11 @@ export async function getExternalCredentialsByWallets({
       // For now, let's refetch each time and rely on http endpoint-level caching
       // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
     })
-    .then(({ data }) => data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node)));
+    .then((response) =>
+      response
+        ? response.data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node))
+        : Promise.reject(new Error('Unknown error'))
+    );
 
   return externalCredentials.map((credential) => ({
     ...credential,
