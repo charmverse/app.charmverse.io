@@ -11,14 +11,11 @@ import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces'
 
 export function CreateProjectForm({
   onCancel,
-  onSave,
-  onAddProject
+  onSave
 }: {
   onSave?: (project: ProjectWithMembers) => void;
   onCancel?: VoidFunction;
-  onAddProject?: VoidFunction;
 }) {
-  const [open, setOpen] = useState(false);
   const { trigger: createProject, isMutating } = useCreateProject();
   const { formState, getValues, reset } = useFormContext<ProjectValues>();
 
@@ -30,7 +27,6 @@ export function CreateProjectForm({
     try {
       const createdProjectWithMembers = await createProject(project);
       onSave?.(createdProjectWithMembers);
-      setOpen(false);
       mutate(
         (cachedData) => {
           if (!cachedData) {
@@ -46,22 +42,6 @@ export function CreateProjectForm({
     } catch (err) {
       //
     }
-  }
-
-  if (!open) {
-    return (
-      <Button
-        disabled={isMutating}
-        onClick={() => {
-          setOpen(true);
-          onAddProject?.();
-        }}
-        data-test='add-project-button'
-        startIcon={<AddIcon fontSize='small' />}
-      >
-        Add a project
-      </Button>
-    );
   }
 
   return (
@@ -86,7 +66,6 @@ export function CreateProjectForm({
             color='error'
             onClick={() => {
               reset();
-              setOpen(false);
               onCancel?.();
             }}
           >

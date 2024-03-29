@@ -1,4 +1,4 @@
-import { MoreHoriz, ContentCopyOutlined, DeleteOutlined, EditOutlined } from '@mui/icons-material';
+import { MoreHoriz, DeleteOutlined } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
@@ -224,14 +224,40 @@ export function ProjectsSettings() {
     fieldConfig: defaultProjectFieldConfig
   });
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
+  const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);
 
   return (
     <>
       <Legend>My Projects</Legend>
       <Typography variant='h6'>Projects</Typography>
-      <Typography variant='caption' mb={1} component='p'>
-        Projects can be used to autofill proposal and grant request information.
-      </Typography>
+      <Box display='flex' alignItems='center' justifyContent='space-between' mb={2}>
+        <Typography variant='body1'>
+          Projects can be used to autofill proposal and grant request information.
+        </Typography>
+        <Button
+          size='small'
+          id='new-workflow-btn'
+          onClick={() => {
+            setOpenedAccordion(null);
+            setIsCreateProjectFormOpen(true);
+          }}
+        >
+          New
+        </Button>
+      </Box>
+
+      {isCreateProjectFormOpen && (
+        <FormProvider {...form}>
+          <CreateProjectForm
+            onCancel={() => {
+              setIsCreateProjectFormOpen(false);
+            }}
+            onSave={() => {
+              setIsCreateProjectFormOpen(false);
+            }}
+          />
+        </FormProvider>
+      )}
 
       {projectsWithMembers && projectsWithMembers.length !== 0 && (
         <Box mb={3}>
@@ -247,13 +273,6 @@ export function ProjectsSettings() {
           ))}
         </Box>
       )}
-      <FormProvider {...form}>
-        <CreateProjectForm
-          onAddProject={() => {
-            setOpenedAccordion(null);
-          }}
-        />
-      </FormProvider>
     </>
   );
 }
