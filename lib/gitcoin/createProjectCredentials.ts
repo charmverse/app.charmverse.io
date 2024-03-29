@@ -14,6 +14,8 @@ export async function createOffchainCredentialsForProjects() {
   for (const chainId of GITCOIN_SUPPORTED_CHAINS) {
     const approvedApplications = await getRoundApplicationsWithMeta(chainId);
 
+    log.info(`Running ${approvedApplications.length} approved applications from gitcoin, on chain ${chainId}`);
+
     for (const application of approvedApplications) {
       const metadata = application.metadata;
       const recepient = getAddress(metadata.recipient);
