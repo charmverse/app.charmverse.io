@@ -1,6 +1,8 @@
 import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+
 import { getProjectMemberCreateTransaction } from './getProjectMemberCreateTransaction';
 import type { ProjectValues, ProjectWithMembers } from './interfaces';
 
@@ -42,6 +44,10 @@ export async function updateProject({
   const deletedProjectMembersIds = Object.keys(existingProjectMembersRecord).filter(
     (memberId) => !payloadProjectMemberIds.includes(memberId)
   );
+
+  for (const _ of deletedProjectMembersIds) {
+    trackUserAction('remove_project_member', { userId, projectId });
+  }
 
   const projectMemberTransactions: Prisma.Prisma__ProjectMemberClient<ProjectMember, never>[] = [];
 

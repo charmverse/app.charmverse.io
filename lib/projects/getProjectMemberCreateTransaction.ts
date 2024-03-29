@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { getENSName } from 'lib/blockchain';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { uid } from 'lib/utils/strings';
@@ -124,6 +125,8 @@ export async function getProjectMemberCreateTransaction({
       connectedUserId = await getOrCreateUserByEmail(email);
     }
   }
+
+  trackUserAction('add_project_member', { userId, projectId, connectedUserId, email, walletAddress });
 
   return () =>
     prisma.projectMember.create({
