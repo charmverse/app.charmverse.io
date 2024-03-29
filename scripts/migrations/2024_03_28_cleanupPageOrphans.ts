@@ -3,10 +3,72 @@ import { uniq } from 'lodash';
 
 import { appendFileSync, readFileSync } from 'fs';
 import { isTruthy } from 'lib/utils/types';
-const FILE_PATH = './orphans';
+const FILE_PATH = './orphans.txt';
+
+const userId = '4e1d4522-6437-4393-8ed1-9c56e53235f4';
 
 const totalPages = 404701;
 const perBatch = 1000;
+
+let count = 0;
+let nonCardOrphanCount = 0;
+
+export async function findOrphans({ offset = 0 }: { offset?: number } = {}) {
+  // Load limited number of spaces at a time
+  const result = await prisma.page.findMany({
+    where: {
+      parentId: {
+        not: null
+      }
+    },
+    select: {
+      id: true,
+      parentId: true,
+      type: true
+      // title: true
+      // space: {
+      //   select: {
+      //     domain: true
+      //   }
+      // }
+    },
+    skip: offset,
+    take: perBatch,
+    orderBy: {
+      id: 'asc'
+    }
+  });
+  // console.log(result);
+  const parents = await prisma.page.findMany({
+    where: {
+      id: {
+        in: uniq(result.map((r) => r.parentId)).filter(isTruthy)
+      }
+    }
+  });
+  const orphans = result.filter((r) => !parents.find((p) => p.id === r.parentId));
+  const nonCardOrphans = orphans.filter((r) => !r.type.startsWith('card'));
+  nonCardOrphanCount += nonCardOrphans.length;
+  count += orphans.length;
+  if (result.length > 0) {
+    if (offset % 10000) {
+      console.log('Offset:', offset, '. Found', count, 'orphans.', totalPages - offset, 'pages left');
+      // if (orphans.length > 0) {
+      //   console.log(orphans[0]);
+      // }
+    }
+    orphans.forEach((o) => {
+      appendFileSync(FILE_PATH, `\n${o.id}`);
+    });
+    return findOrphans({ offset: offset + perBatch });
+  }
+  return count;
+}
+async function search() {
+  const count = await findOrphans();
+  console.log('Orphans:', count);
+  // console.log(spaces.length);
+}
 
 let counts = {
   pages: 0,
@@ -15,7 +77,7 @@ let counts = {
   cards: 0
 };
 
-async function search() {
+async function cleanup() {
   const pageIds = readFileSync(FILE_PATH + '.txt', 'utf-8')
     .split('\n')
     .filter(Boolean);
@@ -41,7 +103,6 @@ async function search() {
       cardId: true
     }
   });
-  console.log(pages);
 
   for (let page of pages) {
     console.log('processing', page.type, page.id, page.boardId, page.cardId);
@@ -71,7 +132,6 @@ async function search() {
           }
         });
       }
-      //console.log('has block', page.boardId, !!block);
     } else if (page.type.includes('card')) {
       counts.cards++;
       if (page.cardId) {
@@ -87,8 +147,6 @@ async function search() {
           }
         });
       }
-
-      //  console.log('has card', page.cardId, !!card);
     } else {
       counts.pages++;
       await prisma.page.update({
@@ -102,7 +160,6 @@ async function search() {
     }
   }
   console.log(counts);
-  //console.log(pages.map((p) => p.space.domain));
 }
 
 search().then(() => console.log('Done'));
