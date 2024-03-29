@@ -13,7 +13,7 @@ handler.get(getProjectController);
 
 async function getProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers | null>) {
   const proposalId = req.query.id as string;
-  const userId = req.session.user.id;
+  const userId = req.session.user?.id;
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId

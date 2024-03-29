@@ -64,6 +64,7 @@ test.beforeAll(async () => {
       projectMembers: [
         {
           ...defaultProjectValues.projectMembers[0],
+          email: `test@${v4()}.com`,
           name: 'Test Member'
         }
       ]
@@ -167,13 +168,13 @@ test.describe.serial('Structured proposal template with project', () => {
     ]);
 
     expect(await proposalFormFieldPage.getProjectFieldLabel('name')).toBe('Project Name*');
-    expect(await proposalFormFieldPage.getProjectFieldLabel('description')).toBe('Describe your project in more depth');
+    expect(await proposalFormFieldPage.getProjectFieldLabel('excerpt')).toBe('Describe your project in one sentence');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-name')).toBe('Name*');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-email')).toBe('Email*');
     expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
   });
 
-  test('Create a structured proposal with project and update project fields', async ({
+  test('Create a structured proposal with project & project members and update project fields', async ({
     proposalPage,
     documentPage,
     proposalFormFieldPage,
@@ -250,7 +251,6 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
-
     await projectSettings.page.waitForTimeout(500);
 
     const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({
@@ -320,6 +320,9 @@ test.describe.serial('Structured proposal template with project', () => {
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Demo Project' });
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
+    await projectSettings.addProjectMemberButton.click();
+    await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
+    await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
     await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
     await proposalPage.publishNewProposalButton.click();
@@ -353,6 +356,8 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(createdProject.name).toBe('Demo Project');
     expect(createdProject.projectMembers[0].name).toBe('John Doe');
     expect(createdProject.projectMembers[0].email).toBe('doe@gmail.com');
+    expect(createdProject.projectMembers[1].name).toBe('Jane Doe');
+    expect(createdProject.projectMembers[1].email).toBe('jane@gmail.com');
 
     await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
 

@@ -45,6 +45,7 @@ export function ProjectProfileInputField({
       charmClient.projects.getProposalProject(proposalId).then((projectWithMembers) => {
         if (projectWithMembers) {
           setSelectedProject(projectWithMembers);
+          reset(convertToProjectValues(projectWithMembers));
         }
       });
     }
