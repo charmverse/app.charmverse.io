@@ -16,14 +16,14 @@ export function ProjectFormAnswers({
   fieldConfig,
   isTeamLead,
   defaultRequired,
-  hideTeamMembers = false,
+  hideAddTeamMemberButton = false,
   disabled
 }: {
   disabled?: boolean;
   fieldConfig?: ProjectFieldConfig;
   isTeamLead: boolean;
   defaultRequired?: boolean;
-  hideTeamMembers?: boolean;
+  hideAddTeamMemberButton?: boolean;
 }) {
   const { getValues, setValue } = useFormContext<ProjectValues>();
   const projectValues = getValues();
@@ -48,7 +48,7 @@ export function ProjectFormAnswers({
         defaultRequired={defaultRequired}
         fieldConfig={fieldConfig?.projectMember}
       />
-      {!hideTeamMembers && extraProjectMembers.length ? (
+      {extraProjectMembers.length ? (
         <>
           <Divider
             sx={{
@@ -86,35 +86,37 @@ export function ProjectFormAnswers({
               />
             </Stack>
           ))}
+        </>
+      ) : null}
+      {!hideAddTeamMemberButton && (
+        <>
           <Divider
             sx={{
               my: 1
             }}
           />
-        </>
-      ) : null}
-      {!hideTeamMembers && (
-        <Box
-          sx={{
-            mb: 2,
-            width: 'fit-content'
-          }}
-        >
-          <Button
-            disabled={!isTeamLead || disabled}
-            disabledTooltip='Only the team lead can add team members'
-            startIcon={<AddIcon fontSize='small' />}
-            onClick={() => {
-              setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true
-              });
+          <Box
+            sx={{
+              mb: 2,
+              width: 'fit-content'
             }}
           >
-            Add a team member
-          </Button>
-        </Box>
+            <Button
+              disabled={!isTeamLead || disabled}
+              disabledTooltip='Only the team lead can add team members'
+              startIcon={<AddIcon fontSize='small' />}
+              onClick={() => {
+                setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
+                  shouldValidate: true,
+                  shouldDirty: true,
+                  shouldTouch: true
+                });
+              }}
+            >
+              Add a team member
+            </Button>
+          </Box>
+        </>
       )}
     </Stack>
   );

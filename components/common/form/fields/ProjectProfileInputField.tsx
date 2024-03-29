@@ -8,6 +8,7 @@ import { useGetProjects } from 'charmClient/hooks/projects';
 import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
+import { defaultProjectValues } from 'lib/projects/constants';
 import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
@@ -48,13 +49,22 @@ export function ProjectProfileInputField({
     }
   }, [proposalId]);
 
-  useEffect(() => {
-    if (selectedProject) {
-      reset(convertToProjectValues(selectedProject));
-    }
-  }, [selectedProject?.id]);
-
   const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
+
+  function onOptionClick(projectIdOrAddProject: string | 'ADD_PROJECT') {
+    if (projectIdOrAddProject === 'ADD_PROJECT') {
+      onChange({ projectId: '' });
+      setShowCreateProjectForm(true);
+      setSelectedProject(null);
+      reset(defaultProjectValues);
+    } else {
+      onChange({ projectId: projectIdOrAddProject });
+      setShowCreateProjectForm(false);
+      const _selectedProject = projectsWithMembers?.find((project) => project.id === projectIdOrAddProject) ?? null;
+      setSelectedProject(_selectedProject);
+      reset(_selectedProject ? convertToProjectValues(_selectedProject) : defaultProjectValues);
+    }
+  }
 
   return (
     <Stack gap={1} width='100%' mb={1}>
@@ -67,24 +77,15 @@ export function ProjectProfileInputField({
           // only proposal author is able to change the project profile, not even team lead can change it
           disabled={disabled}
           displayEmpty
-          value={projectId}
+          value={showCreateProjectForm ? 'ADD_PROJECT' : projectId ?? ''}
           onChange={(e) => {
-            const value = e.target.value as string;
-            if (value === 'ADD_PROFILE') {
-              onChange({ projectId: '' });
-              setShowCreateProjectForm(true);
-            } else {
-              onChange({ projectId: value });
-              setShowCreateProjectForm(false);
-              setSelectedProject(projectsWithMembers?.find((project) => project.id === value) ?? null);
-            }
+            onOptionClick(e.target.value);
           }}
           data-test='project-profile-select'
-          renderValue={(value) => {
-            if (value === 'ADD_PROFILE') {
-              return <Typography>Add a new project profile</Typography>;
-            }
-            if (!selectedProject) {
+          renderValue={() => {
+            if (showCreateProjectForm) {
+              return <Typography>Create a new project profile</Typography>;
+            } else if (!selectedProject) {
               return <Typography>Select a project profile</Typography>;
             }
             // Selected project might have stale name if it was changed, so find the correct project from the list
@@ -102,7 +103,14 @@ export function ProjectProfileInputField({
           {isDraft !== false && (
             <>
               <Divider />
-              <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
+              <MenuItem
+                value='ADD_PROJECT'
+                data-test='project-option-new'
+                onClick={() => {
+                  // on change handler for select doesn't pick up 'ADD_PROJECT' value
+                  onOptionClick('ADD_PROJECT');
+                }}
+              >
                 <Stack flexDirection='row' alignItems='center' gap={0.05}>
                   <MuiAddIcon fontSize='small' />
                   <Typography>Add a new project profile</Typography>
@@ -123,7 +131,8 @@ export function ProjectProfileInputField({
             // only team lead is able to change the project profile if they have edit access to the proposal
             isTeamLead={isTeamLead || showCreateProjectForm}
             disabled={disabled}
-            hideTeamMembers
+            // Hide team member if a project is selected, otherwise show them if the user is creating a new project
+            hideAddTeamMemberButton={showCreateProjectForm === false && !!selectedProject}
           />
         </Box>
       )}
