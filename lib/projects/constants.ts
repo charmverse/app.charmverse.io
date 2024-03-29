@@ -3,7 +3,8 @@ import type { ProjectFieldConfig, ProjectFieldProperty, ProjectValues } from './
 export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
-    label: 'Name'
+    label: 'Name',
+    strictlyRequired: true
   },
   {
     field: 'walletAddress',
@@ -48,7 +49,8 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
 export const projectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
-    label: 'Project Name'
+    label: 'Project Name',
+    strictlyRequired: true
   },
   {
     field: 'excerpt',

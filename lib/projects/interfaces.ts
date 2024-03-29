@@ -58,6 +58,8 @@ export type ProjectFieldProperty = {
   label: string;
   multiline?: boolean;
   rows?: number;
+  // This will take precedence over the fieldConfig proposal template author sets
+  strictlyRequired?: boolean;
 };
 
 export type ProjectWithMembers = Project & {

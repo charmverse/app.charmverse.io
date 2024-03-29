@@ -38,7 +38,8 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
               disabled
               required={fieldConfig?.[property.field]?.required ?? defaultRequired}
             />
-            {onChange && (
+            {/** Required fields must always be required and shown */}
+            {onChange && !property.strictlyRequired && (
               <Stack gap={1}>
                 <Stack gap={0.5} flexDirection='row' alignItems='center'>
                   <Switch
