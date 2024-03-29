@@ -7,7 +7,11 @@ export const getGrantApplicationsQuery = gql`
     $state: String = "approved"
     $startDate: Int = 1
   ) {
-    grantApplications(where: { state: $state, actions_: { state: $state } }, first: $first, skip: $skip) {
+    grantApplications(
+      where: { state: $state, actions_: { state: $state, updatedAtS_gte: $state } }
+      first: $first
+      skip: $skip
+    ) {
       id
       applicantId
       state
