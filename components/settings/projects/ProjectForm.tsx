@@ -1,7 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
-import { useFormContext } from 'react-hook-form';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -25,10 +25,15 @@ export function ProjectFormAnswers({
   defaultRequired?: boolean;
   hideAddTeamMemberButton?: boolean;
 }) {
-  const { getValues, setValue } = useFormContext<ProjectValues>();
+  const { getValues, setValue, control } = useFormContext<ProjectValues>();
   const projectValues = getValues();
   const { user } = useUser();
   const extraProjectMembers = projectValues.projectMembers.slice(1);
+
+  const { remove } = useFieldArray({
+    control,
+    name: 'projectMembers'
+  });
 
   return (
     <Stack gap={2} width='100%'>
@@ -61,17 +66,10 @@ export function ProjectFormAnswers({
                 <Typography variant='h6'>Team member</Typography>
                 {isTeamLead ? (
                   <IconButton
+                    data-test='delete-project-member-button'
                     disabled={disabled}
                     onClick={() => {
-                      setValue(
-                        'projectMembers',
-                        projectValues.projectMembers.filter((_, i) => i !== index + 1),
-                        {
-                          shouldValidate: true,
-                          shouldDirty: true,
-                          shouldTouch: true
-                        }
-                      );
+                      remove(index + 1);
                     }}
                   >
                     <DeleteOutlineOutlinedIcon fontSize='small' color='error' />
@@ -105,6 +103,7 @@ export function ProjectFormAnswers({
               disabled={!isTeamLead || disabled}
               disabledTooltip='Only the team lead can add team members'
               startIcon={<AddIcon fontSize='small' />}
+              data-test='add-project-member-button'
               onClick={() => {
                 setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
                   shouldValidate: true,
