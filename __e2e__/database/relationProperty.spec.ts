@@ -237,9 +237,9 @@ test('create and edit relation property values', async ({ page, document, databa
     templateId: connectedRelationProperty.id
   });
 
-  await expect(targetBoardCard1RelationPropertyCell).toHaveText(sourceBoardCards[0].page!.title);
-  await expect(targetBoardCard1RelationPropertyCell).toHaveText(sourceBoardCards[1].page!.title);
-  await expect(targetBoardCard2RelationPropertyCell).toHaveText(sourceBoardCards[0].page!.title);
+  await expect.soft(targetBoardCard1RelationPropertyCell).toHaveText(new RegExp(sourceBoardCards[0].page!.title));
+  await expect.soft(targetBoardCard1RelationPropertyCell).toHaveText(new RegExp(sourceBoardCards[1].page!.title));
+  await expect.soft(targetBoardCard2RelationPropertyCell).toHaveText(new RegExp(sourceBoardCards[0].page!.title));
 
   await databasePage
     .getDatabaseTableCell({
@@ -265,6 +265,6 @@ test('create and edit relation property values', async ({ page, document, databa
     templateId: sourceRelationProperty.id
   });
 
-  await expect(sourceBoardCard1RelationPropertyCell).toHaveText(targetBoardCards[1].page!.title);
-  await expect(sourceBoardCard2RelationPropertyCell).toHaveText(targetBoardCards[0].page!.title);
+  await expect.soft(sourceBoardCard1RelationPropertyCell).toHaveText(new RegExp(targetBoardCards[1].page!.title));
+  await expect.soft(sourceBoardCard2RelationPropertyCell).toHaveText(new RegExp(targetBoardCards[0].page!.title));
 });
