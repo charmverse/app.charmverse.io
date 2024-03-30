@@ -1,7 +1,6 @@
-import { Box, InputLabel, Typography } from '@mui/material';
+import { Box, InputLabel } from '@mui/material';
 
 import { useTrackPageView } from 'charmClient/hooks/track';
-import { DialogTitle } from 'components/common/Modal';
 import { AccountPreferences } from 'components/settings/account/components/AccountPreferences';
 import Legend from 'components/settings/Legend';
 

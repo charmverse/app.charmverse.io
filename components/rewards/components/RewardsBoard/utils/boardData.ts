@@ -1,9 +1,7 @@
-import type { Block } from '@charmverse/core/prisma';
-
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-import type { Block as FBBlock } from 'lib/focalboard/block';
-import { createBoard } from 'lib/focalboard/board';
+import type { UIBlockWithDetails as FBBlock, BlockWithDetails } from 'lib/databases/block';
+import { createBoard } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
@@ -11,7 +9,7 @@ export function getDefaultBoard({
   storedBoard,
   hasMilestoneRewards = false
 }: {
-  storedBoard: (Omit<Block, 'fields'> & { fields: any }) | undefined;
+  storedBoard: (Omit<BlockWithDetails, 'fields'> & { fields: any }) | undefined;
   hasMilestoneRewards?: boolean;
 }) {
   const block: Partial<FBBlock> = storedBoard

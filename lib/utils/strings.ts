@@ -19,6 +19,14 @@ export function fancyTrimWords(_text: string = '', maxWords: number = 40) {
   return `${words.slice(0, maxWords).join(' ')}...`;
 }
 
+export function slugify(text: string) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9-\s]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
 // example: https://google.com/search?q=3531422 -> https://google.com
 export function getDomain(url: string, includeProtocol?: boolean) {
   if (!url.includes('http')) {

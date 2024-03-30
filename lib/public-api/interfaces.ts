@@ -2,7 +2,7 @@ import type { Page as PrismaPage } from '@charmverse/core/prisma';
 import type { ProposalType } from '@snapshot-labs/snapshot.js/dist/sign/types';
 import type { TypedDataField } from 'ethers/lib/ethers';
 
-import type { IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
+import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { APISpaceTemplateType } from 'lib/spaces/config';
 
 export type BoardPropertyValue = string | string[] | number | null | boolean | Record<string, unknown>;

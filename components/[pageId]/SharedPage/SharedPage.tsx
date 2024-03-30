@@ -4,10 +4,10 @@ import { useEffect } from 'react';
 import { trackPageView } from 'charmClient/hooks/track';
 import { DatabasePage } from 'components/[pageId]/DatabasePage';
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
-import { updateBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { addCard } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { useAppDispatch } from 'components/common/BoardEditor/focalboard/src/store/hooks';
-import { addView, setCurrent } from 'components/common/BoardEditor/focalboard/src/store/views';
+import { updateBoards } from 'components/common/DatabaseEditor/store/boards';
+import { addCard } from 'components/common/DatabaseEditor/store/cards';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
+import { addView, setCurrent } from 'components/common/DatabaseEditor/store/views';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -39,14 +39,15 @@ export function SharedPage({ publicPage }: Props) {
     }
   }, [publicPage, isLoadingRewards]);
 
-  async function onLoad(_publicPage: PublicPageResponse) {
+  async function onLoad(_publicPage: PublicPageResponse, spaceDomain: string, spaceCustomDomain: string | null) {
     const { page: rootPage, cards, boards, views } = _publicPage;
 
     trackPageView({
       type: rootPage.type,
       pageId: rootPage.id,
       spaceId: rootPage.spaceId,
-      spaceDomain: space?.domain
+      spaceDomain,
+      spaceCustomDomain
     });
 
     setPageTitle(rootPage.title);
@@ -65,14 +66,14 @@ export function SharedPage({ publicPage }: Props) {
   }
 
   useEffect(() => {
-    if (publicPage) {
-      onLoad(publicPage);
+    if (publicPage && space) {
+      onLoad(publicPage, space.domain, space.customDomain);
     }
 
     return () => {
       setCurrentPageId('');
     };
-  }, [publicPage?.page.id]);
+  }, [publicPage?.page.id, !!space]);
 
   const currentPage = publicPage?.page ?? pages?.[basePageId];
 

@@ -2,8 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { PropertyType } from 'lib/focalboard/board';
+import type { PropertyType } from 'lib/databases/board';
 import { getBlocks } from 'lib/proposals/blocks/getBlocks';
+import type { ProposalBlockInput, ProposalBlockUpdateInput } from 'lib/proposals/blocks/interfaces';
 import { upsertBlock } from 'lib/proposals/blocks/upsertBlock';
 import { upsertBlocks } from 'lib/proposals/blocks/upsertBlocks';
 
@@ -19,7 +20,7 @@ describe('proposal blocks - updateBlocks', () => {
 
     const textPropertId = v4();
 
-    const propertiesData = {
+    const propertiesData: ProposalBlockInput = {
       spaceId: space.id,
       title: 'Properties',
       type: 'board',
@@ -56,7 +57,7 @@ describe('proposal blocks - updateBlocks', () => {
       proposalStatus: 'published'
     });
 
-    const propertiesUpdateData = {
+    const propertiesUpdateData: ProposalBlockUpdateInput = {
       id: block.id,
       spaceId: space.id,
       title: 'Update',
@@ -76,7 +77,7 @@ describe('proposal blocks - updateBlocks', () => {
       }
     };
 
-    const proposalPropertiesUpdateData = {
+    const proposalPropertiesUpdateData: ProposalBlockUpdateInput = {
       type: 'card',
       id: proposal1.id,
       fields: {

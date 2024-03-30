@@ -1,8 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { prismaToBlock } from 'lib/focalboard/block';
-import type { IPropertyTemplate } from 'lib/focalboard/board';
+import { prismaToBlock } from 'lib/databases/block';
+import type { IPropertyTemplate } from 'lib/databases/board';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { createDatabaseCardPage } from 'lib/public-api/createDatabaseCardPage';
 import { InvalidInputError } from 'lib/utils/errors';

@@ -10,7 +10,8 @@ import { getAddress } from 'viem';
 import { mantle, mantleTestnet } from 'viem/chains';
 
 import { getMantleSafeData, getMantleSafesByOwner } from './mantleClient';
-import { getSafeApiClient, isSupportedSafeApiChain } from './safe/getSafeApiClient';
+import { getSafeApiClient } from './safe/getSafeApiClient';
+import { isSupportedSafeApiChain } from './safe/isSupportedSafeApiChain';
 
 export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][number];
 

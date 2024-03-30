@@ -57,31 +57,28 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
             payload: webhookData as Prisma.InputJsonObject
           }
         });
-        if (webhookData.event.scope === WebhookEventNames.CredentialIssuable) {
-          await attestOnChainAndRecordCredential(webhookData.event.data);
-        } else {
-          // Create and save notifications
-          const notifications = await createNotificationsFromEvent(webhookData);
 
-          log.debug('Saved record of SQS message', {
-            id: webhookMessageHash,
-            notifications: notifications.length,
-            scope: webhookData.event.scope,
-            spaceId: webhookData.spaceId
-          });
+        // Create and save notifications
+        const notifications = await createNotificationsFromEvent(webhookData);
 
-          // Send emails
-          let notificationCount = 0;
-          for (const notification of notifications) {
-            const sent = await sendNotificationEmail(notification);
-            if (sent) {
-              notificationCount += 1;
-            }
+        log.debug('Saved record of SQS message', {
+          id: webhookMessageHash,
+          notifications: notifications.length,
+          scope: webhookData.event.scope,
+          spaceId: webhookData.spaceId
+        });
+
+        // Send emails
+        let notificationCount = 0;
+        for (const notification of notifications) {
+          const sent = await sendNotificationEmail(notification);
+          if (sent) {
+            notificationCount += 1;
           }
-          if (notificationCount > 0) {
-            log.info(`Sent ${notificationCount} email notifications`);
-            count('cron.user-notifications.sent', notificationCount);
-          }
+        }
+        if (notificationCount > 0) {
+          log.info(`Sent ${notificationCount} email notifications`);
+          count('cron.user-notifications.sent', notificationCount);
         }
 
         await publishToWebhook({ webhookURL, signingSecret, ...webhookData });

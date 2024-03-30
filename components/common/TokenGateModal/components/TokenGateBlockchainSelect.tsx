@@ -9,6 +9,8 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import TokenLogo from 'components/common/TokenLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isAnkrChain } from 'lib/blockchain/provider/ankr/config';
+import { isZkSyncChain } from 'lib/blockchain/provider/zksync/config';
+import { isZoraChain } from 'lib/blockchain/provider/zora/config';
 
 function SelectField(
   props: SelectProps<string> & { helperMessage?: ReactNode; chains?: IChainDetails[] },
@@ -20,7 +22,8 @@ function SelectField(
   const chainList =
     chainsProp ||
     getChainList({ enableTestnets: !!space?.enableTestnets }).filter(
-      (chain) => !!chain.alchemyUrl || isAnkrChain(chain.chainId)
+      (chain) =>
+        !!chain.alchemyUrl || isAnkrChain(chain.chainId) || isZkSyncChain(chain.chainId) || isZoraChain(chain.chainId)
     );
 
   return (

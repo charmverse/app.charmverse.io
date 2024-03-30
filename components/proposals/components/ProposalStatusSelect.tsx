@@ -1,14 +1,14 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { useMemo } from 'react';
 
-import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
+import type { IPropertyOption } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
   EVALUATION_STATUS_VERB_LABELS,
   proposalStatusColors
-} from 'lib/focalboard/proposalDbProperties';
+} from 'lib/databases/proposalDbProperties';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';

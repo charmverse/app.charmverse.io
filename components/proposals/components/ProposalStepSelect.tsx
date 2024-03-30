@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
 
-import { TagSelect } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
-import type { IPropertyOption } from 'lib/focalboard/board';
+import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
+import type { IPropertyOption } from 'lib/databases/board';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';

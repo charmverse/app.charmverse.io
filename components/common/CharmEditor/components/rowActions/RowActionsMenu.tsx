@@ -6,6 +6,7 @@ import {
   DragIndicator as DragIndicatorIcon,
   DeleteOutlined
 } from '@mui/icons-material';
+import LinkIcon from '@mui/icons-material/Link';
 import type { MenuProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, ListItemButton, Tooltip, Typography } from '@mui/material';
 import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
@@ -13,14 +14,17 @@ import { TextSelection } from 'prosemirror-state';
 import type { PluginKey } from 'prosemirror-state';
 import type { MouseEvent } from 'react';
 import reactDOM from 'react-dom';
+import { useCopyToClipboard } from 'usehooks-ts';
 
 import charmClient from 'charmClient';
-import { getSortedBoards } from 'components/common/BoardEditor/focalboard/src/store/boards';
-import { useAppSelector } from 'components/common/BoardEditor/focalboard/src/store/hooks';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
+import { getSortedBoards } from 'components/common/DatabaseEditor/store/boards';
+import { useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { isMac } from 'lib/utils/browser';
+import { slugify } from 'lib/utils/strings';
 
 import { nestedPageNodeName } from '../nestedPage/nestedPage.constants';
 
@@ -43,6 +47,8 @@ function Component({ menuState }: { menuState: PluginState }) {
   const { deletePage, pages } = usePages();
   const { space: currentSpace } = useCurrentSpace();
   const boards = useAppSelector(getSortedBoards);
+  const [, copyFn] = useCopyToClipboard();
+  const { showMessage } = useSnackbar();
 
   function deleteRow() {
     const deletedNode = deleteRowNode({
@@ -64,6 +70,32 @@ function Component({ menuState }: { menuState: PluginState }) {
         });
       }
     }
+  }
+
+  const isHeadingNode =
+    menuState.rowPos !== undefined ? view.state.doc.resolve(menuState.rowPos)?.node()?.type.name === 'heading' : false;
+
+  async function copyLinkToBlock() {
+    const rowPosition = menuState.rowPos;
+    if (rowPosition === undefined) {
+      popupState.close();
+      return null;
+    }
+
+    const topPos = view.state.doc.resolve(rowPosition);
+    const node = topPos.node();
+
+    if (node && node.type.name === 'heading') {
+      const text = node.textContent;
+
+      const url = new URL(window.location.href);
+      url.hash = '';
+      const urlWithoutHash = url.toString();
+      copyFn(`${urlWithoutHash}#${slugify(text)}`).then(() => {
+        showMessage('Link copied to clipboard', 'success');
+      });
+    }
+    popupState.close();
   }
 
   async function duplicateRow() {
@@ -165,10 +197,18 @@ function Component({ menuState }: { menuState: PluginState }) {
         </ListItemButton>
         <ListItemButton onClick={duplicateRow} dense>
           <ListItemIcon>
-            <DuplicateIcon color='secondary' />
+            <DuplicateIcon fontSize='small' color='secondary' />
           </ListItemIcon>
           <ListItemText primary='Duplicate' />
         </ListItemButton>
+        {isHeadingNode && (
+          <ListItemButton onClick={copyLinkToBlock} dense>
+            <ListItemIcon>
+              <LinkIcon color='secondary' />
+            </ListItemIcon>
+            <ListItemText primary='Copy link to block' />
+          </ListItemButton>
+        )}
       </Menu>
     </>
   );

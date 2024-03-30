@@ -40,7 +40,8 @@ export function FormFieldsEditor() {
     private: false,
     required: true,
     type: 'short_text',
-    id: v4()
+    id: v4(),
+    fieldConfig: null
   };
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>([field.id]);
   const [formFields, setFormFields] = useState<FormFieldInput[]>([field]);
@@ -74,7 +75,8 @@ export function FormFieldsInputs() {
       required: index % 2 !== 0,
       type: formFieldType,
       id: v4(),
-      value: ''
+      value: '',
+      fieldConfig: null
     };
   });
   const props = useFormFields({ fields });
@@ -154,7 +156,8 @@ export function FormFieldsInputsDisplay() {
       required: index % 2 === 0,
       type: formFieldType,
       id: v4(),
-      value
+      value,
+      fieldConfig: null
     };
   });
   const props = useFormFields({ fields });

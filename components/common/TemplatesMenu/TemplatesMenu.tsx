@@ -24,27 +24,27 @@ export type TemplateItem = {
   draft?: boolean;
 };
 
-type TemplateMenuItemProps = {
+type TemplateMenuItemProps<T extends TemplateItem> = {
   editTemplate: (pageId: string) => void;
   deleteTemplate: (pageId: string) => void;
-  addPageFromTemplate: (pageId: string) => void;
+  addPageFromTemplate: (template: T) => void;
   enableItemOptions?: boolean;
   pageActions?: ActionMenuProps['pageActions'];
 };
 
-type Props = {
-  templates?: TemplateItem[];
+type Props<T extends TemplateItem> = {
+  templates?: T[];
   createTemplate: () => void;
   anchorEl?: Element;
   popupState: PopupState;
   boardTitle?: string;
   enableNewTemplates?: boolean;
   isLoading?: boolean;
-} & TemplateMenuItemProps;
+} & TemplateMenuItemProps<T>;
 
 const maxTitleLength = 35;
 
-export function TemplatesMenu({
+export function TemplatesMenu<T extends TemplateItem>({
   templates,
   anchorEl,
   createTemplate,
@@ -53,7 +53,7 @@ export function TemplatesMenu({
   enableNewTemplates,
   isLoading,
   ...itemProps
-}: Props) {
+}: Props<T>) {
   const theme = useTheme();
 
   const liveTemplates = templates?.filter((tpl) => !tpl.archived && !tpl.draft);
@@ -135,7 +135,7 @@ export function TemplatesMenu({
   );
 }
 
-function TemplateMenuItem({
+function TemplateMenuItem<T extends TemplateItem>({
   template,
   addPageFromTemplate,
   editTemplate,
@@ -143,7 +143,7 @@ function TemplateMenuItem({
   closePopup,
   enableItemOptions,
   pageActions
-}: TemplateMenuItemProps & { closePopup: VoidFunction; template: TemplateItem }) {
+}: TemplateMenuItemProps<T> & { closePopup: VoidFunction; template: T }) {
   return (
     <MenuItem
       data-test={`select-option-${template.id}`}
@@ -151,7 +151,7 @@ function TemplateMenuItem({
       dense
       sx={{ display: 'flex', justifyContent: 'space-between' }}
       onClick={() => {
-        addPageFromTemplate(template.id);
+        addPageFromTemplate(template);
         closePopup();
       }}
     >

@@ -44,7 +44,13 @@ export async function createPrismaPage({
     title: title || '',
     type,
     boardId,
-    parentId
+    parent: parentId
+      ? {
+          connect: {
+            id: parentId
+          }
+        }
+      : undefined
   };
 
   if (type === 'card' && cardId) {

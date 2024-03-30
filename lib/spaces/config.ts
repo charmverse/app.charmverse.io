@@ -36,6 +36,13 @@ export const staticSpaceTemplates = [
     spaceId: '9e215a8f-d4b6-4097-af71-e1d148995d23'
   },
   {
+    id: 'templateGaming',
+    name: 'Gaming Community',
+    apiName: 'gaming',
+    domain: 'cvt-template-gaming',
+    spaceId: '710c95c8-305a-49bb-a67b-c11659d41d7b'
+  },
+  {
     id: 'templateGrantRecipient',
     name: 'Grant Recipient',
     apiName: 'grant_recipient',

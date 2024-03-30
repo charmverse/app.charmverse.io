@@ -5,7 +5,7 @@ import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
 import type { Chain } from 'viem';
 import { createPublicClient, http } from 'viem';
-import { arbitrum, base, optimism, optimismGoerli, optimismSepolia } from 'viem/chains';
+import { arbitrum, base, optimism, optimismGoerli, optimismSepolia, sepolia } from 'viem/chains';
 
 import { clientToProvider } from 'hooks/useWeb3Signer';
 import { typedKeys } from 'lib/utils/objects';
@@ -27,6 +27,7 @@ export async function loadSchema({
 
   const mapping: Record<ExternalCredentialChain | EasSchemaChain, Chain> = {
     [optimism.id]: optimism,
+    [sepolia.id]: sepolia,
     [optimismSepolia.id]: optimismSepolia,
     [base.id]: base,
     [arbitrum.id]: arbitrum
@@ -66,6 +67,7 @@ async function dumpSchemas() {
     [optimism.id]: [],
     [base.id]: [],
     [arbitrum.id]: [],
+    [sepolia.id]: [],
     [optimismSepolia.id]: []
   };
 
@@ -75,7 +77,7 @@ async function dumpSchemas() {
         loadSchema({ chainId, schemaId: _schema.schemaId }).then((_loadedSchema) => ({
           ..._schema,
           schema: _loadedSchema.schema,
-          url: getOnChainSchemaUrl({ chainId, schemaId: _loadedSchema.uid })
+          url: getOnChainSchemaUrl({ chainId, schema: _loadedSchema.uid })
         }))
       )
     );

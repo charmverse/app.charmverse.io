@@ -2,8 +2,8 @@ import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/pr
 import { Box, Typography, FormLabel } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import type { SelectOption } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
-import { UserAndRoleSelect } from 'components/common/BoardEditor/components/properties/UserAndRoleSelect';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import {
   authorSystemRole,
   allMembersSystemRole,

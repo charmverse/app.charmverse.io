@@ -70,9 +70,10 @@ describe('GET /api/blocks/[id]', () => {
       await request(baseUrl).get(`/api/blocks/${database.id}`).set('Cookie', adminCookie).expect(200)
     ).body as Block;
 
+    const { deletedAt, ...expectedFields } = database;
     expect(databaseBlock).toMatchObject(
       expect.objectContaining({
-        ...database,
+        ...expectedFields,
         createdAt: expect.any(String),
         updatedAt: expect.any(String)
       })
@@ -94,9 +95,10 @@ describe('GET /api/blocks/[id]', () => {
       await request(baseUrl).get(`/api/blocks/${databaseCards[0].id}`).set('Cookie', adminCookie).expect(200)
     ).body as Block;
 
+    const { deletedAt: cardDeletedAt, ...expectedCardFields } = databaseCards[0];
     expect(cardBlock).toMatchObject(
       expect.objectContaining({
-        ...databaseCards[0],
+        ...expectedCardFields,
         createdAt: expect.any(String),
         updatedAt: expect.any(String)
       })

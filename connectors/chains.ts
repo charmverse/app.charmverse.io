@@ -24,7 +24,8 @@ import {
   zkSync,
   zora,
   taikoJolnir,
-  taikoTestnetSepolia
+  taikoTestnetSepolia,
+  zkSyncTestnet
 } from 'viem/chains';
 
 import { isDevEnv } from 'config/constants';
@@ -434,6 +435,17 @@ export const RPC: Record<string, IChainDetails> = {
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     shortName: zkSync.name,
     unlockNetwork: true
+  },
+  ZKSYNC_DEV: {
+    ...EVM_DEFAULT,
+    chainId: zkSyncTestnet.id,
+    viem: zkSyncTestnet,
+    chainName: zkSyncTestnet.name,
+    rpcUrls: zkSyncTestnet.rpcUrls.public.http,
+    blockExplorerUrls: [zkSyncTestnet.blockExplorers.default.url],
+    iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
+    testnet: true,
+    shortName: zkSyncTestnet.name
   }
 } as const;
 

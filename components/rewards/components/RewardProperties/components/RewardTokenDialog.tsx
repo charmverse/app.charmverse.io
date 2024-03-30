@@ -6,10 +6,10 @@ import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { PropertyLabel } from 'components/common/BoardEditor/components/properties/PropertyLabel';
-import { SelectPreviewContainer } from 'components/common/BoardEditor/components/properties/TagSelect/TagSelect';
-import type { PropertyValueDisplayType } from 'components/common/BoardEditor/interfaces';
 import { Button } from 'components/common/Button';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
+import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { RewardTokenSelect } from 'components/rewards/components/RewardProperties/components/RewardTokenSelect';

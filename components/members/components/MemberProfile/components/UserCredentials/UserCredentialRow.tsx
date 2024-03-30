@@ -11,11 +11,14 @@ import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
-import { trackedSchemas } from 'lib/credentials/external/schemas';
+import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialDataInput } from 'lib/credentials/schemas';
+import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
+
+import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
 
 export function UserCredentialRow({
   credential,
@@ -30,9 +33,10 @@ export function UserCredentialRow({
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
   const { showMessage } = useSnackbar();
-  const schemaInfo = trackedSchemas[credential.chainId as keyof typeof trackedSchemas]?.find(
-    (s) => s.schemaId === credential.schemaId
-  );
+  const schemaInfo = (
+    trackedSchemas[credential.chainId as keyof typeof trackedSchemas] ??
+    trackedCharmverseSchemas[credential.chainId as keyof typeof trackedCharmverseSchemas]
+  )?.find((s) => s.schemaId === credential.schemaId);
   const { user } = useUser();
   const isUserRecipient = user?.wallets.find((wallet) => lowerCaseEqual(wallet.address, credential.recipient));
   const isMutating = isRemoveFavoriteCredentialLoading || isAddFavoriteCredentialLoading;
@@ -56,14 +60,23 @@ export function UserCredentialRow({
   const charmCredential = credential.content as CredentialDataInput;
   const credentialInfo: {
     title: string;
-    subtitle: string;
+    subtitle: string | string[];
     iconUrl: string;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'charmverse'
+    credential.type === 'charmverse' && 'Organization' in charmCredential
       ? {
           title: charmCredential.Name,
           subtitle: charmCredential.Organization,
+          iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+        }
+      : credential.type === 'charmverse' &&
+        credential.schemaId === externalCredentialSchemaId &&
+        'GrantRound' in charmCredential
+      ? {
+          title: charmCredential.Name,
+          subtitle: ['Gitcoin Round', charmCredential.GrantRound],
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
@@ -91,7 +104,6 @@ export function UserCredentialRow({
   if (credential.type === 'onchain' && !schemaInfo) {
     return null;
   }
-
   const favoriteAndVerificationIconsComponent = (
     <Stack
       flexBasis={isSmallScreen ? undefined : '30%'}
@@ -112,10 +124,10 @@ export function UserCredentialRow({
           <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
         </Link>
       )}
-      {isUserRecipient && !readOnly && (
+      {isUserRecipient && !readOnly && credential.schemaId !== externalCredentialSchemaId && (
         <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
           <div>
-            <IconButton size='small' onClick={toggleFavorite} disabled={isMutating}>
+            <IconButton sx={{ p: 0 }} size='small' onClick={toggleFavorite} disabled={isMutating}>
               {!credential.favoriteCredentialId ? (
                 <StarBorderOutlinedIcon
                   color={isMutating ? 'disabled' : 'primary'}
@@ -148,9 +160,17 @@ export function UserCredentialRow({
         <Typography variant='body1' fontWeight='bold'>
           {credentialInfo.title}
         </Typography>
-        <Typography variant='caption' fontWeight='bold'>
-          {credentialInfo.subtitle}
-        </Typography>
+        {typeof credentialInfo.subtitle === 'string' ? (
+          <Typography variant='caption'>{credentialInfo.subtitle}</Typography>
+        ) : (
+          <>
+            {credentialInfo.subtitle.map((sub) => (
+              <Typography variant='caption' key={sub}>
+                {sub}
+              </Typography>
+            ))}
+          </>
+        )}
       </Box>
     </>
   );
@@ -161,13 +181,28 @@ export function UserCredentialRow({
         <Chip size={isSmallScreen ? 'small' : 'medium'} variant='outlined' key={field.name} label={field.value} />
       ))}
     </Stack>
-  ) : null;
+  ) : (
+    <div />
+  );
+
+  // Readd this later
+  // const hideAndPublishComponent = (
+  //   <UserCredentialHideAndPublish
+  //     credential={credential}
+  //     isSmallScreen={isSmallScreen}
+  //     isUserRecipient={!!isUserRecipient}
+  //     readOnly={readOnly}
+  //     isMutating={isMutating}
+  //     toggleFavorite={toggleFavorite}
+  //   />
+  // );
 
   if (isSmallScreen) {
     return (
       <Stack gap={1}>
         <Box gap={2} display='flex' alignItems='center' justifyItems='flex-start'>
           {credentialOrganizationComponent}
+
           {favoriteAndVerificationIconsComponent}
         </Box>
         {attestationContentComponent}
@@ -180,10 +215,11 @@ export function UserCredentialRow({
       <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='50%'>
         {credentialOrganizationComponent}
       </Box>
-      <Stack justifyContent='space-between' alignItems='center' flexDirection='row' flexGrow={1}>
+      <Stack justifyContent='space-between' alignItems='center' flexDirection='row' width='50%'>
         {attestationContentComponent}
         {favoriteAndVerificationIconsComponent}
       </Stack>
+      {/* {hideAndPublishComponent} */}
     </Stack>
   );
 }

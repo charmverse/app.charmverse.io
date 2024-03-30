@@ -2,15 +2,16 @@
 import type { Space } from '@charmverse/core/prisma';
 import type { Block, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 
+import type { BlockWithDetails } from 'lib/databases/block';
+import { createCardsFromProposals } from 'lib/databases/createCardsFromProposals';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBoard } from 'testing/setupDatabase';
+import { addUserToSpace } from 'testing/utils/spaces';
 
 let space: Space;
-
-let outsideUser: User;
 
 let adminUser: User;
 
@@ -24,13 +25,6 @@ const sourceDatabaseCardsCount = 5;
 // 1 refers to the database definition block
 const totalSourceBlocks = 1 + sourceDatabaseCardsCount + sourceDatabaseViewsCount;
 
-let linkedDatabase: Block;
-let linkedDatabaseViews: Block[];
-const linkedDatabaseViewsCount = 1;
-
-// 1 refers to the database definition block
-const totalLinkedBlocks = 1 + linkedDatabaseViewsCount;
-
 beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
     isAdmin: true
@@ -38,8 +32,6 @@ beforeAll(async () => {
 
   space = generated.space;
   adminUser = generated.user;
-
-  outsideUser = await testUtilsUser.generateUser();
 
   const generatedDatabase = await generateBoard({
     createdBy: adminUser.id,
@@ -70,47 +62,6 @@ beforeAll(async () => {
   expect(database).toBeDefined();
   expect(databaseCards.length).toEqual(sourceDatabaseCardsCount);
   expect(databaseViews.length).toBe(sourceDatabaseViewsCount);
-
-  // Setup linked DB
-  const generatedLinkedDatabase = await generateBoard({
-    createdBy: adminUser.id,
-    spaceId: space.id,
-    views: linkedDatabaseViewsCount,
-    cardCount: 0
-  });
-
-  const generatedLinkedDatabaseBlocks = await prisma.block.findMany({
-    where: {
-      OR: [
-        {
-          id: generatedLinkedDatabase.id
-        },
-        {
-          rootId: generatedLinkedDatabase.id
-        }
-      ]
-    }
-  });
-
-  expect(generatedLinkedDatabaseBlocks).toHaveLength(2);
-
-  linkedDatabase = generatedLinkedDatabaseBlocks.find((b) => b.id === generatedLinkedDatabase.id) as Block;
-  expect(linkedDatabase).toBeDefined();
-
-  const linkedView = generatedLinkedDatabaseBlocks.find((b) => b.type === 'view') as Block;
-  const updatedLinkedView = await prisma.block.update({
-    where: {
-      id: linkedView.id
-    },
-    data: {
-      fields: {
-        ...(linkedView.fields as any),
-        linkedSourceId: generatedDatabase.id
-      }
-    }
-  });
-
-  linkedDatabaseViews = [updatedLinkedView];
 });
 
 describe('GET /api/blocks/[id]/subtree', () => {
@@ -125,33 +76,156 @@ describe('GET /api/blocks/[id]/subtree', () => {
 
     expect(databaseBlocks).toEqual(
       expect.arrayContaining(
-        [database, ...databaseViews, ...databaseCards].map((block) =>
-          expect.objectContaining({ ...block, createdAt: expect.any(String), updatedAt: expect.any(String) })
-        )
+        [database, ...databaseViews, ...databaseCards].map((block) => expect.objectContaining({ id: block.id }))
       )
     );
   });
 
-  it('Should get all board, view and cards blocks for a database and all blocks for any linked inline databases if a user can access the database, responding 200', async () => {
+  it('Should not return a deleted card block', async () => {
     const adminCookie = await loginUser(adminUser.id);
 
-    const foundLinkedDatabaseBlocks = (
-      await request(baseUrl).get(`/api/blocks/${linkedDatabase.id}/subtree`).set('Cookie', adminCookie).expect(200)
+    const cardToDelete = await prisma.page.update({
+      where: {
+        id: databaseCards[0].id
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${database.id}/subtree`).set('Cookie', adminCookie).expect(200)
     ).body as Block[];
 
-    expect(foundLinkedDatabaseBlocks).toHaveLength(totalSourceBlocks + totalLinkedBlocks);
+    expect(databaseBlocks).toHaveLength(totalSourceBlocks - 1);
 
-    expect(foundLinkedDatabaseBlocks).toEqual(
+    expect(databaseBlocks).toEqual(
       expect.arrayContaining(
-        [database, ...databaseViews, ...databaseCards, linkedDatabase, ...linkedDatabaseViews].map((block) =>
-          expect.objectContaining({ ...block, createdAt: expect.any(String), updatedAt: expect.any(String) })
-        )
+        [database, ...databaseViews, ...databaseCards]
+          .filter((c) => c.id !== cardToDelete.id)
+          .map((block) => expect.objectContaining({ id: block.id }))
       )
     );
   });
 
   it('Should fail if the user cannot access the database, responding 404', async () => {
+    const outsideUser = await testUtilsUser.generateUser();
     const outsideUserCookie = await loginUser(outsideUser.id);
     await request(baseUrl).get(`/api/blocks/${database.id}/subtree`).set('Cookie', outsideUserCookie).expect(404);
+  });
+
+  // This test uses public permissions to enable access to cards
+  it('Should return only the pages a user can access', async () => {
+    const sharedDatabase = await generateBoard({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      views: sourceDatabaseViewsCount,
+      cardCount: sourceDatabaseCardsCount,
+      permissions: [
+        {
+          permissionLevel: 'full_access',
+          public: true
+        }
+      ]
+    });
+    const outsideUser = await testUtilsUser.generateUser();
+    const outsideUserCookie = await loginUser(outsideUser.id);
+    const cards = await prisma.block.findMany({
+      where: {
+        rootId: sharedDatabase.id,
+        type: 'card'
+      }
+    });
+
+    // sanity check
+    expect(cards).toHaveLength(sourceDatabaseCardsCount);
+
+    // remove access to one of the cards
+    await prisma.pagePermission.delete({
+      where: {
+        public_pageId: {
+          pageId: cards[0].id,
+          public: true
+        }
+      }
+    });
+
+    const databaseBlocks = (
+      await request(baseUrl)
+        .get(`/api/blocks/${sharedDatabase.id}/subtree`)
+        .set('Cookie', outsideUserCookie)
+        .expect(200)
+    ).body as Block[];
+    const cardBlocks = databaseBlocks.filter((b) => b.type === 'card');
+    expect(cardBlocks).toHaveLength(cards.length - 1);
+  });
+
+  // This test uses public permissions to enable access to cards
+  it('Should return only the cards from proposals that a user can access', async () => {
+    // set up test user
+    const reviewer = await testUtilsUser.generateUser();
+    await addUserToSpace({
+      spaceId: space.id,
+      userId: reviewer.id
+    });
+
+    // set up proposal-as-a-source db
+    const sharedDatabase = await generateBoard({
+      createdBy: adminUser.id,
+      spaceId: space.id,
+      viewDataSource: 'proposals',
+      cardCount: 0,
+      permissions: [
+        {
+          permissionLevel: 'full_access',
+          userId: reviewer.id
+        }
+      ]
+    });
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: adminUser.id,
+      authors: [adminUser.id],
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          permissions: [
+            {
+              assignee: {
+                group: 'all_reviewers'
+              },
+              operation: 'view'
+            }
+          ],
+          reviewers: [{ id: reviewer.id, group: 'user' }]
+        }
+      ]
+    });
+    // proposal is hidden
+    await testUtilsProposals.generateProposal({
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: adminUser.id,
+      authors: [adminUser.id],
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          permissions: [],
+          reviewers: []
+        }
+      ]
+    });
+    const sessionCookie = await loginUser(reviewer.id);
+    await createCardsFromProposals({ boardId: sharedDatabase.id, spaceId: space.id, userId: adminUser.id });
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${sharedDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const cardBlocks = databaseBlocks.filter((b) => b.type === 'card');
+    expect(cardBlocks.map((c) => c.syncWithPageId)).toEqual([visibleProposal.id]);
   });
 });

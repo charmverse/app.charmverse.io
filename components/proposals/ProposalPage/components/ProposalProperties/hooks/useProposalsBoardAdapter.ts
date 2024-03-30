@@ -2,21 +2,20 @@ import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo } from 'react';
 
-import { sortCards } from 'components/common/BoardEditor/focalboard/src/store/cards';
-import { blockToFBBlock } from 'components/common/BoardEditor/utils/blockUtils';
+import { sortCards } from 'components/common/DatabaseEditor/store/cards';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { getDefaultBoard, getDefaultTableView } from 'components/proposals/components/ProposalsBoard/utils/boardData';
 import { useProposals } from 'components/proposals/hooks/useProposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useMembers } from 'hooks/useMembers';
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
-import type { BlockTypes } from 'lib/focalboard/block';
-import type { Board } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import type { Card, CardPage } from 'lib/focalboard/card';
-import { CardFilter } from 'lib/focalboard/cardFilter';
-import { Constants } from 'lib/focalboard/constants';
-import { PROPOSAL_STEP_LABELS } from 'lib/focalboard/proposalDbProperties';
+import type { Board } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import type { Card, CardWithRelations } from 'lib/databases/card';
+import { CardFilter } from 'lib/databases/cardFilter';
+import { Constants } from 'lib/databases/constants';
+import { PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
@@ -77,32 +76,28 @@ export function useProposalsBoardAdapter() {
     return boardView;
   }, [board, proposalBlocks]);
 
-  const cardPages: CardPage[] = useMemo(() => {
-    let cards =
-      proposals
-        ?.map((p) => {
-          const isStructuredProposal = !!p.formId;
-          return {
-            ...mapProposalToCardPage({ proposal: p, spaceId: space?.id }),
-            isStructuredProposal,
-            proposal: {
-              archived: p.archived,
-              currentEvaluationId: p.currentEvaluationId,
-              id: p.id,
-              // status: p.status,
-              currentStep: p.currentStep,
-              sourceTemplateId: p.templateId,
-              evaluations: p.evaluations,
-              hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
-            }
-          } as CardPage;
-        })
-        .filter((cp): cp is CardPage => !!cp.card && !!cp.page) || [];
+  const sortedCards: CardWithRelations[] = useMemo(() => {
+    let cards = (proposals || []).map((p) => {
+      const isStructuredProposal = !!p.formId;
+      return {
+        ...mapProposalToCard({ proposal: p, spaceId: space?.id }),
+        isStructuredProposal,
+        proposal: {
+          archived: p.archived,
+          currentEvaluationId: p.currentEvaluationId,
+          id: p.id,
+          // status: p.status,
+          currentStep: p.currentStep,
+          sourceTemplateId: p.templateId,
+          evaluations: p.evaluations,
+          hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
+        }
+      } as CardWithRelations;
+    });
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
     if (filter) {
-      const cardsRaw = cards.map((cp) => cp.card);
       const filteredCardsIds = CardFilter.applyFilterGroup(
         filter,
         [
@@ -118,10 +113,10 @@ export function useProposalsBoardAdapter() {
             type: 'proposalEvaluationType'
           }
         ],
-        cardsRaw
+        cards
       ).map((c) => c.id);
 
-      cards = cards.filter((cp) => filteredCardsIds.includes(cp.card.id));
+      cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
     }
 
     const sortedCardPages = activeView
@@ -145,16 +140,12 @@ export function useProposalsBoardAdapter() {
     evaluationStepTitles
   });
 
-  // each proposal with fields reflects a card
-  const cards: Card[] = cardPages.map((cp) => cp.card);
-
   const views: BoardView[] = [];
 
   return {
     board,
     boardCustomProperties,
-    cards,
-    cardPages,
+    cards: sortedCards,
     proposalsMap,
     activeView,
     isLoading,
@@ -164,18 +155,18 @@ export function useProposalsBoardAdapter() {
 }
 
 // build mock card from proposal and page data
-export function mapProposalToCardPage({
+export function mapProposalToCard({
   proposal,
   spaceId
 }: {
   proposal: ProposalWithUsersLite;
   spaceId?: string;
-}): CardPage<ProposalPropertyValue> {
+}): Card<ProposalPropertyValue> {
   const proposalFields: ProposalFields = proposal.fields || { properties: {} };
   const proposalSpaceId = spaceId || '';
   proposalFields.properties = {
     ...proposalFields.properties,
-    [Constants.titleColumnId]: proposal.title,
+    // [Constants.titleColumnId]: proposal.title,
     // add default field values on the fly
     [PROPOSAL_STATUS_BLOCK_ID]: proposal.archived ? 'archived' : proposal.currentStep?.result ?? 'in_progress',
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
@@ -195,33 +186,15 @@ export function mapProposalToCardPage({
   const card: Card<ProposalPropertyValue> = {
     id: proposal.id,
     spaceId: proposalSpaceId,
-    parentId: '',
-    schema: 1,
     title: proposal.title,
     rootId: proposalSpaceId,
-    type: 'card' as BlockTypes,
+    type: 'card' as const,
     updatedBy: proposal.updatedBy,
     createdBy: proposal.createdBy,
     createdAt: new Date(proposal.createdAt).getTime(),
     updatedAt: new Date(proposal.updatedAt).getTime(),
-    deletedAt: null,
     fields: { properties: {}, ...proposalFields, contentOrder: [] }
   };
 
-  return {
-    card,
-    page: {
-      id: proposal.id,
-      title: proposal.title,
-      updatedAt: new Date(proposal.updatedAt),
-      updatedBy: proposal.updatedBy,
-      bountyId: null,
-      hasContent: true,
-      icon: null,
-      type: 'bounty',
-      syncWithPageId: null,
-      path: '',
-      proposalId: proposal.id
-    }
-  };
+  return card;
 }

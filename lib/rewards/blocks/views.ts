@@ -1,16 +1,16 @@
 import { v4 as uuid } from 'uuid';
 
 import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
-import type { Block as FBBlock } from 'lib/focalboard/block';
-import type { IViewType } from 'lib/focalboard/boardView';
-import { createBoardView } from 'lib/focalboard/boardView';
-import { Constants } from 'lib/focalboard/constants';
+import type { UIBlockWithDetails as FBBlock } from 'lib/databases/block';
+import type { IViewType } from 'lib/databases/boardView';
+import { createBoardView } from 'lib/databases/boardView';
+import { Constants } from 'lib/databases/constants';
 import {
   DEFAULT_BOARD_BLOCK_ID,
   DEFAULT_BOARD_VIEW_BLOCK_ID,
   DEFAULT_CALENDAR_VIEW_BLOCK_ID,
   DEFAULT_TABLE_VIEW_BLOCK_ID
-} from 'lib/focalboard/customBlocks/constants';
+} from 'lib/databases/customBlocks/constants';
 import type { RewardType } from 'lib/rewards/interfaces';
 
 import {

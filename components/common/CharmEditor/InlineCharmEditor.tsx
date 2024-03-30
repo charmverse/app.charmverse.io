@@ -14,7 +14,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { userDataPlugin } from './components/charm/charm.plugins';
-import EmojiSuggest from './components/emojiSuggest/EmojiSuggest.component';
+import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import { plugins as emojiPlugins } from './components/emojiSuggest/emojiSuggest.plugins';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
@@ -24,7 +24,7 @@ import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
 import { mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
-import { Mention, MentionSuggest } from './components/mention/components';
+import { Mention, MentionsPopup } from './components/mention/components';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 
@@ -244,8 +244,8 @@ export default function CharmEditor({
       }}
     >
       <FloatingMenu inline pluginKey={floatingMenuPluginKey} />
-      <MentionSuggest pluginKey={mentionPluginKey} />
-      <EmojiSuggest pluginKey={emojiPluginKey} />
+      <MentionsPopup pluginKey={mentionPluginKey} />
+      <EmojiPopup pluginKey={emojiPluginKey} />
       {currentSpace && <LinksPopup pluginKey={linksPluginKey} readOnly={readOnly} />}
       {children}
     </StyledReactBangleEditor>

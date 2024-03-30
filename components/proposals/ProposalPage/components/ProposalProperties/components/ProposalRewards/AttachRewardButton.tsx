@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 
-import { AddAPropertyButton } from 'components/common/BoardEditor/components/properties/AddAProperty';
 import { Button } from 'components/common/Button';
+import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 export function AttachRewardButton({

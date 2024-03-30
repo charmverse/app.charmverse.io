@@ -45,13 +45,18 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
         return null;
       }
 
-      return a;
+      return {
+        ...a,
+        ...field
+      };
     })
     .filter(isTruthy);
 
   if (!isDraft && !validateAnswers(answersToSave, form.formFields)) {
     throw new InvalidInputError(`All required fields must be answered`);
   }
+
+  const projectProfileValue = answersToSave.find((a) => a.type === 'project_profile')?.value as { projectId: string };
 
   const res = await prisma.$transaction([
     ...answersToSave.map((a) => {
@@ -73,7 +78,30 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
         }
       });
     }),
-    prisma.formFieldAnswer.findMany({ where: { proposalId } })
+    prisma.formFieldAnswer.findMany({ where: { proposalId } }),
+    ...(projectProfileValue
+      ? projectProfileValue.projectId
+        ? [
+            prisma.proposal.update({
+              where: {
+                id: proposalId
+              },
+              data: {
+                projectId: projectProfileValue.projectId
+              }
+            })
+          ]
+        : [
+            prisma.proposal.update({
+              where: {
+                id: proposalId
+              },
+              data: {
+                projectId: null
+              }
+            })
+          ]
+      : [])
   ]);
 
   return res[res.length - 1];

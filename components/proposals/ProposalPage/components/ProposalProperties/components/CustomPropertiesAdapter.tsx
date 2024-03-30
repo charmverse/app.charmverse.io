@@ -1,4 +1,4 @@
-import CardDetailProperties from 'components/common/BoardEditor/focalboard/src/components/cardDetail/cardDetailProperties';
+import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useUser } from 'hooks/useUser';
@@ -6,7 +6,7 @@ import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { usePropertiesMutator } from '../hooks/usePropertiesMutator';
-import { useProposalsBoardAdapter, mapProposalToCardPage } from '../hooks/useProposalsBoardAdapter';
+import { useProposalsBoardAdapter, mapProposalToCard } from '../hooks/useProposalsBoardAdapter';
 
 type Props = {
   proposalForm: { createdAt: string; fields: ProposalFields | null; id?: string };
@@ -35,7 +35,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     id: '',
     pageId: '',
     title: '',
-    createdAt: '',
+    createdAt: proposalForm.createdAt,
     createdBy: '',
     updatedAt: proposalForm?.createdAt || '',
     updatedBy: '',
@@ -51,7 +51,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     rewardIds: []
   };
   const mutator = usePropertiesMutator({ proposal, onChange });
-  const { card } = mapProposalToCardPage({ proposal, spaceId: space?.id });
+  const card = mapProposalToCard({ proposal, spaceId: space?.id });
 
   return (
     <CardDetailProperties

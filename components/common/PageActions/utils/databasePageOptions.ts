@@ -5,10 +5,10 @@ import type { ParseResult } from 'papaparse';
 import { v4 as uuidv4, validate as uuidValidate } from 'uuid';
 
 import charmClient from 'charmClient';
-import type { Board, IPropertyTemplate, PropertyType } from 'lib/focalboard/board';
-import type { BoardView } from 'lib/focalboard/boardView';
-import { createCard } from 'lib/focalboard/card';
-import { Constants } from 'lib/focalboard/constants';
+import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
+import type { BoardView } from 'lib/databases/boardView';
+import { createCard } from 'lib/databases/card';
+import { Constants } from 'lib/databases/constants';
 import type { Member } from 'lib/members/interfaces';
 import { focalboardColorsMap } from 'theme/colors';
 
