@@ -93,9 +93,10 @@ export const getRelativeTimeInThePast = (date: Date): string => {
 };
 
 // For grouping search results: today, yesterday, past week, past 30 days, older
-export const getRelativeDateInThePast = (dateStr: string): string => {
+export const getRelativeDateInThePast = (dateStr: string, now: DateTime = DateTime.local()): string => {
   const date = DateTime.fromISO(dateStr);
-  const daysAgo = date.diffNow('days').days * -1;
+  const daysAgo = date.diff(now, 'days').days * -1;
+
   switch (true) {
     case daysAgo > 30:
       return 'Older';
@@ -104,7 +105,7 @@ export const getRelativeDateInThePast = (dateStr: string): string => {
     case daysAgo > 2:
       return `Past week`;
     default:
-      return capitalize(date.toRelativeCalendar({ unit: 'days' }) || '');
+      return capitalize(date.toRelativeCalendar({ base: now, unit: 'days' }) || '');
   }
 };
 
