@@ -1,20 +1,16 @@
-import { readFileSync, writeFileSync } from 'fs';
-import { FormFieldAnswer } from '@charmverse/core/prisma';
-import Papa from 'papaparse';
-import { FormField, Prisma, User, prisma } from '@charmverse/core/prisma-client';
-import { v4 as uuid } from 'uuid';
-import { isTruthy } from 'lib/utils/types';
-import type { FieldAnswerInput, FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
-import * as path from 'path';
-import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
-import { IPropertyOption, IPropertyTemplate } from 'lib/databases/board';
-import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
-import { prettyPrint } from 'lib/utils/strings';
-import { ProposalEvaluationInput, createProposal } from 'lib/proposals/createProposal';
 import { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
-import { addUserToSpace } from 'testing/utils/spaces';
+import { FormField, prisma } from '@charmverse/core/prisma-client';
+import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import { readFileSync } from 'fs';
+import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
+import { ProposalEvaluationInput, createProposal } from 'lib/proposals/createProposal';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import Papa from 'papaparse';
+import * as path from 'path';
+import { addUserToSpace } from 'testing/utils/spaces';
+import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
+import { v4 as uuid } from 'uuid';
 
 function readCSV(filename: string) {
 
@@ -279,17 +275,34 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
 
     const fieldsToModify = Object.keys(selectValueModifiers);
 
-    for (const field of fieldsToModify) {
-      const existingFieldOptions = formQuestions[field].options as FormFieldInput['options'] ?? [];
+    for (const fieldId of fieldsToModify) {
 
-      await prisma.formField.update({
+
+      const fieldInDb = await prisma.formField.findFirstOrThrow({
         where: {
-          id: field
+          id: fieldId
         },
-        data: {
-          options: existingFieldOptions.concat(selectValueModifiers[field])
+        select: {
+          options: true
         }
       });
+
+      const existingFieldOptions = fieldInDb.options as FormFieldInput['options'] ?? [];
+
+      const filteredNewOptions = selectValueModifiers[fieldId].filter(option => {
+        return !existingFieldOptions.find(existingOption => existingOption.name.toLowerCase().trim() === option.name.toLowerCase().trim());
+      });
+
+      if (filteredNewOptions.length) {
+        await prisma.formField.update({
+          where: {
+            id: fieldId
+          },
+          data: {
+            options: existingFieldOptions.concat(selectValueModifiers[fieldId])
+          }
+        });
+      }
     }
 
     await upsertProposalFormAnswers({
@@ -301,6 +314,7 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
   }
 }
 
-importApplications({templatePath: 'general-grant-application-13916139412961637', spaceDomain: 'aptos-grants', filename: 'Copy of Aptos grants wave 18 & 19 - Data To Upload.csv'}).then(console.log)
+
+// importApplications({templatePath: 'page-path', spaceDomain: 'space-domain', filename: 'Copy of Aptos grants wave 18 & 19 - Data To Upload.csv'}).then(console.log)
 
 // prisma.page.deleteMany({where: {space: {domain: 'coloured-tomato-gibbon'}, type: 'proposal'}}).then(console.log)
