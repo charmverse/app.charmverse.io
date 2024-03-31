@@ -12,7 +12,7 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   },
   {
     field: 'twitter',
-    label: 'Twitter'
+    label: 'X.com'
   },
   {
     field: 'warpcast',
@@ -66,7 +66,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   },
   {
     field: 'twitter',
-    label: 'Twitter'
+    label: 'X.com'
   },
   {
     field: 'website',
