@@ -16,7 +16,6 @@ let spaceAdmin: User;
 let spaceMember: User;
 let defaultWorkflows: ProposalWorkflowTyped[];
 let project: Project;
-let project2: Project;
 
 test.beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
@@ -66,21 +65,6 @@ test.beforeAll(async () => {
         {
           ...defaultProjectValues.projectMembers[0],
           email: `test@${v4()}.com`,
-          name: 'Test Member'
-        }
-      ]
-    },
-    userId: spaceMember.id
-  });
-
-  // Invalid project without email which is required in the proposal template
-  project2 = await createProject({
-    project: {
-      ...defaultProjectValues,
-      name: 'Test Project 2',
-      projectMembers: [
-        {
-          ...defaultProjectValues.projectMembers[0],
           name: 'Test Member'
         }
       ]
@@ -267,14 +251,6 @@ test.describe.serial('Structured proposal template with project', () => {
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
     await projectSettings.page.waitForTimeout(500);
-
-    // Disabled since project values are missing (email) required in proposal template
-    // using toBeDisabled() does not work here
-    expect(
-      (await (await proposalFormFieldPage.getProjectOption(project2.id)).getAttribute('class'))?.includes(
-        'Mui-disabled'
-      )
-    ).toBeTruthy();
 
     // Assert that the project member values were auto updated
     const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({

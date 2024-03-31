@@ -1,13 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { prisma } from '@charmverse/core/prisma-client';
 import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/forms/createForm';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
-import { defaultProjectFieldConfig, defaultProjectValues } from 'lib/projects/constants';
-import { createProject } from 'lib/projects/createProject';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
@@ -283,42 +281,6 @@ describe('upsertFormAnswers', () => {
         answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
       })
     ).resolves.toBeTruthy();
-  });
-
-  it('Show throw error if an invalid project is provided in the form answers', async () => {
-    const formId = await createForm([
-      {
-        description: 'Project profile',
-        fieldConfig: defaultProjectFieldConfig,
-        name: 'Project profile',
-        options: [],
-        id: v4(),
-        index: 0,
-        private: false,
-        required: true,
-        type: 'project_profile'
-      }
-    ]);
-
-    await prisma.proposal.update({
-      where: { id: proposal.id },
-      data: { formId }
-    });
-
-    const project = await createProject({
-      project: {
-        ...defaultProjectValues,
-        name: ''
-      },
-      userId: user.id
-    });
-
-    expect(
-      upsertProposalFormAnswers({
-        proposalId: proposal.id,
-        answers: [{ fieldId: formId, value: { projectId: project.id } }]
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
   });
 
   it('should throw an error if invalid fieldId was provided', async () => {

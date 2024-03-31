@@ -1,11 +1,10 @@
 import MuiAddIcon from '@mui/icons-material/Add';
-import { Box, Divider, MenuItem, Select, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { ValidationError } from 'yup';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
-import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
+import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectValues } from 'lib/projects/constants';
@@ -87,35 +86,17 @@ export function ProjectProfileInputField({
           }}
         >
           {projectsWithMembers?.map((project) => {
-            const yupSchema = createProjectYupSchema({
-              fieldConfig: formField.fieldConfig as ProjectFieldConfig,
-              defaultRequired: true
-            });
-            let errors: string[] = [];
-            try {
-              yupSchema.validateSync(convertToProjectValues(project), {
-                abortEarly: false
-              });
-            } catch (e) {
-              if (e instanceof ValidationError) {
-                errors = e.errors;
-              }
-            }
             return (
-              <Tooltip title={errors.join(', ')} placement='right' key={project.id}>
-                <div>
-                  <MenuItem
-                    data-test={`project-option-${project.id}`}
-                    value={project.id}
-                    disabled={errors.length !== 0}
-                    onClick={() => {
-                      onOptionClick(project.id);
-                    }}
-                  >
-                    <Typography>{project.name}</Typography>
-                  </MenuItem>
-                </div>
-              </Tooltip>
+              <MenuItem
+                key={project.id}
+                data-test={`project-option-${project.id}`}
+                value={project.id}
+                onClick={() => {
+                  onOptionClick(project.id);
+                }}
+              >
+                <Typography>{project.name}</Typography>
+              </MenuItem>
             );
           })}
           {/** Disable adding new project if proposal has been published */}
