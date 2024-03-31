@@ -1,5 +1,5 @@
-import type { Command, EditorState, Node, Schema } from '@bangle.dev/pm';
-import { keymap, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
+import type { Command, EditorState, Node, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
+import { keymap, NodeSelection, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import {
   copyEmptyCommand,
   cutEmptyCommand,
@@ -7,12 +7,16 @@ import {
   jumpToStartOfNode,
   moveNode
 } from '@bangle.dev/pm-commands';
+import { selectionTooltip } from '@bangle.dev/tooltip';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import { slugify } from 'lib/utils/strings';
+
+import type { BangleEditor } from './@bangle.dev/core/bangle-editor';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -182,4 +186,29 @@ export function insertEmptyParaBelow() {
   return filter(checkIsInHeading, (state, dispatch, view) => {
     return insertEmpty(state.schema.nodes.paragraph, 'below', false)(state, dispatch, view);
   });
+}
+
+export function scrollIntoHeadingNode({ editor, pluginKey }: { editor: BangleEditor; pluginKey: PluginKey }) {
+  const hash = window.location.hash.slice(1);
+
+  if (hash) {
+    let nodePos: number | undefined;
+    editor.view.state.doc.descendants((node, pos) => {
+      if (node.type.name === 'heading' && slugify(node.textContent) === hash) {
+        nodePos = pos;
+        return false;
+      }
+    });
+
+    const domNode = nodePos ? (editor.view.domAtPos(nodePos)?.node as HTMLElement) : null;
+    if (domNode && nodePos !== undefined) {
+      editor.view.dispatch(editor.view.state.tr.setSelection(NodeSelection.create(editor.view.state.doc, nodePos)));
+      setTimeout(() => {
+        // Need to reference the domNode again because the node might have been re-rendered
+        const _domNode = editor.view.domAtPos(nodePos!)?.node as HTMLElement;
+        selectionTooltip.hideSelectionTooltip(pluginKey)(editor.view.state, editor.view.dispatch, editor.view);
+        document.querySelector('.document-print-container')?.scrollTo(0, _domNode.offsetTop);
+      }, 500);
+    }
+  }
 }

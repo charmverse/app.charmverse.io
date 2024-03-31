@@ -11,7 +11,7 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 
-export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = withSessionSsr(async (context) => {
   const template = context.query?.template;
 
   // retrieve space by domain, and then last page view by spaceId

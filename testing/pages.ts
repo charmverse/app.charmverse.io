@@ -36,7 +36,13 @@ export function createPage(
             }
           }
         : undefined,
-      parentId: options.parentId,
+      parent: options.parentId
+        ? {
+            connect: {
+              id: options.parentId
+            }
+          }
+        : undefined,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null
     },

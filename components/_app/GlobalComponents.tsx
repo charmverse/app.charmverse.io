@@ -8,7 +8,7 @@ import { MemberProfileDialogGlobal } from 'components/members/components/MemberP
 import { useAppLoadedEvent } from 'hooks/useAppLoadedEvent';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMarkNotificationFromUrl } from 'hooks/useMarkNotificationFromUrl';
-import { getPagesListCacheKey, usePages } from 'hooks/usePages';
+import { getPagesListCacheKey } from 'hooks/usePages';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useVerifyLoginOtp } from 'hooks/useVerifyLoginOtp';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
@@ -23,7 +23,6 @@ export function GlobalComponents() {
   const router = useRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
-  const { setPages } = usePages();
   const { openSettings, isOpen: isSettingsDialogOpen } = useSettingsDialog();
   const { isOpen: isVerifyOtpOpen, close: closeVerifyOtp } = useVerifyLoginOtp();
   // Register logs to Datadog
