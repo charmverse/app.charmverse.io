@@ -11,8 +11,11 @@ import type {
 import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import { FieldConfig } from 'lib/projects/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
 
+import { getProposalProjectFormField } from './form/getProposalProjectFormField';
 import type { ProposalFields, PopulatedEvaluation, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
 
 type FormFieldsIncludeType = {
@@ -38,6 +41,7 @@ export function mapDbProposalToProposal({
       })[];
       page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
       rewards: { id: string }[];
+      project?: ProjectWithMembers | null;
     };
   permissions: ProposalPermissionFlags;
   permissionsByStep?: Record<string, ProposalPermissionFlags>;
@@ -45,6 +49,14 @@ export function mapDbProposalToProposal({
   const { rewards, form, evaluations, fields, page, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
+  const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
+    ?.fieldConfig as ProjectFieldConfig;
+  const project = getProposalProjectFormField({
+    canViewPrivateFields: !!permissions.view_private_fields,
+    projectWithMembers: proposal.project,
+    fieldConfig: projectFormFieldConfig
+  });
+
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
@@ -60,6 +72,7 @@ export function mapDbProposalToProposal({
 
   const proposalWithUsers: ProposalWithUsersAndRubric = {
     ...rest,
+    project,
     page: pageFields,
     fields: fields as ProposalFields,
     evaluations: mappedEvaluations,

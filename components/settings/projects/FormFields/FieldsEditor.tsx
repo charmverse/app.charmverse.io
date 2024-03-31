@@ -1,17 +1,17 @@
 import { Stack, Switch, Typography } from '@mui/material';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { ProjectFieldProperty } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectFieldProperty } from 'lib/projects/interfaces';
 
-export function FieldsEditor<Values extends Record<string, any> = Record<string, any>>({
+export function FieldsEditor({
   onChange,
   fieldConfig,
   properties,
   defaultRequired,
   isProjectMember
 }: {
-  onChange?: (fieldConfig: Values) => void;
-  fieldConfig: Values;
+  onChange?: (fieldConfig: FieldConfig) => void;
+  fieldConfig: FieldConfig;
   properties: ProjectFieldProperty[];
   defaultRequired?: boolean;
   isProjectMember?: boolean;
@@ -40,7 +40,7 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
             />
             {/** Required fields must always be required and shown */}
             {onChange && !property.strictlyRequired && (
-              <Stack gap={1}>
+              <Stack gap={1} flexDirection='row'>
                 <Stack gap={0.5} flexDirection='row' alignItems='center'>
                   <Switch
                     size='small'
@@ -51,7 +51,8 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
                         ...(fieldConfig ?? {}),
                         [property.field]: {
                           required: isChecked ? false : fieldConfig?.[property.field]?.required ?? true,
-                          hidden: isChecked
+                          hidden: isChecked,
+                          private: isChecked ? false : fieldConfig?.[property.field]?.private ?? true
                         }
                       });
                     }}
@@ -78,6 +79,26 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
                   />
                   <Typography>Required</Typography>
                 </Stack>
+                {property.allowPrivate && (
+                  <Stack gap={0.5} flexDirection='row' alignItems='center'>
+                    <Switch
+                      size='small'
+                      disabled={fieldConfig?.[property.field]?.hidden === true}
+                      checked={fieldConfig?.[property.field]?.private ?? true}
+                      onChange={(e) => {
+                        onChange({
+                          ...(fieldConfig ?? {}),
+                          [property.field]: {
+                            ...fieldConfig?.[property.field],
+                            private: e.target.checked
+                          }
+                        });
+                      }}
+                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-required-toggle`}
+                    />
+                    <Typography>Private</Typography>
+                  </Stack>
+                )}
               </Stack>
             )}
           </Stack>

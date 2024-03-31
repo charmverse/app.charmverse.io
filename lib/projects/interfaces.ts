@@ -39,6 +39,7 @@ export type FieldConfig = Partial<
     {
       required?: boolean;
       hidden?: boolean;
+      private?: boolean;
     }
   >
 >;
@@ -60,6 +61,8 @@ export type ProjectFieldProperty = {
   rows?: number;
   // This will take precedence over the fieldConfig proposal template author sets
   strictlyRequired?: boolean;
+  // This will allow the template author to set the field as private (only visible to authors, reviewers & admins)
+  allowPrivate?: boolean;
 };
 
 export type ProjectWithMembers = Project & {

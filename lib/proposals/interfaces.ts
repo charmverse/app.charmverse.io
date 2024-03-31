@@ -74,5 +74,5 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
     id: string;
     formFields: TypedFormField[] | null;
   } | null;
-  project?: ProjectWithMembers;
+  project?: ProjectWithMembers | null;
 };
