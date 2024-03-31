@@ -2,7 +2,6 @@ import { cloneDeep } from 'lodash';
 
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
 import type { ProjectField, ProjectFieldConfig, ProjectMemberField, ProjectWithMembers } from 'lib/projects/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 export function getProposalProjectFormField({
   canViewPrivateFields,
@@ -19,13 +18,11 @@ export function getProposalProjectFormField({
 
   const clonedProject = cloneDeep(projectWithMembers);
   const privateProjectFields = Object.entries(fieldConfig)
-    .filter(([, config]) => config?.hidden === false)
-    ?.filter(isTruthy)
+    .filter(([, config]) => config?.private === true)
     .map(([key]) => key) as ProjectField[];
 
   const privateProjectMemberFields = Object.entries(fieldConfig.projectMember)
-    .filter(([, config]) => config?.hidden === false)
-    ?.filter(isTruthy)
+    .filter(([, config]) => config?.private === true)
     .map(([key]) => key) as ProjectMemberField[];
 
   (Object.keys(clonedProject) as ProjectField[]).forEach((key) => {
@@ -34,12 +31,13 @@ export function getProposalProjectFormField({
     }
   });
 
-  clonedProject.projectMembers.forEach((member) => {
-    (Object.keys(member) as ProjectMemberField[]).forEach((key) => {
+  clonedProject.projectMembers.forEach((projectMember, index) => {
+    (Object.keys(projectMember) as ProjectMemberField[]).forEach((key) => {
       if (privateProjectMemberFields.includes(key) && !canViewPrivateFields) {
-        member[key] = '';
+        projectMember[key] = '';
       }
     });
+    clonedProject.projectMembers[index] = projectMember;
   });
 
   return clonedProject;
