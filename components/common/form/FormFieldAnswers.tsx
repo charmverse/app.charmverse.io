@@ -48,7 +48,7 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
-  projectWithMembers?: ProjectWithMembers;
+  projectWithMembers?: ProjectWithMembers | null;
 };
 
 const StyledStack = styled(Stack)`

@@ -27,7 +27,7 @@ export function ProjectProfileInputField({
     value?: FormFieldValue;
     fieldConfig?: ProjectFieldConfig;
   };
-  projectWithMembers?: ProjectWithMembers;
+  projectWithMembers?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
   const { user } = useUser();

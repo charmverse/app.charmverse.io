@@ -27,7 +27,7 @@ export function ProposalFormFieldAnswers({
   pageId: string;
   threads: Record<string, ThreadWithComments | undefined>;
   isDraft?: boolean;
-  projectWithMembers?: ProjectWithMembers;
+  projectWithMembers?: ProjectWithMembers | null;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
     proposalId
