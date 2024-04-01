@@ -6,7 +6,8 @@ import { exportRoles } from "lib/templates/exportRoles";
 import { importRoles } from "lib/templates/importRoles";
 import { v4 as uuid } from 'uuid';
 
-import {formFields} from './form'
+// This file should be created by exporting form fields for a proposal
+// import {formFields} from './form'
 
 async function restoreFormFromLogs({pagePath, spaceDomain, inputs}: {pagePath: string; spaceDomain: string; inputs:  (FormFieldInput & {formId?: string})[]}): Promise<any> {
   const page = await prisma.page.findFirstOrThrow({

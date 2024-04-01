@@ -5,12 +5,15 @@ import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/in
 import { readFileSync } from 'fs';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { ProposalEvaluationInput, createProposal } from 'lib/proposals/createProposal';
+import { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { parseMarkdown } from 'lib/prosemirror/markdown/parseMarkdown';
+import _uniqBy from 'lodash/uniqBy';
 import Papa from 'papaparse';
 import * as path from 'path';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 import { v4 as uuid } from 'uuid';
+
 
 function readCSV(filename: string) {
 
@@ -27,13 +30,12 @@ function readCSV(filename: string) {
       const header = headers[index];
       const fieldName = header;
 
-      if (fieldName.toLowerCase() !== 'milestones') {
-        if (fieldName) {
-          acc[fieldName] = field;
-        } else if (header) {
-          console.error('No field match for CSV column: ', header);
-        }
+      if (fieldName) {
+        acc[fieldName] = field;
+      } else {
+        console.error('No field match for CSV column: ', fieldName);
       }
+
       // override for testing
 
       return acc;
@@ -42,7 +44,7 @@ function readCSV(filename: string) {
 }
 
 async function importApplications({templatePath, spaceDomain, filename}: {templatePath: string; spaceDomain: string; filename: string}): Promise<void> {
-  const data = (await readCSV(filename)).slice(18);
+  const data = (await readCSV(filename))
 
   const formProposal = await prisma.proposal.findFirstOrThrow({
     where: {
@@ -117,6 +119,8 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
 
   for (let i=0; i< data.length; i++) {
     const  userAnswers = data[i];
+
+    delete userAnswers['milestones'];
 
     const missingFormField = Object.keys(userAnswers).find(key => {
       return !formQuestions[key.toLowerCase().trim()]
@@ -299,7 +303,7 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
             id: fieldId
           },
           data: {
-            options: existingFieldOptions.concat(selectValueModifiers[fieldId])
+            options: existingFieldOptions.concat(filteredNewOptions)
           }
         });
       }
@@ -315,6 +319,194 @@ async function importApplications({templatePath, spaceDomain, filename}: {templa
 }
 
 
-// importApplications({templatePath: 'page-path', spaceDomain: 'space-domain', filename: 'Copy of Aptos grants wave 18 & 19 - Data To Upload.csv'}).then(console.log)
+function parseMilestones({text, reviewers, authorId}: {text: string, reviewers: {id: string; group: "role" | "user"}[], authorId: string}): ProposalPendingReward[] {
+  const milestones: ProposalPendingReward[] = [];
+  const splitMilestones = text.split("///SEP///").map((m) => m.trim()).filter((m) => m !== "");
+
+
+
+  const titleMatcher = /__TITLE__(.){2,}__TITLE__/
+
+  splitMilestones.forEach((milestone) => {
+    const titleMatch = milestone.match(titleMatcher);
+
+    const rawTitle = titleMatch?.[0] ?? "Untitled";
+
+    const title = rawTitle.replace(/__TITLE__/g, '').trim();
+    const content = milestone.replace(rawTitle, "").trim();
+
+    const parsedContent = parseMarkdown(content);
+
+    milestones.push({
+      draftId: uuid(),
+      // TODO - CONFIRM REWARDS
+      reward: {
+        customReward: "Grant from Aptos",
+        rewardType: "custom",
+        rewardAmount: null,
+        rewardToken: null,
+        fields: {
+          isAssigned: true,
+          properties: {
+            __limit: "",
+            __title: title,
+            __rewarder: "",
+            __available: 1,
+            __createdAt: "",
+            __reviewers: reviewers,
+            __applicants: [
+              authorId
+            ],
+            __rewardChain: "",
+            __rewardToken: "",
+            __rewardAmount: "",
+            __rewardStatus: "",
+            __rewardCustomValue: "Grant from Aptos",
+            __rewardProposalLink: "",
+            __rewardApplicantsCount: 1
+          }
+        }
+      },
+      page: {
+        content: parsedContent,
+        contentText: content,
+        title,
+        icon: null,
+        headerImage: null,
+        updatedAt: new Date(),
+        type: 'bounty'
+      }
+    })
+  });
+
+  return milestones;
+}  
+
+const resolveEmails = ['0xthomas26@gmail.com', 'samiam3d@gmail.com']
+
+async function importMilestones({sourceData, spaceDomain}: {sourceData: string, spaceDomain: string}) {
+  const data = readCSV(sourceData);
+
+  for (let i = 0; i < data.length; i++) {
+
+    const item = data[i];
+
+    const email = item['email address'].toLowerCase().trim();
+
+    if (!email) {
+      throw new Error(`Missing email address for proposal index ${email}`)
+    }
+
+
+    if (!resolveEmails.some(_email => _email === item['email address'].toLowerCase().trim())) {
+      console.log('Skip proposal', i + 1)
+      continue;
+    }
+
+
+
+ 
+    const proposal = await prisma.proposal.findFirst({
+      where: {
+        page: {
+          author: {
+            verifiedEmails: {
+              some: {
+                email: {
+                  equals: email,
+                  mode: 'insensitive'
+                }
+              }
+            }
+          }
+        },
+        formId: {
+          not: null
+        },
+        space: {
+          domain: spaceDomain
+        }
+      },
+      select: {
+        id: true,
+        fields: true,
+        page: {
+          
+          select: {
+            path: true,
+            author: {
+              select: {
+                id: true,
+                verifiedEmails: true
+              }
+            }
+          }
+        },
+        evaluations: {
+          select: {
+            reviewers: {
+              where: {
+                OR: [{
+                  roleId: {
+                    not: null
+                  },
+                }, {
+                  userId: {
+                    not: null
+                  }
+                }]
+              } 
+            }
+          }
+        }
+      }
+    });
+
+    if (!proposal) {
+      console.log('No proposal found for email', email);
+      continue;
+    }
+
+    if (proposal.page?.author.verifiedEmails[0].email !== email) {
+      throw new Error(`Invalid user for proposal ${email} expected ${proposal.page?.author.verifiedEmails[0].email}`);
+    }
+
+    const authorId = proposal.page.author.id;
+
+    const flatReviewers = proposal.evaluations.map(r => r.reviewers).flat();
+
+    const reviewers = _uniqBy((flatReviewers.map(r => ({id: r.userId ?? r.roleId as string, group: r.userId ? 'user' : 'role'}))),  'id' ) as {id: string, group: 'user' | 'role'}[];
+
+
+    if (reviewers.some(r => !r.id )) {
+      throw new Error('Invalid reviewer found for proposal');
+    } else if (!reviewers.length) {
+      throw new Error('No reviewers found for proposal');
+    }
+
+    const parsedInput = {email: item['email address'], milestones: parseMilestones({text: item.milestones, authorId, reviewers})};
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        fields: {
+          ...(proposal.fields ?? {}) as any,
+          enableRewards: true,
+          pendingRewards: parsedInput.milestones
+        }
+      }
+    })
+
+    console.log('Processed item', i + 1, '/', data.length, 'with', parsedInput.milestones.length, 'milestones');
+
+  }
+}
+
+
+// importMilestones({sourceData: 'example-data.csv', spaceDomain: 'space-domain'}).then(console.log)
+
+// importApplications({templatePath: 'proposal-form-5212482570918344', spaceDomain: 'coloured-tomato-gibbon', filename: 'example-data.csv'}).then(console.log)
 
 // prisma.page.deleteMany({where: {space: {domain: 'coloured-tomato-gibbon'}, type: 'proposal'}}).then(console.log)
