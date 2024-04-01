@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getUserProfile } from 'lib/users/getUser';
@@ -35,30 +36,33 @@ export async function refreshENSName({ userId, address }: ENSUserNameRefresh): P
   if (!wallet) {
     throw new MissingDataError('No user wallet found with this address');
   }
+  try {
+    const ensName = await getENSName(lowerCaseAddress);
 
-  const ensName = await getENSName(lowerCaseAddress);
+    if (ensName !== wallet.ensname) {
+      const shouldUpdate = matchWalletAddress(wallet.user.username, wallet);
 
-  if (ensName !== wallet.ensname) {
-    const shouldUpdate = matchWalletAddress(wallet.user.username, wallet);
-
-    await prisma.userWallet.update({
-      where: {
-        address: lowerCaseAddress
-      },
-      data: {
-        ensname: ensName,
-        // Also update the username
-        user: shouldUpdate
-          ? {
-              update: {
-                data: {
-                  username: ensName || undefined
+      await prisma.userWallet.update({
+        where: {
+          address: lowerCaseAddress
+        },
+        data: {
+          ensname: ensName,
+          // Also update the username
+          user: shouldUpdate
+            ? {
+                update: {
+                  data: {
+                    username: ensName || undefined
+                  }
                 }
               }
-            }
-          : undefined
-      }
-    });
+            : undefined
+        }
+      });
+    }
+  } catch (error) {
+    log.warn('Could not refresh user wallet ENS', { error });
   }
 
   return getUserProfile('id', userId);
