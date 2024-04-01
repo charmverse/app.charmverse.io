@@ -72,7 +72,7 @@ class ZkSyncApiClient {
 
     const resultSource = result.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-    const data = result ? await GET<IpfsNft>(resultSource) : {};
+    const data = result ? await GET<IpfsNft>(resultSource).catch(() => ({})) : {};
 
     return mapNFTData(
       {
