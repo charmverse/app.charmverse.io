@@ -345,6 +345,9 @@ function parseMilestones({text, reviewers, authorId}: {text: string, reviewers: 
         rewardType: "custom",
         rewardAmount: null,
         rewardToken: null,
+        chainId: null,
+        reviewers,
+        assignedSubmitters: [authorId],
         fields: {
           isAssigned: true,
           properties: {
@@ -352,7 +355,7 @@ function parseMilestones({text, reviewers, authorId}: {text: string, reviewers: 
             __title: title,
             __rewarder: "",
             __available: 1,
-            __createdAt: "",
+            __createdAt: Date.now(),
             __reviewers: reviewers,
             __applicants: [
               authorId
@@ -382,8 +385,6 @@ function parseMilestones({text, reviewers, authorId}: {text: string, reviewers: 
   return milestones;
 }  
 
-const resolveEmails = ['0xthomas26@gmail.com', 'samiam3d@gmail.com']
-
 async function importMilestones({sourceData, spaceDomain}: {sourceData: string, spaceDomain: string}) {
   const data = readCSV(sourceData);
 
@@ -397,16 +398,8 @@ async function importMilestones({sourceData, spaceDomain}: {sourceData: string, 
       throw new Error(`Missing email address for proposal index ${email}`)
     }
 
-
-    if (!resolveEmails.some(_email => _email === item['email address'].toLowerCase().trim())) {
-      console.log('Skip proposal', i + 1)
-      continue;
-    }
-
-
-
  
-    const proposal = await prisma.proposal.findFirst({
+    const proposal = await prisma.proposal.findFirstOrThrow({
       where: {
         page: {
           author: {
@@ -462,10 +455,6 @@ async function importMilestones({sourceData, spaceDomain}: {sourceData: string, 
       }
     });
 
-    if (!proposal) {
-      console.log('No proposal found for email', email);
-      continue;
-    }
 
     if (proposal.page?.author.verifiedEmails[0].email !== email) {
       throw new Error(`Invalid user for proposal ${email} expected ${proposal.page?.author.verifiedEmails[0].email}`);
@@ -505,7 +494,7 @@ async function importMilestones({sourceData, spaceDomain}: {sourceData: string, 
 }
 
 
-// importMilestones({sourceData: 'example-data.csv', spaceDomain: 'space-domain'}).then(console.log)
+importMilestones({sourceData: 'data.csv', spaceDomain: 'space-domain'}).then(console.log)
 
 // importApplications({templatePath: 'proposal-form-5212482570918344', spaceDomain: 'coloured-tomato-gibbon', filename: 'example-data.csv'}).then(console.log)
 
