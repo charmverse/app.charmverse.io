@@ -1,9 +1,8 @@
 import type { Transaction } from '@charmverse/core/prisma';
-import EthersAdapter from '@safe-global/safe-ethers-lib';
-import SafeServiceClient from '@safe-global/safe-service-client';
+import type SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -16,20 +15,25 @@ export function useGnosisTransaction({ tx }: { tx?: Transaction }) {
   const network = tx?.chainId ? getChainById(Number(tx.chainId)) : null;
   const safeTxHash = tx?.safeTxHash || tx?.transactionId;
   const { provider } = useWeb3Account();
-  const ethAdapter = useMemo(() => {
-    if (!provider) return null;
+  const [safeService, setSafeService] = useState<SafeServiceClient | null>(null);
 
-    return new EthersAdapter({
-      ethers,
-      signerOrProvider: provider
+  useEffect(() => {
+    const gnosisUrl = network?.gnosisUrl;
+    if (!provider || !network || !gnosisUrl) return;
+
+    import('@safe-global/safe-ethers-lib').then((ethersAdapter) => {
+      const EthersAdapter = ethersAdapter.default;
+      const ethAdapter = new EthersAdapter({
+        ethers,
+        signerOrProvider: provider
+      });
+
+      import('@safe-global/safe-service-client').then((safeServiceClient) => {
+        const SafeServiceClient = safeServiceClient.default;
+        setSafeService(new SafeServiceClient({ txServiceUrl: gnosisUrl, ethAdapter }));
+      });
     });
-  }, [provider]);
-
-  const safeService = useMemo(() => {
-    if (!network || !network.gnosisUrl || !ethAdapter) return null;
-
-    return new SafeServiceClient({ txServiceUrl: network.gnosisUrl, ethAdapter });
-  }, [ethAdapter, network]);
+  }, [provider, network]);
 
   const { data: safeTxUrl } = useSWR(
     safeTxHash && safeService ? ['gnosis-transaction', safeTxHash] : null,

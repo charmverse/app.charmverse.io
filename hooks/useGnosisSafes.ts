@@ -1,5 +1,5 @@
 import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { getAddress } from 'viem';
 
@@ -16,13 +16,20 @@ export function useGnosisSafes(chainIdToUse?: number) {
   const { data: existingSafesData, mutate: refreshSafes } = useMultiWalletSigs();
   const { account, chainId } = useWeb3Account();
   const _chainId = chainIdToUse ?? chainId ?? 1;
+  const [safeApiClient, setSafeApiClient] = useState<Awaited<ReturnType<typeof getSafeApiClient>> | null>(null);
 
-  const safeApiClient = useMemo(() => {
-    try {
-      return getSafeApiClient({ chainId: _chainId });
-    } catch (_) {
-      return null;
+  useEffect(() => {
+    async function getSafeClient() {
+      if (_chainId) {
+        try {
+          setSafeApiClient(await getSafeApiClient({ chainId: _chainId }));
+        } catch (_) {
+          setSafeApiClient(null);
+        }
+      }
     }
+
+    getSafeClient();
   }, [_chainId]);
 
   const { data: safeInfos } = useSWR(
