@@ -494,7 +494,7 @@ async function importMilestones({sourceData, spaceDomain}: {sourceData: string, 
 }
 
 
-importMilestones({sourceData: 'data.csv', spaceDomain: 'space-domain'}).then(console.log)
+// importMilestones({sourceData: 'data.csv', spaceDomain: 'space-domain'}).then(console.log)
 
 // importApplications({templatePath: 'proposal-form-5212482570918344', spaceDomain: 'coloured-tomato-gibbon', filename: 'example-data.csv'}).then(console.log)
 
