@@ -124,12 +124,32 @@ function selectionTooltipController({ stateKey }: { stateKey: PluginKey }) {
       handleDOMEvents: {
         mousedown: (_view, _event) => {
           mouseDown = true;
+
+          // add listener to document to capture events outside of prosemirror DOM
+          function handleMouseUp() {
+            mouseDown = false;
+            _syncTooltipOnUpdate(stateKey)(_view.state, _view.dispatch, _view);
+            document.removeEventListener('mouseup', handleMouseUp);
+            return false;
+          }
+          document.addEventListener('mouseup', handleMouseUp);
+
           return false;
         },
         mouseup: (view, _event) => {
           mouseDown = false;
           _syncTooltipOnUpdate(stateKey)(view.state, view.dispatch, view);
           return false;
+        },
+        // hide or show tooltip on blur based on selection
+        blur: (view, event) => {
+          if (view) {
+            // make sure user is not clicking inside a tooltip, which also triggers the 'blur' event
+            const isInsideEditorTooltip = Boolean((event.relatedTarget as any)?.closest?.(`.bangle-tooltip`));
+            if (!isInsideEditorTooltip) {
+              hideSelectionTooltip(stateKey)(view.state, view.dispatch, view);
+            }
+          }
         }
       } as DirectEditorProps['handleDOMEvents']
     },
@@ -154,7 +174,7 @@ function getSelectionReferenceElement(view: EditorView) {
   return {
     getBoundingClientRect: () => {
       const { selection } = view.state;
-      const { head, from } = selection;
+      const { head, from, to } = selection;
       // since head is dependent on the users choice of direction,
       // it is not always equal to `from`.
       // For textSelections we want to show the tooltip at head of the
@@ -162,7 +182,10 @@ function getSelectionReferenceElement(view: EditorView) {
       // But for NodeSelection we always want `from` since, if we go with `head`
       // coordsAtPos(head) might get the position `to` in head, resulting in
       // incorrectly getting position of the node after the selected Node.
-      const pos = selection instanceof NodeSelection ? from : head;
+      // const pos = selection instanceof NodeSelection ? from : head;
+
+      // Using head actually puts the floating menu wherever the cursor ends - use from for now: https://prosemirror.net/docs/ref/version/0.20.0.html
+      const pos = from;
 
       const start = view.coordsAtPos(pos);
       const { top, bottom, left, right } = start;
