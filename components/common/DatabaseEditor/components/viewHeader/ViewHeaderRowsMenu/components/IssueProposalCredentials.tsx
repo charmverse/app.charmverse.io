@@ -3,7 +3,7 @@ import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
-import { useSwitchNetwork } from 'wagmi';
+import { useSwitchChain } from 'wagmi';
 
 import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
@@ -61,7 +61,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
 
   const { account, chainId } = useWeb3Account();
   const { signer } = useWeb3Signer();
-  const { switchNetworkAsync } = useSwitchNetwork({ chainId: space?.credentialsChainId as number });
+  const { switchNetworkAsync } = useSwitchChain({ chainId: space?.credentialsChainId as number });
 
   const { all, proposalApproved, proposalCreated } = (issuableProposalCredentials ?? []).reduce(
     (acc, val) => {

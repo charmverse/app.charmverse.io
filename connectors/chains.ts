@@ -441,7 +441,7 @@ export const RPC: Record<string, IChainDetails> = {
     chainId: zkSyncTestnet.id,
     viem: zkSyncTestnet,
     chainName: zkSyncTestnet.name,
-    rpcUrls: zkSyncTestnet.rpcUrls.public.http,
+    rpcUrls: zkSyncTestnet.rpcUrls.default.http,
     blockExplorerUrls: [zkSyncTestnet.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     testnet: true,
