@@ -51,11 +51,13 @@ export function mapDbProposalToProposal({
   const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
   const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
     ?.fieldConfig as ProjectFieldConfig;
-  const project = getProposalProjectFormField({
-    canViewPrivateFields: !!permissions.view_private_fields,
-    projectWithMembers: proposal.project,
-    fieldConfig: projectFormFieldConfig
-  });
+  const project = proposal.project
+    ? getProposalProjectFormField({
+        canViewPrivateFields: !!permissions.view_private_fields,
+        projectWithMembers: proposal.project,
+        fieldConfig: projectFormFieldConfig
+      })
+    : null;
 
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
     const stepPermissions = permissionsByStep?.[evaluation.id];

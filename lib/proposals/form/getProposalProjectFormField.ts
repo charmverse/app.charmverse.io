@@ -9,14 +9,10 @@ export function getProposalProjectFormField({
   fieldConfig = defaultProjectFieldConfig
 }: {
   fieldConfig?: ProjectFieldConfig;
-  projectWithMembers: ProjectWithMembers | null | undefined;
+  projectWithMembers: ProjectWithMembers;
   canViewPrivateFields: boolean;
 }) {
-  if (!projectWithMembers) {
-    return null;
-  }
-
-  const clonedProject = cloneDeep(projectWithMembers);
+  const projectWithoutPrivateFields = cloneDeep(projectWithMembers);
   const privateProjectFields = Object.entries(fieldConfig)
     .filter(([, config]) => config?.private === true)
     .map(([key]) => key) as ProjectField[];
@@ -25,20 +21,20 @@ export function getProposalProjectFormField({
     .filter(([, config]) => config?.private === true)
     .map(([key]) => key) as ProjectMemberField[];
 
-  (Object.keys(clonedProject) as ProjectField[]).forEach((key) => {
+  (Object.keys(projectWithoutPrivateFields) as ProjectField[]).forEach((key) => {
     if (privateProjectFields.includes(key) && !canViewPrivateFields) {
-      clonedProject[key] = '';
+      projectWithoutPrivateFields[key] = '';
     }
   });
 
-  clonedProject.projectMembers.forEach((projectMember, index) => {
+  projectWithoutPrivateFields.projectMembers.forEach((projectMember, index) => {
     (Object.keys(projectMember) as ProjectMemberField[]).forEach((key) => {
       if (privateProjectMemberFields.includes(key) && !canViewPrivateFields) {
         projectMember[key] = '';
       }
     });
-    clonedProject.projectMembers[index] = projectMember;
+    projectWithoutPrivateFields.projectMembers[index] = projectMember;
   });
 
-  return clonedProject;
+  return projectWithoutPrivateFields;
 }
