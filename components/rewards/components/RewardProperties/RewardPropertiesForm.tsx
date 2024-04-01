@@ -121,7 +121,11 @@ export function RewardPropertiesForm({
     }
 
     onChange({
-      rewardType
+      rewardType,
+      customReward: rewardType === 'custom' ? values.customReward : undefined,
+      rewardAmount: rewardType === 'token' ? values.rewardAmount : undefined,
+      rewardToken: rewardType === 'token' ? values.rewardToken : undefined,
+      chainId: rewardType === 'token' ? values.chainId : undefined
     });
   }
 
