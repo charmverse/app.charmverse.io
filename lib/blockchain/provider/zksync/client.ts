@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
-import { ethers } from 'ethers';
 import type { PublicClient } from 'viem';
 import { zkSync, zkSyncTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
@@ -17,9 +16,9 @@ import { supportedNetworks, type SupportedChainId } from './config';
 const ZK_MAINNET_BLOCK_EXPLORER = 'https://block-explorer-api.mainnet.zksync.io';
 const ZK_TESTNET_BLOCK_EXPLORER = 'https://block-explorer-api.testnets.zksync.dev';
 type IpfsNft = {
-  name: string;
-  description: string;
-  image: string;
+  name?: string;
+  description?: string;
+  image?: string;
 };
 
 type BlockExplorerNft = { timeStamp: string; from: string; to: string; tokenID: string; contractAddress: string };
@@ -71,9 +70,9 @@ class ZkSyncApiClient {
       args: [BigInt(tokenId || 1).toString()]
     })) as string;
 
-    const resultSource = await result.replace('ipfs://', 'https://ipfs.io/ipfs/');
+    const resultSource = result.replace('ipfs://', 'https://ipfs.io/ipfs/');
 
-    const data = await GET<IpfsNft>(resultSource);
+    const data = result ? await GET<IpfsNft>(resultSource) : {};
 
     return mapNFTData(
       {
