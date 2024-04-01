@@ -149,7 +149,7 @@ function ExpandedFormField({
           closeOnClick
           popupContent={
             <MenuList>
-              <MenuItem onClick={onDuplicate}>
+              <MenuItem onClick={onDuplicate} disabled={formField.type === 'project_profile'}>
                 <ListItemIcon>
                   <ContentCopyOutlinedIcon fontSize='small' />
                 </ListItemIcon>
