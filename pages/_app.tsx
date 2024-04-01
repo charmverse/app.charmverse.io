@@ -101,6 +101,7 @@ import 'theme/databases/databases.main.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
+import { WagmiProvider } from '../components/_app/components/WagmiProvider';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
@@ -221,40 +222,42 @@ function DataProviders({ children }: { children: ReactNode }) {
       <UserProvider>
         <VerifyLoginOtpProvider>
           <DiscordProvider>
-            <Web3ConnectionManager>
-              <WalletSelectorModal />
-              <Web3AccountProvider>
-                <SpacesProvider>
-                  <CurrentSpaceProvider>
-                    <PostCategoriesProvider>
-                      <IsSpaceMemberProvider>
-                        <WebSocketClientProvider>
-                          <MembersProvider>
-                            <PaymentMethodsProvider>
-                              <DatabaseProvider>
-                                <PagesProvider>
-                                  <RewardsProvider>
-                                    <MemberPropertiesProvider>
-                                      <LensProvider config={lensConfig}>
-                                        <FarcasterUserProvider>
-                                          <UserProfileProvider>
-                                            <PageTitleProvider>{children}</PageTitleProvider>
-                                          </UserProfileProvider>
-                                        </FarcasterUserProvider>
-                                      </LensProvider>
-                                    </MemberPropertiesProvider>
-                                  </RewardsProvider>
-                                </PagesProvider>
-                              </DatabaseProvider>
-                            </PaymentMethodsProvider>
-                          </MembersProvider>
-                        </WebSocketClientProvider>
-                      </IsSpaceMemberProvider>
-                    </PostCategoriesProvider>
-                  </CurrentSpaceProvider>
-                </SpacesProvider>
-              </Web3AccountProvider>
-            </Web3ConnectionManager>
+            <WagmiProvider>
+              <Web3ConnectionManager>
+                <WalletSelectorModal />
+                <Web3AccountProvider>
+                  <SpacesProvider>
+                    <CurrentSpaceProvider>
+                      <PostCategoriesProvider>
+                        <IsSpaceMemberProvider>
+                          <WebSocketClientProvider>
+                            <MembersProvider>
+                              <PaymentMethodsProvider>
+                                <DatabaseProvider>
+                                  <PagesProvider>
+                                    <RewardsProvider>
+                                      <MemberPropertiesProvider>
+                                        <LensProvider config={lensConfig}>
+                                          <FarcasterUserProvider>
+                                            <UserProfileProvider>
+                                              <PageTitleProvider>{children}</PageTitleProvider>
+                                            </UserProfileProvider>
+                                          </FarcasterUserProvider>
+                                        </LensProvider>
+                                      </MemberPropertiesProvider>
+                                    </RewardsProvider>
+                                  </PagesProvider>
+                                </DatabaseProvider>
+                              </PaymentMethodsProvider>
+                            </MembersProvider>
+                          </WebSocketClientProvider>
+                        </IsSpaceMemberProvider>
+                      </PostCategoriesProvider>
+                    </CurrentSpaceProvider>
+                  </SpacesProvider>
+                </Web3AccountProvider>
+              </Web3ConnectionManager>
+            </WagmiProvider>
           </DiscordProvider>
         </VerifyLoginOtpProvider>
       </UserProvider>

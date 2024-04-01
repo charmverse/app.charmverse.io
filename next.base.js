@@ -23,6 +23,7 @@ const esmModules = [
   '@react-dnd/invariant',
   '@react-dnd/asap',
   '@react-dnd/shallowequal',
+  '@tanstack/react-query',
   'react-dnd-preview',
   'redux',
   '@hookform/resolvers',
@@ -34,7 +35,11 @@ const esmModules = [
   'jose',
   'nanoid',
   '@charmverse/core',
-  '@lens-protocol'
+  '@lens-protocol',
+
+  'wagmi'
+  // '@wagmi/core',
+  // '@wagmi/connectors'
 ];
 
 // this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module

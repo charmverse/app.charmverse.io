@@ -30,6 +30,7 @@ const connectors = [
 export const wagmiConfig = createConfig({
   chains: viemChains,
   connectors,
+  ssr: true, // prevents error: "localStorage not defined"  during npm run build
   transports: viemChains.reduce<Record<string, Transport>>((acc, chain) => {
     acc[chain.id] = http();
     return acc;
