@@ -39,7 +39,7 @@ export function FieldsEditor({
               required={fieldConfig?.[property.field]?.required ?? defaultRequired}
             />
             {/** Required fields must always be required and shown */}
-            {onChange && !property.strictlyRequired && (
+            {onChange && !property.alwaysRequired && (
               <Stack gap={1} flexDirection='row'>
                 <Stack gap={0.5} flexDirection='row' alignItems='center'>
                   <Switch

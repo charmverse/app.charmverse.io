@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/constants';
-import { getFilledProjectValues } from 'lib/projects/getFilledProjectValues';
+import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type {
   ProjectField,
   ProjectMemberField,
@@ -144,7 +144,7 @@ export function useProjectForm(options: {
   const { user } = useUser();
   const { membersRecord } = useMembers();
 
-  const defaultProjectValues = useMemo(() => getFilledProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
 
   const yupSchema = useRef(yup.object());
 

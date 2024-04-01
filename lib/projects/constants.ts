@@ -4,7 +4,7 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
     label: 'Name',
-    strictlyRequired: true
+    alwaysRequired: true
   },
   {
     field: 'walletAddress',
@@ -52,7 +52,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
     label: 'Project Name',
-    strictlyRequired: true
+    alwaysRequired: true
   },
   {
     field: 'excerpt',

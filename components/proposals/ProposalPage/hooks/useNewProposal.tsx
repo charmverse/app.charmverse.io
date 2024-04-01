@@ -14,7 +14,7 @@ import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import { getFilledProjectValues } from 'lib/projects/getFilledProjectValues';
+import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type { ProjectFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -68,7 +68,7 @@ export function useNewProposal({ newProposal }: Props) {
   });
 
   const { membersRecord } = useMembers();
-  const defaultProjectValues = useMemo(() => getFilledProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
   useEffect(() => {
     if (selectedProjectId) {
       projectForm.reset(projectWithMembers);

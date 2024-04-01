@@ -1,18 +1,16 @@
-import { cloneDeep } from 'lodash';
-
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
 import type { ProjectField, ProjectFieldConfig, ProjectMemberField, ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function getProposalProjectFormField({
   canViewPrivateFields,
   projectWithMembers,
-  fieldConfig = defaultProjectFieldConfig
+  fieldConfig
 }: {
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig: ProjectFieldConfig;
   projectWithMembers: ProjectWithMembers;
   canViewPrivateFields: boolean;
 }) {
-  const projectWithoutPrivateFields = cloneDeep(projectWithMembers);
+  if (canViewPrivateFields) return projectWithMembers;
+
   const privateProjectFields = Object.entries(fieldConfig)
     .filter(([, config]) => config?.private === true)
     .map(([key]) => key) as ProjectField[];
@@ -21,20 +19,19 @@ export function getProposalProjectFormField({
     .filter(([, config]) => config?.private === true)
     .map(([key]) => key) as ProjectMemberField[];
 
-  (Object.keys(projectWithoutPrivateFields) as ProjectField[]).forEach((key) => {
-    if (privateProjectFields.includes(key) && !canViewPrivateFields) {
-      projectWithoutPrivateFields[key] = '';
+  privateProjectFields.forEach((key) => {
+    if (key in projectWithMembers) {
+      projectWithMembers[key] = '';
     }
   });
 
-  projectWithoutPrivateFields.projectMembers.forEach((projectMember, index) => {
-    (Object.keys(projectMember) as ProjectMemberField[]).forEach((key) => {
-      if (privateProjectMemberFields.includes(key) && !canViewPrivateFields) {
+  projectWithMembers.projectMembers.forEach((projectMember) => {
+    privateProjectMemberFields.forEach((key) => {
+      if (key in projectMember) {
         projectMember[key] = '';
       }
     });
-    projectWithoutPrivateFields.projectMembers[index] = projectMember;
   });
 
-  return projectWithoutPrivateFields;
+  return projectWithMembers;
 }

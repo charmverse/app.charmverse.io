@@ -5,7 +5,7 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 import { defaultProjectValues } from './constants';
 import type { ProjectValues } from './interfaces';
 
-export function getFilledProjectValues({
+export function getDefaultProjectValues({
   membersRecord,
   user
 }: {

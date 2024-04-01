@@ -60,7 +60,7 @@ export type ProjectFieldProperty = {
   multiline?: boolean;
   rows?: number;
   // This will take precedence over the fieldConfig proposal template author sets
-  strictlyRequired?: boolean;
+  alwaysRequired?: boolean;
   // This will allow the template author to set the field as private (only visible to authors, reviewers & admins)
   allowPrivate?: boolean;
 };
