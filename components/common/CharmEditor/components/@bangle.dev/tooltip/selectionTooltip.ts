@@ -1,6 +1,7 @@
-import type { Command, DirectEditorProps, EditorState, EditorView, Transaction } from '@bangle.dev/pm';
-import { NodeSelection, Plugin, PluginKey } from '@bangle.dev/pm';
 import { log as _log } from '@charmverse/core/log';
+import { NodeSelection, Plugin, PluginKey } from 'prosemirror-state';
+import type { Command, EditorState, Transaction } from 'prosemirror-state';
+import type { DirectEditorProps, EditorView } from 'prosemirror-view';
 
 import type { TooltipDOM } from './createTooltipDOM';
 import { createTooltipDOM } from './createTooltipDOM';

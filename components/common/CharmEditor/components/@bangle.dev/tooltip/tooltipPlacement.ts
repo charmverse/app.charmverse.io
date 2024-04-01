@@ -1,5 +1,3 @@
-import type { DOMOutputSpec, EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
-import { bangleWarn } from '@bangle.dev/utils';
 import { log as _log } from '@charmverse/core/log';
 import type {
   Instance as PopperInstance,
@@ -8,7 +6,10 @@ import type {
   State as PopperState,
   VirtualElement
 } from '@popperjs/core';
+import type { DOMOutputSpec } from 'prosemirror-model';
+import type { EditorState, PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { createTooltipDOM } from './createTooltipDOM';
 import { arrow, createPopper, flip, offset, popperOffsets, preventOverflow } from './popper';
@@ -208,7 +209,7 @@ function tooltipPlacement({
 
 function validateState(state: TooltipPluginState) {
   if (typeof state.show !== 'boolean') {
-    bangleWarn(
+    log(
       `Tooltip must be controlled by a plugin having a boolean field "show" in its state, but received the state=`,
       state
     );

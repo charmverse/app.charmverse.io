@@ -1,5 +1,6 @@
-import type { EditorState, Schema } from '@bangle.dev/pm';
 import { InputRule } from 'prosemirror-inputrules';
+import type { Schema } from 'prosemirror-model';
+import type { EditorState } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 
 // ProseMirror uses the Unicode Character 'OBJECT REPLACEMENT CHARACTER' (U+FFFC) as text representation for

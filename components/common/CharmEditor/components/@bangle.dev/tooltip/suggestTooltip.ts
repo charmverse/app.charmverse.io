@@ -1,16 +1,16 @@
-import type { MarkType, Schema } from '@bangle.dev/pm';
-import { Fragment, keymap, Node } from '@bangle.dev/pm';
-import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
-import { tooltipPlacement } from '@bangle.dev/tooltip';
-import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/src/tooltip-placement';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import { keymap } from 'prosemirror-keymap';
+import type { MarkType, Schema } from 'prosemirror-model';
+import { Fragment, Node } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey, Selection } from 'prosemirror-state';
 
 import type { RawPlugins } from '../core/plugin-loader';
 import type { BaseRawMarkSpec } from '../core/specRegistry';
 
+import * as tooltipPlacement from './tooltipPlacement';
+import type { GetReferenceElementFunction, TooltipRenderOpts } from './tooltipPlacement';
 import { triggerInputRule } from './triggerInputRule';
 
 export const spec = specFactory;
