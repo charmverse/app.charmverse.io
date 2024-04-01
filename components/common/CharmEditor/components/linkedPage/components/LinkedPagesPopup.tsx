@@ -12,8 +12,8 @@ import { STATIC_PAGES } from 'lib/features/constants';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 
-import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggest-tooltip';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggest-tooltip';
+import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltip';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltip';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 

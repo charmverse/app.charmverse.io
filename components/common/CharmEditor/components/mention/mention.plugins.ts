@@ -1,11 +1,10 @@
-import { Plugin } from '@bangle.dev/pm';
-import { PluginKey } from 'prosemirror-state';
+import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip';
-import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggest-tooltip';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 import type { MentionPluginState } from './mention.interfaces';

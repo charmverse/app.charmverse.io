@@ -7,7 +7,6 @@ import { IntlProvider } from 'react-intl';
 import ReactDndProvider from '../components/common/ReactDndProvider';
 import { LocalizationProvider } from '../components/_app/LocalizationProvider';
 
-import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';

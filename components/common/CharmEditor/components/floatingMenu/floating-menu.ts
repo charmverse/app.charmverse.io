@@ -1,13 +1,13 @@
-import type { Command, InputRule } from '@bangle.dev/pm';
-import { selectionTooltip } from '@bangle.dev/tooltip';
-import type { SelectionTooltipProps } from '@bangle.dev/tooltip';
 import { createObject, filter, rafCommandExec } from '@bangle.dev/utils';
+import type { InputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import { PluginKey } from 'prosemirror-state';
-import type { EditorState } from 'prosemirror-state';
+import type { Command, EditorState } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
+import type { SelectionTooltipProps } from '../@bangle.dev/tooltip';
+import { selectionTooltip } from '../@bangle.dev/tooltip';
 import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
 
 const { queryIsSelectionTooltipActive, querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } =

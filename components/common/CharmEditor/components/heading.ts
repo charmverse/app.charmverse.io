@@ -7,7 +7,6 @@ import {
   jumpToStartOfNode,
   moveNode
 } from '@bangle.dev/pm-commands';
-import { selectionTooltip } from '@bangle.dev/tooltip';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
@@ -17,6 +16,7 @@ import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.
 import { slugify } from 'lib/utils/strings';
 
 import type { BangleEditor } from './@bangle.dev/core/bangle-editor';
+import { selectionTooltip } from './@bangle.dev/tooltip';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;

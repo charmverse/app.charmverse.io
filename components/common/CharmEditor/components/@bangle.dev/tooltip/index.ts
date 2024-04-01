@@ -1,9 +1,13 @@
-import type { SuggestTooltipRenderOpts } from './suggest-tooltip';
-import * as suggestTooltip from './suggest-tooltip';
+import * as selectionTooltip from './selectionTooltip';
+import type { SuggestTooltipRenderOpts } from './suggestTooltip';
+import * as suggestTooltip from './suggestTooltip';
 
-export { selectionTooltip, tooltipPlacement, createTooltipDOM } from '@bangle.dev/tooltip';
+export type { SelectionTooltipProps } from './selectionTooltip';
 
-export type { TooltipRenderOpts } from '@bangle.dev/tooltip';
+export * as tooltipPlacement from './tooltipPlacement';
+export type { TooltipRenderOpts } from './tooltipPlacement';
+export { selectionTooltip };
+export { createTooltipDOM } from './createTooltipDOM';
 
 export { suggestTooltip };
 export type { SuggestTooltipRenderOpts };

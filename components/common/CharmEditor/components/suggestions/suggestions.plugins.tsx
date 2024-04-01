@@ -4,7 +4,7 @@ import { RateReviewOutlined } from '@mui/icons-material';
 import { createRoot } from 'react-dom/client';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
-import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggestTooltip';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 import { getEventsFromDoc } from './getEvents';

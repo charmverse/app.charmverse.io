@@ -1,6 +1,6 @@
-import { keymap } from '@bangle.dev/pm';
 import { valuePlugin } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import { keymap } from 'prosemirror-keymap';
 import type { Node, Schema } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 import { PluginKey } from 'prosemirror-state';
@@ -14,7 +14,7 @@ import type {
 import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
 import { createTooltipDOM } from '../@bangle.dev/tooltip';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { paletteMarkName, trigger } from './config';
 

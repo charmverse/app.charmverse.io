@@ -1,13 +1,13 @@
-/* eslint-disable max-len */
-import type { Mark, PluginKey } from '@bangle.dev/pm';
-import { Plugin } from '@bangle.dev/pm';
+import type { Mark } from 'prosemirror-model';
+import type { PluginKey } from 'prosemirror-state';
+import { Plugin } from 'prosemirror-state';
 
 import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
 import {
   hideSuggestionsTooltip,
   referenceElement,
   renderSuggestionsTooltip
-} from '../@bangle.dev/tooltip/suggest-tooltip';
+} from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { getLinkElement } from './getLinkElement';
 import { linkPlugins } from './link';

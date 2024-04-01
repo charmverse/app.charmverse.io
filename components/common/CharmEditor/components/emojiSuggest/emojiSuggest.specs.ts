@@ -4,7 +4,7 @@ import { domSerializationHelpers } from 'components/common/CharmEditor/component
 import type { RawSpecs, BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { markName } from './emojiSuggest.constants';
 

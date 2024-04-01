@@ -18,7 +18,7 @@ import { replaceS3Domain } from 'lib/utils/url';
 import { enableDragAndDrop } from '../utils';
 
 import { getFileBinary } from './@bangle.dev/base-components/image';
-import * as suggestTooltip from './@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from './@bangle.dev/tooltip/suggestTooltip';
 import BlockAligner from './BlockAligner';
 import type { CharmNodeViewProps } from './nodeView/nodeView';
 import Resizable from './Resizable/Resizable';

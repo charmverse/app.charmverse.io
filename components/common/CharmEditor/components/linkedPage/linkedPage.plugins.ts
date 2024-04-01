@@ -5,7 +5,7 @@ import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip';
 import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';
 import type { LinkedPagePluginState } from './linkedPage.interfaces';

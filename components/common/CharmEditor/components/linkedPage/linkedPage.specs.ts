@@ -2,7 +2,7 @@ import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 
 import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 import { encloseNestedPage } from '../nestedPage/nestedPage.utils';
 
 import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';

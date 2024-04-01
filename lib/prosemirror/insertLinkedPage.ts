@@ -2,7 +2,7 @@ import type { EditorView, PluginKey } from '@bangle.dev/pm';
 import { TextSelection } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 
-import { hideSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltip';
 import { replaceSuggestionMarkWith } from 'components/common/CharmEditor/components/inlinePalette';
 import { linkedPageNodeName } from 'components/common/CharmEditor/components/linkedPage/linkedPage.constants';
 import { type LinkedPagePluginState } from 'components/common/CharmEditor/components/linkedPage/linkedPage.interfaces';
