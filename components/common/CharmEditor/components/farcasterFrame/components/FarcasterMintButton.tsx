@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { Tooltip, Typography } from '@mui/material';
 import { switchNetwork } from '@wagmi/core';
-import { getTokenFromUrl, type FrameButtonMint } from 'frames.js';
+import { type FrameButtonMint } from 'frames.js';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { GiDiamonds } from 'react-icons/gi';
@@ -24,6 +24,19 @@ type Props = {
   pageId?: string;
   spaceId?: string;
 };
+
+function getTokenFromUrl(url: string) {
+  const [namespace, chainId, address, tokenId] = url.split(':');
+  if (!namespace || !chainId || !address) {
+    throw new Error('Invalid token URL');
+  }
+  return {
+    namespace,
+    chainId: parseInt(chainId),
+    address,
+    tokenId
+  };
+}
 
 export function FarcasterMintButton({
   item,
