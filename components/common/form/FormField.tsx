@@ -24,6 +24,7 @@ import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import { defaultProjectFieldConfig } from 'lib/projects/constants';
 import type { ProjectFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -205,11 +206,7 @@ function ExpandedFormField({
       {formField.type === 'project_profile' ? (
         <ProjectFormEditor
           defaultRequired
-          fieldConfig={
-            (formField.fieldConfig ?? {
-              projectMember: {}
-            }) as ProjectFieldConfig
-          }
+          fieldConfig={(formField.fieldConfig ?? defaultProjectFieldConfig) as ProjectFieldConfig}
           onChange={(fieldConfig) => {
             updateFormField({
               id: formField.id,
@@ -352,7 +349,7 @@ export function FormField(
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
                 <ProjectFormEditor
-                  fieldConfig={(formField.fieldConfig as ProjectFieldConfig) ?? { projectMember: {} }}
+                  fieldConfig={(formField.fieldConfig as ProjectFieldConfig) ?? defaultProjectFieldConfig}
                   defaultRequired
                 />
               ) : (

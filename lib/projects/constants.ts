@@ -133,9 +133,18 @@ export const defaultProjectFieldConfig = {
   name: {
     required: true
   },
+  walletAddress: {
+    private: true
+  },
   projectMember: {
     name: {
       required: true
+    },
+    email: {
+      private: true
+    },
+    walletAddress: {
+      private: true
     }
   }
 } as ProjectFieldConfig;

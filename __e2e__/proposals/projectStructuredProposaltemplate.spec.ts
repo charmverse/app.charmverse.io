@@ -10,12 +10,15 @@ import { defaultProjectValues } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 let space: Space;
 let spaceAdmin: User;
 let spaceMember: User;
 let defaultWorkflows: ProposalWorkflowTyped[];
 let project: Project;
+let proposalTemplateId: string;
+let shortTextFieldId: string;
 
 test.beforeAll(async () => {
   const generated = await testUtilsUser.generateUserAndSpace({
@@ -26,19 +29,31 @@ test.beforeAll(async () => {
   });
 
   space = generated.space;
-  spaceAdmin = generated.user;
 
-  spaceMember = await testUtilsUser.generateSpaceUser({
+  spaceAdmin = await testUtilsUser.generateSpaceUser({
     spaceId: space.id,
     isAdmin: true
   });
 
-  await prisma.spaceRole.update({
+  spaceMember = await testUtilsUser.generateSpaceUser({
+    spaceId: space.id,
+    isAdmin: false
+  });
+
+  await Promise.all([spaceAdmin.id]);
+
+  await prisma.spaceRole.updateMany({
     where: {
-      spaceUser: {
-        userId: spaceMember.id,
-        spaceId: space.id
-      }
+      OR: [
+        {
+          userId: spaceAdmin.id,
+          spaceId: space.id
+        },
+        {
+          userId: spaceMember.id,
+          spaceId: space.id
+        }
+      ]
     },
     data: {
       onboarded: true
@@ -69,7 +84,7 @@ test.beforeAll(async () => {
         }
       ]
     },
-    userId: spaceMember.id
+    userId: spaceAdmin.id
   });
 
   await prisma.proposalWorkflow.createMany({
@@ -111,6 +126,11 @@ test.describe.serial('Structured proposal template with project', () => {
       required: false
     });
 
+    await proposalFormFieldPage.toggleProjectFieldConfig({
+      fieldName: 'project-walletAddress',
+      private: false
+    });
+
     for (const field of [
       'description',
       'website',
@@ -119,8 +139,7 @@ test.describe.serial('Structured proposal template with project', () => {
       'blog',
       'demoUrl',
       'communityUrl',
-      'otherUrl',
-      'walletAddress'
+      'otherUrl'
     ]) {
       await proposalFormFieldPage.toggleProjectFieldConfig({
         fieldName: `project-${field}`,
@@ -172,23 +191,6 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-name')).toBe('Name*');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-email')).toBe('Email*');
     expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
-  });
-
-  test('Create a structured proposal with project & project members and update project fields', async ({
-    proposalPage,
-    documentPage,
-    proposalFormFieldPage,
-    proposalsListPage,
-    projectSettings
-  }) => {
-    await loginBrowserUser({
-      browserPage: proposalsListPage.page,
-      userId: spaceMember.id
-    });
-
-    await proposalsListPage.goToProposals(space.domain);
-    await proposalsListPage.waitForProposalsList();
-    await proposalsListPage.proposalTemplateSelect.click();
 
     const proposalTemplate = await prisma.proposal.findFirstOrThrow({
       where: {
@@ -213,21 +215,40 @@ test.describe.serial('Structured proposal template with project', () => {
       }
     });
 
-    const shortTextField = proposalTemplate.form!.formFields.find((field) => field.type === 'short_text')!;
+    proposalTemplateId = proposalTemplate.page!.id;
+    shortTextFieldId = proposalTemplate.form!.formFields.find((field) => field.type === 'short_text')!.id;
+  });
 
-    await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
+  test('Create a structured proposal with project & project members and update project fields', async ({
+    proposalPage,
+    documentPage,
+    proposalFormFieldPage,
+    proposalsListPage,
+    projectSettings
+  }) => {
+    await loginBrowserUser({
+      browserPage: proposalsListPage.page,
+      userId: spaceAdmin.id
+    });
+
+    await proposalsListPage.goToProposals(space.domain);
+    await proposalsListPage.waitForProposalsList();
+    await proposalsListPage.proposalTemplateSelect.click();
+
+    await proposalPage.getSelectOption(proposalTemplateId).click();
     await proposalPage.waitForNewProposalPage(space.domain);
     await documentPage.documentTitleInput.fill('Proposal from structured template');
     // Disabled since no project is selected
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
     await proposalFormFieldPage.clickProjectOption(project.id);
+    await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: randomETHWalletAddress() });
     await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
     // Type invalid email
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john' });
     // Disabled since project profile has invalid values
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john@gmail.com' });
-    await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').click();
+    await proposalFormFieldPage.getFormFieldInput(shortTextFieldId, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-from-structured-template*');
@@ -280,50 +301,28 @@ test.describe.serial('Structured proposal template with project', () => {
   }) => {
     await loginBrowserUser({
       browserPage: proposalsListPage.page,
-      userId: spaceMember.id
+      userId: spaceAdmin.id
     });
 
     await proposalsListPage.goToProposals(space.domain);
     await proposalsListPage.waitForProposalsList();
     await proposalsListPage.proposalTemplateSelect.click();
 
-    const proposalTemplate = await prisma.proposal.findFirstOrThrow({
-      where: {
-        spaceId: space.id
-      },
-      select: {
-        page: {
-          select: {
-            id: true
-          }
-        },
-        form: {
-          select: {
-            formFields: {
-              select: {
-                id: true,
-                type: true
-              }
-            }
-          }
-        }
-      }
-    });
+    const projectWalletAddress = randomETHWalletAddress();
 
-    const shortTextField = proposalTemplate.form!.formFields.find((field) => field.type === 'short_text')!;
-
-    await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
+    await proposalPage.getSelectOption(proposalTemplateId).click();
     await proposalPage.waitForNewProposalPage(space.domain);
     await documentPage.documentTitleInput.fill('Proposal structured template');
     await proposalFormFieldPage.clickProjectOption('new');
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Demo Project' });
+    await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: projectWalletAddress });
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     await projectSettings.addProjectMemberButton.click();
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
-    await proposalFormFieldPage.getFormFieldInput(shortTextField.id, 'short_text').click();
+    await proposalFormFieldPage.getFormFieldInput(shortTextFieldId, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-structured-template*');
@@ -331,6 +330,7 @@ test.describe.serial('Structured proposal template with project', () => {
     const proposal = await prisma.proposal.findFirstOrThrow({
       where: {
         page: {
+          spaceId: space.id,
           path: {
             startsWith: 'proposal-structured-template'
           }
@@ -342,6 +342,7 @@ test.describe.serial('Structured proposal template with project', () => {
             id: true,
             name: true,
             excerpt: true,
+            walletAddress: true,
             projectMembers: {
               select: {
                 email: true,
@@ -358,6 +359,7 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(createdProject.projectMembers[0].email).toBe('doe@gmail.com');
     expect(createdProject.projectMembers[1].name).toBe('Jane Doe');
     expect(createdProject.projectMembers[1].email).toBe('jane@gmail.com');
+    expect(createdProject.walletAddress).toBe(projectWalletAddress.toLowerCase());
 
     await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
 
@@ -373,5 +375,65 @@ test.describe.serial('Structured proposal template with project', () => {
     });
 
     expect(projectAfterUpdate2.excerpt).toBe('This is my project');
+  });
+
+  test('Visit an existing proposal as a space member should hide private project fields', async ({
+    projectSettings,
+    documentPage,
+    proposalPage,
+    proposalsListPage
+  }) => {
+    await loginBrowserUser({
+      browserPage: proposalsListPage.page,
+      userId: spaceMember.id
+    });
+
+    await proposalsListPage.goToProposals(space.domain);
+    await proposalsListPage.waitForProposalsList();
+
+    const proposal = await prisma.proposal.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        page: {
+          type: 'proposal',
+          path: {
+            startsWith: 'proposal-from-structured-template'
+          }
+        }
+      },
+      select: {
+        page: {
+          select: {
+            path: true
+          }
+        }
+      }
+    });
+
+    const proposalPath = proposal.page!.path;
+    await documentPage.goToPage({
+      domain: space.domain,
+      path: proposalPath
+    });
+
+    await proposalPage.page.waitForURL(`**/${proposalPath}`);
+    await proposalsListPage.page.pause();
+
+    // Wallet address was manually made public so it should be visible
+    expect(
+      (await projectSettings
+        .getProjectField({
+          fieldName: 'walletAddress'
+        })
+        .inputValue()) !== ''
+    ).toBeTruthy();
+
+    expect(
+      (await projectSettings
+        .getProjectField({
+          fieldName: 'projectMembers[0].email'
+        })
+        .inputValue()) === ''
+    ).toBeTruthy();
   });
 });

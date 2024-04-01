@@ -94,7 +94,7 @@ export function FieldsEditor({
                           }
                         });
                       }}
-                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-required-toggle`}
+                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-private-toggle`}
                     />
                     <Typography>Private</Typography>
                   </Stack>

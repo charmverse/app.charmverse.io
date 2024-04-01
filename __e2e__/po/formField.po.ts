@@ -47,11 +47,13 @@ export class FormField extends DocumentPage {
   async toggleProjectFieldConfig({
     fieldName,
     hidden,
-    required
+    required,
+    private: _private
   }: {
     fieldName: string;
     required?: boolean;
     hidden?: boolean;
+    private?: boolean;
   }) {
     // By default, the field is required
     if (!required) {
@@ -61,6 +63,10 @@ export class FormField extends DocumentPage {
     // By default, the field is not hidden
     if (hidden) {
       await this.page.locator(`data-test=${fieldName}-field-hidden-toggle`).first().click();
+    }
+
+    if (_private !== undefined) {
+      await this.page.locator(`data-test=${fieldName}-field-private-toggle`).first().click();
     }
   }
 

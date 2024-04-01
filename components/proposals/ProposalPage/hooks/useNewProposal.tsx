@@ -223,7 +223,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: isCharmverseSpace ? { projectMember: {} } : null
+            fieldConfig: isCharmverseSpace ? defaultProjectFieldConfig : null
           } as FormFieldInput
         ]
       : [],
