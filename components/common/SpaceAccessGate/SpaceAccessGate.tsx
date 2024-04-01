@@ -4,12 +4,11 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 
 import PrimaryButton from 'components/common/PrimaryButton';
-import { WalletSign } from 'components/login/components/WalletSign';
+import { LoginButton } from 'components/login/components/LoginButton';
 import WorkspaceAvatar from 'components/settings/space/components/LargeAvatar';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { TokenGateJoinType } from 'lib/tokenGates/interfaces';
 import { getSpaceUrl } from 'lib/utils/browser';
 
@@ -159,8 +158,12 @@ export function SpaceAccessGate({
           </PrimaryButton>
         </Box>
       )}
-
-      {walletGateEnabled && !isVerified && (
+      {!user && (
+        <Box sx={{ '.MuiButton-root': { width: '100%' } }}>
+          <LoginButton showSignup={false} />
+        </Box>
+      )}
+      {walletGateEnabled && !isVerified && !!user && (
         <Box mb={2}>
           <PrimaryButton fullWidth loading={isVerifying} disabled={isVerifying} onClick={evaluateUserWallet}>
             Verify
