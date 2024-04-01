@@ -27,6 +27,9 @@ const fieldsInput: FormFieldInput[] = [
       },
       projectMember: {
         ...defaultProjectFieldConfig.projectMember,
+        walletAddress: {
+          private: false
+        },
         email: {
           private: true
         }
