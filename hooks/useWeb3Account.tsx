@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
 import { watchAccount } from '@wagmi/core';
-import { wagmiConfig } from 'connectors/config';
+import { getWagmiConfig } from 'connectors/config';
 import type { Signer } from 'ethers';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -10,10 +10,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { SiweMessage } from 'siwe';
 import { mutate } from 'swr';
 import { getAddress } from 'viem';
-import { useAccount, useConnect, useSignMessage } from 'wagmi';
 
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
+import { useAccount, useConnect, useSignMessage } from 'hooks/wagmi';
 import type {
   SignatureVerificationPayload,
   SignatureVerificationPayloadWithAddress
@@ -62,7 +62,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   const { open: openVerifyOtpModal, isOpen: isVerifyOtpModalOpen, close: closeVerifyOtpModal } = useVerifyLoginOtp();
   const router = useRouter();
   const chainId = chain?.id;
-  const { signMessageAsync } = useSignMessage({});
+  const { signMessageAsync } = useSignMessage();
 
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account;
@@ -180,7 +180,7 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // This runs every time the wallet account changes.
-    const unwatch = watchAccount(wagmiConfig, {
+    const unwatch = watchAccount(getWagmiConfig(), {
       onChange(_account) {
         if (isVerifyOtpModalOpen) {
           closeVerifyOtpModal();

@@ -3,7 +3,6 @@ import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
-import { useSwitchChain } from 'wagmi';
 
 import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
@@ -15,6 +14,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
+import { useSwitchChain } from 'hooks/wagmi';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
 import { getOnChainSchemaUrl } from 'lib/credentials/connectors';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';

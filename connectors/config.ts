@@ -2,9 +2,8 @@ import env from '@beam-australia/react-env';
 import { coinbaseWallet, walletConnect, injected, mock } from '@wagmi/connectors';
 import { getChainList } from 'connectors/chains';
 import type { Address, Chain, Transport } from 'viem';
-import { createPublicClient, custom, createWalletClient, http } from 'viem';
+import { custom, http } from 'viem';
 import { mainnet } from 'viem/chains';
-import type { Connector } from 'wagmi';
 import { createConfig } from 'wagmi';
 
 import 'viem/window';
@@ -37,9 +36,8 @@ export const wagmiConfig = createConfig({
   }, {})
 });
 
-const chains = wagmiConfig.chains;
-
-export const getTestWagmiConfig = () => {
+// get wagmi config based on env - TODO: do we need a method? or just override the wagmiConfig export?
+export const getWagmiConfig = () => {
   if (!isTestEnv) {
     return wagmiConfig;
   }
@@ -80,4 +78,5 @@ export const getTestWagmiConfig = () => {
       }
     });
   }
+  return wagmiConfig;
 };

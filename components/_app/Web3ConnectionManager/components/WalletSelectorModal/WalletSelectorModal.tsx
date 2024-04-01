@@ -3,12 +3,12 @@ import ArrowSquareOut from '@mui/icons-material/Launch';
 import { Grid, IconButton, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { Connector } from 'wagmi';
-import { useAccount, useConnect } from 'wagmi';
 
 import { useMetamaskConnect } from 'components/_app/Web3ConnectionManager/hooks/useMetamaskConnect';
 import ErrorComponent from 'components/common/errors/WalletError';
 import Link from 'components/common/Link';
 import { Modal } from 'components/common/Modal';
+import { useAccount, useConnect } from 'hooks/wagmi';
 
 import { useWeb3ConnectionManager } from '../../Web3ConnectionManager';
 

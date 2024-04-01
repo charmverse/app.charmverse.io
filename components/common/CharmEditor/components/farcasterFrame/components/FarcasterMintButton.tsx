@@ -6,7 +6,6 @@ import { getTokenFromUrl, type FrameButtonMint } from 'frames.js';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { GiDiamonds } from 'react-icons/gi';
-import { useAccount } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
@@ -15,6 +14,7 @@ import { useReservoir } from 'hooks/useReservoir';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { useAccount } from 'hooks/wagmi';
 
 type Props = {
   item: FrameButtonMint;

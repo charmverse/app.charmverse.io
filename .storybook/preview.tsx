@@ -55,7 +55,8 @@ import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
 import { handlers } from './mockApi';
-import { WagmiConfig, http, createConfig, mainnet } from 'wagmi';
+import { mainnet } from 'viem/chains';
+import { WagmiConfig, http, createConfig } from 'wagmi';
 
 // Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
 initialize({

@@ -2,7 +2,8 @@ import { Web3Provider } from '@ethersproject/providers';
 import { providers } from 'ethers';
 import { useMemo } from 'react';
 import type { Account, Chain, Client, Transport } from 'viem';
-import { useWalletClient } from 'wagmi';
+
+import { useWalletClient } from 'hooks/wagmi';
 
 // adapter from viem to ethers https://wagmi.sh/react/ethers-adapters
 export function walletClientToSigner(walletClient: { account: Account; chain: Chain; transport: any }) {
