@@ -61,7 +61,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
 
   const { account, chainId } = useWeb3Account();
   const { signer } = useWeb3Signer();
-  const { switchNetworkAsync } = useSwitchChain({ chainId: space?.credentialsChainId as number });
+  const { switchChainAsync } = useSwitchChain();
 
   const { all, proposalApproved, proposalCreated } = (issuableProposalCredentials ?? []).reduce(
     (acc, val) => {
@@ -89,7 +89,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     }
 
     if (chainId !== space.credentialsChainId) {
-      await switchNetworkAsync?.(space.credentialsChainId);
+      await switchChainAsync?.({ chainId: space.credentialsChainId });
       return;
     }
 
@@ -164,7 +164,9 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
               <Button
                 sx={{ mt: 1 }}
                 fullWidth
-                onClick={() => switchNetworkAsync?.(space.credentialsChainId as number).catch()}
+                onClick={() =>
+                  space.credentialsChainId && switchChainAsync?.({ chainId: space.credentialsChainId }).catch()
+                }
                 variant='outlined'
                 size='small'
               >
@@ -175,7 +177,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
         )}
       </MenuItem>
     );
-  }, [space?.credentialsChainId, chainId, switchNetworkAsync]);
+  }, [space?.credentialsChainId, chainId, switchChainAsync]);
 
   // We only enable this feature if the space has onchain credentials enabled
   if (

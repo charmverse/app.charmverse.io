@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
+import { watchAccount } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import type { Signer } from 'ethers';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -177,19 +179,17 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   }, [account, isConnecting, accountUpdatePaused, !!user, storedAccount]);
 
   useEffect(() => {
-    const handleConnectorUpdate = ({ account: _acc }: { account?: string }) => {
-      // This runs every time the wallet account changes.
-      if (_acc) {
+    // This runs every time the wallet account changes.
+    const unwatch = watchAccount(wagmiConfig, {
+      onChange(_account) {
         if (isVerifyOtpModalOpen) {
           closeVerifyOtpModal();
         }
       }
-    };
-
-    activeConnector?.on('change', handleConnectorUpdate);
+    });
 
     return () => {
-      activeConnector?.off('change', handleConnectorUpdate);
+      unwatch();
     };
   }, []);
 
