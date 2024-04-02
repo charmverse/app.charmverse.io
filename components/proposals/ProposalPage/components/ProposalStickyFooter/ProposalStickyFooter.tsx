@@ -37,7 +37,7 @@ export function ProposalStickyFooter({
   const projectFormFieldAnswer = proposalFormFieldAnswers.find(
     (proposalFormFieldAnswer) => proposalFormFieldAnswer.fieldId === projectField?.id
   );
-  const currentProjectId = (projectFormFieldAnswer?.value as { projectId: string })?.projectId;
+
   const { trigger: createProject } = useCreateProject();
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
@@ -47,7 +47,7 @@ export function ProposalStickyFooter({
     try {
       // Before publishing the proposal, we need to create the project if it doesn't exist
       // And update the form field answer with the project id
-      if (!currentProjectId && projectField && projectFormFieldAnswer) {
+      if (!proposal.projectId && projectField && projectFormFieldAnswer) {
         const { id: projectId } = await createProject(projectForm.getValues());
         await trigger({
           answers: [

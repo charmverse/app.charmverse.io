@@ -100,7 +100,8 @@ export function FormFieldAnswersControlled({
   pageId,
   project,
   onProjectUpdate,
-  threads = {}
+  threads = {},
+  isDraft
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -181,11 +182,9 @@ export function FormFieldAnswersControlled({
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
                     disabled={disabled}
+                    isDraft={isDraft}
                     onProjectUpdate={onProjectUpdate}
-                    formField={{
-                      fieldConfig: formField.fieldConfig as ProjectAndMembersFieldConfig,
-                      value: field.value
-                    }}
+                    fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                     onChange={(projectFormValues) => {
                       setIsFormDirty(true);
                       onFormChange([

@@ -147,7 +147,10 @@ export function useProjectForm(options: {
   const { data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
 
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectAndMembersPayload = useMemo(
+    () => getDefaultProjectValues({ user, membersRecord }),
+    [user, membersRecord]
+  );
 
   const yupSchema = useRef(yup.object());
 
@@ -166,7 +169,7 @@ export function useProjectForm(options: {
   }, [projectWithMembers]);
 
   const form = useForm({
-    defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectValues,
+    defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectAndMembersPayload,
     reValidateMode: 'onChange',
     resolver: yupResolver(yupSchema.current),
     criteriaMode: 'all',
@@ -177,7 +180,7 @@ export function useProjectForm(options: {
     if (options.projectId) {
       form.reset(projectWithMembers);
     } else {
-      form.reset(defaultProjectValues);
+      form.reset(defaultProjectAndMembersPayload);
     }
   }, [options.projectId]);
 

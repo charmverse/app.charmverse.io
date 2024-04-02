@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { defaultProjectValues } from '../constants';
+import { defaultProjectAndMembersPayload } from '../constants';
 import { createProject } from '../createProject';
 
 describe('createProject', () => {
@@ -14,7 +14,7 @@ describe('createProject', () => {
     await expect(
       createProject({
         project: {
-          ...defaultProjectValues,
+          ...defaultProjectAndMembersPayload,
           projectMembers: []
         },
         userId: user.id
@@ -81,42 +81,42 @@ describe('createProject', () => {
 
     const createdProjectWithMembers = await createProject({
       project: {
-        ...defaultProjectValues,
+        ...defaultProjectAndMembersPayload,
         blog: 'https://blog.com',
         projectMembers: [
           // Project lead
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             walletAddress: projectTeamLeadWalletAddress
           },
           // Wallet address connected with user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             walletAddress: walletAddressUserAddress
           },
           // Wallet address not connected with user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             walletAddress: nonConnectedWalletAddress
           },
           // Google account connected with user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             email: googleAccountUserEmail
           },
           // Google account not connected with user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             email: nonConnectedGoogleAccountEmail
           },
           // Verified email connected with user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             email: verifiedEmailUserEmail
           },
           // Verified email not connected with user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             email: nonConnectedVerifiedEmail
           }
         ]

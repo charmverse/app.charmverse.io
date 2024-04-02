@@ -3,7 +3,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import { defaultProjectFieldConfig, defaultProjectValues } from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig, defaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
@@ -21,12 +21,12 @@ const fieldsInput: FormFieldInput[] = [
     private: false,
     required: true,
     fieldConfig: {
-      ...defaultProjectFieldConfig,
+      ...defaultProjectAndMembersFieldConfig,
       walletAddress: {
         private: true
       },
       projectMember: {
-        ...defaultProjectFieldConfig.projectMember,
+        ...defaultProjectAndMembersFieldConfig.projectMember,
         walletAddress: {
           private: false
         },
@@ -47,11 +47,11 @@ describe('getProposalProjectFormField', () => {
     user = generated.user;
     projectWithMembers = await createProject({
       project: {
-        ...defaultProjectValues,
+        ...defaultProjectAndMembersPayload,
         walletAddress: randomETHWalletAddress(),
         projectMembers: [
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             walletAddress: randomETHWalletAddress(),
             email: `${v4()}@gmail.com`
           }

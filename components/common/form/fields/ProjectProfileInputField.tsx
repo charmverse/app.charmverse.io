@@ -7,7 +7,7 @@ import { useGetProjects } from 'charmClient/hooks/projects';
 import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectValues } from 'lib/projects/constants';
+import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
 import type {
   ProjectAndMembersFieldConfig,
   ProjectAndMembersPayload,
@@ -18,31 +18,28 @@ import type { FormFieldValue } from '../interfaces';
 
 export function ProjectProfileInputField({
   onChange,
-  formField,
+  fieldConfig,
   disabled,
   project,
-  isDraft,
   inputEndAdornment,
-  onProjectUpdate
+  onProjectUpdate,
+  isDraft
 }: {
   onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => Promise<void>;
   inputEndAdornment?: React.ReactNode;
-  isDraft?: boolean;
   disabled?: boolean;
-  formField: {
-    value?: FormFieldValue;
-    fieldConfig?: ProjectAndMembersFieldConfig;
-  };
+  fieldConfig?: ProjectAndMembersFieldConfig;
   project?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
+  isDraft?: boolean;
 }) {
   const { user } = useUser();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
   const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
   const { data: projectsWithMembers } = useGetProjects();
-  const projectId = (formField.value as { projectId: string })?.projectId;
+  const projectId = project?.id;
   const { reset } = useFormContext();
-
+  const [menuOpen, setMenuOpen] = useState(false);
   useEffect(() => {
     if (project) {
       reset(convertToProjectValues(project));
@@ -56,13 +53,13 @@ export function ProjectProfileInputField({
       onChange({ projectId: '' });
       setShowCreateProjectForm(true);
       setSelectedProject(null);
-      reset(defaultProjectValues);
+      reset(defaultProjectAndMembersPayload);
     } else {
       onChange({ projectId: projectIdOrAddProject });
       setShowCreateProjectForm(false);
       const _selectedProject = projectsWithMembers?.find((_project) => _project.id === projectIdOrAddProject) ?? null;
       setSelectedProject(_selectedProject);
-      reset(_selectedProject ? convertToProjectValues(_selectedProject) : defaultProjectValues);
+      reset(_selectedProject ? convertToProjectValues(_selectedProject) : defaultProjectAndMembersPayload);
     }
   }
 
@@ -70,10 +67,13 @@ export function ProjectProfileInputField({
     <Stack gap={1} width='100%' mb={1}>
       <Stack flexDirection='row' gap={1} alignItems='center'>
         <Select
+          open={menuOpen}
+          onOpen={() => setMenuOpen(true)}
+          onClose={() => setMenuOpen(false)}
           sx={{
             width: '100%'
           }}
-          key={projectId}
+          key={projectId ?? 'jey'}
           // only proposal author is able to change the project profile, not even team lead can change it
           disabled={disabled}
           displayEmpty
@@ -88,7 +88,8 @@ export function ProjectProfileInputField({
             // Selected project might have stale name if it was changed, so find the correct project from the list
             const selectedProjectName =
               projectsWithMembers?.find((_project) => _project.id === selectedProject?.id)?.name ??
-              selectedProject?.name;
+              selectedProject?.name ??
+              'Untitled';
             return selectedProjectName;
           }}
         >
@@ -100,14 +101,14 @@ export function ProjectProfileInputField({
                 value={_project.id}
                 onClick={() => {
                   onOptionClick(_project.id);
+                  setMenuOpen(false);
                 }}
               >
                 <Typography>{_project.name}</Typography>
               </MenuItem>
             );
           })}
-          {/** Disable adding new project if proposal has been published */}
-          {isDraft !== false && (
+          {!isDraft && (
             <>
               <Divider />
               <MenuItem
@@ -116,6 +117,7 @@ export function ProjectProfileInputField({
                 onClick={() => {
                   // on change handler for select doesn't pick up 'ADD_PROJECT' value
                   onOptionClick('ADD_PROJECT');
+                  setMenuOpen(false);
                 }}
               >
                 <Stack flexDirection='row' alignItems='center' gap={0.05}>
@@ -134,7 +136,7 @@ export function ProjectProfileInputField({
           <ProjectFormAnswers
             defaultRequired
             key={selectedProject.id}
-            fieldConfig={formField.fieldConfig}
+            fieldConfig={fieldConfig}
             isTeamLead={isTeamLead}
             disabled={disabled}
             hideAddTeamMemberButton
@@ -144,7 +146,7 @@ export function ProjectProfileInputField({
       )}
       {showCreateProjectForm && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
-          <ProjectFormAnswers defaultRequired fieldConfig={formField.fieldConfig} isTeamLead disabled={disabled} />
+          <ProjectFormAnswers defaultRequired fieldConfig={fieldConfig} isTeamLead disabled={disabled} />
         </Box>
       )}
     </Stack>

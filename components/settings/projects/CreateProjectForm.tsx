@@ -6,7 +6,7 @@ import { useFormContext } from 'react-hook-form';
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 export function CreateProjectForm({
@@ -46,7 +46,7 @@ export function CreateProjectForm({
 
   return (
     <>
-      <ProjectFormAnswers defaultRequired={false} fieldConfig={defaultProjectFieldConfig} isTeamLead />
+      <ProjectFormAnswers defaultRequired={false} fieldConfig={defaultProjectAndMembersFieldConfig} isTeamLead />
       <Box
         sx={{
           display: 'flex',

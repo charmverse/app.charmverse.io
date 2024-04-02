@@ -101,7 +101,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export const defaultProjectValues: ProjectAndMembersPayload = {
+export const defaultProjectAndMembersPayload: ProjectAndMembersPayload = {
   name: '',
   excerpt: '',
   description: '',
@@ -129,7 +129,7 @@ export const defaultProjectValues: ProjectAndMembersPayload = {
   ]
 };
 
-export const defaultProjectFieldConfig = {
+export const defaultProjectAndMembersFieldConfig = {
   name: {
     required: true
   },

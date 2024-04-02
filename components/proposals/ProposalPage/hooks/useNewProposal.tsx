@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -10,11 +10,9 @@ import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -62,7 +60,7 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectId: selectedProjectId,
-    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectAndMembersFieldConfig,
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig,
     defaultRequired: true
   });
 
@@ -209,7 +207,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: isCharmverseSpace ? defaultProjectFieldConfig : null
+            fieldConfig: isCharmverseSpace ? defaultProjectAndMembersFieldConfig : null
           } as FormFieldInput
         ]
       : [],

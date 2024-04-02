@@ -6,7 +6,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectValues } from 'lib/projects/constants';
+import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
@@ -110,7 +110,10 @@ export function ProjectFormAnswers({
               startIcon={<AddIcon fontSize='small' />}
               data-test='add-project-member-button'
               onClick={() => {
-                const projectMembers = [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]];
+                const projectMembers = [
+                  ...projectValues.projectMembers,
+                  defaultProjectAndMembersPayload.projectMembers[0]
+                ];
 
                 const projectWithMembers = getValues();
 

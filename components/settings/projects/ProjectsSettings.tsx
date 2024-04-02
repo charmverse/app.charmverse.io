@@ -25,7 +25,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { CreateProjectForm } from './CreateProjectForm';
@@ -49,7 +49,7 @@ function ProjectRow({
   const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
     projectId: projectWithMembers.id,
-    fieldConfig: defaultProjectFieldConfig
+    fieldConfig: defaultProjectAndMembersFieldConfig
   });
   const removeProjectMemberPopupState = usePopupState({
     variant: 'popover',
@@ -183,7 +183,9 @@ function ProjectRow({
       >
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Stack width='100%' flexDirection='row' justifyContent='space-between' alignItems='center'>
-            <Typography data-test={`project-title-${projectWithMembers.id}`}>{projectWithMembers.name}</Typography>
+            <Typography data-test={`project-title-${projectWithMembers.id}`}>
+              {projectWithMembers.name ?? 'Untitled'}
+            </Typography>
             {!isTeamLead && (
               <Stack
                 flexDirection='row'
@@ -210,7 +212,7 @@ function ProjectRow({
             <ProjectFormAnswers
               defaultRequired={false}
               isTeamLead={isTeamLead}
-              fieldConfig={defaultProjectFieldConfig}
+              fieldConfig={defaultProjectAndMembersFieldConfig}
             />
           </FormProvider>
         </AccordionDetails>
@@ -254,7 +256,7 @@ export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
   const { data: projectsWithMembers, mutate } = useGetProjects();
   const form = useProjectForm({
-    fieldConfig: defaultProjectFieldConfig
+    fieldConfig: defaultProjectAndMembersFieldConfig
   });
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
   const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);

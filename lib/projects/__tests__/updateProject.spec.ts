@@ -4,7 +4,7 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { defaultProjectValues } from '../constants';
+import { defaultProjectAndMembersPayload } from '../constants';
 import { updateProject } from '../updateProject';
 
 describe('updateProject', () => {
@@ -122,42 +122,42 @@ describe('updateProject', () => {
       projectId: createdProject.id,
       userId: projectTeamLead.id,
       payload: {
-        ...defaultProjectValues,
+        ...defaultProjectAndMembersPayload,
         blog: 'https://blog.com',
         projectMembers: [
           // Making sure team lead doesn't get connected with a different user
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             id: createdProject.projectMembers[0].id,
             walletAddress: walletAddressUserAddress
           },
           // Update existing project user with wallet address connected
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             walletAddress: updatedWalletAddressUserAddress,
             id: createdProject.projectMembers[1].id
           },
           // Connect new user with google account
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             email: googleAccountUserEmail
           },
           // Add new user with wallet address
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             name: 'New Wallet Project Member',
             walletAddress: newWalletUserAddress,
             email: ''
           },
           // Add new user with google account
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             name: 'New Google Account Project Member',
             email: newGoogleAccountUserEmail
           },
           // Add new user with verified email
           {
-            ...defaultProjectValues.projectMembers[0],
+            ...defaultProjectAndMembersPayload.projectMembers[0],
             name: 'New Verified Email Project Member',
             email: newVerifiedEmailUserEmail
           }

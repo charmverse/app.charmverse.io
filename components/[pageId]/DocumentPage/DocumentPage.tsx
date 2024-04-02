@@ -37,7 +37,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -242,13 +242,13 @@ function DocumentPageComponent({
   }
 
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
-
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
 
   const form = useProjectForm({
     projectId,
-    fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectAndMembersFieldConfig
+    fieldConfig: (projectProfileField?.fieldConfig ??
+      defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig
   });
 
   return (

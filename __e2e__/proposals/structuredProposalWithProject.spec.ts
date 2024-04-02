@@ -6,7 +6,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { defaultProjectValues } from 'lib/projects/constants';
+import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
@@ -74,11 +74,11 @@ test.beforeAll(async () => {
 
   project = await createProject({
     project: {
-      ...defaultProjectValues,
+      ...defaultProjectAndMembersPayload,
       name: 'Test Project',
       projectMembers: [
         {
-          ...defaultProjectValues.projectMembers[0],
+          ...defaultProjectAndMembersPayload.projectMembers[0],
           email: `test@${v4()}.com`,
           name: 'Test Member'
         }
@@ -218,7 +218,7 @@ test.describe.serial('Structured proposal template with project', () => {
     shortTextFieldId = proposalTemplate.form!.formFields.find((field) => field.type === 'short_text')!.id;
   });
 
-  test('Create a structured proposal with project & project members and update project fields', async ({
+  test('Publish a structured proposal with existing project and update project fields', async ({
     proposalPage,
     documentPage,
     proposalFormFieldPage,
@@ -291,7 +291,7 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(projectAfterUpdate2.projectMembers[0].email).toBe('doe@gmail.com');
   });
 
-  test('Create a structured proposal with a new project and update project fields', async ({
+  test('Publish a structured proposal with a new project and update project fields', async ({
     proposalPage,
     documentPage,
     proposalFormFieldPage,
