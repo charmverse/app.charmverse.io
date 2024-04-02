@@ -21,8 +21,8 @@ export function FieldsEditor({
       {properties.map((property) => {
         // If in edit mode always show the field,
         // otherwise only show the field if it's not hidden
-        const isHidden = !onChange && fieldConfig?.[property.field]?.hidden;
-        if (isHidden) {
+        const isShown = onChange ? true : fieldConfig?.[property.field]?.show ?? true;
+        if (!isShown) {
           return null;
         }
         return (
@@ -45,30 +45,30 @@ export function FieldsEditor({
                   control={
                     <Switch
                       size='small'
-                      checked={fieldConfig?.[property.field]?.hidden ?? false}
+                      checked={!fieldConfig?.[property.field]?.show ?? true}
                       onChange={(e) => {
                         const isChecked = e.target.checked;
                         onChange({
                           ...(fieldConfig ?? {}),
                           [property.field]: {
-                            required: isChecked ? false : fieldConfig?.[property.field]?.required ?? true,
-                            hidden: isChecked,
-                            private: isChecked ? false : fieldConfig?.[property.field]?.private ?? true
+                            required: !isChecked ? false : fieldConfig?.[property.field]?.required ?? true,
+                            show: isChecked,
+                            private: !isChecked ? false : fieldConfig?.[property.field]?.private ?? true
                           }
                         });
                       }}
-                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-hidden-toggle`}
+                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-show-toggle`}
                       sx={{ mr: 0.5 }}
                     />
                   }
-                  label={<Typography>Hidden</Typography>}
+                  label={<Typography>Show</Typography>}
                 />
 
                 <FormControlLabel
                   control={
                     <Switch
                       size='small'
-                      disabled={fieldConfig?.[property.field]?.hidden === true}
+                      disabled={fieldConfig?.[property.field]?.show === false}
                       checked={fieldConfig?.[property.field]?.required ?? defaultRequired}
                       onChange={(e) => {
                         onChange({
@@ -90,7 +90,7 @@ export function FieldsEditor({
                     control={
                       <Switch
                         size='small'
-                        disabled={fieldConfig?.[property.field]?.hidden === true}
+                        disabled={fieldConfig?.[property.field]?.show === false}
                         checked={fieldConfig?.[property.field]?.private ?? true}
                         onChange={(e) => {
                           onChange({

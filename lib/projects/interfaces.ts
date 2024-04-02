@@ -38,7 +38,7 @@ export type FieldConfig = Partial<
     string,
     {
       required?: boolean;
-      hidden?: boolean;
+      show?: boolean;
       private?: boolean;
     }
   >

@@ -120,7 +120,6 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalPage.waitForNewProposalPage(space.domain);
 
     await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
-
     await proposalFormFieldPage.toggleProjectFieldConfig({
       fieldName: 'project-excerpt',
       required: false
@@ -143,7 +142,7 @@ test.describe.serial('Structured proposal template with project', () => {
     ]) {
       await proposalFormFieldPage.toggleProjectFieldConfig({
         fieldName: `project-${field}`,
-        hidden: true
+        show: false
       });
 
       await proposalFormFieldPage.page.waitForTimeout(50);
@@ -161,7 +160,7 @@ test.describe.serial('Structured proposal template with project', () => {
     ]) {
       await proposalFormFieldPage.toggleProjectFieldConfig({
         fieldName: `project-member-${field}`,
-        hidden: true
+        show: false
       });
 
       await proposalFormFieldPage.page.waitForTimeout(50);

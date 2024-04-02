@@ -20,7 +20,7 @@ function FieldAnswer({
   fieldConfig?: FieldConfig;
   onChange?: (payload: Record<string, any>) => void;
 }) {
-  const { control, register, getValues } = useFormContext<ProjectAndMembersPayload>();
+  const { control, register } = useFormContext<ProjectAndMembersPayload>();
 
   const { field, fieldState } = useController({
     control,
@@ -29,8 +29,8 @@ function FieldAnswer({
 
   const registeredField = register(name);
 
-  const isHidden = fieldConfig?.[property.field]?.hidden ?? false;
-  if (isHidden) {
+  const isShown = fieldConfig?.[property.field]?.show ?? true;
+  if (!isShown) {
     return null;
   }
 

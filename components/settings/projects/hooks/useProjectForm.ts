@@ -59,9 +59,9 @@ export function createProjectYupSchema({
   projectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
       required: defaultRequired,
-      hidden: false
+      show: true
     };
-    if (!projectFieldConfig.hidden) {
+    if (projectFieldConfig.show !== false) {
       if (projectFieldConfig.required) {
         yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string().required();
       } else {
@@ -79,9 +79,9 @@ export function createProjectYupSchema({
   projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
     const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
       required: defaultRequired,
-      hidden: false
+      show: true
     };
-    if (!projectMemberFieldConfig.hidden) {
+    if (projectMemberFieldConfig.show !== false) {
       if (projectMemberFieldConfig.required) {
         yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string().required();
       } else {
