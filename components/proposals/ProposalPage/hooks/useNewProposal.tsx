@@ -55,27 +55,16 @@ export function useNewProposal({ newProposal }: Props) {
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
-  const { data: projectsWithMembers, mutate } = useGetProjects();
+  const { mutate } = useGetProjects();
 
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
-  const projectWithMembers = projectsWithMembers?.find((project) => project.id === selectedProjectId);
 
   const projectForm = useProjectForm({
-    projectWithMembers,
+    projectId: selectedProjectId,
     fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectAndMembersFieldConfig,
     defaultRequired: true
   });
-
-  const { membersRecord } = useMembers();
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
-  useEffect(() => {
-    if (selectedProjectId) {
-      projectForm.reset(projectWithMembers);
-    } else {
-      projectForm.reset(defaultProjectValues);
-    }
-  }, [selectedProjectId]);
 
   const setFormInputs = useCallback(
     (partialFormInputs: Partial<ProposalPageAndPropertiesInput>, { fromUser = true }: { fromUser?: boolean } = {}) => {
@@ -92,28 +81,25 @@ export function useNewProposal({ newProposal }: Props) {
 
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     // Create a project if the proposal has a project field
-    let projectId: string | undefined = projectWithMembers?.id;
-    const projectValues = projectForm.getValues();
+    let projectId: string | undefined = selectedProjectId;
     // Make sure the form is dirty before either updating or creating the project
     // We allow saving draft without a project or a valid project
     // This guard will make sure we don't create empty projects when saving drafts
     if (projectField && formInputs.type === 'proposal' && isDirty) {
       if (!selectedProjectId) {
+        const projectValues = projectForm.getValues();
         const createdProject = await createProject(projectValues);
         projectId = createdProject.id;
       }
       // Make sure the current user is a team lead before updating the project
-      else if (projectWithMembers && user?.id === projectWithMembers.projectMembers[0].userId) {
+      else {
+        const projectWithMembers = projectForm.getValues();
         const updatedProjectValues = {
-          id: projectWithMembers.id,
-          ...projectValues,
-          projectMembers: projectWithMembers.projectMembers.map((member, index) => ({
-            ...member,
-            ...projectValues.projectMembers[index],
-            id: member.id
-          }))
+          id: selectedProjectId,
+          ...projectWithMembers,
+          projectMembers: projectWithMembers.projectMembers
         };
-        await charmClient.projects.updateProject(projectWithMembers.id, updatedProjectValues);
+        await charmClient.projects.updateProject(selectedProjectId, updatedProjectValues);
         mutate();
       }
     }

@@ -18,23 +18,21 @@ export async function updateProject({
   userId: string;
   payload: ProjectAndMembersPayload;
 }): Promise<ProjectWithMembers> {
-  const existingProject = await prisma.project.findUniqueOrThrow({
+  const existingProjectWithMembers = await prisma.project.findUniqueOrThrow({
     where: {
       id: projectId
     },
     select: {
       projectMembers: {
         select: {
-          walletAddress: true,
-          email: true,
           id: true
         }
       }
     }
   });
 
-  const existingProjectMembersRecord = existingProject.projectMembers.reduce<
-    Record<string, Pick<ProjectMember, 'walletAddress' | 'email' | 'id'>>
+  const existingProjectMembersRecord = existingProjectWithMembers.projectMembers.reduce<
+    Record<string, Pick<ProjectMember, 'id'>>
   >(
     (acc, projectMember) => ({
       ...acc,
@@ -52,13 +50,13 @@ export async function updateProject({
     trackUserAction('remove_project_member', { userId, projectId });
   }
 
-  const projectMemberTransactions: Prisma.Prisma__ProjectMemberClient<ProjectMember, never>[] = [];
+  const projectMemberUpdateTransactions: Prisma.Prisma__ProjectMemberClient<ProjectMember, never>[] = [];
 
   const newlyCreatedProjectMembersPayload: ProjectAndMembersPayload['projectMembers'] = [];
 
   for (const projectMember of payload.projectMembers) {
     if (projectMember.id && existingProjectMembersRecord[projectMember.id]) {
-      projectMemberTransactions.push(
+      projectMemberUpdateTransactions.push(
         prisma.projectMember.update({
           where: {
             id: projectMember.id
@@ -127,6 +125,7 @@ export async function updateProject({
         }
       }
     }),
+    ...projectMemberUpdateTransactions,
     ...projectMembersCreatePayload.map((projectMemberCreatePayload) =>
       getProjectMemberCreateTransaction({
         projectId,

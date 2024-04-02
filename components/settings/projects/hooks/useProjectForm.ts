@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { useGetProjects } from 'charmClient/hooks/projects';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/constants';
@@ -136,13 +137,15 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
 
 export function useProjectForm(options: {
   defaultValues?: ProjectAndMembersPayload;
-  projectWithMembers?: ProjectWithMembers | null;
   fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
+  projectId?: string | null;
 }) {
-  const { defaultRequired, defaultValues, fieldConfig, projectWithMembers } = options;
+  const { defaultRequired, defaultValues, fieldConfig } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
+  const { data: projectsWithMembers } = useGetProjects();
+  const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
 
   const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
 
@@ -169,6 +172,14 @@ export function useProjectForm(options: {
     criteriaMode: 'all',
     mode: 'onChange'
   });
+
+  useEffect(() => {
+    if (options.projectId) {
+      form.reset(projectWithMembers);
+    } else {
+      form.reset(defaultProjectValues);
+    }
+  }, [options.projectId]);
 
   return form;
 }

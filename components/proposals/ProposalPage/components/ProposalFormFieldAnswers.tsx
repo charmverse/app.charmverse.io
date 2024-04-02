@@ -18,7 +18,7 @@ export function ProposalFormFieldAnswers({
   pageId,
   threads,
   isDraft,
-  projectWithMembers
+  project
 }: {
   readOnly?: boolean;
   enableComments: boolean;
@@ -27,7 +27,7 @@ export function ProposalFormFieldAnswers({
   pageId: string;
   threads: Record<string, ThreadWithComments | undefined>;
   isDraft?: boolean;
-  projectWithMembers?: ProjectWithMembers | null;
+  project?: ProjectWithMembers | null;
 }) {
   const { data: proposalFormFieldAnswers = [], isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
     proposalId
@@ -84,7 +84,7 @@ export function ProposalFormFieldAnswers({
       isDraft={isDraft}
       // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
       key={isDraft ? 'draft' : 'published'}
-      projectWithMembers={projectWithMembers}
+      project={project}
     />
   );
 }

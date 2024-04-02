@@ -8,7 +8,11 @@ import { convertToProjectValues } from 'components/settings/projects/hooks/usePr
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectValues } from 'lib/projects/constants';
-import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type {
+  ProjectAndMembersFieldConfig,
+  ProjectAndMembersPayload,
+  ProjectWithMembers
+} from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -16,10 +20,12 @@ export function ProjectProfileInputField({
   onChange,
   formField,
   disabled,
-  projectWithMembers,
+  project,
   isDraft,
-  inputEndAdornment
+  inputEndAdornment,
+  onProjectUpdate
 }: {
+  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => Promise<void>;
   inputEndAdornment?: React.ReactNode;
   isDraft?: boolean;
   disabled?: boolean;
@@ -27,21 +33,21 @@ export function ProjectProfileInputField({
     value?: FormFieldValue;
     fieldConfig?: ProjectAndMembersFieldConfig;
   };
-  projectWithMembers?: ProjectWithMembers | null;
+  project?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
   const { user } = useUser();
-  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(projectWithMembers ?? null);
+  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
   const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
   const { data: projectsWithMembers } = useGetProjects();
   const projectId = (formField.value as { projectId: string })?.projectId;
   const { reset } = useFormContext();
 
   useEffect(() => {
-    if (projectWithMembers) {
-      reset(convertToProjectValues(projectWithMembers));
+    if (project) {
+      reset(convertToProjectValues(project));
     }
-  }, [!!projectWithMembers]);
+  }, [!!project]);
 
   const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
 
@@ -54,7 +60,7 @@ export function ProjectProfileInputField({
     } else {
       onChange({ projectId: projectIdOrAddProject });
       setShowCreateProjectForm(false);
-      const _selectedProject = projectsWithMembers?.find((project) => project.id === projectIdOrAddProject) ?? null;
+      const _selectedProject = projectsWithMembers?.find((_project) => _project.id === projectIdOrAddProject) ?? null;
       setSelectedProject(_selectedProject);
       reset(_selectedProject ? convertToProjectValues(_selectedProject) : defaultProjectValues);
     }
@@ -81,21 +87,22 @@ export function ProjectProfileInputField({
             }
             // Selected project might have stale name if it was changed, so find the correct project from the list
             const selectedProjectName =
-              projectsWithMembers?.find((project) => project.id === selectedProject?.id)?.name ?? selectedProject?.name;
+              projectsWithMembers?.find((_project) => _project.id === selectedProject?.id)?.name ??
+              selectedProject?.name;
             return selectedProjectName;
           }}
         >
-          {projectsWithMembers?.map((project) => {
+          {projectsWithMembers?.map((_project) => {
             return (
               <MenuItem
-                key={project.id}
-                data-test={`project-option-${project.id}`}
-                value={project.id}
+                key={_project.id}
+                data-test={`project-option-${_project.id}`}
+                value={_project.id}
                 onClick={() => {
-                  onOptionClick(project.id);
+                  onOptionClick(_project.id);
                 }}
               >
-                <Typography>{project.name}</Typography>
+                <Typography>{_project.name}</Typography>
               </MenuItem>
             );
           })}
@@ -122,18 +129,22 @@ export function ProjectProfileInputField({
         {/** Required for support form field comments */}
         {inputEndAdornment}
       </Stack>
-      {(showCreateProjectForm || selectedProject) && (
+      {selectedProject && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
           <ProjectFormAnswers
             defaultRequired
-            key={selectedProject?.id ?? 'new-project'}
-            fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
-            // only team lead is able to change the project profile if they have edit access to the proposal
-            isTeamLead={isTeamLead || showCreateProjectForm}
+            key={selectedProject.id}
+            fieldConfig={formField.fieldConfig}
+            isTeamLead={isTeamLead}
             disabled={disabled}
-            // Hide team member if a project is selected, otherwise show them if the user is creating a new project
-            hideAddTeamMemberButton={showCreateProjectForm === false && !!selectedProject}
+            hideAddTeamMemberButton
+            onProjectUpdate={onProjectUpdate}
           />
+        </Box>
+      )}
+      {showCreateProjectForm && (
+        <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
+          <ProjectFormAnswers defaultRequired fieldConfig={formField.fieldConfig} isTeamLead disabled={disabled} />
         </Box>
       )}
     </Stack>

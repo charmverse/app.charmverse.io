@@ -5,10 +5,15 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useProjectUpdates } from 'components/settings/projects/hooks/useProjectUpdates';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type {
+  ProjectAndMembersFieldConfig,
+  ProjectAndMembersPayload,
+  ProjectWithMembers
+} from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -48,7 +53,8 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
-  projectWithMembers?: ProjectWithMembers | null;
+  project?: ProjectWithMembers | null;
+  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => Promise<void>;
 };
 
 const StyledStack = styled(Stack)`
@@ -59,14 +65,21 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-export function FormFieldAnswers(props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange'>) {
+export function FormFieldAnswers(
+  props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange' | 'onProjectUpdate'>
+) {
   const { control, errors, onFormChange, values } = useFormFields({
     fields: props.formFields
+  });
+
+  const { onProjectUpdate } = useProjectUpdates({
+    projectId: props.project?.id
   });
 
   return (
     <FormFieldAnswersControlled
       {...props}
+      onProjectUpdate={onProjectUpdate}
       control={control}
       errors={errors}
       onFormChange={onFormChange}
@@ -85,7 +98,8 @@ export function FormFieldAnswersControlled({
   errors,
   onFormChange,
   pageId,
-  projectWithMembers,
+  project,
+  onProjectUpdate,
   isDraft,
   threads = {}
 }: FormFieldAnswersProps & {
@@ -168,6 +182,7 @@ export function FormFieldAnswersControlled({
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
                     disabled={disabled}
+                    onProjectUpdate={onProjectUpdate}
                     formField={{
                       fieldConfig: formField.fieldConfig as ProjectAndMembersFieldConfig,
                       value: field.value
@@ -207,7 +222,7 @@ export function FormFieldAnswersControlled({
                         </Box>
                       )
                     }
-                    projectWithMembers={projectWithMembers}
+                    project={project}
                   />
                 ) : (
                   <FieldTypeRenderer

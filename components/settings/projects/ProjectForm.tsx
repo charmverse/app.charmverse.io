@@ -17,8 +17,10 @@ export function ProjectFormAnswers({
   isTeamLead,
   defaultRequired,
   hideAddTeamMemberButton = false,
-  disabled
+  disabled,
+  onProjectUpdate
 }: {
+  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
   disabled?: boolean;
   fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
@@ -42,6 +44,7 @@ export function ProjectFormAnswers({
         defaultRequired={defaultRequired}
         disabled={!isTeamLead || disabled}
         fieldConfig={fieldConfig}
+        onChange={onProjectUpdate}
       />
       <Typography variant='h6' mt={2}>
         Team Info
@@ -52,6 +55,7 @@ export function ProjectFormAnswers({
         disabled={!isTeamLead || disabled}
         defaultRequired={defaultRequired}
         fieldConfig={fieldConfig?.projectMember}
+        onChange={onProjectUpdate}
       />
       {extraProjectMembers.length ? (
         <>
@@ -77,6 +81,7 @@ export function ProjectFormAnswers({
                 ) : null}
               </Stack>
               <ProjectMemberFieldAnswers
+                onChange={onProjectUpdate}
                 projectMemberIndex={index + 1}
                 disabled={!(isTeamLead || projectMember.userId === user?.id) || disabled}
                 defaultRequired={defaultRequired}
@@ -105,10 +110,19 @@ export function ProjectFormAnswers({
               startIcon={<AddIcon fontSize='small' />}
               data-test='add-project-member-button'
               onClick={() => {
-                setValue('projectMembers', [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]], {
+                const projectMembers = [...projectValues.projectMembers, defaultProjectValues.projectMembers[0]];
+
+                const projectWithMembers = getValues();
+
+                setValue('projectMembers', projectMembers, {
                   shouldValidate: true,
                   shouldDirty: true,
                   shouldTouch: true
+                });
+
+                onProjectUpdate?.({
+                  ...projectWithMembers,
+                  projectMembers
                 });
               }}
             >

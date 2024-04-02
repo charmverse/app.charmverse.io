@@ -28,7 +28,7 @@ import { ProposalRewardsTable } from 'components/proposals/ProposalPage/componen
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useProject } from 'components/settings/projects/hooks/useProject';
+import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -245,7 +245,8 @@ function DocumentPageComponent({
 
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
-  const { form } = useProject({
+
+  const form = useProjectForm({
     projectId,
     fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectAndMembersFieldConfig
   });
@@ -443,7 +444,7 @@ function DocumentPageComponent({
                       formFields={proposal.form?.formFields ?? []}
                       readOnly={!proposal.permissions.edit}
                       threads={threads}
-                      projectWithMembers={proposal.project}
+                      project={proposal.project}
                       isDraft={proposal?.status === 'draft'}
                     />
                   )

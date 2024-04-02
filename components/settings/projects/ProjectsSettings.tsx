@@ -48,10 +48,9 @@ function ProjectRow({
   const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
   const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
-    projectWithMembers,
+    projectId: projectWithMembers.id,
     fieldConfig: defaultProjectFieldConfig
   });
-  const projectMenuPopupState = usePopupState({ variant: 'popover', popupId: `menu-${projectWithMembers.id}` });
   const removeProjectMemberPopupState = usePopupState({
     variant: 'popover',
     popupId: `remove-member-${projectWithMembers.id}`

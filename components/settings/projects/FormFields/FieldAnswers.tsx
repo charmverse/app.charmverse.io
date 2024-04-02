@@ -10,20 +10,24 @@ function FieldAnswer({
   fieldConfig,
   defaultRequired,
   name,
-  disabled
+  disabled,
+  onChange
 }: {
   disabled?: boolean;
   name: Path<ProjectAndMembersPayload>;
   defaultRequired?: boolean;
   property: ProjectFieldProperty;
   fieldConfig?: FieldConfig;
+  onChange?: (payload: Record<string, any>) => void;
 }) {
-  const { control, register } = useFormContext<ProjectAndMembersPayload>();
+  const { control, register, getValues } = useFormContext<ProjectAndMembersPayload>();
 
   const { field, fieldState } = useController({
     control,
     name
   });
+
+  const registeredField = register(name);
 
   const isHidden = fieldConfig?.[property.field]?.hidden ?? false;
   if (isHidden) {
@@ -41,7 +45,13 @@ function FieldAnswer({
       value={(field.value as string) ?? ''}
       error={fieldState.error?.message}
       data-test={`project-field-${name}`}
-      {...register(name)}
+      {...registeredField}
+      onChange={(e) => {
+        field.onChange(e);
+        if (onChange) {
+          onChange({ [name]: e.target.value });
+        }
+      }}
     />
   );
 }
@@ -51,13 +61,15 @@ export function FieldAnswers({
   properties,
   defaultRequired = false,
   name,
-  disabled
+  disabled,
+  onChange
 }: {
   disabled?: boolean;
   name?: string;
   defaultRequired?: boolean;
   fieldConfig?: FieldConfig;
   properties: ProjectFieldProperty[];
+  onChange?: (onChange: Record<string, any>) => void;
 }) {
   return (
     <Stack display='flex' flexDirection='column' gap={2} width='100%'>
@@ -69,6 +81,7 @@ export function FieldAnswers({
           key={property.field as string}
           disabled={disabled}
           property={property}
+          onChange={onChange}
         />
       ))}
     </Stack>

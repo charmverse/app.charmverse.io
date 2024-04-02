@@ -13,9 +13,12 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(createProjectController).get(getProjectsController);
 
 async function createProjectController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers>) {
-  const projectPayload = req.body as ProjectAndMembersPayload;
-  const createdProjectWithMembers = await createProject({ userId: req.session.user.id, project: projectPayload });
-  trackUserAction('add_project', { userId: req.session.user.id, name: projectPayload.name });
+  const projectAndMembersPayload = req.body as ProjectAndMembersPayload;
+  const createdProjectWithMembers = await createProject({
+    userId: req.session.user.id,
+    project: projectAndMembersPayload
+  });
+  trackUserAction('add_project', { userId: req.session.user.id, name: projectAndMembersPayload.name });
   return res.status(201).json(createdProjectWithMembers);
 }
 

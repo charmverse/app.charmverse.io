@@ -417,7 +417,6 @@ test.describe.serial('Structured proposal template with project', () => {
     });
 
     await proposalPage.page.waitForURL(`**/${proposalPath}`);
-    await proposalsListPage.page.pause();
 
     // Wallet address was manually made public so it should be visible
     expect(

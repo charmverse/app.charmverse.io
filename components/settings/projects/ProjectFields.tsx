@@ -1,5 +1,7 @@
+import { useFormContext } from 'react-hook-form';
+
 import { projectFieldProperties } from 'lib/projects/constants';
-import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -7,18 +9,30 @@ import { FieldsEditor } from './FormFields/FieldsEditor';
 export function ProjectFieldAnswers({
   fieldConfig,
   defaultRequired,
-  disabled
+  disabled,
+  onChange
 }: {
   disabled?: boolean;
   fieldConfig?: FieldConfig;
   defaultRequired?: boolean;
+  onChange?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
 }) {
+  const { getValues } = useFormContext<ProjectAndMembersPayload>();
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}
       disabled={disabled}
       fieldConfig={fieldConfig}
       properties={projectFieldProperties}
+      onChange={(updatedProject) => {
+        if (onChange) {
+          const projectWithMembers = getValues();
+          onChange({
+            ...projectWithMembers,
+            ...updatedProject
+          });
+        }
+      }}
     />
   );
 }
