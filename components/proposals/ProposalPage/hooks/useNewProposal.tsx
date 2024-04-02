@@ -9,7 +9,6 @@ import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
@@ -34,9 +33,8 @@ export function useNewProposal({ newProposal }: Props) {
   const [contentUpdated, setContentUpdated] = useState(false);
   // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
   const [isFormLoaded, setIsFormLoaded] = useState(false);
-  const isCharmverseSpace = useIsCharmverseSpace();
   const [formInputs, setFormInputsRaw] = useState<ProposalPageAndPropertiesInput>(
-    emptyState({ ...newProposal, userId: user?.id, isCharmverseSpace })
+    emptyState({ ...newProposal, userId: user?.id })
   );
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
 
@@ -169,11 +167,8 @@ export function useNewProposal({ newProposal }: Props) {
 
 function emptyState({
   userId,
-  isCharmverseSpace,
   ...inputs
-}: (Partial<ProposalPageAndPropertiesInput> & { userId?: string }) & {
-  isCharmverseSpace: boolean;
-}): ProposalPageAndPropertiesInput {
+}: Partial<ProposalPageAndPropertiesInput> & { userId?: string }): ProposalPageAndPropertiesInput {
   const isStructured = inputs.proposalType === 'structured' || !!inputs.formId;
   return {
     createdAt: new Date().toISOString(),
@@ -192,7 +187,7 @@ function emptyState({
     formFields: isStructured
       ? [
           {
-            type: isCharmverseSpace ? 'project_profile' : 'short_text',
+            type: 'project_profile',
             name: '',
             description: emptyDocument,
             index: 0,
@@ -200,7 +195,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: isCharmverseSpace ? defaultProjectAndMembersFieldConfig : null
+            fieldConfig: defaultProjectAndMembersFieldConfig
           } as FormFieldInput
         ]
       : [],
