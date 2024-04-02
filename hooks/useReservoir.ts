@@ -1,8 +1,8 @@
 import { getLogger } from '@charmverse/core/log';
 import { BaseError } from 'viem';
-import { useWalletClient } from 'wagmi';
 
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useWalletClient } from 'hooks/wagmi';
 import { reservoirClient } from 'lib/blockchain/reservoirClient';
 
 const log = getLogger('reservoir');

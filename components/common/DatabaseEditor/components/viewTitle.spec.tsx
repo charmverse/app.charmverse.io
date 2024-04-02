@@ -13,6 +13,10 @@ import ViewTitle from './viewTitle';
 jest.mock('../mutator');
 jest.mock('../utils');
 
+jest.mock('next/router', () => ({
+  useRouter: () => ({ query: {} })
+}));
+
 const mockedMutator = jest.mocked(mutator, { shallow: true });
 const mockedUtils = jest.mocked(Utils, { shallow: true });
 mockedUtils.createGuid.mockReturnValue('test-id');

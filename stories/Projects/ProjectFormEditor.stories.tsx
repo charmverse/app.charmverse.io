@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
+import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 
 export function ProjectFormEditorComponent() {

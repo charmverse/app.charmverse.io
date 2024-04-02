@@ -6,6 +6,7 @@ import { development, LensProvider, production } from '@lens-protocol/react-web'
 import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
 import { Refresh as RefreshIcon } from '@mui/icons-material';
 import IconButton from '@mui/material/IconButton';
+import { wagmiConfig } from 'connectors/config';
 import type { NextPage } from 'next';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
@@ -99,7 +100,7 @@ import 'theme/databases/databases.main.scss';
 import 'theme/print.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
 import 'theme/styles.scss';
-import { WagmiProvider } from '../components/_app/WagmiProvider';
+import { WagmiProvider } from '../components/_app/components/WagmiProvider';
 
 type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement;
@@ -204,7 +205,7 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
 }
 
 const lensConfig: LensConfig = {
-  bindings: wagmiBindings(),
+  bindings: wagmiBindings(wagmiConfig),
   environment: isProdEnv ? production : development
 };
 
