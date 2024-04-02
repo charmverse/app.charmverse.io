@@ -49,7 +49,7 @@ function FieldAnswer({
       onChange={(e) => {
         field.onChange(e);
         if (onChange) {
-          onChange({ [name]: e.target.value });
+          onChange({ [property.field]: e.target.value });
         }
       }}
     />
