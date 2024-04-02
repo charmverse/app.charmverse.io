@@ -90,12 +90,26 @@ export function useNewProposal({ newProposal }: Props) {
       // Make sure the current user is a team lead before updating the project
       else {
         const projectWithMembers = projectForm.getValues();
-        const updatedProjectValues = {
-          id: selectedProjectId,
-          ...projectWithMembers,
-          projectMembers: projectWithMembers.projectMembers
-        };
-        await charmClient.projects.updateProject(selectedProjectId, updatedProjectValues);
+        const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
+        if (isTeamLead) {
+          const updatedProjectValues = {
+            id: selectedProjectId,
+            ...projectWithMembers,
+            projectMembers: projectWithMembers.projectMembers
+          };
+          await charmClient.projects.updateProject(selectedProjectId, updatedProjectValues);
+        } else {
+          const projectMember = projectWithMembers.projectMembers.find(
+            (_projectMember) => _projectMember.userId === user?.id
+          );
+          if (projectMember && projectMember.id) {
+            await charmClient.projects.updateProjectMember({
+              memberId: projectMember.id,
+              payload: projectMember,
+              projectId: selectedProjectId
+            });
+          }
+        }
         mutate();
       }
     }
