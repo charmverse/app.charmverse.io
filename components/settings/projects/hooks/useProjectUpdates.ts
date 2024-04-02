@@ -1,5 +1,5 @@
 import { debounce } from 'lodash';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
@@ -8,54 +8,46 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
-  const { mutate, data: projectsWithMembers } = useGetProjects();
-  const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);
+  const { mutate } = useGetProjects();
 
   const { showMessage } = useSnackbar();
-  const debouncedUpdate = useMemo(() => {
-    return debounce(
-      (projectAndMembersPayload) =>
-        projectId && charmClient.projects.updateProject(projectId, projectAndMembersPayload),
-      300
-    );
-  }, [projectId]);
 
-  const onProjectUpdate = useCallback(
-    async (projectAndMembersPayload: ProjectAndMembersPayload) => {
-      try {
-        await debouncedUpdate(projectAndMembersPayload);
-        mutate(
-          (projects) => {
-            if (!projects || !projectWithMembers) {
-              return projects;
-            }
+  const onProjectUpdate = useMemo(
+    () =>
+      debounce(async (projectAndMembersPayload: ProjectAndMembersPayload) => {
+        if (!projectId) {
+          return null;
+        }
 
-            return projects.map((_project) => {
-              if (_project.id === projectWithMembers.id) {
-                return {
-                  ..._project,
-                  ...projectAndMembersPayload,
-                  projectMembers: projectAndMembersPayload.projectMembers.map((projectMember, index) => {
-                    return {
-                      ..._project.projectMembers[index],
-                      ...projectMember
-                    };
-                  })
-                };
+        try {
+          const updatedProjectWithMember = await charmClient.projects.updateProject(
+            projectId,
+            projectAndMembersPayload
+          );
+
+          mutate(
+            (projects) => {
+              if (!projects) {
+                return projects;
               }
 
-              return _project;
-            });
-          },
-          {
-            revalidate: false
-          }
-        );
-      } catch (_) {
-        showMessage('Failed to update project', 'error');
-      }
-    },
-    [debouncedUpdate, mutate, projectWithMembers, showMessage]
+              return projects.map((project) => {
+                if (project.id === updatedProjectWithMember.id) {
+                  return updatedProjectWithMember;
+                }
+
+                return project;
+              });
+            },
+            {
+              revalidate: false
+            }
+          );
+        } catch (_) {
+          showMessage('Failed to update project', 'error');
+        }
+      }, 300),
+    [projectId]
   );
 
   return {
