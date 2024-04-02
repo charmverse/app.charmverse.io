@@ -49,7 +49,8 @@ export function DialogContainer({
   title,
   fluidSize,
   hideCloseButton,
-  footerActions
+  footerActions,
+  'data-test': dataTest
 }: {
   onClose?: VoidFunction;
   title: string;
@@ -57,12 +58,14 @@ export function DialogContainer({
   fluidSize?: boolean;
   hideCloseButton?: boolean;
   footerActions?: React.ReactNode;
+  'data-test'?: string;
 }) {
   const theme = useTheme();
   const fullWidth = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
     <StyledDialog
+      data-test={dataTest}
       toolbar={<div />}
       fluidSize={fluidSize}
       hideCloseButton={hideCloseButton}

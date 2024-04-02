@@ -142,7 +142,6 @@ export function UserDetailsFormWithSave({
   const { isDirty, isValid, onFormChange, values, errors, isSubmitting, onSubmit } = useRequiredUserDetailsForm({
     userId: user.id
   });
-
   usePreventReload(isDirty);
 
   async function saveForm() {
@@ -156,7 +155,7 @@ export function UserDetailsFormWithSave({
     return () => {
       setUnsavedChanges(false);
     };
-  }, [isDirty]);
+  }, [isDirty, setUnsavedChanges]);
 
   return (
     <>

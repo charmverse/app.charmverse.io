@@ -139,12 +139,10 @@ function UserOnboardingDialog({
   } = useRequiredUserDetailsForm({
     userId: currentUser.id
   });
-
   const { refreshPropertyValues } = useMemberPropertyValues(currentUser.id);
   const confirmExitPopupState = usePopupState({ variant: 'popover', popupId: 'confirm-exit' });
 
   const isFormDirty = isMemberPropertiesDirty || isUserDetailsDirty;
-
   usePreventReload(isFormDirty);
 
   async function saveForm() {
@@ -194,6 +192,7 @@ function UserOnboardingDialog({
 
   return (
     <DialogContainer
+      data-test='onboarding-dialog'
       fluidSize={currentStep === 'email_step'}
       title={title}
       onClose={currentStep !== 'email_step' ? handleClose : undefined}
