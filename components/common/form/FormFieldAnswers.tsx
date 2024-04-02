@@ -54,7 +54,7 @@ type FormFieldAnswersProps = {
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
   project?: ProjectWithMembers | null;
-  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => Promise<void>;
+  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
   proposalId?: string;
 };
 

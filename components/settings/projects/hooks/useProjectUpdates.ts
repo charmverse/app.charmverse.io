@@ -1,61 +1,100 @@
 import { debounce } from 'lodash';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
+
+import { convertToProjectValues } from './useProjectForm';
 
 export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
-  const projectWithMembers = projectsWithMembers?.find((project) => project.id === projectId);
+  const { user } = useUser();
+  const project = projectsWithMembers?.find((_project) => _project.id === projectId);
+  const isTeamLead = project?.projectMembers[0].userId === user?.id;
+
+  const { reset } = useFormContext<ProjectAndMembersPayload>();
 
   const { showMessage } = useSnackbar();
-  const debouncedUpdate = useMemo(() => {
-    return debounce(
-      (projectAndMembersPayload) =>
-        projectId && charmClient.projects.updateProject(projectId, projectAndMembersPayload),
-      300
-    );
-  }, [projectId]);
 
-  const onProjectUpdate = useCallback(
-    async (projectAndMembersPayload: ProjectAndMembersPayload) => {
-      try {
-        await debouncedUpdate(projectAndMembersPayload);
-        mutate(
-          (projects) => {
-            if (!projects || !projectWithMembers) {
-              return projects;
-            }
+  const onProjectUpdate = useMemo(
+    () =>
+      debounce(async (projectAndMembersPayload: ProjectAndMembersPayload) => {
+        if (!projectId) {
+          return null;
+        }
 
-            return projects.map((_project) => {
-              if (_project.id === projectWithMembers.id) {
-                return {
-                  ..._project,
-                  ...projectAndMembersPayload,
-                  projectMembers: projectAndMembersPayload.projectMembers.map((projectMember, index) => {
-                    return {
-                      ..._project.projectMembers[index],
-                      ...projectMember
-                    };
-                  })
-                };
+        try {
+          if (isTeamLead) {
+            const updatedProjectWithMember = await charmClient.projects.updateProject(
+              projectId,
+              projectAndMembersPayload
+            );
+
+            reset(convertToProjectValues(updatedProjectWithMember));
+
+            mutate(
+              (projects) => {
+                if (!projects) {
+                  return projects;
+                }
+
+                return projects.map((_project) => {
+                  if (_project.id === updatedProjectWithMember.id) {
+                    return updatedProjectWithMember;
+                  }
+
+                  return _project;
+                });
+              },
+              {
+                revalidate: false
               }
+            );
+          } else {
+            const updatedProjectMemberPayload = projectAndMembersPayload.projectMembers.find(
+              (projectMember) => projectMember.userId === user?.id
+            );
+            if (updatedProjectMemberPayload && updatedProjectMemberPayload.id && updatedProjectMemberPayload.userId) {
+              const updatedProjectMember = await charmClient.projects.updateProjectMember({
+                memberId: updatedProjectMemberPayload.id,
+                payload: updatedProjectMemberPayload,
+                projectId
+              });
 
-              return _project;
-            });
-          },
-          {
-            revalidate: false
+              mutate((projects) => {
+                if (!projects) {
+                  return projects;
+                }
+
+                return projects.map((_project) => {
+                  if (_project.id === projectId) {
+                    return {
+                      ..._project,
+                      projectMembers: _project.projectMembers.map((_projectMember) => {
+                        if (_projectMember.id === updatedProjectMember.id) {
+                          return updatedProjectMember;
+                        }
+
+                        return _projectMember;
+                      })
+                    };
+                  }
+
+                  return _project;
+                });
+              });
+            }
           }
-        );
-      } catch (_) {
-        showMessage('Failed to update project', 'error');
-      }
-    },
-    [debouncedUpdate, mutate, projectWithMembers, showMessage]
+        } catch (_) {
+          showMessage('Failed to update project', 'error');
+        }
+      }, 300),
+    [projectId]
   );
 
   return {
