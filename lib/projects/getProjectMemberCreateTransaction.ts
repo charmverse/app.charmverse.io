@@ -1,8 +1,8 @@
+import type { ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
 import { getENSName } from 'lib/blockchain';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { uid } from 'lib/utils/strings';
@@ -99,15 +99,9 @@ async function getOrCreateUserByEmail(email: string) {
   return user.id;
 }
 
-export async function getProjectMemberCreateTransaction({
-  projectId,
-  projectMember,
-  userId
-}: {
-  projectId: string;
-  userId: string;
-  projectMember: ProjectAndMembersPayload['projectMembers'][number];
-}) {
+export async function findCharmVerseUserIdWithProjectMember(
+  projectMember: Pick<ProjectMember, 'walletAddress' | 'email'>
+) {
   const walletAddress = projectMember.walletAddress;
   const email = projectMember.email;
 
@@ -126,24 +120,35 @@ export async function getProjectMemberCreateTransaction({
     }
   }
 
-  trackUserAction('add_project_member', { userId, projectId, connectedUserId, email, walletAddress });
+  return connectedUserId;
+}
 
-  return () =>
-    prisma.projectMember.create({
-      data: {
-        name: projectMember.name,
-        email: projectMember.email,
-        walletAddress: projectMember.walletAddress,
-        twitter: projectMember.twitter,
-        warpcast: projectMember.warpcast,
-        github: projectMember.github,
-        linkedin: projectMember.linkedin,
-        telegram: projectMember.telegram,
-        otherUrl: projectMember.otherUrl,
-        previousProjects: projectMember.previousProjects,
-        updatedBy: userId,
-        projectId,
-        userId: connectedUserId
-      }
-    });
+export function getProjectMemberCreateTransaction({
+  projectId,
+  projectMember,
+  userId,
+  connectedUserId
+}: {
+  projectId: string;
+  userId: string;
+  projectMember: ProjectAndMembersPayload['projectMembers'][number];
+  connectedUserId?: string;
+}) {
+  return prisma.projectMember.create({
+    data: {
+      name: projectMember.name,
+      email: projectMember.email,
+      walletAddress: projectMember.walletAddress,
+      twitter: projectMember.twitter,
+      warpcast: projectMember.warpcast,
+      github: projectMember.github,
+      linkedin: projectMember.linkedin,
+      telegram: projectMember.telegram,
+      otherUrl: projectMember.otherUrl,
+      previousProjects: projectMember.previousProjects,
+      updatedBy: userId,
+      projectId,
+      userId: connectedUserId
+    }
+  });
 }

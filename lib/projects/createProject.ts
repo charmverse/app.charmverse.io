@@ -1,8 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 } from 'uuid';
 
-import { getProjectMemberCreateTransaction } from './getProjectMemberCreateTransaction';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
+
+import { findCharmVerseUserIdWithProjectMember } from './getProjectMemberCreateTransaction';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from './interfaces';
 
 export async function createProject(payload: {
@@ -16,9 +18,29 @@ export async function createProject(payload: {
   const project = payload.project;
   const projectLead = project.projectMembers[0];
   const projectMembers = project.projectMembers.slice(1);
+  const projectId = v4();
 
-  const createdProjectWithMembers = await prisma.project.create({
+  const projectMembersCreatePayload = await Promise.all(
+    projectMembers.map(async (projectMemberPayload) => {
+      const charmVerseUserIdWithProjectMember = await findCharmVerseUserIdWithProjectMember(projectMemberPayload);
+      trackUserAction('add_project_member', {
+        userId: payload.userId,
+        projectId,
+        connectedUserId: charmVerseUserIdWithProjectMember,
+        email: projectMemberPayload.email,
+        walletAddress: projectMemberPayload.walletAddress
+      });
+
+      return {
+        connectedUserId: charmVerseUserIdWithProjectMember,
+        projectMember: projectMemberPayload
+      };
+    })
+  );
+
+  const projectWithMembers = await prisma.project.create({
     data: {
+      id: projectId,
       description: project.description,
       excerpt: project.excerpt,
       name: project.name,
@@ -40,35 +62,15 @@ export async function createProject(payload: {
               updatedBy: payload.userId,
               userId: payload.userId,
               ...projectLead
-            }
+            },
+            ...projectMembersCreatePayload.map(({ connectedUserId, projectMember }) => ({
+              updatedBy: payload.userId,
+              userId: connectedUserId,
+              ...projectMember
+            }))
           ]
         }
       }
-    },
-    select: {
-      id: true
-    }
-  });
-
-  const projectMemberTransactions: Prisma.Prisma__ProjectMemberClient<ProjectMember, never>[] = [];
-
-  for (const projectMember of projectMembers) {
-    projectMemberTransactions.push(
-      (
-        await getProjectMemberCreateTransaction({
-          projectId: createdProjectWithMembers.id,
-          userId: payload.userId,
-          projectMember
-        })
-      )()
-    );
-  }
-
-  await prisma.$transaction(projectMemberTransactions);
-
-  const projectWithMembers = await prisma.project.findUniqueOrThrow({
-    where: {
-      id: createdProjectWithMembers.id
     },
     include: {
       projectMembers: true

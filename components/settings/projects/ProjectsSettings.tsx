@@ -1,19 +1,17 @@
-import { MoreHoriz, DeleteOutlined } from '@mui/icons-material';
+import { DeleteOutlined } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
   Box,
-  IconButton,
   ListItemIcon,
   ListItemText,
-  Menu,
   MenuItem,
   Stack,
   Typography
 } from '@mui/material';
-import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import type { KeyedMutator } from 'swr';
@@ -22,6 +20,7 @@ import charmClient from 'charmClient';
 import { useGetProjects, useUpdateProject } from 'charmClient/hooks/projects';
 import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
+import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
@@ -195,19 +194,14 @@ function ProjectRow({
                   e.stopPropagation();
                 }}
               >
-                <Menu {...bindMenu(projectMenuPopupState)} onClick={projectMenuPopupState.close}>
+                <ContextMenu iconSize='small' popupId={`menu-${projectWithMembers.id}`}>
                   <MenuItem onClick={removeProjectMemberPopupState.open}>
                     <ListItemIcon>
                       <DeleteOutlined fontSize='small' />
                     </ListItemIcon>
                     <ListItemText>Leave project</ListItemText>
                   </MenuItem>
-                </Menu>
-                <Box display='flex' gap={2} alignItems='center'>
-                  <IconButton size='small' {...bindTrigger(projectMenuPopupState)}>
-                    <MoreHoriz fontSize='small' />
-                  </IconButton>
-                </Box>
+                </ContextMenu>
               </Stack>
             )}
           </Stack>

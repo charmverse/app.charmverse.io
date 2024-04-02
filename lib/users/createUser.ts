@@ -26,21 +26,16 @@ export async function createOrGetUserFromWallet(
 }> {
   const lowercaseAddress = address.toLowerCase();
 
-  let newlySignedUser: LoggedInUser | undefined;
-
-  let existingUser: {
-    user: LoggedInUser;
-    isNew: boolean;
-  };
-
   try {
     const user = await getUserProfile('addresses', lowercaseAddress);
-    existingUser = {
-      isNew: false,
-      user
-    };
-
     if (user.claimed === false) {
+      let ens: string | null = null;
+      try {
+        ens = await getENSName(address);
+      } catch (error) {
+        log.warn('Could not retrieve ENS while creating a user', { error });
+      }
+
       await prisma.user.update({
         where: {
           id: user.id
@@ -51,8 +46,30 @@ export async function createOrGetUserFromWallet(
           avatar
         }
       });
-      newlySignedUser = user;
-      existingUser.isNew = true;
+
+      try {
+        await prepopulateUserProfile(user, ens);
+      } catch (error) {
+        log.error('Error while prepopulating user profile', { error, userId: user.id });
+      }
+
+      if (user.identityType === 'Wallet') {
+        logSignupViaWallet();
+      }
+
+      if (!skipTracking && user.identityType) {
+        postUserCreate({ user, identityType: user.identityType, signupAnalytics });
+      }
+
+      return {
+        isNew: true,
+        user
+      };
+    } else {
+      return {
+        isNew: false,
+        user
+      };
     }
   } catch (_) {
     // ignore error, it just means user was not found
@@ -83,32 +100,25 @@ export async function createOrGetUserFromWallet(
       include: sessionUserRelations
     });
 
-    existingUser = {
-      isNew: true,
-      user: newUser
-    };
-
-    newlySignedUser = newUser;
-  }
-
-  if (newlySignedUser) {
-    const ens = await getENSName(address);
     try {
-      await prepopulateUserProfile(newlySignedUser, ens);
+      await prepopulateUserProfile(newUser, ens);
     } catch (error) {
-      log.error('Error while prepopulating user profile', { error, userId: newlySignedUser.id });
+      log.error('Error while prepopulating user profile', { error, userId: newUser.id });
     }
 
-    if (newlySignedUser.identityType === 'Wallet') {
+    if (newUser.identityType === 'Wallet') {
       logSignupViaWallet();
     }
 
-    if (!skipTracking && newlySignedUser.identityType) {
-      postUserCreate({ user: newlySignedUser, identityType: newlySignedUser.identityType, signupAnalytics });
+    if (!skipTracking && newUser.identityType) {
+      postUserCreate({ user: newUser, identityType: newUser.identityType, signupAnalytics });
     }
-  }
 
-  return existingUser;
+    return {
+      isNew: true,
+      user: newUser
+    };
+  }
 }
 
 export async function createUserFromWallet(

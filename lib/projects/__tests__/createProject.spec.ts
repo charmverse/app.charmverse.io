@@ -124,14 +124,15 @@ describe('createProject', () => {
       userId: projectTeamLead.id
     });
 
-    expect(createdProjectWithMembers.blog).toBe('https://blog.com');
-    expect(createdProjectWithMembers.projectMembers[0].teamLead).toBe(true);
-    expect(createdProjectWithMembers.projectMembers[0].userId).toBe(projectTeamLead.id);
-    expect(createdProjectWithMembers.projectMembers[0].walletAddress).toBe(projectTeamLeadWalletAddress);
-
-    expect(createdProjectWithMembers.projectMembers[1].teamLead).toBe(false);
-    expect(createdProjectWithMembers.projectMembers[1].userId).toBe(walletAddressUser.id);
-    expect(createdProjectWithMembers.projectMembers[1].walletAddress).toBe(walletAddressUserAddress);
+    const newGoogleAccountUser = await prisma.user.findFirstOrThrow({
+      where: {
+        verifiedEmails: {
+          some: {
+            email: nonConnectedGoogleAccountEmail
+          }
+        }
+      }
+    });
 
     const newWalletUser = await prisma.user.findFirstOrThrow({
       where: {
@@ -143,33 +144,6 @@ describe('createProject', () => {
       }
     });
 
-    expect(newWalletUser.claimed).toBe(false);
-    expect(newWalletUser.identityType).toBe('Wallet');
-    expect(createdProjectWithMembers.projectMembers[2].teamLead).toBe(false);
-    expect(createdProjectWithMembers.projectMembers[2].userId).toBe(newWalletUser.id);
-
-    expect(createdProjectWithMembers.projectMembers[3].teamLead).toBe(false);
-    expect(createdProjectWithMembers.projectMembers[3].userId).toBe(googleAccountUser.id);
-    expect(createdProjectWithMembers.projectMembers[3].email).toBe(googleAccountUserEmail);
-
-    const newGoogleAccountUser = await prisma.user.findFirstOrThrow({
-      where: {
-        verifiedEmails: {
-          some: {
-            email: nonConnectedGoogleAccountEmail
-          }
-        }
-      }
-    });
-    expect(newGoogleAccountUser.claimed).toBe(false);
-    expect(newGoogleAccountUser.identityType).toBe('VerifiedEmail');
-    expect(createdProjectWithMembers.projectMembers[4].teamLead).toBe(false);
-    expect(createdProjectWithMembers.projectMembers[4].userId).toBe(newGoogleAccountUser.id);
-
-    expect(createdProjectWithMembers.projectMembers[5].teamLead).toBe(false);
-    expect(createdProjectWithMembers.projectMembers[5].userId).toBe(verifiedEmailUser.id);
-    expect(createdProjectWithMembers.projectMembers[5].email).toBe(verifiedEmailUserEmail);
-
     const newVerifiedEmailUser = await prisma.user.findFirstOrThrow({
       where: {
         verifiedEmails: {
@@ -179,9 +153,66 @@ describe('createProject', () => {
         }
       }
     });
-    expect(newVerifiedEmailUser.claimed).toBe(false);
-    expect(newVerifiedEmailUser.identityType).toBe('VerifiedEmail');
-    expect(createdProjectWithMembers.projectMembers[6].teamLead).toBe(false);
-    expect(createdProjectWithMembers.projectMembers[6].userId).toBe(newVerifiedEmailUser.id);
+
+    expect(createdProjectWithMembers).toEqual(
+      expect.objectContaining({
+        blog: 'https://blog.com',
+        projectMembers: expect.arrayContaining([
+          expect.objectContaining({
+            teamLead: true,
+            userId: projectTeamLead.id,
+            walletAddress: projectTeamLeadWalletAddress
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: walletAddressUser.id,
+            walletAddress: walletAddressUserAddress
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: newWalletUser.id
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: googleAccountUser.id,
+            email: googleAccountUserEmail
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: newGoogleAccountUser.id
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: verifiedEmailUser.id,
+            email: verifiedEmailUserEmail
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: newVerifiedEmailUser.id
+          })
+        ])
+      })
+    );
+
+    expect(newWalletUser).toEqual(
+      expect.objectContaining({
+        claimed: false,
+        identityType: 'Wallet'
+      })
+    );
+
+    expect(newGoogleAccountUser).toEqual(
+      expect.objectContaining({
+        claimed: false,
+        identityType: 'VerifiedEmail'
+      })
+    );
+
+    expect(newVerifiedEmailUser).toEqual(
+      expect.objectContaining({
+        claimed: false,
+        identityType: 'VerifiedEmail'
+      })
+    );
   });
 });
