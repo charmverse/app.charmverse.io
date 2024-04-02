@@ -86,6 +86,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     where: {
       status: 'published',
       page: {
+        deletedAt: null,
         createdAt: {
           gte: new Date('2024-03-13')
         },
