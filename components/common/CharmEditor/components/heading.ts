@@ -7,7 +7,6 @@ import {
   jumpToStartOfNode,
   moveNode
 } from '@bangle.dev/pm-commands';
-import { selectionTooltip } from '@bangle.dev/tooltip';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
@@ -17,6 +16,7 @@ import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.
 import { slugify } from 'lib/utils/strings';
 
 import type { BangleEditor } from './@bangle.dev/core/bangle-editor';
+import { hideSelectionTooltip } from './@bangle.dev/tooltip/selectionTooltip';
 
 export const spec = specFactory;
 export const plugins = pluginsFactory;
@@ -206,7 +206,7 @@ export function scrollIntoHeadingNode({ editor, pluginKey }: { editor: BangleEdi
       setTimeout(() => {
         // Need to reference the domNode again because the node might have been re-rendered
         const _domNode = editor.view.domAtPos(nodePos!)?.node as HTMLElement;
-        selectionTooltip.hideSelectionTooltip(pluginKey)(editor.view.state, editor.view.dispatch, editor.view);
+        hideSelectionTooltip(pluginKey)(editor.view.state, editor.view.dispatch, editor.view);
         document.querySelector('.document-print-container')?.scrollTo(0, _domNode.offsetTop);
       }, 500);
     }

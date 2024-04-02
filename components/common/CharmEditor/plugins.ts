@@ -22,7 +22,7 @@ import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import * as inlineComment from './components/inlineComment';
-import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
+import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalettePlugin';
 import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';

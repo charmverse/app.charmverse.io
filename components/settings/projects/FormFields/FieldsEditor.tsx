@@ -1,17 +1,17 @@
-import { Stack, Switch, Typography } from '@mui/material';
+import { FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { ProjectFieldProperty } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectFieldProperty } from 'lib/projects/interfaces';
 
-export function FieldsEditor<Values extends Record<string, any> = Record<string, any>>({
+export function FieldsEditor({
   onChange,
-  values,
+  fieldConfig,
   properties,
   defaultRequired,
   isProjectMember
 }: {
-  onChange?: (values: Values) => void;
-  values: Values;
+  onChange?: (fieldConfig: FieldConfig) => void;
+  fieldConfig: FieldConfig;
   properties: ProjectFieldProperty[];
   defaultRequired?: boolean;
   isProjectMember?: boolean;
@@ -21,8 +21,8 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
       {properties.map((property) => {
         // If in edit mode always show the field,
         // otherwise only show the field if it's not hidden
-        const isHidden = !onChange && values?.[property.field]?.hidden;
-        if (isHidden) {
+        const isShown = onChange ? true : fieldConfig?.[property.field]?.show ?? true;
+        if (!isShown) {
           return null;
         }
         return (
@@ -36,47 +36,78 @@ export function FieldsEditor<Values extends Record<string, any> = Record<string,
               multiline={property.multiline}
               rows={property.rows ?? 1}
               disabled
-              required={values?.[property.field]?.required ?? defaultRequired}
+              required={fieldConfig?.[property.field]?.required ?? defaultRequired}
             />
-            {onChange && (
-              <Stack gap={1}>
-                <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                  <Switch
-                    size='small'
-                    checked={values?.[property.field]?.hidden ?? false}
-                    onChange={(e) => {
-                      const isChecked = e.target.checked;
-                      onChange({
-                        ...(values ?? {}),
-                        [property.field]: {
-                          required: isChecked ? false : values?.[property.field]?.required ?? true,
-                          hidden: isChecked
-                        }
-                      });
-                    }}
-                    data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-hidden-toggle`}
-                  />
-                  <Typography>Hidden</Typography>
-                </Stack>
+            {/** Required fields must always be required and shown */}
+            {onChange && !property.alwaysRequired && (
+              <Stack gap={1} flexDirection='row' px={1} alignItems='center'>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      size='small'
+                      checked={fieldConfig?.[property.field]?.show ?? true}
+                      onChange={(e) => {
+                        const isChecked = e.target.checked;
+                        onChange({
+                          ...(fieldConfig ?? {}),
+                          [property.field]: {
+                            required: !isChecked ? false : fieldConfig?.[property.field]?.required ?? true,
+                            show: isChecked,
+                            private: !isChecked ? false : fieldConfig?.[property.field]?.private ?? true
+                          }
+                        });
+                      }}
+                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-show-toggle`}
+                      sx={{ mr: 0.5 }}
+                    />
+                  }
+                  label={<Typography>Show</Typography>}
+                />
 
-                <Stack gap={0.5} flexDirection='row' alignItems='center'>
-                  <Switch
-                    size='small'
-                    disabled={values?.[property.field]?.hidden === true}
-                    checked={values?.[property.field]?.required ?? defaultRequired}
-                    onChange={(e) => {
-                      onChange({
-                        ...(values ?? {}),
-                        [property.field]: {
-                          ...values?.[property.field],
-                          required: e.target.checked
-                        }
-                      });
-                    }}
-                    data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-required-toggle`}
+                <FormControlLabel
+                  control={
+                    <Switch
+                      size='small'
+                      disabled={fieldConfig?.[property.field]?.show === false}
+                      checked={fieldConfig?.[property.field]?.required ?? defaultRequired}
+                      onChange={(e) => {
+                        onChange({
+                          ...(fieldConfig ?? {}),
+                          [property.field]: {
+                            ...fieldConfig?.[property.field],
+                            required: e.target.checked
+                          }
+                        });
+                      }}
+                      data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-required-toggle`}
+                      sx={{ mr: 0.5 }}
+                    />
+                  }
+                  label={<Typography>Required</Typography>}
+                />
+                {property.allowPrivate && (
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        size='small'
+                        disabled={fieldConfig?.[property.field]?.show === false}
+                        checked={fieldConfig?.[property.field]?.private ?? true}
+                        onChange={(e) => {
+                          onChange({
+                            ...(fieldConfig ?? {}),
+                            [property.field]: {
+                              ...fieldConfig?.[property.field],
+                              private: e.target.checked
+                            }
+                          });
+                        }}
+                        data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-private-toggle`}
+                        sx={{ mr: 0.5 }}
+                      />
+                    }
+                    label={<Typography>Private</Typography>}
                   />
-                  <Typography>Required</Typography>
-                </Stack>
+                )}
               </Stack>
             )}
           </Stack>

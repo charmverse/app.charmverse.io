@@ -7,7 +7,7 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
-import { SvgIcon } from '@mui/material';
+import { FaBriefcase } from 'react-icons/fa';
 
 import { CharmsLogo } from 'components/common/CharmsLogo';
 import { ProposalIcon } from 'components/common/PageIcon';
@@ -34,7 +34,7 @@ export type UserSettingsSection = (typeof accountSettingsSections)[number];
 export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
   { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
-  { icon: <AccountCircleIcon fontSize='small' />, path: 'projects', label: 'My Projects' },
+  { icon: <FaBriefcase fontSize='small' />, path: 'projects', label: 'My Projects' },
   {
     icon: <CharmsLogo />,
     path: 'charms',

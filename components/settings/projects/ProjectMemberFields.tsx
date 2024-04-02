@@ -1,5 +1,7 @@
+import { useFormContext } from 'react-hook-form';
+
 import { projectMemberFieldProperties } from 'lib/projects/constants';
-import type { ProjectEditorFieldConfig, ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -8,13 +10,17 @@ export function ProjectMemberFieldAnswers({
   fieldConfig,
   defaultRequired,
   projectMemberIndex,
-  disabled
+  disabled,
+  onChange
 }: {
   projectMemberIndex: number;
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig?: FieldConfig;
   defaultRequired?: boolean;
   disabled?: boolean;
+  onChange?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
 }) {
+  const { getValues } = useFormContext<ProjectAndMembersPayload>();
+
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}
@@ -22,24 +28,34 @@ export function ProjectMemberFieldAnswers({
       name={`projectMembers[${projectMemberIndex}]`}
       fieldConfig={fieldConfig}
       properties={projectMemberFieldProperties}
+      onChange={(updatedProjectMemberPayload) => {
+        const projectWithMembers = getValues();
+        const updatedProjectMembers = projectWithMembers.projectMembers.map((projectMember, index) =>
+          index === projectMemberIndex ? { ...projectMember, ...updatedProjectMemberPayload } : projectMember
+        );
+        onChange?.({
+          ...projectWithMembers,
+          projectMembers: updatedProjectMembers
+        });
+      }}
     />
   );
 }
 
 export function ProjectMemberFieldsEditor({
   onChange,
-  values,
+  fieldConfig,
   defaultRequired
 }: {
   defaultRequired?: boolean;
-  onChange?: (values: ProjectEditorFieldConfig['projectMember']) => void;
-  values: ProjectEditorFieldConfig['projectMember'];
+  onChange?: (values: ProjectAndMembersFieldConfig['projectMember']) => void;
+  fieldConfig: ProjectAndMembersFieldConfig['projectMember'];
 }) {
   return (
     <FieldsEditor
       defaultRequired={defaultRequired}
       properties={projectMemberFieldProperties}
-      values={values}
+      fieldConfig={fieldConfig}
       onChange={onChange}
       isProjectMember
     />

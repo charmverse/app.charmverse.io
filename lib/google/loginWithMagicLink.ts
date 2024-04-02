@@ -51,7 +51,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
 
   let user: LoggedInUser | null = matchedUser;
 
-  let userWillBeCreated = false;
+  let isNew = false;
 
   if (!user && googleAccount) {
     await prisma.verifiedEmail.create({
@@ -64,7 +64,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     });
     user = googleAccount.user;
   } else if (!user) {
-    userWillBeCreated = true;
+    isNew = true;
     user = await prisma.user.create({
       data: {
         username: verificationResult.email,
@@ -83,6 +83,19 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     });
   } else {
     const userId = user.id;
+
+    if (user.claimed === false) {
+      await prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          claimed: true
+        }
+      });
+
+      isNew = true;
+    }
 
     const spaceRoles = await prisma.spaceRole.findMany({
       where: {
@@ -121,7 +134,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
   const updatedUser = await getUserProfile('id', (user as LoggedInUser).id);
 
   return {
-    isNew: userWillBeCreated,
+    isNew,
     user: updatedUser
   };
 }

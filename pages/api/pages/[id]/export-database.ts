@@ -20,6 +20,8 @@ export type ZippedDataRequest = Pick<ContentToCompress, 'csv'> & { pageIds: stri
 async function requestZip(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const customFilter = req.query.filter as string;
+  const viewId = req.query.viewId as string;
+
   let filter = null;
   if (customFilter) {
     try {
@@ -32,7 +34,8 @@ async function requestZip(req: NextApiRequest, res: NextApiResponse) {
   const csvData = await loadAndGenerateCsv({
     userId: req.session.user.id,
     databaseId: pageId,
-    customFilter: filter
+    customFilter: filter,
+    viewId
   });
 
   const markdownPages = await paginatedPrismaTask({

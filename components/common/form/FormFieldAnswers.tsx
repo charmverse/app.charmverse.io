@@ -5,10 +5,15 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useProjectUpdates } from 'components/settings/projects/hooks/useProjectUpdates';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import type {
+  ProjectAndMembersFieldConfig,
+  ProjectAndMembersPayload,
+  ProjectWithMembers
+} from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -48,6 +53,9 @@ type FormFieldAnswersProps = {
   pageId?: string;
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
+  project?: ProjectWithMembers | null;
+  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
+  proposalId?: string;
 };
 
 const StyledStack = styled(Stack)`
@@ -58,14 +66,21 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-export function FormFieldAnswers(props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange'>) {
+export function FormFieldAnswers(
+  props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange' | 'onProjectUpdate'>
+) {
   const { control, errors, onFormChange, values } = useFormFields({
     fields: props.formFields
+  });
+
+  const { onProjectUpdate } = useProjectUpdates({
+    projectId: props.project?.id
   });
 
   return (
     <FormFieldAnswersControlled
       {...props}
+      onProjectUpdate={onProjectUpdate}
       control={control}
       errors={errors}
       onFormChange={onFormChange}
@@ -84,7 +99,11 @@ export function FormFieldAnswersControlled({
   errors,
   onFormChange,
   pageId,
-  threads = {}
+  project,
+  onProjectUpdate,
+  threads = {},
+  isDraft,
+  proposalId
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -164,10 +183,11 @@ export function FormFieldAnswersControlled({
               render={({ field }) =>
                 formField.type === 'project_profile' ? (
                   <ProjectProfileInputField
-                    formField={{
-                      fieldConfig: formField.fieldConfig as ProjectEditorFieldConfig,
-                      value: field.value
-                    }}
+                    disabled={disabled}
+                    isDraft={isDraft}
+                    proposalId={proposalId}
+                    onProjectUpdate={onProjectUpdate}
+                    fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                     onChange={(projectFormValues) => {
                       setIsFormDirty(true);
                       onFormChange([
@@ -177,6 +197,32 @@ export function FormFieldAnswersControlled({
                         }
                       ]);
                     }}
+                    inputEndAdornment={
+                      pageId &&
+                      formField.formFieldAnswer &&
+                      user && (
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            left: '100%',
+                            ml: {
+                              md: 1,
+                              xs: 0.5
+                            }
+                          }}
+                        >
+                          <FormFieldAnswerComment
+                            formFieldAnswer={formField.formFieldAnswer}
+                            pageId={pageId}
+                            formFieldName='Project profile'
+                            disabled={disabled}
+                            fieldAnswerThreads={fieldAnswerThreads}
+                            enableComments={enableComments}
+                          />
+                        </Box>
+                      )
+                    }
+                    project={project}
                   />
                 ) : (
                   <FieldTypeRenderer
