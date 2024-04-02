@@ -1,4 +1,3 @@
-import { selectionTooltip } from '@bangle.dev/tooltip';
 import type { PageType } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Paper } from '@mui/material';
@@ -8,13 +7,12 @@ import { TextSelection } from 'prosemirror-state';
 import { useCreateThread } from 'charmClient/hooks/comments';
 import type { InlineCommentInputHandleSubmitParams } from 'components/[pageId]/DocumentPage/components/InlineCommentInput';
 import { InlineCommentInput } from 'components/[pageId]/DocumentPage/components/InlineCommentInput';
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 
+import { useEditorViewContext } from '../../../components/@bangle.dev/react/hooks';
+import { hideSelectionTooltip } from '../../../components/@bangle.dev/tooltip/selectionTooltip';
 import { updateInlineComment } from '../inlineComment.utils';
-
-const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 
 export const ThreadContainer = styled(Paper)`
   display: flex;
