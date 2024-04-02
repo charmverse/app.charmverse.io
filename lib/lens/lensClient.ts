@@ -1,5 +1,5 @@
 import { LensClient, production, development } from '@lens-protocol/client';
-import { polygon, polygonMumbai } from '@wagmi/core/chains';
+import { polygon, polygonMumbai } from 'viem/chains';
 
 import { isProdEnv } from 'config/constants';
 

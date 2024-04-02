@@ -299,7 +299,7 @@ export function PagesProvider({ children }: { children: ReactNode }) {
       unsubscribeFromPageDeletes();
       unsubscribeFromPageRestores();
     };
-  }, [!!spaceRole?.isGuest]);
+  }, [spaceRole?.isGuest]);
 
   const value: PagesContext = useMemo(
     () => ({

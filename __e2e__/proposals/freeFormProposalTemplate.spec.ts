@@ -68,7 +68,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     description: 'First reward description',
     chain: optimism.id,
     //  USDC Contract Address on OP; Changed last digit to 6 instead of 7 so we get an empty response and fill the fields manually
-    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31606',
+    token: '0x7F5c764cBc14f9669B88837ca1490cCa17c31607',
     amount: 22,
     tokenName: 'USDC Coin',
     tokenSymbol: 'USDC',
@@ -419,6 +419,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalsListPage.proposalTemplateSelect.click();
     await proposalsListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
     await proposalPage.waitForNewProposalPage(space.domain);
+
+    await expect(proposalPage.templateSelect).toHaveText(savedProposalTemplate.title);
 
     // We only need to use to title. The content should come through from the template
     await expect(proposalPage.documentTitleInput).toBeVisible();

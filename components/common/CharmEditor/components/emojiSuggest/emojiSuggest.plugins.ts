@@ -3,8 +3,8 @@ import { Plugin, PluginKey } from '@bangle.dev/pm';
 
 import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
-import { createTooltipDOM } from '../@bangle.dev/tooltip';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { markName } from './emojiSuggest.constants';
 
@@ -62,7 +62,7 @@ function getScrollContainer(view: EditorView) {
   return view.dom.parentElement!;
 }
 
-export function getSuggestTooltipKey(key: PluginKey) {
+function getSuggestTooltipKey(key: PluginKey) {
   return (state: EditorState) => {
     const pluginState = key.getState(state);
     if (pluginState) {

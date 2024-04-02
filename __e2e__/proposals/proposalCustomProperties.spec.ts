@@ -90,8 +90,7 @@ test.describe.serial('Proposal custom properties', () => {
     await documentPage.charmEditor.fill('This is a test proposal');
 
     // Workflow auto-selected when loading the proposal
-    const workflowSelectTextContent = await proposalPage.workflowSelect.textContent();
-    expect(workflowSelectTextContent).toBe(workflow.title);
+    await expect(proposalPage.workflowSelect).toHaveText(workflow.title);
 
     // Move into configuring the actual evaluation
     await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();

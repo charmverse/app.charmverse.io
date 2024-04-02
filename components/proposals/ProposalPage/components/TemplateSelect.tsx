@@ -12,7 +12,7 @@ type Props<T> = {
   disabled?: boolean;
   displayType?: 'details';
   options: T[];
-  value: { id: string } | null;
+  value?: string | null;
   onChange: (value: T | null) => void;
 };
 
@@ -29,8 +29,6 @@ export function TemplateSelect<T extends TemplateOption>({
     value: fancyTrim(option.title || 'Untitled', maxTitleLength)
   }));
 
-  const propertyValue = value?.id ?? '';
-
   function onValueChange(values: string | string[]) {
     const newValue = Array.isArray(values) ? values[0] : values;
     const option = options.find(({ id }) => id === newValue);
@@ -44,14 +42,13 @@ export function TemplateSelect<T extends TemplateOption>({
   return (
     <TagSelect
       wrapColumn
+      data-test='proposal-template-select'
       showEmpty
       displayType={displayType}
       readOnly={disabled}
       options={propertyOptions}
-      noOptionsText={
-        propertyValue ? 'No more options available for this category' : 'No options available for this category'
-      }
-      propertyValue={propertyValue}
+      noOptionsText={value ? 'No more options available for this category' : 'No options available for this category'}
+      propertyValue={value || ''}
       onChange={onValueChange}
     />
   );

@@ -7,7 +7,6 @@ import { IntlProvider } from 'react-intl';
 import ReactDndProvider from '../components/common/ReactDndProvider';
 import { LocalizationProvider } from '../components/_app/LocalizationProvider';
 
-import '@bangle.dev/tooltip/style.css';
 import 'prosemirror-menu/style/menu.css';
 import 'theme/@bangle.dev/styles.scss';
 import 'theme/prosemirror-tables/prosemirror-tables.scss';
@@ -55,8 +54,8 @@ import 'react-resizable/css/styles.css';
 import 'theme/styles.scss';
 
 import { handlers } from './mockApi';
-import { WagmiConfig, configureChains, createConfig, mainnet } from 'wagmi';
-import { publicProvider } from 'wagmi/providers/public';
+import { mainnet } from 'viem/chains';
+import { WagmiConfig, http, createConfig } from 'wagmi';
 
 // Initialize MSW - https://storybook.js.org/addons/msw-storybook-addon
 initialize({
@@ -114,9 +113,11 @@ export const withMuiTheme = (Story, context) => {
   );
 };
 
-const { publicClient } = configureChains([mainnet], [publicProvider()]);
 export const wagmiConfig = createConfig({
-  publicClient
+  chains: [mainnet],
+  transports: {
+    [mainnet.id]: http()
+  }
 });
 
 export const globalProviders = (Story, context) => {

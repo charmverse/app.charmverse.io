@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
@@ -165,7 +166,8 @@ export function DocumentPageActionList({
       members,
       spaceId: _page.spaceId,
       title: _page.title
-    }).catch(() => {
+    }).catch((error) => {
+      log.error('Error exporting markdown', { error });
       showMessage('Error exporting markdown', 'error');
     });
     onComplete();

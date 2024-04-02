@@ -1,6 +1,8 @@
 import { log } from '@charmverse/core/log';
 import type { UserWallet } from '@charmverse/core/prisma';
 import type { Web3Provider } from '@ethersproject/providers';
+import { watchAccount } from '@wagmi/core';
+import { getWagmiConfig } from 'connectors/config';
 import type { Signer } from 'ethers';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
@@ -8,11 +10,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { SiweMessage } from 'siwe';
 import { mutate } from 'swr';
 import { getAddress } from 'viem';
-import type { ConnectorData } from 'wagmi';
-import { useAccount, useConnect, useNetwork, useSignMessage } from 'wagmi';
 
 import { useCreateUser, useLogin, useRemoveWallet } from 'charmClient/hooks/profile';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
+import { useAccount, useConnect, useSignMessage } from 'hooks/wagmi';
 import type {
   SignatureVerificationPayload,
   SignatureVerificationPayloadWithAddress
@@ -57,12 +58,11 @@ export const Web3Context = createContext<Readonly<IContext>>({
 
 // a wrapper around account and library from web3react
 export function Web3AccountProvider({ children }: { children: ReactNode }) {
-  const { address: account, connector: activeConnector, isConnecting } = useAccount();
+  const { address: account, chain, connector: activeConnector, isConnecting } = useAccount();
   const { open: openVerifyOtpModal, isOpen: isVerifyOtpModalOpen, close: closeVerifyOtpModal } = useVerifyLoginOtp();
   const router = useRouter();
-  const { chain } = useNetwork();
   const chainId = chain?.id;
-  const { signMessageAsync } = useSignMessage({});
+  const { signMessageAsync } = useSignMessage();
 
   const [isSigning, setIsSigning] = useState(false);
   const verifiableWalletDetected = !!account;
@@ -179,19 +179,17 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
   }, [account, isConnecting, accountUpdatePaused, !!user, storedAccount]);
 
   useEffect(() => {
-    const handleConnectorUpdate = ({ account: _acc }: ConnectorData) => {
-      // This runs every time the wallet account changes.
-      if (_acc) {
+    // This runs every time the wallet account changes.
+    const unwatch = watchAccount(getWagmiConfig(), {
+      onChange(_account) {
         if (isVerifyOtpModalOpen) {
           closeVerifyOtpModal();
         }
       }
-    };
-
-    activeConnector?.on('change', handleConnectorUpdate);
+    });
 
     return () => {
-      activeConnector?.off('change', handleConnectorUpdate);
+      unwatch();
     };
   }, []);
 
@@ -229,7 +227,9 @@ export function Web3AccountProvider({ children }: { children: ReactNode }) {
           window.ethereum?.isMetaMask
         ) {
           const injectedConnector = connectors.find((c) => c.id === 'injected');
-          connectAsync({ connector: injectedConnector });
+          if (injectedConnector) {
+            connectAsync({ connector: injectedConnector });
+          }
         }
       };
 

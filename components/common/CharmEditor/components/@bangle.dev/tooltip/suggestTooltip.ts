@@ -1,19 +1,17 @@
-import type { MarkType, Schema } from '@bangle.dev/pm';
-import { Fragment, keymap, Node } from '@bangle.dev/pm';
-import type { TooltipRenderOpts } from '@bangle.dev/tooltip';
-import { tooltipPlacement } from '@bangle.dev/tooltip';
-import type { GetReferenceElementFunction } from '@bangle.dev/tooltip/src/tooltip-placement';
 import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
+import { keymap } from 'prosemirror-keymap';
+import type { MarkType, Schema } from 'prosemirror-model';
+import { Fragment, Node } from 'prosemirror-model';
 import type { Command, EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey, Selection } from 'prosemirror-state';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import type { RawPlugins } from '../core/plugin-loader';
 
-import { triggerInputRule } from './trigger-input-rule';
+import { plugins as tooltipPlacementPlugins } from './tooltipPlacement';
+import type { GetReferenceElementFunction, TooltipRenderOpts } from './tooltipPlacement';
+import { triggerInputRule } from './triggerInputRule';
 
-export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
   queryTriggerText,
@@ -32,49 +30,6 @@ export const defaultKeys = {
   right: undefined,
   left: undefined
 };
-
-function specFactory({
-  markName,
-  trigger,
-  markColor,
-  excludes
-}: {
-  excludes?: string;
-  markName: string;
-  trigger?: string;
-  markColor?: string;
-}): BaseRawMarkSpec {
-  return {
-    name: markName,
-    type: 'mark',
-    schema: {
-      excludes,
-      inclusive: true,
-      group: 'suggestTriggerMarks',
-      parseDOM: [{ tag: `span[data-${markName}]` }],
-      toDOM: (mark) => {
-        return [
-          'span',
-          {
-            'data-bangle-name': markName,
-            'data-suggest-trigger': mark.attrs.trigger,
-            style: markColor ? `color: ${markColor}` : ''
-          }
-        ];
-      },
-      attrs: {
-        trigger: { default: trigger }
-      },
-      markdown: {
-        toMarkdown: {
-          open: '',
-          close: '',
-          mixable: true
-        }
-      }
-    }
-  };
-}
 
 export type SuggestTooltipRenderOpts = Omit<TooltipRenderOpts, 'getReferenceElement'>;
 
@@ -179,7 +134,7 @@ function pluginsFactory({
           }
         }
       }),
-      tooltipPlacement.plugins({
+      tooltipPlacementPlugins({
         stateKey: key,
         renderOpts: {
           ...tooltipRenderOpts,

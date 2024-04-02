@@ -21,7 +21,7 @@ import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import * as inlineComment from './components/inlineComment';
 import * as inlineDatabase from './components/inlineDatabase';
-import { spec as inlinePaletteSpecs } from './components/inlinePalette';
+import { spec as inlinePaletteSpecs } from './components/inlinePalette/inlinePaletteSpec';
 import * as inlineVote from './components/inlineVote';
 import { spec as linkSpec } from './components/link/link.specs';
 import { linkedPageSpec } from './components/linkedPage/linkedPage.specs';
