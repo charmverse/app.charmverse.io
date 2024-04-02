@@ -16,7 +16,6 @@ export function ProjectFormAnswers({
   fieldConfig,
   isTeamLead,
   defaultRequired,
-  hideAddTeamMemberButton = false,
   disabled,
   onProjectUpdate
 }: {
@@ -25,7 +24,6 @@ export function ProjectFormAnswers({
   fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
   defaultRequired?: boolean;
-  hideAddTeamMemberButton?: boolean;
 }) {
   const { getValues, setValue, control } = useFormContext<ProjectAndMembersPayload>();
   const projectValues = getValues();
@@ -98,49 +96,42 @@ export function ProjectFormAnswers({
           ))}
         </>
       ) : null}
-      {!hideAddTeamMemberButton && (
-        <>
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-          <Box
-            sx={{
-              mb: 2,
-              width: 'fit-content'
-            }}
-          >
-            <Button
-              disabled={!isTeamLead || disabled}
-              disabledTooltip='Only the team lead can add team members'
-              startIcon={<AddIcon fontSize='small' />}
-              data-test='add-project-member-button'
-              onClick={() => {
-                const projectMembers = [
-                  ...projectValues.projectMembers,
-                  defaultProjectAndMembersPayload.projectMembers[0]
-                ];
+      <Divider
+        sx={{
+          my: 1
+        }}
+      />
+      <Box
+        sx={{
+          mb: 2,
+          width: 'fit-content'
+        }}
+      >
+        <Button
+          disabled={!isTeamLead || disabled}
+          disabledTooltip='Only the team lead can add team members'
+          startIcon={<AddIcon fontSize='small' />}
+          data-test='add-project-member-button'
+          onClick={() => {
+            const projectMembers = [...projectValues.projectMembers, defaultProjectAndMembersPayload.projectMembers[0]];
 
-                const projectWithMembers = getValues();
+            const projectWithMembers = getValues();
 
-                setValue('projectMembers', projectMembers, {
-                  shouldValidate: true,
-                  shouldDirty: true,
-                  shouldTouch: true
-                });
+            setValue('projectMembers', projectMembers, {
+              shouldValidate: true,
+              shouldDirty: true,
+              shouldTouch: true
+            });
 
-                onProjectUpdate?.({
-                  ...projectWithMembers,
-                  projectMembers
-                });
-              }}
-            >
-              Add a team member
-            </Button>
-          </Box>
-        </>
-      )}
+            onProjectUpdate?.({
+              ...projectWithMembers,
+              projectMembers
+            });
+          }}
+        >
+          Add a team member
+        </Button>
+      </Box>
     </Stack>
   );
 }

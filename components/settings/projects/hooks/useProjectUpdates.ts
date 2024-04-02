@@ -1,5 +1,6 @@
 import { debounce } from 'lodash';
 import { useMemo } from 'react';
+import { useFormContext } from 'react-hook-form';
 
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
@@ -7,8 +8,12 @@ import { useGetProjects } from 'charmClient/hooks/projects';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
+import { convertToProjectValues } from './useProjectForm';
+
 export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
   const { mutate } = useGetProjects();
+
+  const { reset } = useFormContext<ProjectAndMembersPayload>();
 
   const { showMessage } = useSnackbar();
 
@@ -24,6 +29,8 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
             projectId,
             projectAndMembersPayload
           );
+
+          reset(convertToProjectValues(updatedProjectWithMember));
 
           mutate(
             (projects) => {
