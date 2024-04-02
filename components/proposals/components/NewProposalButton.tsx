@@ -134,6 +134,7 @@ export function NewProposalButton() {
             />
 
             <MenuItem
+              data-test='duplicate-template-button'
               onClick={() => {
                 duplicateTemplate(pageId);
               }}
