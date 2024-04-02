@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { findCharmVerseUserIdWithProjectMember } from './getProjectMemberCreateTransaction';
 import type { ProjectAndMembersPayload } from './interfaces';
 
 export async function updateProjectMember({
@@ -7,6 +8,9 @@ export async function updateProjectMember({
 }: {
   projectMemberValues: ProjectAndMembersPayload['projectMembers'][0];
 }) {
+  const connectedUserId =
+    projectMemberValues.userId ?? (await findCharmVerseUserIdWithProjectMember(projectMemberValues));
+
   return prisma.projectMember.update({
     where: {
       id: projectMemberValues.id
@@ -21,7 +25,8 @@ export async function updateProjectMember({
       telegram: projectMemberValues.telegram,
       twitter: projectMemberValues.twitter,
       walletAddress: projectMemberValues.walletAddress,
-      warpcast: projectMemberValues.warpcast
+      warpcast: projectMemberValues.warpcast,
+      userId: connectedUserId
     }
   });
 }
