@@ -1,13 +1,12 @@
-import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack } from '@mui/material';
-import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import { ProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
 import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+
+import { ProjectFormAnswers } from './ProjectForm';
 
 export function CreateProjectForm({
   onCancel,
