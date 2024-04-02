@@ -55,7 +55,6 @@ import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
-import '@bangle.dev/tooltip/style.css';
 import 'components/common/DatabaseEditor/components/calculations/calculation.scss';
 import 'components/common/DatabaseEditor/components/calendar/fullcalendar.scss';
 import 'components/common/DatabaseEditor/components/cardDetail/cardDetail.scss';

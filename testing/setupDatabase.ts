@@ -52,11 +52,13 @@ import { boardWithCardsArgs } from './generateBoardStub';
 export async function generateSpaceUser({
   spaceId,
   isAdmin,
-  isGuest
+  isGuest,
+  onboarded
 }: {
   spaceId: string;
   isAdmin?: boolean;
   isGuest?: boolean;
+  onboarded?: boolean;
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
@@ -75,6 +77,7 @@ export async function generateSpaceUser({
               id: spaceId
             }
           },
+          onboarded,
           isAdmin,
           isGuest: !isAdmin && isGuest
         }
@@ -95,7 +98,7 @@ export async function generateUserAndSpaceWithApiToken(
   isAdmin = true,
   spaceName = 'Example space'
 ) {
-  const user = await createUserFromWallet({ email, address: walletAddress });
+  const user = await createUserFromWallet({ email, address: walletAddress ?? randomETHWalletAddress() });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 

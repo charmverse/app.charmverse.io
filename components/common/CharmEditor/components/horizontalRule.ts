@@ -1,6 +1,6 @@
-import type { DOMOutputSpec, Schema } from '@bangle.dev/pm';
-import { InputRule } from '@bangle.dev/pm';
 import { safeInsert } from '@bangle.dev/utils';
+import { InputRule } from 'prosemirror-inputrules';
+import type { DOMOutputSpec, Schema } from 'prosemirror-model';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';

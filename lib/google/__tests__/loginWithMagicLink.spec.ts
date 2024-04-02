@@ -114,6 +114,44 @@ describe('loginWithMagicLink', () => {
     );
   });
 
+  it('should return the user if they already have a verified email to the unclaimed user account', async () => {
+    const user = await testUtilsUser.generateUser();
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        claimed: false
+      }
+    });
+    const email = `test-${uuid()}@example.com`;
+    await prisma.verifiedEmail.create({
+      data: {
+        avatarUrl,
+        email,
+        name: 'Email',
+        userId: user.id
+      }
+    });
+
+    const loginRequest: MagicLinkLoginRequest = {
+      magicLink: {
+        // The mocked implementation returns the access token as the email
+        accessToken: email,
+        avatarUrl
+      }
+    };
+
+    const loginResult = await loginWithMagicLink(loginRequest);
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: {
+        id: user.id
+      }
+    });
+    expect(updatedUser.claimed).toBe(true);
+    expect(loginResult.isNew).toBe(true);
+  });
+
   it('should throw an error if the token decoding failed', async () => {
     mockVerifyIdToken.mockResolvedValue({ email: undefined });
 

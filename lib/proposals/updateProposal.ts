@@ -10,11 +10,13 @@ export type UpdateProposalRequest = {
   authors?: string[];
   fields?: ProposalFields | null;
   selectedCredentialTemplates?: string[];
+  projectId?: string | null;
 };
 
 export async function updateProposal({
   proposalId,
   authors,
+  projectId,
   fields,
   selectedCredentialTemplates,
   actorId
@@ -42,6 +44,17 @@ export async function updateProposal({
         },
         data: {
           selectedCredentialTemplates
+        }
+      });
+    }
+
+    if (projectId) {
+      await tx.proposal.update({
+        where: {
+          id: proposalId
+        },
+        data: {
+          projectId
         }
       });
     }

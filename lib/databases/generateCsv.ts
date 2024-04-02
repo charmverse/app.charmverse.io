@@ -19,8 +19,10 @@ import { Constants } from './constants';
 export async function loadAndGenerateCsv({
   databaseId,
   userId,
-  customFilter
+  customFilter,
+  viewId
 }: {
+  viewId?: string;
   databaseId?: string;
   userId: string;
   customFilter?: FilterGroup | null;
@@ -106,7 +108,9 @@ export async function loadAndGenerateCsv({
   const boardBlock = boardBlocks.find((block) => block.type === 'board');
 
   const viewBlocks = boardBlocks.filter((block) => block.type === 'view');
-  const viewBlock: BoardView = (viewBlocks.find((block) => (block.fields as BoardViewFields).viewType === 'table') ||
+  const viewBlock: BoardView = (viewBlocks.find((block) =>
+    viewId ? block.id === viewId : (block.fields as BoardViewFields).viewType === 'table'
+  ) ||
     viewBlocks[0] ||
     boardBlocks[0]) as unknown as BoardView;
 
@@ -242,7 +246,11 @@ function generateTableArray(
   cardMap: Record<string, { title: string }>
 ): { rows: string[][]; rowIds: string[] } {
   const rows: string[][] = [];
-  const cardProperties = board.fields.cardProperties as IPropertyTemplate[];
+  const visiblePropertyIds: string[] = viewToExport.fields.visiblePropertyIds;
+  const cardProperties =
+    !visiblePropertyIds || visiblePropertyIds.length === 0
+      ? (board.fields.cardProperties as IPropertyTemplate[])
+      : board.fields.cardProperties.filter((template: IPropertyTemplate) => visiblePropertyIds.includes(template.id));
 
   const filterGroup = viewToExport.fields.filter || { filters: [] };
   const filteredCards = CardFilter.applyFilterGroup(filterGroup, cardProperties, cards) || [];

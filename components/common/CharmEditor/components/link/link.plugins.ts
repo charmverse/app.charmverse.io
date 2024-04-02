@@ -1,13 +1,14 @@
-/* eslint-disable max-len */
-import type { Mark, PluginKey } from '@bangle.dev/pm';
-import { Plugin } from '@bangle.dev/pm';
+import type { Mark } from 'prosemirror-model';
+import type { PluginKey } from 'prosemirror-state';
+import { Plugin } from 'prosemirror-state';
 
-import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import {
   hideSuggestionsTooltip,
   referenceElement,
   renderSuggestionsTooltip
-} from '../@bangle.dev/tooltip/suggest-tooltip';
+} from '../@bangle.dev/tooltip/suggestTooltip';
+import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 
 import { getLinkElement } from './getLinkElement';
 import { linkPlugins } from './link';
@@ -141,7 +142,7 @@ export function plugins({ key, readOnly }: { key: PluginKey; readOnly?: boolean 
         }
       }
     }),
-    tooltipPlacement.plugins({
+    tooltipPlacementPlugins({
       stateKey: key,
       renderOpts: {
         placement: 'bottom-start',
