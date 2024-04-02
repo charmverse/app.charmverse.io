@@ -1,8 +1,8 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
-import { Node, PluginKey } from 'prosemirror-model';
-import { Plugin } from 'prosemirror-state';
+import { Node } from 'prosemirror-model';
+import { Plugin, PluginKey } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 import type { CSSProperties, ReactNode } from 'react';
 
