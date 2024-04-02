@@ -1,5 +1,5 @@
-import type { PluginKey } from '@bangle.dev/pm';
 import type { SpaceOperation } from '@charmverse/core/prisma';
+import type { PluginKey } from 'prosemirror-model';
 import type { EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 

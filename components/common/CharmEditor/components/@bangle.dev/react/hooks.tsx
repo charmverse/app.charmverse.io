@@ -1,6 +1,6 @@
-import type { EditorView } from '@bangle.dev/pm';
-import { Plugin, PluginKey } from '@bangle.dev/pm';
 import { rafSchedule } from '@bangle.dev/utils';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import { useContext, useEffect, useState } from 'react';
 
 import type { BangleEditorStateProps } from 'components/common/CharmEditor/components/@bangle.dev/core/bangle-editor-state';

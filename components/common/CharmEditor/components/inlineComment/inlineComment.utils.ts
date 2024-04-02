@@ -1,6 +1,6 @@
-import type { Command, EditorState } from '@bangle.dev/pm';
-import { toggleMark } from '@bangle.dev/pm';
 import { filter, isMarkActiveInSelection } from '@bangle.dev/utils';
+import { toggleMark } from 'prosemirror-commands';
+import type { Command, EditorState } from 'prosemirror-state';
 
 import { markName } from './inlineComment.constants';
 

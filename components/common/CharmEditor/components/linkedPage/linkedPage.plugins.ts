@@ -1,4 +1,4 @@
-import { Plugin, PluginKey } from '@bangle.dev/pm';
+import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';

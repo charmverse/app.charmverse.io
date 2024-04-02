@@ -1,4 +1,4 @@
-import type { Command, EditorState, Node, Schema } from '@bangle.dev/pm';
+import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import type { MoveDirection } from '@bangle.dev/pm-commands';
 import { copyEmptyCommand, cutEmptyCommand, moveNode, parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { browser, domSerializationHelpers, filter, insertEmpty, createObject } from '@bangle.dev/utils';

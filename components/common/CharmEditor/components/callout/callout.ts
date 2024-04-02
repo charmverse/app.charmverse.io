@@ -1,5 +1,5 @@
-import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+import type { DOMOutputSpec, Node } from 'prosemirror-model';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';

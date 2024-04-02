@@ -1,8 +1,8 @@
-import type { PluginKey } from '@bangle.dev/pm';
-import { chainCommands, createParagraphNear, keymap, newlineInCode, splitBlock } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject, filter, insertEmpty } from '@bangle.dev/utils';
-import type { EditorState, Transaction } from 'prosemirror-state';
+import { chainCommands, createParagraphNear, newlineInCode, splitBlock } from 'prosemirror-commands';
+import { keymap } from 'prosemirror-keymap';
+import type { PluginKey, EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';

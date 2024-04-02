@@ -1,6 +1,7 @@
-import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
-import type { EditorState, PluginKey } from '@bangle.dev/pm';
 import { RateReviewOutlined } from '@mui/icons-material';
+import { Plugin, Selection } from 'prosemirror-state';
+import type { EditorState, PluginKey } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';

@@ -1,7 +1,7 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
-import type { EditorState, EditorView } from '@bangle.dev/pm';
-import { PluginKey } from '@bangle.dev/pm';
-import { Plugin } from 'prosemirror-state';
+import type { EditorState } from 'prosemirror-state';
+import { PluginKey, Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';

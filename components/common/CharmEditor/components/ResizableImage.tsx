@@ -1,10 +1,10 @@
-import type { Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import ImageIcon from '@mui/icons-material/Image';
 import { Box, ListItem, Typography } from '@mui/material';
 import Alert from '@mui/material/Alert';
+import type { Node } from 'prosemirror-model';
 import type { HTMLAttributes } from 'react';
 import { memo, useEffect, useRef, useState } from 'react';
 

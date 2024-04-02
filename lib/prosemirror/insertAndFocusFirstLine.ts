@@ -1,5 +1,5 @@
-import type { EditorView } from '@bangle.dev/pm';
-import { TextSelection } from '@bangle.dev/pm';
+import { TextSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 export function insertAndFocusFirstLine(view: EditorView) {
   const { tr, schema } = view.state;

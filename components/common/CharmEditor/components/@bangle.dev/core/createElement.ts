@@ -1,5 +1,5 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
-import { DOMSerializer } from '@bangle.dev/pm';
+import type { DOMOutputSpec } from 'prosemirror-model';
+import { DOMSerializer } from 'prosemirror-model';
 
 export function createElement(spec: DOMOutputSpec): HTMLElement {
   const { dom, contentDOM } = DOMSerializer.renderSpec(window.document, spec);

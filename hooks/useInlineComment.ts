@@ -1,4 +1,4 @@
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
 import type { EditorView } from 'prosemirror-view';
 
 import { threadPluginKey } from 'components/common/CharmEditor/components/thread/thread.plugins';
