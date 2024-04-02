@@ -123,7 +123,8 @@ export function ProjectProfileInputField({
               </MenuItem>
             );
           })}
-          {!isDraft && (
+          {/** Only when draft is false don't show option to create a new project */}
+          {isDraft !== false && (
             <>
               <Divider />
               <MenuItem
@@ -154,7 +155,6 @@ export function ProjectProfileInputField({
             fieldConfig={fieldConfig}
             isTeamLead={isTeamLead}
             disabled={disabled}
-            hideAddTeamMemberButton
             onProjectUpdate={onProjectUpdate}
           />
         </Box>
