@@ -74,6 +74,13 @@ export function ProjectFormAnswers({
                     disabled={disabled}
                     onClick={() => {
                       remove(index + 1);
+                      if (onProjectUpdate) {
+                        const projectWithMembers = getValues();
+                        onProjectUpdate({
+                          ...projectWithMembers,
+                          projectMembers: projectWithMembers.projectMembers.filter((_, i) => i !== index + 1)
+                        });
+                      }
                     }}
                   >
                     <DeleteOutlineOutlinedIcon fontSize='small' color='error' />
