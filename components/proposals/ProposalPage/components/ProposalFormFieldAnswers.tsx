@@ -85,6 +85,7 @@ export function ProposalFormFieldAnswers({
       // This is required to reinstate the form field state after the proposal is published, necessary to show the correct project id
       key={isDraft ? 'draft' : 'published'}
       project={project}
+      proposalId={proposalId}
     />
   );
 }

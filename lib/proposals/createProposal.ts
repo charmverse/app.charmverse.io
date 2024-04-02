@@ -55,6 +55,7 @@ export type CreateProposalInput = {
   selectedCredentialTemplates?: string[];
   sourcePageId?: string;
   sourcePostId?: string;
+  projectId?: string;
 };
 export async function createProposal({
   userId,
@@ -70,7 +71,8 @@ export async function createProposal({
   isDraft,
   selectedCredentialTemplates,
   sourcePageId,
-  sourcePostId
+  sourcePostId,
+  projectId
 }: CreateProposalInput) {
   const proposalId = uuid();
   const proposalStatus: ProposalStatus = isDraft ? 'draft' : 'published';
@@ -110,9 +112,6 @@ export async function createProposal({
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
   }
-
-  const projectId = (formAnswers?.find((a) => a.fieldId === 'project_profile')?.value as { projectId: string })
-    ?.projectId;
 
   if (!isDraft && projectId) {
     await validateProposalProject({
@@ -192,7 +191,10 @@ export async function createProposal({
               }
             }
           : undefined,
-        form: proposalFormId ? { connect: { id: proposalFormId } } : undefined
+        form: proposalFormId ? { connect: { id: proposalFormId } } : undefined,
+        project: {
+          connect: projectId ? { id: projectId } : undefined
+        }
       },
       include: {
         authors: true

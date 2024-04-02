@@ -115,20 +115,13 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
+        projectId,
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         spaceId: currentSpace.id,
         fields: formInputs.fields,
         formId: formInputs.formId,
-        formAnswers: formInputs.formAnswers?.map((formField) => {
-          if (formField.fieldId === projectField?.id && projectId) {
-            return {
-              ...formField,
-              value: { projectId }
-            };
-          }
-          return formField;
-        }),
+        formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId!,
         isDraft,
         selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],

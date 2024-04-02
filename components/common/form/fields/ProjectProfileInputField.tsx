@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
+import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
@@ -23,8 +24,10 @@ export function ProjectProfileInputField({
   project,
   inputEndAdornment,
   onProjectUpdate,
-  isDraft
+  isDraft,
+  proposalId
 }: {
+  proposalId?: string;
   onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => Promise<void>;
   inputEndAdornment?: React.ReactNode;
   disabled?: boolean;
@@ -33,6 +36,9 @@ export function ProjectProfileInputField({
   onChange: (updatedValue: FormFieldValue) => void;
   isDraft?: boolean;
 }) {
+  const { trigger } = useUpdateProposal({
+    proposalId
+  });
   const { user } = useUser();
   const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
   const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
@@ -55,7 +61,16 @@ export function ProjectProfileInputField({
       setSelectedProject(null);
       reset(defaultProjectAndMembersPayload);
     } else {
-      onChange({ projectId: projectIdOrAddProject });
+      // If proposal exist update the projectId field of the proposal
+      if (proposalId) {
+        trigger({
+          projectId: projectIdOrAddProject
+        });
+      }
+      // else update the projectId field of the form, it might be for a new structured proposal form
+      else {
+        onChange({ projectId: projectIdOrAddProject });
+      }
       setShowCreateProjectForm(false);
       const _selectedProject = projectsWithMembers?.find((_project) => _project.id === projectIdOrAddProject) ?? null;
       setSelectedProject(_selectedProject);
@@ -73,7 +88,7 @@ export function ProjectProfileInputField({
           sx={{
             width: '100%'
           }}
-          key={projectId ?? 'jey'}
+          key={projectId}
           // only proposal author is able to change the project profile, not even team lead can change it
           disabled={disabled}
           displayEmpty

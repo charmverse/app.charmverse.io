@@ -336,6 +336,7 @@ test.describe.serial('Structured proposal template with project', () => {
         }
       },
       select: {
+        id: true,
         project: {
           select: {
             id: true,
@@ -374,6 +375,27 @@ test.describe.serial('Structured proposal template with project', () => {
     });
 
     expect(projectAfterUpdate2.excerpt).toBe('This is my project');
+
+    await proposalFormFieldPage.clickProjectOption(project.id);
+
+    expect(
+      (await projectSettings.getProjectField({ fieldName: 'name' }).inputValue()) === 'Updated Project Name'
+    ).toBeTruthy();
+
+    const proposalAfterUpdate = await prisma.proposal.findFirstOrThrow({
+      where: {
+        id: proposal.id
+      },
+      select: {
+        project: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    expect(proposalAfterUpdate.project!.id).toBe(project.id);
   });
 
   test('Visit an existing proposal as a space member should hide private project fields', async ({

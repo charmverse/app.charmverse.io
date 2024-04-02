@@ -55,6 +55,7 @@ type FormFieldAnswersProps = {
   threads?: Record<string, ThreadWithComments | undefined>;
   project?: ProjectWithMembers | null;
   onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => Promise<void>;
+  proposalId?: string;
 };
 
 const StyledStack = styled(Stack)`
@@ -101,7 +102,8 @@ export function FormFieldAnswersControlled({
   project,
   onProjectUpdate,
   threads = {},
-  isDraft
+  isDraft,
+  proposalId
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -183,6 +185,7 @@ export function FormFieldAnswersControlled({
                   <ProjectProfileInputField
                     disabled={disabled}
                     isDraft={isDraft}
+                    proposalId={proposalId}
                     onProjectUpdate={onProjectUpdate}
                     fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                     onChange={(projectFormValues) => {
