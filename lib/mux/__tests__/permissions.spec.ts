@@ -1,4 +1,5 @@
 import { createUserFromWallet } from 'lib/users/createUser';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
@@ -14,7 +15,11 @@ beforeAll(async () => {
   pageId = page.id;
   spaceId = space.id;
   users.member = user.id;
-  users.nonMember = (await createUserFromWallet()).id;
+  users.nonMember = (
+    await createUserFromWallet({
+      address: randomETHWalletAddress()
+    })
+  ).id;
 });
 
 describe('Video Permissions', () => {

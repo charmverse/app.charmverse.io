@@ -44,11 +44,11 @@ export type FieldConfig = Partial<
   >
 >;
 
-export type ProjectFieldConfig = FieldConfig & {
+export type ProjectAndMembersFieldConfig = FieldConfig & {
   projectMember: FieldConfig;
 };
 
-export type ProjectValues = ProjectPayload & {
+export type ProjectAndMembersPayload = ProjectPayload & {
   // project member with id is for updates existing project members
   // project member without id is for creating new project members
   projectMembers: (ProjectMemberPayload & { id?: string; userId?: string | null })[];

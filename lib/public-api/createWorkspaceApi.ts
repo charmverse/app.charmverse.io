@@ -13,6 +13,7 @@ import type { SpaceCreateInput } from 'lib/spaces/createSpace';
 import { createWorkspace } from 'lib/spaces/createSpace';
 import { getAvailableDomainName } from 'lib/spaces/getAvailableDomainName';
 import { createOrGetUserFromWallet } from 'lib/users/createUser';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { InvalidInputError } from 'lib/utils/errors';
 import { isValidUrl } from 'lib/utils/isValidUrl';
 import { uid } from 'lib/utils/strings';
@@ -37,7 +38,10 @@ export async function createWorkspaceApi({
   // Retrieve an id for the admin user
   const adminUserId = adminDiscordUserId
     ? await upsertUserForDiscordId({ discordId: adminDiscordUserId, username: adminUsername, avatar: adminAvatar })
-    : await createOrGetUserFromWallet({ address: adminWalletAddress, avatar: adminAvatar }).then(({ user }) => user.id);
+    : await createOrGetUserFromWallet({
+        address: adminWalletAddress ?? randomETHWalletAddress(),
+        avatar: adminAvatar
+      }).then(({ user }) => user.id);
 
   if (!adminUserId) {
     throw new InvalidInputError('No admin user ID created.');

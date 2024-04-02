@@ -11,7 +11,7 @@ import type {
 import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import { FieldConfig } from 'lib/projects/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
 
@@ -50,7 +50,7 @@ export function mapDbProposalToProposal({
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
   const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
-    ?.fieldConfig as ProjectFieldConfig;
+    ?.fieldConfig as ProjectAndMembersFieldConfig;
   const project = proposal.project
     ? getProposalProjectFormField({
         canViewPrivateFields: !!permissions.view_private_fields,

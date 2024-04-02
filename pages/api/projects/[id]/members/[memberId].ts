@@ -4,7 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deleteProjectMember } from 'lib/projects/deleteProjectMember';
-import type { ProjectValues, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { updateProjectMember } from 'lib/projects/updateProjectMember';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -24,7 +24,7 @@ async function updateProjectMemberController(
       userId
     }
   });
-  const projectMemberValues = req.body as ProjectValues['projectMembers'][0];
+  const projectMemberValues = req.body as ProjectAndMembersPayload['projectMembers'][0];
 
   const projectMember = await updateProjectMember({
     projectMemberValues

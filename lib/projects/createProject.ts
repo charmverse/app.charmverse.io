@@ -3,9 +3,12 @@ import type { Prisma, ProjectMember } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getProjectMemberCreateTransaction } from './getProjectMemberCreateTransaction';
-import type { ProjectValues, ProjectWithMembers } from './interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from './interfaces';
 
-export async function createProject(payload: { userId: string; project: ProjectValues }): Promise<ProjectWithMembers> {
+export async function createProject(payload: {
+  userId: string;
+  project: ProjectAndMembersPayload;
+}): Promise<ProjectWithMembers> {
   if (payload.project.projectMembers.length === 0) {
     throw new InvalidInputError('At least one member is required');
   }

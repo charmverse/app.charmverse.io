@@ -12,7 +12,7 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProjectValues } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -27,7 +27,7 @@ export function ProposalStickyFooter({
   refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
-  const projectForm = useFormContext<ProjectValues>();
+  const projectForm = useFormContext<ProjectAndMembersPayload>();
   const projectField = proposal.form?.formFields?.find((field) => field.type === 'project_profile');
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal.id });
   const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({

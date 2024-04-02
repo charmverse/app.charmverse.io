@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { defaultProjectFieldConfig, defaultProjectValues } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { getProposalProjectFormField } from '../getProposalProjectFormField';
@@ -65,7 +65,7 @@ describe('getProposalProjectFormField', () => {
     const projectWithoutPrivateFields = getProposalProjectFormField({
       canViewPrivateFields: false,
       projectWithMembers,
-      fieldConfig: fieldsInput[0].fieldConfig as ProjectFieldConfig
+      fieldConfig: fieldsInput[0].fieldConfig as ProjectAndMembersFieldConfig
     });
 
     expect(projectWithoutPrivateFields.walletAddress).toBe('');
@@ -80,7 +80,7 @@ describe('getProposalProjectFormField', () => {
     const projectWithoutPrivateFields = getProposalProjectFormField({
       canViewPrivateFields: true,
       projectWithMembers,
-      fieldConfig: fieldsInput[0].fieldConfig as ProjectFieldConfig
+      fieldConfig: fieldsInput[0].fieldConfig as ProjectAndMembersFieldConfig
     });
 
     expect(projectWithoutPrivateFields.walletAddress).toBe(projectWithMembers.walletAddress);

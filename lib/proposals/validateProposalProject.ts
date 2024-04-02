@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
-import type { ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 
 export async function validateProposalProject({
   formFields,
@@ -17,7 +17,7 @@ export async function validateProposalProject({
     ?.projectId;
   if (projectField && projectId) {
     const projectSchema = createProjectYupSchema({
-      fieldConfig: projectField.fieldConfig as ProjectFieldConfig,
+      fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig,
       defaultRequired: true
     });
 

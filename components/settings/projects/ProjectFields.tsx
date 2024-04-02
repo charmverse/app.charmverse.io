@@ -1,5 +1,5 @@
 import { projectFieldProperties } from 'lib/projects/constants';
-import type { FieldConfig, ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -29,8 +29,8 @@ export function ProjectFieldsEditor({
   defaultRequired
 }: {
   defaultRequired?: boolean;
-  onChange?: (value: Omit<ProjectFieldConfig, 'members'>) => void;
-  fieldConfig: Omit<ProjectFieldConfig, 'members'>;
+  onChange?: (value: Omit<ProjectAndMembersFieldConfig, 'members'>) => void;
+  fieldConfig: Omit<ProjectAndMembersFieldConfig, 'members'>;
 }) {
   return (
     <FieldsEditor

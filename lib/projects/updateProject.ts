@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
 import { getProjectMemberCreateTransaction } from './getProjectMemberCreateTransaction';
-import type { ProjectValues, ProjectWithMembers } from './interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from './interfaces';
 
 export async function updateProject({
   userId,
@@ -13,7 +13,7 @@ export async function updateProject({
 }: {
   projectId: string;
   userId: string;
-  payload: ProjectValues;
+  payload: ProjectAndMembersPayload;
 }): Promise<ProjectWithMembers> {
   const existingProject = await prisma.project.findUniqueOrThrow({
     where: {

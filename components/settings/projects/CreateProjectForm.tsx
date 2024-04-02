@@ -7,7 +7,7 @@ import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces';
+import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 export function CreateProjectForm({
   onCancel,
@@ -17,7 +17,7 @@ export function CreateProjectForm({
   onCancel?: VoidFunction;
 }) {
   const { trigger: createProject, isMutating } = useCreateProject();
-  const { formState, getValues, reset } = useFormContext<ProjectValues>();
+  const { formState, getValues, reset } = useFormContext<ProjectAndMembersPayload>();
 
   const isValid = formState.isValid;
   const { mutate } = useGetProjects();

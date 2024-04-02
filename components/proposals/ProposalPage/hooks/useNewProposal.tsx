@@ -15,7 +15,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -63,7 +63,7 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectWithMembers,
-    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectFieldConfig,
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectAndMembersFieldConfig,
     defaultRequired: true
   });
 

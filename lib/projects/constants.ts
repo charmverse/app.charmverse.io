@@ -1,4 +1,4 @@
-import type { ProjectFieldConfig, ProjectFieldProperty, ProjectValues } from './interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectFieldProperty, ProjectAndMembersPayload } from './interfaces';
 
 export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
@@ -101,7 +101,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export const defaultProjectValues: ProjectValues = {
+export const defaultProjectValues: ProjectAndMembersPayload = {
   name: '',
   excerpt: '',
   description: '',
@@ -147,4 +147,4 @@ export const defaultProjectFieldConfig = {
       private: true
     }
   }
-} as ProjectFieldConfig;
+} as ProjectAndMembersFieldConfig;

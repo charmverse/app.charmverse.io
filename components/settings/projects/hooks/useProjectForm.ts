@@ -11,9 +11,9 @@ import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type {
   ProjectField,
   ProjectMemberField,
-  ProjectFieldConfig,
+  ProjectAndMembersFieldConfig,
   ProjectWithMembers,
-  ProjectValues
+  ProjectAndMembersPayload
 } from 'lib/projects/interfaces';
 
 function addMatchersToSchema({
@@ -50,7 +50,7 @@ export function createProjectYupSchema({
   fieldConfig,
   defaultRequired = false
 }: {
-  fieldConfig: ProjectFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
 }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
@@ -131,13 +131,13 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
         userId: projectMember.userId
       };
     })
-  } as ProjectValues;
+  } as ProjectAndMembersPayload;
 }
 
 export function useProjectForm(options: {
-  defaultValues?: ProjectValues;
+  defaultValues?: ProjectAndMembersPayload;
   projectWithMembers?: ProjectWithMembers | null;
-  fieldConfig: ProjectFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
 }) {
   const { defaultRequired, defaultValues, fieldConfig, projectWithMembers } = options;

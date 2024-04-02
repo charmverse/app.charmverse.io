@@ -8,7 +8,7 @@ import { Controller } from 'react-hook-form';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -169,7 +169,7 @@ export function FormFieldAnswersControlled({
                   <ProjectProfileInputField
                     disabled={disabled}
                     formField={{
-                      fieldConfig: formField.fieldConfig as ProjectFieldConfig,
+                      fieldConfig: formField.fieldConfig as ProjectAndMembersFieldConfig,
                       value: field.value
                     }}
                     isDraft={isDraft}

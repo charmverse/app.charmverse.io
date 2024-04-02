@@ -1,5 +1,5 @@
 import { projectMemberFieldProperties } from 'lib/projects/constants';
-import type { FieldConfig, ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -32,8 +32,8 @@ export function ProjectMemberFieldsEditor({
   defaultRequired
 }: {
   defaultRequired?: boolean;
-  onChange?: (values: ProjectFieldConfig['projectMember']) => void;
-  fieldConfig: ProjectFieldConfig['projectMember'];
+  onChange?: (values: ProjectAndMembersFieldConfig['projectMember']) => void;
+  fieldConfig: ProjectAndMembersFieldConfig['projectMember'];
 }) {
   return (
     <FieldsEditor

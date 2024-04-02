@@ -38,7 +38,7 @@ import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
 import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import type { ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
@@ -247,7 +247,7 @@ function DocumentPageComponent({
   const projectId = proposal?.projectId;
   const { form } = useProject({
     projectId,
-    fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectFieldConfig
+    fieldConfig: (projectProfileField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectAndMembersFieldConfig
   });
 
   return (

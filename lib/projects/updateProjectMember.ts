@@ -1,11 +1,11 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { ProjectValues } from './interfaces';
+import type { ProjectAndMembersPayload } from './interfaces';
 
 export async function updateProjectMember({
   projectMemberValues
 }: {
-  projectMemberValues: ProjectValues['projectMembers'][0];
+  projectMemberValues: ProjectAndMembersPayload['projectMembers'][0];
 }) {
   return prisma.projectMember.update({
     where: {

@@ -7,7 +7,7 @@ import { isProfilePathAvailable } from 'lib/profile/isProfilePathAvailable';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { uid } from 'lib/utils/strings';
 
-import type { ProjectValues } from './interfaces';
+import type { ProjectAndMembersPayload } from './interfaces';
 
 async function getOrCreateUserByWallet(walletAddress: string) {
   const user = await prisma.userWallet.findFirst({
@@ -106,7 +106,7 @@ export async function getProjectMemberCreateTransaction({
 }: {
   projectId: string;
   userId: string;
-  projectMember: ProjectValues['projectMembers'][number];
+  projectMember: ProjectAndMembersPayload['projectMembers'][number];
 }) {
   const walletAddress = projectMember.walletAddress;
   const email = projectMember.email;

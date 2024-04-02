@@ -3,7 +3,7 @@ import type { LoggedInUser } from 'models';
 import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import { defaultProjectValues } from './constants';
-import type { ProjectValues } from './interfaces';
+import type { ProjectAndMembersPayload } from './interfaces';
 
 export function getDefaultProjectValues({
   membersRecord,
@@ -11,7 +11,7 @@ export function getDefaultProjectValues({
 }: {
   user: LoggedInUser | null;
   membersRecord: Record<string, Member>;
-}): ProjectValues {
+}): ProjectAndMembersPayload {
   const currentMember = user ? membersRecord[user.id] : null;
   const primaryWallet = user?.wallets.find((wallet) => wallet.id === user?.primaryWalletId) ?? user?.wallets[0];
   const userEmail =

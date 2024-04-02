@@ -7,7 +7,7 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectValues } from 'lib/projects/constants';
-import type { ProjectFieldConfig, ProjectValues } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { ProjectFieldAnswers, ProjectFieldsEditor } from './ProjectFields';
 import { ProjectMemberFieldAnswers, ProjectMemberFieldsEditor } from './ProjectMemberFields';
@@ -20,12 +20,12 @@ export function ProjectFormAnswers({
   disabled
 }: {
   disabled?: boolean;
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig?: ProjectAndMembersFieldConfig;
   isTeamLead: boolean;
   defaultRequired?: boolean;
   hideAddTeamMemberButton?: boolean;
 }) {
-  const { getValues, setValue, control } = useFormContext<ProjectValues>();
+  const { getValues, setValue, control } = useFormContext<ProjectAndMembersPayload>();
   const projectValues = getValues();
   const { user } = useUser();
   const extraProjectMembers = projectValues.projectMembers.slice(1);
@@ -126,8 +126,8 @@ export function ProjectFormEditor({
   fieldConfig,
   defaultRequired
 }: {
-  onChange?: (project: ProjectFieldConfig) => void;
-  fieldConfig: ProjectFieldConfig;
+  onChange?: (project: ProjectAndMembersFieldConfig) => void;
+  fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
 }) {
   return (

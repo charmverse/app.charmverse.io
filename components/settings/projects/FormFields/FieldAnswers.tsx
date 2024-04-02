@@ -3,7 +3,7 @@ import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { ProjectValues, ProjectFieldProperty, FieldConfig } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectFieldProperty, FieldConfig } from 'lib/projects/interfaces';
 
 function FieldAnswer({
   property,
@@ -13,12 +13,12 @@ function FieldAnswer({
   disabled
 }: {
   disabled?: boolean;
-  name: Path<ProjectValues>;
+  name: Path<ProjectAndMembersPayload>;
   defaultRequired?: boolean;
   property: ProjectFieldProperty;
   fieldConfig?: FieldConfig;
 }) {
-  const { control, register } = useFormContext<ProjectValues>();
+  const { control, register } = useFormContext<ProjectAndMembersPayload>();
 
   const { field, fieldState } = useController({
     control,
@@ -63,7 +63,7 @@ export function FieldAnswers({
     <Stack display='flex' flexDirection='column' gap={2} width='100%'>
       {properties.map((property) => (
         <FieldAnswer
-          name={(name ? `${name}.${property.field}` : property.field) as Path<ProjectValues>}
+          name={(name ? `${name}.${property.field}` : property.field) as Path<ProjectAndMembersPayload>}
           defaultRequired={defaultRequired}
           fieldConfig={fieldConfig}
           key={property.field as string}

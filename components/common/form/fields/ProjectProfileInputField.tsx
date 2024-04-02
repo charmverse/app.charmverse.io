@@ -8,7 +8,7 @@ import { convertToProjectValues } from 'components/settings/projects/hooks/usePr
 import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectValues } from 'lib/projects/constants';
-import type { ProjectFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
 
@@ -25,7 +25,7 @@ export function ProjectProfileInputField({
   disabled?: boolean;
   formField: {
     value?: FormFieldValue;
-    fieldConfig?: ProjectFieldConfig;
+    fieldConfig?: ProjectAndMembersFieldConfig;
   };
   projectWithMembers?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
@@ -127,7 +127,7 @@ export function ProjectProfileInputField({
           <ProjectFormAnswers
             defaultRequired
             key={selectedProject?.id ?? 'new-project'}
-            fieldConfig={formField.fieldConfig as ProjectFieldConfig}
+            fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
             // only team lead is able to change the project profile if they have edit access to the proposal
             isTeamLead={isTeamLead || showCreateProjectForm}
             disabled={disabled}
