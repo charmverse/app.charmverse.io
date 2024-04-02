@@ -12,6 +12,11 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
     allowPrivate: true
   },
   {
+    field: 'email',
+    label: 'Email',
+    allowPrivate: true
+  },
+  {
     field: 'twitter',
     label: 'X.com'
   },
@@ -26,11 +31,6 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'linkedin',
     label: 'LinkedIn'
-  },
-  {
-    field: 'email',
-    label: 'Email',
-    allowPrivate: true
   },
   {
     field: 'telegram',

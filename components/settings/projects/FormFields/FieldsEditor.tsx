@@ -45,7 +45,7 @@ export function FieldsEditor({
                   control={
                     <Switch
                       size='small'
-                      checked={!fieldConfig?.[property.field]?.show ?? true}
+                      checked={fieldConfig?.[property.field]?.show ?? true}
                       onChange={(e) => {
                         const isChecked = e.target.checked;
                         onChange({

@@ -228,22 +228,24 @@ function ExpandedFormField({
           options={formField.options}
         />
       )}
-      <Divider
-        sx={{
-          my: 1
-        }}
-      />
 
       {formField.type !== 'label' && formField.type !== 'project_profile' && (
-        <Stack gap={0.5} flexDirection='row' alignItems='center'>
-          <Switch
-            data-test='form-field-required-switch'
-            size='small'
-            checked={formField.required}
-            onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+        <>
+          <Divider
+            sx={{
+              my: 1
+            }}
           />
-          <Typography>Required</Typography>
-        </Stack>
+          <Stack gap={0.5} flexDirection='row' alignItems='center'>
+            <Switch
+              data-test='form-field-required-switch'
+              size='small'
+              checked={formField.required}
+              onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+            />
+            <Typography>Required</Typography>
+          </Stack>
+        </>
       )}
 
       {formField.type !== 'project_profile' && (
