@@ -161,7 +161,7 @@ export function ProjectFormEditor({
               }
         }
       />
-      <Typography variant='h5' mt={2}>
+      <Typography variant='h6' mt={2}>
         Team Info
       </Typography>
       <FieldLabel>Team Lead</FieldLabel>
