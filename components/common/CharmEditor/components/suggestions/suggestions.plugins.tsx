@@ -3,8 +3,9 @@ import type { EditorState, PluginKey } from '@bangle.dev/pm';
 import { RateReviewOutlined } from '@mui/icons-material';
 import { createRoot } from 'react-dom/client';
 
-import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
 import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggestTooltip';
+import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 import { getEventsFromDoc } from './getEvents';
@@ -86,7 +87,7 @@ export function plugins({ onSelectionSet, key }: { onSelectionSet?: (state: Edit
         }
       }
     }),
-    tooltipPlacement.plugins({
+    tooltipPlacementPlugins({
       stateKey: key,
       renderOpts: {
         placement: 'bottom',

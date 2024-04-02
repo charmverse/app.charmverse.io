@@ -3,7 +3,7 @@ import type { DOMOutputSpec } from '@bangle.dev/pm';
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import type { Member } from 'lib/members/interfaces';
 
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { mentionNodeName, mentionSuggestMarkName, mentionTrigger } from './mention.constants';
 

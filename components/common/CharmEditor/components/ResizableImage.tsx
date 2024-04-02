@@ -18,7 +18,7 @@ import { replaceS3Domain } from 'lib/utils/url';
 import { enableDragAndDrop } from '../utils';
 
 import { getFileBinary } from './@bangle.dev/base-components/image';
-import * as suggestTooltip from './@bangle.dev/tooltip/suggestTooltip';
+import { spec as suggestTooltipSpec } from './@bangle.dev/tooltip/suggestTooltipSpec';
 import BlockAligner from './BlockAligner';
 import type { CharmNodeViewProps } from './nodeView/nodeView';
 import Resizable from './Resizable/Resizable';
@@ -245,7 +245,7 @@ function ResizableImage({
 
 export function spec() {
   // this is a dummy marker to let us know to show the image selector
-  const tooltipSpec = suggestTooltip.spec({ markName: 'tooltip-marker', trigger: 'image', excludes: '_' });
+  const tooltipSpec = suggestTooltipSpec({ markName: 'tooltip-marker', trigger: 'image', excludes: '_' });
   tooltipSpec.schema.inclusive = false;
   return [tooltipSpec, imageSpec()];
 }

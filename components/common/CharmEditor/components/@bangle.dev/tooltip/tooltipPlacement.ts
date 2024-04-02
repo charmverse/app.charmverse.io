@@ -21,9 +21,9 @@ const log = LOG ? _log.debug : () => {};
 
 const rem = typeof window === 'undefined' ? 12 : parseFloat(getComputedStyle(document.documentElement).fontSize);
 
-interface TooltipPluginState {
+type TooltipPluginState = {
   show: boolean;
-}
+};
 
 type TooltipCallbackFunction = (state: EditorState, dispatch: any, view: EditorView) => any;
 
@@ -35,7 +35,7 @@ export type GetReferenceElementFunction = (
   scrollContainerDOM: HTMLElement
 ) => VirtualElement;
 
-export interface TooltipRenderOpts {
+export type TooltipRenderOpts = {
   tooltipDOMSpec?: DOMOutputSpec;
   placement?: Placement;
   getReferenceElement: GetReferenceElementFunction;
@@ -50,12 +50,12 @@ export interface TooltipRenderOpts {
     scrollContainerDOM: HTMLElement,
     defaultModifiers: ModifierList
   ) => ModifierList;
-}
+};
 
-interface TooltipPlacementOptions {
+type TooltipPlacementOptions = {
   stateKey: PluginKey;
   renderOpts: TooltipRenderOpts;
-}
+};
 
 function tooltipPlacement({
   stateKey,

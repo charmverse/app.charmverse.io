@@ -3,8 +3,8 @@ import { Plugin, PluginKey } from '@bangle.dev/pm';
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 
-import { createTooltipDOM } from '../@bangle.dev/tooltip';
-import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
+import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltip';
 import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
 
 import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';

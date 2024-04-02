@@ -24,11 +24,11 @@ type SelectionType = string | null;
 
 type CalculateTypeFunction = (state: EditorState, prevType: SelectionType) => SelectionType;
 
-export interface SelectionTooltipProps {
+export type SelectionTooltipProps = {
   key?: PluginKey;
   calculateType?: CalculateTypeFunction;
   tooltipRenderOpts?: Omit<TooltipRenderOpts, 'getReferenceElement'>;
-}
+};
 
 function selectionTooltip({
   key = new PluginKey('selectionTooltipPlugin'),

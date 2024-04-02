@@ -1,18 +1,16 @@
-import { createObject, filter, findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
+import { findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
-import { keymap } from 'prosemirror-keymap';
-import type { MarkType, Schema } from 'prosemirror-model';
+import type { MarkType } from 'prosemirror-model';
 import { Fragment, Node } from 'prosemirror-model';
-import type { Command, EditorState } from 'prosemirror-state';
-import { Plugin, PluginKey, Selection } from 'prosemirror-state';
+import type { Command, EditorState, PluginKey } from 'prosemirror-state';
+import { Selection } from 'prosemirror-state';
 
-import type { RawPlugins } from '../core/plugin-loader';
+import type { BaseRawMarkSpec } from '../core/specRegistry';
 
-import { plugins as tooltipPlacementPlugins } from './tooltipPlacement';
-import type { GetReferenceElementFunction, TooltipRenderOpts } from './tooltipPlacement';
-import { triggerInputRule } from './triggerInputRule';
+import type { TooltipRenderOpts } from './tooltipPlacement';
 
-export const plugins = pluginsFactory;
+export const spec = specFactory;
+
 export const commands = {
   queryTriggerText,
   queryIsSuggestTooltipActive,
@@ -31,221 +29,50 @@ export const defaultKeys = {
   left: undefined
 };
 
-export type SuggestTooltipRenderOpts = Omit<TooltipRenderOpts, 'getReferenceElement'>;
-
-interface PluginsOptions {
-  key?: PluginKey;
-  tooltipRenderOpts: SuggestTooltipRenderOpts;
-  markName: string;
-  trigger?: string;
-  keybindings?: any;
-  onEnter?: Command;
-  onArrowDown?: Command;
-  onArrowUp?: Command;
-  onEscape?: Command;
-  onArrowLeft?: Command;
-  onArrowRight?: Command;
-}
-export interface PluginState {
-  triggerText: string;
-  show: boolean;
-  counter: number;
-  trigger?: string;
-  markName: string;
-}
-
-function pluginsFactory({
-  key = new PluginKey('suggest_tooltip'),
+function specFactory({
   markName,
   trigger,
-  tooltipRenderOpts = {
-    placement: 'bottom-start'
-  },
-  keybindings = defaultKeys,
-  onEnter = (state, dispatch, view) => {
-    return removeSuggestMark(key)(state, dispatch, view);
-  },
-  onArrowDown = incrementSuggestTooltipCounter(key),
-  onArrowUp = decrementSuggestTooltipCounter(key),
-  onEscape = (state, dispatch, view) => {
-    return removeSuggestMark(key)(state, dispatch, view);
-  },
-  onArrowLeft,
-  onArrowRight
-}: PluginsOptions): RawPlugins {
-  return ({ schema }: { schema: Schema }) => {
-    const isActiveCheck = queryIsSuggestTooltipActive(key);
-    return [
-      new Plugin<PluginState>({
-        key,
-        state: {
-          init(_, _state) {
-            return {
-              trigger,
-              markName,
-              triggerText: '',
-              show: false,
-              counter: 0
-            };
-          },
-          apply(tr, pluginState, _oldState, newState) {
-            const meta = tr.getMeta(key);
-            if (meta === undefined) {
-              return pluginState;
-            }
-            // ignore remote changes
-            if (tr.getMeta('remote')) {
-              return pluginState;
-            }
-            if (meta.type === 'RENDER_TOOLTIP') {
-              return {
-                ...pluginState,
-                // Cannot use queryTriggerText because it relies on
-                // reading the pluginState which will not be there in newState.
-                triggerText: getTriggerText(newState, markName, trigger),
-                show: true
-              };
-            }
-            if (meta.type === 'HIDE_TOOLTIP') {
-              // Do not change object reference if show was and is false
-              if (pluginState.show === false) {
-                return pluginState;
-              }
-              return {
-                ...pluginState,
-                triggerText: '',
-                show: false,
-                counter: 0
-              };
-            }
-            if (meta.type === 'INCREMENT_COUNTER') {
-              return { ...pluginState, counter: pluginState.counter + 1 };
-            }
-            if (meta.type === 'RESET_COUNTER') {
-              return { ...pluginState, counter: 0 };
-            }
-            if (meta.type === 'UPDATE_COUNTER') {
-              return { ...pluginState, counter: meta.value };
-            }
-            if (meta.type === 'DECREMENT_COUNTER') {
-              return { ...pluginState, counter: pluginState.counter - 1 };
-            }
-            throw new Error('Unknown type');
+  markColor,
+  excludes
+}: {
+  excludes?: string;
+  markName: string;
+  trigger?: string;
+  markColor?: string;
+}): BaseRawMarkSpec {
+  return {
+    name: markName,
+    type: 'mark',
+    schema: {
+      excludes,
+      inclusive: true,
+      group: 'suggestTriggerMarks',
+      parseDOM: [{ tag: `span[data-${markName}]` }],
+      toDOM: (mark) => {
+        return [
+          'span',
+          {
+            'data-bangle-name': markName,
+            'data-suggest-trigger': mark.attrs.trigger,
+            style: markColor ? `color: ${markColor}` : ''
           }
+        ];
+      },
+      attrs: {
+        trigger: { default: trigger }
+      },
+      markdown: {
+        toMarkdown: {
+          open: '',
+          close: '',
+          mixable: true
         }
-      }),
-      tooltipPlacementPlugins({
-        stateKey: key,
-        renderOpts: {
-          ...tooltipRenderOpts,
-          placement: 'bottom-start',
-          getReferenceElement: referenceElement(key, (state: EditorState) => {
-            const markType = schema.marks[markName];
-            const { selection } = state;
-            return findFirstMarkPosition(markType, state.doc, selection.from - 1, selection.to);
-          })
-        }
-      }),
-      trigger && triggerInputRule(schema, markName, trigger),
-      tooltipController({
-        trigger,
-        markName,
-        key
-      }),
-      keybindings &&
-        keymap(
-          createObject([
-            [keybindings.select, filter(isActiveCheck, onEnter)],
-            [keybindings.up, filter(isActiveCheck, onArrowUp)],
-            [keybindings.down, filter(isActiveCheck, onArrowDown)],
-            [keybindings.left, filter(isActiveCheck, onArrowLeft)],
-            [keybindings.right, filter(isActiveCheck, onArrowRight)],
-            [keybindings.hide, filter(isActiveCheck, onEscape)]
-          ])
-        )
-    ];
-  };
-}
-
-export function referenceElement(
-  pluginKey: PluginKey,
-  getActiveMarkPos: (state: EditorState) => { start: number; end: number }
-): GetReferenceElementFunction {
-  return (view) => {
-    return {
-      getBoundingClientRect: () => {
-        const emojiSuggestState = pluginKey.getState(view.state);
-        // Ref will be present if we are triggering the emoji suggest by clicking on page icon
-        if (emojiSuggestState.ref) {
-          return (emojiSuggestState.ref as HTMLDivElement).getBoundingClientRect();
-        }
-
-        const state = view.state;
-        const markPos = getActiveMarkPos(state);
-        // add by + so that we get the position right after trigger
-        const startPos = markPos.start > -1 ? markPos.start + 1 : 0;
-        const start = view.coordsAtPos(startPos);
-        // if the suggestMark text spanned two lines, we want to show the tooltip based on the end pos
-        // so that it doesn't hide the text
-        const end = view.coordsAtPos(markPos.end > -1 ? markPos.end : startPos);
-
-        const { left, right } = start;
-        const { top, bottom } = end;
-        const x = left;
-        const y = top;
-        const width = right - left;
-        const height = bottom - top;
-        return new DOMRect(x, y, width, height);
       }
-    };
+    }
   };
 }
 
-function tooltipController({ key, trigger, markName }: { key: PluginKey; trigger?: string; markName: string }) {
-  return new Plugin({
-    view() {
-      return {
-        update: (view, lastState) => {
-          const { state } = view;
-          if (lastState === state || !state.selection.empty) {
-            return;
-          }
-          const markType = state.schema.marks[markName];
-          if (
-            lastState.doc.eq(state.doc) &&
-            state.selection.eq(lastState && lastState.selection) &&
-            // This is a shorthand for checking if the stored mark  of `markType`
-            // has changed within the last step. If it has we need to update the state
-            isStoredMark(state, markType) === isStoredMark(lastState, markType)
-          ) {
-            return;
-          }
-
-          const isMarkActive = isSuggestMarkActive(markName)(state);
-
-          // clear the mark if the user delete the trigger but remaining mark text
-          // stayed.
-          // Example `<mark>/hello</mark>` --(user deletes the /)-> `<mark>hello</mark>`
-          // -> (clear) ->  hello
-          if (isMarkActive && trigger && !doesQueryHaveTrigger(state, markType, trigger)) {
-            removeSuggestMark(key)(state, view.dispatch, view);
-            return;
-          }
-
-          if (!isMarkActive) {
-            const keyState = key.getState(state);
-            // performance optimization to prevent unnecessary dispatches
-            if (keyState?.show === true) {
-              hideSuggestionsTooltip(key)(view.state, view.dispatch, view);
-            }
-            return;
-          }
-          renderSuggestionsTooltip(key, {})(view.state, view.dispatch, view);
-        }
-      };
-    }
-  });
-}
+export type SuggestTooltipRenderOpts = Omit<TooltipRenderOpts, 'getReferenceElement'>;
 
 function isStoredMark(state: EditorState, markType: MarkType) {
   return state && state.storedMarks && markType.isInSet(state.storedMarks);

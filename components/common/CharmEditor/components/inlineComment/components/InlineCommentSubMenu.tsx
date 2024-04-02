@@ -11,10 +11,8 @@ import { useInlineComment } from 'hooks/useInlineComment';
 import { useThreads } from 'hooks/useThreads';
 
 import { useEditorViewContext } from '../../../components/@bangle.dev/react/hooks';
-import { selectionTooltip } from '../../../components/@bangle.dev/tooltip';
+import { hideSelectionTooltip } from '../../../components/@bangle.dev/tooltip/selectionTooltip';
 import { updateInlineComment } from '../inlineComment.utils';
-
-const hideSelectionTooltip = selectionTooltip.hideSelectionTooltip;
 
 export const ThreadContainer = styled(Paper)`
   display: flex;

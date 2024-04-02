@@ -6,12 +6,15 @@ import type { Command, EditorState } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
-import type { SelectionTooltipProps } from '../@bangle.dev/tooltip';
-import { selectionTooltip } from '../@bangle.dev/tooltip';
+import type { SelectionTooltipProps } from '../@bangle.dev/tooltip/selectionTooltip';
+import {
+  plugins as selectionTooltipPlugins,
+  queryIsSelectionTooltipActive,
+  querySelectionTooltipType,
+  hideSelectionTooltip,
+  updateSelectionTooltipType
+} from '../@bangle.dev/tooltip/selectionTooltip';
 import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
-
-const { queryIsSelectionTooltipActive, querySelectionTooltipType, hideSelectionTooltip, updateSelectionTooltipType } =
-  selectionTooltip;
 
 export const defaultKeys = {
   hide: 'Escape',
@@ -31,7 +34,7 @@ export function floatingMenu({
   calculateType
 }: FloatingMenuPluginArgs = {}): (undefined | Plugin | (() => Plugin) | InputRule)[] {
   return [
-    selectionTooltip.plugins({
+    selectionTooltipPlugins({
       key,
       calculateType,
       tooltipRenderOpts
