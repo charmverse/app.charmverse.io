@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import { isTestEnv } from 'config/constants';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { createUserFromWallet } from 'lib/users/createUser';
+import { createOrGetUserFromWallet } from 'lib/users/createUser';
 import { getUserProfile } from 'lib/users/getUser';
 import type { LoggedInUser } from 'models';
 
@@ -27,7 +27,8 @@ async function register(req: NextApiRequest, res: NextApiResponse) {
         userId ? `User with id "${userId}" not found` : `Please provide a user wallet to create this account`
       );
     }
-    user = await createUserFromWallet({ address });
+    const { user: createdUser } = await createOrGetUserFromWallet({ address });
+    user = createdUser;
     user.isNew = true;
   }
 

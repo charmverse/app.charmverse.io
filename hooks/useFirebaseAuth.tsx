@@ -17,7 +17,6 @@ import { getAppUrl } from 'lib/utils/browser';
 import { InvalidInputError } from 'lib/utils/errors';
 
 import { useLocalStorage } from './useLocalStorage';
-import { useVerifyLoginOtp } from './useVerifyLoginOtp';
 
 export function useFirebaseAuth({ authenticatePath = 'authenticate' } = {}) {
   const [firebaseApp] = useState<FirebaseApp>(initializeApp(googleWebClientConfig));

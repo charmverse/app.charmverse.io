@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposal } from 'lib/proposals/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
@@ -39,7 +39,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { authors, fields } = req.body as UpdateProposalRequest;
+  const { authors, fields, projectId } = req.body as UpdateProposalRequest;
 
   const proposal = await prisma.proposal.findUnique({
     where: {
@@ -83,9 +83,28 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
+  if (projectId) {
+    const projectWithMembers = await prisma.project.findUnique({
+      where: {
+        id: projectId,
+        projectMembers: {
+          some: {
+            userId
+          }
+        }
+      }
+    });
+
+    // Only team members can update the proposal's connected project
+    if (!projectWithMembers) {
+      throw new ActionNotPermittedError(`You can't update this proposal.`);
+    }
+  }
+
   await updateProposal({
     proposalId: proposal.id,
     authors,
+    projectId,
     fields,
     selectedCredentialTemplates: req.body.selectedCredentialTemplates,
     actorId: userId

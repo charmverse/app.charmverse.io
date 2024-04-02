@@ -23,8 +23,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utils/react';
@@ -89,7 +89,6 @@ function ExpandedFormField({
 }: Omit<FormFieldProps, 'isCollapsed'>) {
   const theme = useTheme();
   const titleTextFieldRef = useRef<HTMLInputElement | null>(null);
-  const isCharmverseSpace = useIsCharmverseSpace();
   // Auto focus on title text field when expanded
   useEffect(() => {
     if (titleTextFieldRef.current && shouldFocus) {
@@ -104,10 +103,6 @@ function ExpandedFormField({
     }
 
     return formFieldTypes.filter((_formFieldType) => {
-      if (!isCharmverseSpace && _formFieldType === 'project_profile') {
-        return false;
-      }
-
       const nonDuplicateFieldType = nonDuplicateFieldTypes.includes(_formFieldType);
       if (nonDuplicateFieldType) {
         return !formFieldTypeFrequencyCount[_formFieldType] || _formFieldType === formFieldType;
@@ -115,7 +110,7 @@ function ExpandedFormField({
 
       return true;
     });
-  }, [formFieldTypeFrequencyCount, formFieldType, isCharmverseSpace]);
+  }, [formFieldTypeFrequencyCount, formFieldType]);
 
   return (
     <>
@@ -149,7 +144,7 @@ function ExpandedFormField({
           closeOnClick
           popupContent={
             <MenuList>
-              <MenuItem onClick={onDuplicate}>
+              <MenuItem onClick={onDuplicate} disabled={formField.type === 'project_profile'}>
                 <ListItemIcon>
                   <ContentCopyOutlinedIcon fontSize='small' />
                 </ListItemIcon>
@@ -205,11 +200,7 @@ function ExpandedFormField({
       {formField.type === 'project_profile' ? (
         <ProjectFormEditor
           defaultRequired
-          values={
-            (formField.fieldConfig ?? {
-              projectMember: {}
-            }) as ProjectEditorFieldConfig
-          }
+          fieldConfig={(formField.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig}
           onChange={(fieldConfig) => {
             updateFormField({
               id: formField.id,
@@ -231,22 +222,24 @@ function ExpandedFormField({
           options={formField.options}
         />
       )}
-      <Divider
-        sx={{
-          my: 1
-        }}
-      />
 
       {formField.type !== 'label' && formField.type !== 'project_profile' && (
-        <Stack gap={0.5} flexDirection='row' alignItems='center'>
-          <Switch
-            data-test='form-field-required-switch'
-            size='small'
-            checked={formField.required}
-            onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+        <>
+          <Divider
+            sx={{
+              my: 1
+            }}
           />
-          <Typography>Required</Typography>
-        </Stack>
+          <Stack gap={0.5} flexDirection='row' alignItems='center'>
+            <Switch
+              data-test='form-field-required-switch'
+              size='small'
+              checked={formField.required}
+              onChange={(e) => updateFormField({ required: e.target.checked, id: formField.id })}
+            />
+            <Typography>Required</Typography>
+          </Stack>
+        </>
       )}
 
       {formField.type !== 'project_profile' && (
@@ -352,7 +345,9 @@ export function FormField(
             <div style={{ cursor: 'pointer' }} onClick={toggleOpen}>
               {formField.type === 'project_profile' ? (
                 <ProjectFormEditor
-                  values={(formField.fieldConfig as ProjectEditorFieldConfig) ?? { projectMember: {} }}
+                  fieldConfig={
+                    (formField.fieldConfig as ProjectAndMembersFieldConfig) ?? defaultProjectAndMembersFieldConfig
+                  }
                   defaultRequired
                 />
               ) : (

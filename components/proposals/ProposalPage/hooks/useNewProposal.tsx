@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import charmClient from 'charmClient';
@@ -9,13 +9,10 @@ import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
-import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -36,9 +33,8 @@ export function useNewProposal({ newProposal }: Props) {
   const [contentUpdated, setContentUpdated] = useState(false);
   // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
   const [isFormLoaded, setIsFormLoaded] = useState(false);
-  const isCharmverseSpace = useIsCharmverseSpace();
   const [formInputs, setFormInputsRaw] = useState<ProposalPageAndPropertiesInput>(
-    emptyState({ ...newProposal, userId: user?.id, isCharmverseSpace })
+    emptyState({ ...newProposal, userId: user?.id })
   );
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
 
@@ -55,27 +51,16 @@ export function useNewProposal({ newProposal }: Props) {
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
-  const { data: projectsWithMembers, mutate } = useGetProjects();
+  const { mutate } = useGetProjects();
 
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
-  const projectWithMembers = projectsWithMembers?.find((project) => project.id === selectedProjectId);
 
   const projectForm = useProjectForm({
-    projectWithMembers,
-    fieldConfig: (projectField?.fieldConfig ?? defaultProjectFieldConfig) as ProjectEditorFieldConfig,
+    projectId: selectedProjectId,
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig,
     defaultRequired: true
   });
-
-  const { membersRecord } = useMembers();
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
-  useEffect(() => {
-    if (selectedProjectId) {
-      projectForm.reset(projectWithMembers);
-    } else {
-      projectForm.reset(defaultProjectValues);
-    }
-  }, [selectedProjectId]);
 
   const setFormInputs = useCallback(
     (partialFormInputs: Partial<ProposalPageAndPropertiesInput>, { fromUser = true }: { fromUser?: boolean } = {}) => {
@@ -88,27 +73,30 @@ export function useNewProposal({ newProposal }: Props) {
     [setFormInputsRaw]
   );
 
+  const isDirty = projectForm.formState.isDirty;
+
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
     // Create a project if the proposal has a project field
-    let projectId: string | undefined;
-    const projectValues = projectForm.getValues();
-    if (projectField && formInputs.type === 'proposal') {
+    let projectId: string | undefined = selectedProjectId;
+    // Make sure the form is dirty before either updating or creating the project
+    // We allow saving draft without a project or a valid project
+    // This guard will make sure we don't create empty projects when saving drafts
+    if (projectField && formInputs.type === 'proposal' && isDirty) {
       if (!selectedProjectId) {
+        const projectValues = projectForm.getValues();
         const createdProject = await createProject(projectValues);
         projectId = createdProject.id;
-      } else if (projectWithMembers) {
+      }
+      // Make sure the current user is a team lead before updating the project
+      else {
+        const projectWithMembers = projectForm.getValues();
         const updatedProjectValues = {
-          id: projectWithMembers.id,
-          ...projectValues,
-          projectMembers: projectWithMembers.projectMembers.map((member, index) => ({
-            ...member,
-            ...projectValues.projectMembers[index],
-            id: member.id
-          }))
+          id: selectedProjectId,
+          ...projectWithMembers,
+          projectMembers: projectWithMembers.projectMembers
         };
-        await charmClient.updateProject(updatedProjectValues);
+        await charmClient.projects.updateProject(selectedProjectId, updatedProjectValues);
         mutate();
-        projectId = projectWithMembers.id;
       }
     }
     log.info('[user-journey] Create a proposal');
@@ -125,20 +113,13 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
+        projectId,
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         spaceId: currentSpace.id,
         fields: formInputs.fields,
         formId: formInputs.formId,
-        formAnswers: formInputs.formAnswers?.map((formField) => {
-          if (formField.fieldId === projectField?.id && projectId) {
-            return {
-              ...formField,
-              value: { projectId }
-            };
-          }
-          return formField;
-        }),
+        formAnswers: formInputs.formAnswers,
         workflowId: formInputs.workflowId!,
         isDraft,
         selectedCredentialTemplates: formInputs.selectedCredentialTemplates ?? [],
@@ -186,11 +167,8 @@ export function useNewProposal({ newProposal }: Props) {
 
 function emptyState({
   userId,
-  isCharmverseSpace,
   ...inputs
-}: (Partial<ProposalPageAndPropertiesInput> & { userId?: string }) & {
-  isCharmverseSpace: boolean;
-}): ProposalPageAndPropertiesInput {
+}: Partial<ProposalPageAndPropertiesInput> & { userId?: string }): ProposalPageAndPropertiesInput {
   const isStructured = inputs.proposalType === 'structured' || !!inputs.formId;
   return {
     createdAt: new Date().toISOString(),
@@ -209,7 +187,7 @@ function emptyState({
     formFields: isStructured
       ? [
           {
-            type: isCharmverseSpace ? 'project_profile' : 'short_text',
+            type: 'project_profile',
             name: '',
             description: emptyDocument,
             index: 0,
@@ -217,7 +195,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: isCharmverseSpace ? { projectMember: {} } : null
+            fieldConfig: defaultProjectAndMembersFieldConfig
           } as FormFieldInput
         ]
       : [],

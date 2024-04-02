@@ -1,5 +1,7 @@
+import { useFormContext } from 'react-hook-form';
+
 import { projectFieldProperties } from 'lib/projects/constants';
-import type { ProjectEditorFieldConfig, ProjectFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -7,36 +9,48 @@ import { FieldsEditor } from './FormFields/FieldsEditor';
 export function ProjectFieldAnswers({
   fieldConfig,
   defaultRequired,
-  disabled
+  disabled,
+  onChange
 }: {
   disabled?: boolean;
-  fieldConfig?: ProjectFieldConfig;
+  fieldConfig?: FieldConfig;
   defaultRequired?: boolean;
+  onChange?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
 }) {
+  const { getValues } = useFormContext<ProjectAndMembersPayload>();
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}
       disabled={disabled}
       fieldConfig={fieldConfig}
       properties={projectFieldProperties}
+      onChange={(updatedProject) => {
+        if (onChange) {
+          const projectWithMembers = getValues();
+          onChange({
+            ...projectWithMembers,
+            ...updatedProject
+          });
+        }
+      }}
     />
   );
 }
 
 export function ProjectFieldsEditor({
   onChange,
-  values,
+  fieldConfig,
   defaultRequired
 }: {
   defaultRequired?: boolean;
-  onChange?: (value: Omit<ProjectEditorFieldConfig, 'members'>) => void;
-  values: Omit<ProjectEditorFieldConfig, 'members'>;
+  onChange?: (value: Omit<ProjectAndMembersFieldConfig, 'members'>) => void;
+  fieldConfig: Omit<ProjectAndMembersFieldConfig, 'members'>;
 }) {
   return (
     <FieldsEditor
       defaultRequired={defaultRequired}
       properties={projectFieldProperties}
-      values={values}
+      fieldConfig={fieldConfig}
       onChange={onChange}
     />
   );

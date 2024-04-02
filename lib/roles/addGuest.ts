@@ -2,6 +2,8 @@ import type { Prisma, SpaceRole, User, VerifiedEmail } from '@charmverse/core/pr
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { checkUserSpaceBanStatus } from 'lib/members/checkUserSpaceBanStatus';
+import { sessionUserRelations } from 'lib/session/config';
+import { postUserCreate } from 'lib/users/postUserCreate';
 import { DataNotFoundError, InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
 import { isUUID, isValidEmail, uid } from 'lib/utils/strings';
 
@@ -106,6 +108,17 @@ export async function addGuest({ userIdOrEmail, spaceId }: GuestToAdd) {
         verifiedEmails: true
       }
     });
+  } else if (user?.claimed === false) {
+    const updatedUser = await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        claimed: true
+      },
+      include: sessionUserRelations
+    });
+    postUserCreate({ user: updatedUser, identityType: 'VerifiedEmail', signupAnalytics: {} });
   }
 
   const existingSpaceRole = user!.spaceRoles.find((sr) => sr.spaceId === spaceId);
