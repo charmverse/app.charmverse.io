@@ -87,6 +87,7 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
     const refreshedData = await super.query(options);
 
     this.setCache(cacheKey, refreshedData);
+
     return refreshedData;
   }
 }
