@@ -3,8 +3,8 @@ import type {
   CredentialEventType,
   CredentialTemplate,
   IssuedCredential,
-  ProposalEvaluation,
-  ProposalStatus,
+  RewardEvaluation,
+  RewardStatus,
   Space
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
@@ -16,13 +16,13 @@ import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
-import type { TypedPendingGnosisSafeTransaction } from './saveGnosisSafeTransactionToIndex';
+import type { TypedPendingGnosisSafeTransaction } from './indexOnChainRewardCredential';
 import type { CredentialDataInput } from './schemas';
 
-export type ProposalWithJoinedData = {
+export type RewardWithJoinedData = {
   id: string;
-  status: ProposalStatus;
-  evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result'>[];
+  status: RewardStatus;
+  evaluations: Pick<RewardEvaluation, 'id' | 'index' | 'result'>[];
   selectedCredentialTemplates: string[];
   authors: {
     author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
@@ -31,7 +31,7 @@ export type ProposalWithJoinedData = {
   page: { id: string };
 };
 
-export type IssuableProposalCredentialContent = {
+export type IssuableRewardCredentialContent = {
   recipientAddress: string;
   recipientUserId: string;
   credential: CredentialDataInput<'proposal'>;
@@ -42,8 +42,8 @@ export type IssuableProposalCredentialContent = {
 };
 
 // A partial subtype to reduce data passed around the system
-export type PartialIssuableProposalCredentialContent = Pick<
-  IssuableProposalCredentialContent,
+export type PartialIssuableRewardCredentialContent = Pick<
+  IssuableRewardCredentialContent,
   'proposalId' | 'event' | 'credentialTemplateId' | 'recipientAddress'
 >;
 
@@ -51,38 +51,38 @@ export type PartialIssuableProposalCredentialContent = Pick<
  * @existingPendingTransactionEvents - Events with already pending credentials awaiting a Gnosis safe transaction
  */
 type GenerateCredentialsParams = {
-  proposal: ProposalWithJoinedData;
+  proposal: RewardWithJoinedData;
   space: Pick<Space, 'id' | 'features'> & {
     credentialTemplates: Pick<
       CredentialTemplate,
       'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
     >[];
   };
-  pendingIssuableCredentials?: PartialIssuableProposalCredentialContent[];
+  pendingIssuableCredentials?: PartialIssuableRewardCredentialContent[];
 };
 
 const events: CredentialEventType[] = ['proposal_created', 'proposal_approved'];
 
-export function generateCredentialInputsForProposal({
+export function generateCredentialInputsForReward({
   proposal,
   space,
   pendingIssuableCredentials
-}: GenerateCredentialsParams): IssuableProposalCredentialContent[] {
+}: GenerateCredentialsParams): IssuableRewardCredentialContent[] {
   if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length) {
     return [];
   }
 
   const templateMap = new Map(space.credentialTemplates.map((t) => [t.id, t]));
 
-  const credentialsToIssue: IssuableProposalCredentialContent[] = [];
+  const credentialsToIssue: IssuableRewardCredentialContent[] = [];
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
 
-  const isApprovedProposal =
+  const isApprovedReward =
     currentEvaluation?.result === 'pass' &&
     currentEvaluation.index === Math.max(...proposal.evaluations.map((e) => e.index));
 
-  const issuableEvents: CredentialEventType[] = isApprovedProposal ? [...events] : ['proposal_created'];
+  const issuableEvents: CredentialEventType[] = isApprovedReward ? [...events] : ['proposal_created'];
 
   proposal.authors.forEach(({ author }) => {
     const targetWallet = author.primaryWallet?.address ?? author.wallets[0]?.address;
@@ -186,11 +186,11 @@ export function proposalCredentialInputFieldsSelect() {
   };
 }
 
-export async function findSpaceIssuableProposalCredentials({
+export async function findSpaceIssuableRewardCredentials({
   spaceId
 }: {
   spaceId: string;
-}): Promise<IssuableProposalCredentialContent[]> {
+}): Promise<IssuableRewardCredentialContent[]> {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -229,27 +229,27 @@ export async function findSpaceIssuableProposalCredentials({
     }
   });
 
-  const pendingProposalsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
+  const pendingRewardsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
     for (const proposalId of pendingTx.proposalIds) {
-      const pendingProposalCredentials =
+      const pendingRewardCredentials =
         (pendingTx as TypedPendingGnosisSafeTransaction).credentialContent?.[proposalId] ?? [];
 
       if (!acc[proposalId]) {
         acc[proposalId] = [];
       }
 
-      acc[proposalId].push(...pendingProposalCredentials);
+      acc[proposalId].push(...pendingRewardCredentials);
     }
 
     return acc;
-  }, {} as Record<string, PartialIssuableProposalCredentialContent[]>);
+  }, {} as Record<string, PartialIssuableRewardCredentialContent[]>);
 
   return proposals
     .map((p) =>
-      generateCredentialInputsForProposal({
-        proposal: p as ProposalWithJoinedData,
+      generateCredentialInputsForReward({
+        proposal: p as RewardWithJoinedData,
         space,
-        pendingIssuableCredentials: pendingProposalsInSafe[p.id]
+        pendingIssuableCredentials: pendingRewardsInSafe[p.id]
       })
     )
     .flat();

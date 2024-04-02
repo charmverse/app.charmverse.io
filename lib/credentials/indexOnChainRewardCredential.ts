@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type {
-  AttestationType,
   CredentialEventType,
   IssuedCredential,
   PendingSafeTransaction,
@@ -142,9 +141,6 @@ export type ProposalCredentialsToIndex = {
   txHash: string;
 };
 
-/**
- * Compatible with EOA transaction. Todo - Add support for safe
- */
 export async function indexProposalCredentials({ chainId, txHash }: ProposalCredentialsToIndex): Promise<void> {
   const publicClient = getPublicClient(chainId);
 
@@ -166,3 +162,13 @@ export async function indexProposalCredentials({ chainId, txHash }: ProposalCred
     data: issuedCredentialInputs.filter((input): input is Prisma.IssuedCredentialCreateManyInput => !!input)
   });
 }
+
+// indexSafeTransaction({
+//   chainId: sepolia.id,
+//   safeTxHash: '0x410992d91c8f58919db7605e8555232497b942f95950a51c0734a1cc6da23883'
+// }).then(console.log);
+
+// indexSafeTransaction({
+//   chainId: sepolia.id,
+//   safeTxHash: '0x6ee2a4967da40389b76a03de7c38a5b45ab48f0fc19baf909387c512207a8841'
+// }).then(console.log);

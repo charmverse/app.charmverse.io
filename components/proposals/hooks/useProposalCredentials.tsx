@@ -67,7 +67,7 @@ export function useProposalCredentials() {
         });
         const safeTxHash = await proposeTransaction({ safeTransactionData: { ...populatedTransaction, value: '0' } });
 
-        await charmClient.credentials.requestPendingProposalCredentialGnosisSafeIndexing({
+        await charmClient.credentials.requestPendingCredentialGnosisSafeIndexing({
           chainId: space.credentialsChainId as EasSchemaChain,
           safeTxHash,
           safeAddress: gnosisSafeForCredentials.address,
@@ -78,7 +78,8 @@ export function useProposalCredentials() {
             proposalId: ic.proposalId,
             credentialTemplateId: ic.credentialTemplateId,
             recipientAddress: ic.recipientAddress
-          }))
+          })),
+          type: 'proposal'
         });
         await refreshIssuableCredentials();
         return 'gnosis';
