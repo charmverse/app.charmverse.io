@@ -1,4 +1,4 @@
-import type { Node, Mark } from '@bangle.dev/pm';
+import type { Node, Mark } from 'prosemirror-model';
 
 // From https://discuss.prosemirror.net/t/expanding-the-selection-to-the-active-mark/478/2 with some bugs fixed
 export function getFromToMark(doc: Node, pos: number, mark: Mark) {

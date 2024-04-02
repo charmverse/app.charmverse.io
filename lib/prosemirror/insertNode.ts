@@ -1,4 +1,5 @@
-import type { EditorState, EditorView, Transaction } from '@bangle.dev/pm';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 interface DispatchFn {
   (tr: Transaction): void;

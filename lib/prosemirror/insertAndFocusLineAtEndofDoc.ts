@@ -1,5 +1,5 @@
-import type { EditorView } from '@bangle.dev/pm';
-import { TextSelection } from '@bangle.dev/pm';
+import { TextSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { checkIsContentEmpty } from './checkIsContentEmpty';
 

@@ -1,7 +1,6 @@
 import type { Command, EditorState, Schema } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
-import type Token from 'markdown-it/lib/token';
 import { wrappingInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 

@@ -1,6 +1,6 @@
-import type { DirectEditorProps } from '@bangle.dev/pm';
-import { EditorView } from '@bangle.dev/pm';
 import { isTestEnv, toHTMLString } from '@bangle.dev/utils';
+import type { DirectEditorProps } from 'prosemirror-view';
+import { EditorView } from 'prosemirror-view';
 
 import { BangleEditorState } from './bangle-editor-state';
 

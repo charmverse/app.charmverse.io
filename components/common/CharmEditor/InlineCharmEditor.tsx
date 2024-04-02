@@ -1,9 +1,9 @@
 import { bold, code, italic, paragraph, strike, underline } from '@bangle.dev/base-components';
-import type { EditorView } from '@bangle.dev/pm';
-import { Node, PluginKey } from '@bangle.dev/pm';
 import styled from '@emotion/styled';
 import debounce from 'lodash/debounce';
-import { Plugin } from 'prosemirror-state';
+import { Node } from 'prosemirror-model';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import type { CSSProperties, ReactNode } from 'react';
 
 import { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';

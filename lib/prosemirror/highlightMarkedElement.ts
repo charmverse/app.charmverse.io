@@ -1,5 +1,6 @@
-import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { TextSelection } from '@bangle.dev/pm';
+import type { PluginKey } from 'prosemirror-state';
+import { TextSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltip';
 import { highlightDomElement } from 'lib/utils/browser';

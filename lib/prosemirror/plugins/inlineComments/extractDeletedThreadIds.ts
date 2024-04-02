@@ -1,4 +1,4 @@
-import type { MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { MarkType, Node, Schema } from 'prosemirror-model';
 import type { NodeWithPos } from 'prosemirror-utils';
 import { findChildrenByMark } from 'prosemirror-utils';
 

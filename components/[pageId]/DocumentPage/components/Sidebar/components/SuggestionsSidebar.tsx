@@ -1,6 +1,6 @@
-import type { EditorState } from '@bangle.dev/pm';
 import { Check, Close, RateReviewOutlined } from '@mui/icons-material';
 import { Box, Stack } from '@mui/material';
+import type { EditorState } from 'prosemirror-state';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';

@@ -1,10 +1,11 @@
-import type { Command, DOMOutputSpec, EditorState, Node, Schema } from '@bangle.dev/pm';
 import { parentHasDirectParentOfType } from '@bangle.dev/pm-commands';
 import { createObject } from '@bangle.dev/utils';
 import { chainCommands } from 'prosemirror-commands';
 import { wrappingInputRule } from 'prosemirror-inputrules';
 import { keymap } from 'prosemirror-keymap';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+import type { DOMOutputSpec, Node, Schema } from 'prosemirror-model';
+import type { Command, EditorState } from 'prosemirror-state';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
