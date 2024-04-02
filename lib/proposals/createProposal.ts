@@ -111,9 +111,12 @@ export async function createProposal({
     throw new InvalidInputError(errors.join('\n'));
   }
 
-  if (!isDraft) {
+  const projectId = (formAnswers?.find((a) => a.fieldId === 'project_profile')?.value as { projectId: string })
+    ?.projectId;
+
+  if (!isDraft && projectId) {
     await validateProposalProject({
-      formAnswers,
+      projectId,
       formFields
     });
   }

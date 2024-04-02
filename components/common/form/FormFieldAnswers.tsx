@@ -100,7 +100,6 @@ export function FormFieldAnswersControlled({
   pageId,
   project,
   onProjectUpdate,
-  isDraft,
   threads = {}
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
@@ -187,7 +186,6 @@ export function FormFieldAnswersControlled({
                       fieldConfig: formField.fieldConfig as ProjectAndMembersFieldConfig,
                       value: field.value
                     }}
-                    isDraft={isDraft}
                     onChange={(projectFormValues) => {
                       setIsFormDirty(true);
                       onFormChange([

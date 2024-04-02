@@ -1,24 +1,24 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 
 export async function validateProposalProject({
   formFields,
-  formAnswers
+  projectId,
+  defaultRequired = true
 }: {
-  formFields?: Pick<FormFieldInput, 'type' | 'id' | 'fieldConfig'>[];
-  formAnswers?: Pick<FieldAnswerInput, 'fieldId' | 'value'>[];
+  projectId: string;
+  formFields?: Pick<FormFieldInput, 'type' | 'fieldConfig'>[];
+  defaultRequired?: boolean;
 }) {
   const projectField = formFields?.find((field) => field.type === 'project_profile');
-  const projectId = (formAnswers?.find((answer) => answer.fieldId === projectField?.id)?.value as { projectId: string })
-    ?.projectId;
-  if (projectField && projectId) {
+  if (projectField) {
     const projectSchema = createProjectYupSchema({
       fieldConfig: projectField.fieldConfig as ProjectAndMembersFieldConfig,
-      defaultRequired: true
+      defaultRequired
     });
 
     const project = await prisma.project.findUnique({
@@ -33,7 +33,7 @@ export async function validateProposalProject({
     }
 
     try {
-      await projectSchema.validate(convertToProjectValues(project));
+      await projectSchema.validate(convertToProjectValues(project), { abortEarly: false });
     } catch (error) {
       throw new InvalidInputError(`Project profile validation failed`);
     }
