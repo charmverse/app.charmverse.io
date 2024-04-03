@@ -72,16 +72,8 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
   }
 
-  let isHeadingNode = false;
-  try {
-    // When a bunch of block is selected and removed, the rowPos goes out of range and throws an error
-    isHeadingNode =
-      menuState.rowPos !== undefined
-        ? view.state.doc.resolve(menuState.rowPos)?.node()?.type.name === 'heading'
-        : false;
-  } catch (_) {
-    //
-  }
+  const isHeadingNode =
+    menuState.rowPos !== undefined ? view.state.doc.resolve(menuState.rowPos)?.node()?.type.name === 'heading' : false;
 
   async function copyLinkToBlock() {
     const rowPosition = menuState.rowPos;
