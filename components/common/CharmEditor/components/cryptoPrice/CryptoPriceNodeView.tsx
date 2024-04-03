@@ -1,9 +1,9 @@
-import type { DOMOutputSpec, EditorView } from '@bangle.dev/pm';
 import ArrowDropDown from '@mui/icons-material/ArrowDropDown';
 import Autorenew from '@mui/icons-material/Autorenew';
 import { Box, Card, CardContent, CardActions, CircularProgress, IconButton, Typography } from '@mui/material';
 import type { CryptoCurrency, FiatCurrency, IPairQuote } from 'connectors/chains';
 import { CryptoCurrencies, getChainById } from 'connectors/chains';
+import type { EditorView } from 'prosemirror-view';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';

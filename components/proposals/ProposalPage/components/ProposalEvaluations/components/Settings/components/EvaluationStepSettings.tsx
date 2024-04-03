@@ -48,7 +48,6 @@ export function EvaluationStepSettings({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
-
   const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
 
   function handleOnChangeReviewers(reviewers: SelectOption[]) {

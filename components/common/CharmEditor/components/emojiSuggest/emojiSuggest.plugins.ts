@@ -1,5 +1,5 @@
 import type { Command, EditorState, EditorView, Schema } from '@bangle.dev/pm';
-import { Plugin, PluginKey } from '@bangle.dev/pm';
+import { Plugin, PluginKey } from 'prosemirror-state';
 
 import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 

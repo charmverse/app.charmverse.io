@@ -1,5 +1,3 @@
-import type { Command, EditorState, Node, Plugin, PluginKey, Schema } from '@bangle.dev/pm';
-import { keymap, NodeSelection, setBlockType, textblockTypeInputRule } from '@bangle.dev/pm';
 import {
   copyEmptyCommand,
   cutEmptyCommand,
@@ -9,7 +7,13 @@ import {
 } from '@bangle.dev/pm-commands';
 import { browser, filter, findParentNodeOfType, insertEmpty, createObject } from '@bangle.dev/utils';
 import type Token from 'markdown-it/lib/token';
+import { setBlockType } from 'prosemirror-commands';
+import { textblockTypeInputRule } from 'prosemirror-inputrules';
+import { keymap } from 'prosemirror-keymap';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+import type { Node, Schema } from 'prosemirror-model';
+import { NodeSelection } from 'prosemirror-state';
+import type { Command, EditorState, PluginKey } from 'prosemirror-state';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';

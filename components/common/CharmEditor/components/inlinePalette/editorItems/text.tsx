@@ -1,4 +1,3 @@
-import type { EditorState, Transaction } from '@bangle.dev/pm';
 import { Fragment, setBlockType, findWrapping } from '@bangle.dev/pm';
 import { rafCommandExec } from '@bangle.dev/utils';
 import type { PageType } from '@charmverse/core/prisma';
@@ -13,7 +12,7 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import LibraryAddCheckIcon from '@mui/icons-material/LibraryAddCheck';
 import DatabaseIcon from '@mui/icons-material/TableChart';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import type { PluginKey } from 'prosemirror-state';
+import type { EditorState, Transaction, PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 
 import type { SpacePermissionFlags } from 'lib/permissions/spaces';

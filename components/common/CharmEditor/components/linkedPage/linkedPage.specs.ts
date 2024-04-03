@@ -1,5 +1,5 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+import type { DOMOutputSpec } from 'prosemirror-model';
 
 import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
 import { spec as SuggestTooltipSpec } from '../@bangle.dev/tooltip/suggestTooltipSpec';

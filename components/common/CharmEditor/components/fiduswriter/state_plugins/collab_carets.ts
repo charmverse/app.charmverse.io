@@ -1,5 +1,5 @@
-import type { EditorState } from '@bangle.dev/pm';
 import { sendableSteps } from 'prosemirror-collab';
+import type { EditorState } from 'prosemirror-state';
 import { Plugin, PluginKey } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 

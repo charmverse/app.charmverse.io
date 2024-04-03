@@ -1,6 +1,5 @@
-import type { PluginKey } from '@bangle.dev/pm';
 import type { SpaceOperation } from '@charmverse/core/prisma';
-import type { EditorState, Transaction } from 'prosemirror-state';
+import type { PluginKey, EditorState, Transaction } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
 export const PALETTE_ITEM_REGULAR_TYPE = 'REGULAR_TYPE';

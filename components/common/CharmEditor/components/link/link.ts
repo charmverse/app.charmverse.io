@@ -1,8 +1,9 @@
 // References: https://github.com/bangle-io/bangle-editor/blob/dev/components/base-components/src/link.ts
 /* eslint-disable max-len */
-import type { MarkType, Schema } from '@bangle.dev/pm';
-import { InputRule, Plugin } from '@bangle.dev/pm';
 import { mapSlice, matchAllPlus, assertNotUndefined, filter, getMarkAttrs } from '@bangle.dev/utils';
+import { InputRule } from 'prosemirror-inputrules';
+import type { MarkType, Schema } from 'prosemirror-model';
+import { Plugin } from 'prosemirror-state';
 import type { Command, EditorState, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 

@@ -1,6 +1,6 @@
 import type { EditorState, EditorView, PluginKey } from '@bangle.dev/pm';
-import { Decoration, DecorationSet } from '@bangle.dev/pm';
 import { Plugin } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';

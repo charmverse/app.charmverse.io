@@ -58,7 +58,7 @@ export async function getSafeTxStatus({
 
       return { status: ApplicationStatus.processing, chainTxHash: txHash, safeTxHash };
     } else {
-      const safeApiClient = getSafeApiClient({ chainId });
+      const safeApiClient = await getSafeApiClient({ chainId });
 
       const safeTx = await safeApiClient.getTransaction(safeTxHash);
 

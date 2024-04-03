@@ -1,10 +1,7 @@
 import { log } from '@charmverse/core/log';
-import EthersAdapter from '@safe-global/safe-ethers-lib';
 import type { SafeInfoResponse, SafeMultisigTransactionListResponse } from '@safe-global/safe-service-client';
-import SafeServiceClient from '@safe-global/safe-service-client';
 import { RateLimit } from 'async-sema';
-import { getChainList, getChainById } from 'connectors/chains';
-import { ethers } from 'ethers';
+import { getChainById, getChainList } from 'connectors/chains';
 import uniqBy from 'lodash/uniqBy';
 import { getAddress } from 'viem';
 import { mantle, mantleTestnet } from 'viem/chains';
@@ -17,31 +14,6 @@ export type GnosisTransaction = SafeMultisigTransactionListResponse['results'][n
 
 function getGnosisRPCUrl(chainId: number) {
   return getChainById(chainId)?.gnosisUrl;
-}
-
-interface GetGnosisServiceProps {
-  signer: ethers.Signer | ethers.providers.Provider;
-  chainId?: number;
-  serviceUrl?: string;
-}
-
-export function getGnosisService({ signer, chainId, serviceUrl }: GetGnosisServiceProps): SafeServiceClient | null {
-  const txServiceUrl = serviceUrl || (chainId && getGnosisRPCUrl(chainId));
-  if (!txServiceUrl) {
-    return null;
-  }
-
-  const ethAdapter = new EthersAdapter({
-    ethers,
-    signerOrProvider: signer
-  });
-
-  const safeService = new SafeServiceClient({
-    txServiceUrl,
-    ethAdapter
-  });
-
-  return safeService;
 }
 
 interface GetSafesForAddressProps {
@@ -88,7 +60,7 @@ export async function getSafesForAddress({ chainId, address }: GetSafesForAddres
     if (supported) {
       const rateLimiter = RateLimit(5);
 
-      const apiClient = getSafeApiClient({ chainId });
+      const apiClient = await getSafeApiClient({ chainId });
       return apiClient.getSafesByOwner(checksumAddress).then((userSafesResponse) =>
         Promise.all(
           userSafesResponse.safes.map(async (safeAddr) => {

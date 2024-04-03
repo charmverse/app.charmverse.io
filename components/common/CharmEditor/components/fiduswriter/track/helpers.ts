@@ -1,6 +1,6 @@
-import type { EditorState, Transaction } from '@bangle.dev/pm';
-import { Decoration, PluginKey } from '@bangle.dev/pm';
-import { DecorationSet } from 'prosemirror-view';
+import { PluginKey } from 'prosemirror-state';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 
 import { getFromToMark } from '../state_plugins/track/getFromToMark';
 import {

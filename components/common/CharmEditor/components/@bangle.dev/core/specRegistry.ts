@@ -1,8 +1,8 @@
 /* eslint-disable no-use-before-define */
-import type { MarkSpec, NodeSpec } from '@bangle.dev/pm';
-import { Schema } from '@bangle.dev/pm';
 import type { MarkdownParser, MarkdownSerializer, UnnestObjValue } from '@bangle.dev/shared-types';
 import { log } from '@charmverse/core/log';
+import type { MarkSpec, NodeSpec } from 'prosemirror-model';
+import { Schema } from 'prosemirror-model';
 
 import * as doc from '../../doc/doc';
 import * as paragraph from '../../paragraph/paragraph';

@@ -1,4 +1,4 @@
-import type { Mark, Node, ParseRule } from '@bangle.dev/pm';
+import type { Mark, Node, ParseRule } from 'prosemirror-model';
 
 import type { BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 

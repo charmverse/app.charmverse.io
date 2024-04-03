@@ -1,4 +1,5 @@
-import type { EditorState, Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
+import type { EditorState } from 'prosemirror-state';
 import { PluginKey, Plugin } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 
