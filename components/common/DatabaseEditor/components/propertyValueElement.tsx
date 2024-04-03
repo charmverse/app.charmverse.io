@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Link, Stack } from '@mui/material';
@@ -711,6 +712,9 @@ function PropertyValueElement(props: Props) {
     );
   } else if (propertyValueElement === null) {
     const displayValueStr = typeof displayValue === 'string' ? displayValue : '';
+    if (typeof displayValue !== 'string') {
+      log.error('displayValue for card property is not a string', { displayValue, template: props.propertyTemplate });
+    }
     propertyValueElement = (
       <div className={clsx('octo-propertyvalue', { readonly: readOnly })}>
         {displayValueStr || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}

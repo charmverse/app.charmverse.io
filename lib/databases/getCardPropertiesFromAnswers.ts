@@ -5,10 +5,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from './board';
+import { excludedFieldTypes } from './setDatabaseProposalProperties';
 
-const excludedFieldTypes = ['project_profile', 'label'];
-
-export function updateCardFormFieldPropertiesValue({
+export function getCardPropertiesFromAnswers({
   accessPrivateFields,
   formFields,
   cardProperties,
