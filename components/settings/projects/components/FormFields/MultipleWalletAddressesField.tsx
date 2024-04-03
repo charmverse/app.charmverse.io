@@ -1,5 +1,6 @@
 import MuiAddIcon from '@mui/icons-material/Add';
-import { Stack } from '@mui/material';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { IconButton, Stack } from '@mui/material';
 
 import { Button } from 'components/common/Button';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
@@ -23,13 +24,7 @@ export function MultipleWalletAddressesField({
   return (
     <Stack gap={1}>
       {addressChainCombos.map((addressChainCombo, index) => (
-        <Stack
-          key={`${index.toString()}.${addressChainCombo.chain}`}
-          sx={{
-            flexDirection: 'row',
-            gap: 1
-          }}
-        >
+        <Stack flexDirection='row' gap={1} alignItems='center' key={`${index.toString()}.${addressChainCombo.chain}`}>
           <TextInputField
             label='Wallet Address'
             required={required}
@@ -49,7 +44,23 @@ export function MultipleWalletAddressesField({
                 : undefined
             }
           />
-          <FieldWrapper required={required} label='Chain'>
+          <FieldWrapper
+            required={required}
+            label='Chain'
+            inputEndAdornment={
+              index !== 0 &&
+              onChange && (
+                <IconButton
+                  size='small'
+                  onClick={() => {
+                    onChange(addressChainCombos.filter((_, i) => i !== index));
+                  }}
+                >
+                  <DeleteOutlineOutlinedIcon color='error' fontSize='small' />
+                </IconButton>
+              )
+            }
+          >
             <InputSearchBlockchain
               disabled={disabled}
               chainId={addressChainCombo.chain}
@@ -85,6 +96,9 @@ export function MultipleWalletAddressesField({
         variant='text'
         disabled={disabled}
         size='small'
+        sx={{
+          width: 'fit-content'
+        }}
         startIcon={<MuiAddIcon fontSize='small' />}
       >
         Add another wallet address

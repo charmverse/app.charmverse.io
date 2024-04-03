@@ -14,36 +14,67 @@ import type {
   ProjectMemberField,
   ProjectAndMembersFieldConfig,
   ProjectWithMembers,
-  ProjectAndMembersPayload
+  ProjectAndMembersPayload,
+  AddressChainCombo
 } from 'lib/projects/interfaces';
 
 function addMatchersToSchema({
   fieldType,
   isRequired,
-  schemaObject
+  schemaObject,
+  isProject
 }: {
   fieldType: ProjectField | ProjectMemberField;
   isRequired: boolean;
-  schemaObject: Record<string, yup.StringSchema>;
+  schemaObject: Record<string, yup.AnySchema>;
+  isProject: boolean;
 }) {
   if (fieldType === 'walletAddress') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-address', 'Invalid wallet address', (value) => {
-      try {
-        if (isRequired && !value) {
-          return false;
-        }
+    if (isProject) {
+      schemaObject[fieldType] = (schemaObject[fieldType] as yup.ArraySchema<AddressChainCombo[], yup.AnyObject>).test(
+        'is-valid-address',
+        'Invalid wallet address',
+        (addressChainCombos) => {
+          try {
+            if (isRequired && (!addressChainCombos || addressChainCombos.length === 0)) {
+              return false;
+            }
 
-        if (value) {
-          return ethers.utils.isAddress(value) || value.endsWith('.eth');
+            return addressChainCombos.every((addressChainCombo) => {
+              const { address } = addressChainCombo;
+              if (!isRequired && address === '') {
+                return true;
+              }
+              return ethers.utils.isAddress(address) || address.endsWith('.eth');
+            });
+          } catch {
+            return false;
+          }
         }
+      );
+    } else {
+      schemaObject[fieldType] = (schemaObject[fieldType] as yup.StringSchema).test(
+        'is-valid-address',
+        'Invalid wallet address',
+        (value) => {
+          try {
+            if (isRequired && !value) {
+              return false;
+            }
 
-        return true;
-      } catch {
-        return false;
-      }
-    });
+            if (value) {
+              return ethers.utils.isAddress(value) || value.endsWith('.eth');
+            }
+
+            return true;
+          } catch {
+            return false;
+          }
+        }
+      );
+    }
   } else if (fieldType === 'email') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.email('Invalid email');
+    schemaObject[fieldType] = (schemaObject[fieldType] as yup.StringSchema).email('Invalid email');
   }
 }
 
@@ -54,7 +85,7 @@ export function createProjectYupSchema({
   fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
 }) {
-  const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
+  const yupProjectSchemaObject: Partial<Record<ProjectField, yup.AnySchema>> = {};
   const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
   projectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
@@ -62,16 +93,24 @@ export function createProjectYupSchema({
       show: true
     };
     if (projectFieldConfig.show !== false) {
-      if (projectFieldConfig.required) {
-        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string().required();
+      if (projectFieldProperty.field !== 'walletAddress') {
+        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = projectFieldConfig.required
+          ? yup.string().required()
+          : yup.string();
       } else {
-        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string();
+        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.array().of(
+          yup.object({
+            address: yup.string(),
+            chain: yup.number()
+          })
+        );
       }
 
       addMatchersToSchema({
         fieldType: projectFieldProperty.field as ProjectField | ProjectMemberField,
         isRequired: !!projectFieldConfig.required,
-        schemaObject: yupProjectSchemaObject
+        schemaObject: yupProjectSchemaObject,
+        isProject: true
       });
     }
   });
@@ -91,7 +130,8 @@ export function createProjectYupSchema({
       addMatchersToSchema({
         fieldType: projectMemberFieldProperty.field as ProjectField | ProjectMemberField,
         isRequired: !!projectMemberFieldConfig.required,
-        schemaObject: yupProjectMemberSchemaObject
+        schemaObject: yupProjectMemberSchemaObject,
+        isProject: false
       });
     }
   });
@@ -168,7 +208,7 @@ export function useProjectForm(options: {
     return convertToProjectValues(projectWithMembers);
   }, [projectWithMembers]);
 
-  const form = useForm({
+  const form = useForm<ProjectAndMembersPayload>({
     defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectAndMembersPayload,
     reValidateMode: 'onChange',
     resolver: yupResolver(yupSchema.current),
@@ -177,12 +217,12 @@ export function useProjectForm(options: {
   });
 
   useEffect(() => {
-    if (options.projectId) {
-      form.reset(projectWithMembers);
+    if (options.projectId && projectWithMembers) {
+      form.reset(convertToProjectValues(projectWithMembers));
     } else {
       form.reset(defaultProjectAndMembersPayload);
     }
-  }, [options.projectId]);
+  }, [options.projectId, !!projectWithMembers]);
 
   return form;
 }

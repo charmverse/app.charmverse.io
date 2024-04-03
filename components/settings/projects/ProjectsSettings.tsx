@@ -29,7 +29,7 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
 import { ProjectFormAnswers } from './components/ProjectForm';
-import { useProjectForm } from './hooks/useProjectForm';
+import { convertToProjectValues, useProjectForm } from './hooks/useProjectForm';
 
 function ProjectRow({
   projectWithMembers,
@@ -82,48 +82,35 @@ function ProjectRow({
   function onUpdateProject() {
     const projectValues = form.getValues();
     if (isTeamLead) {
-      const updatedProject = {
+      updateProject({
         ...projectValues,
-        id: projectWithMembers.id,
         projectMembers: projectValues.projectMembers.map((member, index) => ({
           ...projectWithMembers.projectMembers[index],
           ...member
         }))
-      };
-
-      updateProject(updatedProject);
-
-      form.reset(updatedProject, {
-        keepDirty: false
-      });
-
-      mutate(
-        (projects) => {
-          if (!projects || !projectWithMembers) {
-            return projects;
-          }
-
-          return projects.map((_project) => {
-            if (_project.id === projectWithMembers.id) {
-              return {
-                ..._project,
-                ...updatedProject,
-                projectMembers: _project.projectMembers.map((projectMember, index) => {
-                  return {
-                    ...projectMember,
-                    ...updatedProject.projectMembers[index]
-                  };
-                })
-              };
+      }).then((updatedProjectWithMembers) => {
+        form.reset(convertToProjectValues(updatedProjectWithMembers), {
+          keepDirty: false
+        });
+        mutate(
+          (projects) => {
+            if (!projects || !projectWithMembers) {
+              return projects;
             }
 
-            return _project;
-          });
-        },
-        {
-          revalidate: false
-        }
-      );
+            return projects.map((_project) => {
+              if (_project.id === projectWithMembers.id) {
+                return updatedProjectWithMembers;
+              }
+
+              return _project;
+            });
+          },
+          {
+            revalidate: false
+          }
+        );
+      });
     } else {
       const projectMemberValue = projectValues.projectMembers.find((member) => member.userId === user?.id);
       if (!projectMemberValue || !projectMemberValue.id) {

@@ -44,7 +44,10 @@ export async function createProject(payload: {
       description: project.description,
       excerpt: project.excerpt,
       name: project.name,
-      walletAddress: project.walletAddress?.toLowerCase(),
+      walletAddress: project.walletAddress.map((addressChainCombo) => ({
+        address: addressChainCombo.address.toLowerCase(),
+        chain: addressChainCombo.chain
+      })),
       blog: project.blog,
       communityUrl: project.communityUrl,
       github: project.github,

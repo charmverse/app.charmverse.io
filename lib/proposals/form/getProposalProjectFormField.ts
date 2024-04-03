@@ -26,7 +26,16 @@ export function getProposalProjectFormField({
 
   privateProjectFields.forEach((key) => {
     if (key in projectWithMembers) {
-      projectWithMembers[key] = '';
+      if (key === 'walletAddress') {
+        projectWithMembers.walletAddress = [
+          {
+            chain: -1,
+            address: ''
+          }
+        ];
+      } else {
+        projectWithMembers[key] = '';
+      }
     }
   });
 

@@ -110,7 +110,10 @@ export async function updateProject({
         description: payload.description,
         excerpt: payload.excerpt,
         name: payload.name,
-        walletAddress: payload.walletAddress?.toLowerCase(),
+        walletAddress: payload.walletAddress.map((addressChainCombo) => ({
+          address: addressChainCombo.address.toLowerCase(),
+          chain: addressChainCombo.chain
+        })),
         blog: payload.blog,
         communityUrl: payload.communityUrl,
         github: payload.github,

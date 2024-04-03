@@ -48,7 +48,12 @@ describe('getProposalProjectFormField', () => {
     projectWithMembers = await createProject({
       project: {
         ...defaultProjectAndMembersPayload,
-        walletAddress: randomETHWalletAddress(),
+        walletAddress: [
+          {
+            address: randomETHWalletAddress(),
+            chain: 1
+          }
+        ],
         projectMembers: [
           {
             ...defaultProjectAndMembersPayload.projectMembers[0],
@@ -68,7 +73,12 @@ describe('getProposalProjectFormField', () => {
       fieldConfig: fieldsInput[0].fieldConfig as ProjectAndMembersFieldConfig
     });
 
-    expect(projectWithoutPrivateFields.walletAddress).toBe('');
+    expect(projectWithoutPrivateFields.walletAddress).toStrictEqual([
+      {
+        chain: -1,
+        address: ''
+      }
+    ]);
     // Since the field is not marked as private the value will not be redacted
     expect(projectWithoutPrivateFields.projectMembers[0].walletAddress).toBe(
       projectWithMembers.projectMembers[0].walletAddress
