@@ -109,7 +109,8 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
 
       const generatedZip = await charmClient.pages.exportZippedDatabasePage({
         databaseId: pageId,
-        filter: localViewSettings?.localFilters || null
+        filter: localViewSettings?.localFilters || null,
+        viewId: view?.id
       });
 
       const zipDataUrl = URL.createObjectURL(generatedZip as any);

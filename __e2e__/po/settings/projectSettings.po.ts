@@ -11,11 +11,17 @@ export class ProjectSettings extends SettingsModal {
 
   readonly saveProjectButton: Locator;
 
+  readonly addProjectMemberButton: Locator;
+
+  readonly deleteProjectMemberButton: Locator;
+
   constructor(page: Page) {
     super(page);
+    this.addProjectMemberButton = page.locator('data-test=add-project-member-button');
     this.addProjectButton = page.locator('data-test=add-project-button');
     this.saveNewProjectButton = page.locator('data-test=save-new-project-button');
     this.saveProjectButton = page.locator('data-test=save-project-button');
+    this.deleteProjectMemberButton = page.locator('data-test=delete-project-member-button');
   }
 
   fillProjectField({
@@ -31,6 +37,10 @@ export class ProjectSettings extends SettingsModal {
       .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
       .first()
       .fill(content);
+  }
+
+  getProjectTitle({ projectId }: { projectId: string }) {
+    return this.page.locator(`data-test=project-title-${projectId}`).first();
   }
 
   clickProject({ projectId }: { projectId: string }) {

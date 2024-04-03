@@ -1,6 +1,6 @@
-import type { Node } from '@bangle.dev/pm';
-import { Step } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+import type { Node } from 'prosemirror-model';
+import { Step } from 'prosemirror-transform';
 
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { ProsemirrorJSONStep } from 'lib/websockets/documentEvents/interfaces';

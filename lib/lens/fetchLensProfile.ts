@@ -1,7 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { lensClient } from './lensClient';
-
 export async function fetchLensProfile(userId: string) {
   try {
     const user = await prisma.user.findUniqueOrThrow({
@@ -21,6 +19,8 @@ export async function fetchLensProfile(userId: string) {
     if (walletAddresses.length === 0) {
       return null;
     }
+
+    const { lensClient } = await import('./lensClient');
 
     const profile = await lensClient.profile.fetchAll({
       where: {

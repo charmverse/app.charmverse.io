@@ -1,5 +1,5 @@
-import type { Node } from '@bangle.dev/pm';
 import type { PageType } from '@charmverse/core/prisma-client';
+import type { Node } from 'prosemirror-model';
 
 import type { DocumentEventHandler } from './documentEvents';
 import type { ClientDiffMessage } from './interfaces';

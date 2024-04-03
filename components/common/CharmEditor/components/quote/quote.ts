@@ -1,7 +1,7 @@
-import type { DOMOutputSpec, Node } from '@bangle.dev/pm';
 import { getNodeType } from '@bangle.dev/utils';
 import { wrappingInputRule } from 'prosemirror-inputrules';
 import type { MarkdownSerializerState } from 'prosemirror-markdown';
+import type { DOMOutputSpec, Node } from 'prosemirror-model';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
 import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';

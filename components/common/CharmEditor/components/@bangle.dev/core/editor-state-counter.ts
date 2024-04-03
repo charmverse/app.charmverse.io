@@ -1,4 +1,4 @@
-import { Plugin, PluginKey } from '@bangle.dev/pm';
+import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { PluginGroup } from './plugin-group';
 import type { RawPlugins } from './plugin-loader';

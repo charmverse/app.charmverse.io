@@ -1,6 +1,8 @@
-import type { EditorState, EditorView, Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import { collab, sendableSteps } from 'prosemirror-collab';
+import type { Node } from 'prosemirror-model';
+import type { EditorState } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import { emitSocketMessage } from 'hooks/useWebSocketClient';

@@ -1,18 +1,12 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type {
-  CredentialEventType,
-  IssuedCredential,
-  PendingSafeTransaction,
-  Prisma
-} from '@charmverse/core/prisma-client';
+import type { CredentialEventType, PendingSafeTransaction, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
-import { sepolia } from 'viem/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
@@ -221,7 +215,7 @@ export async function indexSafeTransaction({
   safeTxHash: string;
   chainId: number;
 }): Promise<void> {
-  const apiClient = getSafeApiClient({ chainId });
+  const apiClient = await getSafeApiClient({ chainId });
   const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
 
   if (!pendingSafeTransaction) {

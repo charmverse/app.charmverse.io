@@ -1,10 +1,12 @@
-import { Decoration, DecorationSet, Plugin, Selection } from '@bangle.dev/pm';
-import type { EditorState, PluginKey } from '@bangle.dev/pm';
 import { RateReviewOutlined } from '@mui/icons-material';
+import { Plugin, Selection } from 'prosemirror-state';
+import type { EditorState, PluginKey } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 
-import { createTooltipDOM, tooltipPlacement } from '../@bangle.dev/tooltip';
-import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
+import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggestTooltip';
+import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
 import { getEventsFromDoc } from './getEvents';
@@ -86,7 +88,7 @@ export function plugins({ onSelectionSet, key }: { onSelectionSet?: (state: Edit
         }
       }
     }),
-    tooltipPlacement.plugins({
+    tooltipPlacementPlugins({
       stateKey: key,
       renderOpts: {
         placement: 'bottom',

@@ -1,4 +1,5 @@
-import type { EditorState, Mark } from '@bangle.dev/pm';
+import type { Mark } from 'prosemirror-model';
+import type { EditorState } from 'prosemirror-state';
 
 import type { TrackAttribute } from '../../track/interfaces';
 

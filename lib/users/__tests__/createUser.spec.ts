@@ -1,7 +1,10 @@
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { shortWalletAddress } from 'lib/utils/blockchain';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
-import { createUserFromWallet } from '../createUser';
+import { createOrGetUserFromWallet, createUserFromWallet } from '../createUser';
 
 jest.mock('lib/blockchain/getENSName', () => {
   return {
@@ -25,8 +28,39 @@ jest.mock('lib/blockchain/getENSName', () => {
   };
 });
 
+jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
+  trackUserAction: jest.fn()
+}));
+
 afterAll(async () => {
   jest.resetModules();
+});
+
+describe('createOrGetUserFromWallet', () => {
+  it('Should get existing user based on wallet address', async () => {
+    const address = randomETHWalletAddress();
+    await createUserFromWallet({ address });
+
+    const { isNew, user } = await createOrGetUserFromWallet({ address });
+    expect(isNew).toBe(false);
+    expect(trackUserAction as any).toHaveBeenCalledTimes(1);
+    expect(user.wallets.length).toBe(1);
+  });
+
+  it('Should convert an unclaimed user to claimed', async () => {
+    const address = randomETHWalletAddress();
+    const { id: userId } = await createUserFromWallet({ address });
+    await prisma.user.update({
+      where: { id: userId },
+      data: { claimed: false }
+    });
+    await createOrGetUserFromWallet({ address });
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { id: userId }
+    });
+    expect(trackUserAction as any).toBeCalledWith('sign_up', { userId, identityType: 'Wallet' });
+    expect(user.claimed).toBe(true);
+  });
 });
 
 describe('createUserFromWallet', () => {

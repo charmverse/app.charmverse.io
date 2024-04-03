@@ -29,7 +29,8 @@ const exportedFormat: Record<ExportKeys, string> = {
   rubricResults: 'Rubric Results'
 };
 
-const exportedCustomProps: string[] = ['Mission'];
+const exportedCustomProps: string[] = ['Mission', 'Type'];
+const exportedCustomFields: string[] = ['What is the size of your grant request?'];
 
 const separator = ',';
 const cellEnclosure = '"';
@@ -47,8 +48,10 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     }
   });
 
+  const customProposalProperties = (customBlocks as ProposalBoardBlock)?.fields.cardProperties || [];
+
   const propertyMap = exportedCustomProps.reduce((acc, propName) => {
-    const property = (customBlocks as ProposalBoardBlock)?.fields.cardProperties.find((prop) => prop.name === propName);
+    const property = customProposalProperties.find((prop) => prop.name === propName);
 
     if (!property) {
       throw new Error(`Property ${propName} not found in board ${customBlocks?.id}`);
@@ -59,32 +62,49 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     return acc;
   }, {} as Record<string, ProposalPropertyField>);
 
-  const pageIds = await _getPageIdsFromDatabase();
+  const formFields = await prisma.formField.findMany({
+    where: {
+      form: {
+        proposal: {
+          some: {
+            space: {
+              domain
+            }
+          }
+        }
+      },
+      name: {
+        in: exportedCustomFields
+      }
+    }
+  });
+  const formFieldIdsByName = Object.groupBy(formFields, (field) => field.name);
+
+  // const pageIds = await _getPageIdsFromDatabase();
 
   const proposals = await prisma.proposal.findMany({
-    // where: {
-    //   status: 'published',
-    //   rubricAnswers: {
-    //     some: {}
-    //   },
-    //   page: {
-    //     createdAt: {
-    //       gte: new Date('2024-01-01')
-    //     },
-    //     type: 'proposal',
-    //     space: {
-    //       domain
-    //     }
-    //   }
-    // },
     where: {
+      status: 'published',
       page: {
-        id: {
-          in: pageIds
+        deletedAt: null,
+        createdAt: {
+          gte: new Date('2024-03-13')
+        },
+        type: 'proposal',
+        space: {
+          domain
         }
       }
     },
+    // where: {
+    //   page: {
+    //     id: {
+    //       in: pageIds
+    //     }
+    //   }
+    // },
     include: {
+      formAnswers: true,
       rubricAnswers: true,
       rubricCriteria: {
         orderBy: {
@@ -111,7 +131,9 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
 
   console.log('Found', proposals.length, 'proposals to export');
 
-  const allContent = [[...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps]];
+  const allContent = [
+    [...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps, ...exportedCustomFields]
+  ];
 
   const aggregatedResultsByProposal = proposals.reduce((acc, proposal) => {
     const results = aggregateResults({
@@ -219,7 +241,22 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
         .replace(/;/g, ' ')}${cellEnclosure}`;
     });
 
-    return [...headerRows, ...exportedCustomProps].map((rowKey) => (row as any)[rowKey] as string);
+    exportedCustomFields.forEach((rowKey) => {
+      const fieldIds = (formFieldIdsByName[rowKey] || []).map((field) => field.id);
+      const match = p.formAnswers.find((answer) => fieldIds?.includes(answer.fieldId));
+      if (match) {
+        console.log(match);
+        const valueStr = (match.value as any).contentText || match.value;
+        (row as any)[rowKey] = `${cellEnclosure}${valueStr
+          .replace(new RegExp(cellEnclosure, 'g'), '')
+          .replace(new RegExp(separator, 'g'), '')
+          .replace(/;/g, ' ')}${cellEnclosure}`;
+      }
+    });
+
+    return [...headerRows, ...exportedCustomProps, ...exportedCustomFields].map(
+      (rowKey) => (row as any)[rowKey] as string
+    );
   });
 
   allContent.push(...contentRows);

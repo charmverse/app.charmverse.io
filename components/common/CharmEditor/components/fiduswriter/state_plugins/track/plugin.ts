@@ -1,5 +1,6 @@
-import type { NodeSelection } from '@bangle.dev/pm';
-import { Plugin, PluginKey, Decoration, DecorationSet } from '@bangle.dev/pm';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import type { NodeSelection } from 'prosemirror-state';
+import { Decoration, DecorationSet } from 'prosemirror-view';
 
 import type { FidusEditor } from '../../fiduseditor';
 import type { TrackAttribute } from '../../track/interfaces';

@@ -112,6 +112,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       id: proposalId
     },
     select: {
+      projectId: true,
       formAnswers: {
         select: {
           fieldId: true,
@@ -132,10 +133,12 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     }
   });
 
-  await validateProposalProject({
-    formAnswers: proposalForm?.formAnswers as FieldAnswerInput[],
-    formFields: proposalForm?.form?.formFields
-  });
+  if (proposalForm?.projectId) {
+    await validateProposalProject({
+      projectId: proposalForm.projectId,
+      formFields: proposalForm?.form?.formFields
+    });
+  }
 
   await publishProposal({
     proposalId,

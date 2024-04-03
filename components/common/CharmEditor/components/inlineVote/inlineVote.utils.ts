@@ -1,5 +1,5 @@
-import type { Command, EditorState } from '@bangle.dev/pm';
 import { filter } from '@bangle.dev/utils';
+import type { Command, EditorState } from 'prosemirror-state';
 
 import { markName } from './inlineVote.constants';
 

@@ -1,8 +1,8 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+import type { DOMOutputSpec } from 'prosemirror-model';
 
 import type { RawSpecs } from '../@bangle.dev/core/specRegistry';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { spec as SuggestTooltipSpec } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { encloseNestedPage } from '../nestedPage/nestedPage.utils';
 
 import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';
@@ -47,7 +47,7 @@ export function linkedPageSpec(): RawSpecs {
         }
       }
     },
-    suggestTooltip.spec({ markName: linkedPageSuggestMarkName }),
+    SuggestTooltipSpec({ markName: linkedPageSuggestMarkName }),
     // add temporary stub to support old mark name
     {
       name: 'nestedPageSuggest',
