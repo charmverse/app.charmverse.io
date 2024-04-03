@@ -207,19 +207,62 @@ export async function signPublishAndRecordCharmverseCredential({
 
   const published = await publishSignedCredential(contentToPublish);
 
-  await prisma.issuedCredential.create({
-    data: {
-      id: publishedCredentialId,
-      ceramicId: published.id,
-      ceramicRecord: published,
-      credentialEvent: event,
-      credentialTemplate: { connect: { id: credentialTemplateId } },
-      user: { connect: { id: recipientUserId } },
-      proposal: proposalId ? { connect: { id: proposalId } } : undefined,
-      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined,
-      schemaId: attestationSchemaIds[credential.type]
+  // Won't always happen but an onchain credential may already exist
+
+  await prisma.issuedCredential.upsert({
+    where: {
+      userId_credentialTemplateId_credentialEvent_proposalId_rewardApplicationId: {
+        userId: recipientUserId,
+        credentialTemplateId,
+        credentialEvent: event,
+        proposalId: null,
+        rewardApplicationId: null
+      }
     }
   });
+
+  const existingOnchainCredential = await prisma.issuedCredential.findFirst({
+    where: {
+      credentialEvent: event,
+      userId: recipientUserId,
+      credentialTemplateId,
+      onchainChainId: {
+        not: null
+      },
+      // One of these will be undefined
+      proposalId,
+      rewardApplicationId
+    },
+    select: {
+      id: true
+    }
+  });
+
+  if (existingOnchainCredential) {
+    await prisma.issuedCredential.update({
+      where: {
+        id: existingOnchainCredential.id
+      },
+      data: {
+        ceramicId: published.id,
+        ceramicRecord: published
+      }
+    });
+  } else {
+    await prisma.issuedCredential.create({
+      data: {
+        id: publishedCredentialId,
+        ceramicId: published.id,
+        ceramicRecord: published,
+        credentialEvent: event,
+        credentialTemplate: { connect: { id: credentialTemplateId } },
+        user: { connect: { id: recipientUserId } },
+        proposal: proposalId ? { connect: { id: proposalId } } : undefined,
+        rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined,
+        schemaId: attestationSchemaIds[credential.type]
+      }
+    });
+  }
 
   trackUserAction('credential_issued', {
     userId: recipientUserId,

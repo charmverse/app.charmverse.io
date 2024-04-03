@@ -19,7 +19,7 @@ type IndexableCredential = {
   attestationId: string;
 };
 
-async function getProposalContentToIndex({
+async function indexProposalCredential({
   chainId,
   attestationId,
   eas
@@ -113,15 +113,17 @@ async function getProposalContentToIndex({
     return null;
   }
 
-  return {
-    credentialEvent,
-    credentialTemplateId: matchingCredentialTemplate.id,
-    userId: proposal.authors[0].userId,
-    proposalId: proposal.id,
-    schemaId: attestation.schema,
-    onchainChainId: chainId,
-    onchainAttestationId: attestationId
-  };
+  await prisma.issuedCredential.create({
+    data: {
+      credentialEvent,
+      credentialTemplate: { connect: { id: matchingCredentialTemplate.id } },
+      user: { connect: { id: proposal.authors[0].userId } },
+      proposal: { connect: { id: proposal.id } },
+      schemaId: attestation.schema,
+      onchainChainId: chainId,
+      onchainAttestationId: attestationId
+    }
+  });
 }
 
 // Avoid spamming RPC with requests
@@ -148,7 +150,7 @@ export async function indexProposalCredentials({ chainId, txHash }: ProposalCred
   const issuedCredentialInputs = await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return getProposalContentToIndex({ attestationId: uid, chainId, eas });
+      await indexProposalCredential({ attestationId: uid, chainId, eas });
     })
   );
 

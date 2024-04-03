@@ -7,7 +7,6 @@ import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels } from './constants';
@@ -50,9 +49,6 @@ export async function issueProposalCredentialsIfNecessary({
       }
     }
   });
-  if (baseProposal.space.useOnchainCredentials) {
-    return;
-  }
 
   if (baseProposal.status === 'draft') {
     return;

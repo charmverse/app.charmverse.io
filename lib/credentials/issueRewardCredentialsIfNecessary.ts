@@ -73,10 +73,6 @@ export async function issueRewardCredentialsIfNecessary({
     }
   });
 
-  if (baseReward.space.useOnchainCredentials) {
-    return;
-  }
-
   if (!baseReward.page) {
     throw new DataNotFoundError(`Reward with id ${rewardId} has no matching page`);
   }
