@@ -11,7 +11,8 @@ esbuild
     packages: 'external',
     platform: 'node',
     sourcemap: true,
-    target: 'node18'
+    target: 'node18',
+    logLevel: 'verbose'
   })
   .catch(() => process.exit(1))
   .then(async (result) => {

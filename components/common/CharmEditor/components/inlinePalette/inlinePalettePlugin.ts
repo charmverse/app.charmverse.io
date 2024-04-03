@@ -10,12 +10,12 @@ import { keybindings } from '../../keybindings';
 import { safeRequestAnimationFrame } from '../../utils';
 import type { SpecRegistry } from '../@bangle.dev/core/specRegistry';
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltip';
+import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import {
   decrementSuggestTooltipCounter,
   incrementSuggestTooltipCounter,
   plugins as suggestTooltipPlugins
-} from '../@bangle.dev/tooltip/suggestTooltip';
+} from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 
 import { paletteMarkName } from './config';
 import { queryInlinePaletteActive } from './inlinePalette';

@@ -8,7 +8,7 @@ import { highlightMarkedElement, highlightElement } from 'lib/prosemirror/highli
 import { extractInlineCommentRows } from 'lib/prosemirror/plugins/inlineComments/findTotalInlineComments';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltip';
+import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 import { threadPluginKey } from '../thread/thread.plugins';
 

@@ -7,7 +7,7 @@ import {
   hideSuggestionsTooltip,
   referenceElement,
   renderSuggestionsTooltip
-} from '../@bangle.dev/tooltip/suggestTooltip';
+} from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 
 import { getLinkElement } from './getLinkElement';
