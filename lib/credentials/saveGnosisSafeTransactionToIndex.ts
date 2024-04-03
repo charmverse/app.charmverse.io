@@ -77,8 +77,8 @@ export async function saveGnosisSafeTransactionToIndex<T extends AttestationType
       safeTxHash,
       safeAddress,
       chainId,
-      proposalIds: type === 'reward' ? [] : uniqueValues(ids),
-      rewardIds: type === 'proposal' ? [] : uniqueValues(ids),
+      proposalIds: type === 'proposal' ? uniqueValues(ids) : [],
+      rewardIds: type === 'reward' ? uniqueValues(ids) : [],
       processed: false,
       credentialContent
     }
@@ -99,7 +99,7 @@ export async function indexSafeTransaction({
 }: IndexableSafeTransaction & {
   indexer: (input: { txHash: string; chainId: EasSchemaChain }) => Promise<void>;
 }): Promise<void> {
-  const apiClient = getSafeApiClient({ chainId });
+  const apiClient = await getSafeApiClient({ chainId });
   const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
 
   if (!pendingSafeTransaction) {

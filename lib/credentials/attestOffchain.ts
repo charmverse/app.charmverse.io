@@ -19,6 +19,7 @@ import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
 import type { PublishedSignedCredential } from './queriesAndMutations';
 import { publishSignedCredential } from './queriesAndMutations';
+import { saveIssuedCredential } from './saveIssuedCredential';
 import { encodeAttestation, attestationSchemaIds, type CredentialData } from './schemas';
 
 type AttestationInput<T extends AttestationType = AttestationType> = {
@@ -30,7 +31,7 @@ type AttestationInput<T extends AttestationType = AttestationType> = {
   linkedAttestationUid?: string;
 };
 
-export async function attestOffchain({
+async function attestOffchain({
   credential,
   recipient,
   attester,
@@ -96,7 +97,7 @@ export type SignedAttestation = {
 /**
  *  Only the raw offchain signed credential is returned. The call will handle persisting or publishing this signature
  * */
-export async function signCharmverseAttestation({
+async function signCharmverseAttestation({
   chainId,
   credential,
   recipient
@@ -192,6 +193,8 @@ export async function signPublishAndRecordCharmverseCredential({
 
   const publishedCredentialId = uuid();
 
+  const schemaId = attestationSchemaIds[credential.type];
+
   const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
     chainId,
     recipient: signedCredential.recipient,
@@ -200,69 +203,27 @@ export async function signPublishAndRecordCharmverseCredential({
     type: credential.type,
     verificationUrl: signedCredential.verificationUrl,
     issuer: signedCredential.signer,
-    schemaId: attestationSchemaIds[credential.type],
+    schemaId,
     sig: JSON.stringify(signedCredential.sig),
     charmverseId: publishedCredentialId
   };
 
   const published = await publishSignedCredential(contentToPublish);
 
-  // Won't always happen but an onchain credential may already exist
-
-  await prisma.issuedCredential.upsert({
-    where: {
-      userId_credentialTemplateId_credentialEvent_proposalId_rewardApplicationId: {
-        userId: recipientUserId,
-        credentialTemplateId,
-        credentialEvent: event,
-        proposalId: null,
-        rewardApplicationId: null
-      }
-    }
-  });
-
-  const existingOnchainCredential = await prisma.issuedCredential.findFirst({
-    where: {
+  await saveIssuedCredential({
+    credentialProps: {
       credentialEvent: event,
-      userId: recipientUserId,
       credentialTemplateId,
-      onchainChainId: {
-        not: null
-      },
-      // One of these will be undefined
+      schemaId: attestationSchemaIds[credential.type],
+      userId: recipientUserId,
       proposalId,
       rewardApplicationId
     },
-    select: {
-      id: true
+    offchainData: {
+      ceramicId: published.id,
+      ceramicRecord: published
     }
   });
-
-  if (existingOnchainCredential) {
-    await prisma.issuedCredential.update({
-      where: {
-        id: existingOnchainCredential.id
-      },
-      data: {
-        ceramicId: published.id,
-        ceramicRecord: published
-      }
-    });
-  } else {
-    await prisma.issuedCredential.create({
-      data: {
-        id: publishedCredentialId,
-        ceramicId: published.id,
-        ceramicRecord: published,
-        credentialEvent: event,
-        credentialTemplate: { connect: { id: credentialTemplateId } },
-        user: { connect: { id: recipientUserId } },
-        proposal: proposalId ? { connect: { id: proposalId } } : undefined,
-        rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined,
-        schemaId: attestationSchemaIds[credential.type]
-      }
-    });
-  }
 
   trackUserAction('credential_issued', {
     userId: recipientUserId,

@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { CredentialEventType, Prisma } from '@charmverse/core/prisma-client';
+import type { CredentialEventType, IssuedCredential, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
@@ -12,6 +12,7 @@ import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { rewardSubmissionApprovedVerb } from './constants';
+import { saveIssuedCredential } from './saveIssuedCredential';
 import type { RewardCredential } from './schemas/reward';
 import { decodeRewardCredential } from './schemas/reward';
 
@@ -19,14 +20,14 @@ type IndexableCredential = {
   attestationId: string;
 };
 
-async function getRewardContentToIndex({
+async function indexOnchainRewardCredential({
   chainId,
   attestationId,
   eas
 }: IndexableCredential & {
   eas: EAS;
   chainId: EasSchemaChain;
-}): Promise<Prisma.IssuedCredentialCreateManyInput | null> {
+}): Promise<IssuedCredential> {
   const attestation = await eas.getAttestation(attestationId);
 
   const decodedContent = decodeRewardCredential(attestation.data) as RewardCredential;
@@ -86,27 +87,21 @@ async function getRewardContentToIndex({
     }
   });
 
-  const existingCredential = await prisma.issuedCredential.findFirst({
-    where: {
+  const issuedCredential = await saveIssuedCredential({
+    credentialProps: {
+      credentialEvent,
+      credentialTemplateId: matchingCredentialTemplate.id,
+      schemaId: attestation.schema,
+      userId: application.applicant.id,
+      rewardApplicationId: application.id
+    },
+    onChainData: {
       onchainChainId: chainId,
       onchainAttestationId: attestationId
     }
   });
 
-  // If we already indexed this attestation, no need to reindex it
-  if (existingCredential) {
-    return null;
-  }
-
-  return {
-    credentialEvent,
-    credentialTemplateId: matchingCredentialTemplate.id,
-    userId: application.applicant.id,
-    rewardApplicationId: application.id,
-    schemaId: attestation.schema,
-    onchainChainId: chainId,
-    onchainAttestationId: attestationId
-  };
+  return issuedCredential;
 }
 
 // Avoid spamming RPC with requests
@@ -127,16 +122,12 @@ export async function indexRewardCredentials({ chainId, txHash }: RewardCredenti
   const eas = await getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
 
-  const issuedCredentialInputs = await Promise.all(
+  await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return getRewardContentToIndex({ attestationId: uid, chainId, eas });
+      return indexOnchainRewardCredential({ attestationId: uid, chainId, eas });
     })
   );
-
-  await prisma.issuedCredential.createMany({
-    data: issuedCredentialInputs.filter((input): input is Prisma.IssuedCredentialCreateManyInput => !!input)
-  });
 }
 
 // indexSafeTransaction({

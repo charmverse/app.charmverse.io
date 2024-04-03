@@ -71,11 +71,15 @@ export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id
 function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
   let parsed = {} as any;
 
-  try {
-    const parsedData = JSON.parse(credential.content);
-    parsed = parsedData;
-  } catch (err) {
-    log.error(`Failed to parse content from ceramic record ${credential.id}`);
+  if (typeof credential.content === 'object') {
+    parsed = credential.content;
+  } else {
+    try {
+      const parsedData = JSON.parse(credential.content);
+      parsed = parsedData;
+    } catch (err) {
+      log.error(`Failed to parse content from ceramic record ${credential.id}`);
+    }
   }
 
   return {

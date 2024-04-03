@@ -1,5 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { CredentialEventType, Prisma } from '@charmverse/core/prisma-client';
+import type { CredentialEventType, IssuedCredential, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
@@ -12,6 +12,7 @@ import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
+import { saveIssuedCredential } from './saveIssuedCredential';
 import type { ProposalCredential } from './schemas/proposal';
 import { decodeProposalCredential } from './schemas/proposal';
 
@@ -19,14 +20,14 @@ type IndexableCredential = {
   attestationId: string;
 };
 
-async function indexProposalCredential({
+async function indexOnchainProposalCredential({
   chainId,
   attestationId,
   eas
 }: IndexableCredential & {
   eas: EAS;
   chainId: EasSchemaChain;
-}): Promise<Prisma.IssuedCredentialCreateManyInput | null> {
+}): Promise<IssuedCredential> {
   const attestation = await eas.getAttestation(attestationId);
 
   const decodedContent = decodeProposalCredential(attestation.data) as ProposalCredential;
@@ -101,29 +102,21 @@ async function indexProposalCredential({
     }
   });
 
-  const existingCredential = await prisma.issuedCredential.findFirst({
-    where: {
-      onchainChainId: chainId,
-      onchainAttestationId: attestationId
-    }
-  });
-
-  // If we already indexed this attestation, no need to reindex it
-  if (existingCredential) {
-    return null;
-  }
-
-  await prisma.issuedCredential.create({
-    data: {
+  const issuedCredential = await saveIssuedCredential({
+    credentialProps: {
       credentialEvent,
-      credentialTemplate: { connect: { id: matchingCredentialTemplate.id } },
-      user: { connect: { id: proposal.authors[0].userId } },
-      proposal: { connect: { id: proposal.id } },
+      credentialTemplateId: matchingCredentialTemplate.id,
       schemaId: attestation.schema,
-      onchainChainId: chainId,
-      onchainAttestationId: attestationId
+      userId: proposal.authors[0].userId,
+      proposalId: proposal.id
+    },
+    onChainData: {
+      onchainAttestationId: attestationId,
+      onchainChainId: chainId
     }
   });
+
+  return issuedCredential;
 }
 
 // Avoid spamming RPC with requests
@@ -147,14 +140,10 @@ export async function indexProposalCredentials({ chainId, txHash }: ProposalCred
   const eas = await getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
 
-  const issuedCredentialInputs = await Promise.all(
+  await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      await indexProposalCredential({ attestationId: uid, chainId, eas });
+      return indexOnchainProposalCredential({ attestationId: uid, chainId, eas });
     })
   );
-
-  await prisma.issuedCredential.createMany({
-    data: issuedCredentialInputs.filter((input): input is Prisma.IssuedCredentialCreateManyInput => !!input)
-  });
 }
