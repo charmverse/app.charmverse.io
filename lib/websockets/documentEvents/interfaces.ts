@@ -1,4 +1,4 @@
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
 
 export type Participant = {
   id: string;

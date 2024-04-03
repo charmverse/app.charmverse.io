@@ -1,5 +1,6 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
-import { Plugin, PluginKey, keymap } from '@bangle.dev/pm';
+import { keymap } from 'prosemirror-keymap';
+import type { DOMOutputSpec } from 'prosemirror-model';
+import { Plugin, PluginKey } from 'prosemirror-state';
 
 import { createElement } from 'components/common/CharmEditor/components/@bangle.dev/core/createElement';
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';

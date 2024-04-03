@@ -23,7 +23,7 @@ import type { FailedImportsError } from 'lib/notion/types';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';
-import type { ProjectUpdatePayload, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ITokenMetadata, ITokenMetadataRequest } from 'lib/tokens/tokenData';
 import { encodeFilename } from 'lib/utils/encodeFilename';
 import type { SocketAuthResponse } from 'lib/websockets/interfaces';
@@ -46,6 +46,7 @@ import { NotificationsApi } from './apis/notificationsApi';
 import { PagesApi } from './apis/pagesApi';
 import { PermissionsApi } from './apis/permissions';
 import { ProfileApi } from './apis/profileApi';
+import { ProjectsApi } from './apis/projectsApi';
 import { ProposalsApi } from './apis/proposalsApi';
 import { PublicProfileApi } from './apis/publicProfileApi';
 import { RewardsApi } from './apis/rewardsApi';
@@ -109,6 +110,8 @@ class CharmClient {
   rewards = new RewardsApi();
 
   credentials = new CredentialsApi();
+
+  projects = new ProjectsApi();
 
   async socket() {
     return http.GET<SocketAuthResponse>('/api/socket');
@@ -362,14 +365,6 @@ class CharmClient {
 
   resolveEnsName(ens: string) {
     return http.GET<string | null>('/api/resolve-ens', { ens });
-  }
-
-  removeProjectMember({ projectId, memberId }: { projectId: string; memberId: string }) {
-    return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
-  }
-
-  updateProject(payload: ProjectUpdatePayload) {
-    return http.PUT<ProjectWithMembers>(`/api/projects/${payload.id}`, payload);
   }
 }
 

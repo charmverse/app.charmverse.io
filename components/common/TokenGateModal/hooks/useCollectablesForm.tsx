@@ -1,5 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { readContract } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -41,7 +42,7 @@ const schema = yup.object({
 
           if (chain && collectableOption === 'Unlock') {
             try {
-              await readContract({
+              await readContract(wagmiConfig, {
                 address: value,
                 chainId: Number(chain),
                 abi: PublicLockV13,
@@ -53,7 +54,7 @@ const schema = yup.object({
             }
           } else if (chain && collectableOption === 'Hypersub') {
             try {
-              await readContract({
+              await readContract(wagmiConfig, {
                 address: value,
                 chainId: Number(chain),
                 abi: subscriptionTokenV1ABI,
@@ -65,7 +66,7 @@ const schema = yup.object({
             }
           } else if (chain && ['ERC721', 'ERC1155'].includes(collectableOption)) {
             try {
-              await readContract({
+              await readContract(wagmiConfig, {
                 address: value,
                 chainId: Number(chain),
                 abi: ercAbi,

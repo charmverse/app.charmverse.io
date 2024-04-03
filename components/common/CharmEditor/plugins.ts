@@ -1,7 +1,7 @@
 import { bold, code, italic, strike, underline } from '@bangle.dev/base-components';
-import type { EditorState, EditorView } from '@bangle.dev/pm';
-import { PluginKey } from '@bangle.dev/pm';
-import { Plugin } from 'prosemirror-state';
+import type { EditorState } from 'prosemirror-state';
+import { PluginKey, Plugin } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/core/node-view';
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
@@ -22,7 +22,7 @@ import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
 import * as iframe from './components/iframe';
 import * as inlineComment from './components/inlineComment';
-import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalette';
+import { plugins as inlinePalettePlugins } from './components/inlinePalette/inlinePalettePlugin';
 import * as inlineVote from './components/inlineVote';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { linkedPagePluginKeyName } from './components/linkedPage/linkedPage.constants';

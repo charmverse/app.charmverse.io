@@ -1,6 +1,5 @@
 const esmModules = [
   '@bangle.dev/base-components',
-  '@bangle.dev/tooltip',
   '@bangle.dev/utils',
   'prosemirror-utils-bangle',
   '@popperjs/core',
@@ -34,16 +33,29 @@ const esmModules = [
   'jose',
   'nanoid',
   '@charmverse/core',
-  '@lens-protocol'
+  '@lens-protocol',
+  'wagmi' // compile wagmi to avoid error: QueryClientProvider must be used as a child of ReactQueryClientProvider when running app
 ];
 
 // this breaks the dev environment with an error when importing MUI icons: Cannot use 'import.meta' outside a module
 if (process.env.NODE_ENV === 'test') {
   esmModules.push('@babel/runtime');
   esmModules.push('isows');
-  esmModules.push('wagmi');
-  esmModules.push('@wagmi/core');
-  esmModules.push('@wagmi/connectors');
+  // related modules
+  esmModules.push(
+    ...[
+      'wagmi',
+      '@wagmi/core',
+      '@wagmi/connectors',
+      '@walletconnect/core',
+      '@walletconnect/utils',
+      '@walletconnect/ethereum-provider',
+      '@walletconnect/relay-auth',
+      'preact',
+      'uint8arrays',
+      'multiformats'
+    ]
+  );
 }
 
 exports.esmModules = esmModules;

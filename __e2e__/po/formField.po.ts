@@ -46,12 +46,14 @@ export class FormField extends DocumentPage {
 
   async toggleProjectFieldConfig({
     fieldName,
-    hidden,
-    required
+    show,
+    required,
+    private: _private
   }: {
     fieldName: string;
     required?: boolean;
-    hidden?: boolean;
+    show?: boolean;
+    private?: boolean;
   }) {
     // By default, the field is required
     if (!required) {
@@ -59,13 +61,22 @@ export class FormField extends DocumentPage {
     }
 
     // By default, the field is not hidden
-    if (hidden) {
-      await this.page.locator(`data-test=${fieldName}-field-hidden-toggle`).first().click();
+    if (show === false) {
+      await this.page.locator(`data-test=${fieldName}-field-show-toggle`).first().click();
+    }
+
+    if (_private !== undefined) {
+      await this.page.locator(`data-test=${fieldName}-field-private-toggle`).first().click();
     }
   }
 
   async getProjectFieldLabel(fieldName: string) {
     return this.page.locator(`data-test=project-${fieldName}-field-container >> data-test=field-label`).textContent();
+  }
+
+  async getProjectOption(projectId: string) {
+    await this.page.locator('data-test=project-profile-select').click();
+    return this.page.locator(`data-test=project-option-${projectId}`);
   }
 
   async clickProjectOption(projectId: string) {

@@ -1,8 +1,9 @@
-import type { Schema } from '@bangle.dev/pm';
-import { InputRule, Plugin, PluginKey } from '@bangle.dev/pm';
+import { InputRule } from 'prosemirror-inputrules';
+import type { Schema } from 'prosemirror-model';
+import { Plugin, PluginKey } from 'prosemirror-state';
 import { v4 } from 'uuid';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
+import type { RawPlugins } from '../core/plugin-loader';
 
 // example: <img src=”data:image/gif;base64, R0lGODlhCAAFAIABAMaAgP///yH5BAEAAAEALAAAAAAIAAUAAAIKBBKGebzqoJKtAAA7″ />
 

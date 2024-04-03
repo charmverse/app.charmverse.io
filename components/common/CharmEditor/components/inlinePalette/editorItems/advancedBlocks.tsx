@@ -1,10 +1,12 @@
-import type { EditorView, Node } from '@bangle.dev/pm';
-import { Fragment, setBlockType } from '@bangle.dev/pm';
 import { rafCommandExec, findParentNodeOfType } from '@bangle.dev/utils';
 import { FormatListBulleted } from '@mui/icons-material';
 import CodeIcon from '@mui/icons-material/Code';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
+import { setBlockType } from 'prosemirror-commands';
+import { Fragment } from 'prosemirror-model';
+import type { Node } from 'prosemirror-model';
 import { TextSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 
 import { insertNode, isAtBeginningOfLine } from '../../../utils';
 import { replaceSuggestionMarkWith } from '../inlinePalette';

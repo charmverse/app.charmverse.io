@@ -1,6 +1,6 @@
-import * as pmHistory from '@bangle.dev/pm';
-import { keymap } from '@bangle.dev/pm';
 import { createObject } from '@bangle.dev/utils';
+import * as pmHistory from 'prosemirror-history';
+import { keymap } from 'prosemirror-keymap';
 
 import { PluginGroup } from './plugin-group';
 import { type RawPlugins } from './plugin-loader';

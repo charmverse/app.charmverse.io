@@ -1,5 +1,5 @@
-import type { EditorView } from '@bangle.dev/pm';
 import { Mapping, AddMarkStep, RemoveMarkStep } from '@bangle.dev/pm';
+import type { EditorView } from 'prosemirror-view';
 
 import { deleteNode } from './delete';
 import { deactivateAllSelectedChanges } from './helpers';

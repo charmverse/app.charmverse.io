@@ -1,6 +1,6 @@
 // @ts-nocheck - skip for now
-import type { Mark, Node } from '@bangle.dev/pm';
 import { isEqual } from 'lodash';
+import type { Mark, Node } from 'prosemirror-model';
 
 export function toMiniJSON(node: Node) {
   // Similar to the ProseMirror internal toJSON function,

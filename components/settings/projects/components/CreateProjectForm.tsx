@@ -1,26 +1,22 @@
-import AddIcon from '@mui/icons-material/Add';
 import { Box, Stack } from '@mui/material';
-import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
-import { defaultProjectFieldConfig } from 'lib/projects/constants';
-import type { ProjectWithMembers, ProjectValues } from 'lib/projects/interfaces';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+
+import { ProjectFormAnswers } from './ProjectForm';
 
 export function CreateProjectForm({
   onCancel,
-  onSave,
-  onAddProject
+  onSave
 }: {
   onSave?: (project: ProjectWithMembers) => void;
   onCancel?: VoidFunction;
-  onAddProject?: VoidFunction;
 }) {
-  const [open, setOpen] = useState(false);
   const { trigger: createProject, isMutating } = useCreateProject();
-  const { formState, getValues, reset } = useFormContext<ProjectValues>();
+  const { formState, getValues, reset } = useFormContext<ProjectAndMembersPayload>();
 
   const isValid = formState.isValid;
   const { mutate } = useGetProjects();
@@ -28,16 +24,15 @@ export function CreateProjectForm({
   async function saveProject() {
     const project = getValues();
     try {
-      const createdProjectWithMember = await createProject(project);
-      onSave?.(createdProjectWithMember);
-      setOpen(false);
+      const createdProjectWithMembers = await createProject(project);
+      onSave?.(createdProjectWithMembers);
       mutate(
         (cachedData) => {
           if (!cachedData) {
             return cachedData;
           }
 
-          return [...cachedData, createdProjectWithMember];
+          return [...cachedData, createdProjectWithMembers];
         },
         {
           revalidate: false
@@ -48,25 +43,9 @@ export function CreateProjectForm({
     }
   }
 
-  if (!open) {
-    return (
-      <Button
-        disabled={isMutating}
-        onClick={() => {
-          setOpen(true);
-          onAddProject?.();
-        }}
-        data-test='add-project-button'
-        startIcon={<AddIcon fontSize='small' />}
-      >
-        Add a project
-      </Button>
-    );
-  }
-
   return (
     <>
-      <ProjectFormAnswers defaultRequired={false} fieldConfig={defaultProjectFieldConfig} isTeamLead />
+      <ProjectFormAnswers defaultRequired={false} fieldConfig={defaultProjectAndMembersFieldConfig} isTeamLead />
       <Box
         sx={{
           display: 'flex',
@@ -86,7 +65,6 @@ export function CreateProjectForm({
             color='error'
             onClick={() => {
               reset();
-              setOpen(false);
               onCancel?.();
             }}
           >

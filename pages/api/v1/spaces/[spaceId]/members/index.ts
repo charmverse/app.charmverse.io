@@ -10,7 +10,7 @@ import { searchUserProfile } from 'lib/public-api/searchUserProfile';
 import { withSessionRoute } from 'lib/session/withSession';
 import { addUserToSpace } from 'lib/summon/addUserToSpace';
 import { syncSummonSpaceRoles } from 'lib/summon/syncSummonSpaceRoles';
-import { createUserFromWallet } from 'lib/users/createUser';
+import { createOrGetUserFromWallet } from 'lib/users/createUser';
 
 const handler = defaultHandler();
 
@@ -72,7 +72,7 @@ async function createSpaceMember(req: NextApiRequest, res: NextApiResponse<UserP
   try {
     user = await searchUserProfile(payload);
   } catch (_) {
-    const createdUser = await createUserFromWallet({
+    const { user: createdUser } = await createOrGetUserFromWallet({
       address: payload.wallet,
       email: payload.email
     });

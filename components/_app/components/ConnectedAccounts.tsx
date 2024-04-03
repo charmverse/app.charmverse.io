@@ -1,6 +1,5 @@
 import { Stack, Typography } from '@mui/material';
 import { type ReactNode } from 'react';
-import { useAccount } from 'wagmi';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
 import { Button } from 'components/common/Button';
@@ -12,7 +11,7 @@ import { useDiscordConnection } from 'hooks/useDiscordConnection';
 import { useGoogleLogin } from 'hooks/useGoogleLogin';
 import { useTelegramConnect } from 'hooks/useTelegramConnect';
 import { useUser } from 'hooks/useUser';
-import { useWeb3Account } from 'hooks/useWeb3Account';
+import { useAccount } from 'hooks/wagmi';
 import type { SignatureVerificationPayload } from 'lib/blockchain/signAndVerify';
 import type { DiscordAccount } from 'lib/discord/client/getDiscordAccount';
 import { shortenHex } from 'lib/utils/blockchain';

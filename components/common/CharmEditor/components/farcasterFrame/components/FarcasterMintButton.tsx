@@ -1,11 +1,11 @@
 import { log } from '@charmverse/core/log';
 import { Tooltip, Typography } from '@mui/material';
-import { switchNetwork } from '@wagmi/core';
+import { switchChain } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import { type FrameButtonMint } from 'frames.js';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
 import { GiDiamonds } from 'react-icons/gi';
-import { useAccount, useNetwork } from 'wagmi';
 
 import charmClient from 'charmClient';
 import { useWeb3ConnectionManager } from 'components/_app/Web3ConnectionManager/Web3ConnectionManager';
@@ -14,6 +14,7 @@ import { useReservoir } from 'hooks/useReservoir';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { useAccount } from 'hooks/wagmi';
 
 type Props = {
   item: FrameButtonMint;
@@ -50,9 +51,8 @@ export function FarcasterMintButton({
   const { mintNFT } = useReservoir();
   const { user } = useUser();
   const { openSettings } = useSettingsDialog();
-  const { isConnected } = useAccount();
+  const { isConnected, chain: currentChain } = useAccount();
   const { connectWallet } = useWeb3ConnectionManager();
-  const { chain: currentChain } = useNetwork();
   const { showError, showMessage } = useSnackbar();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -95,7 +95,7 @@ export function FarcasterMintButton({
   const safeSwitchNetwork = async () => {
     try {
       setIsLoading(true);
-      await switchNetwork({ chainId: tokenToMint.chainId });
+      await switchChain(wagmiConfig, { chainId: tokenToMint.chainId });
     } catch (error) {
       log.warn('[frame] Failed to switch network', { error });
       showError('Failed to switch network');

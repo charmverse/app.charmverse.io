@@ -1,5 +1,5 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
+import type { DOMOutputSpec } from 'prosemirror-model';
 
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
