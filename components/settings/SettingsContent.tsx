@@ -30,6 +30,7 @@ import type { SpaceSettingsTab } from './config';
 import { ACCOUNT_TABS, SPACE_SETTINGS_TABS } from './config';
 import { SpaceCredentialSettings } from './credentials/SpaceCredentialSettings';
 import { ImportSettings } from './import/ImportSettings';
+import { IntegrationSettings } from './integrations/IntegrationSettings';
 import { Invites } from './invites/Invites';
 import { ProjectsSettings } from './projects/ProjectsSettings';
 import { SpaceProposalSettings } from './proposals/SpaceProposalSettings';
@@ -53,7 +54,8 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   subscription: SubscriptionSettings,
   space: SpaceSettings,
   proposals: SpaceProposalSettings,
-  credentials: SpaceCredentialSettings
+  credentials: SpaceCredentialSettings,
+  integrations: IntegrationSettings
 };
 
 function TabPanel(props: TabPanelProps) {
