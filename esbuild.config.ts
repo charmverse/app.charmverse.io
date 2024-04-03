@@ -11,8 +11,8 @@ esbuild
     packages: 'external',
     platform: 'node',
     sourcemap: true,
-    target: 'node18',
-    logLevel: 'verbose'
+    target: 'node18'
+    // logLevel: 'verbose' // uncomment to see more build details like imported file info
   })
   .catch(() => process.exit(1))
   .then(async (result) => {
