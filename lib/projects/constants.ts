@@ -9,7 +9,8 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'walletAddress',
     label: 'Wallet Address',
-    allowPrivate: true
+    allowPrivate: true,
+    multipleWalletAddresses: true
   },
   {
     field: 'email',
@@ -112,7 +113,12 @@ export const defaultProjectAndMembersPayload: ProjectAndMembersPayload = {
   demoUrl: '',
   communityUrl: '',
   otherUrl: '',
-  walletAddress: '',
+  walletAddress: [
+    {
+      address: '',
+      chain: 1
+    }
+  ],
   projectMembers: [
     {
       name: '',

@@ -1,9 +1,19 @@
+import MuiAddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
+import { Button } from 'components/common/Button';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { ProjectAndMembersPayload, ProjectFieldProperty, FieldConfig } from 'lib/projects/interfaces';
+import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
+import type {
+  ProjectAndMembersPayload,
+  ProjectFieldProperty,
+  FieldConfig,
+  AddressChainCombo
+} from 'lib/projects/interfaces';
+
+import { MultipleWalletAddressesField } from './MultipleWalletAddressesField';
 
 function FieldAnswer({
   property,
@@ -20,7 +30,7 @@ function FieldAnswer({
   fieldConfig?: FieldConfig;
   onChange?: (payload: Record<string, any>) => void;
 }) {
-  const { control, register } = useFormContext<ProjectAndMembersPayload>();
+  const { control, register, setValue } = useFormContext<ProjectAndMembersPayload>();
 
   const { field, fieldState } = useController({
     control,
@@ -32,6 +42,29 @@ function FieldAnswer({
   const isShown = fieldConfig?.[property.field]?.show ?? true;
   if (!isShown) {
     return null;
+  }
+
+  // Make sure the property also support adding multiple wallet address as regular project member wallet address is a single string
+  if (property.field === 'walletAddress' && property.multipleWalletAddresses) {
+    const addressChainCombos = (field.value ?? []) as AddressChainCombo[];
+    return (
+      <MultipleWalletAddressesField
+        addressChainCombos={addressChainCombos}
+        required={fieldConfig?.[property.field]?.required ?? defaultRequired ?? true}
+        disabled={disabled}
+        name={name}
+        onChange={(newAddressChainCombos) => {
+          setValue(name, newAddressChainCombos, {
+            shouldDirty: true,
+            shouldValidate: true
+          });
+
+          if (onChange) {
+            onChange({ [property.field]: newAddressChainCombos });
+          }
+        }}
+      />
+    );
   }
 
   return (

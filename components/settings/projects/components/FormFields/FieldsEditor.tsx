@@ -3,6 +3,8 @@ import { FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { FieldConfig, ProjectFieldProperty } from 'lib/projects/interfaces';
 
+import { MultipleWalletAddressesField } from './MultipleWalletAddressesField';
+
 export function FieldsEditor({
   onChange,
   fieldConfig,
@@ -31,13 +33,27 @@ export function FieldsEditor({
             key={property.label}
             data-test={`project${isProjectMember ? '-member-' : '-'}${property.field}-field-container`}
           >
-            <TextInputField
-              label={property.label}
-              multiline={property.multiline}
-              rows={property.rows ?? 1}
-              disabled
-              required={fieldConfig?.[property.field]?.required ?? defaultRequired}
-            />
+            {property.field === 'walletAddress' && property.multipleWalletAddresses ? (
+              <MultipleWalletAddressesField
+                addressChainCombos={[
+                  {
+                    address: '',
+                    chain: 1
+                  }
+                ]}
+                required={fieldConfig?.[property.field]?.required ?? defaultRequired ?? true}
+                disabled
+                name={property.field}
+              />
+            ) : (
+              <TextInputField
+                label={property.label}
+                multiline={property.multiline}
+                rows={property.rows ?? 1}
+                disabled
+                required={fieldConfig?.[property.field]?.required ?? defaultRequired}
+              />
+            )}
             {/** Required fields must always be required and shown */}
             {onChange && !property.alwaysRequired && (
               <Stack gap={1} flexDirection='row' px={1} alignItems='center'>

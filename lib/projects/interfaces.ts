@@ -1,5 +1,10 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 
+export type AddressChainCombo = {
+  chain: number;
+  address: string;
+};
+
 type ProjectPayload = Pick<
   Project,
   | 'name'
@@ -12,8 +17,9 @@ type ProjectPayload = Pick<
   | 'demoUrl'
   | 'communityUrl'
   | 'otherUrl'
-  | 'walletAddress'
->;
+> & {
+  walletAddress: AddressChainCombo[];
+};
 
 export type ProjectField = keyof ProjectPayload;
 
@@ -63,6 +69,8 @@ export type ProjectFieldProperty = {
   alwaysRequired?: boolean;
   // This will allow the template author to set the field as private (only visible to authors, reviewers & admins)
   allowPrivate?: boolean;
+  // Allow multiple wallet addresses with different chains
+  multipleWalletAddresses?: boolean;
 };
 
 export type ProjectWithMembers = Project & {
