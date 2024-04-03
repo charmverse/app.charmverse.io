@@ -1,13 +1,10 @@
 import { findFirstMarkPosition, isChromeWithSelectionBug, safeInsert } from '@bangle.dev/utils';
 import { log } from '@charmverse/core/log';
-import type { MarkType } from 'prosemirror-model';
 import { Fragment, Node } from 'prosemirror-model';
 import type { Command, EditorState, PluginKey } from 'prosemirror-state';
 import { Selection } from 'prosemirror-state';
 
 import type { BaseRawMarkSpec } from '../core/specRegistry';
-
-import type { TooltipRenderOpts } from './tooltipPlacement';
 
 export const spec = specFactory;
 
@@ -72,41 +69,6 @@ function specFactory({
   };
 }
 
-export type SuggestTooltipRenderOpts = Omit<TooltipRenderOpts, 'getReferenceElement'>;
-
-function isStoredMark(state: EditorState, markType: MarkType) {
-  return state && state.storedMarks && markType.isInSet(state.storedMarks);
-}
-
-function isSuggestMarkActive(markName: string) {
-  return (state: EditorState) => {
-    const { from, to } = state.selection;
-
-    const markType = state.schema.marks[markName];
-    return state.doc.rangeHasMark(from - 1, to, markType);
-  };
-}
-
-function doesQueryHaveTrigger(state: EditorState, markType: MarkType, trigger: string) {
-  const { nodeBefore } = state.selection.$from;
-
-  // nodeBefore in a new line (a new paragraph) is null
-  if (!nodeBefore) {
-    return false;
-  }
-
-  const suggestMark = markType.isInSet(nodeBefore.marks || []);
-
-  // suggestMark is undefined if you delete the trigger while keeping rest of the query alive
-  if (!suggestMark) {
-    return false;
-  }
-
-  const textContent = nodeBefore.textContent || '';
-
-  return textContent.includes(trigger);
-}
-
 export function renderSuggestionsTooltip(key: PluginKey, value: Record<string, any>): Command {
   return (state, dispatch, _view) => {
     if (dispatch) {
@@ -125,7 +87,7 @@ export function hideSuggestionsTooltip(key: PluginKey): Command {
   };
 }
 
-function getTriggerText(state: EditorState, markName: string, trigger?: string) {
+export function getTriggerText(state: EditorState, markName: string, trigger?: string) {
   const markType = state.schema.marks[markName];
 
   const { nodeBefore } = state.selection.$from;
