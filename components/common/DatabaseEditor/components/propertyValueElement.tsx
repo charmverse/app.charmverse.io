@@ -710,9 +710,10 @@ function PropertyValueElement(props: Props) {
       </div>
     );
   } else if (propertyValueElement === null) {
+    const displayValueStr = typeof displayValue === 'string' ? displayValue : '';
     propertyValueElement = (
       <div className={clsx('octo-propertyvalue', { readonly: readOnly })}>
-        {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+        {displayValueStr || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
       </div>
     );
   }

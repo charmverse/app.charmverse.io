@@ -6,6 +6,8 @@ import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from './board';
 
+const excludedFieldTypes = ['project_profile', 'label'];
+
 export function updateCardFormFieldPropertiesValue({
   accessPrivateFields,
   formFields,
@@ -26,7 +28,8 @@ export function updateCardFormFieldPropertiesValue({
   for (const formField of filteredFormFields) {
     const cardProperty = cardProperties.find((p) => p.formFieldId === formField.id);
     const answerValue = formField.answers.find((ans) => ans.proposalId === proposalId)?.value as FormFieldValue;
-    if (formField.type !== 'label' && cardProperty) {
+    // exclude some field types
+    if (!excludedFieldTypes.includes(formField.type) && cardProperty) {
       if (formField.type === 'long_text') {
         properties[cardProperty.id] =
           (
