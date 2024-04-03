@@ -21,7 +21,7 @@ export function useProposalCredentials() {
     error,
     isLoading: isLoadingIssuableProposalCredentials,
     mutate: refreshIssuableCredentials
-  } = useSWR(space ? `/api/credentials/proposals?spaceId=${space.id}` : null, () =>
+  } = useSWR(space ? `/api/credentials/proposals/issuable?spaceId=${space.id}` : null, () =>
     charmClient.credentials.getIssuableProposalCredentials({ spaceId: space?.id as string })
   );
 

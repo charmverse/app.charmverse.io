@@ -10,8 +10,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).post(requestRewardCredentialsIndexingController);
 
 async function requestRewardCredentialsIndexingController(req: NextApiRequest, res: NextApiResponse) {
-  const issuableCredentials = await indexRewardCredentials(req.body);
-  return res.status(200).json(issuableCredentials);
+  await indexRewardCredentials(req.body);
+  return res.status(200).json({ success: true });
 }
 
 export default withSessionRoute(handler);

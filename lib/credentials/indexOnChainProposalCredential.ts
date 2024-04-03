@@ -1,27 +1,17 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { log } from '@charmverse/core/log';
-import type {
-  AttestationType,
-  CredentialEventType,
-  IssuedCredential,
-  PendingSafeTransaction,
-  Prisma
-} from '@charmverse/core/prisma-client';
+import type { CredentialEventType, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
-import { sepolia } from 'viem/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
-import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
-import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { getEasInstance, type EasSchemaChain } from './connectors';
 import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
-import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
 import type { ProposalCredential } from './schemas/proposal';
 import { decodeProposalCredential } from './schemas/proposal';
 

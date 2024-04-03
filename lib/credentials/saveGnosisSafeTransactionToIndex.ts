@@ -10,12 +10,12 @@ import { prettyPrint } from 'lib/utils/strings';
 
 import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
-import type { PartialIssuableRewardCredentialContent } from './findIssuableRewardCredentials';
+import type { PartialIssuableRewardApplicationCredentialContent } from './findIssuableRewardCredentials';
 
 type PendingCredentialContent<T extends AttestationType> = T extends 'proposal'
   ? PartialIssuableProposalCredentialContent
   : T extends 'reward'
-  ? PartialIssuableRewardCredentialContent
+  ? PartialIssuableRewardApplicationCredentialContent
   : never;
 
 export type GnosisSafeTransactionToIndex<T extends AttestationType = AttestationType> = Pick<
@@ -59,7 +59,7 @@ export async function saveGnosisSafeTransactionToIndex<T extends AttestationType
     },
     {
       ids: [] as string[],
-      credentialContent: {} as Record<string, PendingCredentialContent[]>
+      credentialContent: {} as Record<string, PendingCredentialContent<T>[]>
     }
   );
 

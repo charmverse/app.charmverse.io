@@ -208,8 +208,6 @@ export async function issueProposalCredentialsIfNecessary({
           credentialsToGiveUser,
           error: e
         });
-
-        prettyPrint(e);
       }
     }
   }
