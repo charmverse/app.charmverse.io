@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { UserGnosisSafe } from '@charmverse/core/prisma-client';
 import { useEffect, useState } from 'react';
 import useSWR from 'swr';
@@ -24,6 +25,9 @@ export function useGnosisSafes(chainIdToUse?: number) {
         try {
           setSafeApiClient(await getSafeApiClient({ chainId: _chainId }));
         } catch (_) {
+          log.warn('Failed to get SafeApiClient', {
+            chainId: _chainId
+          });
           setSafeApiClient(null);
         }
       }

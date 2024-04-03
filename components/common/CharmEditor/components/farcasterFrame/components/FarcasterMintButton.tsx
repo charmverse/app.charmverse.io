@@ -26,6 +26,8 @@ type Props = {
   spaceId?: string;
 };
 
+// Reference: https://github.com/framesjs/frames.js/blob/55c53e77776cefec391265eef2c8ea47428f0495/packages/frames.js/src/getTokenFromUrl.ts#L9
+/** Parses a [CAIP-10](https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-10.md) compliant URL with optional token ID */
 function getTokenFromUrl(url: string) {
   const [namespace, chainId, address, tokenId] = url.split(':');
   if (!namespace || !chainId || !address) {
