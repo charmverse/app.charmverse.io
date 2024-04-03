@@ -5,6 +5,7 @@ import { v4 } from 'uuid';
 import { randomETHWallet } from 'lib/utils/blockchain';
 
 import { defaultProjectAndMembersPayload } from '../constants';
+import { createProject } from '../createProject';
 import { updateProject } from '../updateProject';
 
 describe('updateProject', () => {
@@ -25,6 +26,22 @@ describe('updateProject', () => {
     const newWalletUserAddress = randomETHWallet().address.toLowerCase();
     const newGoogleAccountUserEmail = `${v4()}@gmail.com`;
     const newVerifiedEmailUserEmail = `${v4()}@gmail.com`;
+
+    const walletAddressUser2 = await testUtilsUser.generateUser();
+    const walletAddressUser2Address = randomETHWallet().address.toLowerCase();
+
+    await prisma.user.update({
+      where: {
+        id: walletAddressUser2.id
+      },
+      data: {
+        wallets: {
+          create: {
+            address: walletAddressUser2Address
+          }
+        }
+      }
+    });
 
     await prisma.user.update({
       where: {
@@ -69,52 +86,50 @@ describe('updateProject', () => {
       }
     });
 
-    const createdProject = await prisma.project.create({
-      data: {
+    const createdProject = await createProject({
+      userId: projectTeamLead.id,
+      project: {
+        ...defaultProjectAndMembersPayload,
         name: 'Test project',
-        updatedBy: projectTeamLead.id,
-        projectMembers: {
-          createMany: {
-            data: [
-              {
-                name: 'Team Lead',
-                email: projectTeamLeadEmail,
-                teamLead: true,
-                userId: projectTeamLead.id,
-                updatedBy: projectTeamLead.id,
-                walletAddress: projectTeamLeadAddress
-              },
-              // Update user with wallet address
-              {
-                email: '',
-                name: 'Wallet address user',
-                updatedBy: projectTeamLead.id,
-                walletAddress: walletAddressUserAddress,
-                userId: walletAddressUser.id
-              },
-              // Remove project user without any user connected
-              {
-                email: '',
-                name: 'Random Project user',
-                updatedBy: projectTeamLead.id,
-                walletAddress: ''
-              },
-              // Remove project user with user connected
-              {
-                email: verifiedEmailUserEmail,
-                name: 'Verified Email Project user',
-                updatedBy: projectTeamLead.id,
-                walletAddress: '',
-                userId: verifiedEmailUser.id
-              }
-            ]
+        projectMembers: [
+          {
+            ...defaultProjectAndMembersPayload.projectMembers[0],
+            name: 'Team Lead',
+            email: projectTeamLeadEmail,
+            userId: projectTeamLead.id,
+            walletAddress: projectTeamLeadAddress
+          },
+          // Update user with wallet address
+          {
+            ...defaultProjectAndMembersPayload.projectMembers[0],
+            email: '',
+            name: 'Wallet address user',
+            walletAddress: walletAddressUserAddress,
+            userId: walletAddressUser.id
+          },
+          // Remove project user without any user connected
+          {
+            ...defaultProjectAndMembersPayload.projectMembers[0],
+            email: '',
+            name: 'Random Project user',
+            walletAddress: ''
+          },
+          // Remove project user with user connected
+          {
+            ...defaultProjectAndMembersPayload.projectMembers[0],
+            email: verifiedEmailUserEmail,
+            name: 'Verified Email Project user',
+            walletAddress: '',
+            userId: verifiedEmailUser.id
+          },
+          // Connect user id with a project member without any wallet address or email
+          {
+            ...defaultProjectAndMembersPayload.projectMembers[0],
+            email: '',
+            name: 'Random Project user 2',
+            walletAddress: ''
           }
-        },
-        walletAddress: '',
-        createdBy: projectTeamLead.id
-      },
-      include: {
-        projectMembers: true
+        ]
       }
     });
 
@@ -127,15 +142,13 @@ describe('updateProject', () => {
         projectMembers: [
           // Making sure team lead doesn't get connected with a different user
           {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
-            id: createdProject.projectMembers[0].id,
+            ...createdProject.projectMembers[0],
             walletAddress: walletAddressUserAddress
           },
           // Update existing project user with wallet address connected
           {
-            ...defaultProjectAndMembersPayload.projectMembers[0],
-            walletAddress: updatedWalletAddressUserAddress,
-            id: createdProject.projectMembers[1].id
+            ...createdProject.projectMembers[1],
+            walletAddress: updatedWalletAddressUserAddress
           },
           // Connect new user with google account
           {
@@ -160,6 +173,11 @@ describe('updateProject', () => {
             ...defaultProjectAndMembersPayload.projectMembers[0],
             name: 'New Verified Email Project Member',
             email: newVerifiedEmailUserEmail
+          },
+          // Remove project user without any user connected
+          {
+            ...createdProject.projectMembers[2],
+            walletAddress: walletAddressUser2Address
           }
         ]
       }
@@ -229,6 +247,11 @@ describe('updateProject', () => {
             teamLead: false,
             userId: newVerifiedEmailUser.id,
             email: newVerifiedEmailUserEmail
+          }),
+          expect.objectContaining({
+            teamLead: false,
+            userId: walletAddressUser2.id,
+            walletAddress: walletAddressUser2Address
           })
         ])
       })

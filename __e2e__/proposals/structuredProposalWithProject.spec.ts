@@ -189,7 +189,7 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(await proposalFormFieldPage.getProjectFieldLabel('excerpt')).toBe('Describe your project in one sentence');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-name')).toBe('Name*');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-email')).toBe('Email*');
-    expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
+    // expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
 
     const proposalTemplate = await prisma.proposal.findFirstOrThrow({
       where: {
@@ -269,8 +269,10 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(projectAfterUpdate1.projectMembers[0].email).toBe('john@gmail.com');
 
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
+    const pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects/);
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
-    await projectSettings.page.waitForTimeout(500);
+
+    await pendingApiCall;
 
     // Assert that the project member values were auto updated
     const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({

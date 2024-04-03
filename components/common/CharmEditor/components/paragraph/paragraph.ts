@@ -1,5 +1,3 @@
-import type { Node, Command, DOMOutputSpec, EditorState } from '@bangle.dev/pm';
-import { keymap, Schema, setBlockType } from '@bangle.dev/pm';
 import {
   copyEmptyCommand,
   cutEmptyCommand,
@@ -17,6 +15,10 @@ import {
   getParaNodeType,
   insertEmpty
 } from '@bangle.dev/utils';
+import { setBlockType } from 'prosemirror-commands';
+import { keymap } from 'prosemirror-keymap';
+import type { Node, DOMOutputSpec } from 'prosemirror-model';
+import type { Command, EditorState } from 'prosemirror-state';
 
 import type { RawPlugins } from '../@bangle.dev/core/plugin-loader';
 import type { BaseRawNodeSpec, RawSpecs } from '../@bangle.dev/core/specRegistry';

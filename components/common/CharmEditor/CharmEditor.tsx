@@ -1,5 +1,3 @@
-import type { EditorView } from '@bangle.dev/pm';
-import { Node } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { PageType } from '@charmverse/core/prisma';
@@ -9,7 +7,9 @@ import type { CryptoCurrency, FiatCurrency } from 'connectors/chains';
 import debounce from 'lodash/debounce';
 import throttle from 'lodash/throttle';
 import { useRouter } from 'next/router';
+import { Node } from 'prosemirror-model';
 import type { EditorState } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 import type { CSSProperties } from 'react';
 import { memo, useEffect, useMemo, useRef } from 'react';
 import { useSWRConfig } from 'swr';

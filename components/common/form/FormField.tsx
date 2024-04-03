@@ -22,7 +22,7 @@ import {
 import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { ProjectFormEditor } from 'components/settings/projects/ProjectForm';
+import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
 import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';

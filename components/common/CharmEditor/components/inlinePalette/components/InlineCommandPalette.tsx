@@ -1,5 +1,4 @@
 import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { selectionTooltip } from '@bangle.dev/tooltip';
 import styled from '@emotion/styled';
 import { ClickAwayListener } from '@mui/material';
 import Grow from '@mui/material/Grow';
@@ -11,8 +10,8 @@ import type { PopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useMemo, useCallback, useEffect, useState } from 'react';
 
-import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
-
+import { useEditorViewContext } from '../../@bangle.dev/react/hooks';
+import { hideSelectionTooltip } from '../../@bangle.dev/tooltip/selectionTooltip';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import { GroupLabel } from '../../PopoverMenu';
 import { useInlinePaletteItems, useInlinePaletteQuery } from '../hooks';
@@ -136,7 +135,7 @@ export default function InlineCommandPalette({
 
   function closeSubMenu() {
     if (menuKey) {
-      selectionTooltip.hideSelectionTooltip(menuKey)(view.state, view.dispatch, view);
+      hideSelectionTooltip(menuKey)(view.state, view.dispatch, view);
     }
   }
 

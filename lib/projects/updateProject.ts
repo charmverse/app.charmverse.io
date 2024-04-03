@@ -56,6 +56,7 @@ export async function updateProject({
 
   for (const projectMember of payload.projectMembers) {
     if (projectMember.id && existingProjectMembersRecord[projectMember.id]) {
+      const connectedUserId = projectMember.userId ?? (await findCharmVerseUserIdWithProjectMember(projectMember));
       projectMemberUpdateTransactions.push(
         prisma.projectMember.update({
           where: {
@@ -72,7 +73,8 @@ export async function updateProject({
             telegram: projectMember.telegram,
             otherUrl: projectMember.otherUrl,
             previousProjects: projectMember.previousProjects,
-            updatedBy: userId
+            updatedBy: userId,
+            userId: connectedUserId
           }
         })
       );

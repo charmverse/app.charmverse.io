@@ -26,7 +26,7 @@ export function TemplatePageActionMenu(props: Props) {
   return (
     <>
       <IconButton size='small' {...bindTrigger(popupState)} data-test={`template-menu-${pageId}`}>
-        <MoreHorizIcon fontSize='small' />
+        <MoreHorizIcon fontSize='small' data-test='template-context-menu' />
       </IconButton>
 
       <Menu

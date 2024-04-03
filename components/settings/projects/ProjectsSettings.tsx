@@ -23,12 +23,12 @@ import { Button } from 'components/common/Button';
 import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
-import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
-import { CreateProjectForm } from './CreateProjectForm';
+import { CreateProjectForm } from './components/CreateProjectForm';
+import { ProjectFormAnswers } from './components/ProjectForm';
 import { useProjectForm } from './hooks/useProjectForm';
 
 function ProjectRow({

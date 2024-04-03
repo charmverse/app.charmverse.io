@@ -1,5 +1,6 @@
-import type { EditorView, MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { MarkType, Node, Schema } from 'prosemirror-model';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
+import type { EditorView } from 'prosemirror-view';
 
 import type { ExtendedVote } from 'lib/votes/interfaces';
 

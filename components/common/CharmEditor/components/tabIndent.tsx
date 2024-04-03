@@ -1,8 +1,8 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
-import { keymap } from '@bangle.dev/pm';
+import { keymap } from 'prosemirror-keymap';
+import type { DOMOutputSpec } from 'prosemirror-model';
 
-import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
-import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
+import type { RawPlugins } from './@bangle.dev/core/plugin-loader';
+import type { RawSpecs } from './@bangle.dev/core/specRegistry';
 
 const name = 'tabIndent';
 

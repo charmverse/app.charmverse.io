@@ -1,8 +1,8 @@
-import type { EditorView, PluginKey } from '@bangle.dev/pm';
-import { Plugin } from '@bangle.dev/pm';
 import { log } from '@charmverse/core/log';
 import throttle from 'lodash/throttle';
-import { NodeSelection } from 'prosemirror-state';
+import type { PluginKey } from 'prosemirror-state';
+import { Plugin, NodeSelection } from 'prosemirror-state';
+import type { EditorView } from 'prosemirror-view';
 // @ts-ignore
 import { __serializeForClipboard as serializeForClipboard } from 'prosemirror-view';
 
