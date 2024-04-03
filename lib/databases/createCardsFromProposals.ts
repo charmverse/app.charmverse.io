@@ -23,8 +23,8 @@ import type { BoardViewFields } from './boardView';
 import type { CardPropertyValue } from './card';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
+import { getCardPropertiesFromAnswers } from './getCardPropertiesFromAnswers';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
-import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
 
 export async function createCardsFromProposals({
   boardId,
@@ -284,7 +284,7 @@ export async function createCardsFromProposals({
       userId
     });
     const accessPrivateFields = permissions.view_private_fields;
-    const formFieldProperties = updateCardFormFieldPropertiesValue({
+    const formFieldProperties = getCardPropertiesFromAnswers({
       accessPrivateFields,
       cardProperties: boardBlockCardProperties,
       formFields,

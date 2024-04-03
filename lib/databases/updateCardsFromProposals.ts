@@ -30,8 +30,8 @@ import type { BoardViewFields } from './boardView';
 import type { CardFields, CardPropertyValue } from './card';
 import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
+import { getCardPropertiesFromAnswers } from './getCardPropertiesFromAnswers';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
-import { updateCardFormFieldPropertiesValue } from './updateCardFormFieldPropertiesValue';
 
 const pageSelectObject = {
   id: true,
@@ -598,7 +598,7 @@ export async function updateCardsFromProposals({
 
           const proposalFormFields = formFields.filter((f) => f.formId === pageWithProposal.proposal?.formId);
 
-          const formFieldProperties = updateCardFormFieldPropertiesValue({
+          const formFieldProperties = getCardPropertiesFromAnswers({
             accessPrivateFields,
             cardProperties: boardBlockCardProperties,
             formFields: proposalFormFields,
