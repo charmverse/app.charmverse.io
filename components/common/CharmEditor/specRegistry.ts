@@ -18,7 +18,7 @@ import { specs as fileSpecs } from './components/file/file.specs';
 import { hardBreakSpec } from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';
-import * as iframe from './components/iframe';
+import * as iframe from './components/iframe/iframeSpec';
 import * as image from './components/image/imageSpecs';
 import * as inlineComment from './components/inlineComment/inlineComment.specs';
 import * as inlineDatabase from './components/inlineDatabase';
