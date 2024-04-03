@@ -1,7 +1,7 @@
 import type { EditorState, EditorView, Node, Plugin, ResolvedPos, Transaction } from '@bangle.dev/pm';
 import type { NodeSelection, PluginKey } from 'prosemirror-state';
 
-import { floatingMenu } from './floating-menu';
+import { floatingMenu } from './floatingMenuPlugin';
 
 // Components that should not trigger floating menu
 const blacklistedComponents =

@@ -10,7 +10,7 @@ import { usePluginState } from '../@bangle.dev/react/hooks';
 import { InlineCommentSubMenu } from '../inlineComment/components/InlineCommentSubMenu';
 import { TextColorMenuDropdown } from '../textColor/ColorMenuDropdown';
 
-import type { SubMenu } from './floating-menu';
+import type { SubMenu } from './floatingMenuPlugin';
 import { LinkSubMenu } from './LinkSubMenu';
 import { Menu } from './Menu';
 import {

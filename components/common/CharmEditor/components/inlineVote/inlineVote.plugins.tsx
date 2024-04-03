@@ -8,7 +8,7 @@ import { highlightMarkedElement } from 'lib/prosemirror/highlightMarkedElement';
 import { extractInlineVoteRows } from 'lib/prosemirror/plugins/inlineVotes/findTotalInlineVotes';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltip';
+import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 
 import RowDecoration from './components/InlineVoteRowDecoration';

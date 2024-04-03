@@ -2,7 +2,7 @@ import type { PluginKey } from 'prosemirror-state';
 import { TextSelection } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
-import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltip';
+import { renderSuggestionsTooltip } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltipSpec';
 import { highlightDomElement } from 'lib/utils/browser';
 
 export function highlightMarkedElement({

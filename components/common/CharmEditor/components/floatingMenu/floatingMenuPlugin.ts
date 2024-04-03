@@ -6,14 +6,14 @@ import type { Command, EditorState } from 'prosemirror-state';
 
 import { hasComponentInSchema } from 'lib/prosemirror/hasComponentInSchema';
 
-import type { SelectionTooltipProps } from '../@bangle.dev/tooltip/selectionTooltip';
 import {
-  plugins as selectionTooltipPlugins,
   queryIsSelectionTooltipActive,
   querySelectionTooltipType,
   hideSelectionTooltip,
   updateSelectionTooltipType
 } from '../@bangle.dev/tooltip/selectionTooltip';
+import type { SelectionTooltipProps } from '../@bangle.dev/tooltip/selectionTooltipPlugin';
+import { plugins as selectionTooltipPlugins } from '../@bangle.dev/tooltip/selectionTooltipPlugin';
 import { markName as inlineCommentMarkName } from '../inlineComment/inlineComment.constants';
 
 export const defaultKeys = {
