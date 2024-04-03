@@ -45,13 +45,13 @@ export function RewardReviewerActions({
 
       if (safeTransaction) {
         const chainId = Number(safeTransaction.chainId);
-        getSafeApiClient({ chainId })
-          .getTransaction(safeTransaction.safeTxHash as string)
-          .then((txData) => {
+        getSafeApiClient({ chainId }).then((safeApiClient) => {
+          safeApiClient.getTransaction(safeTransaction.safeTxHash as string).then((txData) => {
             setPendingSafeTransactionUrl(
               getGnosisTransactionUrl(txData.safe, chainId, safeTransaction.safeTxHash as string)
             );
           });
+        });
       }
     }
   }, [application.status, application.transactions.length]);

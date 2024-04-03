@@ -12,7 +12,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
-import { LensChain } from 'lib/lens/lensClient';
+import { LensChain } from 'lib/lens/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
