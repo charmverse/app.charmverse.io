@@ -21,7 +21,7 @@ import { useEditorViewContext, usePluginState } from 'components/common/CharmEdi
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import type { LinkPluginState } from './link.plugins';
 

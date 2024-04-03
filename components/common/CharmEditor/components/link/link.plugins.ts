@@ -3,11 +3,8 @@ import type { PluginKey } from 'prosemirror-state';
 import { Plugin } from 'prosemirror-state';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import {
-  hideSuggestionsTooltip,
-  referenceElement,
-  renderSuggestionsTooltip
-} from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { hideSuggestionsTooltip, renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 
 import { getLinkElement } from './getLinkElement';

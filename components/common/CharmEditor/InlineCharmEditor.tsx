@@ -25,7 +25,7 @@ import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
 import { mentionPlugins, mentionPluginKeyName } from './components/mention';
 import { Mention, MentionsPopup } from './components/mention/components';
-import { spec as mentionSpecs } from './components/mention/mention.specs';
+import { mentionSpecs } from './components/mention/mention.specs';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 

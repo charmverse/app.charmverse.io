@@ -13,7 +13,7 @@ import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 
 import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import type { NestedPagePluginState } from '../../nestedPage/nestedPage.interfaces';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 

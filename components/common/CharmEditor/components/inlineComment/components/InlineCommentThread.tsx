@@ -10,7 +10,7 @@ import { useThreads } from 'hooks/useThreads';
 import { removeInlineCommentMark } from 'lib/prosemirror/plugins/inlineComments/removeInlineCommentMark';
 import { isTruthy } from 'lib/utils/types';
 
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PageThread from '../../thread/PageThread';
 import type { InlineCommentPluginState } from '../inlineComment.plugins';
 

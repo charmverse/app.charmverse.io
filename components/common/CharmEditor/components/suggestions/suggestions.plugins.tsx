@@ -5,7 +5,8 @@ import { Decoration, DecorationSet } from 'prosemirror-view';
 import { createRoot } from 'react-dom/client';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import { renderSuggestionsTooltip, referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { referenceElement } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { renderSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { plugins as tooltipPlacementPlugins } from '../@bangle.dev/tooltip/tooltipPlacement';
 import { RowDecoration } from '../inlineComment/components/InlineCommentRowDecoration';
 
