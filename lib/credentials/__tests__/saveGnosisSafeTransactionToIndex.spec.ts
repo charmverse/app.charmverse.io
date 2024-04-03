@@ -8,8 +8,8 @@ import { randomETHWalletAddress } from 'lib/utils/blockchain';
 
 import type { PartialIssuableProposalCredentialContent } from '../findIssuableProposalCredentials';
 import type { PartialIssuableRewardApplicationCredentialContent } from '../findIssuableRewardCredentials';
-import type { TypedPendingGnosisSafeTransaction } from '../saveGnosisSafeTransactionToIndex';
-import { saveGnosisSafeTransactionToIndex } from '../saveGnosisSafeTransactionToIndex';
+import type { TypedPendingGnosisSafeTransaction } from '../indexGnosisSafeCredentialTransaction';
+import { saveGnosisSafeTransactionToIndex } from '../indexGnosisSafeCredentialTransaction';
 import { proposalCredentialSchemaId } from '../schemas/proposal';
 import { rewardCredentialSchemaId } from '../schemas/reward';
 

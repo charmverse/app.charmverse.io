@@ -15,7 +15,7 @@ import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
-import type { TypedPendingGnosisSafeTransaction } from './saveGnosisSafeTransactionToIndex';
+import type { TypedPendingGnosisSafeTransaction } from './indexGnosisSafeCredentialTransaction';
 import type { CredentialDataInput } from './schemas';
 
 export type ProposalWithJoinedData = {

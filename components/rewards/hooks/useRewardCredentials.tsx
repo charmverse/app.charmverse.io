@@ -10,7 +10,10 @@ import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
-import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
+import type {
+  IssuableRewardApplicationCredentialContent,
+  PartialIssuableRewardApplicationCredentialContent
+} from 'lib/credentials/findIssuableRewardCredentials';
 import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 
@@ -73,13 +76,16 @@ export function useRewardCredentials() {
           safeAddress: gnosisSafeForCredentials.address,
           schemaId: rewardCredentialSchemaId,
           spaceId: space.id,
-          credentials: _issuableRewardCredentials.map((ic) => ({
-            event: ic.event,
-            rewardId: ic.rewardId,
-            credentialTemplateId: ic.credentialTemplateId,
-            recipientAddress: ic.recipientAddress,
-            rewardApplicationId: ic.rewardApplicationId
-          })),
+          credentials: _issuableRewardCredentials.map(
+            (ic) =>
+              ({
+                event: ic.event,
+                rewardId: ic.rewardId,
+                credentialTemplateId: ic.credentialTemplateId,
+                recipientAddress: ic.recipientAddress,
+                rewardApplicationId: ic.rewardApplicationId
+              } as PartialIssuableRewardApplicationCredentialContent)
+          ),
           type: 'reward'
         });
         await refreshIssuableCredentials();

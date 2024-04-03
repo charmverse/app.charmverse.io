@@ -20,7 +20,7 @@ type IndexableCredential = {
   attestationId: string;
 };
 
-async function indexOnchainProposalCredential({
+async function indexSingleOnchainProposalCredential({
   chainId,
   attestationId,
   eas
@@ -130,7 +130,7 @@ export type ProposalCredentialsToIndex = {
 /**
  * Compatible with EOA transaction. Todo - Add support for safe
  */
-export async function indexProposalCredentials({ chainId, txHash }: ProposalCredentialsToIndex): Promise<void> {
+export async function indexOnchainProposalCredentials({ chainId, txHash }: ProposalCredentialsToIndex): Promise<void> {
   const publicClient = getPublicClient(chainId);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
@@ -143,7 +143,7 @@ export async function indexProposalCredentials({ chainId, txHash }: ProposalCred
   await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return indexOnchainProposalCredential({ attestationId: uid, chainId, eas });
+      return indexSingleOnchainProposalCredential({ attestationId: uid, chainId, eas });
     })
   );
 }

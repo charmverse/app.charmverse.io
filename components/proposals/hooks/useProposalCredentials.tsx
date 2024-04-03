@@ -10,7 +10,10 @@ import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
-import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
+import type {
+  IssuableProposalCredentialContent,
+  PartialIssuableProposalCredentialContent
+} from 'lib/credentials/findIssuableProposalCredentials';
 import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 
@@ -73,12 +76,15 @@ export function useProposalCredentials() {
           safeAddress: gnosisSafeForCredentials.address,
           schemaId: proposalCredentialSchemaId,
           spaceId: space.id,
-          credentials: _issuableProposalCredentials.map((ic) => ({
-            event: ic.event,
-            proposalId: ic.proposalId,
-            credentialTemplateId: ic.credentialTemplateId,
-            recipientAddress: ic.recipientAddress
-          })),
+          credentials: _issuableProposalCredentials.map(
+            (ic) =>
+              ({
+                event: ic.event,
+                proposalId: ic.proposalId,
+                credentialTemplateId: ic.credentialTemplateId,
+                recipientAddress: ic.recipientAddress
+              } as PartialIssuableProposalCredentialContent)
+          ),
           type: 'proposal'
         });
         await refreshIssuableCredentials();

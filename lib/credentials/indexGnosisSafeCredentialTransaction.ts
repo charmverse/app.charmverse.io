@@ -4,6 +4,7 @@ import type { AttestationType, PendingSafeTransaction } from '@charmverse/core/p
 import { prisma } from '@charmverse/core/prisma-client';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { getChainById } from 'connectors/chains';
+import { sepolia } from 'viem/chains';
 
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { uniqueValues } from 'lib/utils/array';
@@ -12,6 +13,7 @@ import { prettyPrint } from 'lib/utils/strings';
 import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
 import type { PartialIssuableRewardApplicationCredentialContent } from './findIssuableRewardCredentials';
+import { indexOnchainProposalCredentials } from './indexOnChainProposalCredential';
 
 type PendingCredentialContent<T extends AttestationType> = T extends 'proposal'
   ? PartialIssuableProposalCredentialContent
@@ -136,7 +138,8 @@ export async function indexSafeTransaction({
 }
 // indexSafeTransaction({
 //   chainId: sepolia.id,
-//   safeTxHash: '0x410992d91c8f58919db7605e8555232497b942f95950a51c0734a1cc6da23883'
+//   safeTxHash: '0x410992d91c8f58919db7605e8555232497b942f95950a51c0734a1cc6da23883',
+//   indexer: indexOnchainProposalCredentials
 // }).then(console.log);
 
 // indexSafeTransaction({

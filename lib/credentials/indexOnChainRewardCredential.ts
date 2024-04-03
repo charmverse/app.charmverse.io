@@ -20,7 +20,7 @@ type IndexableCredential = {
   attestationId: string;
 };
 
-async function indexOnchainRewardCredential({
+async function indexSingleOnchainRewardCredential({
   chainId,
   attestationId,
   eas
@@ -112,7 +112,7 @@ export type RewardCredentialsToIndex = {
   txHash: string;
 };
 
-export async function indexRewardCredentials({ chainId, txHash }: RewardCredentialsToIndex): Promise<void> {
+export async function indexOnchainRewardCredentials({ chainId, txHash }: RewardCredentialsToIndex): Promise<void> {
   const publicClient = getPublicClient(chainId);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
@@ -125,7 +125,7 @@ export async function indexRewardCredentials({ chainId, txHash }: RewardCredenti
   await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return indexOnchainRewardCredential({ attestationId: uid, chainId, eas });
+      return indexSingleOnchainRewardCredential({ attestationId: uid, chainId, eas });
     })
   );
 }
