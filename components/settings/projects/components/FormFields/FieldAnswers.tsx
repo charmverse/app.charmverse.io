@@ -1,16 +1,13 @@
-import MuiAddIcon from '@mui/icons-material/Add';
 import { Stack } from '@mui/material';
 import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
-import { Button } from 'components/common/Button';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import type {
-  ProjectAndMembersPayload,
-  ProjectFieldProperty,
+  AddressChainCombo,
   FieldConfig,
-  AddressChainCombo
+  ProjectAndMembersPayload,
+  ProjectFieldProperty
 } from 'lib/projects/interfaces';
 
 import { MultipleWalletAddressesField } from './MultipleWalletAddressesField';

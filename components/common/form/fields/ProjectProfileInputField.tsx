@@ -98,7 +98,7 @@ export function ProjectProfileInputField({
             if (showCreateProjectForm) {
               return <Typography>Create a new project profile</Typography>;
             } else if (!selectedProject) {
-              return <Typography>Select a project profile</Typography>;
+              return <Typography color='secondary'>Select a project profile</Typography>;
             }
             // Selected project might have stale name if it was changed, so find the correct project from the list
             const selectedProjectName =

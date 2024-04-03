@@ -9,8 +9,7 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'walletAddress',
     label: 'Wallet Address',
-    allowPrivate: true,
-    multipleWalletAddresses: true
+    allowPrivate: true
   },
   {
     field: 'email',
@@ -98,7 +97,8 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'walletAddress',
     label: 'Wallet Address to receive funds',
-    allowPrivate: true
+    allowPrivate: true,
+    multipleWalletAddresses: true
   }
 ];
 
