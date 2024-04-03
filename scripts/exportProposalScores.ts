@@ -8,6 +8,7 @@ import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rub
 import { writeToSameFolder } from 'lib/utils/file';
 import { isNumber } from 'lib/utils/numbers';
 import { isTruthy } from 'lib/utils/types';
+import { groupBy } from 'lodash';
 
 type ExportedProposal = {
   proposalUrl: string;
@@ -78,31 +79,33 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       }
     }
   });
-  const formFieldIdsByName = Object.groupBy(formFields, (field) => field.name);
+  const formFieldIdsByName = groupBy(formFields, (field) => field.name);
 
-  // const pageIds = await _getPageIdsFromDatabase();
+  const pageIds = await _getPageIdsFromDatabase();
 
   const proposals = await prisma.proposal.findMany({
+    // where: {
+    //   status: 'published',
+    //   page: {
+    //     deletedAt: null,
+    //     createdAt: {
+    //       gte: new Date('2024-03-13')
+    //     },
+    //     type: 'proposal',
+    //     space: {
+    //       domain
+    //     }
+    //   }
+    // },
     where: {
       status: 'published',
       page: {
         deletedAt: null,
-        createdAt: {
-          gte: new Date('2024-03-13')
-        },
-        type: 'proposal',
-        space: {
-          domain
+        id: {
+          in: pageIds
         }
       }
     },
-    // where: {
-    //   page: {
-    //     id: {
-    //       in: pageIds
-    //     }
-    //   }
-    // },
     include: {
       formAnswers: true,
       rubricAnswers: true,
@@ -245,8 +248,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       const fieldIds = (formFieldIdsByName[rowKey] || []).map((field) => field.id);
       const match = p.formAnswers.find((answer) => fieldIds?.includes(answer.fieldId));
       if (match) {
-        console.log(match);
-        const valueStr = (match.value as any).contentText || match.value;
+        const valueStr = (match.value as any).contentText ?? match.value;
         (row as any)[rowKey] = `${cellEnclosure}${valueStr
           .replace(new RegExp(cellEnclosure, 'g'), '')
           .replace(new RegExp(separator, 'g'), '')
@@ -287,7 +289,8 @@ async function _getPageIdsFromDatabase() {
       page: true
     }
   });
-  const property = (board.fields as unknown as BoardFields).cardProperties.find((prop) => prop.name === 'R1 Final');
+  // console.log((board.fields as unknown as BoardFields).cardProperties);
+  const property = (board.fields as unknown as BoardFields).cardProperties.find((prop) => prop.name === 'Finalist');
   const yesOption = property?.options.find((opt) => opt.value === 'Yes');
   if (!yesOption || !property) {
     throw new Error('cannot find property or option');

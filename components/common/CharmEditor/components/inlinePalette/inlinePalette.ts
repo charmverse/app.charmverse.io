@@ -5,7 +5,7 @@ import {
   queryIsSuggestTooltipActive,
   queryTriggerText,
   replaceSuggestMarkWith
-} from '../@bangle.dev/tooltip/suggestTooltip';
+} from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 export const commands = {};
 

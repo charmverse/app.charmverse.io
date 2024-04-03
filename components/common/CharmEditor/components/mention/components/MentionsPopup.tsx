@@ -14,8 +14,8 @@ import type { Member } from 'lib/members/interfaces';
 import { safeScrollIntoViewIfNeeded } from 'lib/utils/browser';
 import { sanitizeForRegex } from 'lib/utils/strings';
 
-import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltip';
-import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltip';
+import type { PluginState as SuggestTooltipPluginState } from '../../@bangle.dev/tooltip/suggestTooltipPlugin';
+import { hideSuggestionsTooltip } from '../../@bangle.dev/tooltip/suggestTooltipSpec';
 import PopoverMenu, { GroupLabel } from '../../PopoverMenu';
 import type { MentionPluginState } from '../mention.interfaces';
 import { selectMention } from '../mention.utils';

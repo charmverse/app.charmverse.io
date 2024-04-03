@@ -1,15 +1,16 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { Box, Typography } from '@mui/material';
 
-import { BlockNodeContainer } from 'components/common/CharmEditor/components/common/BlockNodeContainer';
-import { EmptyEmbed } from 'components/common/CharmEditor/components/common/EmptyEmbed';
-import { MediaSelectionPopup } from 'components/common/CharmEditor/components/common/MediaSelectionPopup';
-import { FileUploadForm } from 'components/common/CharmEditor/components/file/FileUploadForm';
-import type { CharmNodeViewProps } from 'components/common/CharmEditor/components/nodeView/nodeView';
 import Link from 'components/common/Link';
 import MultiTabs from 'components/common/MultiTabs';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import { replaceS3Domain } from 'lib/utils/url';
+
+import { BlockNodeContainer } from '../common/BlockNodeContainer';
+import { EmptyEmbed } from '../common/EmptyEmbed';
+import { MediaSelectionPopup } from '../common/MediaSelectionPopup';
+import { FileUploadForm } from '../file/FileUploadForm';
+import type { CharmNodeViewProps } from '../nodeView/nodeView';
 
 export function File({ node, readOnly, selected, deleteNode, updateAttrs }: CharmNodeViewProps) {
   const { src: url, size, name } = node.attrs;
