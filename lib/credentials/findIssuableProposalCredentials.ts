@@ -43,8 +43,8 @@ export type IssuableProposalCredentialContent = {
 // A partial subtype to reduce data passed around the system
 export type PartialIssuableProposalCredentialContent = Pick<
   IssuableProposalCredentialContent,
-  'proposalId' | 'event' | 'credentialTemplateId' | 'recipientAddress'
->;
+  'proposalId' | 'credentialTemplateId' | 'recipientAddress'
+> & { event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'> };
 
 /**
  * @existingPendingTransactionEvents - Events with already pending credentials awaiting a Gnosis safe transaction

@@ -10,7 +10,6 @@ import {
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
-import { Reward } from 'lib/rewards/interfaces';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
@@ -46,7 +45,7 @@ export type IssuableRewardApplicationCredentialContent = {
 // A partial subtype to reduce data passed around the system
 export type PartialIssuableRewardApplicationCredentialContent = Pick<
   IssuableRewardApplicationCredentialContent,
-  'rewardApplicationId' | 'event' | 'credentialTemplateId' | 'recipientAddress'
+  'rewardApplicationId' | 'event' | 'credentialTemplateId' | 'recipientAddress' | 'rewardId'
 >;
 
 type GenerateRewardCredentialsParams = {
@@ -90,11 +89,13 @@ export function generateCredentialInputsForReward({
       }
 
       const credentialTemplate = templateMap.get(credentialTemplateId);
+
       if (
         !credentialTemplate ||
         !credentialTemplate.credentialEvents.includes('reward_submission_approved') ||
         pendingIssuableCredentials?.some(
           (pendingIssuableCred) =>
+            pendingIssuableCred.rewardApplicationId === application.id &&
             pendingIssuableCred.credentialTemplateId === credentialTemplateId &&
             pendingIssuableCred.event === 'reward_submission_approved' &&
             lowerCaseEqual(pendingIssuableCred.recipientAddress, targetWallet)
@@ -187,24 +188,24 @@ export async function findSpaceIssuableRewardCredentials({
   const pendingSafeTransactions = await prisma.pendingSafeTransaction.findMany({
     where: {
       spaceId,
-      rewardApplicationIds: { hasSome: rewards.map((r) => r.id) }
+      rewardIds: { hasSome: rewards.map((r) => r.id) }
     },
     select: {
       credentialContent: true,
-      rewardApplicationIds: true
+      rewardIds: true
     }
   });
 
   const pendingRewardsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
-    for (const applicationId of pendingTx.rewardApplicationIds) {
+    for (const rewardId of pendingTx.rewardIds) {
       const pendingRewardCredentials =
-        (pendingTx as TypedPendingGnosisSafeTransaction<'reward'>).credentialContent?.[applicationId] ?? [];
+        (pendingTx as TypedPendingGnosisSafeTransaction<'reward'>).credentialContent?.[rewardId] ?? [];
 
-      if (!acc[applicationId]) {
-        acc[applicationId] = [];
+      if (!acc[rewardId]) {
+        acc[rewardId] = [];
       }
 
-      acc[applicationId].push(...pendingRewardCredentials);
+      acc[rewardId].push(...pendingRewardCredentials);
     }
     return acc;
   }, {} as Record<string, PartialIssuableRewardApplicationCredentialContent[]>);

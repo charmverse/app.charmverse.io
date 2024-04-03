@@ -6,6 +6,7 @@ import { JsonRpcProvider } from '@ethersproject/providers';
 import { getChainById } from 'connectors/chains';
 
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
+import { uniqueValues } from 'lib/utils/array';
 import { prettyPrint } from 'lib/utils/strings';
 
 import { type EasSchemaChain } from './connectors';
@@ -23,6 +24,9 @@ export type GnosisSafeTransactionToIndex<T extends AttestationType = Attestation
   'safeTxHash' | 'chainId' | 'safeAddress' | 'spaceId' | 'schemaId'
 > & { credentials: PendingCredentialContent<T>[]; type: T };
 
+/**
+ * The type of the pending safe transaction, with the credentials grouped by proposal ID or reward ID
+ */
 export type TypedPendingGnosisSafeTransaction<T extends AttestationType> = Omit<
   PendingSafeTransaction,
   'credentialContent'
@@ -45,7 +49,10 @@ export async function saveGnosisSafeTransactionToIndex<T extends AttestationType
 
   const { ids, credentialContent } = credentials.reduce(
     (acc, val) => {
-      const itemId = type === 'proposal' ? val.proposalId : val.rewardApplicationId;
+      const itemId =
+        type === 'proposal'
+          ? (val as PendingCredentialContent<'proposal'>).proposalId
+          : (val as PendingCredentialContent<'reward'>).rewardId;
 
       acc.ids.push(itemId);
 
@@ -70,14 +77,14 @@ export async function saveGnosisSafeTransactionToIndex<T extends AttestationType
       safeTxHash,
       safeAddress,
       chainId,
-      proposalIds: type === 'reward' ? [] : ids,
-      rewardApplicationIds: type === 'proposal' ? [] : ids,
+      proposalIds: type === 'reward' ? [] : uniqueValues(ids),
+      rewardIds: type === 'proposal' ? [] : uniqueValues(ids),
       processed: false,
       credentialContent
     }
   });
 
-  return pendingSafeTransactionToIndex as TypedPendingGnosisSafeTransaction;
+  return pendingSafeTransactionToIndex as TypedPendingGnosisSafeTransaction<T>;
 }
 
 export type IndexableSafeTransaction = {
