@@ -94,7 +94,6 @@ test.describe.serial('Create and edit project from user settings', () => {
 
     await projectSettings.saveNewProjectButton.click();
     await projectSettings.page.waitForTimeout(500);
-
     const project = await prisma.project.findFirstOrThrow({
       where: {
         createdBy: spaceUser.id
@@ -162,10 +161,15 @@ test.describe.serial('Create and edit project from user settings', () => {
     });
 
     expect(updatedProject.name).toBe('Updated Test Project');
-    expect(updatedProject.walletAddress).toBe(updatedWalletAddress.toLowerCase());
+    expect(updatedProject.walletAddress).toStrictEqual([
+      {
+        address: updatedWalletAddress.toLowerCase(),
+        chain: 1
+      }
+    ]);
   });
 
-  test('Delete a project member from user settings', async ({ page, projectSettings }) => {
+  test('Remove a project member from user settings', async ({ page, projectSettings }) => {
     await login({ page, userId: spaceUser.id });
     await page.goto(baseUrl as string);
     await projectSettings.openSettingsModal();

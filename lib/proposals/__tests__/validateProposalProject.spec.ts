@@ -2,6 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 
 import { defaultProjectAndMembersFieldConfig, defaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
@@ -22,7 +23,7 @@ describe('validateProposalProject', () => {
             type: 'project_profile',
             fieldConfig: {
               ...defaultProjectAndMembersFieldConfig,
-              name: {
+              walletAddress: {
                 required: true
               }
             }
@@ -39,6 +40,12 @@ describe('validateProposalProject', () => {
       project: {
         ...defaultProjectAndMembersPayload,
         name: 'Test Project',
+        walletAddress: [
+          {
+            address: randomETHWalletAddress(),
+            chain: 1
+          }
+        ],
         projectMembers: [
           {
             ...defaultProjectAndMembersPayload.projectMembers[0],
@@ -58,6 +65,9 @@ describe('validateProposalProject', () => {
             fieldConfig: {
               ...defaultProjectAndMembersFieldConfig,
               name: {
+                required: true
+              },
+              walletAddress: {
                 required: true
               }
             }

@@ -189,7 +189,7 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(await proposalFormFieldPage.getProjectFieldLabel('excerpt')).toBe('Describe your project in one sentence');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-name')).toBe('Name*');
     expect(await proposalFormFieldPage.getProjectFieldLabel('member-email')).toBe('Email*');
-    // expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
+    expect(await proposalPage.page.locator('data-test=project-member-walletAddress-field-container').count()).toBe(0);
 
     const proposalTemplate = await prisma.proposal.findFirstOrThrow({
       where: {
@@ -361,7 +361,12 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(createdProject.projectMembers[0].email).toBe('doe@gmail.com');
     expect(createdProject.projectMembers[1].name).toBe('Jane Doe');
     expect(createdProject.projectMembers[1].email).toBe('jane@gmail.com');
-    expect(createdProject.walletAddress).toBe(projectWalletAddress.toLowerCase());
+    expect(createdProject.walletAddress).toStrictEqual([
+      {
+        address: projectWalletAddress.toLowerCase(),
+        chain: 1
+      }
+    ]);
 
     await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
 
@@ -450,6 +455,7 @@ test.describe.serial('Structured proposal template with project', () => {
         .inputValue()) !== ''
     ).toBeTruthy();
 
+    // Email was manually made private so it should be hidden
     expect(
       (await projectSettings
         .getProjectField({

@@ -30,7 +30,7 @@ export function MultipleWalletAddressesField({
             required={required}
             disabled={disabled}
             value={addressChainCombo.address}
-            data-test={`project-field-${name}.address`}
+            data-test={`project-field-${name}`}
             onChange={
               onChange
                 ? (e) => {
