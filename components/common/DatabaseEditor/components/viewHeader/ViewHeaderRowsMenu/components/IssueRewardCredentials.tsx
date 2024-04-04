@@ -3,7 +3,7 @@ import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
-import { useSwitchNetwork } from 'wagmi';
+import { useSwitchChain } from 'wagmi';
 
 import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
@@ -65,7 +65,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
 
   const { account, chainId } = useWeb3Account();
   const { signer } = useWeb3Signer();
-  const { switchNetworkAsync } = useSwitchNetwork({ chainId: space?.credentialsChainId as number });
+  const { switchChainAsync } = useSwitchChain();
 
   async function handleIssueCredentials(_issuableRewardCredentials: IssuableRewardApplicationCredentialContent[]) {
     if (!signer || !space?.useOnchainCredentials || !space.credentialsChainId) {
@@ -73,7 +73,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
     }
 
     if (chainId !== space.credentialsChainId) {
-      await switchNetworkAsync?.(space.credentialsChainId);
+      await switchChainAsync?.({ chainId: space.credentialsChainId });
       return;
     }
 
@@ -148,7 +148,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
               <Button
                 sx={{ mt: 1 }}
                 fullWidth
-                onClick={() => switchNetworkAsync?.(space.credentialsChainId as number).catch()}
+                onClick={() => switchChainAsync?.({ chainId: space.credentialsChainId as number }).catch()}
                 variant='outlined'
                 size='small'
               >
@@ -159,7 +159,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
         )}
       </MenuItem>
     );
-  }, [space?.credentialsChainId, chainId, switchNetworkAsync]);
+  }, [space?.credentialsChainId, chainId, switchChainAsync]);
 
   // We only enable this feature if the space has onchain credentials enabled
   if (

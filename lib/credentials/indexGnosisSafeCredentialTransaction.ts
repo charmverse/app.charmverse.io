@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { AttestationType, PendingSafeTransaction } from '@charmverse/core/prisma-client';
+import type { AttestationType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { getChainById } from 'connectors/chains';
@@ -14,6 +14,8 @@ import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
 import type { PartialIssuableRewardApplicationCredentialContent } from './findIssuableRewardCredentials';
 import { indexOnchainProposalCredentials } from './indexOnChainProposalCredential';
+import type { IdenticalCredentialProps } from './saveIssuedCredential';
+import { rewardCredentialSchemaId } from './schemas/reward';
 
 type PendingCredentialContent<T extends AttestationType> = T extends 'proposal'
   ? PartialIssuableProposalCredentialContent
@@ -72,10 +74,15 @@ export async function saveGnosisSafeTransactionToIndex<T extends AttestationType
     }
   );
 
+  if (ids.length === 0) {
+    throw new InvalidInputError(`No indexable credentials`);
+  }
+
   const pendingSafeTransactionToIndex = await prisma.pendingSafeTransaction.create({
     data: {
       space: { connect: { id: spaceId } },
       schemaId,
+      credentialType: type,
       safeTxHash,
       safeAddress,
       chainId,
@@ -94,13 +101,19 @@ export type IndexableSafeTransaction = {
   chainId: EasSchemaChain;
 };
 
-export async function indexSafeTransaction({
+export async function indexGnosisSafeCredentialTransaction({
   safeTxHash,
   chainId,
   indexer
 }: IndexableSafeTransaction & {
-  indexer: (input: { txHash: string; chainId: EasSchemaChain }) => Promise<void>;
+  indexer: (input: { txHash: string; chainId: EasSchemaChain }) => Promise<IssuedCredential[]>;
 }): Promise<void> {
+  const safetransactionInDb = await prisma.pendingSafeTransaction.findFirstOrThrow({
+    where: {
+      safeTxHash
+    }
+  });
+
   const apiClient = await getSafeApiClient({ chainId });
   const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
 
@@ -115,8 +128,6 @@ export async function indexSafeTransaction({
     return;
   }
 
-  prettyPrint(pendingSafeTransaction);
-
   const onchainTxHash = pendingSafeTransaction?.transactionHash;
 
   if (!onchainTxHash) {
@@ -124,25 +135,123 @@ export async function indexSafeTransaction({
     return;
   }
 
-  const provider = new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId);
-
-  await indexer({
+  const issuedCredentials = await indexer({
     chainId: chainId as EasSchemaChain,
     txHash: pendingSafeTransaction.transactionHash
   });
 
-  await prisma.pendingSafeTransaction.update({
-    where: { safeTxHash },
-    data: { processed: true }
-  });
+  /**
+   * Utility to generate a unique key for a credential
+   */
+  function getKey({
+    credentialEvent,
+    credentialTemplateId,
+    userId,
+    proposalId,
+    rewardApplicationId
+  }: Omit<IdenticalCredentialProps, 'schemaId'>) {
+    return `${credentialEvent}-${credentialTemplateId}-${userId}-${proposalId}-${rewardApplicationId}`;
+  }
+
+  let newValues = {};
+
+  if (safetransactionInDb.credentialType === 'reward') {
+    const mappedCredentialsByApplicationId = issuedCredentials.reduce((acc, val) => {
+      const key = getKey({
+        credentialTemplateId: val.credentialTemplateId as string,
+        rewardApplicationId: val.rewardApplicationId as string,
+        credentialEvent: val.credentialEvent,
+        userId: val.userId
+      });
+      acc[key] = val;
+      return acc;
+    }, {} as Record<string, IssuedCredential>);
+
+    const values = (safetransactionInDb as TypedPendingGnosisSafeTransaction<'reward'>).credentialContent;
+
+    // Create a new map of values that may have failed processing
+    newValues = Object.entries(values).reduce((acc, [rewardId, pendingRewardApplicationCredentials]) => {
+      const filtered = pendingRewardApplicationCredentials.filter((pendingCredential) => {
+        const key = getKey({
+          credentialTemplateId: pendingCredential.credentialTemplateId as string,
+          rewardApplicationId: pendingCredential.rewardApplicationId as string,
+          credentialEvent: pendingCredential.event,
+          userId: pendingCredential.recipientUserId
+        });
+        const issuedCredential = mappedCredentialsByApplicationId[key];
+
+        return !issuedCredential;
+      });
+
+      if (filtered.length) {
+        acc[rewardId] = filtered;
+      }
+
+      return acc;
+    }, {} as Record<string, PartialIssuableRewardApplicationCredentialContent[]>);
+  } else if (safetransactionInDb.credentialType === 'proposal') {
+    const mappedCredentialsByProposalId = issuedCredentials.reduce((acc, val) => {
+      const key = getKey({
+        credentialTemplateId: val.credentialTemplateId as string,
+        rewardApplicationId: val.rewardApplicationId as string,
+        credentialEvent: val.credentialEvent,
+        userId: val.userId,
+        proposalId: val.proposalId as string
+      });
+      acc[key] = val;
+      return acc;
+    }, {} as Record<string, IssuedCredential>);
+
+    const values = (safetransactionInDb as TypedPendingGnosisSafeTransaction<'proposal'>).credentialContent;
+
+    // Create a new map of values that may have failed processing
+    newValues = Object.entries(values).reduce((acc, [proposalId, pendingProposalCredentials]) => {
+      const filtered = pendingProposalCredentials.filter((pendingCredential) => {
+        const key = getKey({
+          credentialTemplateId: pendingCredential.credentialTemplateId as string,
+          proposalId: pendingCredential.proposalId as string,
+          credentialEvent: pendingCredential.event,
+          userId: pendingCredential.recipientUserId
+        });
+        const issuedCredential = mappedCredentialsByProposalId[key];
+
+        return !issuedCredential;
+      });
+
+      if (filtered.length) {
+        acc[proposalId] = filtered;
+      }
+
+      return acc;
+    }, {} as Record<string, PartialIssuableProposalCredentialContent[]>);
+  }
+
+  if (Object.keys(newValues).length === 0) {
+    log.info(`All credentials for safe transaction ${safeTxHash} on chain ${chainId} have been processed`);
+
+    await prisma.pendingSafeTransaction.delete({
+      where: {
+        safeTxHash
+      }
+    });
+  } else {
+    // Mark this transaction as processed so we can refer to it later
+    await prisma.pendingSafeTransaction.update({
+      where: { safeTxHash },
+      data: { processed: true, credentialContent: newValues }
+    });
+  }
 }
+
+// First
 // indexSafeTransaction({
 //   chainId: sepolia.id,
-//   safeTxHash: '0x410992d91c8f58919db7605e8555232497b942f95950a51c0734a1cc6da23883',
+//   safeTxHash: '0xe94b6caf24c7e14679df8c069be5c976c63648c0bb07cee63258ab556586b32b',
 //   indexer: indexOnchainProposalCredentials
 // }).then(console.log);
 
+// Second
 // indexSafeTransaction({
 //   chainId: sepolia.id,
-//   safeTxHash: '0x6ee2a4967da40389b76a03de7c38a5b45ab48f0fc19baf909387c512207a8841'
+//   safeTxHash: '0xef1be00af76b2e898f3583e5fa8881c97615d30cd3e89f74d641793eb88cf0f3'
 // }).then(console.log);

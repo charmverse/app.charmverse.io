@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
-import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
+import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -154,7 +154,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     });
   }
 
-  await issueProposalCredentialsIfNecessary({
+  await issueOffchainProposalCredentialsIfNecessary({
     event: 'proposal_created',
     proposalId
   });

@@ -1,12 +1,13 @@
 import type { IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtils, testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
+import { pseudoRandomHexString } from 'lib/utils/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
-import { issueProposalCredentialsIfNecessary } from '../issueProposalCredentialsIfNecessary';
+import { issueOffchainProposalCredentialsIfNecessary } from '../issueOffchainProposalCredentialsIfNecessary';
 import { publishSignedCredential, type PublishedSignedCredential } from '../queriesAndMutations';
 import { attestationSchemaIds } from '../schemas';
 
@@ -33,8 +34,8 @@ afterEach(() => {
   mockedPublishSignedCredential.mockClear();
 });
 
-describe.skip('issueProposalCredentialIfNecessary', () => {
-  it('should issue credentials once for a unique combination of user, proposal and credential template', async () => {
+describe('issueProposalCredentialIfNecessary', () => {
+  it('should issue credentials once for a unique combination of user, proposal, event and credential template', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
@@ -58,21 +59,21 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_created',
       proposalId: proposal.id
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_created',
       proposalId: proposal.id
     });
@@ -134,6 +135,65 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
     );
   });
 
+  it('should issue the offchain credentials for a unique combination of user, proposal, event and credential template if it exists onchain, but not offchain', async () => {
+    const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
+    });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      authors: [author1.id],
+      userId: author1.id,
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
+    });
+
+    const existingOnchainCredential = await testUtilsCredentials.generateIssuedOnchainCredential({
+      credentialEvent: 'proposal_approved',
+      credentialTemplateId: firstCredentialTemplate.id,
+      userId: author1.id,
+      proposalId: proposal.id,
+      onchainChainId: optimism.id,
+      onchainAttestationId: pseudoRandomHexString()
+    });
+
+    await issueOffchainProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: proposal.id
+    });
+
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(1);
+
+    const issuedCredentials = await prisma.issuedCredential.findMany({
+      where: {
+        proposalId: proposal.id
+      }
+    });
+
+    // 2 event types * 2 credential templates * 2 authors
+    expect(issuedCredentials).toHaveLength(1);
+
+    expect(issuedCredentials).toMatchObject(
+      expect.arrayContaining<Partial<IssuedCredential>>([
+        expect.objectContaining<Partial<IssuedCredential>>({
+          id: existingOnchainCredential.id,
+          userId: author1.id,
+          credentialEvent: 'proposal_approved',
+          credentialTemplateId: firstCredentialTemplate.id,
+          ceramicId: expect.any(String),
+          onchainChainId: existingOnchainCredential.onchainChainId,
+          onchainAttestationId: existingOnchainCredential.onchainAttestationId
+        })
+      ])
+    );
+  });
+
   it('should only issue credentials if the credential template allows issuing credentials for the event', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),
@@ -158,12 +218,12 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_created',
       proposalId: proposal.id
     });
@@ -219,7 +279,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
@@ -233,7 +293,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       }
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
@@ -288,7 +348,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
@@ -336,7 +396,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
@@ -372,7 +432,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [] }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_created',
       proposalId: proposal.id
     });
@@ -408,7 +468,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', result: 'fail', permissions: [] }]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });
@@ -447,7 +507,7 @@ describe.skip('issueProposalCredentialIfNecessary', () => {
       ]
     });
 
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId: proposal.id
     });

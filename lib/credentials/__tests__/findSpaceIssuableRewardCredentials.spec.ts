@@ -290,7 +290,7 @@ describe('findSpaceIssuableRewardCredentials', () => {
     expect(result.length).toBe(2);
 
     // Simulate having issued this credential already
-    await testUtilsCredentials.generateIssuedCredential({
+    await testUtilsCredentials.generateIssuedOffchainCredential({
       credentialEvent: 'reward_submission_approved',
       credentialTemplateId: credentialTemplate.id,
       rewardApplicationId: rewardApplication.id,

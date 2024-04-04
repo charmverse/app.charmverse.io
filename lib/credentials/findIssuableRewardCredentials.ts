@@ -45,7 +45,7 @@ export type IssuableRewardApplicationCredentialContent = {
 // A partial subtype to reduce data passed around the system
 export type PartialIssuableRewardApplicationCredentialContent = Pick<
   IssuableRewardApplicationCredentialContent,
-  'rewardApplicationId' | 'event' | 'credentialTemplateId' | 'recipientAddress' | 'rewardId'
+  'rewardApplicationId' | 'event' | 'credentialTemplateId' | 'recipientAddress' | 'rewardId' | 'recipientUserId'
 >;
 
 type GenerateRewardCredentialsParams = {

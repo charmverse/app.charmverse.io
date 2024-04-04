@@ -6,11 +6,12 @@ import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
+import { sepolia } from 'viem/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
-import { lowerCaseEqual } from 'lib/utils/strings';
+import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
-import { getEasInstance, type EasSchemaChain } from './connectors';
+import { getEasConnector, getEasInstance, type EasSchemaChain } from './connectors';
 import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
 import { saveIssuedCredential } from './saveIssuedCredential';
 import type { ProposalCredential } from './schemas/proposal';
@@ -50,6 +51,7 @@ async function indexSingleOnchainProposalCredential({
       id: true,
       selectedCredentialTemplates: true,
       spaceId: true,
+      issuedCredentials: true,
       space: {
         select: {
           credentialsWallet: true
@@ -69,15 +71,15 @@ async function indexSingleOnchainProposalCredential({
     }
   });
 
+  const existingCredential = proposal.issuedCredentials.find((c) => c.onchainAttestationId === attestationId);
+
+  if (existingCredential) {
+    return existingCredential;
+  }
+
   if (!proposal.authors.length) {
     throw new InvalidInputError(
       `No author with wallet address ${attestation.recipient} found for proposal ${proposal.id}`
-    );
-  }
-
-  if (!lowerCaseEqual(proposal.space.credentialsWallet, attestation.attester)) {
-    throw new InvalidInputError(
-      `Proposal ${proposal.id} was issued on chain ${chainId} by ${attestation.recipient}, but credentials wallet is ${proposal.space.credentialsWallet}`
     );
   }
 
@@ -130,20 +132,29 @@ export type ProposalCredentialsToIndex = {
 /**
  * Compatible with EOA transaction. Todo - Add support for safe
  */
-export async function indexOnchainProposalCredentials({ chainId, txHash }: ProposalCredentialsToIndex): Promise<void> {
+export async function indexOnchainProposalCredentials({
+  chainId,
+  txHash
+}: ProposalCredentialsToIndex): Promise<IssuedCredential[]> {
   const publicClient = getPublicClient(chainId);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
 
-  const attestationUids = receipt.logs.map((_log) => _log.data);
+  const attestationContract = getEasConnector(chainId).attestationContract;
+
+  const attestationUids = receipt.logs
+    .filter((log) => lowerCaseEqual(log.address, attestationContract))
+    .map((_log) => _log.data);
 
   const eas = await getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
 
-  await Promise.all(
+  const credentials = await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
       return indexSingleOnchainProposalCredential({ attestationId: uid, chainId, eas });
     })
-  );
+  ).then((data) => data.filter(Boolean));
+
+  return credentials;
 }

@@ -37,14 +37,14 @@ export type IssuableProposalCredentialContent = {
   credentialTemplateId: string;
   proposalId: string;
   pageId: string;
-  event: CredentialEventType;
+  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
 };
 
 // A partial subtype to reduce data passed around the system
 export type PartialIssuableProposalCredentialContent = Pick<
   IssuableProposalCredentialContent,
-  'proposalId' | 'credentialTemplateId' | 'recipientAddress'
-> & { event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'> };
+  'proposalId' | 'credentialTemplateId' | 'recipientAddress' | 'recipientUserId' | 'event'
+>;
 
 /**
  * @existingPendingTransactionEvents - Events with already pending credentials awaiting a Gnosis safe transaction
@@ -128,7 +128,7 @@ export function generateCredentialInputsForProposal({
               proposalId: proposal.id,
               recipientUserId: author.id,
               pageId: proposal.page.id,
-              event,
+              event: event as Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>,
               credential: {
                 Name: credentialTemplate.name,
                 Description: credentialTemplate.description ?? '',

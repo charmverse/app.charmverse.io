@@ -14,7 +14,7 @@ import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
-export async function issueProposalCredentialsIfNecessary({
+export async function issueOffchainProposalCredentialsIfNecessary({
   proposalId,
   event
 }: {
@@ -122,7 +122,9 @@ export async function issueProposalCredentialsIfNecessary({
     proposalWithSpaceConfig.selectedCredentialTemplates.forEach((credentialTemplateId) => {
       const userHasNotReceivedCredential = !issuedCredentials.some(
         (issuedCredential) =>
-          issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
+          issuedCredential.credentialTemplateId === credentialTemplateId &&
+          issuedCredential.userId === author.userId &&
+          !!issuedCredential.ceramicId
       );
       if (
         userHasNotReceivedCredential &&

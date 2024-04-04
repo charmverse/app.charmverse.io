@@ -8,13 +8,12 @@ import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
-import type { EasSchemaChain } from './connectors';
 import { credentialEventLabels } from './constants';
 import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
-export async function issueRewardCredentialsIfNecessary({
+export async function issueOffchainRewardCredentialsIfNecessary({
   rewardId,
   event,
   submissionId
@@ -105,7 +104,8 @@ export async function issueRewardCredentialsIfNecessary({
         (issuedCredential) =>
           issuedCredential.credentialTemplateId === credentialTemplateId &&
           issuedCredential.userId === submitterUserId &&
-          issuedCredential.rewardApplicationId === application.id
+          issuedCredential.rewardApplicationId === application.id &&
+          !issuedCredential.ceramicId
       );
       if (
         userHasNotReceivedCredential &&

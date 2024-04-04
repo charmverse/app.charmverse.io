@@ -32,13 +32,15 @@ describe('saveGnosisSafeTransactionToIndex', () => {
         proposalId,
         credentialTemplateId: uuid(),
         event: 'proposal_approved',
-        recipientAddress: randomETHWalletAddress()
+        recipientAddress: randomETHWalletAddress(),
+        recipientUserId: user.id
       },
       {
         proposalId,
         credentialTemplateId: uuid(),
         event: 'proposal_approved',
-        recipientAddress: randomETHWalletAddress()
+        recipientAddress: randomETHWalletAddress(),
+        recipientUserId: user.id
       }
     ];
 
@@ -47,7 +49,8 @@ describe('saveGnosisSafeTransactionToIndex', () => {
         proposalId: secondProposalId,
         credentialTemplateId: uuid(),
         event: 'proposal_approved',
-        recipientAddress: randomETHWalletAddress()
+        recipientAddress: randomETHWalletAddress(),
+        recipientUserId: user.id
       }
     ];
 
@@ -66,6 +69,7 @@ describe('saveGnosisSafeTransactionToIndex', () => {
       chainId: mainnet.id,
       safeAddress,
       spaceId: space.id,
+      credentialType: 'proposal',
       schemaId: proposalCredentialSchemaId,
       proposalIds: [proposalId, secondProposalId],
       rewardIds: [],
@@ -89,14 +93,16 @@ describe('saveGnosisSafeTransactionToIndex', () => {
         rewardApplicationId: uuid(),
         credentialTemplateId: uuid(),
         event: 'reward_submission_approved',
-        recipientAddress: randomETHWalletAddress()
+        recipientAddress: randomETHWalletAddress(),
+        recipientUserId: user.id
       },
       {
         rewardId,
         rewardApplicationId: uuid(),
         credentialTemplateId: uuid(),
         event: 'reward_submission_approved',
-        recipientAddress: randomETHWalletAddress()
+        recipientAddress: randomETHWalletAddress(),
+        recipientUserId: user.id
       }
     ];
 
@@ -106,7 +112,8 @@ describe('saveGnosisSafeTransactionToIndex', () => {
         rewardApplicationId: uuid(),
         credentialTemplateId: uuid(),
         event: 'reward_submission_approved',
-        recipientAddress: randomETHWalletAddress()
+        recipientAddress: randomETHWalletAddress(),
+        recipientUserId: user.id
       }
     ];
 
@@ -128,6 +135,7 @@ describe('saveGnosisSafeTransactionToIndex', () => {
       schemaId: rewardCredentialSchemaId,
       proposalIds: [],
       rewardIds: [rewardId, secondRewardId],
+      credentialType: 'reward',
       processed: false,
       credentialContent: {
         [rewardId]: firstRewardCredentials,

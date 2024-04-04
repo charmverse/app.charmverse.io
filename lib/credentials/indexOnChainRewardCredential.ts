@@ -10,7 +10,7 @@ import { getChainById } from 'connectors/chains';
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
-import { getEasInstance, type EasSchemaChain } from './connectors';
+import { getEasConnector, getEasInstance, type EasSchemaChain } from './connectors';
 import { rewardSubmissionApprovedVerb } from './constants';
 import { saveIssuedCredential } from './saveIssuedCredential';
 import type { RewardCredential } from './schemas/reward';
@@ -45,6 +45,7 @@ async function indexSingleOnchainRewardCredential({
     },
     select: {
       id: true,
+      issuedCredentials: true,
       bounty: {
         select: {
           id: true,
@@ -62,10 +63,10 @@ async function indexSingleOnchainRewardCredential({
     }
   });
 
-  if (!lowerCaseEqual(application.bounty.space.credentialsWallet, attestation.attester)) {
-    throw new InvalidInputError(
-      `Application ${application.id} was issued on chain ${chainId} by ${attestation.recipient}, but credentials wallet is ${application.bounty.space.credentialsWallet}`
-    );
+  const existingCredential = application.issuedCredentials.find((cred) => cred.onchainAttestationId === attestationId);
+
+  if (existingCredential) {
+    return existingCredential;
   }
 
   const credentialEvent: CredentialEventType | null = decodedContent.Event.match(rewardSubmissionApprovedVerb)
@@ -112,30 +113,29 @@ export type RewardCredentialsToIndex = {
   txHash: string;
 };
 
-export async function indexOnchainRewardCredentials({ chainId, txHash }: RewardCredentialsToIndex): Promise<void> {
+export async function indexOnchainRewardCredentials({
+  chainId,
+  txHash
+}: RewardCredentialsToIndex): Promise<IssuedCredential[]> {
   const publicClient = getPublicClient(chainId);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
 
-  const attestationUids = receipt.logs.map((_log) => _log.data);
+  const attestationContract = getEasConnector(chainId).attestationContract;
+
+  const attestationUids = receipt.logs
+    .filter((log) => lowerCaseEqual(log.address, attestationContract))
+    .map((_log) => _log.data);
 
   const eas = await getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
 
-  await Promise.all(
+  const credentials = await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
       return indexSingleOnchainRewardCredential({ attestationId: uid, chainId, eas });
     })
   );
+
+  return credentials;
 }
-
-// indexSafeTransaction({
-//   chainId: sepolia.id,
-//   safeTxHash: '0x410992d91c8f58919db7605e8555232497b942f95950a51c0734a1cc6da23883'
-// }).then(console.log);
-
-// indexSafeTransaction({
-//   chainId: sepolia.id,
-//   safeTxHash: '0x6ee2a4967da40389b76a03de7c38a5b45ab48f0fc19baf909387c512207a8841'
-// }).then(console.log);
