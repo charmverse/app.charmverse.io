@@ -63,6 +63,7 @@ export function CredentialsOnChainConfig({
               chains={isCharmverseSpace ? [...easSchemaChains] : [...easSchemaMainnetChains.map((c) => c.id)]}
               chainId={credentialsChainId as number}
               onChange={(chainId) => onChange({ credentialsChainId: chainId })}
+              disabled={readOnly}
             />
           </Grid>
           <Grid item xs={6} px={2}>
