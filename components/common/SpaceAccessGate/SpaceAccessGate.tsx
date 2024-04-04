@@ -165,7 +165,13 @@ export function SpaceAccessGate({
       )}
       {walletGateEnabled && !isVerified && !!user && (
         <Box mb={2}>
-          <PrimaryButton fullWidth loading={isVerifying} disabled={isVerifying} onClick={evaluateUserWallet}>
+          <PrimaryButton
+            fullWidth
+            loading={isVerifying}
+            disabled={isVerifying}
+            onClick={evaluateUserWallet}
+            data-test='verify-token-gate-btn'
+          >
             Verify
           </PrimaryButton>
         </Box>
