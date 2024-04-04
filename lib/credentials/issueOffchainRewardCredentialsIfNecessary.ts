@@ -105,7 +105,7 @@ export async function issueOffchainRewardCredentialsIfNecessary({
           issuedCredential.credentialTemplateId === credentialTemplateId &&
           issuedCredential.userId === submitterUserId &&
           issuedCredential.rewardApplicationId === application.id &&
-          !issuedCredential.ceramicId
+          issuedCredential.ceramicId
       );
       if (
         userHasNotReceivedCredential &&

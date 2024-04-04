@@ -83,6 +83,11 @@ describe('issueRewardCredentialIfNecessary', () => {
       rewardId: reward.id
     });
 
+    await issueOffchainRewardCredentialsIfNecessary({
+      event: 'reward_submission_approved',
+      rewardId: reward.id
+    });
+
     // 1 event types * 2 credential templates * 3 submissions
     expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(6);
 
@@ -164,7 +169,7 @@ describe('issueRewardCredentialIfNecessary', () => {
     });
 
     const existingOnchainCredential = await testUtilsCredentials.generateIssuedOnchainCredential({
-      credentialEvent: 'proposal_approved',
+      credentialEvent: 'reward_submission_approved',
       credentialTemplateId: firstCredentialTemplate.id,
       userId: rewardCreatorAndSubmitter.id,
       rewardApplicationId: reward.applications[0].id,
@@ -188,19 +193,17 @@ describe('issueRewardCredentialIfNecessary', () => {
     // 2 event types * 2 credential templates * 2 authors
     expect(issuedCredentials).toHaveLength(1);
 
-    expect(issuedCredentials).toMatchObject(
-      expect.arrayContaining<Partial<IssuedCredential>>([
-        expect.objectContaining<Partial<IssuedCredential>>({
-          id: existingOnchainCredential.id,
-          userId: rewardCreatorAndSubmitter.id,
-          credentialEvent: 'proposal_approved',
-          credentialTemplateId: firstCredentialTemplate.id,
-          ceramicId: expect.any(String),
-          onchainChainId: existingOnchainCredential.onchainChainId,
-          onchainAttestationId: existingOnchainCredential.onchainAttestationId
-        })
-      ])
-    );
+    expect(issuedCredentials).toMatchObject([
+      expect.objectContaining<Partial<IssuedCredential>>({
+        id: existingOnchainCredential.id,
+        userId: rewardCreatorAndSubmitter.id,
+        credentialEvent: 'reward_submission_approved',
+        credentialTemplateId: firstCredentialTemplate.id,
+        ceramicId: expect.any(String),
+        onchainChainId: existingOnchainCredential.onchainChainId,
+        onchainAttestationId: existingOnchainCredential.onchainAttestationId
+      })
+    ]);
   });
 
   it('should target only a specific submission if this parameter is provided credentials once for a unique combination of user, reward submission and credential template', async () => {
