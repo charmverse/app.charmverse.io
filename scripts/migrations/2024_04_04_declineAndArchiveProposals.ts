@@ -1,23 +1,15 @@
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { submitEvaluationResult } from 'lib/proposals/submitEvaluationResult';
 import { archiveProposals } from 'lib/proposals/archiveProposals';
 
-const spaceDomain = "grateful-plum-ox";
+const spaceDomain = "classic-orange-dingo";
 
 export async function declineAndArchiveProposals() {
   const allProposals = await prisma.proposal.findMany({
     where: {
       space: {
         domain: spaceDomain
-      },
-      status: "published",
-      // Get the proposals that are in feedback step
-      evaluations: {
-        some: {
-          result: null,
-          type: ProposalEvaluationType.feedback
-        }
       }
     },
     orderBy: {
@@ -30,8 +22,11 @@ export async function declineAndArchiveProposals() {
     }
   });
 
-  // get 1/3 of the proposals each time
-  const selectedProposals = allProposals.slice(0, Math.ceil(allProposals.length / 3))
+  let iteration = 1;
+  const proposalsPerIteration = Math.ceil(allProposals.length / 3);
+  const start = iteration * proposalsPerIteration;
+  const end = (iteration + 1) * proposalsPerIteration;
+  const selectedProposals = allProposals.slice(start, end).filter(proposal => !proposal.archived);
 
   const spaceAdmin = await prisma.spaceRole.findFirstOrThrow({
     where: {
@@ -49,8 +44,8 @@ export async function declineAndArchiveProposals() {
 
   for (const proposal of selectedProposals) {
     const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+    let rubricEvaluationId: null | string = null;
     if (currentEvaluation?.type === "feedback") {
-      const nextEvaluation = proposal.evaluations[currentEvaluation.index + 1];
       await submitEvaluationResult({
         proposalId: proposal.id,
         evaluationId: currentEvaluation.id,
@@ -59,20 +54,28 @@ export async function declineAndArchiveProposals() {
         spaceId: proposal.spaceId
       })
 
+      rubricEvaluationId = proposal.evaluations[currentEvaluation.index + 1]?.id;
+    } 
+    // Skip the rubric evaluation if it has failed or passed
+    else if (currentEvaluation?.type === "rubric" && currentEvaluation.result === null) {
+      rubricEvaluationId = currentEvaluation.id;
+    }
+
+    if (rubricEvaluationId) {
       await submitEvaluationResult({
         proposalId: proposal.id,
-        evaluationId: nextEvaluation.id,
+        evaluationId: rubricEvaluationId,
         result: "fail",
         decidedBy: spaceAdminUserId,
         spaceId: proposal.spaceId
       })
-
-      await archiveProposals({
-        archived: true,
-        proposalIds: [proposal.id],
-        actorId: spaceAdminUserId
-      })
     }
+
+    await archiveProposals({
+      archived: true,
+      proposalIds: [proposal.id],
+      actorId: spaceAdminUserId
+    })
   }
 }
 
