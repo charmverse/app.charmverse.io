@@ -7,7 +7,7 @@ import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
-import { isProdEnv } from 'config/constants';
+import { isDevEnv, isStagingEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
@@ -23,36 +23,38 @@ import { externalCredentialChains, trackedCharmverseSchemas, trackedSchemas } fr
 // For a specific profile, only refresh attestations every half hour
 const defaultEASCacheDuration = 1800;
 
+const skipRedisCache = isStagingEnv || isDevEnv;
+
 const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloClient<any>> = {
   [optimism.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [sepolia.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [optimismSepolia.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism-sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [base.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'base-easscan',
     uri: 'https://base.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [arbitrum.id]: new ApolloClientWithRedisCache({
     uri: 'https://arbitrum.easscan.org/graphql',
     cacheKeyPrefix: 'arbitrum-easscan',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   })
 };
 
