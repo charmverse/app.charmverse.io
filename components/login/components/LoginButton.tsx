@@ -98,6 +98,7 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
         size='large'
         onClick={handleClickOpen}
         variant={showSignup ? 'outlined' : undefined}
+        data-test='signin-button'
       >
         Sign in
       </StyledButton>
