@@ -12,7 +12,11 @@ export type RubricAnswerUpsert = {
   answers: FieldAnswerInput[];
 };
 
-export async function upsertProposalFormAnswers({ answers, proposalId }: RubricAnswerUpsert) {
+export async function upsertProposalFormAnswers({
+  answers,
+  proposalId,
+  skipRequiredFieldCheck
+}: RubricAnswerUpsert & { skipRequiredFieldCheck?: boolean }) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   }
