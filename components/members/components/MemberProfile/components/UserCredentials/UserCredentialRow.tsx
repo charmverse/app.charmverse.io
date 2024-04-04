@@ -20,15 +20,13 @@ import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
 
-export function UserCredentialRow({
-  credential,
-  readOnly = false,
-  smallScreen
-}: {
+export type UserCredentialRowProps = {
   credential: EASAttestationWithFavorite;
   readOnly?: boolean;
   smallScreen?: boolean;
-}) {
+};
+
+export function UserCredentialRow({ credential, readOnly = false, smallScreen }: UserCredentialRowProps) {
   const isSmallScreen = useSmallScreen() || smallScreen;
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
