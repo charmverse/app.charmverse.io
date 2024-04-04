@@ -1,11 +1,13 @@
 import styled from '@emotion/styled';
-import { MoreHoriz } from '@mui/icons-material';
-import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Tab, Tabs, Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { ToggleViewSidebarButton } from 'components/common/DatabaseEditor/components/viewHeader/ToggleViewSidebarButton';
+import { StyledTab } from 'components/common/DatabaseEditor/components/viewHeader/viewTabs';
 import { iconForViewType } from 'components/common/DatabaseEditor/components/viewMenu';
+import { SortMenuButton } from 'components/common/DatabaseEditor/components/ViewSortControl';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import { CenteredPageContent } from 'components/common/PageLayout/components/PageContent';
 import { useFilteredMembers } from 'components/members/hooks/useFilteredMembers';
@@ -17,6 +19,8 @@ import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryV
 import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
 import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
 import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
+import type { SortValue } from './components/SortMenuItems';
+import { SortMenuItems } from './components/SortMenuItems';
 
 const StyledButton = styled(Button)`
   padding: ${({ theme }) => theme.spacing(0.5, 1)};
@@ -30,21 +34,36 @@ const StyledButton = styled(Button)`
 const views = ['gallery', 'table'] as const;
 type View = (typeof views)[number];
 
+const defaultSort = {
+  value: 'username' as const,
+  reversed: false
+};
+
 function memberNamePropertyValue(member: Member) {
   return member.username.startsWith('0x') ? `zzzzzzzz${member.username}` : member.username;
 }
 
-export default function MemberDirectoryPage({ title }: { title: string }) {
+export function MemberDirectoryPage({ title }: { title: string }) {
   const router = useRouter();
+  const [sortState, setSortState] = useState<{ value: SortValue; reversed: boolean }>(defaultSort);
   const [currentView, setCurrentView] = useState<View>((router.query.view as View) ?? 'gallery');
   const [isPropertiesDrawerVisible, setIsPropertiesDrawerVisible] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const filteredMembers = useFilteredMembers(searchQuery);
   const { hasAccess: showDirectory, isLoadingAccess } = useHasMemberLevel('member');
 
-  const sortedMembers = filteredMembers.sort((mem1, mem2) =>
-    memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1
-  );
+  const sortedMembers = useMemo(() => {
+    const result: Member[] = [...filteredMembers]; // using mutative methods below
+    if (sortState.value === 'username') {
+      result.sort((mem1, mem2) => (memberNamePropertyValue(mem1) > memberNamePropertyValue(mem2) ? 1 : -1));
+    } else if (sortState.value === 'join_date') {
+      result.sort((mem1, mem2) => (mem1.joinDate > mem2.joinDate ? 1 : -1));
+    }
+    if (sortState.reversed) {
+      result.reverse();
+    }
+    return result;
+  }, [sortState, filteredMembers]);
 
   if (isLoadingAccess) {
     return null;
@@ -60,48 +79,47 @@ export default function MemberDirectoryPage({ title }: { title: string }) {
         {title}
       </Typography>
       <MemberDirectorySearchBar onChange={setSearchQuery} />
-      <Stack flexDirection='row' justifyContent='space-between' mb={1}>
-        <Tabs
-          textColor='primary'
-          indicatorColor='secondary'
-          value={currentView}
-          sx={{ minHeight: 0, height: 'fit-content' }}
-        >
-          {views.map((view) => (
-            <Tab
-              component='div'
-              disableRipple
-              key={view}
-              label={
-                <StyledButton
-                  startIcon={iconForViewType(view)}
-                  onClick={() => {
-                    setCurrentView(view);
-                    setUrlWithoutRerender(router.pathname, { view });
-                  }}
-                  variant='text'
-                  size='small'
-                  color={currentView === view ? 'textPrimary' : 'secondary'}
-                >
-                  {view[0].toUpperCase() + view.slice(1)}
-                </StyledButton>
+      <Box mb={2}>
+        <div className='ViewHeader'>
+          <Tabs
+            textColor='primary'
+            indicatorColor='secondary'
+            // value={currentView}
+            value={false} // use false to disable the indicator
+            sx={{ minHeight: 0, mb: '-5px' }}
+          >
+            {views.map((view) => (
+              <StyledTab
+                key={view}
+                isActive={currentView === view}
+                icon={iconForViewType(view)}
+                label={view[0].toUpperCase() + view.slice(1)}
+                onClick={() => {
+                  setCurrentView(view);
+                  setUrlWithoutRerender(router.pathname, { view });
+                }}
+              />
+            ))}
+          </Tabs>
+          <div className='octo-spacer' />
+          <div className='view-actions'>
+            <SortMenuButton
+              // show sort if not using default
+              hasSort={sortState.value !== defaultSort.value || sortState.reversed !== defaultSort.reversed}
+              menuItems={
+                <SortMenuItems value={sortState.value} reversed={sortState.reversed} onChange={setSortState} />
               }
-              sx={{ p: 0, mb: '5px' }}
-              value={view}
             />
-          ))}
-        </Tabs>
-
-        <IconButton
-          onClick={() => {
-            setTimeout(() => {
-              setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
-            });
-          }}
-        >
-          <MoreHoriz color='secondary' />
-        </IconButton>
-      </Stack>
+            <ToggleViewSidebarButton
+              onClick={() => {
+                setTimeout(() => {
+                  setIsPropertiesDrawerVisible(!isPropertiesDrawerVisible);
+                });
+              }}
+            />
+          </div>
+        </div>
+      </Box>
       <Box position='relative' display='flex' height='100%'>
         <Box width='100%' overflow={currentView === 'table' ? 'auto' : 'visible'} height='fit-content'>
           {currentView === 'table' && <MemberDirectoryTableView members={sortedMembers} />}

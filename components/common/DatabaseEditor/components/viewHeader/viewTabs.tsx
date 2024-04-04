@@ -136,27 +136,55 @@ function ViewTab({
   view: BoardView;
   onClick: (event: MouseEvent<HTMLElement>) => void;
 }) {
-  const theme = useTheme();
   const [isDragging, isOver, columnRef] = useSortable<BoardView, HTMLButtonElement>('view', view, true, onDrop);
+  return (
+    <StyledTab
+      icon={iconForViewType(view.fields.viewType)}
+      label={view.title || formatViewTitle(view)}
+      href={href}
+      isActive={isActive}
+      onClick={onClick}
+      ref={columnRef}
+      sx={{ opacity: isDragging ? 0.5 : 1, backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial' }}
+    />
+  );
+}
+
+export function StyledTab({
+  icon,
+  label,
+  href,
+  isActive,
+  onClick,
+  ref,
+  sx
+}: {
+  icon?: JSX.Element;
+  label: string;
+  href?: string;
+  onClick: (event: MouseEvent<HTMLElement>) => void;
+  isActive?: boolean;
+  ref?: any;
+  sx?: any;
+}) {
   return (
     <TabButton
       className='disable-drag-selection'
-      ref={columnRef as any}
+      ref={ref}
       disableRipple
       href={href}
       onClick={onClick}
       variant='text'
       size='small'
-      data-view-id={view.id}
       sx={{
         p: 0,
+        opacity: 1,
         overflow: 'unset',
-        opacity: isDragging ? 0.5 : 1,
         transition: `background-color 150ms ease-in-out`,
-        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
         flexDirection: 'row',
         // The tab indicator is not shown anymore since its located in a separate component
-        borderBottom: `1px solid ${isActive ? theme.palette.text.primary : 'transparent'}`
+        borderBottom: `1px solid ${isActive ? 'var(--primary-text)' : 'transparent'}`,
+        ...sx
       }}
       label={
         <StyledTabContent
@@ -168,8 +196,8 @@ function ViewTab({
           gap={1}
         >
           <span>
-            {iconForViewType(view.fields.viewType)}
-            {view.title || formatViewTitle(view)}
+            {icon}
+            {label}
           </span>
         </StyledTabContent>
       }

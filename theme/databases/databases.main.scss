@@ -25,60 +25,60 @@
     background-color: rgba(var(--center-channel-color-rgb), 0.09);
     margin-bottom: 8px;
   }
+}
 
 
-  /* Main app */
+/* Main app */
 
-  .dragover {
-    background-color: rgba(128, 192, 255, 0.4);
+.dragover {
+  background-color: rgba(128, 192, 255, 0.4);
+}
+
+.octo-spacer {
+  flex: 1;
+}
+
+/* Icons */
+
+.octo-icontitle {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: 0;
+}
+
+/*-- Property list --*/
+
+.octo-propertyvalue {
+
+  &.empty {
+    color: rgba(var(--center-channel-color-rgb), 0.4);
   }
 
-  .octo-spacer {
-    flex: 1;
-  }
+  .IconButton.delete-value {
+    width: 16px;
+    min-width: 16px;
+    height: 16px;
 
-  /* Icons */
-
-  .octo-icontitle {
-    flex: 0 0 auto;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    min-width: 0;
-  }
-
-  /*-- Property list --*/
-
-  .octo-propertyvalue {
-
-    &.empty {
-      color: rgba(var(--center-channel-color-rgb), 0.4);
+    i {
+      font-size: 16px;
     }
-
-    .IconButton.delete-value {
-      width: 16px;
-      min-width: 16px;
-      height: 16px;
-
-      i {
-        font-size: 16px;
-      }
-    }
   }
+}
 
-  /*-- Editable --*/
+/*-- Editable --*/
 
-  .Editable {
-    cursor: text;
-  }
+.Editable {
+  cursor: text;
+}
 
-  .Editable.active {
-    min-width: 100px;
-  }
+.Editable.active {
+  min-width: 100px;
+}
 
-  .octo-propertyvalue.Editable.active,
-  .octo-table-cell .Editable.active {
-    border-radius: 3px;
-    box-shadow: rgba(15, 15, 15, 0.05) 0 0 0 1px, rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
-  }
+.octo-propertyvalue.Editable.active,
+.octo-table-cell .Editable.active {
+  border-radius: 3px;
+  box-shadow: rgba(15, 15, 15, 0.05) 0 0 0 1px, rgba(15, 15, 15, 0.1) 0 3px 6px, rgba(15, 15, 15, 0.2) 0 9px 24px;
 }
