@@ -95,11 +95,13 @@ const GET_EXTERNAL_CREDENTIALS = gql`
 function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | EasSchemaChain>({
   chainId,
   wallets,
-  schemas
+  schemas,
+  type = 'onchain'
 }: {
   schemas: Record<Chain, { schemaId: string; issuers?: string[] }[]>;
   chainId: Chain;
   wallets: string[];
+  type?: 'onchain' | 'charmverse';
 }): Promise<EASAttestationFromApi[]> {
   const recipient = wallets.map((w) => getAddress(w));
 
@@ -125,7 +127,7 @@ function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | Ea
         return {
           ...attestation,
           chainId,
-          type: 'onchain',
+          type,
           content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
             acc[val.name] = val.value.value;
             return acc;
@@ -146,14 +148,19 @@ export async function getCharmverseOnchainCredentials({
 }) {
   const charmverseAttestations = await Promise.all(
     (includeTestnets ? easSchemaChains : easSchemaMainnetChains.map((c) => c.id)).map((chainId) =>
-      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedCharmverseSchemas }).catch((err) => {
-        log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
-          wallets,
-          chainId,
-          error: err
-        });
-        return [] as EASAttestationFromApi[];
-      })
+      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedCharmverseSchemas, type: 'charmverse' }).catch(
+        (err) => {
+          log.error(
+            `Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`,
+            {
+              wallets,
+              chainId,
+              error: err
+            }
+          );
+          return [] as EASAttestationFromApi[];
+        }
+      )
     )
   ).then((results) => results.flat());
 
