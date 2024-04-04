@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { baseUrl } from 'config/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
 import { createPage } from 'testing/setupDatabase';
@@ -295,6 +296,7 @@ type UserAndSpaceInput = {
   skipOnboarding?: boolean;
   email?: string;
   memberSpacePermissions?: SpaceOperation[];
+  pageContent?: PageContent;
 };
 
 export async function generateUserAndSpace({
@@ -304,7 +306,8 @@ export async function generateUserAndSpace({
   publicBountyBoard,
   skipOnboarding = true,
   email = `${uuid()}@gmail.com`,
-  memberSpacePermissions
+  memberSpacePermissions,
+  pageContent
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -360,6 +363,7 @@ export async function generateUserAndSpace({
     spaceId: space.id,
     createdBy: user.id,
     title: 'Test Page',
+    content: pageContent,
     pagePermissions: [
       {
         spaceId: space.id,
