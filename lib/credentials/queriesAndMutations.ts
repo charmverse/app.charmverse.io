@@ -147,14 +147,16 @@ export async function getCharmverseOffchainCredentialsByWallets({
     return [];
   }
 
-  const charmverseCredentials: EASAttestationFromApi[] = await ceramicGraphQlClient
+  const lowerCaseWallets = wallets.map((w) => w.toLowerCase());
+
+  const charmverseCredentials: EASAttestationFromApi[] | null = await ceramicGraphQlClient
     .query({
       query: GET_CREDENTIALS,
       variables: {
         filter: {
           where: {
             schemaId: { in: [proposalCredentialSchemaId, rewardCredentialSchemaId] },
-            recipient: { in: wallets.map((w) => w.toLowerCase()) },
+            recipient: { in: lowerCaseWallets },
             issuer: { equalTo: credentialWalletAddress }
           }
         }
@@ -166,19 +168,37 @@ export async function getCharmverseOffchainCredentialsByWallets({
       response
         ? response.data.charmverseCredentialIndex.edges.map((e: any) => getParsedCredential(e.node))
         : Promise.reject(new Error('Unknown error'))
-    );
+    )
+    .catch((err) => {
+      log.error('Failed to fetch offchain credentials from ceramic', { error: err, wallets });
+      return null;
+    });
 
-  const credentialIds = charmverseCredentials.map((c) => c.id);
+  const credentialIds = charmverseCredentials?.map((c) => c.id);
 
   const issuedCredentials = await prisma.issuedCredential.findMany({
-    where: {
-      ceramicId: {
-        in: credentialIds
-      }
-    },
+    where: charmverseCredentials
+      ? {
+          ceramicId: {
+            in: credentialIds
+          }
+        }
+      : {
+          user: {
+            wallets: {
+              some: {
+                address: {
+                  in: wallets
+                }
+              }
+            }
+          }
+        },
     select: {
       id: true,
       ceramicId: true,
+      // Only fetch the saved record if we failed to fetch data from ceramic
+      ceramicRecord: !charmverseCredentials,
       onchainAttestationId: true,
       rewardApplication: {
         select: {
@@ -225,39 +245,42 @@ export async function getCharmverseOffchainCredentialsByWallets({
     }
   });
 
-  return (
-    charmverseCredentials
-      // Only display IPFS credentials for which we have a reference in our database, and which have not been attested on-chain
-      .filter(
-        (credentialFromCeramic) =>
-          !!issuedCredsMap[credentialFromCeramic.id] && !issuedCredsMap[credentialFromCeramic.id].onchainAttestationId
-      )
-      .map((credential) => {
-        const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
-        const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
-        const iconUrl =
-          (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
-          (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
+  const sourceData = charmverseCredentials
+    ? charmverseCredentials
+        // Only display IPFS credentials for which we have a reference in our database, and which have not been attested on-chain
+        .filter(
+          (credentialFromCeramic) =>
+            !!issuedCredsMap[credentialFromCeramic.id] && !issuedCredsMap[credentialFromCeramic.id].onchainAttestationId
+        )
+    : issuedCredentials
+        .filter((ic) => !!ic.ceramicRecord)
+        .map((cachedCred) => getParsedCredential(cachedCred.ceramicRecord as any as CredentialFromCeramic));
 
-        if (favoriteCredential) {
-          return {
-            ...credential,
-            iconUrl,
-            favoriteCredentialId: favoriteCredential.id,
-            index: favoriteCredential.index,
-            issuedCredentialId: issuedCredential?.id
-          };
-        }
+  return sourceData.map((credential) => {
+    const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
+    const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
+    const iconUrl =
+      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
+      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
 
-        return {
-          ...credential,
-          iconUrl,
-          favoriteCredentialId: null,
-          index: -1,
-          issuedCredentialId: issuedCredential?.id
-        };
-      })
-  );
+    if (favoriteCredential) {
+      return {
+        ...credential,
+        iconUrl,
+        favoriteCredentialId: favoriteCredential.id,
+        index: favoriteCredential.index,
+        issuedCredentialId: issuedCredential?.id
+      };
+    }
+
+    return {
+      ...credential,
+      iconUrl,
+      favoriteCredentialId: null,
+      index: -1,
+      issuedCredentialId: issuedCredential?.id
+    };
+  });
 }
 
 export async function getExternalCredentialsByWallets({

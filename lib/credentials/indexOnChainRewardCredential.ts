@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { CredentialEventType, IssuedCredential, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
@@ -124,8 +125,8 @@ export async function indexOnchainRewardCredentials({
   const attestationContract = getEasConnector(chainId).attestationContract;
 
   const attestationUids = receipt.logs
-    .filter((log) => lowerCaseEqual(log.address, attestationContract))
-    .map((_log) => _log.data);
+    .filter((txLog) => lowerCaseEqual(txLog.address, attestationContract))
+    .map((txLog) => txLog.data);
 
   const eas = await getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
@@ -133,9 +134,12 @@ export async function indexOnchainRewardCredentials({
   const credentials = await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return indexSingleOnchainRewardCredential({ attestationId: uid, chainId, eas });
+      return indexSingleOnchainRewardCredential({ attestationId: uid, chainId, eas }).catch((error) => {
+        log.error(`Failed to index credential ${uid} on ${chainId}`, { error });
+        return null;
+      });
     })
-  );
+  ).then((data) => data.filter(Boolean));
 
-  return credentials;
+  return credentials as IssuedCredential[];
 }

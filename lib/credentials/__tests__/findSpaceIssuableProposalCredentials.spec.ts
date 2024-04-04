@@ -64,6 +64,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
         schemaId: '0x1234',
         proposalIds: [proposal.id],
         space: { connect: { id: space.id } },
+        credentialType: 'proposal',
         credentialContent: {
           [proposal.id]: [
             {
@@ -85,6 +86,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
         schemaId: '0x1234',
         proposalIds: [proposal.id],
         space: { connect: { id: space.id } },
+        credentialType: 'proposal',
         credentialContent: {
           [proposal.id]: [
             {

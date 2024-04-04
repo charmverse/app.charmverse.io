@@ -14,6 +14,7 @@ import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
 import type { PartialIssuableRewardApplicationCredentialContent } from './findIssuableRewardCredentials';
 import { indexOnchainProposalCredentials } from './indexOnChainProposalCredential';
+import { indexOnchainRewardCredentials } from './indexOnChainRewardCredential';
 import type { IdenticalCredentialProps } from './saveIssuedCredential';
 import { rewardCredentialSchemaId } from './schemas/reward';
 
@@ -103,36 +104,46 @@ export type IndexableSafeTransaction = {
 
 export async function indexGnosisSafeCredentialTransaction({
   safeTxHash,
-  chainId,
-  indexer
-}: IndexableSafeTransaction & {
-  indexer: (input: { txHash: string; chainId: EasSchemaChain }) => Promise<IssuedCredential[]>;
-}): Promise<void> {
+  chainId
+}: IndexableSafeTransaction): Promise<void> {
+  const apiClient = await getSafeApiClient({ chainId });
+  const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
+
+  const onchainTxHash = pendingSafeTransaction?.transactionHash;
+
   const safetransactionInDb = await prisma.pendingSafeTransaction.findFirstOrThrow({
     where: {
       safeTxHash
     }
   });
 
-  const apiClient = await getSafeApiClient({ chainId });
-  const pendingSafeTransaction = await apiClient.getTransaction(safeTxHash);
+  if (!onchainTxHash) {
+    const safeInfo = await apiClient.getSafeInfo(pendingSafeTransaction.safe);
 
-  if (!pendingSafeTransaction) {
-    log.info(`Safe transaction ${safeTxHash} not found on chain ${chainId}`);
+    const safeNonce = safeInfo.nonce;
 
-    await prisma.pendingSafeTransaction.delete({
-      where: {
-        safeTxHash
-      }
-    });
+    if (safeNonce > pendingSafeTransaction.nonce) {
+      log.info(`Safe transaction ${safeTxHash} on chain ${chainId} has been replaced by another transaction`);
+      await prisma.pendingSafeTransaction.delete({
+        where: {
+          safeTxHash
+        }
+      });
+    } else {
+      log.info(`Safe transaction ${safeTxHash} on chain ${chainId} has not been confirmed yet`);
+    }
     return;
   }
 
-  const onchainTxHash = pendingSafeTransaction?.transactionHash;
+  const indexer =
+    safetransactionInDb.credentialType === 'reward'
+      ? indexOnchainRewardCredentials
+      : safetransactionInDb.credentialType === 'proposal'
+      ? indexOnchainProposalCredentials
+      : null;
 
-  if (!onchainTxHash) {
-    log.info(`Safe transaction ${safeTxHash} on chain ${chainId} has not been confirmed yet`);
-    return;
+  if (!indexer) {
+    throw new InvalidInputError(`Invalid credential type ${safetransactionInDb.credentialType}. Cannot index`);
   }
 
   const issuedCredentials = await indexer({
@@ -235,7 +246,7 @@ export async function indexGnosisSafeCredentialTransaction({
       }
     });
   } else {
-    // Mark this transaction as processed so we can refer to it later
+    // Mark this transaction as processed so we can debug it later
     await prisma.pendingSafeTransaction.update({
       where: { safeTxHash },
       data: { processed: true, credentialContent: newValues }
@@ -244,14 +255,18 @@ export async function indexGnosisSafeCredentialTransaction({
 }
 
 // First
-// indexSafeTransaction({
+// indexGnosisSafeCredentialTransaction({
 //   chainId: sepolia.id,
-//   safeTxHash: '0xe94b6caf24c7e14679df8c069be5c976c63648c0bb07cee63258ab556586b32b',
-//   indexer: indexOnchainProposalCredentials
+//   safeTxHash: '0x27a3bd51b76720fff43ab0c78240b4b31ad2ea12cddbbb12aa1bea8ab2f43aa8'
 // }).then(console.log);
 
 // Second
-// indexSafeTransaction({
+// indexGnosisSafeCredentialTransaction({
 //   chainId: sepolia.id,
-//   safeTxHash: '0xef1be00af76b2e898f3583e5fa8881c97615d30cd3e89f74d641793eb88cf0f3'
+//   safeTxHash: '0xa733df3fadac83e64ebbd028d9e323fd9e92612572fee756429174af71a23762'
+// }).then(console.log);
+
+// indexGnosisSafeCredentialTransaction({
+//   chainId: sepolia.id,
+//   safeTxHash: '0xe94b6caf24c7e14679df8c069be5c976c63648c0bb07cee63258ab556586b32b'
 // }).then(console.log);
