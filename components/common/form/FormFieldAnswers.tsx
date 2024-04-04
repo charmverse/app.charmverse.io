@@ -21,6 +21,7 @@ import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 
 import { fieldTypePlaceholderRecord } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
+import { FieldWrapper } from './fields/FieldWrapper';
 import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
@@ -182,48 +183,50 @@ export function FormFieldAnswersControlled({
               control={control}
               render={({ field }) =>
                 formField.type === 'project_profile' ? (
-                  <ProjectProfileInputField
-                    disabled={disabled}
-                    isDraft={isDraft}
-                    proposalId={proposalId}
-                    onProjectUpdate={onProjectUpdate}
-                    fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
-                    onChange={(projectFormValues) => {
-                      setIsFormDirty(true);
-                      onFormChange([
-                        {
-                          id: formField.id,
-                          value: projectFormValues
-                        }
-                      ]);
-                    }}
-                    inputEndAdornment={
-                      pageId &&
-                      formField.formFieldAnswer &&
-                      user && (
-                        <Box
-                          sx={{
-                            position: 'absolute',
-                            left: '100%',
-                            ml: {
-                              md: 1,
-                              xs: 0.5
-                            }
-                          }}
-                        >
-                          <FormFieldAnswerComment
-                            formFieldAnswer={formField.formFieldAnswer}
-                            pageId={pageId}
-                            formFieldName='Project profile'
-                            disabled={disabled}
-                            fieldAnswerThreads={fieldAnswerThreads}
-                            enableComments={enableComments}
-                          />
-                        </Box>
-                      )
-                    }
-                    project={project}
-                  />
+                  <FieldWrapper required label='Project'>
+                    <ProjectProfileInputField
+                      disabled={disabled}
+                      isDraft={isDraft}
+                      proposalId={proposalId}
+                      onProjectUpdate={onProjectUpdate}
+                      fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
+                      onChange={(projectFormValues) => {
+                        setIsFormDirty(true);
+                        onFormChange([
+                          {
+                            id: formField.id,
+                            value: projectFormValues
+                          }
+                        ]);
+                      }}
+                      inputEndAdornment={
+                        pageId &&
+                        formField.formFieldAnswer &&
+                        user && (
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              left: '100%',
+                              ml: {
+                                md: 1,
+                                xs: 0.5
+                              }
+                            }}
+                          >
+                            <FormFieldAnswerComment
+                              formFieldAnswer={formField.formFieldAnswer}
+                              pageId={pageId}
+                              formFieldName='Project profile'
+                              disabled={disabled}
+                              fieldAnswerThreads={fieldAnswerThreads}
+                              enableComments={enableComments}
+                            />
+                          </Box>
+                        )
+                      }
+                      project={project}
+                    />
+                  </FieldWrapper>
                 ) : (
                   <FieldTypeRenderer
                     {...field}

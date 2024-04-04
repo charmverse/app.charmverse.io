@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { ethers } from 'ethers';
 import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
@@ -34,7 +35,7 @@ function addMatchersToSchema({
         }
 
         if (value) {
-          return ethers.utils.isAddress(value) || value.endsWith('.eth');
+          return isAddress(value) || value.endsWith('.eth');
         }
 
         return true;
