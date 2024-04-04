@@ -10,6 +10,9 @@ export async function declineAndArchiveProposals() {
     where: {
       space: {
         domain: spaceDomain
+      },
+      page: {
+        type: "proposal"
       }
     },
     orderBy: {
