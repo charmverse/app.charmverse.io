@@ -22,15 +22,6 @@ import { MemberDirectoryTableView } from './components/MemberDirectoryTableView'
 import type { SortValue } from './components/SortMenuItems';
 import { SortMenuItems } from './components/SortMenuItems';
 
-const StyledButton = styled(Button)`
-  padding: ${({ theme }) => theme.spacing(0.5, 1)};
-
-  .Icon {
-    width: 20px;
-    height: 20px;
-  }
-`;
-
 const views = ['gallery', 'table'] as const;
 type View = (typeof views)[number];
 

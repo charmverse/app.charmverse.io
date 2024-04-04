@@ -18,7 +18,7 @@ const sortOptions: SortOptionItem[] = [
   },
   {
     value: 'username',
-    label: 'Username',
+    label: 'Name',
     iconType: 'text'
   }
 ];
