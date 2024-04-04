@@ -184,7 +184,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
         disabled={disableIssueCredentialRows}
         issuableCredentials={filteredCredentials ?? []}
         handleIssueCredentials={handleIssueCredentials}
-        label={`${rewardLabel} Created`}
+        label='Submission approved'
       />
       {publishingCredential && (
         <MenuItem sx={{ gap: 2 }}>
