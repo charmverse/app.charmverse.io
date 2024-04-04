@@ -2,13 +2,9 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { AttestationType, IssuedCredential, PendingSafeTransaction } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { JsonRpcProvider } from '@ethersproject/providers';
-import { getChainById } from 'connectors/chains';
-import { sepolia } from 'viem/chains';
 
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { uniqueValues } from 'lib/utils/array';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { type EasSchemaChain } from './connectors';
 import type { PartialIssuableProposalCredentialContent } from './findIssuableProposalCredentials';
@@ -16,7 +12,6 @@ import type { PartialIssuableRewardApplicationCredentialContent } from './findIs
 import { indexOnchainProposalCredentials } from './indexOnChainProposalCredential';
 import { indexOnchainRewardCredentials } from './indexOnChainRewardCredential';
 import type { IdenticalCredentialProps } from './saveIssuedCredential';
-import { rewardCredentialSchemaId } from './schemas/reward';
 
 type PendingCredentialContent<T extends AttestationType> = T extends 'proposal'
   ? PartialIssuableProposalCredentialContent
