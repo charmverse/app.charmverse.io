@@ -100,7 +100,7 @@ export function generateCredentialInputsForReward({
             pendingIssuableCred.event === 'reward_submission_approved' &&
             lowerCaseEqual(pendingIssuableCred.recipientAddress, targetWallet)
         ) ||
-        application.issuedCredentials.some(
+        !application.issuedCredentials.some(
           (cred) =>
             cred.userId === application.applicant.id &&
             cred.credentialTemplateId === credentialTemplateId &&
