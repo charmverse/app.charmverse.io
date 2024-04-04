@@ -3,7 +3,7 @@ import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmv
 import { v4 as uuid } from 'uuid';
 
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
-import { randomETHWallet } from 'lib/utils/blockchain';
+import { randomETHWallet, randomETHWalletAddress } from 'lib/utils/blockchain';
 
 import { proposalApprovedVerb, proposalCreatedVerb } from '../constants';
 import {
@@ -448,7 +448,8 @@ describe('generateCredentialInputsForProposal', () => {
         {
           credentialEvent: 'proposal_created',
           credentialTemplateId: credentialTemplateId1,
-          userId: authorId1
+          userId: authorId1,
+          onchainAttestationId: uuid()
         }
       ],
       page: { id: uuid() }
@@ -517,7 +518,8 @@ describe('generateCredentialInputsForProposal', () => {
         {
           credentialEvent: 'proposal_created',
           credentialTemplateId: credentialTemplateId1,
-          userId: authorId1
+          userId: authorId1,
+          onchainAttestationId: uuid()
         }
       ],
       page: { id: uuid() }
@@ -543,5 +545,75 @@ describe('generateCredentialInputsForProposal', () => {
 
     const result = generateCredentialInputsForProposal({ proposal, space });
     expect(result).toEqual([]);
+  });
+
+  it('should filter out credentials that were already issued onchain', async () => {
+    const userWallet = randomETHWalletAddress().toLowerCase();
+    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_created'],
+      schemaType: 'reward'
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [user.id],
+      proposalStatus: 'published',
+      selectedCredentialTemplateIds: [credentialTemplate.id],
+      evaluationInputs: [{ evaluationType: 'feedback', result: 'pass', permissions: [], reviewers: [] }]
+    });
+
+    const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
+    expect(result.length).toBe(1);
+
+    // Simulate having issued this credential already
+    await testUtilsCredentials.generateIssuedOnchainCredential({
+      credentialEvent: 'proposal_created',
+      credentialTemplateId: credentialTemplate.id,
+      proposalId: proposal.id,
+      userId: user.id
+    });
+
+    const resultAfterIssuedCredentialSaved = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
+
+    expect(resultAfterIssuedCredentialSaved).toHaveLength(0);
+  });
+
+  it('should return credentials that were only issued offchain but not yet onchain', async () => {
+    const userWallet = randomETHWalletAddress().toLowerCase();
+    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_created'],
+      schemaType: 'reward'
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      authors: [user.id],
+      proposalStatus: 'published',
+      selectedCredentialTemplateIds: [credentialTemplate.id],
+      evaluationInputs: [{ evaluationType: 'feedback', result: 'pass', permissions: [], reviewers: [] }]
+    });
+
+    const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
+    expect(result.length).toBe(1);
+
+    // Simulate having issued this credential already
+    await testUtilsCredentials.generateIssuedOffchainCredential({
+      credentialEvent: 'proposal_created',
+      credentialTemplateId: credentialTemplate.id,
+      proposalId: proposal.id,
+      userId: user.id
+    });
+
+    const resultAfterIssuedCredentialSaved = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
+
+    expect(resultAfterIssuedCredentialSaved).toHaveLength(1);
   });
 });

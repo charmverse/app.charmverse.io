@@ -210,6 +210,7 @@ describe('findSpaceIssuableRewardCredentials', () => {
         safeAddress: pseudoRandomHexString(),
         safeTxHash: pseudoRandomHexString(),
         schemaId: pseudoRandomHexString(),
+        credentialType: 'reward',
         rewardIds: [reward.id],
         credentialContent: {
           [reward.id]: [
@@ -259,7 +260,7 @@ describe('findSpaceIssuableRewardCredentials', () => {
     expect(result.length).toBe(0);
   });
 
-  it('should filter out credentials that were already issued', async () => {
+  it('should filter out credentials that were already issued onchain', async () => {
     const userWallet = randomETHWalletAddress().toLowerCase();
     const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
 
@@ -279,15 +280,44 @@ describe('findSpaceIssuableRewardCredentials', () => {
 
     const rewardApplication = reward.applications[0];
 
-    const secondRewardApplication = await generateBountyApplication({
-      applicationStatus: 'complete',
-      bountyId: reward.id,
-      spaceId: space.id,
+    const result = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
+    expect(result.length).toBe(1);
+
+    // Simulate having issued this credential already
+    await testUtilsCredentials.generateIssuedOnchainCredential({
+      credentialEvent: 'reward_submission_approved',
+      credentialTemplateId: credentialTemplate.id,
+      rewardApplicationId: rewardApplication.id,
       userId: user.id
     });
 
+    const resultAfterIssuedCredentialSaved = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
+
+    expect(resultAfterIssuedCredentialSaved).toHaveLength(0);
+  });
+
+  it('should return credentials that were only issued offchain but not yet onchain', async () => {
+    const userWallet = randomETHWalletAddress().toLowerCase();
+    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['reward_submission_approved'],
+      schemaType: 'reward'
+    });
+
+    const reward = await generateBountyWithSingleApplication({
+      bountyCap: null,
+      applicationStatus: 'complete',
+      spaceId: space.id,
+      userId: user.id,
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const rewardApplication = reward.applications[0];
+
     const result = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
-    expect(result.length).toBe(2);
+    expect(result.length).toBe(1);
 
     // Simulate having issued this credential already
     await testUtilsCredentials.generateIssuedOffchainCredential({
@@ -297,26 +327,8 @@ describe('findSpaceIssuableRewardCredentials', () => {
       userId: user.id
     });
 
-    const resultAfterPendingTx = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
+    const resultAfterIssuedCredentialSaved = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
 
-    expect(resultAfterPendingTx).toEqual<IssuableRewardApplicationCredentialContent[]>([
-      {
-        rewardId: reward.id,
-        credentialTemplateId: credentialTemplate.id,
-        event: 'reward_submission_approved',
-        rewardPageId: reward.page.id,
-        recipientAddress: userWallet,
-        recipientUserId: user.id,
-        // Important bit, make sure second application is unaffected
-        rewardApplicationId: secondRewardApplication.id,
-        credential: {
-          Description: credentialTemplate.description,
-          Event: 'Reward submission Approved',
-          Name: credentialTemplate.name,
-          Organization: credentialTemplate.organization,
-          rewardURL: getSubmissionPagePermalink({ submissionId: secondRewardApplication.id })
-        }
-      }
-    ]);
+    expect(resultAfterIssuedCredentialSaved.length).toBe(1);
   });
 });
