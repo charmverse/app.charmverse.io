@@ -5,8 +5,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from './board';
+import { excludedFieldTypes } from './setDatabaseProposalProperties';
 
-export function updateCardFormFieldPropertiesValue({
+export function getCardPropertiesFromAnswers({
   accessPrivateFields,
   formFields,
   cardProperties,
@@ -26,7 +27,8 @@ export function updateCardFormFieldPropertiesValue({
   for (const formField of filteredFormFields) {
     const cardProperty = cardProperties.find((p) => p.formFieldId === formField.id);
     const answerValue = formField.answers.find((ans) => ans.proposalId === proposalId)?.value as FormFieldValue;
-    if (formField.type !== 'label' && cardProperty) {
+    // exclude some field types
+    if (!excludedFieldTypes.includes(formField.type) && cardProperty) {
       if (formField.type === 'long_text') {
         properties[cardProperty.id] =
           (

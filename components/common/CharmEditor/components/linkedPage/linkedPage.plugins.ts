@@ -4,8 +4,8 @@ import { NodeView } from 'components/common/CharmEditor/components/@bangle.dev/c
 import { insertLinkedPage } from 'lib/prosemirror/insertLinkedPage';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltip';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
+import type { SuggestTooltipRenderOpts } from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipPlugin';
 
 import { linkedPageNodeName, linkedPageSuggestMarkName } from './linkedPage.constants';
 import type { LinkedPagePluginState } from './linkedPage.interfaces';

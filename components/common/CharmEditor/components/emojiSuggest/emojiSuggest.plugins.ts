@@ -4,7 +4,8 @@ import { Plugin, PluginKey } from 'prosemirror-state';
 import type { SpecRegistry } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 
 import { createTooltipDOM } from '../@bangle.dev/tooltip/createTooltipDOM';
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltip';
+import * as suggestTooltipPlugins from '../@bangle.dev/tooltip/suggestTooltipPlugin';
+import * as suggestTooltip from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { markName } from './emojiSuggest.constants';
 
@@ -20,7 +21,7 @@ function pluginsFactory({ key }: { key: PluginKey }) {
 
     const suggestTooltipKey = new PluginKey('suggestTooltipKey');
 
-    const tooltipRenderOpts: suggestTooltip.SuggestTooltipRenderOpts = {
+    const tooltipRenderOpts: suggestTooltipPlugins.SuggestTooltipRenderOpts = {
       getScrollContainer,
       placement: 'bottom-start'
     };
@@ -45,7 +46,7 @@ function pluginsFactory({ key }: { key: PluginKey }) {
           }
         }
       }),
-      suggestTooltip.plugins({
+      suggestTooltipPlugins.plugins({
         key: suggestTooltipKey,
         markName,
         trigger,

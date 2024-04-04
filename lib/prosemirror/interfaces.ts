@@ -1,7 +1,7 @@
 /* eslint-disable no-use-before-define */
 import type { PluginKey } from 'prosemirror-state';
 
-import type { PluginState as SuggestTooltipPluginState } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltip';
+import type { PluginState as SuggestTooltipPluginState } from 'components/common/CharmEditor/components/@bangle.dev/tooltip/suggestTooltipPlugin';
 
 export interface SuggestPluginState {
   tooltipContentDOM: HTMLElement;

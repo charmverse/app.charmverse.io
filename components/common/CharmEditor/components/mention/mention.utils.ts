@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
 
-import { replaceSuggestMarkWith } from '../@bangle.dev/tooltip/suggestTooltip';
+import { replaceSuggestMarkWith } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { UserDataPluginKey } from '../charm/charm.plugins';
 
 export function selectMention(key: PluginKey<SuggestPluginState>, mentionValue: string, mentionType: string): Command {
