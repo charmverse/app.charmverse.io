@@ -260,8 +260,9 @@ export async function getCharmverseOffchainCredentialsByWallets({
     const issuedCredential = issuedCredentials.find((ic) => ic.ceramicId === credential.id);
     const favoriteCredential = favoriteCredentials.find((fc) => fc.issuedCredentialId === issuedCredential?.id);
     const iconUrl =
-      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ??
-      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork;
+      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.credentialLogo ||
+      (issuedCredential?.proposal ?? issuedCredential?.rewardApplication?.bounty)?.space.spaceArtwork ||
+      null;
 
     if (favoriteCredential) {
       return {
