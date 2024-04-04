@@ -8,7 +8,7 @@ import { iconForPropertyType } from 'components/common/DatabaseEditor/widgets/ic
 import type { PropertyType } from 'lib/databases/board';
 
 export type SortValue = 'join_date' | 'username';
-type SortOptionItem = { value: SortValue; label: string; iconType: PropertyType };
+type SortOptionItem = { value: SortValue; label: string; iconType: PropertyType | 'title' };
 
 const sortOptions: SortOptionItem[] = [
   {
@@ -19,7 +19,7 @@ const sortOptions: SortOptionItem[] = [
   {
     value: 'username',
     label: 'Name',
-    iconType: 'text'
+    iconType: 'title'
   }
 ];
 

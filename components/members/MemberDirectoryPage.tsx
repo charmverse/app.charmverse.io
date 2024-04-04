@@ -16,8 +16,8 @@ import type { Member } from 'lib/members/interfaces';
 import { setUrlWithoutRerender } from 'lib/utils/browser';
 
 import { MemberDirectoryGalleryView } from './components/MemberDirectoryGalleryView';
-import { MemberPropertiesSidebar } from './components/MemberDirectoryProperties/MemberPropertiesSidebar';
 import { MemberDirectorySearchBar } from './components/MemberDirectorySearchBar';
+import { MemberPropertiesSidebar } from './components/MemberDirectorySidebar/MemberPropertiesSidebar';
 import { MemberDirectoryTableView } from './components/MemberDirectoryTableView';
 import type { SortValue } from './components/SortMenuItems';
 import { SortMenuItems } from './components/SortMenuItems';

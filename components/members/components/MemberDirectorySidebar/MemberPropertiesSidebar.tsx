@@ -4,8 +4,7 @@ import { ClickAwayListener, Collapse, Stack } from '@mui/material';
 import { DatabaseSidebarHeader } from 'components/common/DatabaseEditor/components/viewSidebar/databaseSidebarHeader';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 
-import { AddMemberPropertyButton } from '../AddMemberPropertyButton';
-
+import { AddMemberPropertyButton } from './AddMemberPropertyButton';
 import { MemberPropertySidebarItem } from './MemberPropertiesSidebarItem';
 
 const StyledSidebar = styled.div`
