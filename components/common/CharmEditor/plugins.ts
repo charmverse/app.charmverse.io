@@ -16,7 +16,7 @@ import * as disclosure from './components/disclosure';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import * as emoji from './components/emojiSuggest/emojiSuggest.plugins';
 import { plugins as filePlugins } from './components/file/file.plugins';
-import * as floatingMenu from './components/floatingMenu';
+import * as floatingMenu from './components/floatingMenu/floatingMenu.plugins';
 import * as hardBreak from './components/hardBreak';
 import * as heading from './components/heading';
 import * as horizontalRule from './components/horizontalRule';

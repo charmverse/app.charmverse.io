@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
-import { removeSuggestMark } from '../@bangle.dev/tooltip/suggestTooltip';
+import { removeSuggestMark } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { getSuggestTooltipKey } from './inlinePalette';
 import type { InlinePaletteItem } from './paletteItem';

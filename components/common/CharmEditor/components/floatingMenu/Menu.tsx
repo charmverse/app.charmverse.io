@@ -2,7 +2,7 @@ import styled from '@emotion/styled';
 import Paper from '@mui/material/Paper';
 import React from 'react';
 
-import type { SubMenu } from './floating-menu';
+import type { SubMenu } from './floatingMenuPlugin';
 
 const StyledMenu = styled(Paper, { shouldForwardProp: (prop: string) => prop !== 'noScroll' })<{
   type?: SubMenu;

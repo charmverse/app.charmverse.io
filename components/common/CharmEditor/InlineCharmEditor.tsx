@@ -18,13 +18,14 @@ import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
 import { pluginKeyName as emojiSuggestKeyName } from './components/emojiSuggest/emojiSuggest.constants';
 import { plugins as emojiPlugins } from './components/emojiSuggest/emojiSuggest.plugins';
 import * as emoji from './components/emojiSuggest/emojiSuggest.specs';
-import * as floatingMenu from './components/floatingMenu';
 import FloatingMenu from './components/floatingMenu/FloatingMenu';
+import * as floatingMenu from './components/floatingMenu/floatingMenu.plugins';
 import { plugins as linkPlugins } from './components/link/link.plugins';
 import { spec as linkSpec } from './components/link/link.specs';
 import { LinksPopup } from './components/link/LinksPopup';
-import { mentionPlugins, mentionSpecs, mentionPluginKeyName } from './components/mention';
+import { mentionPlugins, mentionPluginKeyName } from './components/mention';
 import { Mention, MentionsPopup } from './components/mention/components';
+import { mentionSpecs } from './components/mention/mention.specs';
 import { placeholderPlugin } from './components/placeholder/placeholder';
 import * as tabIndent from './components/tabIndent';
 

@@ -72,9 +72,10 @@ function Component({ menuState }: { menuState: PluginState }) {
     }
   }
 
-  const isHeadingNode =
-    menuState.rowPos !== undefined ? view.state.doc.resolve(menuState.rowPos)?.node()?.type.name === 'heading' : false;
-
+  let isHeadingNode = false;
+  if (menuState.rowPos !== undefined && menuState.rowPos >= 0 && menuState.rowPos <= view.state.doc.content.size) {
+    isHeadingNode = view.state.doc.resolve(menuState.rowPos)?.node()?.type.name === 'heading';
+  }
   async function copyLinkToBlock() {
     const rowPosition = menuState.rowPos;
     if (rowPosition === undefined) {

@@ -15,8 +15,8 @@ import * as link from '../link/link';
 import { defaultKeys as paragraphKeys, queryIsTopLevelParagraph, convertToParagraph } from '../paragraph/paragraph';
 import { getCSSColor, queryActiveColor } from '../textColor/textColorUtils';
 
-import type { SubMenu } from './floating-menu';
-import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput } from './floating-menu';
+import { defaultKeys as floatingMenuKeys, toggleSubMenu, focusFloatingMenuInput } from './floatingMenuPlugin';
+import type { SubMenu } from './floatingMenuPlugin';
 import { MenuButton } from './Icon';
 import {
   BoldIcon,
