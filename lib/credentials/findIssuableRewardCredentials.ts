@@ -24,7 +24,10 @@ export type RewardWithJoinedData = {
     createdBy: string;
     status: ApplicationStatus;
     applicant: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
-    issuedCredentials: Pick<IssuedCredential, 'userId' | 'credentialTemplateId' | 'credentialEvent'>[];
+    issuedCredentials: Pick<
+      IssuedCredential,
+      'userId' | 'credentialTemplateId' | 'credentialEvent' | 'onchainAttestationId'
+    >[];
   }[];
   page: {
     id: string;
@@ -100,11 +103,12 @@ export function generateCredentialInputsForReward({
             pendingIssuableCred.event === 'reward_submission_approved' &&
             lowerCaseEqual(pendingIssuableCred.recipientAddress, targetWallet)
         ) ||
-        !application.issuedCredentials.some(
+        application.issuedCredentials.some(
           (cred) =>
             cred.userId === application.applicant.id &&
             cred.credentialTemplateId === credentialTemplateId &&
-            cred.credentialEvent === 'reward_submission_approved'
+            cred.credentialEvent === 'reward_submission_approved' &&
+            cred.onchainAttestationId
         )
       ) {
         return;
@@ -171,7 +175,9 @@ export async function findSpaceIssuableRewardCredentials({
           id: true,
           createdBy: true,
           status: true,
-          issuedCredentials: { select: { userId: true, credentialTemplateId: true, credentialEvent: true } },
+          issuedCredentials: {
+            select: { userId: true, credentialTemplateId: true, credentialEvent: true, onchainAttestationId: true }
+          },
           applicant: {
             select: {
               id: true,

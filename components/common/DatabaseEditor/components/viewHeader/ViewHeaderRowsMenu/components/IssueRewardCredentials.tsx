@@ -46,8 +46,6 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
 
   const { space } = useCurrentSpace();
 
-  const rewardLabel = getFeatureTitle('Reward');
-
   const {
     issuableRewardCredentials,
     issueAndSaveRewardCredentials,

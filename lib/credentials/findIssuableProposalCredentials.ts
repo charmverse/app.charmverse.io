@@ -26,7 +26,10 @@ export type ProposalWithJoinedData = {
   authors: {
     author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
   }[];
-  issuedCredentials: Pick<IssuedCredential, 'userId' | 'credentialTemplateId' | 'credentialEvent'>[];
+  issuedCredentials: Pick<
+    IssuedCredential,
+    'userId' | 'credentialTemplateId' | 'credentialEvent' | 'onchainAttestationId'
+  >[];
   page: { id: string };
 };
 
@@ -114,7 +117,8 @@ export function generateCredentialInputsForProposal({
               (ic) =>
                 ic.userId === author.id &&
                 ic.credentialTemplateId === credentialTemplateId &&
-                ic.credentialEvent === event
+                ic.credentialEvent === event &&
+                !!ic.onchainAttestationId
             );
 
           if (canIssueCredential) {
@@ -162,7 +166,8 @@ function proposalCredentialInputFieldsSelect() {
       select: {
         userId: true,
         credentialTemplateId: true,
-        credentialEvent: true
+        credentialEvent: true,
+        onchainAttestationId: true
       }
     },
     selectedCredentialTemplates: true,
