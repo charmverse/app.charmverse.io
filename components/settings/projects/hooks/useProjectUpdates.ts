@@ -17,14 +17,14 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
   const project = projectsWithMembers?.find((_project) => _project.id === projectId);
   const isTeamLead = project?.projectMembers[0].userId === user?.id;
 
-  const { reset } = useFormContext<ProjectAndMembersPayload>();
+  const { reset, formState } = useFormContext<ProjectAndMembersPayload>();
 
   const { showMessage } = useSnackbar();
 
   const onProjectUpdate = useMemo(
     () =>
       debounce(async (projectAndMembersPayload: ProjectAndMembersPayload) => {
-        if (!projectId) {
+        if (!projectId || !formState.isValid) {
           return null;
         }
 
@@ -99,7 +99,7 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
           showMessage('Failed to update project', 'error');
         }
       }, 300),
-    [projectId]
+    [projectId, formState.isValid, user?.id, isTeamLead]
   );
 
   return {
