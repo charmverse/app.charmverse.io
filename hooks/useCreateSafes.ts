@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
-import Safe from '@safe-global/safe-core-sdk';
-import EthersAdapter from '@safe-global/safe-ethers-lib';
+import type ISafe from '@safe-global/safe-core-sdk';
 import { ethers } from 'ethers';
 import { useEffect, useState } from 'react';
 import { getAddress } from 'viem';
@@ -9,11 +8,14 @@ import { useWeb3Account } from 'hooks/useWeb3Account';
 import { isTruthy } from 'lib/utils/types';
 
 export function useCreateSafes(safeAddresses: string[]) {
-  const [safes, setSafes] = useState<Safe[]>([]);
+  const [safes, setSafes] = useState<ISafe[]>([]);
   const { account, signer } = useWeb3Account();
 
   async function loadSafes() {
     if (!signer) return;
+
+    const Safe = (await import('@safe-global/safe-core-sdk')).default;
+    const EthersAdapter = (await import('@safe-global/safe-ethers-lib')).default;
 
     const ethAdapter = new EthersAdapter({
       ethers,

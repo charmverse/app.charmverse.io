@@ -2,7 +2,8 @@
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { Dispatch, PropsWithChildren, SetStateAction } from 'react';
 import { useContext, createContext, useState, useMemo } from 'react';
-import { useAccount } from 'wagmi';
+
+import { useAccount } from 'hooks/wagmi';
 
 const Web3Connection = createContext({
   isWalletSelectorModalOpen: false,

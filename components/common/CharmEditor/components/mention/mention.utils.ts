@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import type { SuggestPluginState } from 'lib/prosemirror/interfaces';
 
-import { suggestTooltip } from '../@bangle.dev/tooltip';
+import { replaceSuggestMarkWith } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { UserDataPluginKey } from '../charm/charm.plugins';
 
 export function selectMention(key: PluginKey<SuggestPluginState>, mentionValue: string, mentionType: string): Command {
@@ -20,7 +20,7 @@ export function selectMention(key: PluginKey<SuggestPluginState>, mentionValue: 
       const suggestPluginState = key.getState(state);
       if (suggestPluginState) {
         const suggestTooltipKey = suggestPluginState.suggestTooltipKey;
-        return suggestTooltip.replaceSuggestMarkWith(suggestTooltipKey, mentionNode)(state, dispatch, view);
+        return replaceSuggestMarkWith(suggestTooltipKey, mentionNode)(state, dispatch, view);
       }
     }
     return false;

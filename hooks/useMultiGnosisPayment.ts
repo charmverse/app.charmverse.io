@@ -1,17 +1,13 @@
 import { SystemError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import type { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
-import EthersAdapter from '@safe-global/safe-ethers-lib';
-import SafeServiceClient from '@safe-global/safe-service-client';
 import { getChainById } from 'connectors/chains';
 import { ethers } from 'ethers';
 import { getAddress } from 'viem';
 
-import charmClient from 'charmClient';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { switchActiveNetwork } from 'lib/blockchain/switchNetwork';
 import { isMantleChain, proposeMantleSafeTransaction } from 'lib/gnosis/mantleClient';
-import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { isTruthy } from 'lib/utils/types';
 
 import { useCreateSafes } from './useCreateSafes';
@@ -57,8 +53,9 @@ export function useMultiGnosisPayment({
 
     // Increment tx Nonce
     const nonce = await safe.getNonce();
+    const { getSafeApiClient } = await import('lib/gnosis/safe/getSafeApiClient');
 
-    const client = getSafeApiClient({ chainId });
+    const client = await getSafeApiClient({ chainId });
 
     const pendingTx = await client.getPendingTransactions(safeAddress);
 
@@ -88,6 +85,9 @@ export function useMultiGnosisPayment({
         nonce: txNonce
       }
     });
+
+    const EthersAdapter = (await import('@safe-global/safe-ethers-lib')).default;
+    const SafeServiceClient = (await import('@safe-global/safe-service-client')).default;
 
     const txHash = await safe.getTransactionHash(safeTransaction);
     const senderSignature = await safe.signTransactionHash(txHash);

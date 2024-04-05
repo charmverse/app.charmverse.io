@@ -16,7 +16,6 @@ import { SidebarLink } from 'components/common/PageLayout/components/Sidebar/com
 import { useMemberProfileDialog } from 'components/members/hooks/useMemberProfileDialog';
 import { CharmsSettings } from 'components/settings/charms/CharmsSettings';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSettingsDialog, type SettingsPath } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -93,7 +92,6 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
   const switchSpaceMenu = usePopupState({ variant: 'popover', popupId: 'switch-space' });
   const { showUserProfile } = useMemberProfileDialog();
   const { onClose: closeSettingsDialog } = useSettingsDialog();
-  const isCharmverseSpace = useIsCharmverseSpace();
   return (
     <Box data-test-active-path={activePath} display='flex' flexDirection='row' flex='1' overflow='hidden' height='100%'>
       <Box
@@ -109,12 +107,7 @@ export function SettingsContent({ activePath, onClose, onSelectPath, setUnsavedC
         <Box mt={2} py={0.5}>
           <SectionName>Account</SectionName>
         </Box>
-        {ACCOUNT_TABS.filter((tab) => {
-          if (!isCharmverseSpace && tab.path === 'projects') {
-            return false;
-          }
-          return true;
-        }).map((tab) => (
+        {ACCOUNT_TABS.map((tab) => (
           <SidebarLink
             key={tab.path}
             data-test={`space-settings-tab-${tab.path}`}

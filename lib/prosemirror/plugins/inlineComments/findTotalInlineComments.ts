@@ -1,4 +1,4 @@
-import type { MarkType, Node, Schema } from '@bangle.dev/pm';
+import type { MarkType, Node, Schema } from 'prosemirror-model';
 import { findChildrenByMark, findChildrenByType } from 'prosemirror-utils';
 
 import type { ThreadWithComments } from 'lib/threads/interfaces';

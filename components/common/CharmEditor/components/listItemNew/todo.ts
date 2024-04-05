@@ -1,6 +1,8 @@
-import type { EditorState, Node, Schema, Transaction } from '@bangle.dev/pm';
-import { canJoin, findWrapping, InputRule } from '@bangle.dev/pm';
 import { filter } from '@bangle.dev/utils';
+import { InputRule } from 'prosemirror-inputrules';
+import type { Node, Schema } from 'prosemirror-model';
+import type { EditorState, Transaction } from 'prosemirror-state';
+import { canJoin, findWrapping } from 'prosemirror-transform';
 
 export const isNodeTodo = (node: Node, schema: Schema) => {
   return node.type === schema.nodes.list_item && typeof node.attrs.todoChecked === 'boolean';

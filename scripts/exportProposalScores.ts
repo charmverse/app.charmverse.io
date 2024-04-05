@@ -8,6 +8,7 @@ import { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rub
 import { writeToSameFolder } from 'lib/utils/file';
 import { isNumber } from 'lib/utils/numbers';
 import { isTruthy } from 'lib/utils/types';
+import { groupBy } from 'lodash';
 
 type ExportedProposal = {
   proposalUrl: string;
@@ -29,7 +30,8 @@ const exportedFormat: Record<ExportKeys, string> = {
   rubricResults: 'Rubric Results'
 };
 
-const exportedCustomProps: string[] = ['Mission'];
+const exportedCustomProps: string[] = ['Mission', 'Type'];
+const exportedCustomFields: string[] = ['What is the size of your grant request?'];
 
 const separator = ',';
 const cellEnclosure = '"';
@@ -47,8 +49,10 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     }
   });
 
+  const customProposalProperties = (customBlocks as ProposalBoardBlock)?.fields.cardProperties || [];
+
   const propertyMap = exportedCustomProps.reduce((acc, propName) => {
-    const property = (customBlocks as ProposalBoardBlock)?.fields.cardProperties.find((prop) => prop.name === propName);
+    const property = customProposalProperties.find((prop) => prop.name === propName);
 
     if (!property) {
       throw new Error(`Property ${propName} not found in board ${customBlocks?.id}`);
@@ -59,17 +63,33 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     return acc;
   }, {} as Record<string, ProposalPropertyField>);
 
+  const formFields = await prisma.formField.findMany({
+    where: {
+      form: {
+        proposal: {
+          some: {
+            space: {
+              domain
+            }
+          }
+        }
+      },
+      name: {
+        in: exportedCustomFields
+      }
+    }
+  });
+  const formFieldIdsByName = groupBy(formFields, (field) => field.name);
+
   const pageIds = await _getPageIdsFromDatabase();
 
   const proposals = await prisma.proposal.findMany({
     // where: {
     //   status: 'published',
-    //   rubricAnswers: {
-    //     some: {}
-    //   },
     //   page: {
+    //     deletedAt: null,
     //     createdAt: {
-    //       gte: new Date('2024-01-01')
+    //       gte: new Date('2024-03-13')
     //     },
     //     type: 'proposal',
     //     space: {
@@ -78,13 +98,16 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
     //   }
     // },
     where: {
+      status: 'published',
       page: {
+        deletedAt: null,
         id: {
           in: pageIds
         }
       }
     },
     include: {
+      formAnswers: true,
       rubricAnswers: true,
       rubricCriteria: {
         orderBy: {
@@ -111,7 +134,9 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
 
   console.log('Found', proposals.length, 'proposals to export');
 
-  const allContent = [[...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps]];
+  const allContent = [
+    [...headerRows.map((rowKey) => exportedFormat[rowKey]), ...exportedCustomProps, ...exportedCustomFields]
+  ];
 
   const aggregatedResultsByProposal = proposals.reduce((acc, proposal) => {
     const results = aggregateResults({
@@ -219,7 +244,21 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
         .replace(/;/g, ' ')}${cellEnclosure}`;
     });
 
-    return [...headerRows, ...exportedCustomProps].map((rowKey) => (row as any)[rowKey] as string);
+    exportedCustomFields.forEach((rowKey) => {
+      const fieldIds = (formFieldIdsByName[rowKey] || []).map((field) => field.id);
+      const match = p.formAnswers.find((answer) => fieldIds?.includes(answer.fieldId));
+      if (match) {
+        const valueStr = (match.value as any).contentText ?? match.value;
+        (row as any)[rowKey] = `${cellEnclosure}${valueStr
+          .replace(new RegExp(cellEnclosure, 'g'), '')
+          .replace(new RegExp(separator, 'g'), '')
+          .replace(/;/g, ' ')}${cellEnclosure}`;
+      }
+    });
+
+    return [...headerRows, ...exportedCustomProps, ...exportedCustomFields].map(
+      (rowKey) => (row as any)[rowKey] as string
+    );
   });
 
   allContent.push(...contentRows);
@@ -250,7 +289,8 @@ async function _getPageIdsFromDatabase() {
       page: true
     }
   });
-  const property = (board.fields as unknown as BoardFields).cardProperties.find((prop) => prop.name === 'R1 Final');
+  // console.log((board.fields as unknown as BoardFields).cardProperties);
+  const property = (board.fields as unknown as BoardFields).cardProperties.find((prop) => prop.name === 'Finalist');
   const yesOption = property?.options.find((opt) => opt.value === 'Yes');
   if (!yesOption || !property) {
     throw new Error('cannot find property or option');

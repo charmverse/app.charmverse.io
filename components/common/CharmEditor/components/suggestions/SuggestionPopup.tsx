@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import { useUser } from 'hooks/useUser';
 
-import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggest-tooltip';
+import { hideSuggestionsTooltip } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 import { ThreadContainer } from '../inlineComment/components/InlineCommentThread';
 
 import { getEventsFromDoc } from './getEvents';

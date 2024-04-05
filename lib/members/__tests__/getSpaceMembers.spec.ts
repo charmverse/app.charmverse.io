@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { createUserFromWallet } from 'lib/users/createUser';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { addUserToSpace, generateSpaceForUser } from 'testing/utils/spaces';
 
 import { createMemberProperty } from '../createMemberProperty';
@@ -9,8 +10,12 @@ import { getSpaceMembers } from '../getSpaceMembers';
 
 describe('getSpaceMembers', () => {
   it(`Should get space members based on custom member property value`, async () => {
-    const user1 = await createUserFromWallet();
-    const user2 = await createUserFromWallet();
+    const user1 = await createUserFromWallet({
+      address: randomETHWalletAddress()
+    });
+    const user2 = await createUserFromWallet({
+      address: randomETHWalletAddress()
+    });
     const space = await generateSpaceForUser({ user: user1 });
     await addUserToSpace({ spaceId: space.id, userId: user2.id, isAdmin: false });
 

@@ -132,7 +132,7 @@ describe('GET /api/v1/users/search', () => {
 
   it('should fail if user is not found or is not a part of the space', async () => {
     const randomEmail = 'random@example.com';
-    await createUserFromWallet({ email: randomEmail });
+    await createUserFromWallet({ email: randomEmail, address: randomETHWalletAddress() });
 
     await request(baseUrl)
       .get(`/api/v1/users/search?&email=${randomEmail}`)

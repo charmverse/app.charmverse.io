@@ -3,35 +3,66 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { removeProjectMember } from 'lib/projects/removeProjectMember';
+import { deleteProjectMember } from 'lib/projects/deleteProjectMember';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
+import { updateProjectMember } from 'lib/projects/updateProjectMember';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.use(requireUser).delete(removeProjectMemberController);
+handler.use(requireUser).delete(deleteProjectMemberController).put(updateProjectMemberController);
 
-async function removeProjectMemberController(req: NextApiRequest, res: NextApiResponse) {
-  const projectId = req.query.id as string;
-  const memberId = req.query.memberId as string;
-
-  const projectLead = await prisma.projectMember.findFirst({
+async function updateProjectMemberController(
+  req: NextApiRequest,
+  res: NextApiResponse<ProjectWithMembers['projectMembers'][number]>
+) {
+  const userId = req.session.user.id;
+  const projectMemberId = req.query.memberId as string;
+  await prisma.projectMember.findFirstOrThrow({
     where: {
-      teamLead: true,
-      projectId,
-      userId: req.session.user.id
+      id: projectMemberId,
+      userId
+    }
+  });
+  const projectMemberValues = req.body as ProjectAndMembersPayload['projectMembers'][0];
+
+  const projectMember = await updateProjectMember({
+    projectMemberValues
+  });
+
+  return res.status(200).send(projectMember);
+}
+
+async function deleteProjectMemberController(req: NextApiRequest, res: NextApiResponse) {
+  const userId = req.session.user.id;
+  const projectId = req.query.id as string;
+  const projectMemberId = req.query.memberId as string;
+  const project = await prisma.project.findUniqueOrThrow({
+    where: {
+      id: projectId
+    },
+    select: {
+      projectMembers: {
+        select: {
+          userId: true,
+          teamLead: true
+        }
+      }
     }
   });
 
-  if (!projectLead) {
-    throw new ActionNotPermittedError('Only team lead can remove project members');
+  const isUserProjectLead = project.projectMembers.find((member) => member.userId === userId)?.teamLead;
+  const isUserProjectMember = project.projectMembers.find((member) => member.userId === userId);
+
+  if (!isUserProjectLead && !isUserProjectMember) {
+    throw new ActionNotPermittedError('You are not allowed to delete project member');
   }
 
-  await removeProjectMember({
-    projectId,
-    memberId
+  await deleteProjectMember({
+    projectMemberId
   });
 
-  return res.status(201).end();
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

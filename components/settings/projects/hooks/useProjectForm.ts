@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
+import { useGetProjects } from 'charmClient/hooks/projects';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/constants';
@@ -11,9 +12,9 @@ import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
 import type {
   ProjectField,
   ProjectMemberField,
-  ProjectEditorFieldConfig,
+  ProjectAndMembersFieldConfig,
   ProjectWithMembers,
-  ProjectValues
+  ProjectAndMembersPayload
 } from 'lib/projects/interfaces';
 
 function addMatchersToSchema({
@@ -50,7 +51,7 @@ export function createProjectYupSchema({
   fieldConfig,
   defaultRequired = false
 }: {
-  fieldConfig: ProjectEditorFieldConfig;
+  fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
 }) {
   const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
@@ -58,9 +59,9 @@ export function createProjectYupSchema({
   projectFieldProperties.forEach((projectFieldProperty) => {
     const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
       required: defaultRequired,
-      hidden: false
+      show: true
     };
-    if (!projectFieldConfig.hidden) {
+    if (projectFieldConfig.show !== false) {
       if (projectFieldConfig.required) {
         yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string().required();
       } else {
@@ -78,9 +79,9 @@ export function createProjectYupSchema({
   projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
     const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
       required: defaultRequired,
-      hidden: false
+      show: true
     };
-    if (!projectMemberFieldConfig.hidden) {
+    if (projectMemberFieldConfig.show !== false) {
       if (projectMemberFieldConfig.required) {
         yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string().required();
       } else {
@@ -117,6 +118,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
     website: projectWithMembers.website,
     projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
       return {
+        warpcast: projectMember.warpcast,
         email: projectMember.email,
         github: projectMember.github,
         linkedin: projectMember.linkedin,
@@ -125,23 +127,30 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
         previousProjects: projectMember.previousProjects,
         telegram: projectMember.telegram,
         twitter: projectMember.twitter,
-        walletAddress: projectMember.walletAddress
+        walletAddress: projectMember.walletAddress,
+        id: projectMember.id,
+        userId: projectMember.userId
       };
     })
-  } as ProjectValues;
+  } as ProjectAndMembersPayload;
 }
 
 export function useProjectForm(options: {
-  defaultValues?: ProjectValues;
-  projectWithMembers?: ProjectWithMembers;
-  fieldConfig: ProjectEditorFieldConfig;
+  defaultValues?: ProjectAndMembersPayload;
+  fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
+  projectId?: string | null;
 }) {
-  const { defaultRequired, defaultValues, fieldConfig, projectWithMembers } = options;
+  const { defaultRequired, defaultValues, fieldConfig } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
+  const { data: projectsWithMembers } = useGetProjects();
+  const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
 
-  const defaultProjectValues = useMemo(() => getDefaultProjectValues({ user, membersRecord }), [user, membersRecord]);
+  const defaultProjectAndMembersPayload = useMemo(
+    () => getDefaultProjectValues({ user, membersRecord }),
+    [user, membersRecord]
+  );
 
   const yupSchema = useRef(yup.object());
 
@@ -160,12 +169,20 @@ export function useProjectForm(options: {
   }, [projectWithMembers]);
 
   const form = useForm({
-    defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectValues,
+    defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectAndMembersPayload,
     reValidateMode: 'onChange',
     resolver: yupResolver(yupSchema.current),
     criteriaMode: 'all',
     mode: 'onChange'
   });
+
+  useEffect(() => {
+    if (options.projectId) {
+      form.reset(projectWithMembers);
+    } else {
+      form.reset(defaultProjectAndMembersPayload);
+    }
+  }, [options.projectId]);
 
   return form;
 }

@@ -6,6 +6,7 @@ import useSWRImmutable from 'swr/immutable';
 import { getAddress } from 'viem';
 
 import type { MaybeString } from 'charmClient/hooks/helpers';
+import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { isSupportedSafeApiChain } from 'lib/gnosis/safe/isSupportedSafeApiChain';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
@@ -19,8 +20,7 @@ export function useGetGnosisSafe({ address, chainId }: { chainId: number; addres
 
   async function initSafeClient() {
     if (chainId && isSupportedSafeApiChain(chainId).supported) {
-      const { getSafeApiClient } = await import('lib/gnosis/safe/getSafeApiClient');
-      setSafeApiClient(getSafeApiClient({ chainId }));
+      setSafeApiClient(await getSafeApiClient({ chainId }));
     }
   }
 

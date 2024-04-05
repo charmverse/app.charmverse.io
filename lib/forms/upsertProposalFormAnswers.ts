@@ -12,7 +12,11 @@ export type RubricAnswerUpsert = {
   answers: FieldAnswerInput[];
 };
 
-export async function upsertProposalFormAnswers({ answers, proposalId }: RubricAnswerUpsert) {
+export async function upsertProposalFormAnswers({
+  answers,
+  proposalId,
+  skipRequiredFieldCheck
+}: RubricAnswerUpsert & { skipRequiredFieldCheck?: boolean }) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   }
@@ -56,8 +60,6 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
     throw new InvalidInputError(`All required fields must be answered`);
   }
 
-  const projectProfileValue = answersToSave.find((a) => a.type === 'project_profile')?.value as { projectId: string };
-
   const res = await prisma.$transaction([
     ...answersToSave.map((a) => {
       const field = form.formFields.find((f) => f.id === a.fieldId);
@@ -78,30 +80,7 @@ export async function upsertProposalFormAnswers({ answers, proposalId }: RubricA
         }
       });
     }),
-    prisma.formFieldAnswer.findMany({ where: { proposalId } }),
-    ...(projectProfileValue
-      ? projectProfileValue.projectId
-        ? [
-            prisma.proposal.update({
-              where: {
-                id: proposalId
-              },
-              data: {
-                projectId: projectProfileValue.projectId
-              }
-            })
-          ]
-        : [
-            prisma.proposal.update({
-              where: {
-                id: proposalId
-              },
-              data: {
-                projectId: null
-              }
-            })
-          ]
-      : [])
+    prisma.formFieldAnswer.findMany({ where: { proposalId } })
   ]);
 
   return res[res.length - 1];

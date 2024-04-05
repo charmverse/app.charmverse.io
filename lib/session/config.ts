@@ -1,6 +1,5 @@
 import type { IdentityType } from '@charmverse/core/prisma-client';
 import type { IronSession } from 'iron-session';
-import type { NextApiRequest as OriginalNextRequest } from 'next';
 
 export type SessionData = {
   // this data is only useful for authentication - it is not kept up-to-date!

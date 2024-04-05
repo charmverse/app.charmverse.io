@@ -15,6 +15,8 @@ import {
 import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+export const excludedFieldTypes = ['project_profile', 'label'];
+
 export async function setDatabaseProposalProperties({
   boardId,
   cardProperties
@@ -136,8 +138,9 @@ function getBoardProperties({
   currentCardProperties: IPropertyTemplate[];
   formFields?: FormField[];
 }) {
-  const boardProperties = [...currentCardProperties];
-
+  // TODO: we shouldn't have to filter out the excluded field types here after week of April 3, 2024.
+  // We should probably hav ea whitelist of form field answers that we support
+  const boardProperties = [...currentCardProperties].filter((prop) => !excludedFieldTypes.includes(prop.type));
   const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
   const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
   const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
@@ -240,12 +243,11 @@ function getBoardProperties({
         break;
       }
       default: {
-        if (formField.type !== 'label') {
+        if (!excludedFieldTypes.includes(formField.type)) {
           boardPropertyType = formField.type as IPropertyTemplate['type'];
         }
       }
     }
-
     if (boardPropertyType) {
       const boardProperty = {
         name: formField.name,
@@ -268,7 +270,6 @@ function getBoardProperties({
       }
     }
   });
-
   return boardProperties;
 }
 

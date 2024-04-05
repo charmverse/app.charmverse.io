@@ -1,5 +1,6 @@
-import type { FetchEnsAddressResult } from '@wagmi/core';
-import { fetchEnsAddress } from '@wagmi/core';
+import type { GetEnsAddressReturnType } from '@wagmi/core';
+import { getEnsAddress } from '@wagmi/core';
+import { wagmiConfig } from 'connectors/config';
 import { isValidName } from 'ethers/lib/utils';
 import { useCallback } from 'react';
 import type { Resolver } from 'react-hook-form';
@@ -28,7 +29,8 @@ export type FormValues = yup.InferType<typeof schema>;
 const defaultValues: FormValues = { contract: '', ensWallet: '' };
 
 export function useWalletForm() {
-  const resolveEnsAddress = async (ensName: string) => fetchEnsAddress({ chainId: 1, name: normalize(ensName) });
+  const resolveEnsAddress = async (ensName: string) =>
+    getEnsAddress(wagmiConfig, { chainId: 1, name: normalize(ensName) });
 
   const resolver = useCallback(
     (validationSchema: typeof schema): Resolver<FormValues> => customResolver(validationSchema, resolveEnsAddress),
@@ -46,7 +48,7 @@ export function useWalletForm() {
 
 function customResolver(
   validationSchema: typeof schema,
-  resolveEnsAddress: (ensName: string) => Promise<FetchEnsAddressResult>
+  resolveEnsAddress: (ensName: string) => Promise<GetEnsAddressReturnType>
 ): Resolver<FormValues> {
   return async (data: FormValues) => {
     try {
