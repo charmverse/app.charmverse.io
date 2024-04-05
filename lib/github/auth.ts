@@ -3,7 +3,7 @@ import { App } from '@octokit/app';
 import { Octokit } from 'octokit';
 
 export function getSpaceGithubCredential({ spaceId }: { spaceId: string }) {
-  return prisma.githubCredential.findFirst({
+  return prisma.spaceGithubCredential.findFirst({
     where: {
       spaceId
     }

@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { app } from 'lib/github/app';
 import { onError, InvalidStateError, onNoMatch, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -16,8 +17,11 @@ handler.use(requireUser).post(connectGithub);
 
 async function connectGithub(req: NextApiRequest, res: NextApiResponse<TelegramUser | { message: string }>) {
   // console.log('req', req.query, req.body);
-  const telegramAccount = req.body as TelegramAccount;
-
+  const githubAccount = req.body as TelegramAccount;
+  // const octokit = await app.getInstallationOctokit(INSTALLATION_ID);
+  const { token } = await app.createToken({
+    code: 'code123'
+  });
   const { id, ...rest } = telegramAccount;
   const userId = req.session.user.id;
 

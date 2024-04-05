@@ -1,12 +1,6 @@
 import { createNodeMiddleware } from 'octokit';
 
-import { App } from './app';
-
-const app = new App({
-  appId: 123,
-  privateKey: '__PRIVATE_KEY__',
-  webhooks: { secret: 'mysecret' }
-});
+import { app } from './app';
 
 app.webhooks.on('issues.opened', ({ octokit, payload }) => {
   // console.log('issues.opened event received', payload);
