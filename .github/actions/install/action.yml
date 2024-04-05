@@ -28,7 +28,7 @@ runs:
   steps:
     - uses: actions/setup-node@v4
       with:
-        node-version: 18
+        node-version: 18.19
 
     - name: Create .env.test.local file
       shell: bash

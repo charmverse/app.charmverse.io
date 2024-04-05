@@ -7,7 +7,6 @@ import { optimism } from 'viem/chains';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { signPublishAndRecordCharmverseCredential } from './attestOffchain';
 import { credentialEventLabels } from './constants';
@@ -15,7 +14,7 @@ import type { CredentialDataInput } from './schemas';
 
 const disablePublishedCredentials = process.env.DISABLE_PUBLISHED_CREDENTIALS === 'true';
 
-export async function issueProposalCredentialsIfNecessary({
+export async function issueOffchainProposalCredentialsIfNecessary({
   proposalId,
   event
 }: {
@@ -50,9 +49,6 @@ export async function issueProposalCredentialsIfNecessary({
       }
     }
   });
-  if (baseProposal.space.useOnchainCredentials) {
-    return;
-  }
 
   if (baseProposal.status === 'draft') {
     return;
@@ -126,7 +122,9 @@ export async function issueProposalCredentialsIfNecessary({
     proposalWithSpaceConfig.selectedCredentialTemplates.forEach((credentialTemplateId) => {
       const userHasNotReceivedCredential = !issuedCredentials.some(
         (issuedCredential) =>
-          issuedCredential.credentialTemplateId === credentialTemplateId && issuedCredential.userId === author.userId
+          issuedCredential.credentialTemplateId === credentialTemplateId &&
+          issuedCredential.userId === author.userId &&
+          !!issuedCredential.ceramicId
       );
       if (
         userHasNotReceivedCredential &&
@@ -208,8 +206,6 @@ export async function issueProposalCredentialsIfNecessary({
           credentialsToGiveUser,
           error: e
         });
-
-        prettyPrint(e);
       }
     }
   }

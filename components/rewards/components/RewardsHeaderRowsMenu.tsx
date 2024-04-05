@@ -244,6 +244,7 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       onChangeRewardsToken={onChangeRewardsToken}
       isMarkPaidDisabled={isMarkPaidDisabled}
       isMarkCompleteDisabled={isMarkCompleteDisabled}
+      showIssueRewardCredentials
     />
   );
 }

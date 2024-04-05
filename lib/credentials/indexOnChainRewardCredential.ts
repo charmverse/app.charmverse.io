@@ -7,22 +7,21 @@ import type { EAS } from '@ethereum-attestation-service/eas-sdk';
 import { JsonRpcProvider } from '@ethersproject/providers';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
-import { sepolia } from 'viem/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
 import { getEasConnector, getEasInstance, type EasSchemaChain } from './connectors';
-import { proposalApprovedVerb, proposalCreatedVerb } from './constants';
+import { rewardSubmissionApprovedVerb } from './constants';
 import { saveIssuedCredential } from './saveIssuedCredential';
-import type { ProposalCredential } from './schemas/proposal';
-import { decodeProposalCredential } from './schemas/proposal';
+import type { RewardCredential } from './schemas/reward';
+import { decodeRewardCredential } from './schemas/reward';
 
 type IndexableCredential = {
   attestationId: string;
 };
 
-async function indexSingleOnchainProposalCredential({
+async function indexSingleOnchainRewardCredential({
   chainId,
   attestationId,
   eas
@@ -32,62 +31,47 @@ async function indexSingleOnchainProposalCredential({
 }): Promise<IssuedCredential> {
   const attestation = await eas.getAttestation(attestationId);
 
-  const decodedContent = decodeProposalCredential(attestation.data) as ProposalCredential;
+  const decodedContent = decodeRewardCredential(attestation.data) as RewardCredential;
 
-  const pagePermalinkId = decodedContent.URL.split('/').pop();
+  const applicationPermalinkId = decodedContent.rewardURL.split('/').pop();
 
-  if (!pagePermalinkId || !stringUtils.isUUID(pagePermalinkId)) {
+  if (!applicationPermalinkId || !stringUtils.isUUID(applicationPermalinkId)) {
     throw new InvalidInputError(`Invalid page permalink ID for credential ${attestationId} on ${chainId}`);
   }
 
-  // Sanity check to ensure the proposal exists in our db
-  const proposal = await prisma.proposal.findFirstOrThrow({
+  // Sanity check to ensure the application exists in our db
+  const application = await prisma.application.findFirstOrThrow({
     where: {
-      page: {
-        id: pagePermalinkId,
-        type: 'proposal'
-      }
+      id: applicationPermalinkId
     },
     select: {
       id: true,
-      selectedCredentialTemplates: true,
-      spaceId: true,
       issuedCredentials: true,
-      space: {
+      bounty: {
         select: {
-          credentialsWallet: true
-        }
-      },
-      authors: {
-        where: {
-          author: {
-            wallets: {
-              some: {
-                address: attestation.recipient.toLowerCase()
-              }
+          id: true,
+          spaceId: true,
+          selectedCredentialTemplates: true,
+          space: {
+            select: {
+              credentialsWallet: true
             }
           }
         }
-      }
+      },
+      spaceId: true,
+      applicant: true
     }
   });
 
-  const existingCredential = proposal.issuedCredentials.find((c) => c.onchainAttestationId === attestationId);
+  const existingCredential = application.issuedCredentials.find((cred) => cred.onchainAttestationId === attestationId);
 
   if (existingCredential) {
     return existingCredential;
   }
 
-  if (!proposal.authors.length) {
-    throw new InvalidInputError(
-      `No author with wallet address ${attestation.recipient} found for proposal ${proposal.id}`
-    );
-  }
-
-  const credentialEvent: CredentialEventType | null = decodedContent.Event.match(proposalCreatedVerb)
-    ? 'proposal_created'
-    : decodedContent.Event.match(proposalApprovedVerb)
-    ? 'proposal_approved'
+  const credentialEvent: CredentialEventType | null = decodedContent.Event.match(rewardSubmissionApprovedVerb)
+    ? 'reward_submission_approved'
     : null;
 
   if (!credentialEvent) {
@@ -96,11 +80,11 @@ async function indexSingleOnchainProposalCredential({
 
   const matchingCredentialTemplate = await prisma.credentialTemplate.findFirstOrThrow({
     where: {
-      spaceId: proposal.spaceId,
+      spaceId: application.bounty.spaceId,
       name: decodedContent.Name,
       description: decodedContent.Description,
       id: {
-        in: proposal.selectedCredentialTemplates
+        in: application.bounty.selectedCredentialTemplates
       }
     }
   });
@@ -110,12 +94,12 @@ async function indexSingleOnchainProposalCredential({
       credentialEvent,
       credentialTemplateId: matchingCredentialTemplate.id,
       schemaId: attestation.schema,
-      userId: proposal.authors[0].userId,
-      proposalId: proposal.id
+      userId: application.applicant.id,
+      rewardApplicationId: application.id
     },
     onChainData: {
-      onchainAttestationId: attestationId,
-      onchainChainId: chainId
+      onchainChainId: chainId,
+      onchainAttestationId: attestationId
     }
   });
 
@@ -125,18 +109,15 @@ async function indexSingleOnchainProposalCredential({
 // Avoid spamming RPC with requests
 const limiter = RateLimit(10);
 
-export type ProposalCredentialsToIndex = {
+export type RewardCredentialsToIndex = {
   chainId: EasSchemaChain;
   txHash: string;
 };
 
-/**
- * Compatible with EOA transaction. Todo - Add support for safe
- */
-export async function indexOnchainProposalCredentials({
+export async function indexOnchainRewardCredentials({
   chainId,
   txHash
-}: ProposalCredentialsToIndex): Promise<IssuedCredential[]> {
+}: RewardCredentialsToIndex): Promise<IssuedCredential[]> {
   const publicClient = getPublicClient(chainId);
 
   const receipt = await publicClient.waitForTransactionReceipt({ hash: txHash as `0x${string}`, confirmations: 1 });
@@ -153,8 +134,9 @@ export async function indexOnchainProposalCredentials({
   const credentials = await Promise.all(
     attestationUids.map(async (uid) => {
       await limiter();
-      return indexSingleOnchainProposalCredential({ attestationId: uid, chainId, eas }).catch((e) => {
-        log.error(`Failed to index credential ${uid} on ${chainId}`, { error: e });
+      return indexSingleOnchainRewardCredential({ attestationId: uid, chainId, eas }).catch((error) => {
+        log.error(`Failed to index credential ${uid} on ${chainId}`, { error });
+        return null;
       });
     })
   ).then((data) => data.filter(Boolean));
