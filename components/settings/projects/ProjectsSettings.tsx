@@ -177,7 +177,7 @@ function ProjectRow({
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Stack width='100%' flexDirection='row' justifyContent='space-between' alignItems='center'>
             <Typography data-test={`project-title-${projectWithMembers.id}`}>
-              {projectWithMembers.name ?? 'Untitled'}
+              {projectWithMembers.name || 'Untitled'}
             </Typography>
             {!isTeamLead && (
               <Stack

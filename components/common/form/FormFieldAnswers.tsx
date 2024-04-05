@@ -5,15 +5,10 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import { useProjectUpdates } from 'components/settings/projects/hooks/useProjectUpdates';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type {
-  ProjectAndMembersFieldConfig,
-  ProjectAndMembersPayload,
-  ProjectWithMembers
-} from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
@@ -55,7 +50,6 @@ type FormFieldAnswersProps = {
   isDraft?: boolean;
   threads?: Record<string, ThreadWithComments | undefined>;
   project?: ProjectWithMembers | null;
-  onProjectUpdate?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
   proposalId?: string;
 };
 
@@ -74,14 +68,9 @@ export function FormFieldAnswers(
     fields: props.formFields
   });
 
-  const { onProjectUpdate } = useProjectUpdates({
-    projectId: props.project?.id
-  });
-
   return (
     <FormFieldAnswersControlled
       {...props}
-      onProjectUpdate={onProjectUpdate}
       control={control}
       errors={errors}
       onFormChange={onFormChange}
@@ -101,9 +90,7 @@ export function FormFieldAnswersControlled({
   onFormChange,
   pageId,
   project,
-  onProjectUpdate,
   threads = {},
-  isDraft,
   proposalId
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
@@ -186,9 +173,7 @@ export function FormFieldAnswersControlled({
                   <FieldWrapper required label='Project'>
                     <ProjectProfileInputField
                       disabled={disabled}
-                      isDraft={isDraft}
                       proposalId={proposalId}
-                      onProjectUpdate={onProjectUpdate}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                       onChange={(projectFormValues) => {
                         setIsFormDirty(true);
