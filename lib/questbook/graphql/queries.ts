@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const getGrantApplicationsQuery = gql`
   query getGrantApplicationsQuery(
-    $first: Int = 1000
+    $first: Int = 10000
     $skip: Int = 0
     $state: String = "approved"
     $startDate: Int = 1
