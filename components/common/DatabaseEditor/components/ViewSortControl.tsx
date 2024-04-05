@@ -1,5 +1,6 @@
 import { Menu } from '@mui/material';
 import { bindMenu, bindTrigger, type PopupState } from 'material-ui-popup-state/hooks';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { FormattedMessage } from 'react-intl';
 
 import { Button } from 'components/common/Button';
@@ -11,19 +12,35 @@ import type { Card } from 'lib/databases/card';
 import ViewHeaderSortMenu from './viewHeader/viewHeaderSortMenu';
 
 type Props = {
-  viewSortPopup: PopupState;
   activeView: BoardView;
   activeBoard?: Board;
   cards: Card[];
 };
 
-export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards }: Props) {
+export function ViewSortControl({ activeView, activeBoard, cards }: Props) {
   const sortOptions = useViewSortOptions(activeView);
+
+  return (
+    <SortMenuButton
+      hasSort={sortOptions?.length > 0}
+      menuItems={
+        <ViewHeaderSortMenu
+          properties={activeBoard?.fields.cardProperties ?? []}
+          activeView={activeView}
+          orderedCards={cards}
+        />
+      }
+    />
+  );
+}
+
+export function SortMenuButton({ hasSort, menuItems }: { hasSort: boolean; menuItems: React.ReactNode }) {
+  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   return (
     <>
       <Button
-        color={sortOptions?.length > 0 ? 'primary' : 'secondary'}
+        color={hasSort ? 'primary' : 'secondary'}
         variant='text'
         size='small'
         sx={{ minWidth: 0 }}
@@ -33,9 +50,12 @@ export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards 
       </Button>
       <Menu
         {...bindMenu(viewSortPopup)}
-        PaperProps={{
-          sx: {
-            overflow: 'visible'
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: 200,
+              overflow: 'visible'
+            }
           }
         }}
         anchorOrigin={{
@@ -48,11 +68,7 @@ export function ViewSortControl({ viewSortPopup, activeView, activeBoard, cards 
         }}
         onClick={() => viewSortPopup.close()}
       >
-        <ViewHeaderSortMenu
-          properties={activeBoard?.fields.cardProperties ?? []}
-          activeView={activeView}
-          orderedCards={cards}
-        />
+        {menuItems}
       </Menu>
     </>
   );
