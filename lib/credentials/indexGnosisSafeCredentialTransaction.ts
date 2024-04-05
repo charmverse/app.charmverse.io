@@ -248,20 +248,3 @@ export async function indexGnosisSafeCredentialTransaction({
     });
   }
 }
-
-// First
-// indexGnosisSafeCredentialTransaction({
-//   chainId: sepolia.id,
-//   safeTxHash: '0x27a3bd51b76720fff43ab0c78240b4b31ad2ea12cddbbb12aa1bea8ab2f43aa8'
-// }).then(console.log);
-
-// Second
-// indexGnosisSafeCredentialTransaction({
-//   chainId: sepolia.id,
-//   safeTxHash: '0xa733df3fadac83e64ebbd028d9e323fd9e92612572fee756429174af71a23762'
-// }).then(console.log);
-
-// indexGnosisSafeCredentialTransaction({
-//   chainId: sepolia.id,
-//   safeTxHash: '0xe94b6caf24c7e14679df8c069be5c976c63648c0bb07cee63258ab556586b32b'
-// }).then(console.log);
