@@ -1,8 +1,11 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { OverridableComponent } from '@mui/material/OverridableComponent';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
@@ -61,7 +64,7 @@ export function UserCredentialRow({
   const credentialInfo: {
     title: string;
     subtitle: string | string[];
-    iconUrl: string;
+    iconUrl: string | OverridableComponent<SvgIconTypeMap>;
     attestationContent: { name: string; value: string }[];
   } =
     credential.type === 'charmverse' && 'Organization' in charmCredential
@@ -73,11 +76,22 @@ export function UserCredentialRow({
         }
       : credential.type === 'charmverse' &&
         credential.schemaId === externalCredentialSchemaId &&
-        'GrantRound' in charmCredential
+        'GrantRound' in charmCredential &&
+        charmCredential.Source === 'Gitcoin'
       ? {
           title: charmCredential.Name,
           subtitle: ['Gitcoin Round', charmCredential.GrantRound],
-          iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
+          iconUrl: credential.iconUrl ?? '/images/logos/gitcoin-logo.png',
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+        }
+      : credential.type === 'charmverse' &&
+        credential.schemaId === externalCredentialSchemaId &&
+        'GrantRound' in charmCredential &&
+        charmCredential.Source === 'Questbook'
+      ? {
+          title: charmCredential.Name,
+          subtitle: ['Questbook Grant', charmCredential.GrantRound],
+          iconUrl: credential.iconUrl ?? WorkspacePremiumIcon,
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
       : credential.type === 'gitcoin'
@@ -150,12 +164,16 @@ export function UserCredentialRow({
 
   const credentialOrganizationComponent = (
     <>
-      <Image
-        src={credentialInfo.iconUrl}
-        alt='charmverse-logo'
-        height={isSmallScreen ? 40 : 30}
-        width={isSmallScreen ? 40 : 30}
-      />
+      {typeof credentialInfo.iconUrl === 'string' ? (
+        <Image
+          src={credentialInfo.iconUrl}
+          alt='charmverse-logo'
+          height={isSmallScreen ? 40 : 30}
+          width={isSmallScreen ? 40 : 30}
+        />
+      ) : (
+        <credentialInfo.iconUrl fontSize='large' />
+      )}
       <Box display='flex' flexDirection='column' flexGrow={1}>
         <Typography variant='body1' fontWeight='bold'>
           {credentialInfo.title}

@@ -27,7 +27,7 @@ import type { Member, Social } from 'lib/members/interfaces';
 
 import { useMemberProfileDialog } from '../hooks/useMemberProfileDialog';
 
-import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
+import { MemberPropertyTextMultiline } from './MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledTableCell = styled(TableCell)`

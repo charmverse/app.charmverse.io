@@ -78,16 +78,18 @@ export async function getProjectDetails({
 }
 
 export async function getProjectOwners(ownerAddresses: Owners, chainId: number) {
-  const promises = ownerAddresses.map((address) => getSafeOwners({ address, chainId }));
+  const promises = ownerAddresses.map(async (address) => {
+    const owners = await getSafeOwners({ address, chainId });
+
+    if (owners?.length) {
+      return owners;
+    }
+    return [address];
+  });
+
   const results = await Promise.all(promises);
 
-  const owners = results.reduce<Owners>((acc, o) => {
-    if (o?.length) {
-      return [...acc, ...o];
-    }
-
-    return acc;
-  }, []);
+  const owners = [...new Set(results.flat())];
 
   return owners;
 }

@@ -16,7 +16,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useUser } from 'hooks/useUser';
 import type { Member, Social } from 'lib/members/interfaces';
 
-import { MemberPropertyTextMultiline } from './MemberDirectoryProperties/MemberPropertyTextMultiline';
+import { MemberPropertyTextMultiline } from './MemberPropertyTextMultiline';
 import { TimezoneDisplay } from './TimezoneDisplay';
 
 const StyledBox = styled(Box)`
