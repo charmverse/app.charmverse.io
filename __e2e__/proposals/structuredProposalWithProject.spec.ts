@@ -166,8 +166,6 @@ test.describe.serial('Structured proposal template with project', () => {
       await proposalFormFieldPage.page.waitForTimeout(50);
     }
 
-    await proposalFormFieldPage.page.waitForTimeout(150);
-
     await proposalFormFieldPage.addNewFormFieldButton.click();
 
     await proposalFormFieldPage.getFormFieldNameInput(0).fill('Short Text');
@@ -252,21 +250,16 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-from-structured-template*');
 
-    const projectAfterUpdate1 = await prisma.project.findUniqueOrThrow({
+    let projectAfterUpdate = await prisma.project.findUniqueOrThrow({
       where: {
         id: project.id
       },
-      select: {
-        excerpt: true,
-        projectMembers: {
-          select: {
-            email: true
-          }
-        }
+      include: {
+        projectMembers: true
       }
     });
-    expect(projectAfterUpdate1.excerpt).toBe('This is my project');
-    expect(projectAfterUpdate1.projectMembers[0].email).toBe('john@gmail.com');
+    expect(projectAfterUpdate.excerpt).toBe('This is my project');
+    expect(projectAfterUpdate.projectMembers[0].email).toBe('john@gmail.com');
 
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     const pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects/);
@@ -275,22 +268,17 @@ test.describe.serial('Structured proposal template with project', () => {
     await pendingApiCall;
 
     // Assert that the project member values were auto updated
-    const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({
+    projectAfterUpdate = await prisma.project.findUniqueOrThrow({
       where: {
         id: project.id
       },
-      select: {
-        name: true,
-        projectMembers: {
-          select: {
-            email: true
-          }
-        }
+      include: {
+        projectMembers: true
       }
     });
 
-    expect(projectAfterUpdate2.name).toBe('Updated Project Name');
-    expect(projectAfterUpdate2.projectMembers[0].email).toBe('doe@gmail.com');
+    expect(projectAfterUpdate.name).toBe('Updated Project Name');
+    expect(projectAfterUpdate.projectMembers[0].email).toBe('doe@gmail.com');
   });
 
   test('Publish a structured proposal with a new project and update project fields', async ({
@@ -365,9 +353,11 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
 
-    await projectSettings.page.waitForTimeout(500);
+    await projectSettings.page.waitForResponse((response) => {
+      return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
+    });
 
-    const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({
+    const projectAfterUpdate = await prisma.project.findUniqueOrThrow({
       where: {
         id: createdProject.id
       },
@@ -376,7 +366,7 @@ test.describe.serial('Structured proposal template with project', () => {
       }
     });
 
-    expect(projectAfterUpdate2.excerpt).toBe('This is my project');
+    expect(projectAfterUpdate.excerpt).toBe('This is my project');
 
     await proposalFormFieldPage.clickProjectOption(project.id);
 

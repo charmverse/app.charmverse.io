@@ -93,7 +93,9 @@ test.describe.serial('Create and edit project from user settings', () => {
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[2].email', content: verifiedEmail });
 
     await projectSettings.saveNewProjectButton.click();
-    await projectSettings.page.waitForTimeout(500);
+    await projectSettings.page.waitForResponse((response) => {
+      return response.request().method() === 'POST' && /\/api\/projects/.test(response.url());
+    });
 
     const project = await prisma.project.findFirstOrThrow({
       where: {
@@ -149,7 +151,9 @@ test.describe.serial('Create and edit project from user settings', () => {
     const updatedWalletAddress = randomETHWallet().address;
     await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: updatedWalletAddress });
     await projectSettings.saveProjectButton.click();
-    await projectSettings.page.waitForTimeout(500);
+    await projectSettings.page.waitForResponse((response) => {
+      return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
+    });
 
     const updatedProject = await prisma.project.findFirstOrThrow({
       where: {
