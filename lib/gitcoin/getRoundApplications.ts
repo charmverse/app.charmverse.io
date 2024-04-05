@@ -59,8 +59,7 @@ export async function getRoundApplications(chainId: ChainId, startDate?: number)
 }
 
 export async function getRoundApplicationsWithMeta(chainId: ChainId) {
-  const yesterday = yesterdayUnixTimestamp();
-  const startDate = Math.round(yesterday);
+  const startDate = yesterdayUnixTimestamp();
   const applications = await getRoundApplications(chainId, startDate);
   const updatedApplications: ApplicationWithMetadata[] = [];
 
@@ -87,5 +86,5 @@ export async function getRoundApplicationsWithMeta(chainId: ChainId) {
 
 function yesterdayUnixTimestamp() {
   const yesterday = new Date().getTime() - 24 * 60 * 60 * 1000;
-  return yesterday / 1000;
+  return Math.round(yesterday / 1000);
 }
