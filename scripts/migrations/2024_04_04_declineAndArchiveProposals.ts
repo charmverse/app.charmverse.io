@@ -21,7 +21,11 @@ export async function declineAndArchiveProposals() {
       }
     },
     include: {
-      evaluations: true
+      evaluations: {
+        orderBy: {
+          index: "asc"
+        }
+      }
     }
   });
 
@@ -73,13 +77,13 @@ export async function declineAndArchiveProposals() {
         spaceId: proposal.spaceId
       })
     }
-
-    await archiveProposals({
-      archived: true,
-      proposalIds: [proposal.id],
-      actorId: spaceAdminUserId
-    })
   }
+
+  await archiveProposals({
+    archived: true,
+    proposalIds: selectedProposals.map(selectedProposal => selectedProposal.id),
+    actorId: spaceAdminUserId
+  })
 }
 
 declineAndArchiveProposals().then(() => console.log('Done'));
