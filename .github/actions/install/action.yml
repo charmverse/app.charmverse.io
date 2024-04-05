@@ -39,7 +39,7 @@ runs:
       uses: actions/cache/restore@v4
       with:
         path: ./node_modules
-        key: nodemodules-cache-key-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+        key: nodemodules-cache-k-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
 
     - name: Install npm dependencies
       shell: bash
@@ -85,4 +85,4 @@ runs:
       uses: actions/cache/save@v4
       with:
         path: ./node_modules
-        key: nodemodules-cache-key-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
+        key: nodemodules-cache-k-${{ hashFiles('package-lock.json') }}-${{ hashFiles('patches/**.patch', 'prisma/schema.prisma') }}
