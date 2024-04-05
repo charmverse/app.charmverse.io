@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getAddress } from 'viem';
 import { optimism } from 'viem/chains';
+import { getAddress } from 'viem/utils';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
 import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
@@ -52,14 +52,14 @@ export async function createOffchainCredentialsForProjects() {
           });
 
           try {
-            const cred = await signAndPublishCharmverseCredential({
+            await signAndPublishCharmverseCredential({
               credential: {
                 type: 'external',
                 data: {
                   Name: application.projectName,
                   ProjectId: externalProject.id,
                   Source: 'Questbook',
-                  Event: 'Approved',
+                  Event: 'Grant Approved',
                   GrantRound: application.grantTitle,
                   Date: credentialDate,
                   GrantURL: '',

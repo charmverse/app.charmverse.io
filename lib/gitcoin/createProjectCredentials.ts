@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getAddress } from 'viem';
 import { optimism } from 'viem/chains';
+import { getAddress } from 'viem/utils';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
 import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
