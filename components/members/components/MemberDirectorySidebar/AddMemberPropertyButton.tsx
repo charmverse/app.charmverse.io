@@ -2,7 +2,7 @@ import type { MemberPropertyType } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import { Button, Menu, MenuItem, Stack, TextField } from '@mui/material';
 import { bindMenu, usePopupState } from 'material-ui-popup-state/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOptionsList';
@@ -13,7 +13,7 @@ import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
 
-import { MemberPropertyItem } from './MemberDirectoryProperties/MemberPropertyItem';
+import { MemberPropertyItem } from './MemberPropertyItem';
 
 export function AddMemberPropertyButton() {
   const addMemberPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'member-property' });
@@ -46,17 +46,21 @@ export function AddMemberPropertyButton() {
     }
   }
 
-  const configurableProperties = Object.entries(MEMBER_PROPERTY_CONFIG).filter(([propertyType, propertyConfig]) => {
-    if (propertyConfig.default) {
-      return false;
-    }
-    // Read-only properties can only have one instance, join_date is an example
-    if (propertyConfig.readonly && properties?.find((property) => property.type === propertyType)) {
-      return false;
-    }
+  const configurableProperties = useMemo(
+    () =>
+      Object.entries(MEMBER_PROPERTY_CONFIG).filter(([propertyType, propertyConfig]) => {
+        if (propertyConfig.default) {
+          return false;
+        }
+        // Read-only properties can only have one instance, join_date is an example
+        if (propertyConfig.readonly && properties?.some((property) => property.type === propertyType)) {
+          return false;
+        }
 
-    return true;
-  });
+        return true;
+      }),
+    [properties]
+  );
 
   return (
     <>

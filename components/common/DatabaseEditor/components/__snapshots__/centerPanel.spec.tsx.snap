@@ -30,9 +30,7 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
-                    data-view-id="1"
-                    draggable="true"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -741,9 +739,7 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
-                    data-view-id="1"
-                    draggable="true"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -1202,9 +1198,7 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
-                    data-view-id="1"
-                    draggable="true"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -1913,9 +1907,7 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                   role="tablist"
                 >
                   <button
-                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
-                    data-view-id="1"
-                    draggable="true"
+                    class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
                     role="tab"
                     tabindex="-1"
                     type="button"

@@ -14,7 +14,7 @@ import { SelectOptionsList } from 'components/common/form/fields/Select/SelectOp
 import { isSelectType } from 'components/common/form/fields/utils';
 import Modal from 'components/common/Modal';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectoryProperties/MemberPropertySidebarDetails';
+import { MemberPropertySidebarDetails } from 'components/members/components/MemberDirectorySidebar/MemberPropertySidebarDetails';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';

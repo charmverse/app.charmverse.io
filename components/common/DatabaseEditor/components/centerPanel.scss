@@ -74,10 +74,6 @@
   }
 
   // hide view actions for embedded databases
-  .view-actions {
-    display: flex;
-    transition: opacity 0.2s ease-in-out;
-  }
 
   &.embedded-board .view-actions {
     opacity: 0;
@@ -86,4 +82,9 @@
   &.embedded-board:hover .view-actions {
     opacity: 1;
   }
+}
+
+.view-actions {
+  display: flex;
+  transition: opacity 0.2s ease-in-out;
 }

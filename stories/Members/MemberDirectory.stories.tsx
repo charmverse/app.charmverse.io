@@ -1,7 +1,7 @@
 import { rest } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
-import MemberDirectoryComponent from 'components/members/MemberDirectoryPage';
+import { MemberDirectoryPage as MemberDirectoryComponent } from 'components/members/MemberDirectoryPage';
 
 import { memberProperties } from '../lib/mockData';
 
