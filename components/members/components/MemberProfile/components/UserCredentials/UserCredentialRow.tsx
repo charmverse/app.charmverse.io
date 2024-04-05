@@ -45,7 +45,10 @@ export function UserCredentialRow({ credential, readOnly = false, smallScreen }:
       } else {
         await addFavorite({
           chainId: credential.chainId,
-          attestationId: credential.type === 'onchain' ? credential.id : undefined,
+          attestationId:
+            (credential.type === 'onchain' || credential.type === 'charmverse') && credential.id.startsWith('0x')
+              ? credential.id
+              : undefined,
           issuedCredentialId: credential.type === 'charmverse' ? credential.issuedCredentialId : undefined,
           gitcoinWalletAddress: credential.type === 'gitcoin' ? credential.recipient : undefined
         });
