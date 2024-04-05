@@ -290,11 +290,17 @@ export async function getExternalCredentialsByWallets({
         : Promise.reject(new Error('Unknown error'))
     );
 
-  return externalCredentials.map((credential) => ({
-    ...credential,
-    iconUrl: null,
-    favoriteCredentialId: null,
-    index: -1,
-    issuedCredentialId: undefined
-  }));
+  return externalCredentials
+    .map((credential) => ({
+      ...credential,
+      iconUrl: null,
+      favoriteCredentialId: null,
+      index: -1,
+      issuedCredentialId: undefined
+    }))
+    .filter(
+      (c) =>
+        !(c.content?.Name as string)?.toLowerCase().includes('test') &&
+        !(c.content?.Name as string)?.toLowerCase().includes('demo')
+    );
 }
