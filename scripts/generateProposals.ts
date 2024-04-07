@@ -70,10 +70,10 @@ async function generateRubricProposals({ spaceIdOrDomain, amount, complete, sele
 //   }
 // }).then(console.log)
 
-const spaceDomain = 'quick-jade-halibut'
+const spaceDomain = 'casual-orange-aardwolf'
 
-// generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['40e46dcc-f67a-4926-a250-1eb88752a870'] })
-// .then(console.log);
+generateRubricProposals({ amount: 10, spaceIdOrDomain: spaceDomain, complete: true, selectedCredentialTemplateIds: ['a6a700c7-4702-4e3b-84f2-a3a3dcaebf3a'] })
+.then(console.log);
 
 // prisma.proposal.updateMany({
 //   where: {

@@ -250,6 +250,9 @@ export async function generateUserAndSpace({
   };
 }
 
+/**
+ * @customPageId used for different reward and page ids to test edge cases where these ended up different
+ */
 export async function generateBounty({
   proposalId,
   content = undefined,
@@ -269,7 +272,8 @@ export async function generateBounty({
   type = 'bounty',
   id,
   allowMultipleApplications,
-  selectedCredentialTemplates
+  selectedCredentialTemplates,
+  customPageId
 }: Pick<Bounty, 'createdBy' | 'spaceId'> &
   Partial<
     Pick<
@@ -287,11 +291,13 @@ export async function generateBounty({
     >
   > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
+    customPageId?: string;
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
     page?: Partial<Pick<Page, 'deletedAt'>>;
   }): Promise<Bounty & { applications: ApplicationMeta[] }> {
-  const pageId = id ?? v4();
+  const rewardId = id ?? v4();
+  const pageId = customPageId ?? rewardId;
 
   const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(
     bountyPermissions
@@ -319,7 +325,7 @@ export async function generateBounty({
     // Step 1 - Initialise bounty with page and bounty permissions
     prisma.bounty.create({
       data: {
-        id: pageId,
+        id: rewardId,
         createdBy,
         allowMultipleApplications,
         chainId,
@@ -363,7 +369,7 @@ export async function generateBounty({
     })
   ]);
 
-  return getRewardOrThrow({ rewardId: pageId });
+  return getRewardOrThrow({ rewardId });
 }
 
 export async function generateComment({

@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
+import { issueOffchainRewardCredentialsIfNecessary } from 'lib/credentials/issueOffchainRewardCredentialsIfNecessary';
 import { InvalidInputError } from 'lib/utils/errors';
 
 import { paidRewardStatuses } from './constants';
@@ -41,7 +41,7 @@ export async function markRewardAsPaid(rewardId: string): Promise<RewardWithUser
     })
     .then(mapDbRewardToReward);
 
-  await issueRewardCredentialsIfNecessary({
+  await issueOffchainRewardCredentialsIfNecessary({
     event: 'reward_submission_approved',
     rewardId
   });

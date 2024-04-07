@@ -7,7 +7,6 @@ import type { SelectOption } from 'components/common/DatabaseEditor/components/p
 import type { ViewHeaderRowsMenuProps } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { ViewHeaderRowsMenu } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/ViewHeaderRowsMenu';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { ProposalEvaluationStep } from 'lib/proposals/interfaces';
@@ -33,8 +32,6 @@ export function ProposalsHeaderRowsMenu({
   const { proposalsMap } = useProposals();
   const { updateStatuses, updateSteps } = useBatchUpdateProposalStatusOrStep();
   const { trigger: archiveProposals } = useArchiveProposals();
-
-  const showIssueCredentials = useIsCharmverseSpace();
 
   let propertyTemplates: IPropertyTemplate<PropertyType>[] = [];
 
@@ -255,7 +252,7 @@ export function ProposalsHeaderRowsMenu({
       onChangeProposalsStatuses={onChangeProposalsStatuses}
       onChangeProposalsSteps={onChangeProposalsSteps}
       onArchiveProposals={onArchiveProposals}
-      showIssueProposalCredentials={!!showIssueCredentials}
+      showIssueProposalCredentials
     />
   );
 }
