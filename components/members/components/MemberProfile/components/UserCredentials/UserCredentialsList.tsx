@@ -3,13 +3,43 @@ import { Alert, Box, Card, Divider, Typography } from '@mui/material';
 import Stack from '@mui/material/Stack';
 
 import { useGetUserCredentials } from 'charmClient/hooks/credentials';
+import type { DraggableListItemProps } from 'components/common/DraggableListItem';
 import { DraggableListItem } from 'components/common/DraggableListItem';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 
+import type { UserCredentialRowProps } from './UserCredentialRow';
 import { UserCredentialRow } from './UserCredentialRow';
+
+function UserCredentialRowWithDivider({
+  credential,
+  smallScreen,
+  readOnly,
+  ...props
+}: UserCredentialRowProps & Partial<DraggableListItemProps>) {
+  const row = <UserCredentialRow credential={credential} smallScreen={smallScreen} readOnly={readOnly} />;
+
+  // Credential might be empty, so we don't want to render a list of dividers
+  if (row) {
+    if (props.changeOrderHandler && props.name && props.itemId) {
+      return (
+        <Box>
+          <DraggableListItem {...(props as any)}>{row}</DraggableListItem>
+          <Divider sx={{ mt: 1 }} />
+        </Box>
+      );
+    }
+    return (
+      <Box>
+        {row}
+        <Divider sx={{ mt: 1 }} />
+      </Box>
+    );
+  }
+  return null;
+}
 
 export function UserFavoriteList({
   credentials,
@@ -29,20 +59,21 @@ export function UserFavoriteList({
       <Stack gap={1}>
         {credentials.map((credential) =>
           !readOnly ? (
-            <DraggableListItem
+            <UserCredentialRowWithDivider
               key={credential.id}
               name='credentialItem'
               itemId={credential.favoriteCredentialId!}
               changeOrderHandler={reorderFavorites}
-            >
-              <UserCredentialRow smallScreen={smallScreen} credential={credential} />
-              <Divider sx={{ mt: 1 }} />
-            </DraggableListItem>
+              smallScreen={smallScreen}
+              credential={credential}
+            />
           ) : (
-            <Box key={credential.id}>
-              <UserCredentialRow smallScreen={smallScreen} readOnly credential={credential} />
-              <Divider sx={{ mt: 1 }} />
-            </Box>
+            <UserCredentialRowWithDivider
+              key={credential.id}
+              smallScreen={smallScreen}
+              readOnly
+              credential={credential}
+            />
           )
         )}
       </Stack>
@@ -62,10 +93,12 @@ export function UserAllCredentialsList({
   return (
     <Stack gap={1}>
       {credentials.map((credential) => (
-        <Box key={credential.id}>
-          <UserCredentialRow smallScreen={smallScreen} readOnly={readOnly} credential={credential} />
-          <Divider sx={{ mt: 1 }} />
-        </Box>
+        <UserCredentialRowWithDivider
+          key={credential.id}
+          smallScreen={smallScreen}
+          readOnly={readOnly}
+          credential={credential}
+        />
       ))}
     </Stack>
   );

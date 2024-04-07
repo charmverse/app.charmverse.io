@@ -26,7 +26,8 @@ export function CredentialsOnChainConfig({
 }: Props) {
   const validAddress = !credentialsWallet || isAddress(credentialsWallet);
 
-  const isCharmverseSpace = useIsCharmverseSpace();
+  // Enable testnets for test space
+  const showTestnets = useIsCharmverseSpace();
 
   return (
     <Grid container display='flex' justifyContent='flex-start' alignItems='center' gap={2}>
@@ -60,9 +61,10 @@ export function CredentialsOnChainConfig({
           <Grid item xs={4} style={{ minHeight: '72px' }}>
             {/* Added a minimum height */}
             <InputSearchBlockchain
-              chains={isCharmverseSpace ? [...easSchemaChains] : [...easSchemaMainnetChains.map((c) => c.id)]}
+              chains={showTestnets ? [...easSchemaChains] : [...easSchemaMainnetChains.map((c) => c.id)]}
               chainId={credentialsChainId as number}
               onChange={(chainId) => onChange({ credentialsChainId: chainId })}
+              disabled={readOnly}
             />
           </Grid>
           <Grid item xs={6} px={2}>

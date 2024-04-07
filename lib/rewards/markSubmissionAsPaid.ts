@@ -2,7 +2,7 @@ import { WrongStateError } from '@charmverse/core/errors';
 import type { Application } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { issueRewardCredentialsIfNecessary } from 'lib/credentials/issueRewardCredentialsIfNecessary';
+import { issueOffchainRewardCredentialsIfNecessary } from 'lib/credentials/issueOffchainRewardCredentialsIfNecessary';
 
 export async function markSubmissionAsPaid(submissionId: string): Promise<Application> {
   const submission = await prisma.application.findUniqueOrThrow({
@@ -19,7 +19,7 @@ export async function markSubmissionAsPaid(submissionId: string): Promise<Applic
     throw new WrongStateError(`Submission must be complete to be marked as paid`);
   }
 
-  await issueRewardCredentialsIfNecessary({
+  await issueOffchainRewardCredentialsIfNecessary({
     event: 'reward_submission_approved',
     rewardId: submission.bountyId,
     submissionId

@@ -5,10 +5,11 @@ import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
 import { typedKeys } from 'lib/utils/objects';
+import { pseudoRandomHexString } from 'lib/utils/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateBounty, generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
-import { issueRewardCredentialsIfNecessary } from '../issueRewardCredentialsIfNecessary';
+import { issueOffchainRewardCredentialsIfNecessary } from '../issueOffchainRewardCredentialsIfNecessary';
 import { publishSignedCredential, type PublishedSignedCredential } from '../queriesAndMutations';
 import { attestationSchemaIds } from '../schemas';
 
@@ -34,8 +35,8 @@ const mockedPublishSignedCredential = jest.mocked(publishSignedCredential);
 afterEach(() => {
   mockedPublishSignedCredential.mockClear();
 });
-describe.skip('issueRewardCredentialIfNecessary', () => {
-  it('should issue credentials once for a unique combination of user, reward submission and credential template', async () => {
+describe('issueRewardCredentialIfNecessary', () => {
+  it('should issue credentials once for a unique combination of user, reward submission, event and credential template', async () => {
     const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
@@ -72,12 +73,17 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       userId: submitter.id
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
+      event: 'reward_submission_approved',
+      rewardId: reward.id
+    });
+
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
@@ -144,6 +150,62 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
     );
   });
 
+  it('should issue the offchain credentials for a unique combination of user, reward submission, event and credential template if it exists onchain, but not offchain', async () => {
+    const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
+    });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['reward_submission_approved']
+    });
+
+    const reward = await generateBountyWithSingleApplication({
+      applicationStatus: 'complete',
+      bountyCap: null,
+      spaceId: space.id,
+      userId: rewardCreatorAndSubmitter.id,
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id]
+    });
+
+    const existingOnchainCredential = await testUtilsCredentials.generateIssuedOnchainCredential({
+      credentialEvent: 'reward_submission_approved',
+      credentialTemplateId: firstCredentialTemplate.id,
+      userId: rewardCreatorAndSubmitter.id,
+      rewardApplicationId: reward.applications[0].id,
+      onchainChainId: optimism.id,
+      onchainAttestationId: pseudoRandomHexString()
+    });
+
+    await issueOffchainRewardCredentialsIfNecessary({
+      event: 'reward_submission_approved',
+      rewardId: reward.id
+    });
+
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(1);
+
+    const issuedCredentials = await prisma.issuedCredential.findMany({
+      where: {
+        rewardApplicationId: reward.applications[0].id
+      }
+    });
+
+    // 2 event types * 2 credential templates * 2 authors
+    expect(issuedCredentials).toHaveLength(1);
+
+    expect(issuedCredentials).toMatchObject([
+      expect.objectContaining<Partial<IssuedCredential>>({
+        id: existingOnchainCredential.id,
+        userId: rewardCreatorAndSubmitter.id,
+        credentialEvent: 'reward_submission_approved',
+        credentialTemplateId: firstCredentialTemplate.id,
+        ceramicId: expect.any(String),
+        onchainChainId: existingOnchainCredential.onchainChainId,
+        onchainAttestationId: existingOnchainCredential.onchainAttestationId
+      })
+    ]);
+  });
+
   it('should target only a specific submission if this parameter is provided credentials once for a unique combination of user, reward submission and credential template', async () => {
     const { space, user: rewardCreatorAndSubmitter } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),
@@ -177,13 +239,13 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       userId: submitter.id
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id,
       submissionId: submitterApplication.id
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id,
       submissionId: submitterApplication.id
@@ -249,7 +311,7 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       userId: submitter.id
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
@@ -290,7 +352,7 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       selectedCredentialTemplateIds: [firstCredentialTemplate.id, secondCredentialTemplate.id]
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
@@ -304,7 +366,7 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       userId: submitter.id
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
@@ -377,7 +439,7 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       selectedCredentialTemplateIds: [firstCredentialTemplate.id, inexistentCredentialId]
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
@@ -425,7 +487,7 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       selectedCredentialTemplateIds: [firstCredentialTemplate.id]
     });
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
@@ -475,7 +537,7 @@ describe.skip('issueRewardCredentialIfNecessary', () => {
       generatedApplications[applicationStatus] = application;
     }
 
-    await issueRewardCredentialsIfNecessary({
+    await issueOffchainRewardCredentialsIfNecessary({
       event: 'reward_submission_approved',
       rewardId: reward.id
     });
