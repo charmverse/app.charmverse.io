@@ -91,7 +91,7 @@ export function UserCredentialRow({ credential, readOnly = false, smallScreen }:
         charmCredential.Source === 'Questbook'
       ? {
           title: charmCredential.Name,
-          subtitle: ['Questbook Grant', charmCredential.GrantRound],
+          subtitle: charmCredential.GrantRound,
           iconUrl: credential.iconUrl ?? WorkspacePremiumIcon,
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }

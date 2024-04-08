@@ -48,7 +48,7 @@ cron.schedule('0 1 * * *', updateMixpanelProfilesTask);
 cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 // Create external eas credentials for Gitcoin and Questbook every day at midnight
-// cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
+cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
 const port = process.env.PORT || 4000;
 
