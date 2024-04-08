@@ -28,7 +28,7 @@ import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
-import { ProjectFormAnswers } from './components/ProjectForm';
+import { SettingsProjectFormAnswers } from './components/ProjectForm';
 import { useProjectForm } from './hooks/useProjectForm';
 
 function ProjectRow({
@@ -202,11 +202,7 @@ function ProjectRow({
         </AccordionSummary>
         <AccordionDetails>
           <FormProvider {...form}>
-            <ProjectFormAnswers
-              defaultRequired={false}
-              isTeamLead={isTeamLead}
-              fieldConfig={defaultProjectAndMembersFieldConfig}
-            />
+            <SettingsProjectFormAnswers isTeamLead={isTeamLead} />
           </FormProvider>
         </AccordionDetails>
       </Accordion>

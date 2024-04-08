@@ -15,7 +15,7 @@ export function ProjectFieldAnswers({
   disabled?: boolean;
   fieldConfig?: FieldConfig;
   defaultRequired?: boolean;
-  onChange?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
+  onChange?: (updatedProjectValues: Record<string, any>) => any;
 }) {
   const { getValues } = useFormContext<ProjectAndMembersPayload>();
   return (
@@ -26,11 +26,7 @@ export function ProjectFieldAnswers({
       properties={projectFieldProperties}
       onChange={(updatedProject) => {
         if (onChange) {
-          const projectWithMembers = getValues();
-          onChange({
-            ...projectWithMembers,
-            ...updatedProject
-          });
+          onChange(updatedProject);
         }
       }}
     />

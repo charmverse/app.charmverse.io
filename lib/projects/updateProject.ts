@@ -46,8 +46,8 @@ export async function updateProject({
     (memberId) => !payloadProjectMemberIds.includes(memberId)
   );
 
-  for (const _ of deletedProjectMembersIds) {
-    trackUserAction('remove_project_member', { userId, projectId });
+  for (const projectMemberId of deletedProjectMembersIds) {
+    trackUserAction('remove_project_member', { userId, projectId, projectMemberId });
   }
 
   const projectMemberUpdateTransactions: Prisma.Prisma__ProjectMemberClient<ProjectMember, never>[] = [];

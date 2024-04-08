@@ -47,7 +47,6 @@ export function useNewProposal({ newProposal }: Props) {
     // Only set the initial state with fields when we are creating a structured proposal
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
-
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
 
