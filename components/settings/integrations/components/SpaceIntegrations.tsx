@@ -1,4 +1,4 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { KycOption, Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -6,23 +6,21 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import {
-  useGetKycCredentials,
-  useUpdateSpace,
-  useUpdateKycCredentials,
-  useDeleteKycCredentials
-} from 'charmClient/hooks/spaces';
+import { useGetKycCredentials, useUpdateSpace, useUpdateKycCredentials } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
+import type { KycCredentials } from 'lib/kyc/getKycCredentials';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { isTruthy } from 'lib/utils/types';
 
 import { ConnectBoto } from './ConnectBoto';
 import { ConnectCollabland } from './ConnectCollabland';
 import { SnapshotIntegration } from './SnapshotDomain';
-import { SpaceCompliance } from './SpaceKyc';
+import { SpaceKyc } from './SpaceKyc';
+import { SynapsModal } from './SynapsModal';
 
 const schema = yup.object({
   snapshotDomain: yup
@@ -36,8 +34,13 @@ const schema = yup.object({
       }
       return true;
     }),
-  synapsCredentialApiKey: yup.string(),
-  synapsCredentialSecret: yup.string().nullable()
+  kycOption: yup.string<KycOption>().oneOf(['synaps', 'persona']),
+  synapsApiKey: yup.string(),
+  synapsSecret: yup.string().nullable(),
+  personaApiKey: yup.string().nullable(),
+  personaSecret: yup.string().nullable(),
+  personaTemplateId: yup.string().nullable(),
+  personaEnvironmentId: yup.string().nullable()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -45,61 +48,75 @@ export type FormValues = yup.InferType<typeof schema>;
 export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const { data: synapsCredential, mutate: mutateKycCredentials } = useGetKycCredentials(space.id);
-  const { trigger: updateKycCredential, isMutating: kycCredentialsLoading } = useUpdateKycCredentials(space.id);
-  const { trigger: deleteKycCredential } = useDeleteKycCredentials(space.id);
-  const synapsCredentialApiKey = synapsCredential?.apiKey;
-  const synapsCredentialSecret = synapsCredential?.secret;
+  const { data: kycCredentials, mutate: mutateKycCredentials } = useGetKycCredentials(space.id);
+  const { trigger: updateKycCredential, isMutating: kycUpdateCredentialsLoading } = useUpdateKycCredentials(space.id);
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
+  const isAllowedSpace = useIsCharmverseSpace();
   const {
     handleSubmit,
     reset,
     control,
-    setValue,
     formState: { isDirty, dirtyFields }
   } = useForm<FormValues>({
     defaultValues: {
       snapshotDomain: space.snapshotDomain,
-      synapsCredentialApiKey,
-      synapsCredentialSecret
+      kycOption: space.kycOption || undefined
     },
     resolver: yupResolver(schema),
     mode: 'onSubmit'
   });
 
   useEffect(() => {
-    if (synapsCredentialApiKey || synapsCredentialSecret) {
-      setValue('synapsCredentialApiKey', synapsCredentialApiKey);
-      setValue('synapsCredentialSecret', synapsCredentialSecret);
-    }
-  }, [synapsCredentialApiKey, synapsCredentialSecret]);
+    reset(getDefaultValues(kycCredentials));
+  }, [
+    kycCredentials?.synaps?.apiKey,
+    kycCredentials?.synaps?.secret,
+    kycCredentials?.persona?.apiKey,
+    kycCredentials?.persona?.secret,
+    kycCredentials?.persona?.templateId,
+    kycCredentials?.persona?.envId
+  ]);
 
   const onSubmit = async (values: FormValues) => {
     if (!isAdmin || !isDirty) {
       return;
     }
 
-    if (dirtyFields.snapshotDomain) {
-      await updateSpace({ snapshotDomain: values.snapshotDomain }, { onSuccess: () => refreshCurrentSpace() });
+    if (dirtyFields.snapshotDomain || dirtyFields.kycOption) {
+      await updateSpace(
+        { snapshotDomain: values.snapshotDomain, kycOption: values.kycOption },
+        { onSuccess: () => refreshCurrentSpace() }
+      );
     }
 
-    // Delete synaps credential if the user doesn't want it anymore
-    if (synapsCredential?.apiKey && !values.synapsCredentialApiKey) {
-      await deleteKycCredential(undefined, { onSuccess: () => mutateKycCredentials() });
-    }
-
-    if ((dirtyFields.synapsCredentialApiKey || dirtyFields.synapsCredentialSecret) && values.synapsCredentialApiKey) {
-      const synapsPayload = {
-        apiKey: values.synapsCredentialApiKey ?? '',
-        secret: values.synapsCredentialSecret ?? ''
+    if (
+      dirtyFields.synapsApiKey ||
+      dirtyFields.synapsSecret ||
+      dirtyFields.personaApiKey ||
+      dirtyFields.personaSecret ||
+      dirtyFields.personaTemplateId ||
+      dirtyFields.personaEnvironmentId
+    ) {
+      const synapsPayload: KycCredentials = {
+        synaps: {
+          spaceId: space.id,
+          apiKey: values.synapsApiKey ?? '',
+          secret: values.synapsSecret ?? ''
+        },
+        persona: {
+          spaceId: space.id,
+          apiKey: values.personaApiKey ?? '',
+          secret: values.personaSecret ?? '',
+          envId: values.personaEnvironmentId ?? '',
+          templateId: values.personaTemplateId ?? ''
+        }
       };
 
-      await updateKycCredential({ ...synapsPayload }, { onSuccess: () => mutateKycCredentials() });
+      await updateKycCredential({ ...synapsPayload }, { onSuccess: (data) => mutateKycCredentials(data) });
     }
-    mutateKycCredentials();
   };
 
-  const isLoading = updateSpaceLoading || kycCredentialsLoading;
+  const isLoading = updateSpaceLoading || kycUpdateCredentialsLoading;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -117,8 +134,13 @@ export function SpaceIntegrations({ space }: { space: Space }) {
           <ConnectBoto />
         </Grid>
         <Grid item>
-          <SpaceCompliance control={control} isAdmin={isAdmin} />
+          <SpaceKyc control={control} isAdmin={isAdmin} kycCredentials={kycCredentials} />
         </Grid>
+        {isAllowedSpace && space.kycOption === 'synaps' && (
+          <Grid item>
+            <SynapsModal spaceId={space.id} />
+          </Grid>
+        )}
       </Grid>
       {isAdmin && (
         <Box
@@ -145,4 +167,15 @@ export function SpaceIntegrations({ space }: { space: Space }) {
       )}
     </form>
   );
+}
+
+function getDefaultValues(kycCredentials?: KycCredentials) {
+  return {
+    synapsApiKey: kycCredentials?.synaps?.apiKey ?? '',
+    synapsSecret: kycCredentials?.synaps?.secret ?? '',
+    personaApiKey: kycCredentials?.persona?.apiKey ?? '',
+    personaSecret: kycCredentials?.persona?.secret ?? '',
+    personaTemplateId: kycCredentials?.persona?.templateId ?? '',
+    personaEnvironmentId: kycCredentials?.persona?.envId ?? ''
+  };
 }

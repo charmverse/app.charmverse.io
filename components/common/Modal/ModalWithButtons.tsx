@@ -5,7 +5,7 @@ import { Button } from 'components/common/Button';
 import type { ModalProps } from 'components/common/Modal';
 import { Modal } from 'components/common/Modal';
 
-type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
+type Props = Pick<ModalProps, 'open' | 'size'> & {
   children: ReactNode;
   buttonText?: string;
   loading?: boolean;

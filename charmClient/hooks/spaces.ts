@@ -1,6 +1,8 @@
-import type { PaymentMethod, Space, SynapsCredential } from '@charmverse/core/prisma';
+import type { PaymentMethod, Space, SynapsUserKyc } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
+import type { KycCredentials } from 'lib/kyc/getKycCredentials';
+import type { SynapsSession } from 'lib/kyc/synaps/interfaces';
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 
 import type { MaybeString } from './helpers';
@@ -39,13 +41,17 @@ export function useUpdateSpace(spaceId: MaybeString) {
 }
 
 export function useGetKycCredentials(spaceId: MaybeString) {
-  return useGET<SynapsCredential>(spaceId ? `/api/spaces/${spaceId}/kyc-credentials` : null);
+  return useGET<KycCredentials>(spaceId ? `/api/spaces/${spaceId}/kyc-credentials` : null);
 }
 
 export function useUpdateKycCredentials(spaceId: MaybeString) {
-  return usePOST<Partial<SynapsCredential>, SynapsCredential>(`/api/spaces/${spaceId}/kyc-credentials`);
+  return usePOST<KycCredentials, KycCredentials>(`/api/spaces/${spaceId}/kyc-credentials`);
 }
 
-export function useDeleteKycCredentials(spaceId: MaybeString) {
-  return useDELETE<undefined>(`/api/spaces/${spaceId}/kyc-credentials`);
+export function useInitSynapsSession(spaceId: MaybeString) {
+  return usePOST<undefined, SynapsSession>(`/api/spaces/${spaceId}/kyc-credentials/synaps`);
+}
+
+export function useGetSynapsSession(spaceId: MaybeString) {
+  return useGET<SynapsUserKyc>(`/api/spaces/${spaceId}/kyc-credentials/synaps`);
 }
