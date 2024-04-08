@@ -152,6 +152,7 @@ export const StyledTab = React.forwardRef(
         onClick={onClick}
         variant='text'
         size='small'
+        // DONT DELETE: this id is used in viewTabs.tsx when selecting a tab as `dataset.viewId`
         data-view-id={viewId}
         sx={{
           p: 0,
