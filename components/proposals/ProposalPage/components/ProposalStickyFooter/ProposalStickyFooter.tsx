@@ -2,12 +2,7 @@ import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
 
-import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
-import {
-  useGetProposalFormFieldAnswers,
-  usePublishProposal,
-  useUpdateProposalFormFieldAnswers
-} from 'charmClient/hooks/proposals';
+import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -29,37 +24,13 @@ export function ProposalStickyFooter({
 }) {
   const projectForm = useFormContext<ProjectAndMembersPayload>();
   const projectField = proposal.form?.formFields?.find((field) => field.type === 'project_profile');
-  const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal.id });
-  const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({
-    proposalId: proposal.id
-  });
-  const { mutate } = useGetProjects();
-  const projectFormFieldAnswer = proposalFormFieldAnswers.find(
-    (proposalFormFieldAnswer) => proposalFormFieldAnswer.fieldId === projectField?.id
-  );
 
-  const { trigger: createProject } = useCreateProject();
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
 
   async function onClick() {
     try {
-      // Before publishing the proposal, we need to create the project if it doesn't exist
-      // And update the form field answer with the project id
-      if (!proposal.projectId && projectField && projectFormFieldAnswer) {
-        const { id: projectId } = await createProject(projectForm.getValues());
-        await trigger({
-          answers: [
-            {
-              fieldId: projectField.id,
-              value: { projectId },
-              id: projectFormFieldAnswer.id
-            }
-          ]
-        });
-        await mutate();
-      }
       await publishProposal();
     } catch (error) {
       showMessage((error as Error).message, 'error');

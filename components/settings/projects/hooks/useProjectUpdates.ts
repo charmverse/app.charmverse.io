@@ -66,35 +66,40 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
                 projectId
               });
 
-              mutate((projects) => {
-                if (!projects) {
-                  return projects;
-                }
-
-                return projects.map((_project) => {
-                  if (_project.id === projectId) {
-                    return {
-                      ..._project,
-                      projectMembers: _project.projectMembers.map((_projectMember) => {
-                        if (_projectMember.id === updatedProjectMember.id) {
-                          return updatedProjectMember;
-                        }
-
-                        return _projectMember;
-                      })
-                    };
+              mutate(
+                (projects) => {
+                  if (!projects) {
+                    return projects;
                   }
 
-                  return _project;
-                });
-              });
+                  return projects.map((_project) => {
+                    if (_project.id === projectId) {
+                      return {
+                        ..._project,
+                        projectMembers: _project.projectMembers.map((_projectMember) => {
+                          if (_projectMember.id === updatedProjectMember.id) {
+                            return updatedProjectMember;
+                          }
+
+                          return _projectMember;
+                        })
+                      };
+                    }
+
+                    return _project;
+                  });
+                },
+                {
+                  revalidate: false
+                }
+              );
             }
           }
         } catch (_) {
           showMessage('Failed to update project', 'error');
         }
       }, 300),
-    [projectId]
+    [projectId, user?.id, isTeamLead]
   );
 
   return {
