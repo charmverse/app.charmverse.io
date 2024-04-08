@@ -96,7 +96,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   },
   {
     field: 'walletAddress',
-    label: 'Wallet Address to receive funds',
+    label: 'Primary Project Wallet to receive funds',
     allowPrivate: true
   }
 ];

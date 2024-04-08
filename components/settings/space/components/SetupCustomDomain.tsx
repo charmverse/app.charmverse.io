@@ -178,7 +178,9 @@ export function SetupCustomDomain({
                           <TableRow>
                             <TableCell>
                               <LabelWithCopy
-                                label={customDomainVerification?.certificateDetails?.dnsValidation?.name || ''}
+                                label={removeEndingPeriod(
+                                  customDomainVerification?.certificateDetails?.dnsValidation?.name || ''
+                                )}
                               />
                             </TableCell>
                             <TableCell>
@@ -234,4 +236,9 @@ export function SetupCustomDomain({
       </UpgradeWrapper>
     </Stack>
   );
+}
+
+// DNS setups usually do not expect the trailing period, so we remove it
+function removeEndingPeriod(domain: string) {
+  return domain.replace(/\.$/, '');
 }
