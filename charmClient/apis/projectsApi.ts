@@ -7,17 +7,9 @@ export class ProjectsApi {
     return http.DELETE(`/api/projects/${projectId}/members/${memberId}`);
   }
 
-  updateProjectMember({
-    projectId,
-    memberId,
-    payload
-  }: {
-    projectId: string;
-    memberId: string;
-    payload: UpdateProjectMemberPayload;
-  }) {
+  updateProjectMember({ projectId, payload }: { projectId: string; payload: UpdateProjectMemberPayload }) {
     return http.PUT<ProjectWithMembers['projectMembers'][number]>(
-      `/api/projects/${projectId}/members/${memberId}`,
+      `/api/projects/${projectId}/members/${payload.id}`,
       payload
     );
   }

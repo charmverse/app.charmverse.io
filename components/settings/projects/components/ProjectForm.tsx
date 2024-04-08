@@ -3,6 +3,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import { Box, Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
+import { useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
@@ -29,10 +30,10 @@ export function ProposalProjectFormAnswers({
   selectedProjectMemberIds: string[];
   onFormFieldChange: (newProjectMemberIds: string[]) => void;
 }) {
-  const { getValues } = useFormContext<ProjectAndMembersPayload>();
-  const projectValues = getValues();
+  const { data: projectsWithMembers } = useGetProjects();
   const { user } = useUser();
-  const extraProjectMembers = projectValues.projectMembers.slice(1);
+  const projectWithMember = projectsWithMembers?.find((project) => project.id === projectId);
+  const extraProjectMembers = projectWithMember?.projectMembers.slice(1) ?? [];
   const selectedProjectMembers = extraProjectMembers.filter(
     (projectMember) => projectMember.id && selectedProjectMemberIds.includes(projectMember.id)
   );
@@ -78,10 +79,12 @@ export function ProposalProjectFormAnswers({
         defaultRequired
         fieldConfig={fieldConfig?.projectMember}
         onChange={(updatedProjectMember) => {
-          onProjectMemberUpdate({
-            ...updatedProjectMember,
-            id: projectValues.projectMembers[0].id!
-          });
+          if (projectWithMember) {
+            onProjectMemberUpdate({
+              ...updatedProjectMember,
+              id: projectWithMember.projectMembers[0].id!
+            });
+          }
         }}
       />
       <Divider

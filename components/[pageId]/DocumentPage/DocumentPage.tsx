@@ -7,6 +7,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 
+import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -107,7 +108,9 @@ function DocumentPageComponent({
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
-
+  const { data: proposalFormFieldAnswers = [], isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
+    proposalId
+  });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly || !!proposal?.archived;
 
@@ -244,9 +247,13 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
+  const projectFormFieldAnswer = proposalFormFieldAnswers.find(
+    (answer) => answer.fieldId === projectProfileField?.id
+  ) as { projectId: string; selectedMemberIds: string[] } | undefined;
 
   const form = useProjectForm({
     projectId,
+    selectedMemberIds: projectFormFieldAnswer?.selectedMemberIds,
     fieldConfig: (projectProfileField?.fieldConfig ??
       defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig
   });

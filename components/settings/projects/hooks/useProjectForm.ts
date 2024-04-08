@@ -1,5 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ethers } from 'ethers';
 import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -17,6 +16,7 @@ import type {
   ProjectWithMembers,
   ProjectAndMembersPayload
 } from 'lib/projects/interfaces';
+import { isValidEmail } from 'lib/utils/strings';
 
 function addMatchersToSchema({
   fieldType,
@@ -44,7 +44,17 @@ function addMatchersToSchema({
       }
     });
   } else if (fieldType === 'email') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.email('Invalid email');
+    schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-email', 'Invalid email address', (value) => {
+      if (isRequired && !value) {
+        return false;
+      }
+
+      if (value) {
+        return isValidEmail(value);
+      }
+
+      return true;
+    });
   }
 }
 
@@ -62,6 +72,9 @@ export function createProjectYupSchema({
       required: defaultRequired,
       show: true
     };
+
+    projectFieldConfig.required = projectFieldConfig.required ?? defaultRequired;
+
     if (projectFieldConfig.show !== false) {
       if (projectFieldConfig.required) {
         yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string().required();
@@ -82,6 +95,7 @@ export function createProjectYupSchema({
       required: defaultRequired,
       show: true
     };
+    projectMemberFieldConfig.required = projectMemberFieldConfig.required ?? defaultRequired;
     if (projectMemberFieldConfig.show !== false) {
       if (projectMemberFieldConfig.required) {
         yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string().required();
@@ -141,12 +155,14 @@ export function useProjectForm(options: {
   fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
   projectId?: string | null;
+  selectedMemberIds?: string[];
 }) {
   const { defaultRequired, defaultValues, fieldConfig } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
   const { data: projectsWithMembers } = useGetProjects();
   const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
+  const selectedMemberIds = options.selectedMemberIds;
 
   const defaultProjectAndMembersPayload = useMemo(
     () => getDefaultProjectValues({ user, membersRecord }),
@@ -166,8 +182,14 @@ export function useProjectForm(options: {
     if (!projectWithMembers) {
       return undefined;
     }
-    return convertToProjectValues(projectWithMembers);
-  }, [projectWithMembers]);
+    return convertToProjectValues({
+      ...projectWithMembers,
+      projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
+        // 0th index is the team lead which is always present
+        member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
+      )
+    });
+  }, [projectWithMembers, selectedMemberIds?.length]);
 
   const form = useForm({
     defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectAndMembersPayload,
@@ -178,12 +200,23 @@ export function useProjectForm(options: {
   });
 
   useEffect(() => {
-    if (options.projectId) {
-      form.reset(projectWithMembers);
+    if (options.projectId && projectWithMembers) {
+      form.reset(
+        {
+          ...projectWithMembers,
+          projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
+            // 0th index is the team lead which is always present
+            member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
+          )
+        },
+        {
+          keepIsValid: false
+        }
+      );
     } else {
       form.reset(defaultProjectAndMembersPayload);
     }
-  }, [options.projectId]);
+  }, [options.projectId, selectedMemberIds?.length]);
 
   return form;
 }

@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
@@ -48,12 +48,17 @@ export function useNewProposal({ newProposal }: Props) {
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
-  const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
+  const projectFieldValue = projectField
+    ? (values[projectField.id] as { projectId: string; selectedMemberIds: string[] })
+    : undefined;
+  const selectedProjectId = projectFieldValue?.projectId;
+  const selectedMemberIds = projectFieldValue?.selectedMemberIds;
 
   const projectForm = useProjectForm({
     projectId: selectedProjectId,
     fieldConfig: (projectField?.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig,
-    defaultRequired: true
+    defaultRequired: true,
+    selectedMemberIds
   });
 
   const setFormInputs = useCallback(

@@ -26,6 +26,7 @@ import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
 import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
 import { SettingsProjectFormAnswers } from './components/ProjectForm';
@@ -125,8 +126,7 @@ function ProjectRow({
 
       charmClient.projects
         .updateProjectMember({
-          memberId: projectMemberValue.id,
-          payload: projectMemberValue,
+          payload: projectMemberValue as UpdateProjectMemberPayload,
           projectId: projectWithMembers.id
         })
         .then((updatedProjectMember) => {
