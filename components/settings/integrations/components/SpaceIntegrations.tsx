@@ -83,9 +83,12 @@ export function SpaceIntegrations({ space }: { space: Space }) {
           sx={{
             py: 1,
             px: { xs: 5, md: 3 },
-            position: 'sticky',
+            position: 'absolute',
             mt: 3,
-            bottom: '0',
+            bottom: '20px',
+            left: 0,
+            right: 0,
+            marginX: 'auto',
             background: (theme) => theme.palette.background.paper,
             borderTop: (theme) => `1px solid ${theme.palette.divider}`,
             textAlign: 'right'
