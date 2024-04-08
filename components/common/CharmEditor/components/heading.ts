@@ -191,15 +191,7 @@ export function insertEmptyParaBelow() {
   });
 }
 
-export function scrollIntoHeadingNode({
-  view,
-  headingSlug,
-  pluginKey
-}: {
-  view: EditorView;
-  headingSlug: string;
-  pluginKey?: PluginKey;
-}) {
+export function scrollIntoHeadingNode({ view, headingSlug }: { view: EditorView; headingSlug: string }) {
   let nodePos: number | undefined;
   view.state.doc.descendants((node, pos) => {
     if (node.type.name === 'heading' && slugify(node.textContent) === headingSlug) {
@@ -210,7 +202,12 @@ export function scrollIntoHeadingNode({
 
   const domNode = nodePos ? (findDomRefAtPos(nodePos, view.domAtPos.bind(view)) as HTMLElement) : false;
   if (domNode && typeof nodePos !== 'undefined') {
-    view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, nodePos)));
+    view.dispatch(
+      view.state.tr
+        .setSelection(NodeSelection.create(view.state.doc, nodePos))
+        // disable floating menu or other tooltips from appearing
+        .setMeta('skip-selection-tooltip', true)
+    );
     // hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
     const node = findDomRefAtPos(nodePos, view.domAtPos.bind(view));
     if (node) {
