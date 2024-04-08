@@ -21,8 +21,6 @@ import type { RawPlugins } from 'components/common/CharmEditor/components/@bangl
 import type { RawSpecs } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { slugify } from 'lib/utils/strings';
 
-import { hideSelectionTooltip } from './@bangle.dev/tooltip/selectionTooltip';
-
 export const spec = specFactory;
 export const plugins = pluginsFactory;
 export const commands = {
