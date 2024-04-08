@@ -1,6 +1,6 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
@@ -180,6 +180,12 @@ export function ProjectFormEditor({
               }
         }
       />
+      <FieldLabel>Team Members</FieldLabel>
+      <Select disabled value='SELECT_TEAM_MEMBER'>
+        <MenuItem value='SELECT_TEAM_MEMBER'>
+          <Typography>Select a team member</Typography>
+        </MenuItem>
+      </Select>
     </Stack>
   );
 }
