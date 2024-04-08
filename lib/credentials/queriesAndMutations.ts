@@ -328,7 +328,5 @@ export async function getExternalCredentialsByWallets({
       index: -1,
       issuedCredentialId: undefined
     }))
-    .filter(
-      (c) => c?.content.Name && !blacklistedNameRegexes.some((pattern) => pattern.test(c.content.Name.toLowerCase()))
-    );
+    .filter((c) => c?.content.Name && !blacklistedNameRegexes.some((pattern) => pattern.test(c.content.Name)));
 }
