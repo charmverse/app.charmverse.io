@@ -10,6 +10,7 @@ import type {
   ClientSelectionMessage
 } from 'lib/websockets/documentEvents/interfaces';
 
+import { scrollIntoHeadingNode } from '../../heading';
 import { getSelectionUpdate, updateCollaboratorSelection } from '../state_plugins';
 
 import { Merge } from './merge';
@@ -142,7 +143,7 @@ export class ModCollabDoc {
     this.mod.editor.docInfo.confirmedDoc = this.mod.editor.view.state.doc;
     // deactivateWait();
     if (locationHash.length) {
-      // this.mod.editor.scrollIdIntoView(locationHash.slice(1));
+      scrollIntoHeadingNode({ view: this.mod.editor.view, headingSlug: window.location.hash.slice(1) });
     }
 
     // DISABLED FOR NOW (Matt) - this moves the page around after first load

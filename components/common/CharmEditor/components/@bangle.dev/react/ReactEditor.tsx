@@ -150,14 +150,14 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
     }
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
-  useEffect(() => {
-    if (editor && !isLoadingRef.current && floatingMenuPluginKey) {
-      scrollIntoHeadingNode({
-        editor,
-        pluginKey: floatingMenuPluginKey
-      });
-    }
-  }, [isLoadingRef.current]);
+  // useEffect(() => {
+  //   if (editor && !isLoadingRef.current && floatingMenuPluginKey) {
+  //     scrollIntoHeadingNode({
+  //       editor,
+  //       pluginKey: floatingMenuPluginKey
+  //     });
+  //   }
+  // }, [isLoadingRef.current, editor]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {

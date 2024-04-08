@@ -90,7 +90,7 @@ function selectionTooltipState({
           return pluginState;
         }
 
-        log.debug('update tooltip state to ', meta.type);
+        // log.debug('update tooltip state to ', meta.type);
         return {
           ...pluginState,
           type: meta.type,
