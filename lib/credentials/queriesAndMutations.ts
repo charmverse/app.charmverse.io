@@ -318,6 +318,8 @@ export async function getExternalCredentialsByWallets({
         : Promise.reject(new Error('Unknown error'))
     );
 
+  const blacklistedNameRegexes = [/test/i, /demo/i];
+
   return externalCredentials
     .map((credential) => ({
       ...credential,
@@ -327,8 +329,6 @@ export async function getExternalCredentialsByWallets({
       issuedCredentialId: undefined
     }))
     .filter(
-      (c) =>
-        !(c.content?.Name as string)?.toLowerCase().includes('test') &&
-        !(c.content?.Name as string)?.toLowerCase().includes('demo')
+      (c) => c?.content.Name && !blacklistedNameRegexes.some((pattern) => pattern.test(c.content.Name.toLowerCase()))
     );
 }
