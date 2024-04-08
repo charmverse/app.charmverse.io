@@ -1,7 +1,5 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box, Stack, Tooltip } from '@mui/material';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRouter } from 'next/router';
 import type { Dispatch, SetStateAction } from 'react';
 import React from 'react';
@@ -53,7 +51,6 @@ type Props = {
 
 function ViewHeader(props: Props) {
   const router = useRouter();
-  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const { trigger: trashPages } = useTrashPages();
   const { showError } = useSnackbar();
   const views = props.views.filter((view) => !view.fields.inline);
@@ -177,14 +174,7 @@ function ViewHeader(props: Props) {
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
               {/* Sort */}
-              {withSortBy && (
-                <ViewSortControl
-                  activeBoard={activeBoard}
-                  activeView={activeView}
-                  cards={cards}
-                  viewSortPopup={viewSortPopup}
-                />
-              )}
+              {withSortBy && <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />}
             </>
           )}
 

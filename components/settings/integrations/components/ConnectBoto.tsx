@@ -2,7 +2,6 @@ import { Grid, Typography } from '@mui/material';
 
 import { Button } from 'components/common/Button';
 import Link from 'components/common/Link';
-import { isProdEnv } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 
 export function ConnectBoto() {

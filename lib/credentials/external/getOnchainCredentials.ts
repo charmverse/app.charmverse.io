@@ -7,7 +7,7 @@ import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
-import { isProdEnv } from 'config/constants';
+import { isDevEnv, isStagingEnv } from 'config/constants';
 
 import { ApolloClientWithRedisCache } from '../apolloClientWithRedisCache';
 import type { EasSchemaChain } from '../connectors';
@@ -23,36 +23,38 @@ import { externalCredentialChains, trackedCharmverseSchemas, trackedSchemas } fr
 // For a specific profile, only refresh attestations every half hour
 const defaultEASCacheDuration = 1800;
 
+const skipRedisCache = isStagingEnv || isDevEnv;
+
 const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloClient<any>> = {
   [optimism.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [sepolia.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [optimismSepolia.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'optimism-easscan',
     uri: 'https://optimism-sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [base.id]: new ApolloClientWithRedisCache({
     cacheKeyPrefix: 'base-easscan',
     uri: 'https://base.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   }),
   [arbitrum.id]: new ApolloClientWithRedisCache({
     uri: 'https://arbitrum.easscan.org/graphql',
     cacheKeyPrefix: 'arbitrum-easscan',
     persistForSeconds: defaultEASCacheDuration,
-    skipRedisCache: !isProdEnv
+    skipRedisCache
   })
 };
 
@@ -95,11 +97,13 @@ const GET_EXTERNAL_CREDENTIALS = gql`
 function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | EasSchemaChain>({
   chainId,
   wallets,
-  schemas
+  schemas,
+  type = 'onchain'
 }: {
   schemas: Record<Chain, { schemaId: string; issuers?: string[] }[]>;
   chainId: Chain;
   wallets: string[];
+  type?: 'onchain' | 'charmverse';
 }): Promise<EASAttestationFromApi[]> {
   const recipient = wallets.map((w) => getAddress(w));
 
@@ -125,7 +129,7 @@ function getTrackedOnChainCredentials<Chain extends ExternalCredentialChain | Ea
         return {
           ...attestation,
           chainId,
-          type: 'onchain',
+          type,
           content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
             acc[val.name] = val.value.value;
             return acc;
@@ -146,14 +150,19 @@ export async function getCharmverseOnchainCredentials({
 }) {
   const charmverseAttestations = await Promise.all(
     (includeTestnets ? easSchemaChains : easSchemaMainnetChains.map((c) => c.id)).map((chainId) =>
-      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedCharmverseSchemas }).catch((err) => {
-        log.error(`Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`, {
-          wallets,
-          chainId,
-          error: err
-        });
-        return [] as EASAttestationFromApi[];
-      })
+      getTrackedOnChainCredentials({ chainId, wallets, schemas: trackedCharmverseSchemas, type: 'charmverse' }).catch(
+        (err) => {
+          log.error(
+            `Error fetching on chain EAS attestations for wallets ${wallets.join(', ')} on chainId ${chainId}`,
+            {
+              wallets,
+              chainId,
+              error: err
+            }
+          );
+          return [] as EASAttestationFromApi[];
+        }
+      )
     )
   ).then((results) => results.flat());
 

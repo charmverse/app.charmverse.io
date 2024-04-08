@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getAddress } from 'viem';
 import { optimism } from 'viem/chains';
+import { getAddress } from 'viem/utils';
 
 import { signAndPublishCharmverseCredential } from 'lib/credentials/attestOffchain';
 import type { ExternalProjectMetadata } from 'lib/credentials/schemas/external';
@@ -13,6 +13,8 @@ import { getRoundApplicationsWithMeta } from './getRoundApplications';
 export async function createOffchainCredentialsForProjects() {
   for (const chainId of GITCOIN_SUPPORTED_CHAINS) {
     const approvedApplications = await getRoundApplicationsWithMeta(chainId);
+
+    log.info(`Running ${approvedApplications.length} approved applications from gitcoin, on chain ${chainId}`);
 
     for (const application of approvedApplications) {
       const metadata = application.metadata;

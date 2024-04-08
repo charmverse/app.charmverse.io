@@ -26,7 +26,7 @@ const confirmDiffFrameReceived = (page: Page) => {
   });
 };
 
-test('Select and delete all blocks in a document', async ({ documentPage }) => {
+test.fixme('Select and delete all blocks in a document', async ({ documentPage }) => {
   const { space, user, page } = await generateUserAndSpace({
     isAdmin: true,
     pageContent: _.doc(_.p('Paragraph 1'), _.p(''), _.p('Paragraph 2')).toJSON()

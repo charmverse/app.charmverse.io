@@ -7,6 +7,7 @@ import { createOffchainCredentialsForExternalProjects } from 'lib/credentials/cr
 import app from './healthCheck/app';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
 import { task as archiveTask } from './tasks/deleteArchivedPages';
+import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
 import { task as processWebhookMessages } from './tasks/processWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
@@ -21,6 +22,9 @@ processWebhookMessages();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
+
+// Index pending gnosis safe credentials every 30 minutes
+cron.schedule('*/30 * * * *', indexPendingCredentialsTask);
 
 // Update votes status
 cron.schedule('*/30 * * * *', voteTask);
@@ -44,7 +48,7 @@ cron.schedule('0 1 * * *', updateMixpanelProfilesTask);
 cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 // Create external eas credentials for Gitcoin and Questbook every day at midnight
-// cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
+cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
 const port = process.env.PORT || 4000;
 

@@ -2,8 +2,6 @@ import { log } from '@charmverse/core/log';
 import { useCallback, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
-import charmClient from 'charmClient';
-import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import type { FormFieldInput } from 'components/common/form/interfaces';
@@ -29,7 +27,6 @@ export function useNewProposal({ newProposal }: Props) {
   const { showMessage } = useSnackbar();
   const { space: currentSpace } = useCurrentSpace();
   const { trigger: createProposalTrigger, isMutating: isCreatingProposal } = useCreateProposal();
-  const { trigger: createProject } = useCreateProject();
   const [contentUpdated, setContentUpdated] = useState(false);
   // keep track of whether the form is "loaded" so we can hide elements that depend on it. TODO: maybe formInputs should be null at first?
   const [isFormLoaded, setIsFormLoaded] = useState(false);
@@ -51,8 +48,6 @@ export function useNewProposal({ newProposal }: Props) {
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
 
-  const { mutate } = useGetProjects();
-
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
   const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
 
@@ -73,46 +68,7 @@ export function useNewProposal({ newProposal }: Props) {
     [setFormInputsRaw]
   );
 
-  const isDirty = projectForm.formState.isDirty;
-
   async function createProposal({ isDraft }: { isDraft?: boolean }) {
-    // Create a project if the proposal has a project field
-    let projectId: string | undefined = selectedProjectId;
-    // Make sure the form is dirty before either updating or creating the project
-    // We allow saving draft without a project or a valid project
-    // This guard will make sure we don't create empty projects when saving drafts
-    if (projectField && formInputs.type === 'proposal' && isDirty) {
-      if (!selectedProjectId) {
-        const projectValues = projectForm.getValues();
-        const createdProject = await createProject(projectValues);
-        projectId = createdProject.id;
-      }
-      // Make sure the current user is a team lead before updating the project
-      else {
-        const projectWithMembers = projectForm.getValues();
-        const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
-        if (isTeamLead) {
-          const updatedProjectValues = {
-            id: selectedProjectId,
-            ...projectWithMembers,
-            projectMembers: projectWithMembers.projectMembers
-          };
-          await charmClient.projects.updateProject(selectedProjectId, updatedProjectValues);
-        } else {
-          const projectMember = projectWithMembers.projectMembers.find(
-            (_projectMember) => _projectMember.userId === user?.id
-          );
-          if (projectMember && projectMember.id) {
-            await charmClient.projects.updateProjectMember({
-              memberId: projectMember.id,
-              payload: projectMember,
-              projectId: selectedProjectId
-            });
-          }
-        }
-        mutate();
-      }
-    }
     log.info('[user-journey] Create a proposal');
     if (currentSpace) {
       const result = await createProposalTrigger({
@@ -127,7 +83,7 @@ export function useNewProposal({ newProposal }: Props) {
           icon: formInputs.icon,
           type: formInputs.type
         },
-        projectId,
+        projectId: selectedProjectId,
         formFields: formInputs.formFields,
         evaluations: formInputs.evaluations,
         spaceId: currentSpace.id,

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { saveGnosisSafeTransactionToIndex } from 'lib/credentials/indexOnChainProposalCredential';
+import { saveGnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import { onError, onNoMatch, requireSpaceMembership, requireUser } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -11,10 +11,10 @@ handler
   .use(requireUser)
   .post(
     requireSpaceMembership({ adminOnly: false, location: 'body' }),
-    requestProposalCredentialsGnosisSafeIndexingController
+    requestRewardCredentialsGnosisSafeIndexingController
   );
 
-async function requestProposalCredentialsGnosisSafeIndexingController(req: NextApiRequest, res: NextApiResponse) {
+async function requestRewardCredentialsGnosisSafeIndexingController(req: NextApiRequest, res: NextApiResponse) {
   await saveGnosisSafeTransactionToIndex(req.body);
   return res.status(200).json({ success: true });
 }

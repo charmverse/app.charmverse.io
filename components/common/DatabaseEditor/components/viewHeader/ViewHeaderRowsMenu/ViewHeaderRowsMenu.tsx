@@ -33,6 +33,7 @@ import mutator from '../../../mutator';
 import { ArchiveProposals } from './components/ArchiveProposals';
 import { BatchPaymentRewards } from './components/BatchPaymentRewards';
 import { IssueProposalCredentials } from './components/IssueProposalCredentials';
+import { IssueRewardCredentials } from './components/IssueRewardCredentials';
 import { StyledMenuItem } from './components/PropertyMenu';
 import type { PropertyTemplateMenuProps } from './components/PropertyTemplateMenu';
 import { PropertyTemplateMenu } from './components/PropertyTemplateMenu';
@@ -106,6 +107,7 @@ export type ViewHeaderRowsMenuProps = {
   onChangeRewardsToken?: PropertyTemplateMenuProps['onChangeRewardsToken'];
   onChangeCustomRewardsValue?: PropertyTemplateMenuProps['onChangeCustomRewardsValue'];
   showIssueProposalCredentials?: boolean;
+  showIssueRewardCredentials?: boolean;
   showRewardsPaymentButton?: boolean;
   showTrashIcon?: boolean;
   onMarkRewardsAsPaid?: () => Promise<void>;
@@ -135,6 +137,7 @@ export function ViewHeaderRowsMenu({
   onChangeRewardsDueDate,
   onChangeRewardsReviewers,
   showIssueProposalCredentials,
+  showIssueRewardCredentials,
   showRewardsPaymentButton,
   showTrashIcon = !board.fields.sourceType,
   onMarkRewardsAsComplete,
@@ -335,7 +338,7 @@ export function ViewHeaderRowsMenu({
         </Tooltip>
       )}
       {showIssueProposalCredentials && <IssueProposalCredentials selectedPageIds={checkedIds} />}
-      {/* {onIssueProposalCredentials && (<IssueProposalCredentials)} */}
+      {showIssueRewardCredentials && <IssueRewardCredentials selectedPageIds={checkedIds} />}
       {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
