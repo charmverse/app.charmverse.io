@@ -22,6 +22,7 @@ export type StaticPageType =
   | 'settings/invites'
   | 'settings/credentials'
   | 'settings/proposals'
+  | 'settings/integrations'
   | 'billing/marketing'
   | 'billing/checkout'
   | 'billing/settings';
