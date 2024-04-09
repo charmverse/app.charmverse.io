@@ -20,7 +20,7 @@ export const proposalPropertyTypesList = [
   'proposalStep',
   'proposalReviewerNotes'
 ] as const;
-export type DatabaseProposalPropertyType = (typeof proposalPropertyTypesList)[number];
+export type ProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
 export type PropertyType =
   | 'text'
@@ -41,7 +41,7 @@ export type PropertyType =
   | 'tokenAmount'
   | 'tokenChain'
   | 'relation'
-  | DatabaseProposalPropertyType;
+  | ProposalPropertyType;
 
 interface IPropertyOption<T = string> {
   id: T;

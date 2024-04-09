@@ -17,7 +17,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export const excludedFieldTypes = ['project_profile', 'label'];
 
-export async function setDatabaseProposalProperties({
+export async function updateDatabaseProposalProperties({
   boardId,
   cardProperties
 }: {
@@ -73,33 +73,30 @@ export async function setDatabaseProposalProperties({
   const formFields = forms
     .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
     .flatMap((p) => p.formFields);
-  const proposals = await prisma.proposal.findMany({
+  const evaluationSteps = await prisma.proposalEvaluation.findMany({
     where: {
-      spaceId: boardBlock.spaceId
+      proposal: {
+        spaceId: boardBlock.spaceId
+      }
     },
     select: {
-      evaluations: {
-        select: {
-          type: true,
-          title: true
-        },
-        orderBy: {
-          index: 'asc'
-        }
-      }
-    }
+      type: true,
+      title: true
+    },
+    orderBy: {
+      index: 'asc'
+    },
+    distinct: ['title']
   });
 
   const evaluationStepTitles: Set<string> = new Set();
   const rubricStepTitles: Set<string> = new Set();
 
-  proposals.forEach((p) => {
-    p.evaluations.forEach((e) => {
-      evaluationStepTitles.add(e.title);
-      if (e.type === 'rubric') {
-        rubricStepTitles.add(e.title);
-      }
-    });
+  evaluationSteps.forEach((e) => {
+    evaluationStepTitles.add(e.title);
+    if (e.type === 'rubric') {
+      rubricStepTitles.add(e.title);
+    }
   });
 
   const boardProperties = getBoardProperties({
@@ -110,7 +107,7 @@ export async function setDatabaseProposalProperties({
     rubricStepTitles: Array.from(rubricStepTitles)
   });
 
-  const updatedBoardBlock = await prisma.block.update({
+  return prisma.block.update({
     where: {
       id: boardBlock.id
     },
@@ -121,8 +118,6 @@ export async function setDatabaseProposalProperties({
       }
     }
   });
-
-  return updatedBoardBlock;
 }
 
 function getBoardProperties({

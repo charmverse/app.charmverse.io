@@ -9,8 +9,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
 import { prismaToUIBlock } from 'lib/databases/block';
-import { extractCardProposalProperties } from 'lib/databases/proposalsSource/extractCardProposalProperties';
-import { extractDatabaseProposalProperties } from 'lib/databases/proposalsSource/extractDatabaseProposalProperties';
+import { getCardPropertiesFromProposal } from 'lib/databases/proposalsSource/getCardPropertiesFromProposals';
+import { getProposalSourceProperties } from 'lib/databases/proposalsSource/getProposalSourceProperties';
 import { InvalidStateError } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
@@ -31,7 +31,7 @@ import { DEFAULT_BOARD_BLOCK_ID } from '../customBlocks/constants';
 
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { getCardPropertiesFromAnswers } from './getCardPropertiesFromAnswers';
-import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
+import { updateDatabaseProposalProperties } from './updateDatabaseProposalProperties';
 
 const pageSelectObject = {
   id: true,
@@ -156,7 +156,7 @@ export async function updateCardsFromProposals({
   const boardBlockFields = (proposalBoardBlock as null | { fields: BoardFields })?.fields;
 
   const [dbBlock, boardPage] = await Promise.all([
-    setDatabaseProposalProperties({
+    updateDatabaseProposalProperties({
       boardId,
       cardProperties: []
     }),
@@ -367,8 +367,8 @@ export async function updateCardsFromProposals({
     {}
   );
 
-  const databaseProposalProps = extractDatabaseProposalProperties({
-    boardBlock
+  const databaseProposalProps = getProposalSourceProperties({
+    cardProperties: boardBlock.fields.cardProperties
   });
 
   /**
@@ -443,7 +443,7 @@ export async function updateCardsFromProposals({
 
         if (card) {
           const { cardProposalStatus, cardEvaluationType, cardProposalStep, cardProposalUrl, cardProposalAuthor } =
-            extractCardProposalProperties({
+            getCardPropertiesFromProposal({
               card: card.block,
               databaseProperties: databaseProposalProps
             });

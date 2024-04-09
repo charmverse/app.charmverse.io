@@ -14,7 +14,7 @@ import { generateUser } from 'testing/utils/users';
 import type { BoardFields, IPropertyTemplate } from '../../board';
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCardsFromProposals } from '../createCardsFromProposals';
+import { createCardsFromProposals } from '../applySourceToDatabase';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
 
 describe('updateCardsFromProposals()', () => {

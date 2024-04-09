@@ -4,7 +4,7 @@ import type { ProposalEvaluationResultExtended, ProposalEvaluationStatus } from 
 
 import type { CardFields, CardPropertyValue } from '../card';
 
-import type { ExtractedDatabaseProposalProperties } from './extractDatabaseProposalProperties';
+import type { ProposalPropertiesMap } from './getProposalSourceProperties';
 
 export type ExtractedCardProposalProperties = {
   cardProposalUrl: { propertyId: string; value: string };
@@ -14,12 +14,12 @@ export type ExtractedCardProposalProperties = {
   cardProposalAuthor: { propertyId: string; value: string[] };
 };
 
-export function extractCardProposalProperties({
+export function getCardPropertiesFromProposal({
   card,
   databaseProperties
 }: {
   card: Pick<Block, 'fields'>;
-  databaseProperties: Partial<ExtractedDatabaseProposalProperties>;
+  databaseProperties: Partial<ProposalPropertiesMap>;
 }): Partial<ExtractedCardProposalProperties> {
   const cardValues = (card.fields as CardFields).properties as Record<string, CardPropertyValue>;
 

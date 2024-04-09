@@ -14,9 +14,9 @@ import { generateUser } from 'testing/utils/users';
 
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCardsFromProposals } from '../createCardsFromProposals';
+import { applySourceToDatabase } from '../applySourceToDatabase';
 
-describe('createCardsFromProposals', () => {
+describe('applySourceToDatabase', () => {
   let user: User;
   let space: Space;
   let board: Page;

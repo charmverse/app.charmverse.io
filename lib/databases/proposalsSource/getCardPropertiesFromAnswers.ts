@@ -6,7 +6,11 @@ import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 
-import { excludedFieldTypes } from './setDatabaseProposalProperties';
+import { excludedFieldTypes } from './updateDatabaseProposalProperties';
+
+export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'> & {
+  answers: Pick<FormFieldAnswer, 'value' | 'proposalId'>[];
+};
 
 export function getCardPropertiesFromAnswers({
   accessPrivateFields,
@@ -16,9 +20,7 @@ export function getCardPropertiesFromAnswers({
 }: {
   cardProperties: IPropertyTemplate[];
   accessPrivateFields: boolean;
-  formFields: (Pick<FormField, 'id' | 'type' | 'private'> & {
-    answers: Pick<FormFieldAnswer, 'value' | 'proposalId'>[];
-  })[];
+  formFields: FormFieldData[];
   proposalId: string;
 }) {
   const properties: Record<string, BoardPropertyValue> = {};

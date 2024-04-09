@@ -5,9 +5,10 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
+import { applySourceToDatabase } from 'lib/databases/proposalsSource/applySourceToDatabase';
 import { assembleBlocks } from 'lib/databases/proposalsSource/assembleBlocks';
 import { createCards } from 'lib/databases/proposalsSource/createCards';
-import { getProposalsAsCards } from 'lib/databases/proposalsSource/getProposalsAsCards';
+import { getCardsFromProposals } from 'lib/databases/proposalsSource/getCardsFromProposals';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -58,17 +59,28 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   const block = blocks.find((b) => b.id === blockId);
 
   // Hydrate and filter blocks based on proposal permissions
-  if ((block?.fields as BoardFields).sourceType === 'proposals') {
-    const [permissionsById, newCards, proposalCards] = await Promise.all([
+  if (block && (block.fields as BoardFields).sourceType === 'proposals') {
+    // Update board and view blocks before computing proposal cards
+    await applySourceToDatabase({ boardId: pageId, spaceId: page.spaceId });
+
+    const [permissionsById, newCardBlocks, proposalCards] = await Promise.all([
+      // get permissions for each propsoal
       permissionsApiClient.proposals.bulkComputeProposalPermissions({
         spaceId: page.spaceId,
         userId: req.session.user?.id
       }),
-      createCards({ boardId: blockId, spaceId: page.spaceId }),
-      getProposalsAsCards({ boardId: blockId, spaceId: page.spaceId })
+      // create missing blocks for new proposals
+      createCards({ boardId: blockId, spaceId: page.spaceId, createdBy: block.createdBy }),
+      // get properties for proposals
+      getCardsFromProposals({ cardProperties: block.fields.cardProperties, spaceId: page.spaceId })
     ]);
-    const result = assembleBlocks({ permissions: permissionsById, blocks: blocks.concat(newCards), proposalCards });
-    // Remmeber to allow normal blocks that do not have a page, like views, to be shown
+    // combine blocks with proposal cards and permissions
+    const result = assembleBlocks({
+      blocks: blocks.concat(newCardBlocks),
+      permissions: permissionsById,
+      proposalCards
+    });
+    // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
     const filtered = result.filter(
       (b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view
     );

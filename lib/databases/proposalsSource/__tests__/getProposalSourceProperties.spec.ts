@@ -4,8 +4,8 @@ import { v4 as uuid } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 
-import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
-import type { ExtractedDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
+import { getProposalSourceProperties } from '../getProposalSourceProperties';
+import type { ProposalPropertiesMap } from '../getProposalSourceProperties';
 
 const statusProp: IPropertyTemplate = {
   id: uuid(),
@@ -32,19 +32,15 @@ const urlProp: IPropertyTemplate = {
   options: []
 };
 
-describe('extractDatabaseProposalProperties', () => {
+describe('getProposalSourceProperties', () => {
   it('should extract database proposal properties', () => {
     const exampleProperties: IPropertyTemplate[] = [statusProp, urlProp];
 
-    const extractedProps = extractDatabaseProposalProperties({
-      boardBlock: {
-        fields: {
-          cardProperties: exampleProperties
-        } as any
-      }
+    const extractedProps = getProposalSourceProperties({
+      cardProperties: exampleProperties
     });
 
-    expect(extractedProps).toMatchObject<ExtractedDatabaseProposalProperties>({
+    expect(extractedProps).toMatchObject<ProposalPropertiesMap>({
       proposalStatus: statusProp,
       proposalUrl: urlProp
     });
@@ -53,14 +49,10 @@ describe('extractDatabaseProposalProperties', () => {
   it('should work if only some properties are present', () => {
     const exampleProperties: IPropertyTemplate[] = [];
 
-    const extractedProps = extractDatabaseProposalProperties({
-      boardBlock: {
-        fields: {
-          cardProperties: exampleProperties
-        } as any
-      }
+    const extractedProps = getProposalSourceProperties({
+      cardProperties: exampleProperties
     });
 
-    expect(extractedProps).toMatchObject<Partial<ExtractedDatabaseProposalProperties>>({});
+    expect(extractedProps).toMatchObject<Partial<ProposalPropertiesMap>>({});
   });
 });

@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createCardsFromProposals } from 'lib/databases/proposalsSource/createCardsFromProposals';
+import { applySourceToDatabase } from 'lib/databases/proposalsSource/applySourceToDatabase';
 import { updateCardsFromProposals } from 'lib/databases/proposalsSource/updateCardsFromProposals';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -46,7 +46,7 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  await createCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
+  await applySourceToDatabase({ boardId: pageId, spaceId: boardPage.spaceId });
 
   return res.status(200).end();
 }
@@ -81,14 +81,14 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
 
   log.debug('Refresh cards for proposal-as-a-source board (started)', { pageId, spaceId: boardPage.spaceId, userId });
 
-  const result = await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
+  // const result = await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId, userId });
 
-  log.debug('Refresh cards for proposal-as-a-source board (complete)', {
-    pageId,
-    spaceId: boardPage.spaceId,
-    userId,
-    result
-  });
+  // log.debug('Refresh cards for proposal-as-a-source board (complete)', {
+  //   pageId,
+  //   spaceId: boardPage.spaceId,
+  //   userId,
+  //   result
+  // });
 
   return res.status(200).end();
 }

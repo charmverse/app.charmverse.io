@@ -11,11 +11,11 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
 import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';
-import { setDatabaseProposalProperties } from '../setDatabaseProposalProperties';
+import { updateDatabaseProposalProperties } from '../updateDatabaseProposalProperties';
 
 const statusPropertyOptions = objectUtils.typedKeys(EVALUATION_STATUS_LABELS);
 
-describe('setDatabaseProposalProperties()', () => {
+describe('updateDatabaseProposalProperties()', () => {
   let space: Space;
   let user: User;
 
@@ -44,7 +44,7 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
@@ -101,7 +101,7 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
@@ -161,7 +161,7 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
@@ -179,11 +179,11 @@ describe('setDatabaseProposalProperties()', () => {
     const urlProp = properties.find((p) => p.type === 'proposalUrl') as IPropertyTemplate;
 
     // --- Run this a second and third time
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
@@ -316,7 +316,7 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
@@ -414,7 +414,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     // --- Run this a second and third time
-    await setDatabaseProposalProperties({
+    await updateDatabaseProposalProperties({
       boardId: rootId,
       cardProperties: []
     });
@@ -469,7 +469,7 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await expect(
-      setDatabaseProposalProperties({
+      updateDatabaseProposalProperties({
         boardId: rootId,
         cardProperties: []
       })

@@ -4,9 +4,9 @@ import { v4 as uuid } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 
-import type { ExtractedCardProposalProperties } from '../extractCardProposalProperties';
-import { extractCardProposalProperties } from '../extractCardProposalProperties';
-import { extractDatabaseProposalProperties } from '../extractDatabaseProposalProperties';
+import type { ExtractedCardProposalProperties } from '../getCardPropertiesFromProposals';
+import { getCardPropertiesFromProposal } from '../getCardPropertiesFromProposals';
+import { getProposalSourceProperties } from '../getProposalSourceProperties';
 
 const statusProp: IPropertyTemplate = {
   id: uuid(),
@@ -54,7 +54,7 @@ const evaluatedAverageProp: IPropertyTemplate = {
   type: 'proposalEvaluationAverage'
 };
 
-describe('extractCardProposalProperties', () => {
+describe('getCardPropertiesFromProposal', () => {
   it('should extract card proposal properties', () => {
     const exampleProperties: IPropertyTemplate[] = [
       statusProp,
@@ -64,11 +64,11 @@ describe('extractCardProposalProperties', () => {
       evaluatedByProp
     ];
 
-    const extractedSchema = extractDatabaseProposalProperties({
+    const extractedSchema = getProposalSourceProperties({
       boardBlock: { fields: { cardProperties: exampleProperties } as any }
     });
 
-    const extractedValues = extractCardProposalProperties({
+    const extractedValues = getCardPropertiesFromProposal({
       card: {
         fields: {
           properties: {
@@ -96,11 +96,11 @@ describe('extractCardProposalProperties', () => {
   it('should work if only some properties are present', () => {
     const exampleProperties: IPropertyTemplate[] = [];
 
-    const extractedSchema = extractDatabaseProposalProperties({
+    const extractedSchema = getProposalSourceProperties({
       boardBlock: { fields: { cardProperties: exampleProperties } as any }
     });
 
-    const extractedValues = extractCardProposalProperties({
+    const extractedValues = getCardPropertiesFromProposal({
       card: {
         fields: {
           properties: {
