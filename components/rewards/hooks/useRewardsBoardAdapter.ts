@@ -212,7 +212,7 @@ export function mapRewardToCard({
             limit: reward.maxSubmissions
           }) as number
         )?.toString()
-      : '-',
+      : 'Unlimited',
     [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [REWARDER_BLOCK_ID]: (rewardPage?.createdBy && [rewardPage.createdBy]) || '',
     // focalboard component expects a timestamp

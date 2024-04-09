@@ -9,7 +9,7 @@ export type EditableProps = {
   readOnly?: boolean;
   spellCheck?: boolean;
   autoExpand?: boolean;
-
+  skipValidation?: boolean;
   validator?: (value: string) => boolean;
   onCancel?: () => void;
   onSave?: (saveType: 'onEnter' | 'onEsc' | 'onBlur') => void;
@@ -80,7 +80,7 @@ export function useEditable(
 
   const { value, onChange, className, placeholderText, readOnly } = props;
   let error = false;
-  if (props.validator) {
+  if (props.validator && !props.skipValidation) {
     error = !props.validator(value || '');
   }
   return {

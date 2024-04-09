@@ -679,6 +679,7 @@ function PropertyValueElement(props: Props) {
     },
     onCancel: () => setValue(propertyValue || ''),
     validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
+    skipValidation: propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID && value.toString() === 'Unlimited',
     spellCheck: propertyTemplate.type === 'text',
     wrapColumn: props.wrapColumn ?? false,
     columnRef: props.columnRef
