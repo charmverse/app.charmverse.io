@@ -4,7 +4,8 @@ import type { FormFieldValue } from 'components/common/form/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
-import type { IPropertyTemplate } from './board';
+import type { IPropertyTemplate } from '../board';
+
 import { excludedFieldTypes } from './setDatabaseProposalProperties';
 
 export function getCardPropertiesFromAnswers({

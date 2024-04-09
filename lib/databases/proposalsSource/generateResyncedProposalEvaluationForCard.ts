@@ -1,8 +1,8 @@
 import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 
-import type { IPropertyTemplate } from './board';
-import type { CardPropertyValue } from './card';
+import type { IPropertyTemplate } from '../board';
+import type { CardPropertyValue } from '../card';
 
 export function generateResyncedProposalEvaluationForCard({
   properties,

@@ -5,11 +5,13 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
+import { assembleBlocks } from 'lib/databases/proposalsSource/assembleBlocks';
+import { createCards } from 'lib/databases/proposalsSource/createCards';
+import { getProposalsAsCards } from 'lib/databases/proposalsSource/getProposalsAsCards';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isTruthy } from 'lib/utils/types';
-
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
@@ -54,19 +56,24 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
 
   const { blocks } = await getRelatedBlocks(blockId);
   const block = blocks.find((b) => b.id === blockId);
+
+  // Hydrate and filter blocks based on proposal permissions
   if ((block?.fields as BoardFields).sourceType === 'proposals') {
-    // Filter blocks based on proposal permissions
-    const permissionsById = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
-      spaceId: page.spaceId,
-      userId: req.session.user?.id
-    });
+    const [permissionsById, newCards, proposalCards] = await Promise.all([
+      permissionsApiClient.proposals.bulkComputeProposalPermissions({
+        spaceId: page.spaceId,
+        userId: req.session.user?.id
+      }),
+      createCards({ boardId: blockId, spaceId: page.spaceId }),
+      getProposalsAsCards({ boardId: blockId, spaceId: page.spaceId })
+    ]);
+    const result = assembleBlocks({ permissions: permissionsById, blocks: blocks.concat(newCards), proposalCards });
     // Remmeber to allow normal blocks that do not have a page, like views, to be shown
-    const filtered = blocks.filter(
+    const filtered = result.filter(
       (b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view
     );
     return res.status(200).json(filtered);
   } else {
-    const x = Math.random();
     const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
       pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
       userId: req.session.user?.id

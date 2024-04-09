@@ -10,7 +10,7 @@ import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
-import { EVALUATION_STATUS_LABELS } from '../proposalDbProperties';
+import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';
 import { setDatabaseProposalProperties } from '../setDatabaseProposalProperties';
 
 const statusPropertyOptions = objectUtils.typedKeys(EVALUATION_STATUS_LABELS);

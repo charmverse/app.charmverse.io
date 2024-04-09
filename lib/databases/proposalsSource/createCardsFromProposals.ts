@@ -15,12 +15,12 @@ import type {
 } from 'lib/proposals/rubric/interfaces';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from '../pages/createCardPage';
+import { createCardPage } from '../../pages/createCardPage';
+import type { Board, BoardFields } from '../board';
+import { proposalPropertyTypesList } from '../board';
+import type { BoardViewFields } from '../boardView';
+import type { CardPropertyValue } from '../card';
 
-import type { Board, BoardFields } from './board';
-import { proposalPropertyTypesList } from './board';
-import type { BoardViewFields } from './boardView';
-import type { CardPropertyValue } from './card';
 import { extractDatabaseProposalProperties } from './extractDatabaseProposalProperties';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { getCardPropertiesFromAnswers } from './getCardPropertiesFromAnswers';

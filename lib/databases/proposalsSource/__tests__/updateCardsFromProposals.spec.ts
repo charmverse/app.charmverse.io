@@ -11,9 +11,9 @@ import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
-import type { BoardFields, IPropertyTemplate } from '../board';
-import type { BoardViewFields } from '../boardView';
-import type { CardFields } from '../card';
+import type { BoardFields, IPropertyTemplate } from '../../board';
+import type { BoardViewFields } from '../../boardView';
+import type { CardFields } from '../../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
 import { updateCardsFromProposals } from '../updateCardsFromProposals';
 

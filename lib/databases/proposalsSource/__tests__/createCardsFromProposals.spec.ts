@@ -12,8 +12,8 @@ import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/s
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
-import type { BoardViewFields } from '../boardView';
-import type { CardFields } from '../card';
+import type { BoardViewFields } from '../../boardView';
+import type { CardFields } from '../../card';
 import { createCardsFromProposals } from '../createCardsFromProposals';
 
 describe('createCardsFromProposals', () => {

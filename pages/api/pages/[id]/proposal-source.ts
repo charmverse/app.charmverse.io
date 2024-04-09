@@ -4,8 +4,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createCardsFromProposals } from 'lib/databases/createCardsFromProposals';
-import { updateCardsFromProposals } from 'lib/databases/updateCardsFromProposals';
+import { createCardsFromProposals } from 'lib/databases/proposalsSource/createCardsFromProposals';
+import { updateCardsFromProposals } from 'lib/databases/proposalsSource/updateCardsFromProposals';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';

@@ -9,8 +9,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import _ from 'lodash';
 
 import { prismaToUIBlock } from 'lib/databases/block';
-import { extractCardProposalProperties } from 'lib/databases/extractCardProposalProperties';
-import { extractDatabaseProposalProperties } from 'lib/databases/extractDatabaseProposalProperties';
+import { extractCardProposalProperties } from 'lib/databases/proposalsSource/extractCardProposalProperties';
+import { extractDatabaseProposalProperties } from 'lib/databases/proposalsSource/extractDatabaseProposalProperties';
 import { InvalidStateError } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
@@ -22,13 +22,13 @@ import type {
 import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
-import { createCardPage } from '../pages/createCardPage';
+import { createCardPage } from '../../pages/createCardPage';
+import { proposalPropertyTypesList } from '../board';
+import type { IPropertyTemplate, Board, BoardFields } from '../board';
+import type { BoardViewFields } from '../boardView';
+import type { CardFields, CardPropertyValue } from '../card';
+import { DEFAULT_BOARD_BLOCK_ID } from '../customBlocks/constants';
 
-import { proposalPropertyTypesList } from './board';
-import type { IPropertyTemplate, Board, BoardFields } from './board';
-import type { BoardViewFields } from './boardView';
-import type { CardFields, CardPropertyValue } from './card';
-import { DEFAULT_BOARD_BLOCK_ID } from './customBlocks/constants';
 import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
 import { getCardPropertiesFromAnswers } from './getCardPropertiesFromAnswers';
 import { setDatabaseProposalProperties } from './setDatabaseProposalProperties';
