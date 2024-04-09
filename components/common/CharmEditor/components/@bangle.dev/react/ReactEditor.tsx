@@ -25,11 +25,10 @@ import { useUser } from 'hooks/useUser';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utils/browser';
-import { slugify } from 'lib/utils/strings';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
-import { scrollIntoHeadingNode } from '../../heading';
+import { scrollToHeadingNode } from '../../heading';
 import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
@@ -149,6 +148,16 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
       editor.view.dispatch(editor.view.state.tr.setMeta(threadPluginKey, threadIds));
     }
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
+
+  useEffect(() => {
+    const locationHash = window.location.hash.slice(1);
+    if (editor && locationHash && !isLoadingRef.current) {
+      scrollToHeadingNode({
+        view: editor.view,
+        headingSlug: locationHash
+      });
+    }
+  }, [isLoadingRef.current, !!editor]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {

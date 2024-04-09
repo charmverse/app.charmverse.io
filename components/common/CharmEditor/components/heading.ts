@@ -190,7 +190,7 @@ export function insertEmptyParaBelow() {
   });
 }
 
-export function scrollIntoHeadingNode({ view, headingSlug }: { view: EditorView; headingSlug: string }) {
+export function scrollToHeadingNode({ view, headingSlug }: { view: EditorView; headingSlug: string }) {
   let nodePos: number | undefined;
   view.state.doc.descendants((node, pos) => {
     if (node.type.name === 'heading' && slugify(node.textContent) === headingSlug) {
