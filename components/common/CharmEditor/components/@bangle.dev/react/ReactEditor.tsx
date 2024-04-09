@@ -152,9 +152,12 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   useEffect(() => {
     const locationHash = window.location.hash.slice(1);
     if (editor && locationHash && !isLoadingRef.current) {
-      scrollToHeadingNode({
-        view: editor.view,
-        headingSlug: locationHash
+      // delay scrolling to allow images and embeds to be loaded
+      setTimeout(() => {
+        scrollToHeadingNode({
+          view: editor.view,
+          headingSlug: locationHash
+        });
       });
     }
   }, [isLoadingRef.current, !!editor]);
