@@ -14,7 +14,6 @@ import type { MarkdownSerializerState } from 'prosemirror-markdown';
 import type { Node, Schema } from 'prosemirror-model';
 import { NodeSelection } from 'prosemirror-state';
 import type { Command, EditorState, PluginKey } from 'prosemirror-state';
-import { findDomRefAtPos } from 'prosemirror-utils';
 import type { EditorView } from 'prosemirror-view';
 
 import type { RawPlugins } from 'components/common/CharmEditor/components/@bangle.dev/core/plugin-loader';
@@ -199,19 +198,15 @@ export function scrollIntoHeadingNode({ view, headingSlug }: { view: EditorView;
       return false;
     }
   });
-
-  const domNode = nodePos ? (findDomRefAtPos(nodePos, view.domAtPos.bind(view)) as HTMLElement) : false;
-  if (domNode && typeof nodePos !== 'undefined') {
+  if (typeof nodePos === 'number') {
     view.dispatch(
       view.state.tr
         .setSelection(NodeSelection.create(view.state.doc, nodePos))
         // disable floating menu or other tooltips from appearing
         .setMeta('skip-selection-tooltip', true)
     );
-    // hideSelectionTooltip(pluginKey)(view.state, view.dispatch, view);
-    const node = findDomRefAtPos(nodePos, view.domAtPos.bind(view));
-    if (node) {
-      document.querySelector('.document-print-container')?.scrollTo(0, (node as HTMLElement).offsetTop);
-    }
+    // scroll to top of the heading node
+    const domTopPosition = view.coordsAtPos(nodePos).top;
+    document.querySelector('.document-print-container')?.scrollTo({ top: domTopPosition });
   }
 }
