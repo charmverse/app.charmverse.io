@@ -78,7 +78,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
         </Grid>
         <Grid item>
           <FieldLabel>Sync with Github Repo</FieldLabel>
-          <ConnectGithubApp />
+          <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
         </Grid>
       </Grid>
       {isAdmin && (

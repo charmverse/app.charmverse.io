@@ -104,6 +104,6 @@ export class SpacesApi {
   }
 
   connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {
-    return http.POST(`/api/spaces/${spaceId}/github`, { installationId });
+    return http.POST(`/api/spaces/${spaceId}/github/connect`, { installationId });
   }
 }
