@@ -1,3 +1,4 @@
+import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { createAppAuth } from '@octokit/auth-app';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -22,37 +23,23 @@ export type GithubApplicationData = {
   }[];
   spaceGithubCredential: {
     name: string;
-    installationId: number;
-    rewardsRepos: {
-      repositoryName: string;
-      repositoryId: string;
-      rewardTemplateId: string;
-    }[];
+    installationId: string;
+    rewardsRepo: RewardsGithubRepo | null;
   };
 };
 
-async function getGithubApplicationData(req: NextApiRequest, res: NextApiResponse) {
+async function getGithubApplicationData(req: NextApiRequest, res: NextApiResponse<GithubApplicationData | null>) {
   const spaceId = req.query.id as string;
-  const spaceGithubCredential = await prisma.spaceGithubCredential.findFirst({
+  const spaceGithubCredential = await prisma.spaceGithubCredential.findFirstOrThrow({
     where: {
       spaceId
     },
     select: {
       name: true,
       installationId: true,
-      rewardsRepos: {
-        select: {
-          repositoryName: true,
-          repositoryId: true,
-          rewardTemplateId: true
-        }
-      }
+      rewardsRepos: true
     }
   });
-
-  if (!spaceGithubCredential) {
-    return res.status(200).json(null);
-  }
 
   const appOctokit = new Octokit({
     authStrategy: createAppAuth,
@@ -85,7 +72,10 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
 
   return res.status(200).json({
     repositories,
-    spaceGithubCredential
+    spaceGithubCredential: {
+      ...spaceGithubCredential,
+      rewardsRepo: spaceGithubCredential.rewardsRepos[0] ?? null
+    }
   });
 }
 

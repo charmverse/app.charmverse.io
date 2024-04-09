@@ -1,10 +1,13 @@
 import { log } from '@charmverse/core/log';
+import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { SelectChangeEvent } from '@mui/material';
 import { Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
+import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
 
+import charmClient from 'charmClient';
 import {
   useConnectGithubRepository,
   useDisconnectGithubApplication,
@@ -16,7 +19,8 @@ import { useGithubApp } from 'hooks/useGithubApp';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
-import type { ConnectGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
+import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
+import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 
 export const schema = yup.object({
   repositoryId: yup.string().required(),
@@ -32,12 +36,8 @@ function ConnectedGithubAppSection({
   githubAppName
 }: {
   spaceId: string;
-  installationId: number;
-  rewardRepo: Partial<{
-    repositoryId: string;
-    rewardTemplateId: string;
-    repositoryName: string;
-  }>;
+  installationId: string;
+  rewardRepo: RewardsGithubRepo | null;
   repositories: GithubApplicationData['repositories'];
   githubAppName: string;
 }) {
@@ -48,6 +48,16 @@ function ConnectedGithubAppSection({
   const { trigger: connectGithubRepository, isMutating: isConnectingGithubRepository } =
     useConnectGithubRepository(spaceId);
   const { templates, isLoading: isLoadingRewardTemplates } = useRewardTemplates();
+
+  const { trigger: updateGithubRepoWithReward, isMutating: isUpdatingGithubRepoWithReward } = useSWRMutation(
+    rewardRepo ? `spaces/${spaceId}/github/repo/${rewardRepo.id}` : null,
+    (_url, { arg }: Readonly<{ arg: UpdateGithubRepoWithReward }>) =>
+      charmClient.spaces.updateGithubRewardsRepo({
+        repoId: rewardRepo?.id as string,
+        spaceId,
+        payload: arg
+      })
+  );
 
   async function handleDisconnect() {
     try {
@@ -66,7 +76,11 @@ function ConnectedGithubAppSection({
   }
 
   const { setValue, watch, getValues, formState } = useForm({
-    defaultValues: rewardRepo,
+    defaultValues: rewardRepo ?? {
+      repositoryId: '',
+      rewardTemplateId: '',
+      repositoryName: ''
+    },
     reValidateMode: 'onChange',
     resolver: yupResolver(schema)
   });
@@ -93,7 +107,11 @@ function ConnectedGithubAppSection({
     });
   }
 
-  const disabled = isConnectingGithubRepository || isDisconnectingGithubApplication || isLoadingRewardTemplates;
+  const disabled =
+    isConnectingGithubRepository ||
+    isDisconnectingGithubApplication ||
+    isLoadingRewardTemplates ||
+    isUpdatingGithubRepoWithReward;
 
   async function handleConnectGithubRepository() {
     if (!formState.isValid) {
@@ -103,8 +121,13 @@ function ConnectedGithubAppSection({
     const connectGithubPayload = getValues();
 
     try {
-      await connectGithubRepository(connectGithubPayload as ConnectGithubRepoPayload);
+      if (rewardRepo === null) {
+        await connectGithubRepository(connectGithubPayload as ConnectRewardGithubRepoPayload);
+      } else {
+        await updateGithubRepoWithReward(connectGithubPayload);
+      }
       showMessage('Github repository connected', 'success');
+      mutate();
     } catch (err) {
       showMessage('Failed to connect Github repository', 'error');
       log.error('Failed to connect Github repository', {
@@ -182,7 +205,7 @@ function ConnectedGithubAppSection({
               }}
               variant='contained'
               color='primary'
-              loading={isConnectingGithubRepository}
+              loading={isConnectingGithubRepository || isUpdatingGithubRepoWithReward}
               disabled={!formState.isValid || disabled || !formState.isDirty}
               disabledTooltip={!formState.isValid ? 'Select a reward template and repository' : undefined}
               onClick={handleConnectGithubRepository}
@@ -239,7 +262,7 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
             installationId={data.spaceGithubCredential.installationId}
             spaceId={spaceId}
             repositories={data.repositories}
-            rewardRepo={data.spaceGithubCredential.rewardsRepos[0]}
+            rewardRepo={data.spaceGithubCredential.rewardsRepo}
             githubAppName={data.spaceGithubCredential.name}
           />
         ))}

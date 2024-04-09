@@ -14,8 +14,6 @@ const handler = nc({
 
 handler.get(connectGithub);
 
-// https://github.com/apps/dev-charmverse-integration/installations/new?state=%7B%22spaceId%22%3A%22d59149ab-0515-4096-8c59-ebc1c3ad04c0%22%7D
-
 const auth = createOAuthAppAuth({
   clientType: 'github-app',
   clientId: process.env.GITHUB_APP_CLIENT_ID!,

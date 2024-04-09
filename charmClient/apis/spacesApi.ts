@@ -8,6 +8,7 @@ import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequir
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
 import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
+import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
@@ -105,5 +106,17 @@ export class SpacesApi {
 
   connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {
     return http.POST(`/api/spaces/${spaceId}/github/connect`, { installationId });
+  }
+
+  updateGithubRewardsRepo({
+    spaceId,
+    repoId,
+    payload
+  }: {
+    spaceId: string;
+    repoId: string;
+    payload: UpdateGithubRepoWithReward;
+  }) {
+    return http.PUT(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
   }
 }

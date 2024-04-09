@@ -1,3 +1,4 @@
+import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -10,18 +11,18 @@ const handler = nc({
   onNoMatch
 });
 
-handler.use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' })).post(connectGithubRepo);
+handler.use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' })).post(connectGithubRepoWithReward);
 
-export type ConnectGithubRepoPayload = {
+export type ConnectRewardGithubRepoPayload = {
   rewardTemplateId: string;
   repositoryId: string;
   repositoryName: string;
 };
 
-async function connectGithubRepo(req: NextApiRequest, res: NextApiResponse) {
+async function connectGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse<RewardsGithubRepo>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
-  const { repositoryId, rewardTemplateId, repositoryName } = req.body as ConnectGithubRepoPayload;
+  const { repositoryId, rewardTemplateId, repositoryName } = req.body as ConnectRewardGithubRepoPayload;
 
   const spaceGithubCredential = await prisma.spaceGithubCredential.findFirstOrThrow({
     where: {
@@ -34,28 +35,17 @@ async function connectGithubRepo(req: NextApiRequest, res: NextApiResponse) {
     }
   });
 
-  await prisma.rewardsGithubRepo.upsert({
-    create: {
+  const rewardsGithubRepo = await prisma.rewardsGithubRepo.create({
+    data: {
       repositoryId,
       repositoryName,
       rewardTemplateId,
       credentialId: spaceGithubCredential.id,
       rewardAuthorId: userId
-    },
-    update: {
-      repositoryName,
-      rewardTemplateId,
-      rewardAuthorId: userId
-    },
-    where: {
-      credentialId_repositoryId: {
-        credentialId: spaceGithubCredential.id,
-        repositoryId
-      }
     }
   });
 
-  return res.status(200).end();
+  return res.status(200).json(rewardsGithubRepo);
 }
 
 export default withSessionRoute(handler);
