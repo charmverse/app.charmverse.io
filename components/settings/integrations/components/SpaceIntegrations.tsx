@@ -10,12 +10,12 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { isTruthy } from 'lib/utils/types';
 
 import { ConnectBoto } from './ConnectBoto';
 import { ConnectCollabland } from './ConnectCollabland';
+import { ConnectGithubApp } from './ConnectGithubApp';
 import { SnapshotIntegration } from './SnapshotDomain';
 
 const schema = yup.object({
@@ -38,7 +38,6 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { refreshCurrentSpace } = useCurrentSpace();
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
-  const isAllowedSpace = useIsCharmverseSpace();
   const {
     handleSubmit,
     reset,
@@ -76,6 +75,10 @@ export function SpaceIntegrations({ space }: { space: Space }) {
         <Grid item>
           <FieldLabel>Send events to Discord/Telegram</FieldLabel>
           <ConnectBoto />
+        </Grid>
+        <Grid item>
+          <FieldLabel>Sync with Github Repo</FieldLabel>
+          <ConnectGithubApp />
         </Grid>
       </Grid>
       {isAdmin && (

@@ -30,15 +30,14 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  const appAuth = createAppAuth({
-    appId: process.env.GITHUB_APP_ID!,
-    privateKey: process.env.GITHUB_APP_PRIVATE_KEY!,
-    installationId
-  });
-
   const appOctokit = new Octokit({
     authStrategy: createAppAuth,
-    auth: appAuth
+    auth: {
+      appId: Number(process.env.GITHUB_APP_ID),
+      // Replace newlines with actual newlines
+      privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+      installationId
+    }
   });
 
   const { data: app } = await appOctokit.request('GET /app');

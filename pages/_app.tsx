@@ -36,6 +36,7 @@ import { CurrentSpaceProvider } from 'hooks/useCurrentSpace';
 import { DiscordProvider } from 'hooks/useDiscordConnection';
 import { FarcasterUserProvider } from 'hooks/useFarcasterUser';
 import { PostCategoriesProvider } from 'hooks/useForumCategories';
+import { GithubAppProvider } from 'hooks/useGithubApp';
 import { useInterval } from 'hooks/useInterval';
 import { IsSpaceMemberProvider } from 'hooks/useIsSpaceMember';
 import { DbViewSettingsProvider } from 'hooks/useLocalDbViewSettings';
@@ -167,32 +168,34 @@ export default function App({ Component, pageProps, router }: AppPropsWithLayout
               <SettingsDialogProvider>
                 <LocalizationProvider>
                   <NotionProvider>
-                    <IntlProvider>
-                      <DbViewSettingsProvider>
-                        <PageHead {...pageProps} />
+                    <GithubAppProvider>
+                      <IntlProvider>
+                        <DbViewSettingsProvider>
+                          <PageHead {...pageProps} />
 
-                        <RouteGuard>
-                          <ErrorBoundary>
-                            <Snackbar
-                              isOpen={isOldBuild}
-                              message='New CharmVerse platform update available. Please refresh.'
-                              actions={[
-                                <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
-                                  <RefreshIcon fontSize='small' />
-                                </IconButton>
-                              ]}
-                              origin={{ vertical: 'top', horizontal: 'center' }}
-                              severity='warning'
-                              handleClose={() => setIsOldBuild(false)}
-                            />
+                          <RouteGuard>
+                            <ErrorBoundary>
+                              <Snackbar
+                                isOpen={isOldBuild}
+                                message='New CharmVerse platform update available. Please refresh.'
+                                actions={[
+                                  <IconButton key='reload' onClick={() => window.location.reload()} color='inherit'>
+                                    <RefreshIcon fontSize='small' />
+                                  </IconButton>
+                                ]}
+                                origin={{ vertical: 'top', horizontal: 'center' }}
+                                severity='warning'
+                                handleClose={() => setIsOldBuild(false)}
+                              />
 
-                            {getLayout(<Component {...pageProps} />)}
+                              {getLayout(<Component {...pageProps} />)}
 
-                            <GlobalComponents />
-                          </ErrorBoundary>
-                        </RouteGuard>
-                      </DbViewSettingsProvider>
-                    </IntlProvider>
+                              <GlobalComponents />
+                            </ErrorBoundary>
+                          </RouteGuard>
+                        </DbViewSettingsProvider>
+                      </IntlProvider>
+                    </GithubAppProvider>
                   </NotionProvider>
                 </LocalizationProvider>
               </SettingsDialogProvider>
