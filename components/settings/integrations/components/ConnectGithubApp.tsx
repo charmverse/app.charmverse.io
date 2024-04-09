@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { SelectChangeEvent } from '@mui/material';
-import { Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { alpha, Chip, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -14,9 +14,12 @@ import {
   useGetGithubApplicationData
 } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
+import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
 import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
@@ -25,8 +28,16 @@ import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/re
 export const schema = yup.object({
   repositoryId: yup.string().required(),
   rewardTemplateId: yup.string().uuid().required(),
-  repositoryName: yup.string().required()
+  repositoryName: yup.string().required(),
+  rewardAuthorId: yup.string().uuid().required(),
+  repositoryLabels: yup.array(yup.string())
 });
+
+const formValueOptions = {
+  shouldDirty: true,
+  shouldTouch: true,
+  shouldValidate: true
+};
 
 function ConnectedGithubAppSection({
   installationId,
@@ -48,7 +59,7 @@ function ConnectedGithubAppSection({
   const { trigger: connectGithubRepository, isMutating: isConnectingGithubRepository } =
     useConnectGithubRepository(spaceId);
   const { templates, isLoading: isLoadingRewardTemplates } = useRewardTemplates();
-
+  const { membersRecord } = useMembers();
   const { trigger: updateGithubRepoWithReward, isMutating: isUpdatingGithubRepoWithReward } = useSWRMutation(
     rewardRepo ? `spaces/${spaceId}/github/repo/${rewardRepo.id}` : null,
     (_url, { arg }: Readonly<{ arg: UpdateGithubRepoWithReward }>) =>
@@ -79,7 +90,9 @@ function ConnectedGithubAppSection({
     defaultValues: rewardRepo ?? {
       repositoryId: '',
       rewardTemplateId: '',
-      repositoryName: ''
+      repositoryName: '',
+      rewardAuthorId: '',
+      repositoryLabels: []
     },
     reValidateMode: 'onChange',
     resolver: yupResolver(schema)
@@ -87,6 +100,8 @@ function ConnectedGithubAppSection({
 
   const repositoryId = watch('repositoryId');
   const rewardTemplateId = watch('rewardTemplateId');
+  const rewardAuthorId = watch('rewardAuthorId');
+  const repositoryLabels = watch('repositoryLabels');
 
   async function handleChangeRepo(event: SelectChangeEvent<string>) {
     const repoId = event.target.value;
@@ -95,16 +110,8 @@ function ConnectedGithubAppSection({
       return;
     }
 
-    setValue('repositoryId', repoId, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
-    setValue('repositoryName', repository.name, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
+    setValue('repositoryId', repoId, formValueOptions);
+    setValue('repositoryName', repository.name, formValueOptions);
   }
 
   const disabled =
@@ -139,6 +146,8 @@ function ConnectedGithubAppSection({
     }
   }
 
+  const selectedRepository = repositories.find((repo) => repo.id.toString() === repositoryId);
+
   return (
     <Grid container direction='row' gap={1} justifyContent='space-between' alignItems='center'>
       <Grid item xs={12}>
@@ -146,11 +155,9 @@ function ConnectedGithubAppSection({
           <Typography>
             Connected to <strong>{githubAppName}</strong>
           </Typography>
-          <Stack flexDirection='row' gap={1}>
+          <Stack>
+            <FieldLabel variant='subtitle1'>Repository</FieldLabel>
             <Select
-              sx={{
-                width: '50%'
-              }}
               disabled={disabled}
               displayEmpty
               renderValue={(repoId) => {
@@ -171,14 +178,49 @@ function ConnectedGithubAppSection({
                 </MenuItem>
               ))}
             </Select>
+          </Stack>
+          <Stack>
+            <FieldLabel variant='subtitle1'>Labels</FieldLabel>
             <Select
-              sx={{
-                width: '50%'
+              disabled={disabled}
+              displayEmpty
+              renderValue={(labels) => {
+                return (
+                  <Stack direction='row' gap={1}>
+                    {labels.map((label) => (
+                      <Chip size='small' key={label} label={label} />
+                    ))}
+                  </Stack>
+                );
               }}
+              onChange={(e) => {
+                setValue('repositoryLabels', e.target.value as string[], formValueOptions);
+              }}
+              placeholder='Select labels'
+              value={repositoryLabels}
+              multiple
+            >
+              {selectedRepository?.labels.map((label) => (
+                <MenuItem key={label.name} value={label.name.toString()}>
+                  <Chip
+                    size='small'
+                    label={label.name}
+                    sx={{
+                      border: `1px solid #${label.color}`,
+                      backgroundColor: alpha(`#${label.color}`, 0.1)
+                    }}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
+          </Stack>
+          <Stack>
+            <FieldLabel variant='subtitle1'>Reward Template</FieldLabel>
+            <Select
               disabled={disabled}
               displayEmpty
               onChange={(e) => {
-                setValue('rewardTemplateId', e.target.value);
+                setValue('rewardTemplateId', e.target.value, formValueOptions);
               }}
               renderValue={(templateId) => {
                 const template = templates?.find((tpl) => tpl.page.id === templateId);
@@ -197,6 +239,19 @@ function ConnectedGithubAppSection({
                 </MenuItem>
               ))}
             </Select>
+          </Stack>
+          <Stack>
+            <FieldLabel variant='subtitle1'>Reward Author</FieldLabel>
+            <InputSearchMemberMultiple
+              onChange={(id: string[]) => {
+                setValue('rewardAuthorId', id[0], formValueOptions);
+              }}
+              disableClearable
+              defaultValue={rewardRepo ? [rewardAuthorId] : undefined}
+              disableCloseOnSelect
+              filterSelectedOptions
+              placeholder={!rewardAuthorId ? 'Search for a person...' : ''}
+            />
           </Stack>
           <Stack flexDirection='row' gap={1}>
             <Button

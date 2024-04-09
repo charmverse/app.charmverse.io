@@ -17,12 +17,14 @@ export type ConnectRewardGithubRepoPayload = {
   rewardTemplateId: string;
   repositoryId: string;
   repositoryName: string;
+  rewardAuthorId: string;
+  repositoryLabels: string[];
 };
 
 async function connectGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse<RewardsGithubRepo>) {
   const spaceId = req.query.id as string;
-  const userId = req.session.user.id;
-  const { repositoryId, rewardTemplateId, repositoryName } = req.body as ConnectRewardGithubRepoPayload;
+  const { repositoryId, rewardTemplateId, repositoryName, repositoryLabels, rewardAuthorId } =
+    req.body as ConnectRewardGithubRepoPayload;
 
   const spaceGithubCredential = await prisma.spaceGithubCredential.findFirstOrThrow({
     where: {
@@ -40,8 +42,9 @@ async function connectGithubRepoWithReward(req: NextApiRequest, res: NextApiResp
       repositoryId,
       repositoryName,
       rewardTemplateId,
-      credentialId: spaceGithubCredential.id,
-      rewardAuthorId: userId
+      rewardAuthorId,
+      repositoryLabels,
+      credentialId: spaceGithubCredential.id
     }
   });
 

@@ -20,6 +20,7 @@ export type GithubApplicationData = {
     name: string;
     url: string;
     id: number;
+    labels: { name: string; color: string }[];
   }[];
   spaceGithubCredential: {
     name: string;
@@ -61,7 +62,22 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
       per_page: perPage
     });
 
-    repositories = [...repositories, ...repos.repositories.map(({ name, id, url }) => ({ name, url, id }))];
+    const repoPromises = repos.repositories.map(async (repo) => {
+      const { data: labels } = await appOctokit.request('GET /repos/{owner}/{repo}/labels', {
+        owner: repo.owner.login,
+        repo: repo.name
+      });
+
+      return {
+        name: repo.name,
+        url: repo.url,
+        id: repo.id,
+        labels: labels.map((label) => ({ name: label.name, color: label.color }))
+      };
+    });
+
+    const repoData = await Promise.all(repoPromises);
+    repositories = [...repositories, ...repoData];
 
     if (repos.repositories.length < perPage) {
       hasMore = false;

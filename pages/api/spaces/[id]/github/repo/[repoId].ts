@@ -16,12 +16,15 @@ export type UpdateGithubRepoWithReward = Partial<{
   rewardTemplateId: string;
   repositoryId: string;
   repositoryName: string;
+  repositoryLabels: string[];
+  rewardAuthorId: string;
 }>;
 
 async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
   const repoId = req.query.repoId as string;
-  const { repositoryId, rewardTemplateId, repositoryName } = req.body as UpdateGithubRepoWithReward;
+  const { repositoryId, rewardTemplateId, repositoryName, repositoryLabels, rewardAuthorId } =
+    req.body as UpdateGithubRepoWithReward;
   await prisma.rewardsGithubRepo.updateMany({
     where: {
       id: repoId,
@@ -31,6 +34,8 @@ async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiRespo
     },
     data: {
       repositoryName,
+      repositoryLabels,
+      rewardAuthorId,
       repositoryId,
       rewardTemplateId
     }
