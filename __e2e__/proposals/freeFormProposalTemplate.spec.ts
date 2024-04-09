@@ -524,7 +524,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
                       __limit: '',
                       __title: '',
                       __rewarder: '',
-                      __available: '-',
+                      __available: 'Unlimited',
                       __createdAt: '',
                       __reviewers: [
                         {
