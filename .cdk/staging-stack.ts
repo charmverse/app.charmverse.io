@@ -153,6 +153,11 @@ export class CdkDeployStack extends Stack {
         value: 'us-east-1a,us-east-1d,us-east-1c,us-east-1f'
       },
       {
+        namespace: 'aws:autoscaling:trigger',
+        optionName: 'LowerThreshold',
+        value: '0' // never hit the lower threshold, so that we dont get chaged for scaling Alarms
+      },
+      {
         namespace: 'aws:ec2:instances',
         optionName: 'InstanceTypes',
         value: 't3a.small,t3.small'

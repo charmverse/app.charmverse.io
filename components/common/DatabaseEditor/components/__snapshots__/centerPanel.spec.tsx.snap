@@ -31,6 +31,8 @@ exports[`components/centerPanel return centerPanel and click on card to show car
                 >
                   <button
                     class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
+                    data-view-id="1"
+                    draggable="true"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -740,6 +742,8 @@ exports[`components/centerPanel should match snapshot for Gallery 1`] = `
                 >
                   <button
                     class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
+                    data-view-id="1"
+                    draggable="true"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -1199,6 +1203,8 @@ exports[`components/centerPanel should match snapshot for Kanban 1`] = `
                 >
                   <button
                     class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
+                    data-view-id="1"
+                    draggable="true"
                     role="tab"
                     tabindex="-1"
                     type="button"
@@ -1908,6 +1914,8 @@ exports[`components/centerPanel should match snapshot for Table 1`] = `
                 >
                   <button
                     class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
+                    data-view-id="1"
+                    draggable="true"
                     role="tab"
                     tabindex="-1"
                     type="button"
