@@ -67,6 +67,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   options: IPropertyOption[];
   description?: string;
   formFieldId?: string;
+  private?: boolean; // used for answers to form fields in proposal-as-a-source
   proposalFieldId?: string;
   relationData?: RelationPropertyData;
 };

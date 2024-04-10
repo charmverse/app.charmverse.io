@@ -101,7 +101,7 @@ export async function getCardPropertiesFromProposals({
 
   return proposalPages.reduce<Record<string, ProposalCardData>>((acc, { proposal, ...page }) => {
     if (proposal) {
-      acc[page.id] = mapProposalToCard({
+      acc[page.id] = getCardProperties({
         page,
         proposal,
         cardProperties,
@@ -112,15 +112,7 @@ export async function getCardPropertiesFromProposals({
   }, {});
 }
 
-export async function getCardPropertiesFromProposal({
-  canViewPrivateFields,
-  boardId,
-  pageId
-}: {
-  canViewPrivateFields: boolean;
-  boardId: string;
-  pageId: string;
-}): Promise<ProposalCardData> {
+export async function getCardPropertiesFromProposal({ boardId, pageId }: { boardId: string; pageId: string }) {
   const [boardBlock, { proposal, ...page }] = await Promise.all([
     prisma.block.findFirstOrThrow({ where: { id: boardId } }),
     prisma.page.findFirstOrThrow({
@@ -150,12 +142,15 @@ export async function getCardPropertiesFromProposal({
       })
     : [];
 
-  return mapProposalToCard({
-    cardProperties: (boardBlock.fields as any as BoardFields).cardProperties,
-    formFields,
-    proposal,
-    page
-  });
+  return {
+    boardBlock,
+    card: getCardProperties({
+      cardProperties: (boardBlock.fields as any as BoardFields).cardProperties,
+      formFields,
+      proposal,
+      page
+    })
+  };
 }
 
 type ProposalData = {
@@ -176,7 +171,7 @@ type ProposalData = {
   cardProperties: IPropertyTemplate[];
 };
 
-function mapProposalToCard({ page, proposal, cardProperties, formFields }: ProposalData): ProposalCardData {
+function getCardProperties({ page, proposal, cardProperties, formFields }: ProposalData): ProposalCardData {
   const proposalProps = getCardPropertyTemplates({ cardProperties });
 
   let properties: Record<string, CardPropertyValue> = {};
@@ -230,7 +225,6 @@ function mapProposalToCard({ page, proposal, cardProperties, formFields }: Propo
   });
 
   const formFieldProperties = getCardPropertiesFromForm({
-    accessPrivateFields: true,
     cardProperties,
     formAnswers: proposal.formAnswers,
     formFields

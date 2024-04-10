@@ -13,21 +13,17 @@ export type FormAnswerData = Pick<FormFieldAnswer, 'value' | 'fieldId'>;
 type PropertiesMap = Record<string, FormFieldValue>;
 
 export function getCardPropertiesFromForm({
-  accessPrivateFields,
   formAnswers,
   formFields,
   cardProperties
 }: {
   cardProperties: IPropertyTemplate[];
-  accessPrivateFields: boolean;
   formAnswers: FormAnswerData[];
   formFields: FormFieldData[];
 }): PropertiesMap {
   const properties: PropertiesMap = {};
 
-  const filteredFormFields = accessPrivateFields ? formFields : formFields.filter((formField) => !formField.private);
-
-  for (const formField of filteredFormFields) {
+  for (const formField of formFields) {
     const cardProperty = cardProperties.find((p) => p.formFieldId === formField.id);
     const answerValue = formAnswers.find((ans) => ans.fieldId === formField.id)?.value as FormFieldValue;
     // exclude some field types

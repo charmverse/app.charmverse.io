@@ -93,6 +93,7 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
   ]);
   // combine blocks with proposal cards and permissions
   const assembled = applyPropertiesToCards({
+    boardProperties: block.fields.cardProperties,
     blocks: blocks.concat(newCardBlocks),
     permissions: permissionsById,
     proposalCards

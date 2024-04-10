@@ -4,8 +4,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
+import type { BlockWithDetails } from 'lib/databases/block';
 import { applyPageToBlock } from 'lib/databases/block';
+import type { BoardFields } from 'lib/databases/board';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { applyPropertiesToCard } from 'lib/databases/proposalsSource/applyPropertiesToCards';
 import { getCardPropertiesFromProposal } from 'lib/databases/proposalsSource/getCardProperties';
@@ -56,12 +57,12 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
       resourceId: page.syncWithPageId,
       userId: page.createdBy
     });
-    const proposalCardProps = await getCardPropertiesFromProposal({
-      canViewPrivateFields: proposalPermission.view_private_fields,
+    const { boardBlock, card: proposalCardProps } = await getCardPropertiesFromProposal({
       boardId: block.rootId,
       pageId: page.syncWithPageId
     });
     const updatedFields = applyPropertiesToCard({
+      boardProperties: (boardBlock.fields as any as BoardFields).cardProperties,
       block: result,
       proposalProperties: proposalCardProps,
       canViewPrivateFields: proposalPermission.view_private_fields

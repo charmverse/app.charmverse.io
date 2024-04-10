@@ -1,14 +1,17 @@
 import type { SmallProposalPermissionFlags } from '@charmverse/core/permissions';
 
 import type { BlockWithDetails } from '../block';
+import type { IPropertyTemplate } from '../board';
 
 import type { ProposalCardData } from './getCardProperties';
 
 export function applyPropertiesToCards({
   blocks,
+  boardProperties,
   permissions,
   proposalCards
 }: {
+  boardProperties: IPropertyTemplate[];
   blocks: BlockWithDetails[];
   permissions: Record<string, SmallProposalPermissionFlags>;
   proposalCards: Record<string, ProposalCardData>;
@@ -18,6 +21,7 @@ export function applyPropertiesToCards({
     if (proposalCard) {
       const canViewPrivateFields = !!block.syncWithPageId && permissions[block.syncWithPageId].view_private_fields;
       return applyPropertiesToCard({
+        boardProperties,
         block,
         proposalProperties: proposalCard,
         canViewPrivateFields
@@ -28,26 +32,27 @@ export function applyPropertiesToCards({
 }
 
 export function applyPropertiesToCard({
+  boardProperties,
   block,
   proposalProperties,
   canViewPrivateFields
 }: {
+  boardProperties: IPropertyTemplate[];
   block: BlockWithDetails;
   proposalProperties: ProposalCardData;
   canViewPrivateFields: boolean;
 }) {
-  const accessPrivateFields = !!block.syncWithPageId && canViewPrivateFields;
+  const filteredProperties = Object.entries(proposalProperties.fields.properties).reduce((acc, [key, value]) => {
+    const boardProperty = boardProperties.find((p) => p.id === key);
+    if (canViewPrivateFields || !boardProperty?.private) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {} as ProposalCardData['fields']['properties']);
 
-  // TODO: filter private answers if user does not have access
-  // const formFieldProperties = getCardPropertiesFromForm({
-  //   accessPrivateFields,
-  //   cardProperties: boardBlockCardProperties,
-  //   formFields,
-  //   proposalId: pageProposal.proposal!.id
-  // });
   const properties = {
     ...block.fields.properties,
-    ...proposalProperties.fields.properties
+    ...filteredProperties
   };
   return {
     ...block,

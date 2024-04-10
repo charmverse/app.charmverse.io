@@ -18,11 +18,11 @@ export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
   evaluationStepTitles = [],
-  cardProperties = [],
+  proposalCustomProperties = [],
   rubricStepTitles = []
 }: {
   rubricStepTitles?: string[];
-  cardProperties?: IPropertyTemplate[];
+  proposalCustomProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   currentCardProperties: IPropertyTemplate[];
   formFields?: FormField[];
@@ -88,7 +88,7 @@ export function getBoardProperties({
     rubricStepTitles
   });
 
-  cardProperties.forEach((cardProp) => {
+  proposalCustomProperties.forEach((cardProp) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
 
     if (existingPropIndex > -1) {
@@ -143,7 +143,8 @@ export function getBoardProperties({
         options: boardPropertyOptions,
         description: (formField.description as { content: PageContent; contentText: string })?.contentText,
         type: boardPropertyType,
-        formFieldId: formField.id
+        formFieldId: formField.id,
+        private: formField.private
       };
 
       if (existingPropIndex === -1) {
