@@ -2,6 +2,7 @@ import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
@@ -74,6 +75,10 @@ export function SpaceKyc({
 
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column' mt={2} gap={2}>
+      <Box>
+        <FieldLabel>KYC</FieldLabel>
+        <Typography variant='body2'>Choose your provider</Typography>
+      </Box>
       {(kycCredentials?.synaps?.apiKey || kycCredentials?.persona?.apiKey) && (
         <Box>
           <FormControlLabel
