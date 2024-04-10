@@ -1,5 +1,5 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
-import type { Space, Prisma } from '@charmverse/core/prisma';
+import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
@@ -117,6 +117,6 @@ export class SpacesApi {
     repoId: string;
     payload: UpdateGithubRepoWithReward;
   }) {
-    return http.PUT(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
+    return http.PUT<RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
   }
 }

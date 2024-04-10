@@ -93,7 +93,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^3.2.0",
-    "@charmverse/core": "^0.40.2-rc-github-sync.6",
+    "@charmverse/core": "^0.40.2-rc-github-sync.7",
     "@column-resizer/core": "^1.0.2",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",

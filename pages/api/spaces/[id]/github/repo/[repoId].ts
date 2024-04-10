@@ -20,12 +20,12 @@ export type UpdateGithubRepoWithReward = Partial<
   >
 >;
 
-async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse) {
+async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse<RewardsGithubRepo>) {
   const spaceId = req.query.id as string;
   const repoId = req.query.repoId as string;
   const { repositoryId, rewardTemplateId, repositoryName, repositoryLabels, rewardAuthorId } =
     req.body as UpdateGithubRepoWithReward;
-  await prisma.rewardsGithubRepo.updateMany({
+  const updatedRewardsGithubRepo = await prisma.rewardsGithubRepo.update({
     where: {
       id: repoId,
       connection: {
@@ -41,7 +41,7 @@ async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiRespo
     }
   });
 
-  return res.status(200).end();
+  return res.status(200).json(updatedRewardsGithubRepo);
 }
 
 export default withSessionRoute(handler);

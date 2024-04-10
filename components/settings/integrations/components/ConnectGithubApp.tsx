@@ -19,7 +19,6 @@ import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMem
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
 import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
@@ -27,19 +26,13 @@ import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/re
 
 export const schema = yup.object({
   repositoryId: yup.string().required(),
-  rewardTemplateId: yup.string().uuid().required(),
+  rewardTemplateId: yup.string().uuid().nullable(),
   repositoryName: yup.string().required(),
   rewardAuthorId: yup.string().uuid().required(),
   repositoryLabels: yup.array(yup.string())
 });
 
-const formValueOptions = {
-  shouldDirty: true,
-  shouldTouch: true,
-  shouldValidate: true
-};
-
-function ConnectedGithubAppSection({
+export function ConnectedGithubAppForm({
   installationId,
   spaceId,
   repositories,
@@ -59,7 +52,6 @@ function ConnectedGithubAppSection({
   const { trigger: connectGithubRepository, isMutating: isConnectingGithubRepository } =
     useConnectGithubRepository(spaceId);
   const { templates, isLoading: isLoadingRewardTemplates } = useRewardTemplates();
-  const { membersRecord } = useMembers();
   const { trigger: updateGithubRepoWithReward, isMutating: isUpdatingGithubRepoWithReward } = useSWRMutation(
     rewardRepo ? `spaces/${spaceId}/github/repo/${rewardRepo.id}` : null,
     (_url, { arg }: Readonly<{ arg: UpdateGithubRepoWithReward }>) =>
@@ -86,13 +78,13 @@ function ConnectedGithubAppSection({
     }
   }
 
-  const { setValue, watch, getValues, formState } = useForm({
-    defaultValues: rewardRepo ?? {
-      repositoryId: '',
-      rewardTemplateId: '',
-      repositoryName: '',
-      rewardAuthorId: '',
-      repositoryLabels: []
+  const { setValue, watch, formState, handleSubmit, getValues, reset } = useForm({
+    defaultValues: {
+      repositoryId: rewardRepo?.repositoryId ?? '',
+      rewardTemplateId: rewardRepo?.rewardTemplateId ?? null,
+      repositoryName: rewardRepo?.repositoryName ?? '',
+      rewardAuthorId: rewardRepo?.rewardAuthorId ?? '',
+      repositoryLabels: rewardRepo?.repositoryLabels ?? []
     },
     reValidateMode: 'onChange',
     resolver: yupResolver(schema)
@@ -110,8 +102,16 @@ function ConnectedGithubAppSection({
       return;
     }
 
-    setValue('repositoryId', repoId, formValueOptions);
-    setValue('repositoryName', repository.name, formValueOptions);
+    setValue('repositoryId', repoId, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true
+    });
+    setValue('repositoryName', repository.name, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true
+    });
   }
 
   const disabled =
@@ -120,30 +120,34 @@ function ConnectedGithubAppSection({
     isLoadingRewardTemplates ||
     isUpdatingGithubRepoWithReward;
 
-  async function handleConnectGithubRepository() {
-    if (!formState.isValid) {
-      return;
-    }
-
-    const connectGithubPayload = getValues();
-
-    try {
-      if (rewardRepo === null) {
-        await connectGithubRepository(connectGithubPayload as ConnectRewardGithubRepoPayload);
-      } else {
-        await updateGithubRepoWithReward(connectGithubPayload);
+  function handleConnectGithubRepository() {
+    handleSubmit(
+      async (connectGithubPayload) => {
+        let githubRepoWithReward: RewardsGithubRepo;
+        if (rewardRepo === null) {
+          githubRepoWithReward = await connectGithubRepository(connectGithubPayload as ConnectRewardGithubRepoPayload);
+          showMessage('Github repository connected', 'success');
+        } else {
+          githubRepoWithReward = await updateGithubRepoWithReward(connectGithubPayload);
+          showMessage('Repository connection updated', 'success');
+        }
+        reset(githubRepoWithReward, {
+          keepDirty: false,
+          keepTouched: false,
+          keepErrors: false
+        });
+        mutate();
+      },
+      (connectGithubPayload) => {
+        showMessage('Failed to connect Github repository', 'error');
+        log.error('Failed to connect Github repository', {
+          installationId,
+          spaceId,
+          rewardTemplateId: connectGithubPayload.rewardTemplateId,
+          repositoryId: connectGithubPayload.repositoryId
+        });
       }
-      showMessage('Github repository connected', 'success');
-      mutate();
-    } catch (err) {
-      showMessage('Failed to connect Github repository', 'error');
-      log.error('Failed to connect Github repository', {
-        installationId,
-        spaceId,
-        rewardTemplateId: connectGithubPayload.rewardTemplateId,
-        repositoryId: connectGithubPayload.repositoryId
-      });
-    }
+    )();
   }
 
   const selectedRepository = repositories.find((repo) => repo.id.toString() === repositoryId);
@@ -194,7 +198,11 @@ function ConnectedGithubAppSection({
                 );
               }}
               onChange={(e) => {
-                setValue('repositoryLabels', e.target.value as string[], formValueOptions);
+                setValue('repositoryLabels', e.target.value as string[], {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true
+                });
               }}
               placeholder='Select labels'
               value={repositoryLabels}
@@ -220,7 +228,12 @@ function ConnectedGithubAppSection({
               disabled={disabled}
               displayEmpty
               onChange={(e) => {
-                setValue('rewardTemplateId', e.target.value, formValueOptions);
+                const value = e.target.value;
+                setValue('rewardTemplateId', value === 'none' ? null : value, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true
+                });
               }}
               renderValue={(templateId) => {
                 const template = templates?.find((tpl) => tpl.page.id === templateId);
@@ -231,20 +244,27 @@ function ConnectedGithubAppSection({
                 return <Typography color='secondary'>Select a reward template</Typography>;
               }}
               placeholder='Select a reward template'
-              value={rewardTemplateId ?? ''}
+              value={rewardTemplateId ?? 'none'}
             >
               {templates?.map((template) => (
                 <MenuItem key={template.page.id} value={template.page.id}>
                   <Typography>{template.page.title}</Typography>
                 </MenuItem>
               ))}
+              <MenuItem value='none'>
+                <Typography>None</Typography>
+              </MenuItem>
             </Select>
           </Stack>
           <Stack>
             <FieldLabel variant='subtitle1'>CharmVerse Reward Author</FieldLabel>
             <InputSearchMemberMultiple
               onChange={(id: string[]) => {
-                setValue('rewardAuthorId', id[0], formValueOptions);
+                setValue('rewardAuthorId', id[0], {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                  shouldValidate: true
+                });
               }}
               disableClearable
               defaultValue={rewardRepo ? [rewardAuthorId] : undefined}
@@ -262,7 +282,7 @@ function ConnectedGithubAppSection({
               color='primary'
               loading={isConnectingGithubRepository || isUpdatingGithubRepoWithReward}
               disabled={!formState.isValid || disabled || !formState.isDirty}
-              disabledTooltip={!formState.isValid ? 'Select a reward template and repository' : undefined}
+              disabledTooltip={!formState.isValid ? `Please provide all required fields` : undefined}
               onClick={handleConnectGithubRepository}
             >
               Save
@@ -313,7 +333,7 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
             </Button>
           </Grid>
         ) : (
-          <ConnectedGithubAppSection
+          <ConnectedGithubAppForm
             installationId={data.spaceGithubConnection.installationId}
             spaceId={spaceId}
             repositories={data.repositories}
