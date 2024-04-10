@@ -32,6 +32,12 @@ export const schema = yup.object({
   repositoryLabels: yup.array(yup.string())
 });
 
+const formFieldOptions = {
+  shouldDirty: true,
+  shouldTouch: true,
+  shouldValidate: true
+};
+
 export function ConnectGithubRepoForm({
   installationId,
   spaceId,
@@ -82,7 +88,7 @@ export function ConnectGithubRepoForm({
     }
   }
 
-  const { setValue, watch, formState, handleSubmit, getValues, reset } = useForm({
+  const { setValue, watch, formState, handleSubmit, reset } = useForm({
     defaultValues: {
       repositoryId: rewardRepo?.repositoryId ?? '',
       rewardTemplateId: rewardRepo?.rewardTemplateId ?? null,
@@ -106,16 +112,8 @@ export function ConnectGithubRepoForm({
       return;
     }
 
-    setValue('repositoryId', repoId, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
-    setValue('repositoryName', repository.name, {
-      shouldDirty: true,
-      shouldTouch: true,
-      shouldValidate: true
-    });
+    setValue('repositoryId', repoId, formFieldOptions);
+    setValue('repositoryName', repository.name, formFieldOptions);
   }
 
   const disabled =
@@ -206,11 +204,7 @@ export function ConnectGithubRepoForm({
                 );
               }}
               onChange={(e) => {
-                setValue('repositoryLabels', e.target.value as string[], {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true
-                });
+                setValue('repositoryLabels', e.target.value as string[], formFieldOptions);
               }}
               placeholder='Select labels'
               value={repositoryLabels}
@@ -237,11 +231,7 @@ export function ConnectGithubRepoForm({
               displayEmpty
               onChange={(e) => {
                 const value = e.target.value;
-                setValue('rewardTemplateId', value === 'none' ? null : value, {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true
-                });
+                setValue('rewardTemplateId', value === 'none' ? null : value, formFieldOptions);
               }}
               renderValue={(templateId) => {
                 const template = templates?.find((tpl) => tpl.page.id === templateId);
@@ -268,11 +258,7 @@ export function ConnectGithubRepoForm({
             <FieldLabel variant='subtitle1'>CharmVerse Reward Author</FieldLabel>
             <InputSearchMemberMultiple
               onChange={(id: string[]) => {
-                setValue('rewardAuthorId', id[id.length - 1], {
-                  shouldDirty: true,
-                  shouldTouch: true,
-                  shouldValidate: true
-                });
+                setValue('rewardAuthorId', id[id.length - 1], formFieldOptions);
               }}
               disabled={disabled}
               disableClearable
@@ -290,7 +276,7 @@ export function ConnectGithubRepoForm({
               variant='contained'
               color='primary'
               loading={isConnectingGithubRepository || isUpdatingGithubRepoWithReward}
-              disabled={!formState.isValid || disabled || !formState.isDirty}
+              disabled={!formState.isValid || disabled || Object.keys(formState.dirtyFields).length === 0}
               disabledTooltip={!formState.isValid ? `Please provide all required fields` : undefined}
               onClick={handleConnectGithubRepository}
             >
