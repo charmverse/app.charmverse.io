@@ -6,8 +6,8 @@ import nc from 'next-connect';
 
 import { prismaToBlock } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { updateCardPages } from 'lib/databases/proposalsSource/updateCardPages';
-import { updateDatabaseProperties } from 'lib/databases/proposalsSource/updateDatabaseProperties';
 import { updateViews } from 'lib/databases/proposalsSource/updateViews';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -50,7 +50,7 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const boardBlock = await updateDatabaseProperties({ boardId: pageId });
+  const boardBlock = await updateBoardProperties({ boardId: pageId });
   const board = prismaToBlock(boardBlock) as Board;
   const views = await updateViews({ board });
 

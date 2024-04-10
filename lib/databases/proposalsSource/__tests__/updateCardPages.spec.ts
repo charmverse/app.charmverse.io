@@ -17,7 +17,7 @@ import type { CardFields } from '../../card';
 import { createCards } from '../createCards';
 import { updateCardPages } from '../updateCardPages';
 
-describe('updateCardPages()', () => {
+describe('updateCardPages', () => {
   let user: User;
   let space: Space;
   let board: Page;

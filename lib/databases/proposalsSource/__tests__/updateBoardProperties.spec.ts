@@ -11,11 +11,11 @@ import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
 import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';
-import { updateDatabaseProperties } from '../updateDatabaseProperties';
+import { updateBoardProperties } from '../updateBoardProperties';
 
 const statusPropertyOptions = objectUtils.typedKeys(EVALUATION_STATUS_LABELS);
 
-describe('updateDatabaseProperties()', () => {
+describe('updateBoardProperties()', () => {
   let space: Space;
   let user: User;
 
@@ -44,7 +44,7 @@ describe('updateDatabaseProperties()', () => {
       }
     });
 
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
 
@@ -100,7 +100,7 @@ describe('updateDatabaseProperties()', () => {
       }
     });
 
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
 
@@ -159,7 +159,7 @@ describe('updateDatabaseProperties()', () => {
       }
     });
 
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
 
@@ -176,10 +176,10 @@ describe('updateDatabaseProperties()', () => {
     const urlProp = properties.find((p) => p.type === 'proposalUrl') as IPropertyTemplate;
 
     // --- Run this a second and third time
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
 
@@ -311,7 +311,7 @@ describe('updateDatabaseProperties()', () => {
       }
     });
 
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
 
@@ -408,7 +408,7 @@ describe('updateDatabaseProperties()', () => {
     });
 
     // --- Run this a second and third time
-    await updateDatabaseProperties({
+    await updateBoardProperties({
       boardId: rootId
     });
 
@@ -462,7 +462,7 @@ describe('updateDatabaseProperties()', () => {
     });
 
     await expect(
-      updateDatabaseProperties({
+      updateBoardProperties({
         boardId: rootId
       })
     ).rejects.toBeInstanceOf(InvalidStateError);

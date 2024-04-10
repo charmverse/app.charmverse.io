@@ -8,7 +8,7 @@ import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { applyPropertiesToCards } from 'lib/databases/proposalsSource/applyPropertiesToCards';
 import { createCards } from 'lib/databases/proposalsSource/createCards';
 import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
-import { updateDatabaseProperties } from 'lib/databases/proposalsSource/updateDatabaseProperties';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -76,7 +76,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
 // retrieve blocks for databases using "proposal as a source"
 async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockWithDetails[]) {
   // Update board and view blocks before computing proposal cards
-  const updatedBoard = await updateDatabaseProperties({ boardId: block.id });
+  const updatedBoard = await updateBoardProperties({ boardId: block.id });
   // use the most recent the card properties
   block.fields = updatedBoard.fields as unknown as BoardFields;
 

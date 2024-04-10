@@ -5,7 +5,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 
-import { excludedFieldTypes } from './updateDatabaseProperties';
+import { excludedFieldTypes } from './getBoardProperties';
 
 export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'>;
 export type FormAnswerData = Pick<FormFieldAnswer, 'value' | 'fieldId'>;
