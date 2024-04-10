@@ -1,25 +1,64 @@
 import type { AttestationType, CredentialTemplate } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
+import AddIcon from '@mui/icons-material/Add';
+import type { SxProps, Theme } from '@mui/material';
+import { Autocomplete, Box, Chip, Stack, TextField, Typography } from '@mui/material';
+import { useMemo, type HTMLAttributes } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
-import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
-import type { IPropertyOption } from 'lib/databases/board';
+import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { credentialEventLabels } from 'lib/credentials/constants';
+
+const ADD_CREDENTIAL_TEMPLATE = 'ADD_CREDENTIAL_TEMPLATE' as const;
 
 // import { EmptyPlaceholder } from './EmptyPlaceholder';
+type CredentialTemplateOption =
+  | Pick<CredentialTemplate, 'id' | 'name' | 'credentialEvents'>
+  | typeof ADD_CREDENTIAL_TEMPLATE;
 
 type CredentialsSelectProps = {
-  onChange: (selectedCredentialTemplates: string[]) => void;
+  onChange: (templateIds: string[]) => void;
   selectedCredentialTemplates?: string[] | null;
   readOnly?: boolean;
+  sx?: SxProps<Theme>;
   templateType: AttestationType;
-};
+} & Omit<HTMLAttributes<HTMLLIElement>, 'onChange'>;
+
+function CredentialComponent({
+  credentialEvents,
+  id,
+  name,
+  ...props
+}: Pick<CredentialTemplate, 'id' | 'name' | 'credentialEvents'>) {
+  const { getFeatureTitle } = useSpaceFeatures();
+  return (
+    <Box {...props}>
+      <Stack>
+        <Typography variant='caption' fontWeight='bold'>
+          {name}
+        </Typography>
+        <Box display='flex' gap={2}>
+          {credentialEvents.map((ev) => {
+            const title = credentialEventLabels[ev]?.(getFeatureTitle);
+            return <Chip variant='outlined' key={ev} size='small' title={title} label={title} />;
+          })}
+        </Box>
+      </Stack>
+    </Box>
+  );
+}
 
 export function CredentialSelect({
   onChange,
   selectedCredentialTemplates,
   readOnly,
-  templateType
+  templateType,
+  sx
 }: CredentialsSelectProps) {
   const { credentialTemplates, proposalCredentialTemplates, rewardCredentialTemplates } = useGetCredentialTemplates();
+
+  const { openSettings } = useSettingsDialog();
 
   function _onChange(val: string | string[]) {
     if (Array.isArray(val)) {
@@ -29,6 +68,22 @@ export function CredentialSelect({
     }
   }
 
+  const baseOptions = useMemo(() => {
+    const options =
+      templateType === 'proposal'
+        ? proposalCredentialTemplates
+        : templateType === 'reward'
+        ? rewardCredentialTemplates
+        : ([] as CredentialTemplate[]);
+
+    return options ?? [];
+  }, [proposalCredentialTemplates, rewardCredentialTemplates, templateType]);
+
+  const populatedValues = useMemo(
+    () => [...(baseOptions ?? []).filter((opt) => selectedCredentialTemplates?.includes(opt.id)).map((v) => v.id)],
+    [baseOptions, selectedCredentialTemplates]
+  );
+
   if (!credentialTemplates) {
     return null;
   }
@@ -37,26 +92,89 @@ export function CredentialSelect({
     return null;
   }
 
-  const options = (
-    templateType === 'proposal'
-      ? proposalCredentialTemplates
-      : templateType === 'reward'
-      ? rewardCredentialTemplates
-      : []
-  ) as CredentialTemplate[];
-
   return (
-    <TagSelect
-      onChange={_onChange}
-      propertyValue={selectedCredentialTemplates as any}
-      canEditOptions={false}
-      multiselect
-      showEmpty
-      readOnly={readOnly}
-      readOnlyMessage='You cannot add a credential'
-      noOptionsText='No credentials found'
-      options={options.map((template) => ({ id: template.id, color: 'gray', value: template.name } as IPropertyOption))}
-      emptyMessage='+ Add a credential'
-    />
+    <Box>
+      <Autocomplete<CredentialTemplateOption, true, true, true>
+        sx={{ minWidth: 150, ...sx }}
+        forcePopupIcon
+        onChange={(_, _value) => {
+          if (_value) {
+            onChange(
+              _value
+                .filter((v) => (typeof v === 'string' && stringUtils.isUUID(v)) || !!(v as CredentialTemplate).id)
+                .map((v) => (typeof v === 'string' ? v : (v as CredentialTemplate).id))
+            );
+          } else {
+            onChange([]);
+          }
+        }}
+        getOptionLabel={(option) => (typeof option === 'string' ? '' : option.name)}
+        multiple
+        data-test='token-list'
+        value={populatedValues}
+        // onInputChange={(event, newInputValue) => {
+        //   if (newInputValue !== ADD_CREDENTIAL_TEMPLATE) {
+        //     setInputValue(newInputValue);
+        //   }
+        // }}
+        options={[...baseOptions, ADD_CREDENTIAL_TEMPLATE]}
+        disableClearable
+        autoHighlight
+        size='small'
+        renderOption={(props, option) => {
+          if (option === ADD_CREDENTIAL_TEMPLATE) {
+            return (
+              <Box
+                {...props}
+                data-test='add-credential-template'
+                component='li'
+                onClick={() => openSettings('credentials')}
+              >
+                <AddIcon color='secondary' sx={{ mr: '5px' }} />
+                <Typography variant='body2'>Add a credential</Typography>
+              </Box>
+            );
+          }
+
+          return <CredentialComponent key={option.id} {...option} {...props} />;
+        }}
+        renderTags={(value: any[], getTagProps) => {
+          return value.map((val, index) => {
+            const matchingOption = baseOptions.find((_opt) => _opt.id === val);
+            if (matchingOption) {
+              return (
+                <Chip
+                  {...getTagProps({ index })}
+                  size='small'
+                  variant='outlined'
+                  key={val}
+                  label={matchingOption.name}
+                  // onDelete={() => {
+                  //   _onChange([]);
+                  // }}
+                />
+              );
+            }
+            return null;
+          });
+        }}
+        renderInput={(params) => {
+          return (
+            <TextField
+              {...params}
+              variant='standard'
+              InputProps={{
+                ...params.InputProps,
+                disableUnderline: true,
+                placeholder: '+ Select credentials'
+                // startAdornment: tokenInfo ? <TokenLogo height={20} src={tokenInfo.canonicalLogo} /> : null
+              }}
+            />
+          );
+        }}
+        disabled={readOnly}
+        readOnly={readOnly}
+      />
+    </Box>
   );
 }

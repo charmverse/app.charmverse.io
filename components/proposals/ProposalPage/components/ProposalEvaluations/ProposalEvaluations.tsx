@@ -14,6 +14,7 @@ export type ProposalEvaluationsProps = {
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
+  onChangeSelectedCredentialTemplates: ProposalSettingsProps['onChangeSelectedCredentialTemplates'];
   refreshProposal?: VoidFunction;
   pagePath?: string;
   pageTitle?: string;
@@ -33,6 +34,7 @@ export function ProposalEvaluations({
   onChangeWorkflow,
   onChangeRewardSettings,
   refreshProposal,
+  onChangeSelectedCredentialTemplates,
   pagePath,
   pageTitle,
   isUnpublishedProposal,
@@ -54,6 +56,7 @@ export function ProposalEvaluations({
         expanded={expanded}
         isTemplate={isProposalTemplate}
         onChangeRewardSettings={onChangeRewardSettings}
+        onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         isStructuredProposal={!!isStructuredProposal}
       />
     );

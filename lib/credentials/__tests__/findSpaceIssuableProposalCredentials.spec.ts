@@ -17,6 +17,151 @@ import type {
 } from '../findIssuableProposalCredentials';
 
 describe('findSpaceIssuableProposalCredentials', () => {
+  it('should only return issuable credentials for a specific proposal if this is provided', async () => {
+    const authorWalletAddress = randomETHWallet().address;
+    const { space, user: author } = await testUtilsUser.generateUserAndSpace({ wallet: authorWalletAddress });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved', 'proposal_created'],
+      schemaType: 'proposal',
+      schemaAddress: '0x1234',
+      description: 'Description 1',
+      name: 'Template 1',
+      organization: 'Org 1'
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      proposalStatus: 'published',
+      authors: [author.id],
+      evaluationInputs: [{ index: 1, result: 'pass', evaluationType: 'pass_fail', permissions: [], reviewers: [] }],
+      selectedCredentialTemplateIds: [credentialTemplate.id],
+      userId: author.id
+    });
+
+    const secondProposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      proposalStatus: 'published',
+      authors: [author.id],
+      evaluationInputs: [{ index: 1, result: 'pass', evaluationType: 'pass_fail', permissions: [], reviewers: [] }],
+      selectedCredentialTemplateIds: [credentialTemplate.id],
+      userId: author.id
+    });
+
+    const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
+
+    // 1 author * 2 proposals * 1 credential template * 2 events
+    expect(result).toHaveLength(4);
+
+    expect(result).toMatchObject(
+      expect.arrayContaining<IssuableProposalCredentialContent>([
+        {
+          proposalId: proposal.id,
+          recipientUserId: space.createdBy,
+          recipientAddress: authorWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_created',
+          pageId: proposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `${proposalCreatedVerb} Proposal`,
+            URL: getPagePermalink({ pageId: proposal.page.id })
+          }
+        } as IssuableProposalCredentialContent,
+        {
+          proposalId: proposal.id,
+          recipientUserId: author.id,
+          recipientAddress: authorWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_approved',
+          pageId: proposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `Proposal ${proposalApprovedVerb}`,
+            URL: getPagePermalink({ pageId: proposal.page.id })
+          }
+        } as IssuableProposalCredentialContent,
+        {
+          proposalId: secondProposal.id,
+          recipientUserId: author.id,
+          recipientAddress: authorWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_approved',
+          pageId: secondProposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `Proposal ${proposalApprovedVerb}`,
+            URL: getPagePermalink({ pageId: secondProposal.page.id })
+          }
+        } as IssuableProposalCredentialContent,
+        {
+          proposalId: secondProposal.id,
+          recipientUserId: space.createdBy,
+          recipientAddress: authorWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_created',
+          pageId: secondProposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `${proposalCreatedVerb} Proposal`,
+            URL: getPagePermalink({ pageId: secondProposal.page.id })
+          }
+        } as IssuableProposalCredentialContent
+      ])
+    );
+
+    const resultWithSelectedProposalId = await findSpaceIssuableProposalCredentials({
+      spaceId: space.id,
+      proposalIds: [secondProposal.id]
+    });
+
+    expect(resultWithSelectedProposalId).toHaveLength(2);
+
+    expect(resultWithSelectedProposalId).toMatchObject(
+      expect.arrayContaining<IssuableProposalCredentialContent>([
+        {
+          proposalId: secondProposal.id,
+          recipientUserId: author.id,
+          recipientAddress: authorWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_approved',
+          pageId: secondProposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `Proposal ${proposalApprovedVerb}`,
+            URL: getPagePermalink({ pageId: secondProposal.page.id })
+          }
+        } as IssuableProposalCredentialContent,
+        {
+          proposalId: secondProposal.id,
+          recipientUserId: space.createdBy,
+          recipientAddress: authorWalletAddress,
+          credentialTemplateId: credentialTemplate.id,
+          event: 'proposal_created',
+          pageId: secondProposal.page.id,
+          credential: {
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
+            Event: `${proposalCreatedVerb} Proposal`,
+            URL: getPagePermalink({ pageId: secondProposal.page.id })
+          }
+        } as IssuableProposalCredentialContent
+      ])
+    );
+  });
+
   it('should not duplicate credentials for proposals where credentials with the same proposalId and event already feature in a pending Gnosis Safe transaction', async () => {
     const userWalletAddress = randomETHWallet().address;
     const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWalletAddress });

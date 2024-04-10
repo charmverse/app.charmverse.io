@@ -104,7 +104,14 @@ function DocumentPageComponent({
   const proposalId = page.proposalId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
   });
 
@@ -382,6 +389,7 @@ function DocumentPageComponent({
                 onChangeEvaluation={onChangeEvaluation}
                 refreshProposal={refreshProposal}
                 onChangeWorkflow={onChangeWorkflow}
+                onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
               />
             )}
 

@@ -12,17 +12,19 @@ import { WorkflowSelect } from '../../../WorkflowSelect';
 import { EvaluationStepRow } from '../Review/components/EvaluationStepRow';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
+import { ProposalCredentialSettings } from './components/ProposalCredentialSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';
 import { RewardSettings } from './components/RewardSettings';
 import { RubricTemplatesButton } from './components/RubricTemplatesButton';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
+  proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId' | 'selectedCredentialTemplates'>;
   isTemplate?: boolean;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   onChangeRewardSettings?: RewardSettingsProps['onChange'];
+  onChangeSelectedCredentialTemplates: (templateIds: string[]) => void;
   templateId?: string | null;
   isStructuredProposal: boolean;
   requireWorkflowChangeConfirmation?: boolean;
@@ -36,6 +38,7 @@ export function EvaluationsSettings({
   readOnly,
   onChangeWorkflow,
   onChangeRewardSettings,
+  onChangeSelectedCredentialTemplates,
   templateId,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
@@ -98,11 +101,37 @@ export function EvaluationsSettings({
               </EvaluationStepRow>
             );
           })}
+          <Box mb={8}>
+            <EvaluationStepRow
+              index={proposal ? proposal.evaluations.length + 1 : 0}
+              result={null}
+              title='Credentials'
+              expanded={expandedContainer}
+              expandedContainer={expandedContainer}
+              actions={
+                isStructuredProposal && (
+                  <Stack direction='row' alignItems='center' gap={1}>
+                    {!proposal.fields?.enableRewards && <Chip label='Disabled' size='small' />}
+                    <Switch
+                      checked={proposal.fields?.enableRewards}
+                      onChange={(e, checked) => ({ enableRewards: checked })}
+                    />
+                  </Stack>
+                )
+              }
+            >
+              <ProposalCredentialSettings
+                readOnly={readOnly}
+                selectedCredentialTemplates={proposal.selectedCredentialTemplates ?? []}
+                setSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+              />
+            </EvaluationStepRow>
+          </Box>
           {/* reward settings */}
           {isTemplate && onChangeRewardSettings && (
             <Box mb={8}>
               <EvaluationStepRow
-                index={proposal ? proposal.evaluations.length + 1 : 0}
+                index={proposal ? proposal.evaluations.length + 2 : 0}
                 result={null}
                 title={mappedFeatures.rewards.title}
                 expanded={expandedContainer}

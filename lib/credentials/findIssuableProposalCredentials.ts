@@ -191,9 +191,11 @@ function proposalCredentialInputFieldsSelect() {
 }
 
 export async function findSpaceIssuableProposalCredentials({
-  spaceId
+  spaceId,
+  proposalIds
 }: {
   spaceId: string;
+  proposalIds?: string[];
 }): Promise<IssuableProposalCredentialContent[]> {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
@@ -214,6 +216,11 @@ export async function findSpaceIssuableProposalCredentials({
 
   const proposals = await prisma.proposal.findMany({
     where: {
+      id: proposalIds
+        ? {
+            in: proposalIds
+          }
+        : undefined,
       spaceId,
       page: {
         type: 'proposal'

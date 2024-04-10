@@ -78,6 +78,14 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
           });
           await refreshProposal();
         }
+      },
+      onChangeSelectedCredentialTemplates: async (templateIds: string[]) => {
+        if (proposal) {
+          await updateProposal({
+            selectedCredentialTemplates: templateIds
+          });
+          await refreshProposal();
+        }
       }
     }),
     [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria, updateProposal]
