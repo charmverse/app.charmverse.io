@@ -5,6 +5,7 @@ import type { IPropertyTemplate } from '../board';
 
 import type { ProposalCardData } from './getCardProperties';
 
+// apply information from proposals onto the card blocks
 export function applyPropertiesToCards({
   blocks,
   boardProperties,

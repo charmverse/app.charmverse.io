@@ -1,5 +1,4 @@
 import { log } from '@charmverse/core/log';
-import type { Block, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { applyPageToBlock } from 'lib/databases/block';
@@ -67,38 +66,37 @@ export async function createCards({
     }
   });
 
-  const cards: { page: Page; block: Block }[] = [];
-
   if (pagesMissingCards.length > 0) {
     log.debug('Creating cards from new Proposals', { boardId, pagesMissingCards: pagesMissingCards.length, spaceId });
   }
 
-  for (const proposalPage of pagesMissingCards) {
-    const createdAt = proposalPage.createdAt;
+  return Promise.all(
+    pagesMissingCards.map(async (proposalPage) => {
+      const createdAt = proposalPage.createdAt;
 
-    const _card = await createCardPage({
-      title: proposalPage.title,
-      boardId,
-      spaceId: proposalPage.spaceId,
-      createdAt,
-      createdBy,
-      properties: {},
-      hasContent: proposalPage.hasContent,
-      content: proposalPage.content,
-      contentText: proposalPage.contentText,
-      syncWithPageId: proposalPage.id,
-      permissions: rootPagePermissions.permissions.map((permission) => ({
-        permissionLevel: permission.permissionLevel,
-        allowDiscovery: permission.allowDiscovery,
-        inheritedFromPermission: permission.id,
-        public: permission.public,
-        roleId: permission.roleId,
-        spaceId: permission.spaceId,
-        userId: permission.userId
-      }))
-    });
-    cards.push(_card);
-  }
+      const { block, page } = await createCardPage({
+        title: proposalPage.title,
+        boardId,
+        spaceId: proposalPage.spaceId,
+        createdAt,
+        createdBy,
+        properties: {},
+        hasContent: proposalPage.hasContent,
+        content: proposalPage.content,
+        contentText: proposalPage.contentText,
+        syncWithPageId: proposalPage.id,
+        permissions: rootPagePermissions.permissions.map((permission) => ({
+          permissionLevel: permission.permissionLevel,
+          allowDiscovery: permission.allowDiscovery,
+          inheritedFromPermission: permission.id,
+          public: permission.public,
+          roleId: permission.roleId,
+          spaceId: permission.spaceId,
+          userId: permission.userId
+        }))
+      });
 
-  return cards.map((card) => applyPageToBlock(card.block, card.page));
+      return applyPageToBlock(block, page);
+    })
+  );
 }
