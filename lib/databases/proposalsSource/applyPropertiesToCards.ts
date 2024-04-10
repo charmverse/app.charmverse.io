@@ -4,7 +4,7 @@ import type { BlockWithDetails } from '../block';
 
 import type { ProposalCardData } from './getCardProperties';
 
-export function applyProposalsToBlocks({
+export function applyPropertiesToCards({
   blocks,
   permissions,
   proposalCards
@@ -14,10 +14,10 @@ export function applyProposalsToBlocks({
   proposalCards: Record<string, ProposalCardData>;
 }): BlockWithDetails[] {
   return blocks.map((block) => {
-    const proposalCard = block.syncWithPageId && proposalCards[block.syncWithPageId];
+    const proposalCard = !!block.syncWithPageId && proposalCards[block.syncWithPageId];
     if (proposalCard) {
       const canViewPrivateFields = !!block.syncWithPageId && permissions[block.syncWithPageId].view_private_fields;
-      return applyProposalToBlock({
+      return applyPropertiesToCard({
         block,
         proposalProperties: proposalCard,
         canViewPrivateFields
@@ -27,7 +27,7 @@ export function applyProposalsToBlocks({
   });
 }
 
-export function applyProposalToBlock({
+export function applyPropertiesToCard({
   block,
   proposalProperties,
   canViewPrivateFields

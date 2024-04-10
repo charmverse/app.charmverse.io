@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
-import { applyProposalsToBlocks } from 'lib/databases/proposalsSource/applyProposalsToBlocks';
+import { applyPropertiesToCards } from 'lib/databases/proposalsSource/applyPropertiesToCards';
 import { createCards } from 'lib/databases/proposalsSource/createCards';
 import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
 import { updateDatabaseProperties } from 'lib/databases/proposalsSource/updateDatabaseProperties';
@@ -92,7 +92,7 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
     getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
   ]);
   // combine blocks with proposal cards and permissions
-  const assembled = applyProposalsToBlocks({
+  const assembled = applyPropertiesToCards({
     blocks: blocks.concat(newCardBlocks),
     permissions: permissionsById,
     proposalCards
