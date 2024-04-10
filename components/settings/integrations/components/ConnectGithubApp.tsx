@@ -156,7 +156,7 @@ function ConnectedGithubAppSection({
             Connected to <strong>{githubAppName}</strong>
           </Typography>
           <Stack>
-            <FieldLabel variant='subtitle1'>Repository</FieldLabel>
+            <FieldLabel variant='subtitle1'>Github Repository</FieldLabel>
             <Select
               disabled={disabled}
               displayEmpty
@@ -180,7 +180,7 @@ function ConnectedGithubAppSection({
             </Select>
           </Stack>
           <Stack>
-            <FieldLabel variant='subtitle1'>Labels</FieldLabel>
+            <FieldLabel variant='subtitle1'>Github Labels</FieldLabel>
             <Select
               disabled={disabled}
               displayEmpty
@@ -215,7 +215,7 @@ function ConnectedGithubAppSection({
             </Select>
           </Stack>
           <Stack>
-            <FieldLabel variant='subtitle1'>Reward Template</FieldLabel>
+            <FieldLabel variant='subtitle1'>CharmVerse Reward Template</FieldLabel>
             <Select
               disabled={disabled}
               displayEmpty
@@ -241,7 +241,7 @@ function ConnectedGithubAppSection({
             </Select>
           </Stack>
           <Stack>
-            <FieldLabel variant='subtitle1'>Reward Author</FieldLabel>
+            <FieldLabel variant='subtitle1'>CharmVerse Reward Author</FieldLabel>
             <InputSearchMemberMultiple
               onChange={(id: string[]) => {
                 setValue('rewardAuthorId', id[0], formValueOptions);
