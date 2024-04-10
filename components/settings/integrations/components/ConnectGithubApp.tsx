@@ -32,18 +32,22 @@ export const schema = yup.object({
   repositoryLabels: yup.array(yup.string())
 });
 
-export function ConnectedGithubAppForm({
+export function ConnectGithubRepoForm({
   installationId,
   spaceId,
   repositories,
   rewardRepo,
-  githubAppName
+  githubAppName,
+  onSave,
+  hideDisconnect = false
 }: {
+  onSave?: VoidFunction;
   spaceId: string;
   installationId: string;
   rewardRepo: RewardsGithubRepo | null;
   repositories: GithubApplicationData['repositories'];
   githubAppName: string;
+  hideDisconnect?: boolean;
 }) {
   const { trigger: disconnectGithubApplication, isMutating: isDisconnectingGithubApplication } =
     useDisconnectGithubApplication(spaceId);
@@ -137,6 +141,7 @@ export function ConnectedGithubAppForm({
           keepErrors: false
         });
         mutate();
+        onSave?.();
       },
       (connectGithubPayload) => {
         showMessage('Failed to connect Github repository', 'error');
@@ -189,6 +194,9 @@ export function ConnectedGithubAppForm({
               disabled={disabled}
               displayEmpty
               renderValue={(labels) => {
+                if (labels.length === 0) {
+                  return <Typography color='secondary'>Select labels</Typography>;
+                }
                 return (
                   <Stack direction='row' gap={1}>
                     {labels.map((label) => (
@@ -260,12 +268,13 @@ export function ConnectedGithubAppForm({
             <FieldLabel variant='subtitle1'>CharmVerse Reward Author</FieldLabel>
             <InputSearchMemberMultiple
               onChange={(id: string[]) => {
-                setValue('rewardAuthorId', id[0], {
+                setValue('rewardAuthorId', id[id.length - 1], {
                   shouldDirty: true,
                   shouldTouch: true,
                   shouldValidate: true
                 });
               }}
+              disabled={disabled}
               disableClearable
               defaultValue={rewardRepo ? [rewardAuthorId] : undefined}
               disableCloseOnSelect
@@ -287,18 +296,20 @@ export function ConnectedGithubAppForm({
             >
               Save
             </Button>
-            <Button
-              sx={{
-                width: 'fit-content'
-              }}
-              variant='outlined'
-              color='error'
-              loading={isDisconnectingGithubApplication}
-              disabled={disabled}
-              onClick={handleDisconnect}
-            >
-              Disconnect
-            </Button>
+            {!hideDisconnect && (
+              <Button
+                sx={{
+                  width: 'fit-content'
+                }}
+                variant='outlined'
+                color='error'
+                loading={isDisconnectingGithubApplication}
+                disabled={disabled}
+                onClick={handleDisconnect}
+              >
+                Disconnect
+              </Button>
+            )}
           </Stack>
         </Stack>
       </Grid>
@@ -333,7 +344,7 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
             </Button>
           </Grid>
         ) : (
-          <ConnectedGithubAppForm
+          <ConnectGithubRepoForm
             installationId={data.spaceGithubConnection.installationId}
             spaceId={spaceId}
             repositories={data.repositories}
