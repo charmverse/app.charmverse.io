@@ -1,6 +1,8 @@
 import { createHmac } from 'crypto';
 
+import { createAppAuth } from '@octokit/auth-app';
 import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
+import { Octokit } from 'octokit';
 
 import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
 
@@ -24,53 +26,16 @@ type MessageHandlers = {
 
 const messageHandlers: MessageHandlers = {
   labeled: async (message: IssuesLabeledEvent) => {
-    const installationId = message.installation?.id;
-    if (!installationId) {
-      return {
-        success: true,
-        message: 'Missing installation ID.'
-      };
-    }
-
-    if (!message.issue || !message.repository) {
-      return {
-        success: true,
-        message: 'Missing issue or repository data.'
-      };
-    }
-
     return createRewardFromIssue({
-      installationId: installationId.toString(),
-      issueTitle: message.issue.title,
-      repositoryId: message.repository.id.toString(),
-      label: message.label?.name,
-      issueState: message.issue.state,
-      issueUrl: message.issue.html_url
+      message,
+      createIssueComment: false
     });
   },
 
   opened: async (message: IssuesOpenedEvent) => {
-    const installationId = message.installation?.id;
-    if (!installationId) {
-      return {
-        success: true,
-        message: 'Missing installation ID.'
-      };
-    }
-
-    if (!message.issue || !message.repository) {
-      return {
-        success: true,
-        message: 'Missing issue or repository data.'
-      };
-    }
-
     return createRewardFromIssue({
-      installationId: installationId.toString(),
-      issueTitle: message.issue.title,
-      repositoryId: message.repository.id.toString(),
-      issueState: message.issue.state,
-      issueUrl: message.issue.html_url
+      message,
+      createIssueComment: true
     });
   }
 };

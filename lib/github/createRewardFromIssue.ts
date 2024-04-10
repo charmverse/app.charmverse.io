@@ -1,31 +1,39 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { IssuesLabeledEvent } from '@octokit/webhooks-types';
+import { createAppAuth } from '@octokit/auth-app';
+import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
+import { Octokit } from 'octokit';
 
+import { baseUrl } from 'config/constants';
 import { createReward } from 'lib/rewards/createReward';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 
 export async function createRewardFromIssue({
-  installationId,
-  repositoryId,
-  label,
-  issueTitle,
-  issueState,
-  issueUrl
+  createIssueComment,
+  message
 }: {
-  installationId: string;
-  repositoryId: string;
-  label?: string;
-  issueUrl: string;
-  issueTitle: string;
-  issueState: IssuesLabeledEvent['issue']['state'];
+  createIssueComment?: boolean;
+  message: IssuesLabeledEvent | IssuesOpenedEvent;
 }) {
+  const installationId = message.installation?.id?.toString();
+
+  if (!installationId) {
+    return {
+      success: true,
+      message: 'Missing installation ID.'
+    };
+  }
+
+  const issueState = message.issue.state;
+
   if (issueState !== 'open') {
     return {
       success: true,
       message: 'Issue is not open.'
     };
   }
+
+  const issueUrl = message.issue.html_url;
 
   const existingReward = await prisma.bounty.findFirst({
     where: {
@@ -45,6 +53,11 @@ export async function createRewardFromIssue({
       installationId
     },
     select: {
+      space: {
+        select: {
+          domain: true
+        }
+      },
       spaceId: true,
       rewardsRepos: true
     }
@@ -64,6 +77,8 @@ export async function createRewardFromIssue({
     };
   }
 
+  const repositoryId = message.repository.id.toString();
+
   const rewardsRepo = spaceGithubConnection.rewardsRepos[0];
   if (repositoryId !== rewardsRepo.repositoryId) {
     return {
@@ -71,6 +86,8 @@ export async function createRewardFromIssue({
       message: 'Github repository is not connected to rewards.'
     };
   }
+
+  const label = 'label' in message ? message.label?.name : null;
 
   const targetLabels = rewardsRepo.repositoryLabels;
   if (targetLabels.length !== 0 && (!label || !targetLabels.includes(label))) {
@@ -123,7 +140,9 @@ export async function createRewardFromIssue({
     }
   });
 
-  await createReward({
+  const issueTitle = message.issue.title;
+
+  const createdReward = await createReward({
     spaceId,
     userId,
     approveSubmitters: rewardTemplate?.approveSubmitters,
@@ -155,6 +174,24 @@ export async function createRewardFromIssue({
       title: issueTitle
     }
   });
+
+  if (createIssueComment) {
+    const appOctokit = new Octokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId: Number(process.env.GITHUB_APP_ID),
+        privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+        installationId
+      }
+    });
+
+    appOctokit.rest.issues.createComment({
+      owner: message.repository.owner.login,
+      repo: message.repository.name,
+      issue_number: message.issue.number,
+      body: `[Link to created CharmVerse reward](${baseUrl}/${spaceGithubConnection.space.domain}/${createdReward.createdPageId})`
+    });
+  }
 
   return {
     spaceIds: [spaceGithubConnection.spaceId],

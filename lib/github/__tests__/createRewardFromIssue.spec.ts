@@ -8,15 +8,28 @@ import { createPage } from 'testing/pages';
 import { createRewardFromIssue } from '../createRewardFromIssue';
 
 describe('createRewardFromIssue', () => {
+  it(`Should return Missing installation ID message if the installation id is missing`, async () => {
+    expect(
+      await createRewardFromIssue({
+        message: {} as any
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Missing installation ID.'
+    });
+  });
+
   it(`Should return an issue not open message if the issue state is not open`, async () => {
     expect(
       await createRewardFromIssue({
-        installationId: '',
-        repositoryId: v4(),
-        label: '',
-        issueTitle: '',
-        issueUrl: v4(),
-        issueState: 'closed'
+        message: {
+          installation: {
+            id: 1
+          },
+          issue: {
+            state: 'closed'
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -28,7 +41,6 @@ describe('createRewardFromIssue', () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
     const githubIssueId = v4();
     const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
-    const githubRepoId = v4();
     await createReward({
       spaceId: space.id,
       userId: user.id,
@@ -46,12 +58,15 @@ describe('createRewardFromIssue', () => {
 
     expect(
       await createRewardFromIssue({
-        installationId: '',
-        repositoryId: githubRepoId,
-        label: '',
-        issueTitle: '',
-        issueUrl: githubIssueUrl,
-        issueState: 'open'
+        message: {
+          installation: {
+            id: 1
+          },
+          issue: {
+            state: 'open',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -60,14 +75,19 @@ describe('createRewardFromIssue', () => {
   });
 
   it(`Should return a space not found message if the space with installation id is not found`, async () => {
+    const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
     expect(
       await createRewardFromIssue({
-        installationId: '',
-        repositoryId: v4(),
-        label: '',
-        issueTitle: '',
-        issueUrl: '',
-        issueState: 'open'
+        message: {
+          installation: {
+            id: 1
+          },
+          issue: {
+            state: 'open',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -78,6 +98,8 @@ describe('createRewardFromIssue', () => {
   it(`Should return a space not connected to rewards repo message if the space with installation id is not connected to any rewards repo`, async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
     const installationId = v4();
+    const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     await prisma.spaceGithubConnection.create({
       data: {
@@ -91,12 +113,15 @@ describe('createRewardFromIssue', () => {
 
     expect(
       await createRewardFromIssue({
-        installationId,
-        repositoryId: v4(),
-        label: '',
-        issueTitle: '',
-        issueUrl: '',
-        issueState: 'open'
+        message: {
+          installation: {
+            id: installationId
+          },
+          issue: {
+            state: 'open',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -108,6 +133,8 @@ describe('createRewardFromIssue', () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
     const installationId = v4();
     const githubRepoId = v4();
+    const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     const rewardTemplatePage = await createPage({
       type: 'bounty_template',
@@ -133,16 +160,20 @@ describe('createRewardFromIssue', () => {
       }
     });
 
-    const githubIssueId = v4();
-
     expect(
       await createRewardFromIssue({
-        installationId,
-        repositoryId: v4(),
-        label: '',
-        issueTitle: '',
-        issueUrl: '',
-        issueState: 'open'
+        message: {
+          installation: {
+            id: installationId
+          },
+          repository: {
+            id: 1
+          },
+          issue: {
+            state: 'open',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -154,6 +185,8 @@ describe('createRewardFromIssue', () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
     const installationId = v4();
     const githubRepoId = v4();
+    const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     const rewardTemplatePage = await createPage({
       type: 'bounty_template',
@@ -179,17 +212,20 @@ describe('createRewardFromIssue', () => {
         }
       }
     });
-
-    const githubIssueId = v4();
-    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
-
     expect(
       await createRewardFromIssue({
-        installationId,
-        repositoryId: githubRepoId,
-        issueTitle: '',
-        issueUrl: githubIssueUrl,
-        issueState: 'open'
+        message: {
+          installation: {
+            id: installationId
+          },
+          repository: {
+            id: githubRepoId
+          },
+          issue: {
+            state: 'open',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -232,12 +268,21 @@ describe('createRewardFromIssue', () => {
 
     expect(
       await createRewardFromIssue({
-        installationId,
-        repositoryId: githubRepoId,
-        issueTitle: 'Issue Title',
-        label: 'test',
-        issueUrl: githubIssueUrl,
-        issueState: 'open'
+        message: {
+          installation: {
+            id: installationId
+          },
+          repository: {
+            id: githubRepoId
+          },
+          label: {
+            name: 'test'
+          },
+          issue: {
+            state: 'open',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       success: true,
@@ -272,11 +317,19 @@ describe('createRewardFromIssue', () => {
 
     expect(
       await createRewardFromIssue({
-        installationId,
-        repositoryId: githubRepoId,
-        issueTitle: 'Issue Title',
-        issueUrl: githubIssueUrl,
-        issueState: 'open'
+        message: {
+          installation: {
+            id: installationId
+          },
+          repository: {
+            id: githubRepoId
+          },
+          issue: {
+            state: 'open',
+            title: 'Issue Title',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       spaceIds: [space.id],
@@ -375,11 +428,19 @@ describe('createRewardFromIssue', () => {
 
     expect(
       await createRewardFromIssue({
-        installationId,
-        repositoryId: githubRepoId,
-        issueTitle: 'Issue Title',
-        issueUrl: githubIssueUrl,
-        issueState: 'open'
+        message: {
+          installation: {
+            id: installationId
+          },
+          repository: {
+            id: githubRepoId
+          },
+          issue: {
+            state: 'open',
+            title: 'Issue Title',
+            html_url: githubIssueUrl
+          }
+        } as any
       })
     ).toStrictEqual({
       spaceIds: [space.id],
