@@ -4,8 +4,8 @@ import { v4 as uuid } from 'uuid';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 
-import { getProposalSourceProperties } from '../getProposalSourceProperties';
-import type { ProposalPropertiesMap } from '../getProposalSourceProperties';
+import { getCardPropertyTemplates } from '../getCardPropertyTemplates';
+import type { ProposalPropertiesMap } from '../getCardPropertyTemplates';
 
 const statusProp: IPropertyTemplate = {
   id: uuid(),
@@ -32,11 +32,11 @@ const urlProp: IPropertyTemplate = {
   options: []
 };
 
-describe('getProposalSourceProperties', () => {
+describe('getCardPropertyTemplates', () => {
   it('should extract database proposal properties', () => {
     const exampleProperties: IPropertyTemplate[] = [statusProp, urlProp];
 
-    const extractedProps = getProposalSourceProperties({
+    const extractedProps = getCardPropertyTemplates({
       cardProperties: exampleProperties
     });
 
@@ -49,7 +49,7 @@ describe('getProposalSourceProperties', () => {
   it('should work if only some properties are present', () => {
     const exampleProperties: IPropertyTemplate[] = [];
 
-    const extractedProps = getProposalSourceProperties({
+    const extractedProps = getCardPropertyTemplates({
       cardProperties: exampleProperties
     });
 

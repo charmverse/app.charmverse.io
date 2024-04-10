@@ -5,7 +5,7 @@ export type ProposalPropertiesMap = Partial<Record<ProposalPropertyType, IProper
 /**
  * Returns all proposal properties
  */
-export function getProposalSourceProperties({
+export function getCardPropertyTemplates({
   cardProperties
 }: {
   cardProperties: IPropertyTemplate[];

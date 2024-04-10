@@ -8,7 +8,7 @@ import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { applySourceToDatabase } from 'lib/databases/proposalsSource/applySourceToDatabase';
 import { assembleBlocks } from 'lib/databases/proposalsSource/assembleBlocks';
 import { createCards } from 'lib/databases/proposalsSource/createCards';
-import { getCardsFromProposals } from 'lib/databases/proposalsSource/getCardsFromProposals';
+import { getPropertiesFromProposals } from 'lib/databases/proposalsSource/getPropertiesFromProposals';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -72,7 +72,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
       // create missing blocks for new proposals
       createCards({ boardId: blockId, spaceId: page.spaceId, createdBy: block.createdBy }),
       // get properties for proposals
-      getCardsFromProposals({ cardProperties: block.fields.cardProperties, spaceId: page.spaceId })
+      getPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: page.spaceId })
     ]);
     // combine blocks with proposal cards and permissions
     const result = assembleBlocks({

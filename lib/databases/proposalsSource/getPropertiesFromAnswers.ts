@@ -2,7 +2,6 @@ import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client'
 
 import type { FormFieldValue } from 'components/common/form/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { BoardPropertyValue } from 'lib/public-api/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 
@@ -11,9 +10,9 @@ import { excludedFieldTypes } from './updateDatabaseProposalProperties';
 export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'>;
 export type FormAnswerData = Pick<FormFieldAnswer, 'value' | 'fieldId'>;
 
-type PropertiesMap = Record<string, BoardPropertyValue>;
+type PropertiesMap = Record<string, FormFieldValue>;
 
-export function getPropertyValuesFromAnswers({
+export function getPropertiesFromAnswers({
   accessPrivateFields,
   formAnswers,
   formFields,

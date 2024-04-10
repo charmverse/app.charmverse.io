@@ -16,10 +16,10 @@ import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../bo
 import { proposalPropertyTypesList } from '../board';
 import type { CardPropertyValue } from '../card';
 
-import { generateResyncedProposalEvaluationForCard } from './generateResyncedProposalEvaluationForCard';
-import type { FormFieldData, FormAnswerData } from './getPropertyValuesFromAnswers';
-import { getPropertyValuesFromAnswers } from './getPropertyValuesFromAnswers';
-import { getProposalSourceProperties } from './getProposalSourceProperties';
+import { getCardPropertyTemplates } from './getCardPropertyTemplates';
+import type { FormFieldData, FormAnswerData } from './getPropertiesFromAnswers';
+import { getPropertiesFromAnswers } from './getPropertiesFromAnswers';
+import { getPropertiesFromRubricEvaluation } from './getPropertiesFromRubricEvaluation';
 
 export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
 
@@ -58,7 +58,7 @@ const pageSelectObject = {
   }
 } as const;
 
-export async function getCardsFromProposals({
+export async function getPropertiesFromProposals({
   cardProperties,
   spaceId
 }: {
@@ -113,7 +113,7 @@ export async function getCardsFromProposals({
   }, {});
 }
 
-export async function getCardFromProposal({
+export async function getPropertiesFromProposal({
   canViewPrivateFields,
   boardId,
   pageId
@@ -178,7 +178,7 @@ type ProposalData = {
 };
 
 function mapProposalToCard({ page, proposal, cardProperties, formFields }: ProposalData): ProposalCardData {
-  const proposalProps = getProposalSourceProperties({ cardProperties });
+  const proposalProps = getCardPropertyTemplates({ cardProperties });
 
   let properties: Record<string, CardPropertyValue> = {};
 
@@ -220,7 +220,7 @@ function mapProposalToCard({ page, proposal, cardProperties, formFields }: Propo
 
   proposal.evaluations.forEach((evaluation) => {
     if (evaluation.type === 'rubric') {
-      properties = generateResyncedProposalEvaluationForCard({
+      properties = getPropertiesFromRubricEvaluation({
         properties,
         rubricAnswers: evaluation.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
         rubricCriteria: evaluation.rubricCriteria,
@@ -230,7 +230,7 @@ function mapProposalToCard({ page, proposal, cardProperties, formFields }: Propo
     }
   });
 
-  const formFieldProperties = getPropertyValuesFromAnswers({
+  const formFieldProperties = getPropertiesFromAnswers({
     accessPrivateFields: true,
     cardProperties,
     formAnswers: proposal.formAnswers,
