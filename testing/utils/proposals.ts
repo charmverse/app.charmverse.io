@@ -10,9 +10,14 @@ import { ProposalSystemRole, prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { v4 as uuid } from 'uuid';
 
+import { prismaToBlock } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
+import { updateViews } from 'lib/databases/proposalsSource/updateViews';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { getDefaultPermissions } from 'lib/proposals/workflows/defaultEvaluation';
+import { generateBoard } from 'testing/setupDatabase';
 
 export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   authors: ProposalAuthor[];
@@ -211,4 +216,19 @@ export async function generateProposalWorkflowWithEvaluations(options: {
       }
     ]
   });
+}
+
+export async function generateProposalSourceDb({ createdBy, spaceId }: { createdBy: string; spaceId: string }) {
+  const database = await generateBoard({
+    createdBy,
+    spaceId,
+    views: 1,
+    viewDataSource: 'proposals'
+  });
+
+  // sync board properties
+  const updatedBlock = await updateBoardProperties({ boardId: database.id });
+  const updatedBoard = prismaToBlock(updatedBlock) as Board;
+  await updateViews({ board: updatedBoard });
+  return updatedBoard;
 }

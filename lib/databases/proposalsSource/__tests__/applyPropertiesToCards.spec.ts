@@ -2,17 +2,14 @@ import type { FormField, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 
-import { prismaToBlock, blockToUIBlock } from 'lib/databases/block';
+import { prismaToBlock } from 'lib/databases/block';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import { generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
-import { addUserToSpace } from 'testing/utils/spaces';
-import { generateUser } from 'testing/utils/users';
+import { generateProposalSourceDb } from 'testing/utils/proposals';
 
 import { applyPropertiesToCard } from '../applyPropertiesToCards';
 import { createMissingCards } from '../createMissingCards';
 import { getCardPropertiesFromProposals } from '../getCardProperties';
-import { updateBoardProperties } from '../updateBoardProperties';
-import { updateViews } from '../updateViews';
 
 describe('applyPropertiesToCard', () => {
   let user: User;
@@ -171,18 +168,3 @@ describe('applyPropertiesToCard', () => {
     expect(card2Properties[email1Prop.id]).toBe('john.doe@gmail.com');
   });
 });
-
-async function generateProposalSourceDb({ createdBy, spaceId }: { createdBy: string; spaceId: string }) {
-  const database = await generateBoard({
-    createdBy,
-    spaceId,
-    views: 1,
-    viewDataSource: 'proposals'
-  });
-
-  // sync board properties
-  const updatedBlock = await updateBoardProperties({ boardId: database.id });
-  const updatedBoard = prismaToBlock(updatedBlock) as Board;
-  await updateViews({ board: updatedBoard });
-  return updatedBoard;
-}
