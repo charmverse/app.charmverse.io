@@ -6,7 +6,7 @@ import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import { createCards } from 'lib/databases/proposalsSource/createMissingCards';
+import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBoard } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
