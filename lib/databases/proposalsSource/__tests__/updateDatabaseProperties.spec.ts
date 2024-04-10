@@ -45,8 +45,7 @@ describe('updateDatabaseProperties()', () => {
     });
 
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -102,8 +101,7 @@ describe('updateDatabaseProperties()', () => {
     });
 
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -162,8 +160,7 @@ describe('updateDatabaseProperties()', () => {
     });
 
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -180,12 +177,10 @@ describe('updateDatabaseProperties()', () => {
 
     // --- Run this a second and third time
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -317,8 +312,7 @@ describe('updateDatabaseProperties()', () => {
     });
 
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -415,8 +409,7 @@ describe('updateDatabaseProperties()', () => {
 
     // --- Run this a second and third time
     await updateDatabaseProperties({
-      boardId: rootId,
-      cardProperties: []
+      boardId: rootId
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -470,8 +463,7 @@ describe('updateDatabaseProperties()', () => {
 
     await expect(
       updateDatabaseProperties({
-        boardId: rootId,
-        cardProperties: []
+        boardId: rootId
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

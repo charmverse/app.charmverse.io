@@ -14,9 +14,9 @@ import { generateUser } from 'testing/utils/users';
 
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { applySourceToDatabase } from '../applySourceToDatabase';
+import { createCards } from '../createCards';
 
-describe('applySourceToDatabase', () => {
+describe('createCards', () => {
   let user: User;
   let space: Space;
   let board: Page;
@@ -64,16 +64,14 @@ describe('applySourceToDatabase', () => {
       spaceId: space.id,
       userId: user.id
     });
-    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    const cards = await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
     expect(cards.length).toBe(1);
     expect(
       cards.every(
         (card) =>
           card.syncWithPageId === newProposal.id &&
           card.title === newProposal.page.title &&
-          card.contentText === newProposal.page.contentText &&
-          card.hasContent === newProposal.page.hasContent &&
-          isEqual(newProposal.page.content, card.content)
+          card.hasContent === newProposal.page.hasContent
       )
     ).toBeTruthy();
   });
@@ -86,7 +84,7 @@ describe('applySourceToDatabase', () => {
       userId: user.id
     });
 
-    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    const cards = await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     expect(cards.length).toBe(0);
   });
@@ -255,10 +253,10 @@ describe('applySourceToDatabase', () => {
       viewDataSource: 'proposals'
     });
 
-    const cards = await createCardsFromProposals({
+    const cards = await createCards({
       boardId: database.id,
       spaceId: generated.space.id,
-      userId: user.id
+      createdBy: user.id
     });
 
     const databaseAfterUpdate = await prisma.block.findUnique({
@@ -319,7 +317,7 @@ describe('applySourceToDatabase', () => {
 
     const card = await prisma.block.findFirstOrThrow({
       where: {
-        id: cards[0].cardId as string
+        id: cards[0].id
       },
       select: {
         fields: true
@@ -441,15 +439,15 @@ describe('applySourceToDatabase', () => {
       viewDataSource: 'proposals'
     });
 
-    const [cardPage] = await createCardsFromProposals({
+    const [cardPage] = await createCards({
       boardId: databaseBoard.id,
       spaceId: testSpace.id,
-      userId: proposalAuthor.id
+      createdBy: proposalAuthor.id
     });
 
     const cardBlock = await prisma.block.findUniqueOrThrow({
       where: {
-        id: cardPage.cardId!
+        id: cardPage.id
       },
       select: {
         fields: true
@@ -576,10 +574,10 @@ describe('applySourceToDatabase', () => {
       viewDataSource: 'proposals'
     });
 
-    const [cardPage] = await createCardsFromProposals({
+    const [cardPage] = await createCards({
       boardId: database1.id,
       spaceId: testSpace.id,
-      userId: proposalAuthor.id
+      createdBy: proposalAuthor.id
     });
 
     const database1Block = await prisma.block.findUnique({
@@ -599,7 +597,7 @@ describe('applySourceToDatabase', () => {
 
     const databaseCard = await prisma.block.findUnique({
       where: {
-        id: cardPage.cardId!
+        id: cardPage.id
       },
       select: {
         fields: true
@@ -618,10 +616,10 @@ describe('applySourceToDatabase', () => {
       viewDataSource: 'proposals'
     });
 
-    const [cardPage2] = await createCardsFromProposals({
+    const [cardPage2] = await createCards({
       boardId: database2.id,
       spaceId: testSpace.id,
-      userId: spaceMember.id
+      createdBy: spaceMember.id
     });
 
     const database2Block = await prisma.block.findUnique({
@@ -641,7 +639,7 @@ describe('applySourceToDatabase', () => {
 
     const databaseCard2 = await prisma.block.findUnique({
       where: {
-        id: cardPage2.cardId!
+        id: cardPage2.id
       },
       select: {
         fields: true
@@ -654,29 +652,25 @@ describe('applySourceToDatabase', () => {
   });
 
   it('should not create cards from proposals if board is not found', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toThrowError();
+    await expect(createCards({ boardId: v4(), spaceId: space.id, createdBy: user.id })).rejects.toThrowError();
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toThrowError();
+    await expect(createCards({ boardId: board.id, spaceId: v4(), createdBy: user.id })).rejects.toThrowError();
   });
 
   it('should throw an error if boardId or spaceId is invalid', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: board.id, spaceId: 'Bad space id', userId: user.id })
-    ).rejects.toThrowError(InvalidInputError);
+    await expect(createCards({ boardId: board.id, spaceId: 'Bad space id', createdBy: user.id })).rejects.toThrowError(
+      InvalidInputError
+    );
 
-    await expect(
-      createCardsFromProposals({ boardId: 'bad board id', spaceId: space.id, userId: user.id })
-    ).rejects.toThrowError(InvalidInputError);
+    await expect(createCards({ boardId: 'bad board id', spaceId: space.id, createdBy: user.id })).rejects.toThrowError(
+      InvalidInputError
+    );
   });
 
   it('should not create cards if no proposals are found', async () => {
-    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    const cards = await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     expect(cards.length).toBe(0);
   });
@@ -708,7 +702,7 @@ describe('applySourceToDatabase', () => {
       userId: testUser.id
     });
 
-    const cards = await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    const cards = await createCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
 
     expect(cards.length).toBe(1);
 
@@ -761,7 +755,7 @@ describe('applySourceToDatabase', () => {
       userId: testUser.id
     });
 
-    await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    await createCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
 
     const pages = await prisma.page.findMany({
       where: {

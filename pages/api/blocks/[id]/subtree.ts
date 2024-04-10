@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
-import { assembleBlocks } from 'lib/databases/proposalsSource/assembleBlocks';
+import { applyProposalsToBlocks } from 'lib/databases/proposalsSource/applyProposalsToBlocks';
 import { createCards } from 'lib/databases/proposalsSource/createCards';
 import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
 import { updateDatabaseProperties } from 'lib/databases/proposalsSource/updateDatabaseProperties';
@@ -60,31 +60,8 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
 
   // Hydrate and filter blocks based on proposal permissions
   if (block && (block.fields as BoardFields).sourceType === 'proposals') {
-    // Update board and view blocks before computing proposal cards
-    await updateDatabaseProperties({ boardId: pageId });
-
-    const [permissionsById, newCardBlocks, proposalCards] = await Promise.all([
-      // get permissions for each propsoal based on the database author
-      permissionsApiClient.proposals.bulkComputeProposalPermissions({
-        spaceId: page.spaceId,
-        userId: block.createdBy
-      }),
-      // create missing blocks for new proposals
-      createCards({ boardId: blockId, spaceId: page.spaceId, createdBy: block.createdBy }),
-      // get properties for proposals
-      getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: page.spaceId })
-    ]);
-    // combine blocks with proposal cards and permissions
-    const result = assembleBlocks({
-      blocks: blocks.concat(newCardBlocks),
-      permissions: permissionsById,
-      proposalCards
-    });
-    // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
-    const filtered = result.filter(
-      (b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view
-    );
-    return res.status(200).json(filtered);
+    const result = await _getProposalSourceSubtree(block, blocks);
+    return res.status(200).json(result);
   } else {
     const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
       pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
@@ -94,6 +71,34 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
     const filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
     return res.status(200).json(filtered);
   }
+}
+
+// retrieve blocks for databases using "proposal as a source"
+async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockWithDetails[]) {
+  // Update board and view blocks before computing proposal cards
+  const updatedBoard = await updateDatabaseProperties({ boardId: block.id });
+  // use the most recent the card properties
+  block.fields = updatedBoard.fields as unknown as BoardFields;
+
+  const [permissionsById, newCardBlocks, proposalCards] = await Promise.all([
+    // get permissions for each propsoal based on the database author
+    permissionsApiClient.proposals.bulkComputeProposalPermissions({
+      spaceId: block.spaceId,
+      userId: block.createdBy
+    }),
+    // create missing blocks for new proposals
+    createCards({ boardId: block.id, spaceId: block.spaceId, createdBy: block.createdBy }),
+    // get properties for proposals
+    getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
+  ]);
+  // combine blocks with proposal cards and permissions
+  const assembled = applyProposalsToBlocks({
+    blocks: blocks.concat(newCardBlocks),
+    permissions: permissionsById,
+    proposalCards
+  });
+  // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
+  return assembled.filter((b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view);
 }
 
 export default withSessionRoute(handler);

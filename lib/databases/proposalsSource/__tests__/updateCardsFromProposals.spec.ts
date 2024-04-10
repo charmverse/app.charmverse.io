@@ -14,7 +14,7 @@ import { generateUser } from 'testing/utils/users';
 import type { BoardFields, IPropertyTemplate } from '../../board';
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCardsFromProposals } from '../applySourceToDatabase';
+import { createCards } from '../createCards';
 import { updateCardPages } from '../updateCardPages';
 
 describe('updateCardPages()', () => {
@@ -65,7 +65,7 @@ describe('updateCardPages()', () => {
       userId: user.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     const updatedProposalPageDetails = {
       title: 'Updated title',
@@ -83,8 +83,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
+      spaceId: space.id
     });
 
     const updatedCard = await prisma.page.findFirst({
@@ -226,10 +225,10 @@ describe('updateCardPages()', () => {
       }
     });
 
-    await createCardsFromProposals({
+    await createCards({
       boardId: database.id,
       spaceId: generated.space.id,
-      userId: admin.id
+      createdBy: admin.id
     });
 
     // After creating the initial proposal cards, update the proposal rubric Evaluation by submitting reviews by proposal reviewer
@@ -377,8 +376,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: database.id,
-      spaceId: generated.space.id,
-      userId: admin.id
+      spaceId: generated.space.id
     });
 
     const databaseAfterUpdate = await prisma.block.findUnique({
@@ -496,7 +494,7 @@ describe('updateCardPages()', () => {
 
   it('should not create cards from draft proposals', async () => {
     // populate board view
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
@@ -508,8 +506,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
+      spaceId: space.id
     });
 
     const newCreatedCard = await prisma.page.findFirst({
@@ -523,7 +520,7 @@ describe('updateCardPages()', () => {
   });
   it('should not create cards from archived proposals', async () => {
     // populate board view
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
@@ -536,8 +533,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
+      spaceId: space.id
     });
 
     const newCreatedCard = await prisma.page.findFirst({
@@ -655,10 +651,10 @@ describe('updateCardPages()', () => {
       }
     });
 
-    await createCardsFromProposals({
+    await createCards({
       boardId: databaseBoard.id,
       spaceId: testSpace.id,
-      userId: proposalAuthor.id
+      createdBy: proposalAuthor.id
     });
 
     const databaseBlock = await prisma.block.findUniqueOrThrow({
@@ -755,8 +751,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: databaseBoard.id,
-      spaceId: testSpace.id,
-      userId: proposalAuthor.id
+      spaceId: testSpace.id
     });
 
     const updatedCardBlocks = await prisma.block.findMany({
@@ -885,10 +880,10 @@ describe('updateCardPages()', () => {
       viewDataSource: 'proposals'
     });
 
-    await createCardsFromProposals({
+    await createCards({
       boardId: database.id,
       spaceId: testSpace.id,
-      userId: proposalAuthor.id
+      createdBy: proposalAuthor.id
     });
 
     const proposal2 = await testUtilsProposals.generateProposal({
@@ -967,8 +962,7 @@ describe('updateCardPages()', () => {
     // Even though the member doesn't have access to the private wallet field, since the database was created by the proposal author, the wallet field should be added to the board
     await updateCardPages({
       boardId: database.id,
-      spaceId: testSpace.id,
-      userId: spaceMember.id
+      spaceId: testSpace.id
     });
 
     const databaseAfterUpdate = await prisma.block.findUniqueOrThrow({
@@ -1040,7 +1034,7 @@ describe('updateCardPages()', () => {
       userId: user.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     await prisma.page.update({
       where: {
@@ -1053,8 +1047,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
+      spaceId: space.id
     });
 
     const deletedCard = await prisma.page.findFirst({
@@ -1082,7 +1075,7 @@ describe('updateCardPages()', () => {
       userId: user.id
     });
 
-    await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     await prisma.$transaction([
       prisma.page.delete({
@@ -1099,8 +1092,7 @@ describe('updateCardPages()', () => {
 
     await updateCardPages({
       boardId: board.id,
-      spaceId: space.id,
-      userId: user.id
+      spaceId: space.id
     });
 
     const deletedCard = await prisma.page.findFirst({
@@ -1121,17 +1113,17 @@ describe('updateCardPages()', () => {
       views: 2
     });
 
-    await expect(updateCardPages({ boardId: database.id, spaceId: space.id, userId: user.id })).rejects.toBeInstanceOf(
+    await expect(updateCardPages({ boardId: database.id, spaceId: space.id })).rejects.toBeInstanceOf(
       InvalidStateError
     );
   });
 
   it('should not create cards from proposals if board is not found', async () => {
-    await expect(updateCardPages({ boardId: v4(), spaceId: space.id, userId: user.id })).rejects.toThrowError();
+    await expect(updateCardPages({ boardId: v4(), spaceId: space.id })).rejects.toThrowError();
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(updateCardPages({ boardId: board.id, spaceId: v4(), userId: user.id })).rejects.toThrowError();
+    await expect(updateCardPages({ boardId: board.id, spaceId: v4() })).rejects.toThrowError();
   });
 
   it('should create cards with permissions matching the parent', async () => {
@@ -1173,7 +1165,7 @@ describe('updateCardPages()', () => {
     );
 
     // This sets up the board
-    await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    await createCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
 
     // This proposal was created after the datasource was created
     const visibleProposal = await testUtilsProposals.generateProposal({
@@ -1185,7 +1177,7 @@ describe('updateCardPages()', () => {
     });
 
     // This calls the update method we are testing
-    await updateCardPages({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    await updateCardPages({ boardId: testBoard.id, spaceId: testSpace.id });
     const pages = await prisma.page.findMany({
       where: {
         parentId: testBoard.id

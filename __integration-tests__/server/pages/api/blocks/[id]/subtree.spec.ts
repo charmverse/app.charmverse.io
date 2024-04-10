@@ -6,7 +6,7 @@ import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import { createCardsFromProposals } from 'lib/databases/proposalsSource/applySourceToDatabase';
+import { createCards } from 'lib/databases/proposalsSource/createCards';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBoard } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
@@ -219,7 +219,7 @@ describe('GET /api/blocks/[id]/subtree', () => {
       ]
     });
     const sessionCookie = await loginUser(reviewer.id);
-    await createCardsFromProposals({ boardId: sharedDatabase.id, spaceId: space.id, userId: adminUser.id });
+    await createCards({ boardId: sharedDatabase.id, spaceId: space.id, createdBy: adminUser.id });
 
     const databaseBlocks = (
       await request(baseUrl).get(`/api/blocks/${sharedDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
