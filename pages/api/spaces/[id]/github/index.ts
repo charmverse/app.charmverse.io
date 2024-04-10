@@ -69,7 +69,7 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
       });
 
       return {
-        name: repo.name,
+        name: repo.full_name,
         url: repo.url,
         id: repo.id,
         labels: labels.map((label) => ({ name: label.name, color: label.color }))
