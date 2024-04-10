@@ -14,7 +14,7 @@ import { generateUser } from 'testing/utils/users';
 import type { BoardFields, IPropertyTemplate } from '../../board';
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCards } from '../createMissingCards';
+import { createMissingCards } from '../createMissingCards';
 import { updateCardPages } from '../updateCardPages';
 
 describe('updateCardPages', () => {

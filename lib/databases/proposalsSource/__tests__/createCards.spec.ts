@@ -14,7 +14,7 @@ import { generateUser } from 'testing/utils/users';
 
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCards } from '../createMissingCards';
+import { createMissingCards } from '../createMissingCards';
 
 describe('createCards', () => {
   let user: User;
