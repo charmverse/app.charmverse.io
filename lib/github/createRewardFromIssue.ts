@@ -139,7 +139,15 @@ export async function createRewardFromIssue({
     rewardType: rewardTemplate ? getRewardType(rewardTemplate) : undefined,
     allowedSubmitterRoles: allowedSubmitterRoles.length > 0 ? allowedSubmitterRoles : undefined,
     assignedSubmitters: assignedSubmitters.length > 0 ? assignedSubmitters : undefined,
-    reviewers,
+    reviewers:
+      reviewers.length > 0
+        ? reviewers
+        : [
+            {
+              group: 'user',
+              id: rewardsRepo.rewardAuthorId
+            }
+          ],
     githubIssueId: issueId,
     githubRepoId: repositoryId,
     pageProps: {

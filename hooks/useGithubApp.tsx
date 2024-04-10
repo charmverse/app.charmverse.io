@@ -26,15 +26,17 @@ function ConnectGithubRepoFormWithApp({ spaceId, closeModal }: { spaceId: string
   }
 
   return (
-    <ConnectGithubRepoForm
-      installationId={data.spaceGithubConnection.installationId}
-      spaceId={spaceId}
-      repositories={data.repositories}
-      rewardRepo={data.spaceGithubConnection.rewardsRepo}
-      githubAppName={data.spaceGithubConnection.name}
-      onSave={closeModal}
-      hideDisconnect
-    />
+    <Modal open title='Connect Github repo' onClose={closeModal}>
+      <ConnectGithubRepoForm
+        installationId={data.spaceGithubConnection.installationId}
+        spaceId={spaceId}
+        repositories={data.repositories}
+        rewardRepo={data.spaceGithubConnection.rewardsRepo}
+        githubAppName={data.spaceGithubConnection.name}
+        onSave={closeModal}
+        hideDisconnect
+      />
+    </Modal>
   );
 }
 
@@ -48,7 +50,6 @@ export function GithubAppProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (space?.id && githubInstallationId) {
       setLoading(true);
-      setShowGithubRepoConnectionModal(true);
       deleteCookie(INSTALLATION_ID_COOKIE);
       charmClient.spaces
         .connectWithGithubApplication({
@@ -57,6 +58,7 @@ export function GithubAppProvider({ children }: { children: ReactNode }) {
         })
         .then(() => {
           showMessage('Github application connected successfully', 'success');
+          setShowGithubRepoConnectionModal(true);
         })
         .finally(() => {
           setLoading(false);
@@ -70,20 +72,12 @@ export function GithubAppProvider({ children }: { children: ReactNode }) {
     <GithubAppContext.Provider value={value}>
       {children}
       {showGithubRepoConnectionModal && space && (
-        <Modal
-          open
-          title='Connect Github repo'
-          onClose={() => {
+        <ConnectGithubRepoFormWithApp
+          spaceId={space.id}
+          closeModal={() => {
             setShowGithubRepoConnectionModal(false);
           }}
-        >
-          <ConnectGithubRepoFormWithApp
-            spaceId={space.id}
-            closeModal={() => {
-              setShowGithubRepoConnectionModal(false);
-            }}
-          />
-        </Modal>
+        />
       )}
     </GithubAppContext.Provider>
   );
