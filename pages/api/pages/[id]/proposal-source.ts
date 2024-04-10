@@ -30,7 +30,8 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse) {
     select: {
       id: true,
       boardId: true,
-      spaceId: true
+      spaceId: true,
+      type: true
     }
   });
 

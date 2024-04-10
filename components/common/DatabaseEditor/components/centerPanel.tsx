@@ -15,7 +15,6 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { useGetPageMeta } from 'charmClient/hooks/pages';
@@ -44,8 +43,7 @@ import {
   addTemplate,
   getAllCards
 } from '../store/cards';
-import { initialDatabaseLoad } from '../store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppSelector } from '../store/hooks';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
@@ -106,7 +104,6 @@ function CenterPanel(props: Props) {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const localViewSettings = useLocalDbViewSettings(activeView?.id);
-  const dispatch = useAppDispatch();
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
   // for 'linked' boards, each view has its own board which we use to determine the cards to show

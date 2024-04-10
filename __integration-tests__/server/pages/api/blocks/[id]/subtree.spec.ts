@@ -233,6 +233,44 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
     expect(cardPageIds).toEqual([visibleProposal.id]);
   });
 
+  it('Should not return archived proposals', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+
+    // set up proposal-as-a-source db
+    const proposalDatabase = await generateBoard({
+      createdBy: admin.id,
+      spaceId: space.id,
+      viewDataSource: 'proposals',
+      cardCount: 0
+    });
+    // proposal is hidden
+    await testUtilsProposals.generateProposal({
+      archived: true,
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: admin.id,
+      authors: [admin.id],
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          permissions: [],
+          reviewers: []
+        }
+      ]
+    });
+    const sessionCookie = await loginUser(admin.id);
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${proposalDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const cards = databaseBlocks.filter((c) => c.type === 'card');
+    expect(cards).toHaveLength(0);
+  });
+
   it('Should create new cards', async () => {
     const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
