@@ -45,7 +45,7 @@ const messageHandlers: MessageHandlers = {
       repositoryId: message.repository.id.toString(),
       label: message.label?.name,
       issueState: message.issue.state,
-      issueId: message.issue.id.toString()
+      issueUrl: message.issue.html_url
     });
   },
 
@@ -70,7 +70,7 @@ const messageHandlers: MessageHandlers = {
       issueTitle: message.issue.title,
       repositoryId: message.repository.id.toString(),
       issueState: message.issue.state,
-      issueId: message.issue.id.toString()
+      issueUrl: message.issue.html_url
     });
   }
 };

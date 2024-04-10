@@ -19,6 +19,7 @@ import { randomEmojiList } from 'components/common/DatabaseEditor/emojiList';
 import EmojiIcon from 'components/common/Emoji';
 import { randomIntFromInterval } from 'lib/utils/random';
 
+import { GithubIssueChip } from './GithubIssueChip';
 import { randomBannerImage } from './PageBanner';
 import { PageTitleInput } from './PageTitleInput';
 
@@ -77,6 +78,7 @@ type PageHeaderProps = {
   parentId?: string | null;
   insideModal?: boolean;
   pageId?: string;
+  githubIssueUrl?: string | null;
   focusDocumentEditor: VoidFunction;
 };
 
@@ -92,6 +94,7 @@ function PageHeader({
   parentId,
   insideModal,
   pageId,
+  githubIssueUrl,
   focusDocumentEditor
 }: PageHeaderProps) {
   function updateTitle(page: { title: string; updatedAt: any }) {
@@ -111,7 +114,8 @@ function PageHeader({
         readOnly={readOnly}
         setPage={setPage}
       />
-      <PageParentChip insideModal={insideModal} pageId={pageId} parentId={parentId} />
+      {parentId && <PageParentChip insideModal={insideModal} pageId={pageId} parentId={parentId} />}
+      {githubIssueUrl && <GithubIssueChip githubIssueUrl={githubIssueUrl} />}
       <PageTitleInput
         readOnly={readOnly || readOnlyTitle}
         value={title}
