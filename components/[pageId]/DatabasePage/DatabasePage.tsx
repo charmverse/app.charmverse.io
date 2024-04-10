@@ -9,7 +9,11 @@ import CenterPanel from 'components/common/DatabaseEditor/components/centerPanel
 import DatabasePortal from 'components/common/DatabaseEditor/DatabasePortal';
 import mutator from 'components/common/DatabaseEditor/mutator';
 import { getCurrentBoard, setCurrent as setCurrentBoard } from 'components/common/DatabaseEditor/store/boards';
-import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import {
+  initialDatabaseLoad,
+  databaseViewsLoad,
+  blockLoad
+} from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from 'components/common/DatabaseEditor/store/hooks';
 import { getCurrentBoardViews, setCurrent as setCurrentView } from 'components/common/DatabaseEditor/store/views';
 import { Utils } from 'components/common/DatabaseEditor/utils';
@@ -87,6 +91,9 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
   useEffect(() => {
     if (page.id && (!board || page.id !== board.id)) {
       dispatch(initialDatabaseLoad({ pageId: page.id }));
+      // extra call to load the board and views as it takes less time when u have lots of cards
+      dispatch(blockLoad({ blockId: page.id }));
+      dispatch(databaseViewsLoad({ pageId: page.id as string }));
     }
   }, [page.id]);
 
