@@ -31,7 +31,7 @@ export type GithubApplicationData = {
 
 async function getGithubApplicationData(req: NextApiRequest, res: NextApiResponse<GithubApplicationData | null>) {
   const spaceId = req.query.id as string;
-  const spaceGithubConnection = await prisma.spaceGithubConnection.findFirstOrThrow({
+  const { installationId, rewardsRepos, name } = await prisma.spaceGithubConnection.findFirstOrThrow({
     where: {
       spaceId
     },
@@ -47,7 +47,7 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
     auth: {
       appId: Number(process.env.GITHUB_APP_ID),
       privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      installationId: spaceGithubConnection.installationId
+      installationId
     }
   });
 
@@ -89,8 +89,9 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
   return res.status(200).json({
     repositories,
     spaceGithubConnection: {
-      ...spaceGithubConnection,
-      rewardsRepo: spaceGithubConnection.rewardsRepos[0] ?? null
+      installationId,
+      name,
+      rewardsRepo: rewardsRepos[0] ?? null
     }
   });
 }
