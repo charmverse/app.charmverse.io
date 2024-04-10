@@ -4,30 +4,25 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 import { Octokit } from 'octokit';
 
-import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc({
   onError,
   onNoMatch
 });
 
-handler.use(requireUser).delete(disconnectGithub);
+handler
+  .use(
+    requireSpaceMembership({
+      adminOnly: true,
+      spaceIdKey: 'id'
+    })
+  )
+  .delete(disconnectGithub);
 
 async function disconnectGithub(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
-  const userId = req.session.user.id;
-
-  const { error } = await hasAccessToSpace({
-    adminOnly: true,
-    spaceId,
-    userId
-  });
-
-  if (error) {
-    throw error;
-  }
 
   const { installationId, id } = await prisma.spaceGithubConnection.findFirstOrThrow({
     where: {
