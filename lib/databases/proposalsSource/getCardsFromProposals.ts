@@ -20,7 +20,7 @@ import type { FormFieldData } from './getCardPropertiesFromAnswers';
 import { getCardPropertiesFromAnswers } from './getCardPropertiesFromAnswers';
 import { getProposalSourceProperties } from './getProposalSourceProperties';
 
-export type ProposalCardData = Pick<BlockWithDetails, 'fields'>;
+export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
 
 export async function getCardsFromProposals({
   cardProperties,
@@ -29,7 +29,7 @@ export async function getCardsFromProposals({
   cardProperties: IPropertyTemplate[];
   spaceId: string;
 }): Promise<Record<string, ProposalCardData>> {
-  const pageProposals = await prisma.page.findMany({
+  const proposalPages = await prisma.page.findMany({
     where: {
       spaceId,
       type: 'proposal',
@@ -46,6 +46,7 @@ export async function getCardsFromProposals({
     select: {
       id: true,
       path: true,
+      title: true,
       proposal: {
         select: {
           id: true,
@@ -96,11 +97,11 @@ export async function getCardsFromProposals({
     }
   });
 
-  return pageProposals.reduce<Record<string, ProposalCardData>>((acc, pageProposal) => {
-    if (pageProposal.proposal) {
-      acc[pageProposal.id] = mapProposalToCard({
-        pagePath: pageProposal.path,
-        proposal: pageProposal.proposal,
+  return proposalPages.reduce<Record<string, ProposalCardData>>((acc, proposalPage) => {
+    if (proposalPage.proposal) {
+      acc[proposalPage.id] = mapProposalToCard({
+        page: proposalPage,
+        proposal: proposalPage.proposal,
         cardProperties
       });
     }
@@ -109,7 +110,10 @@ export async function getCardsFromProposals({
 }
 
 type ProposalData = {
-  pagePath: string;
+  page: {
+    title: string;
+    path: string;
+  };
   proposal: Pick<Proposal, 'fields' | 'id' | 'status'> & {
     authors: { userId: string }[];
     evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'> & {
@@ -124,13 +128,13 @@ type ProposalData = {
   cardProperties: IPropertyTemplate[];
 };
 
-function mapProposalToCard({ pagePath, proposal, cardProperties }: ProposalData): ProposalCardData {
+function mapProposalToCard({ page, proposal, cardProperties }: ProposalData): ProposalCardData {
   const proposalProps = getProposalSourceProperties({ cardProperties });
 
   let properties: Record<string, CardPropertyValue> = {};
 
   if (proposalProps.proposalUrl) {
-    properties[proposalProps.proposalUrl.id] = pagePath;
+    properties[proposalProps.proposalUrl.id] = page.path;
   }
 
   cardProperties.forEach((cardProperty) => {
@@ -186,6 +190,7 @@ function mapProposalToCard({ pagePath, proposal, cardProperties }: ProposalData)
   });
 
   return {
+    title: page.title,
     fields: {
       properties: {
         ...properties,
