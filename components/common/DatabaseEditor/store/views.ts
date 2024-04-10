@@ -90,7 +90,7 @@ export const makeSelectSortedViews = () =>
     (state: RootState, boardId: string) => state.boards.boards[boardId],
     getViews,
     (boardId, board, views) => {
-      const viewIds = board?.fields.viewIds.length ? board?.fields.viewIds : Object.keys(views);
+      const viewIds = board?.fields.viewIds?.length ? board?.fields.viewIds : Object.keys(views);
       return Object.values(views)
         .filter((v) => v.parentId === boardId)
         .sort((a, b) => (viewIds.indexOf(a.id) > viewIds.indexOf(b.id) ? 1 : -1))
