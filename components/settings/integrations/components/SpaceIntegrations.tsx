@@ -34,13 +34,13 @@ const schema = yup.object({
       }
       return true;
     }),
-  kycOption: yup.string<KycOption>().oneOf(['synaps', 'persona']),
   synapsApiKey: yup.string(),
   synapsSecret: yup.string().nullable(),
   personaApiKey: yup.string().nullable(),
   personaSecret: yup.string().nullable(),
   personaTemplateId: yup.string().nullable(),
-  personaEnvironmentId: yup.string().nullable()
+  personaEnvironmentId: yup.string().nullable(),
+  kycOption: yup.string().oneOf<KycOption>(['synaps', 'persona']).nullable()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -60,7 +60,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   } = useForm<FormValues>({
     defaultValues: {
       snapshotDomain: space.snapshotDomain,
-      kycOption: space.kycOption || undefined
+      kycOption: space.kycOption
     },
     resolver: yupResolver(schema),
     mode: 'onSubmit'
@@ -84,7 +84,10 @@ export function SpaceIntegrations({ space }: { space: Space }) {
 
     if (dirtyFields.snapshotDomain || dirtyFields.kycOption) {
       await updateSpace(
-        { snapshotDomain: values.snapshotDomain, kycOption: values.kycOption },
+        {
+          snapshotDomain: values.snapshotDomain,
+          kycOption: values.kycOption || null
+        },
         { onSuccess: () => refreshCurrentSpace() }
       );
     }
@@ -136,7 +139,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
         <Grid item>
           <SpaceKyc control={control} isAdmin={isAdmin} kycCredentials={kycCredentials} />
         </Grid>
-        {isAllowedSpace && space.kycOption === 'synaps' && (
+        {isAllowedSpace && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
           <Grid item>
             <SynapsModal spaceId={space.id} />
           </Grid>
