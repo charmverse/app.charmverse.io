@@ -29,7 +29,7 @@ async function disconnectGithub(req: NextApiRequest, res: NextApiResponse) {
     throw error;
   }
 
-  const { installationId, id } = await prisma.spaceGithubCredential.findFirstOrThrow({
+  const { installationId, id } = await prisma.spaceGithubConnection.findFirstOrThrow({
     where: {
       spaceId
     },
@@ -52,7 +52,7 @@ async function disconnectGithub(req: NextApiRequest, res: NextApiResponse) {
     installation_id: Number(installationId)
   });
 
-  await prisma.spaceGithubCredential.delete({
+  await prisma.spaceGithubConnection.delete({
     where: {
       id
     }

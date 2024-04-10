@@ -13,20 +13,17 @@ const handler = nc({
 
 handler.use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' })).post(connectGithubRepoWithReward);
 
-export type ConnectRewardGithubRepoPayload = {
-  rewardTemplateId: string;
-  repositoryId: string;
-  repositoryName: string;
-  rewardAuthorId: string;
-  repositoryLabels: string[];
-};
+export type ConnectRewardGithubRepoPayload = Pick<
+  RewardsGithubRepo,
+  'repositoryId' | 'rewardTemplateId' | 'repositoryName' | 'repositoryLabels' | 'rewardAuthorId'
+>;
 
 async function connectGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse<RewardsGithubRepo>) {
   const spaceId = req.query.id as string;
   const { repositoryId, rewardTemplateId, repositoryName, repositoryLabels, rewardAuthorId } =
     req.body as ConnectRewardGithubRepoPayload;
 
-  const spaceGithubCredential = await prisma.spaceGithubCredential.findFirstOrThrow({
+  const spaceGithubConnection = await prisma.spaceGithubConnection.findFirstOrThrow({
     where: {
       spaceId
     },
@@ -44,7 +41,7 @@ async function connectGithubRepoWithReward(req: NextApiRequest, res: NextApiResp
       rewardTemplateId,
       rewardAuthorId,
       repositoryLabels,
-      credentialId: spaceGithubCredential.id
+      connectionId: spaceGithubConnection.id
     }
   });
 

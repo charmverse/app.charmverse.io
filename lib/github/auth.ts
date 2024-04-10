@@ -2,8 +2,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { App } from '@octokit/app';
 import { Octokit } from 'octokit';
 
-export function getSpaceGithubCredential({ spaceId }: { spaceId: string }) {
-  return prisma.spaceGithubCredential.findFirst({
+export function getSpaceGithubConnection({ spaceId }: { spaceId: string }) {
+  return prisma.spaceGithubConnection.findFirst({
     where: {
       spaceId
     }

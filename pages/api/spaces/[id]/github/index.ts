@@ -22,7 +22,7 @@ export type GithubApplicationData = {
     id: number;
     labels: { name: string; color: string }[];
   }[];
-  spaceGithubCredential: {
+  spaceGithubConnection: {
     name: string;
     installationId: string;
     rewardsRepo: RewardsGithubRepo | null;
@@ -31,7 +31,7 @@ export type GithubApplicationData = {
 
 async function getGithubApplicationData(req: NextApiRequest, res: NextApiResponse<GithubApplicationData | null>) {
   const spaceId = req.query.id as string;
-  const spaceGithubCredential = await prisma.spaceGithubCredential.findFirstOrThrow({
+  const spaceGithubConnection = await prisma.spaceGithubConnection.findFirstOrThrow({
     where: {
       spaceId
     },
@@ -47,7 +47,7 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
     auth: {
       appId: Number(process.env.GITHUB_APP_ID),
       privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      installationId: spaceGithubCredential.installationId
+      installationId: spaceGithubConnection.installationId
     }
   });
 
@@ -88,9 +88,9 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
 
   return res.status(200).json({
     repositories,
-    spaceGithubCredential: {
-      ...spaceGithubCredential,
-      rewardsRepo: spaceGithubCredential.rewardsRepos[0] ?? null
+    spaceGithubConnection: {
+      ...spaceGithubConnection,
+      rewardsRepo: spaceGithubConnection.rewardsRepos[0] ?? null
     }
   });
 }

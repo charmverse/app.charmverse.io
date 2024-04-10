@@ -1,3 +1,4 @@
+import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -12,13 +13,12 @@ const handler = nc({
 
 handler.use(requireSpaceMembership({ adminOnly: true, spaceIdKey: 'id' })).put(updateGithubRepoWithReward);
 
-export type UpdateGithubRepoWithReward = Partial<{
-  rewardTemplateId: string;
-  repositoryId: string;
-  repositoryName: string;
-  repositoryLabels: string[];
-  rewardAuthorId: string;
-}>;
+export type UpdateGithubRepoWithReward = Partial<
+  Pick<
+    RewardsGithubRepo,
+    'repositoryId' | 'rewardTemplateId' | 'repositoryName' | 'repositoryLabels' | 'rewardAuthorId'
+  >
+>;
 
 async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
@@ -28,7 +28,7 @@ async function updateGithubRepoWithReward(req: NextApiRequest, res: NextApiRespo
   await prisma.rewardsGithubRepo.updateMany({
     where: {
       id: repoId,
-      credential: {
+      connection: {
         spaceId
       }
     },

@@ -43,7 +43,7 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
   const { data: app } = await appOctokit.request('GET /app');
   const appName = app.name;
 
-  await prisma.spaceGithubCredential.create({
+  await prisma.spaceGithubConnection.create({
     data: {
       installationId,
       spaceId,

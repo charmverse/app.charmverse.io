@@ -314,11 +314,11 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
           </Grid>
         ) : (
           <ConnectedGithubAppSection
-            installationId={data.spaceGithubCredential.installationId}
+            installationId={data.spaceGithubConnection.installationId}
             spaceId={spaceId}
             repositories={data.repositories}
-            rewardRepo={data.spaceGithubCredential.rewardsRepo}
-            githubAppName={data.spaceGithubCredential.name}
+            rewardRepo={data.spaceGithubConnection.rewardsRepo}
+            githubAppName={data.spaceGithubConnection.name}
           />
         ))}
     </Grid>
