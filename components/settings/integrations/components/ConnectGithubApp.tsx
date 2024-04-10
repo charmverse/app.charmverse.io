@@ -20,6 +20,7 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { GITHUB_APP_NAME } from 'lib/github/constants';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
 import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
 import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
@@ -320,7 +321,7 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
               loading={loading || isLoadingGithubApplicationData}
               disabledTooltip={loading ? 'Connecting with CharmVerse Github App' : undefined}
               external
-              href={`https://github.com/apps/dev-charmverse-integration/installations/new?state=${encodeURIComponent(
+              href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
                 JSON.stringify({
                   redirect: `${window?.location.origin}/${spaceDomain as string}`
                 })
