@@ -17,6 +17,7 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
 import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
@@ -53,6 +54,7 @@ export function ConnectGithubRepoForm({
   githubAppName: string;
   hideDisconnect?: boolean;
 }) {
+  const isAdmin = useIsAdmin();
   const { trigger: disconnectGithubApplication, isMutating: isDisconnectingGithubApplication } =
     useDisconnectGithubApplication(spaceId);
   const { mutate } = useGetGithubApplicationData(spaceId);
@@ -118,7 +120,8 @@ export function ConnectGithubRepoForm({
     isConnectingGithubRepository ||
     isDisconnectingGithubApplication ||
     isLoadingRewardTemplates ||
-    isUpdatingGithubRepoWithReward;
+    isUpdatingGithubRepoWithReward ||
+    !isAdmin;
 
   function handleConnectGithubRepository() {
     handleSubmit(

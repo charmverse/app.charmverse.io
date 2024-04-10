@@ -17,12 +17,6 @@ export const schema = yup.object({
   repositoryLabels: yup.array(yup.string())
 });
 
-const formFieldOptions = {
-  shouldDirty: true,
-  shouldTouch: true,
-  shouldValidate: true
-};
-
 export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; spaceDomain: string }) {
   const isAdmin = useIsAdmin();
   const { data, isLoading: isLoadingGithubApplicationData } = useGetGithubApplicationData(spaceId);
@@ -33,31 +27,37 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
       <Grid item>
         <Typography variant='body2'>Connect your space to Github to sync rewards and issues.</Typography>
       </Grid>
-      {isAdmin &&
-        (!data ? (
-          <Grid item>
-            <Button
-              loading={loading || isLoadingGithubApplicationData}
-              disabledTooltip={loading ? 'Connecting with CharmVerse Github App' : undefined}
-              external
-              href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
-                JSON.stringify({
-                  redirect: `${window?.location.origin}/${spaceDomain as string}`
-                })
-              )}`}
-            >
-              Connect
-            </Button>
-          </Grid>
-        ) : (
-          <ConnectGithubRepoForm
-            installationId={data.spaceGithubConnection.installationId}
-            spaceId={spaceId}
-            repositories={data.repositories}
-            rewardRepo={data.spaceGithubConnection.rewardsRepo}
-            githubAppName={data.spaceGithubConnection.name}
-          />
-        ))}
+      {!data ? (
+        <Grid item>
+          <Button
+            loading={loading || isLoadingGithubApplicationData}
+            disabledTooltip={
+              loading
+                ? 'Connecting with CharmVerse Github App'
+                : !isAdmin
+                ? 'Only admins can connect to Github'
+                : undefined
+            }
+            disabled={loading || !isAdmin}
+            external
+            href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
+              JSON.stringify({
+                redirect: `${window?.location.origin}/${spaceDomain as string}`
+              })
+            )}`}
+          >
+            Connect
+          </Button>
+        </Grid>
+      ) : (
+        <ConnectGithubRepoForm
+          installationId={data.spaceGithubConnection.installationId}
+          spaceId={spaceId}
+          repositories={data.repositories}
+          rewardRepo={data.spaceGithubConnection.rewardsRepo}
+          githubAppName={data.spaceGithubConnection.name}
+        />
+      )}
     </Grid>
   );
 }
