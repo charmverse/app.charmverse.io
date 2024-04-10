@@ -494,19 +494,14 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const { trigger: updateProposalSource } = useSWRMutation(
-    `/api/pages/${activeBoard?.id}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
-  );
-
-  useEffect(() => {
-    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
-      updateProposalSource({ pageId: currentRootPageId }).then(() => {
-        // Refetch database after updating proposal source board, otherwise the UI will be out of sync
-        dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
-      });
-    }
-  }, [currentRootPageId, activeBoard?.id]);
+  // useEffect(() => {
+  //   if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
+  //     updateProposalSource({ pageId: currentRootPageId }).then(() => {
+  //       // Refetch database after updating proposal source board, otherwise the UI will be out of sync
+  //       dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
+  //     });
+  //   }
+  // }, [currentRootPageId, activeBoard?.id]);
 
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';

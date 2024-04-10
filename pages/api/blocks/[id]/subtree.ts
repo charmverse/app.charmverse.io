@@ -80,7 +80,7 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
   // use the most recent the card properties
   block.fields = updatedBoard.fields as unknown as BoardFields;
 
-  const [permissionsById, newCardBlocks, proposalCards] = await Promise.all([
+  const [permissionsById, newCardBlocks, proposalCardProperties] = await Promise.all([
     // get permissions for each propsoal based on the database author
     permissionsApiClient.proposals.bulkComputeProposalPermissions({
       spaceId: block.spaceId,
@@ -96,7 +96,7 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
     boardProperties: block.fields.cardProperties,
     blocks: blocks.concat(newCardBlocks),
     permissions: permissionsById,
-    proposalCards
+    proposalCards: proposalCardProperties
   });
   // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
   return assembled.filter((b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view);

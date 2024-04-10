@@ -17,9 +17,18 @@ export async function trashOrDeletePage(pageId: string, userId: string, action: 
     // Only top level page can be proposal page
     await prisma.proposal.deleteMany({
       where: {
-        page: {
-          id: pageId
-        }
+        OR: [
+          {
+            page: {
+              id: pageId
+            }
+          },
+          {
+            page: {
+              syncWithPageId: pageId
+            }
+          }
+        ]
       }
     });
     await prisma.$transaction([
@@ -75,9 +84,18 @@ export async function trashOrDeletePage(pageId: string, userId: string, action: 
 
     await prisma.page.updateMany({
       where: {
-        id: {
-          in: modifiedChildPageIds
-        }
+        OR: [
+          {
+            id: {
+              in: modifiedChildPageIds
+            }
+          },
+          {
+            syncWithPageId: {
+              in: modifiedChildPageIds
+            }
+          }
+        ]
       },
       data: {
         ...data,
