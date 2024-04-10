@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -20,7 +19,7 @@ handler
   .use(requireKeys(['id'], 'query'))
   .post(createProposalSource);
 
-async function createProposalSource(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
+async function createProposalSource(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
 

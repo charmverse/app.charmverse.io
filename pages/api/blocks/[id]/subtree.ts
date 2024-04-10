@@ -87,7 +87,7 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
       userId: block.createdBy
     }),
     // create missing blocks for new proposals
-    createMissingCards({ boardId: block.id, spaceId: block.spaceId, createdBy: block.createdBy }),
+    createMissingCards({ boardId: block.id }),
     // get properties for proposals
     getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
   ]);

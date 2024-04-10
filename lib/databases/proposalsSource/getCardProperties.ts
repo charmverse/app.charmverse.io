@@ -241,7 +241,7 @@ function getCardProperties({ page, proposal, cardProperties, formFields }: Propo
   };
 }
 
-function getCardPropertyTemplates({ cardProperties }: { cardProperties: IPropertyTemplate[] }) {
+export function getCardPropertyTemplates({ cardProperties }: { cardProperties: IPropertyTemplate[] }) {
   return {
     proposalAuthor: cardProperties.find((prop) => prop.type === 'proposalAuthor'),
     proposalEvaluationType: cardProperties.find((prop) => prop.type === 'proposalEvaluationType'),

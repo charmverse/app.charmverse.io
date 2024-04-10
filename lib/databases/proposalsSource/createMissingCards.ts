@@ -7,15 +7,7 @@ import { createCardPage } from 'lib/pages/createCardPage';
 import type { BlockWithDetails } from '../block';
 
 // Create card blocks for proposals that do not exist already
-export async function createMissingCards({
-  boardId,
-  createdBy,
-  spaceId
-}: {
-  boardId: string;
-  createdBy: string;
-  spaceId: string;
-}): Promise<BlockWithDetails[]> {
+export async function createMissingCards({ boardId }: { boardId: string }): Promise<BlockWithDetails[]> {
   const latestCard = await prisma.block.findFirst({
     where: { parentId: boardId, type: 'card' },
     select: { createdAt: true },
@@ -30,7 +22,9 @@ export async function createMissingCards({
       id: boardId
     },
     select: {
-      permissions: true
+      createdBy: true,
+      permissions: true,
+      spaceId: true
     }
   });
 
@@ -42,7 +36,7 @@ export async function createMissingCards({
             gt: latestTimestamp
           }
         : undefined,
-      spaceId,
+      spaceId: rootPagePermissions.spaceId,
       type: 'proposal',
       proposal: {
         archived: {
@@ -67,7 +61,11 @@ export async function createMissingCards({
   });
 
   if (pagesMissingCards.length > 0) {
-    log.debug('Creating cards from new Proposals', { boardId, pagesMissingCards: pagesMissingCards.length, spaceId });
+    log.debug('Creating cards for Proposals source', {
+      pageId: boardId,
+      pagesMissingCards: pagesMissingCards.length,
+      spaceId: rootPagePermissions.spaceId
+    });
   }
 
   return Promise.all(
@@ -79,7 +77,7 @@ export async function createMissingCards({
         boardId,
         spaceId: proposalPage.spaceId,
         createdAt,
-        createdBy,
+        createdBy: rootPagePermissions.createdBy,
         properties: {},
         hasContent: proposalPage.hasContent,
         content: proposalPage.content,
