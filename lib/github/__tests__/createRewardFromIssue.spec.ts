@@ -1,0 +1,458 @@
+import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
+import { v4 } from 'uuid';
+
+import { createReward } from 'lib/rewards/createReward';
+import { createPage } from 'testing/pages';
+
+import { createRewardFromIssue } from '../createRewardFromIssue';
+
+describe('createRewardFromIssue', () => {
+  it(`Should return an issue not open message if the issue state is not open`, async () => {
+    expect(
+      await createRewardFromIssue({
+        installationId: '',
+        repositoryId: v4(),
+        label: '',
+        issueTitle: '',
+        issueId: v4(),
+        issueState: 'closed'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Issue is not open.'
+    });
+  });
+
+  it(`Should return a reward already created message if the reward already exists`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const githubIssueId = v4();
+    const githubRepoId = v4();
+    await createReward({
+      spaceId: space.id,
+      userId: user.id,
+      githubIssueId,
+      githubRepoId,
+      reviewers: [
+        {
+          group: 'user',
+          id: user.id
+        }
+      ],
+      pageProps: {
+        title: 'Test'
+      }
+    });
+
+    expect(
+      await createRewardFromIssue({
+        installationId: '',
+        repositoryId: githubRepoId,
+        label: '',
+        issueTitle: '',
+        issueId: githubIssueId,
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Reward already created.'
+    });
+  });
+
+  it(`Should return a space not found message if the space with installation id is not found`, async () => {
+    expect(
+      await createRewardFromIssue({
+        installationId: '',
+        repositoryId: v4(),
+        label: '',
+        issueTitle: '',
+        issueId: v4(),
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Space not found or not connected to CharmVerse GitHub App.'
+    });
+  });
+
+  it(`Should return a space not connected to rewards repo message if the space with installation id is not connected to any rewards repo`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const installationId = v4();
+
+    await prisma.spaceGithubConnection.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        installationId,
+        name: 'Test Github App',
+        updatedBy: user.id
+      }
+    });
+
+    expect(
+      await createRewardFromIssue({
+        installationId,
+        repositoryId: v4(),
+        label: '',
+        issueTitle: '',
+        issueId: v4(),
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Space not connected to any rewards repo.'
+    });
+  });
+
+  it(`Should return a github repository not connected to rewards message if the repository ids are different`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const installationId = v4();
+    const githubRepoId = v4();
+
+    const rewardTemplatePage = await createPage({
+      type: 'bounty_template',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await prisma.spaceGithubConnection.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        installationId,
+        name: 'Test Github App',
+        updatedBy: user.id,
+        rewardsRepos: {
+          create: {
+            repositoryId: githubRepoId,
+            repositoryName: 'Test Repo',
+            rewardTemplateId: rewardTemplatePage.id,
+            rewardAuthorId: user.id
+          }
+        }
+      }
+    });
+
+    const githubIssueId = v4();
+
+    expect(
+      await createRewardFromIssue({
+        installationId,
+        repositoryId: v4(),
+        label: '',
+        issueTitle: '',
+        issueId: githubIssueId,
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Github repository is not connected to rewards.'
+    });
+  });
+
+  it(`Should return issue doesn't have a label message if the issue doesn't have a label but is required`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const installationId = v4();
+    const githubRepoId = v4();
+
+    const rewardTemplatePage = await createPage({
+      type: 'bounty_template',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await prisma.spaceGithubConnection.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        installationId,
+        name: 'Test Github App',
+        updatedBy: user.id,
+        rewardsRepos: {
+          create: {
+            repositoryId: githubRepoId,
+            repositoryName: 'Test Repo',
+            rewardTemplateId: rewardTemplatePage.id,
+            rewardAuthorId: user.id,
+            repositoryLabels: ['production']
+          }
+        }
+      }
+    });
+
+    const githubIssueId = v4();
+
+    expect(
+      await createRewardFromIssue({
+        installationId,
+        repositoryId: githubRepoId,
+        issueTitle: '',
+        issueId: githubIssueId,
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Issue does not have a label.'
+    });
+  });
+
+  it(`Should return issue label doesn't match the repo labels if there is a mismatch`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const installationId = v4();
+    const githubRepoId = v4();
+
+    const rewardTemplatePage = await createPage({
+      type: 'bounty_template',
+      createdBy: user.id,
+      spaceId: space.id
+    });
+
+    await prisma.spaceGithubConnection.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        installationId,
+        name: 'Test Github App',
+        updatedBy: user.id,
+        rewardsRepos: {
+          create: {
+            repositoryId: githubRepoId,
+            repositoryName: 'Test Repo',
+            rewardTemplateId: rewardTemplatePage.id,
+            rewardAuthorId: user.id,
+            repositoryLabels: ['production']
+          }
+        }
+      }
+    });
+
+    const githubIssueId = v4();
+
+    expect(
+      await createRewardFromIssue({
+        installationId,
+        repositoryId: githubRepoId,
+        issueTitle: 'Issue Title',
+        label: 'test',
+        issueId: githubIssueId,
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      success: true,
+      message: 'Issue label does not match the rewards repo labels.'
+    });
+  });
+
+  it(`Should create a rewards without any rewards template id connected with rewards repo`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const installationId = v4();
+    const githubRepoId = v4();
+
+    await prisma.spaceGithubConnection.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        installationId,
+        name: 'Test Github App',
+        updatedBy: user.id,
+        rewardsRepos: {
+          create: {
+            repositoryId: githubRepoId,
+            repositoryName: 'Test Repo',
+            rewardAuthorId: user.id
+          }
+        }
+      }
+    });
+
+    const githubIssueId = v4();
+
+    expect(
+      await createRewardFromIssue({
+        installationId,
+        repositoryId: githubRepoId,
+        issueTitle: 'Issue Title',
+        issueId: githubIssueId,
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      spaceIds: [space.id],
+      success: true,
+      message: 'Reward created.'
+    });
+
+    const spaceReward = await prisma.bounty.findFirstOrThrow({
+      where: {
+        spaceId: space.id
+      },
+      select: {
+        author: {
+          select: {
+            id: true
+          }
+        },
+        permissions: {
+          select: {
+            permissionLevel: true,
+            userId: true
+          }
+        },
+        githubIssueId: true,
+        githubRepoId: true,
+        page: {
+          select: {
+            title: true
+          }
+        }
+      }
+    });
+
+    expect(spaceReward.author.id).toBe(user.id);
+    expect(spaceReward.githubIssueId).toBe(githubIssueId);
+    expect(spaceReward.githubRepoId).toBe(githubRepoId);
+    expect(spaceReward.page!.title).toBe('Issue Title');
+    expect(spaceReward.permissions).toStrictEqual([
+      {
+        permissionLevel: 'reviewer',
+        userId: user.id
+      }
+    ]);
+  });
+
+  it(`Should create a rewards without a reward template id connected with rewards repo`, async () => {
+    const { user, space } = await testUtilsUser.generateUserAndSpace();
+    const user2 = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
+
+    const installationId = v4();
+    const githubRepoId = v4();
+    const dueDate = new Date();
+    const rewardTemplate = await createReward({
+      spaceId: space.id,
+      userId: user.id,
+      allowMultipleApplications: true,
+      approveSubmitters: true,
+      chainId: 1,
+      dueDate,
+      fields: {},
+      maxSubmissions: 10,
+      pageProps: {
+        title: 'Test',
+        contentText: 'Test Content Text',
+        icon: 'Test Icon',
+        type: 'bounty_template'
+      },
+      rewardAmount: 100,
+      rewardToken: 'ETH',
+      rewardType: 'token',
+      reviewers: [
+        {
+          group: 'user',
+          id: user.id
+        }
+      ]
+    });
+
+    await prisma.spaceGithubConnection.create({
+      data: {
+        spaceId: space.id,
+        createdBy: user.id,
+        installationId,
+        name: 'Test Github App',
+        updatedBy: user.id,
+        rewardsRepos: {
+          create: {
+            repositoryId: githubRepoId,
+            repositoryName: 'Test Repo',
+            rewardAuthorId: user.id,
+            rewardTemplateId: rewardTemplate.createdPageId
+          }
+        }
+      }
+    });
+
+    const githubIssueId = v4();
+
+    expect(
+      await createRewardFromIssue({
+        installationId,
+        repositoryId: githubRepoId,
+        issueTitle: 'Issue Title',
+        issueId: githubIssueId,
+        issueState: 'open'
+      })
+    ).toStrictEqual({
+      spaceIds: [space.id],
+      success: true,
+      message: 'Reward created.'
+    });
+
+    const spaceReward = await prisma.bounty.findFirstOrThrow({
+      where: {
+        spaceId: space.id,
+        id: {
+          not: rewardTemplate.createdPageId
+        }
+      },
+      select: {
+        author: {
+          select: {
+            id: true
+          }
+        },
+        permissions: {
+          select: {
+            permissionLevel: true,
+            userId: true,
+            roleId: true
+          }
+        },
+        githubIssueId: true,
+        allowMultipleApplications: true,
+        approveSubmitters: true,
+        dueDate: true,
+        maxSubmissions: true,
+        rewardAmount: true,
+        rewardToken: true,
+        chainId: true,
+        githubRepoId: true,
+        page: {
+          select: {
+            icon: true,
+            type: true,
+            autoGenerated: true,
+            contentText: true,
+            title: true
+          }
+        }
+      }
+    });
+
+    expect(spaceReward.page).toStrictEqual({
+      icon: 'Test Icon',
+      type: 'bounty',
+      autoGenerated: true,
+      contentText: 'Test Content Text',
+      title: 'Issue Title'
+    });
+    expect(spaceReward.author.id).toBe(user.id);
+    expect(spaceReward.githubIssueId).toBe(githubIssueId);
+    expect(spaceReward.githubRepoId).toBe(githubRepoId);
+    expect(spaceReward.dueDate).toStrictEqual(dueDate);
+    expect(spaceReward.allowMultipleApplications).toBe(true);
+    expect(spaceReward.approveSubmitters).toBe(true);
+    expect(spaceReward.maxSubmissions).toBe(10);
+    expect(spaceReward.rewardAmount).toBe(100);
+    expect(spaceReward.rewardToken).toBe('ETH');
+    expect(spaceReward.chainId).toBe(1);
+    expect(spaceReward.permissions).toMatchObject(
+      expect.arrayContaining([
+        expect.objectContaining({
+          permissionLevel: 'reviewer',
+          userId: user.id
+        })
+      ])
+    );
+  });
+});
