@@ -9,6 +9,7 @@ export function TogglePageSidebarButton({ onClick, className }: { onClick: VoidF
       className={className}
       onClick={onClick}
       size='small'
+      data-test='close-sidebar-button'
       sx={{
         '&.MuiIconButton-root': {
           borderRadius: '4px',
