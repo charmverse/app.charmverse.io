@@ -2,7 +2,7 @@ import type { SmallProposalPermissionFlags } from '@charmverse/core/permissions'
 
 import type { BlockWithDetails } from '../block';
 
-import type { ProposalCardData } from './getCardPropertiesFromProposals';
+import type { ProposalCardData } from './getCardsFromProposals';
 
 export function assembleBlocks({
   blocks,
@@ -24,7 +24,7 @@ export function assembleBlocks({
       const accessPrivateFields = !!block.syncWithPageId && permissions[block.syncWithPageId].view_private_fields;
 
       // TODO: filter private answers if user does not have access
-      // const formFieldProperties = getCardPropertiesFromAnswers({
+      // const formFieldProperties = getPropertyValuesFromAnswers({
       //   accessPrivateFields,
       //   cardProperties: boardBlockCardProperties,
       //   formFields,
@@ -32,6 +32,7 @@ export function assembleBlocks({
       // });
       return {
         ...block,
+        title: proposalCard.title,
         fields: {
           ...block.fields,
           properties: mergedProperties

@@ -7,6 +7,7 @@ import nc from 'next-connect';
 import type { BlockWithDetails, BlockTypes } from 'lib/databases/block';
 import { applyPageToBlock } from 'lib/databases/block';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
+import { getCardFromProposal } from 'lib/databases/proposalsSource/getCardsFromProposals';
 import { ActionNotPermittedError, ApiError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { trashOrDeletePage } from 'lib/pages/trashOrDeletePage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -47,6 +48,24 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
   }
 
   const result = page ? applyPageToBlock(block, page) : (block as BlockWithDetails);
+
+  // apply readonly properties from source page (eg. proposal)
+  if (page?.syncWithPageId) {
+    const proposalPermission = await permissionsApiClient.proposals.computeProposalPermissions({
+      resourceId: page.syncWithPageId,
+      userId: page.createdBy
+    });
+    const proposalCardProps = await getCardFromProposal({
+      canViewPrivateFields: proposalPermission.view_private_fields,
+      boardId: block.rootId,
+      pageId: page.syncWithPageId
+    });
+    result.fields.properties = {
+      ...result.fields.properties,
+      ...proposalCardProps.fields.properties
+    };
+    result.title = proposalCardProps.title;
+  }
 
   return res.status(200).json(result);
 }

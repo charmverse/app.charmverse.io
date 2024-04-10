@@ -64,10 +64,10 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
     await applySourceToDatabase({ boardId: pageId, spaceId: page.spaceId });
 
     const [permissionsById, newCardBlocks, proposalCards] = await Promise.all([
-      // get permissions for each propsoal
+      // get permissions for each propsoal based on the database author
       permissionsApiClient.proposals.bulkComputeProposalPermissions({
         spaceId: page.spaceId,
-        userId: req.session.user?.id
+        userId: block.createdBy
       }),
       // create missing blocks for new proposals
       createCards({ boardId: blockId, spaceId: page.spaceId, createdBy: block.createdBy }),

@@ -11,10 +11,10 @@ export function getProposalSourceProperties({
   cardProperties: IPropertyTemplate[];
 }): Partial<ProposalPropertiesMap> {
   return {
-    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
-    proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
-    proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
+    proposalAuthor: cardProperties.find((prop) => prop.type === 'proposalAuthor'),
     proposalEvaluationType: cardProperties.find((prop) => prop.type === 'proposalEvaluationType'),
-    proposalAuthor: cardProperties.find((prop) => prop.type === 'proposalAuthor')
+    proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
+    proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
+    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl')
   };
 }

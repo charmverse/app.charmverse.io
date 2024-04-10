@@ -8,28 +8,29 @@ import type { IPropertyTemplate } from '../board';
 
 import { excludedFieldTypes } from './updateDatabaseProposalProperties';
 
-export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'> & {
-  answers: Pick<FormFieldAnswer, 'value' | 'proposalId'>[];
-};
+export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'>;
+export type FormAnswerData = Pick<FormFieldAnswer, 'value' | 'fieldId'>;
 
-export function getCardPropertiesFromAnswers({
+type PropertiesMap = Record<string, BoardPropertyValue>;
+
+export function getPropertyValuesFromAnswers({
   accessPrivateFields,
+  formAnswers,
   formFields,
-  cardProperties,
-  proposalId
+  cardProperties
 }: {
   cardProperties: IPropertyTemplate[];
   accessPrivateFields: boolean;
+  formAnswers: FormAnswerData[];
   formFields: FormFieldData[];
-  proposalId: string;
-}) {
-  const properties: Record<string, BoardPropertyValue> = {};
+}): PropertiesMap {
+  const properties: PropertiesMap = {};
 
   const filteredFormFields = accessPrivateFields ? formFields : formFields.filter((formField) => !formField.private);
 
   for (const formField of filteredFormFields) {
     const cardProperty = cardProperties.find((p) => p.formFieldId === formField.id);
-    const answerValue = formField.answers.find((ans) => ans.proposalId === proposalId)?.value as FormFieldValue;
+    const answerValue = formAnswers.find((ans) => ans.fieldId === formField.id)?.value as FormFieldValue;
     // exclude some field types
     if (!excludedFieldTypes.includes(formField.type) && cardProperty) {
       if (formField.type === 'long_text') {
