@@ -44,7 +44,8 @@ const messageHandlers: MessageHandlers = {
       issueTitle: message.issue.title,
       repositoryId: message.repository.id.toString(),
       label: message.label?.name,
-      issueState: message.issue.state
+      issueState: message.issue.state,
+      issueId: message.issue.id.toString()
     });
   },
 
@@ -68,7 +69,8 @@ const messageHandlers: MessageHandlers = {
       installationId: installationId.toString(),
       issueTitle: message.issue.title,
       repositoryId: message.repository.id.toString(),
-      issueState: message.issue.state
+      issueState: message.issue.state,
+      issueId: message.issue.id.toString()
     });
   }
 };
