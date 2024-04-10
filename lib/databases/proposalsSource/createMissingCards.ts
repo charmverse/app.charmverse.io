@@ -7,7 +7,7 @@ import { createCardPage } from 'lib/pages/createCardPage';
 import type { BlockWithDetails } from '../block';
 
 // Create card blocks for proposals that do not exist already
-export async function createCards({
+export async function createMissingCards({
   boardId,
   createdBy,
   spaceId

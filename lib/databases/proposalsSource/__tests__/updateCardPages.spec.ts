@@ -14,7 +14,7 @@ import { generateUser } from 'testing/utils/users';
 import type { BoardFields, IPropertyTemplate } from '../../board';
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCards } from '../createCards';
+import { createCards } from '../createMissingCards';
 import { updateCardPages } from '../updateCardPages';
 
 describe('updateCardPages', () => {
@@ -65,7 +65,7 @@ describe('updateCardPages', () => {
       userId: user.id
     });
 
-    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     const updatedProposalPageDetails = {
       title: 'Updated title',
@@ -225,7 +225,7 @@ describe('updateCardPages', () => {
       }
     });
 
-    await createCards({
+    await createMissingCards({
       boardId: database.id,
       spaceId: generated.space.id,
       createdBy: admin.id
@@ -494,7 +494,7 @@ describe('updateCardPages', () => {
 
   it('should not create cards from draft proposals', async () => {
     // populate board view
-    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
@@ -520,7 +520,7 @@ describe('updateCardPages', () => {
   });
   it('should not create cards from archived proposals', async () => {
     // populate board view
-    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     const pageProposal2 = await testUtilsProposals.generateProposal({
       authors: [],
@@ -651,7 +651,7 @@ describe('updateCardPages', () => {
       }
     });
 
-    await createCards({
+    await createMissingCards({
       boardId: databaseBoard.id,
       spaceId: testSpace.id,
       createdBy: proposalAuthor.id
@@ -880,7 +880,7 @@ describe('updateCardPages', () => {
       viewDataSource: 'proposals'
     });
 
-    await createCards({
+    await createMissingCards({
       boardId: database.id,
       spaceId: testSpace.id,
       createdBy: proposalAuthor.id
@@ -1034,7 +1034,7 @@ describe('updateCardPages', () => {
       userId: user.id
     });
 
-    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     await prisma.page.update({
       where: {
@@ -1075,7 +1075,7 @@ describe('updateCardPages', () => {
       userId: user.id
     });
 
-    await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     await prisma.$transaction([
       prisma.page.delete({
@@ -1165,7 +1165,7 @@ describe('updateCardPages', () => {
     );
 
     // This sets up the board
-    await createCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
+    await createMissingCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
 
     // This proposal was created after the datasource was created
     const visibleProposal = await testUtilsProposals.generateProposal({

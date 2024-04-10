@@ -14,7 +14,7 @@ import { generateUser } from 'testing/utils/users';
 
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
-import { createCards } from '../createCards';
+import { createCards } from '../createMissingCards';
 
 describe('createCards', () => {
   let user: User;
@@ -64,7 +64,7 @@ describe('createCards', () => {
       spaceId: space.id,
       userId: user.id
     });
-    const cards = await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    const cards = await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
     expect(cards.length).toBe(1);
     expect(
       cards.every(
@@ -84,7 +84,7 @@ describe('createCards', () => {
       userId: user.id
     });
 
-    const cards = await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    const cards = await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     expect(cards.length).toBe(0);
   });
@@ -253,7 +253,7 @@ describe('createCards', () => {
       viewDataSource: 'proposals'
     });
 
-    const cards = await createCards({
+    const cards = await createMissingCards({
       boardId: database.id,
       spaceId: generated.space.id,
       createdBy: user.id
@@ -439,7 +439,7 @@ describe('createCards', () => {
       viewDataSource: 'proposals'
     });
 
-    const [cardPage] = await createCards({
+    const [cardPage] = await createMissingCards({
       boardId: databaseBoard.id,
       spaceId: testSpace.id,
       createdBy: proposalAuthor.id
@@ -574,7 +574,7 @@ describe('createCards', () => {
       viewDataSource: 'proposals'
     });
 
-    const [cardPage] = await createCards({
+    const [cardPage] = await createMissingCards({
       boardId: database1.id,
       spaceId: testSpace.id,
       createdBy: proposalAuthor.id
@@ -616,7 +616,7 @@ describe('createCards', () => {
       viewDataSource: 'proposals'
     });
 
-    const [cardPage2] = await createCards({
+    const [cardPage2] = await createMissingCards({
       boardId: database2.id,
       spaceId: testSpace.id,
       createdBy: spaceMember.id
@@ -652,25 +652,25 @@ describe('createCards', () => {
   });
 
   it('should not create cards from proposals if board is not found', async () => {
-    await expect(createCards({ boardId: v4(), spaceId: space.id, createdBy: user.id })).rejects.toThrowError();
+    await expect(createMissingCards({ boardId: v4(), spaceId: space.id, createdBy: user.id })).rejects.toThrowError();
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(createCards({ boardId: board.id, spaceId: v4(), createdBy: user.id })).rejects.toThrowError();
+    await expect(createMissingCards({ boardId: board.id, spaceId: v4(), createdBy: user.id })).rejects.toThrowError();
   });
 
   it('should throw an error if boardId or spaceId is invalid', async () => {
-    await expect(createCards({ boardId: board.id, spaceId: 'Bad space id', createdBy: user.id })).rejects.toThrowError(
-      InvalidInputError
-    );
+    await expect(
+      createMissingCards({ boardId: board.id, spaceId: 'Bad space id', createdBy: user.id })
+    ).rejects.toThrowError(InvalidInputError);
 
-    await expect(createCards({ boardId: 'bad board id', spaceId: space.id, createdBy: user.id })).rejects.toThrowError(
-      InvalidInputError
-    );
+    await expect(
+      createMissingCards({ boardId: 'bad board id', spaceId: space.id, createdBy: user.id })
+    ).rejects.toThrowError(InvalidInputError);
   });
 
   it('should not create cards if no proposals are found', async () => {
-    const cards = await createCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
+    const cards = await createMissingCards({ boardId: board.id, spaceId: space.id, createdBy: user.id });
 
     expect(cards.length).toBe(0);
   });
@@ -702,7 +702,7 @@ describe('createCards', () => {
       userId: testUser.id
     });
 
-    const cards = await createCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
+    const cards = await createMissingCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
 
     expect(cards.length).toBe(1);
 
@@ -755,7 +755,7 @@ describe('createCards', () => {
       userId: testUser.id
     });
 
-    await createCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
+    await createMissingCards({ boardId: testBoard.id, spaceId: testSpace.id, createdBy: testUser.id });
 
     const pages = await prisma.page.findMany({
       where: {

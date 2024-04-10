@@ -6,7 +6,7 @@ import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
 import { applyPropertiesToCards } from 'lib/databases/proposalsSource/applyPropertiesToCards';
-import { createCards } from 'lib/databases/proposalsSource/createCards';
+import { createCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { onError, onNoMatch } from 'lib/middleware';
@@ -87,7 +87,7 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
       userId: block.createdBy
     }),
     // create missing blocks for new proposals
-    createCards({ boardId: block.id, spaceId: block.spaceId, createdBy: block.createdBy }),
+    createMissingCards({ boardId: block.id, spaceId: block.spaceId, createdBy: block.createdBy }),
     // get properties for proposals
     getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
   ]);
