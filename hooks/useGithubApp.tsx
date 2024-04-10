@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import charmClient from 'charmClient';
 import { useGetGithubApplicationData } from 'charmClient/hooks/spaces';
 import Modal from 'components/common/Modal';
-import { ConnectGithubRepoForm } from 'components/settings/integrations/components/ConnectGithubApp';
+import { ConnectGithubRepoForm } from 'components/settings/integrations/components/ConnectGithubRepoForm';
 import { INSTALLATION_ID_COOKIE } from 'lib/github/constants';
 import { deleteCookie, getCookie } from 'lib/utils/browser';
 
