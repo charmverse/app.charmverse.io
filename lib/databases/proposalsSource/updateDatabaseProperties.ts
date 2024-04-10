@@ -4,8 +4,7 @@ import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { prismaToUIBlock } from 'lib/databases/block';
-import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
+import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
@@ -13,22 +12,30 @@ import {
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
 import { InvalidStateError } from 'lib/middleware/errors';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export const excludedFieldTypes = ['project_profile', 'label'];
 
-export async function updateDatabaseProposalProperties({
-  boardId,
-  cardProperties
-}: {
-  boardId: string;
-  cardProperties: IPropertyTemplate[];
-}): Promise<Block> {
+export async function updateDatabaseProperties({ boardId }: { boardId: string }): Promise<Block> {
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
     }
   });
+  const proposalBoardBlock = (await prisma.proposalBlock.findUnique({
+    where: {
+      id_spaceId: {
+        id: DEFAULT_BOARD_BLOCK_ID,
+        spaceId: boardBlock.spaceId
+      }
+    },
+    select: {
+      fields: true
+    }
+  })) as null | { fields: BoardFields };
+  const cardProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
+
   const boardFields = boardBlock.fields as unknown as BoardFields;
 
   if (boardFields.sourceType !== 'proposals') {

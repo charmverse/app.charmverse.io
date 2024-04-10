@@ -5,14 +5,14 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 
-import { excludedFieldTypes } from './updateDatabaseProposalProperties';
+import { excludedFieldTypes } from './updateDatabaseProperties';
 
 export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'>;
 export type FormAnswerData = Pick<FormFieldAnswer, 'value' | 'fieldId'>;
 
 type PropertiesMap = Record<string, FormFieldValue>;
 
-export function getPropertiesFromAnswers({
+export function getCardPropertiesFromForm({
   accessPrivateFields,
   formAnswers,
   formFields,

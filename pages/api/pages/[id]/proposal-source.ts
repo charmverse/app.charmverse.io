@@ -4,11 +4,15 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { applySourceToDatabase } from 'lib/databases/proposalsSource/applySourceToDatabase';
-import { updateCardsFromProposals } from 'lib/databases/proposalsSource/updateCardsFromProposals';
+import { prismaToBlock } from 'lib/databases/block';
+import type { Board } from 'lib/databases/board';
+import { updateCardPages } from 'lib/databases/proposalsSource/updateCardPages';
+import { updateDatabaseProperties } from 'lib/databases/proposalsSource/updateDatabaseProperties';
+import { updateViews } from 'lib/databases/proposalsSource/updateViews';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -46,7 +50,17 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  await applySourceToDatabase({ boardId: pageId, spaceId: boardPage.spaceId });
+  const boardBlock = await updateDatabaseProperties({ boardId: pageId });
+  const board = prismaToBlock(boardBlock) as Board;
+  const views = await updateViews({ board });
+
+  relay.broadcast(
+    {
+      type: 'blocks_updated',
+      payload: [board, ...views.map(prismaToBlock)]
+    },
+    board.spaceId
+  );
 
   return res.status(200).end();
 }
@@ -81,7 +95,7 @@ async function updateProposalSource(req: NextApiRequest, res: NextApiResponse<Pa
 
   log.debug('Refresh cards for proposal-as-a-source board (started)', { pageId, spaceId: boardPage.spaceId, userId });
 
-  const result = await updateCardsFromProposals({ boardId: pageId, spaceId: boardPage.spaceId });
+  const result = await updateCardPages({ boardId: pageId, spaceId: boardPage.spaceId });
 
   log.debug('Refresh pages for proposal-as-a-source board (complete)', {
     pageId,

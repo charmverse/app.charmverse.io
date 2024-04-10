@@ -16,10 +16,9 @@ import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../bo
 import { proposalPropertyTypesList } from '../board';
 import type { CardPropertyValue } from '../card';
 
-import { getCardPropertyTemplates } from './getCardPropertyTemplates';
-import type { FormFieldData, FormAnswerData } from './getPropertiesFromAnswers';
-import { getPropertiesFromAnswers } from './getPropertiesFromAnswers';
-import { getPropertiesFromRubricEvaluation } from './getPropertiesFromRubricEvaluation';
+import type { FormFieldData, FormAnswerData } from './getCardPropertiesFromForm';
+import { getCardPropertiesFromForm } from './getCardPropertiesFromForm';
+import { getCardPropertiesFromRubric } from './getCardPropertiesFromRubric';
 
 export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
 
@@ -58,7 +57,7 @@ const pageSelectObject = {
   }
 } as const;
 
-export async function getPropertiesFromProposals({
+export async function getCardPropertiesFromProposals({
   cardProperties,
   spaceId
 }: {
@@ -113,7 +112,7 @@ export async function getPropertiesFromProposals({
   }, {});
 }
 
-export async function getPropertiesFromProposal({
+export async function getCardPropertiesFromProposal({
   canViewPrivateFields,
   boardId,
   pageId
@@ -220,7 +219,7 @@ function mapProposalToCard({ page, proposal, cardProperties, formFields }: Propo
 
   proposal.evaluations.forEach((evaluation) => {
     if (evaluation.type === 'rubric') {
-      properties = getPropertiesFromRubricEvaluation({
+      properties = getCardPropertiesFromRubric({
         properties,
         rubricAnswers: evaluation.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
         rubricCriteria: evaluation.rubricCriteria,
@@ -230,7 +229,7 @@ function mapProposalToCard({ page, proposal, cardProperties, formFields }: Propo
     }
   });
 
-  const formFieldProperties = getPropertiesFromAnswers({
+  const formFieldProperties = getCardPropertiesFromForm({
     accessPrivateFields: true,
     cardProperties,
     formAnswers: proposal.formAnswers,
@@ -245,5 +244,15 @@ function mapProposalToCard({ page, proposal, cardProperties, formFields }: Propo
         ...formFieldProperties
       }
     }
+  };
+}
+
+function getCardPropertyTemplates({ cardProperties }: { cardProperties: IPropertyTemplate[] }) {
+  return {
+    proposalAuthor: cardProperties.find((prop) => prop.type === 'proposalAuthor'),
+    proposalEvaluationType: cardProperties.find((prop) => prop.type === 'proposalEvaluationType'),
+    proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
+    proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
+    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl')
   };
 }

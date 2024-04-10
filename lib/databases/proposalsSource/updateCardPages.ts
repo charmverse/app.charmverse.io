@@ -53,7 +53,7 @@ async function fetchAndProcessProposalPages({
   }
 }
 
-export async function updateCardsFromProposals({ boardId, spaceId }: { boardId: string; spaceId: string }) {
+export async function updateCardPages({ boardId, spaceId }: { boardId: string; spaceId: string }) {
   const proposalPagesLite = await prisma.page.findMany({
     where: {
       spaceId,

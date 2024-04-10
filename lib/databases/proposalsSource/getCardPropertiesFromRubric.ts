@@ -4,7 +4,7 @@ import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 import type { IPropertyTemplate } from '../board';
 import type { CardPropertyValue } from '../card';
 
-export function getPropertiesFromRubricEvaluation({
+export function getCardPropertiesFromRubric({
   properties,
   templates,
   rubricAnswers,

@@ -5,10 +5,10 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
-import { applySourceToDatabase } from 'lib/databases/proposalsSource/applySourceToDatabase';
 import { assembleBlocks } from 'lib/databases/proposalsSource/assembleBlocks';
 import { createCards } from 'lib/databases/proposalsSource/createCards';
-import { getPropertiesFromProposals } from 'lib/databases/proposalsSource/getPropertiesFromProposals';
+import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
+import { updateDatabaseProperties } from 'lib/databases/proposalsSource/updateDatabaseProperties';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -61,7 +61,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   // Hydrate and filter blocks based on proposal permissions
   if (block && (block.fields as BoardFields).sourceType === 'proposals') {
     // Update board and view blocks before computing proposal cards
-    await applySourceToDatabase({ boardId: pageId, spaceId: page.spaceId });
+    await updateDatabaseProperties({ boardId: pageId });
 
     const [permissionsById, newCardBlocks, proposalCards] = await Promise.all([
       // get permissions for each propsoal based on the database author
@@ -72,7 +72,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
       // create missing blocks for new proposals
       createCards({ boardId: blockId, spaceId: page.spaceId, createdBy: block.createdBy }),
       // get properties for proposals
-      getPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: page.spaceId })
+      getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: page.spaceId })
     ]);
     // combine blocks with proposal cards and permissions
     const result = assembleBlocks({

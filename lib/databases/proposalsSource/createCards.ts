@@ -1,7 +1,6 @@
 import { log } from '@charmverse/core/log';
 import type { Block, Page } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { sortBy } from 'lodash';
 
 import { applyPageToBlock } from 'lib/databases/block';
 import { createCardPage } from 'lib/pages/createCardPage';
@@ -100,16 +99,6 @@ export async function createCards({
     });
     cards.push(_card);
   }
-
-  // if (cards.length > 0) {
-  //   relay.broadcast(
-  //     {
-  //       type: 'blocks_created',
-  //       payload: cards.map((card) => prismaToUIBlock(card.block, card.page))
-  //     },
-  //     spaceId
-  //   );
-  // }
 
   return cards.map((card) => applyPageToBlock(card.block, card.page));
 }

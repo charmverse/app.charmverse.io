@@ -15,9 +15,9 @@ import type { BoardFields, IPropertyTemplate } from '../../board';
 import type { BoardViewFields } from '../../boardView';
 import type { CardFields } from '../../card';
 import { createCardsFromProposals } from '../applySourceToDatabase';
-import { updateCardsFromProposals } from '../updateCardsFromProposals';
+import { updateCardPages } from '../updateCardPages';
 
-describe('updateCardsFromProposals()', () => {
+describe('updateCardPages()', () => {
   let user: User;
   let space: Space;
   let board: Page;
@@ -81,7 +81,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: board.id,
       spaceId: space.id,
       userId: user.id
@@ -375,7 +375,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: database.id,
       spaceId: generated.space.id,
       userId: admin.id
@@ -506,7 +506,7 @@ describe('updateCardsFromProposals()', () => {
       userId: user.id
     });
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: board.id,
       spaceId: space.id,
       userId: user.id
@@ -534,7 +534,7 @@ describe('updateCardsFromProposals()', () => {
       archived: true
     });
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: board.id,
       spaceId: space.id,
       userId: user.id
@@ -753,7 +753,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: databaseBoard.id,
       spaceId: testSpace.id,
       userId: proposalAuthor.id
@@ -965,7 +965,7 @@ describe('updateCardsFromProposals()', () => {
 
     // Space member visits the board and triggers the update
     // Even though the member doesn't have access to the private wallet field, since the database was created by the proposal author, the wallet field should be added to the board
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: database.id,
       spaceId: testSpace.id,
       userId: spaceMember.id
@@ -1051,7 +1051,7 @@ describe('updateCardsFromProposals()', () => {
       }
     });
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: board.id,
       spaceId: space.id,
       userId: user.id
@@ -1097,7 +1097,7 @@ describe('updateCardsFromProposals()', () => {
       })
     ]);
 
-    await updateCardsFromProposals({
+    await updateCardPages({
       boardId: board.id,
       spaceId: space.id,
       userId: user.id
@@ -1121,21 +1121,17 @@ describe('updateCardsFromProposals()', () => {
       views: 2
     });
 
-    await expect(
-      updateCardsFromProposals({ boardId: database.id, spaceId: space.id, userId: user.id })
-    ).rejects.toBeInstanceOf(InvalidStateError);
+    await expect(updateCardPages({ boardId: database.id, spaceId: space.id, userId: user.id })).rejects.toBeInstanceOf(
+      InvalidStateError
+    );
   });
 
   it('should not create cards from proposals if board is not found', async () => {
-    await expect(
-      updateCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toThrowError();
+    await expect(updateCardPages({ boardId: v4(), spaceId: space.id, userId: user.id })).rejects.toThrowError();
   });
 
   it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(
-      updateCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toThrowError();
+    await expect(updateCardPages({ boardId: board.id, spaceId: v4(), userId: user.id })).rejects.toThrowError();
   });
 
   it('should create cards with permissions matching the parent', async () => {
@@ -1189,7 +1185,7 @@ describe('updateCardsFromProposals()', () => {
     });
 
     // This calls the update method we are testing
-    await updateCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
+    await updateCardPages({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
     const pages = await prisma.page.findMany({
       where: {
         parentId: testBoard.id
