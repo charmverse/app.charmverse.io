@@ -15,7 +15,7 @@ describe('createRewardFromIssue', () => {
         repositoryId: v4(),
         label: '',
         issueTitle: '',
-        issueId: v4(),
+        issueUrl: v4(),
         issueState: 'closed'
       })
     ).toStrictEqual({
@@ -27,12 +27,12 @@ describe('createRewardFromIssue', () => {
   it(`Should return a reward already created message if the reward already exists`, async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
     const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
     const githubRepoId = v4();
     await createReward({
       spaceId: space.id,
       userId: user.id,
-      githubIssueId,
-      githubRepoId,
+      githubIssueUrl,
       reviewers: [
         {
           group: 'user',
@@ -50,7 +50,7 @@ describe('createRewardFromIssue', () => {
         repositoryId: githubRepoId,
         label: '',
         issueTitle: '',
-        issueId: githubIssueId,
+        issueUrl: githubIssueUrl,
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -66,7 +66,7 @@ describe('createRewardFromIssue', () => {
         repositoryId: v4(),
         label: '',
         issueTitle: '',
-        issueId: v4(),
+        issueUrl: '',
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -95,7 +95,7 @@ describe('createRewardFromIssue', () => {
         repositoryId: v4(),
         label: '',
         issueTitle: '',
-        issueId: v4(),
+        issueUrl: '',
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -141,7 +141,7 @@ describe('createRewardFromIssue', () => {
         repositoryId: v4(),
         label: '',
         issueTitle: '',
-        issueId: githubIssueId,
+        issueUrl: '',
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -181,13 +181,14 @@ describe('createRewardFromIssue', () => {
     });
 
     const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     expect(
       await createRewardFromIssue({
         installationId,
         repositoryId: githubRepoId,
         issueTitle: '',
-        issueId: githubIssueId,
+        issueUrl: githubIssueUrl,
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -227,6 +228,7 @@ describe('createRewardFromIssue', () => {
     });
 
     const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     expect(
       await createRewardFromIssue({
@@ -234,7 +236,7 @@ describe('createRewardFromIssue', () => {
         repositoryId: githubRepoId,
         issueTitle: 'Issue Title',
         label: 'test',
-        issueId: githubIssueId,
+        issueUrl: githubIssueUrl,
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -266,13 +268,14 @@ describe('createRewardFromIssue', () => {
     });
 
     const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     expect(
       await createRewardFromIssue({
         installationId,
         repositoryId: githubRepoId,
         issueTitle: 'Issue Title',
-        issueId: githubIssueId,
+        issueUrl: githubIssueUrl,
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -297,8 +300,7 @@ describe('createRewardFromIssue', () => {
             userId: true
           }
         },
-        githubIssueId: true,
-        githubRepoId: true,
+        githubIssueUrl: true,
         page: {
           select: {
             title: true
@@ -308,8 +310,7 @@ describe('createRewardFromIssue', () => {
     });
 
     expect(spaceReward.author.id).toBe(user.id);
-    expect(spaceReward.githubIssueId).toBe(githubIssueId);
-    expect(spaceReward.githubRepoId).toBe(githubRepoId);
+    expect(spaceReward.githubIssueUrl).toBe(githubIssueUrl);
     expect(spaceReward.page!.title).toBe('Issue Title');
     expect(spaceReward.permissions).toStrictEqual([
       {
@@ -321,9 +322,6 @@ describe('createRewardFromIssue', () => {
 
   it(`Should create a rewards without a reward template id connected with rewards repo`, async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
-    const user2 = await testUtilsUser.generateSpaceUser({
-      spaceId: space.id
-    });
 
     const installationId = v4();
     const githubRepoId = v4();
@@ -373,13 +371,14 @@ describe('createRewardFromIssue', () => {
     });
 
     const githubIssueId = v4();
+    const githubIssueUrl = `https://github.com/charmverse/charmverse/issues/${githubIssueId}`;
 
     expect(
       await createRewardFromIssue({
         installationId,
         repositoryId: githubRepoId,
         issueTitle: 'Issue Title',
-        issueId: githubIssueId,
+        issueUrl: githubIssueUrl,
         issueState: 'open'
       })
     ).toStrictEqual({
@@ -408,7 +407,7 @@ describe('createRewardFromIssue', () => {
             roleId: true
           }
         },
-        githubIssueId: true,
+        githubIssueUrl: true,
         allowMultipleApplications: true,
         approveSubmitters: true,
         dueDate: true,
@@ -416,7 +415,6 @@ describe('createRewardFromIssue', () => {
         rewardAmount: true,
         rewardToken: true,
         chainId: true,
-        githubRepoId: true,
         page: {
           select: {
             icon: true,
@@ -437,8 +435,7 @@ describe('createRewardFromIssue', () => {
       title: 'Issue Title'
     });
     expect(spaceReward.author.id).toBe(user.id);
-    expect(spaceReward.githubIssueId).toBe(githubIssueId);
-    expect(spaceReward.githubRepoId).toBe(githubRepoId);
+    expect(spaceReward.githubIssueUrl).toBe(githubIssueUrl);
     expect(spaceReward.dueDate).toStrictEqual(dueDate);
     expect(spaceReward.allowMultipleApplications).toBe(true);
     expect(spaceReward.approveSubmitters).toBe(true);
