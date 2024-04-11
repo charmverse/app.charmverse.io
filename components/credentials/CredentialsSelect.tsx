@@ -82,7 +82,13 @@ export function CredentialSelect({
   }
 
   if (readOnly) {
-    return <SelectPreview value={filteredValues} options={credentialTemplates ?? []} />;
+    return (
+      <SelectPreview
+        value={filteredValues}
+        wrapColumn
+        options={credentialTemplates.map((template) => ({ ...template, color: 'gray' })) ?? []}
+      />
+    );
   }
 
   return (
