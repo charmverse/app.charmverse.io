@@ -16,6 +16,7 @@ import {
 } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { FieldWrapper, FieldWrapperContainer } from 'components/common/form/fields/FieldWrapper';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
@@ -166,33 +167,35 @@ export function ConnectGithubRepoForm({
           <Typography>
             Connected to <strong>{githubAppName}</strong>
           </Typography>
-          <Stack>
-            <FieldLabel variant='subtitle1'>Github Repository</FieldLabel>
-            <Select
-              disabled={disabled}
-              displayEmpty
-              renderValue={(repoId) => {
-                const repo = repositories.find((repository) => repository.id.toString() === repoId);
-                if (repo) {
-                  return <Typography>{repo.name}</Typography>;
-                }
+          <Stack gap={2}>
+            <FieldWrapper label='Repository Name' required>
+              <Select
+                fullWidth
+                disabled={disabled}
+                displayEmpty
+                renderValue={(repoId) => {
+                  const repo = repositories.find((repository) => repository.id.toString() === repoId);
+                  if (repo) {
+                    return <Typography>{repo.name}</Typography>;
+                  }
 
-                return <Typography color='secondary'>Select a github repo</Typography>;
-              }}
-              onChange={handleChangeRepo}
-              placeholder='Select a repository'
-              value={repositoryId ?? ''}
-            >
-              {repositories.map((repository) => (
-                <MenuItem key={repository.id} value={repository.id.toString()}>
-                  <Typography>{repository.name}</Typography>
-                </MenuItem>
-              ))}
-            </Select>
+                  return <Typography color='secondary'>Select a github repo</Typography>;
+                }}
+                onChange={handleChangeRepo}
+                placeholder='Select a repository'
+                value={repositoryId ?? ''}
+              >
+                {repositories.map((repository) => (
+                  <MenuItem key={repository.id} value={repository.id.toString()}>
+                    <Typography>{repository.name}</Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FieldWrapper>
           </Stack>
-          <Stack>
-            <FieldLabel variant='subtitle1'>Github Labels</FieldLabel>
+          <FieldWrapper label='Repository Labels'>
             <Select
+              fullWidth
               disabled={disabled}
               displayEmpty
               renderValue={(labels) => {
@@ -227,10 +230,22 @@ export function ConnectGithubRepoForm({
                 </MenuItem>
               ))}
             </Select>
-          </Stack>
-          <Stack>
-            <FieldLabel variant='subtitle1'>CharmVerse Reward Template</FieldLabel>
+          </FieldWrapper>
+          <FieldWrapper label='CharmVerse Reward Author' required>
+            <InputSearchMemberMultiple
+              onChange={(id: string[]) => {
+                setValue('rewardAuthorId', id[id.length - 1], formFieldOptions);
+              }}
+              disabled={disabled}
+              disableClearable
+              defaultValue={rewardRepo ? [rewardAuthorId] : undefined}
+              disableCloseOnSelect
+              filterSelectedOptions
+            />
+          </FieldWrapper>
+          <FieldWrapper label='CharmVerse Reward Template'>
             <Select
+              fullWidth
               disabled={disabled}
               displayEmpty
               onChange={(e) => {
@@ -257,21 +272,8 @@ export function ConnectGithubRepoForm({
                 <Typography>No template</Typography>
               </MenuItem>
             </Select>
-          </Stack>
-          <Stack>
-            <FieldLabel variant='subtitle1'>CharmVerse Reward Author</FieldLabel>
-            <InputSearchMemberMultiple
-              onChange={(id: string[]) => {
-                setValue('rewardAuthorId', id[id.length - 1], formFieldOptions);
-              }}
-              disabled={disabled}
-              disableClearable
-              defaultValue={rewardRepo ? [rewardAuthorId] : undefined}
-              disableCloseOnSelect
-              filterSelectedOptions
-              placeholder={!rewardAuthorId ? 'Search for a person...' : ''}
-            />
-          </Stack>
+          </FieldWrapper>
+
           <Stack flexDirection='row' gap={1}>
             <Button
               sx={{
