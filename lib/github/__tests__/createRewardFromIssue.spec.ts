@@ -106,8 +106,7 @@ describe('createRewardFromIssue', () => {
         spaceId: space.id,
         createdBy: user.id,
         installationId,
-        name: 'Test Github App',
-        updatedBy: user.id
+        name: 'Test Github App'
       }
     });
 
@@ -148,7 +147,6 @@ describe('createRewardFromIssue', () => {
         createdBy: user.id,
         installationId,
         name: 'Test Github App',
-        updatedBy: user.id,
         rewardsRepos: {
           create: {
             repositoryId: githubRepoId,
@@ -200,7 +198,6 @@ describe('createRewardFromIssue', () => {
         createdBy: user.id,
         installationId,
         name: 'Test Github App',
-        updatedBy: user.id,
         rewardsRepos: {
           create: {
             repositoryId: githubRepoId,
@@ -250,7 +247,6 @@ describe('createRewardFromIssue', () => {
         createdBy: user.id,
         installationId,
         name: 'Test Github App',
-        updatedBy: user.id,
         rewardsRepos: {
           create: {
             repositoryId: githubRepoId,
@@ -301,7 +297,6 @@ describe('createRewardFromIssue', () => {
         createdBy: user.id,
         installationId,
         name: 'Test Github App',
-        updatedBy: user.id,
         rewardsRepos: {
           create: {
             repositoryId: githubRepoId,
@@ -411,7 +406,6 @@ describe('createRewardFromIssue', () => {
         createdBy: user.id,
         installationId,
         name: 'Test Github App',
-        updatedBy: user.id,
         rewardsRepos: {
           create: {
             repositoryId: githubRepoId,

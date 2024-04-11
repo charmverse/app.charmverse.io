@@ -36,8 +36,7 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
       installationId,
       spaceId,
       name: appName,
-      createdBy: userId,
-      updatedBy: userId
+      createdBy: userId
     }
   });
 
