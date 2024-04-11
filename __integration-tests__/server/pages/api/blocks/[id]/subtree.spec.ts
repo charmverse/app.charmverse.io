@@ -7,6 +7,7 @@ import request from 'supertest';
 
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
+import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBoard } from 'testing/setupDatabase';
@@ -246,8 +247,7 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
       cardCount: 0
     });
     // proposal is hidden
-    await testUtilsProposals.generateProposal({
-      archived: true,
+    const testProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'published',
       spaceId: space.id,
       userId: admin.id,
@@ -261,6 +261,19 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
         }
       ]
     });
+    // generate cards
+    await createMissingCards({ boardId: proposalDatabase.id });
+
+    // mark proposal as archived
+    await prisma.proposal.update({
+      where: {
+        id: testProposal.id
+      },
+      data: {
+        archived: true
+      }
+    });
+
     const sessionCookie = await loginUser(admin.id);
 
     const databaseBlocks = (

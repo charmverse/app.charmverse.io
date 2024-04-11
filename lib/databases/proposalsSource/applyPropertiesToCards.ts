@@ -1,5 +1,7 @@
 import type { SmallProposalPermissionFlags } from '@charmverse/core/permissions';
 
+import { isTruthy } from 'lib/utils/types';
+
 import type { BlockWithDetails } from '../block';
 import type { IPropertyTemplate } from '../board';
 
@@ -17,19 +19,26 @@ export function applyPropertiesToCards({
   permissions: Record<string, SmallProposalPermissionFlags>;
   proposalCards: Record<string, ProposalCardData>;
 }): BlockWithDetails[] {
-  return blocks.map((block) => {
-    const proposalCard = !!block.syncWithPageId && proposalCards[block.syncWithPageId];
-    if (proposalCard) {
-      const canViewPrivateFields = !!block.syncWithPageId && permissions[block.syncWithPageId].view_private_fields;
-      return applyPropertiesToCard({
-        boardProperties,
-        block,
-        proposalProperties: proposalCard,
-        canViewPrivateFields
-      });
-    }
-    return block;
-  });
+  return blocks
+    .map((block) => {
+      if (block.syncWithPageId) {
+        const proposalCard = proposalCards[block.syncWithPageId];
+        if (proposalCard) {
+          const canViewPrivateFields = !!block.syncWithPageId && permissions[block.syncWithPageId].view_private_fields;
+          return applyPropertiesToCard({
+            boardProperties,
+            block,
+            proposalProperties: proposalCard,
+            canViewPrivateFields
+          });
+        } else {
+          // missing proposal data means proposal is in trash, draft, or archived state
+          return null;
+        }
+      }
+      return block;
+    })
+    .filter(isTruthy);
 }
 
 export function applyPropertiesToCard({
