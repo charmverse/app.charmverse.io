@@ -1,7 +1,8 @@
-import { Grid, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
+import { LoadingIcon } from 'components/common/LoadingComponent';
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { GITHUB_APP_NAME } from 'lib/github/constants';
@@ -27,7 +28,11 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
       <Grid item>
         <Typography variant='body2'>Connect your space to GitHub to create Rewards from GitHub issues.</Typography>
       </Grid>
-      {!githubApplicationData ? (
+      {isLoadingGithubApplicationData ? (
+        <Stack alignItems='center' justifyContent='center' width={90} height={35}>
+          <LoadingIcon size={25} />
+        </Stack>
+      ) : !githubApplicationData ? (
         <Grid item>
           <Button
             loading={isConnectingWithGithubApp || isLoadingGithubApplicationData}
