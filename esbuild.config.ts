@@ -5,7 +5,11 @@ import * as esbuild from 'esbuild';
 esbuild
   .build({
     bundle: true,
-    entryPoints: ['./background/initWebsockets.ts', './background/cron.ts'],
+    entryPoints: [
+      './background/initWebsockets.ts',
+      './background/cron.ts',
+      './background/ceramicServer/ceramic-client.ts'
+    ],
     // metafile: true, // uncomment to analyize build file contents
     outdir: './dist',
     packages: 'external',

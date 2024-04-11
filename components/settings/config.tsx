@@ -1,4 +1,5 @@
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import AppsIcon from '@mui/icons-material/Apps';
 import UserRoleIcon from '@mui/icons-material/AssignmentIndOutlined';
 import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
@@ -22,7 +23,8 @@ export const SPACE_SETTINGS_TABS = [
   { icon: <CloudSyncOutlinedIcon fontSize='small' />, path: 'api', label: 'API' },
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' },
   { icon: <MedalIcon fontSize='small' />, path: 'credentials', label: 'Credentials' },
-  { icon: <ProposalIcon fontSize='small' />, path: 'proposals', label: 'Proposals' }
+  { icon: <ProposalIcon fontSize='small' />, path: 'proposals', label: 'Proposals' },
+  { icon: <AppsIcon fontSize='small' />, path: 'integrations', label: 'Integrations' }
 ] as const;
 
 export type SpaceSettingsTab = (typeof SPACE_SETTINGS_TABS)[number];
@@ -35,11 +37,7 @@ export const ACCOUNT_TABS = [
   { icon: <ManageAccountsIcon fontSize='small' />, path: 'account', label: 'My Account' },
   { icon: <AccountCircleIcon fontSize='small' />, path: 'profile', label: 'My Profile' },
   { icon: <FaBriefcase fontSize='small' />, path: 'projects', label: 'My Projects' },
-  {
-    icon: <CharmsLogo />,
-    path: 'charms',
-    label: 'Charms'
-  }
+  { icon: <CharmsLogo />, path: 'charms', label: 'Charms' }
 ] as const;
 
 export type UserSettingsTab = (typeof ACCOUNT_TABS)[number];

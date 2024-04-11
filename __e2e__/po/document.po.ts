@@ -52,6 +52,12 @@ export class DocumentPage extends GlobalPage {
 
   public rootSelector: { locator: Locator['locator'] };
 
+  public closeSidebar: Locator;
+
+  public charmverseInlineCommentIcon: Locator;
+
+  public charmverseInlineCommentThread: Locator;
+
   constructor(public page: Page, rootSelector?: string) {
     super(page);
     this.rootSelector = rootSelector ? this.page.locator(rootSelector) : this.page;
@@ -77,6 +83,9 @@ export class DocumentPage extends GlobalPage {
     this.cardDetailProperties = this.rootSelector.locator('data-test=card-detail-properties');
     this.addCardPropertyButton = this.rootSelector.locator('data-test=add-custom-property');
     this.saveNewPage = this.rootSelector.locator('data-test=save-new-page-button');
+    this.closeSidebar = this.rootSelector.locator('data-test=close-sidebar-button');
+    this.charmverseInlineCommentIcon = this.rootSelector.locator('data-test=charmverse-inline-comment-icon');
+    this.charmverseInlineCommentThread = this.rootSelector.locator('data-test=inline-comment-thread');
   }
 
   async goToPage({ domain, path }: { domain: string; path: string }) {
