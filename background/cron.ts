@@ -1,8 +1,10 @@
 import { log } from '@charmverse/core/log';
 import cron from 'node-cron';
+import { Server } from 'socket.io';
 
 import { updateMixpanelProfilesTask } from 'background/tasks/updateMixpanelProfilesTask';
 import { createOffchainCredentialsForExternalProjects } from 'lib/credentials/createOffchainCredentialsForExternalProjects';
+import { relay } from 'lib/websockets/relay';
 
 import app from './healthCheck/app';
 import { countAllSpacesBlocksTask } from './tasks/countAllSpacesBlocksTask';
@@ -15,7 +17,9 @@ import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
 import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateMemberships';
-import './websockets/app';
+
+// Initiate Redis adapter for socket.io
+relay.bindServer(new Server());
 
 log.info('Starting cron jobs');
 
