@@ -1,12 +1,10 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
-import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -16,6 +14,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import { ConnectBoto } from './ConnectBoto';
 import { ConnectCollabland } from './ConnectCollabland';
+import { ConnectGithubApp } from './ConnectGithubApp';
 import { SnapshotIntegration } from './SnapshotDomain';
 
 const schema = yup.object({
@@ -37,11 +36,10 @@ export type FormValues = yup.InferType<typeof schema>;
 export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
-  const isAllowedSpace = useIsCharmverseSpace();
+  const isCharmverseSpace = useIsCharmverseSpace();
+  const { trigger: updateSpace } = useUpdateSpace(space.id);
   const {
     handleSubmit,
-    reset,
     control,
     formState: { isDirty, dirtyFields }
   } = useForm<FormValues>({
@@ -77,39 +75,13 @@ export function SpaceIntegrations({ space }: { space: Space }) {
           <FieldLabel>Send events to Discord/Telegram</FieldLabel>
           <ConnectBoto />
         </Grid>
+        {isCharmverseSpace && (
+          <Grid item>
+            <FieldLabel>Sync with Github Repo</FieldLabel>
+            <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
+          </Grid>
+        )}
       </Grid>
-      {isAdmin && (
-        <Box
-          sx={{
-            py: 1,
-            px: { xs: 5, md: 3 },
-            position: 'absolute',
-            mt: 3,
-            bottom: '20px',
-            left: 0,
-            right: 0,
-            marginX: 'auto',
-            background: (theme) => theme.palette.background.paper,
-            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
-            textAlign: 'right'
-          }}
-        >
-          {isDirty && (
-            <Button
-              disableElevation
-              variant='outlined'
-              disabled={updateSpaceLoading || !isDirty}
-              onClick={reset}
-              sx={{ mr: 2 }}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button disableElevation disabled={updateSpaceLoading || !isDirty} type='submit' loading={updateSpaceLoading}>
-            Save
-          </Button>
-        </Box>
-      )}
     </form>
   );
 }
