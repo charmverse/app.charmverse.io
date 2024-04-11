@@ -42,7 +42,7 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
             external
             href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
               JSON.stringify({
-                redirect: `${window?.location.origin}/${spaceDomain as string}?settingTab=integrations`
+                redirect: `${window?.location.origin}/${spaceDomain}/rewards?settingTab=integrations`
               })
             )}`}
           >
