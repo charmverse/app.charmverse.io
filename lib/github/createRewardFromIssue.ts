@@ -12,6 +12,7 @@ export async function createRewardFromIssue({
   createIssueComment,
   message
 }: {
+  // Adding a flag to create issue comment so that it can be skipped in tests
   createIssueComment?: boolean;
   message: IssuesLabeledEvent | IssuesOpenedEvent;
 }) {

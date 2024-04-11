@@ -28,7 +28,7 @@ const messageHandlers: MessageHandlers = {
   labeled: async (message: IssuesLabeledEvent) => {
     return createRewardFromIssue({
       message,
-      createIssueComment: false
+      createIssueComment: true
     });
   },
 
