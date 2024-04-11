@@ -3,6 +3,8 @@ import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
+import Modal from 'components/common/Modal';
+import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
@@ -10,6 +12,7 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { WorkflowSelect } from '../../../WorkflowSelect';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
+import { EditStepButton } from './components/EditStepButton';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
@@ -67,6 +70,7 @@ export function EvaluationsReview({
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
+  const [showEditCredentials, setShowEditCredentials] = useState(false);
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
@@ -225,11 +229,18 @@ export function EvaluationsReview({
           index={proposal ? proposal.evaluations.length + 1 : 0}
           result={isRewardsComplete ? 'pass' : null}
           title='Credentials'
+          actions={
+            <EditStepButton
+              readOnlyTooltip='You cannot edit credentials'
+              readOnly={readOnlyCredentialTemplates}
+              onClick={() => setShowEditCredentials(true)}
+            />
+          }
         >
           <ProposalCredentials
             selectedCredentialTemplates={proposal.selectedCredentialTemplates}
             setSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
-            readOnly={readOnlyCredentialTemplates ?? false}
+            readOnly
             proposalId={proposal.id}
           />
         </EvaluationStepRow>
@@ -274,6 +285,13 @@ export function EvaluationsReview({
           updateEvaluation={updateEvaluation}
         />
       )}
+      <Modal open={showEditCredentials} onClose={() => setShowEditCredentials(false)} title='Edit proposal credentials'>
+        <CredentialSelect
+          templateType='proposal'
+          selectedCredentialTemplates={proposal?.selectedCredentialTemplates ?? []}
+          onChange={onChangeSelectedCredentialTemplates}
+        />
+      </Modal>
     </LoadingComponent>
   );
 }

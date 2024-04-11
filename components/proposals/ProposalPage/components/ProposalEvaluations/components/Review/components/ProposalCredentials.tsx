@@ -1,4 +1,4 @@
-import { Divider } from '@mui/material';
+import { Divider, FormLabel } from '@mui/material';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -9,6 +9,8 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { UserCredentialRow } from 'components/members/components/MemberProfile/components/UserCredentials/UserCredentialRow';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+
+const preventAccordionToggle = (e: any) => e.stopPropagation();
 
 export function ProposalCredentials({
   readOnly,
@@ -26,7 +28,7 @@ export function ProposalCredentials({
   });
   const { space } = useCurrentSpace();
   return (
-    <Box display='flex' flexDirection='column' gap={2}>
+    <Box display='flex' flexDirection='column' gap={2} onClick={preventAccordionToggle}>
       <Typography variant='body2'>
         Issue credentials to proposal authors for passing the proposal review process
       </Typography>
@@ -47,7 +49,9 @@ export function ProposalCredentials({
       )}
       {issuedCredentials?.length && (
         <Stack>
-          <Divider sx={{ mb: 2 }} />
+          <FormLabel sx={{ mb: 1 }}>
+            <Typography variant='subtitle1'>Issued Credentials</Typography>
+          </FormLabel>
           {issuedCredentials.map((c) => (
             <UserCredentialRow hideFavourite credential={c} key={c.id} />
           ))}
