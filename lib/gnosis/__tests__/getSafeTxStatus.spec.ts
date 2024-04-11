@@ -1,4 +1,4 @@
-describe('getGnosisTransactionQueueUrl', () => {
+describe('getSafeTxStatus', () => {
   let getTransactionMock: jest.Mock;
   let getAllTransactionsMock: jest.Mock;
   let getMantleTransactionMock: jest.Mock;
