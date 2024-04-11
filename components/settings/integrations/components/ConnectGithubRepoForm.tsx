@@ -3,6 +3,7 @@ import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { SelectChangeEvent } from '@mui/material';
 import { alpha, Chip, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
 import * as yup from 'yup';
@@ -16,6 +17,7 @@ import {
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -54,6 +56,7 @@ export function ConnectGithubRepoForm({
   githubAppName: string;
   hideDisconnect?: boolean;
 }) {
+  const disconnectGithubModalState = usePopupState({ variant: 'popover', popupId: 'disconnect-github' });
   const isAdmin = useIsAdmin();
   const { trigger: disconnectGithubApplication, isMutating: isDisconnectingGithubApplication } =
     useDisconnectGithubApplication(spaceId);
@@ -292,11 +295,19 @@ export function ConnectGithubRepoForm({
                 color='error'
                 loading={isDisconnectingGithubApplication}
                 disabled={disabled}
-                onClick={handleDisconnect}
+                onClick={disconnectGithubModalState.open}
               >
                 Disconnect
               </Button>
             )}
+            <ConfirmDeleteModal
+              title='Disconnect Github Application'
+              onClose={disconnectGithubModalState.close}
+              open={disconnectGithubModalState.isOpen}
+              buttonText='Disconnect'
+              question='You will disconnect the Github application from this space. This will stop syncing rewards with repository issues.'
+              onConfirm={handleDisconnect}
+            />
           </Stack>
         </Stack>
       </Grid>

@@ -30,6 +30,9 @@ export const useGithubApp = ({ spaceId }: { spaceId: string }) => {
           showMessage('Github application connected successfully', 'success');
           mutate();
         })
+        .catch(() => {
+          showMessage('Failed to connect with Github application', 'error');
+        })
         .finally(() => {
           setLoading(false);
         });
