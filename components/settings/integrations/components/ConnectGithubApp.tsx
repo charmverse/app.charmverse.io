@@ -1,7 +1,6 @@
 import { Grid, Typography } from '@mui/material';
 import * as yup from 'yup';
 
-import { useGetGithubApplicationData } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { useGithubApp } from 'hooks/useGithubApp';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -19,30 +18,31 @@ export const schema = yup.object({
 
 export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; spaceDomain: string }) {
   const isAdmin = useIsAdmin();
-  const { data, isLoading: isLoadingGithubApplicationData } = useGetGithubApplicationData(spaceId);
-  const { loading } = useGithubApp();
+  const { isConnectingWithGithubApp, isLoadingGithubApplicationData, githubApplicationData } = useGithubApp({
+    spaceId
+  });
 
   return (
     <Grid container direction='row' gap={1} justifyContent='space-between' alignItems='center'>
       <Grid item>
         <Typography variant='body2'>Connect your space to Github to sync rewards and issues.</Typography>
       </Grid>
-      {!data ? (
+      {!githubApplicationData ? (
         <Grid item>
           <Button
-            loading={loading || isLoadingGithubApplicationData}
+            loading={isConnectingWithGithubApp || isLoadingGithubApplicationData}
             disabledTooltip={
-              loading
+              isConnectingWithGithubApp
                 ? 'Connecting with CharmVerse Github App'
                 : !isAdmin
                 ? 'Only admins can connect to Github'
                 : undefined
             }
-            disabled={loading || !isAdmin}
+            disabled={isConnectingWithGithubApp || !isAdmin}
             external
             href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
               JSON.stringify({
-                redirect: `${window?.location.origin}/${spaceDomain as string}`
+                redirect: `${window?.location.origin}/${spaceDomain as string}?settingTab=integrations`
               })
             )}`}
           >
@@ -51,11 +51,11 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
         </Grid>
       ) : (
         <ConnectGithubRepoForm
-          installationId={data.spaceGithubConnection.installationId}
+          installationId={githubApplicationData.spaceGithubConnection.installationId}
           spaceId={spaceId}
-          repositories={data.repositories}
-          rewardRepo={data.spaceGithubConnection.rewardsRepo}
-          githubAppName={data.spaceGithubConnection.name}
+          repositories={githubApplicationData.repositories}
+          rewardRepo={githubApplicationData.spaceGithubConnection.rewardsRepo}
+          githubAppName={githubApplicationData.spaceGithubConnection.name}
         />
       )}
     </Grid>
