@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
 
 import { baseUrl } from 'config/constants';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { createReward } from 'lib/rewards/createReward';
 import { getRewardType } from 'lib/rewards/getRewardType';
@@ -197,6 +198,14 @@ export async function createRewardFromIssue({
       body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
     });
   }
+
+  trackUserAction('github_issue_reward_create', {
+    rewardId: createdReward.reward.id,
+    issueId: message.issue.id,
+    repoId: message.repository.id,
+    action: message.action,
+    userId
+  });
 
   return {
     spaceIds: [spaceGithubConnection.spaceId],

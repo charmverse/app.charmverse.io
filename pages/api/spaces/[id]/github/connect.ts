@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { createOctokitApp } from 'lib/github/app';
+import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -38,6 +39,12 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
       createdBy: userId,
       updatedBy: userId
     }
+  });
+
+  trackUserAction('github_app_connect', {
+    installationId,
+    spaceId,
+    userId
   });
 
   return res.status(200).end();
