@@ -8,13 +8,16 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export type FieldType = MemberPropertyType | FormFieldType;
 
+// used by charm editor
+export type LongTextValue = {
+  content: PageContent;
+  contentText: string;
+};
+
 export type FormFieldValue =
   | string
   | string[]
-  | {
-      content: PageContent;
-      contentText: string;
-    }
+  | LongTextValue
   | UploadedFileInfo
   | {
       projectId: string;

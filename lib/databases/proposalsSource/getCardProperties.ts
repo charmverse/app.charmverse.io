@@ -9,14 +9,13 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
 import { proposalPropertyTypesList } from '../board';
 import type { CardPropertyValue } from '../card';
 
-import type { FormFieldData, FormAnswerData } from './getCardPropertiesFromForm';
+import type { FormAnswerData } from './getCardPropertiesFromForm';
 import { getCardPropertiesFromForm } from './getCardPropertiesFromForm';
 import { getCardPropertiesFromRubric } from './getCardPropertiesFromRubric';
 
@@ -29,10 +28,19 @@ const pageSelectObject = {
   proposal: {
     select: {
       id: true,
-      authors: true,
+      authors: {
+        select: {
+          userId: true
+        }
+      },
       fields: true,
       formId: true,
-      formAnswers: true,
+      formAnswers: {
+        select: {
+          fieldId: true,
+          value: true
+        }
+      },
       status: true,
       evaluations: {
         select: {
@@ -81,31 +89,12 @@ export async function getCardPropertiesFromProposals({
     select: pageSelectObject
   });
 
-  const formIds = Array.from(new Set(proposalPages.map((p) => p.proposal?.formId))).filter(isTruthy);
-  const formFields = await prisma.formField.findMany({
-    where: {
-      formId: {
-        in: formIds
-      }
-    },
-    select: {
-      formId: true,
-      id: true,
-      type: true,
-      private: true
-    },
-    orderBy: {
-      index: 'asc'
-    }
-  });
-
   return proposalPages.reduce<Record<string, ProposalCardData>>((acc, { proposal, ...page }) => {
     if (proposal) {
       acc[page.id] = getCardProperties({
         page,
         proposal,
-        cardProperties,
-        formFields: formFields.filter((formField) => formField.formId === proposal.formId)
+        cardProperties
       });
     }
     return acc;
@@ -146,7 +135,6 @@ export async function getCardPropertiesFromProposal({ boardId, pageId }: { board
     boardBlock,
     card: getCardProperties({
       cardProperties: (boardBlock.fields as any as BoardFields).cardProperties,
-      formFields,
       proposal,
       page
     })
@@ -167,11 +155,10 @@ type ProposalData = {
     formAnswers: FormAnswerData[];
     rewards: { id: string }[];
   };
-  formFields: FormFieldData[];
   cardProperties: IPropertyTemplate[];
 };
 
-function getCardProperties({ page, proposal, cardProperties, formFields }: ProposalData): ProposalCardData {
+function getCardProperties({ page, proposal, cardProperties }: ProposalData): ProposalCardData {
   const proposalProps = getCardPropertyTemplates({ cardProperties });
 
   let properties: Record<string, CardPropertyValue> = {};
@@ -226,8 +213,7 @@ function getCardProperties({ page, proposal, cardProperties, formFields }: Propo
 
   const formFieldProperties = getCardPropertiesFromForm({
     cardProperties,
-    formAnswers: proposal.formAnswers,
-    formFields
+    formAnswers: proposal.formAnswers
   });
 
   return {
