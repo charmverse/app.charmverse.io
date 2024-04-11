@@ -1,7 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { prismaToBlock } from 'lib/databases/block';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { deleteBlocks } from 'lib/rewards/blocks/deleteBlocks';
 import { getBlocks } from 'lib/rewards/blocks/getBlocks';

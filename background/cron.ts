@@ -15,6 +15,7 @@ import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
 import { task as verifyTokenGateMembershipsTask } from './tasks/verifyTokenGateMemberships';
+import './websockets/app';
 
 log.info('Starting cron jobs');
 

@@ -4,9 +4,11 @@ import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-ty
 import { Octokit } from 'octokit';
 
 import { baseUrl } from 'config/constants';
+import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { createReward } from 'lib/rewards/createReward';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
+import { relay } from 'lib/websockets/relay';
 
 export async function createRewardFromIssue({
   createIssueComment,
@@ -176,6 +178,16 @@ export async function createRewardFromIssue({
     }
   });
 
+  const createdPageId = createdReward.createdPageId!;
+  const pages = await getPageMetaList([createdPageId]);
+  relay.broadcast(
+    {
+      type: 'pages_created',
+      payload: pages
+    },
+    spaceId
+  );
+
   if (createIssueComment) {
     const appOctokit = new Octokit({
       authStrategy: createAppAuth,
@@ -190,7 +202,7 @@ export async function createRewardFromIssue({
       owner: message.repository.owner.login,
       repo: message.repository.name,
       issue_number: message.issue.number,
-      body: `[Link to created CharmVerse reward](${baseUrl}/${spaceGithubConnection.space.domain}/${createdReward.createdPageId})`
+      body: `[Link to created CharmVerse reward](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
     });
   }
 
