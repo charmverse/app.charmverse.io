@@ -33,6 +33,7 @@ services:
       - REACT_APP_APP_ENV=staging
     profiles:
       - stg-cron
+      - stg-webapp
 
   prd-webapp:
     extends:
