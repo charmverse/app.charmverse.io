@@ -23,7 +23,7 @@ export async function createRewardFromIssue({
 
   if (!installationId) {
     return {
-      success: true,
+      success: false,
       message: 'Missing installation ID.'
     };
   }
@@ -69,7 +69,7 @@ export async function createRewardFromIssue({
 
   if (!spaceGithubConnection) {
     return {
-      success: true,
+      success: false,
       message: 'Space not found or not connected to CharmVerse GitHub App.'
     };
   }
@@ -181,6 +181,7 @@ export async function createRewardFromIssue({
 
   const createdPageId = createdReward.createdPageId!;
   const pages = await getPageMetaList([createdPageId]);
+
   relay.broadcast(
     {
       type: 'pages_created',
