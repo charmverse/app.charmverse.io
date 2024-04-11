@@ -95,6 +95,8 @@
     "@ceramicnetwork/http-client": "^3.2.0",
     "@charmverse/core": "^0.40.5",
     "@column-resizer/core": "^1.0.2",
+    "@composedb/devtools": "^0.7.1",
+    "@composedb/devtools-node": "^0.7.1",
     "@datadog/browser-logs": "^4.42.2",
     "@datadog/browser-rum": "^4.42.2",
     "@emotion/babel-preset-css-prop": "^11.11.0",
@@ -284,7 +286,6 @@
   },
   "devDependencies": {
     "@ceramicnetwork/streamid": "^3.2.0",
-    "@composedb/devtools": "^0.6.1",
     "@depay/web3-mock": "^13.18.1",
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@next/eslint-plugin-next": "^13.5.6",
