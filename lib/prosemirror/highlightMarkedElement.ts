@@ -54,15 +54,13 @@ export function highlightElement({
   const isShowingActionList = !!pageActionListNode && pageActionListNode.style.visibility !== 'hidden';
   // Check if we are inside a card page modal
   if (ids.length > 0) {
+    // Use regular dom methods as we have no access to a ref inside a plugin
+    // Plus this is only a cosmetic change which doesn't impact any of the state
+    const actionDocument = document.getElementById(`${prefix}.${ids[0]}`);
     // If we are showing the thread list on the right, then navigate to the appropriate thread and highlight it
-    if (isShowingActionList) {
-      // Use regular dom methods as we have no access to a ref inside a plugin
-      // Plus this is only a cosmetic change which doesn't impact any of the state
-      const actionDocument = document.getElementById(`${prefix}.${ids[0]}`);
-      if (actionDocument) {
-        highlightDomElement(actionDocument);
-        return true;
-      }
+    if (isShowingActionList && actionDocument) {
+      highlightDomElement(actionDocument);
+      return true;
     } else {
       // If the page thread list isn't open, then we need to show the inline thread component
       renderSuggestionsTooltip(key, {

@@ -9,7 +9,6 @@ export type EditableProps = {
   readOnly?: boolean;
   spellCheck?: boolean;
   autoExpand?: boolean;
-
   validator?: (value: string) => boolean;
   onCancel?: () => void;
   onSave?: (saveType: 'onEnter' | 'onEsc' | 'onBlur') => void;

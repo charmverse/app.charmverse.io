@@ -40,4 +40,9 @@ test('Create an inline comment in the charmEditor', async ({ documentPage }) => 
   );
   await expect(commentInput).toBeVisible();
   expect(await commentInput.evaluate((node) => (node as HTMLElement).innerText)).toBe('one comment');
+
+  // Close the sidebar and check if the inline comment can be seen in the popover
+  await documentPage.closeSidebar.click();
+  await documentPage.charmverseInlineCommentIcon.click();
+  await expect(documentPage.charmverseInlineCommentThread).toBeVisible();
 });

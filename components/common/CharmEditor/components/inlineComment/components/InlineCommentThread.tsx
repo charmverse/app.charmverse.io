@@ -71,7 +71,7 @@ export function InlineCommentThread({
           }}
           timeout={250}
         >
-          <Box display='flex' flexDirection='column' gap={1}>
+          <Box display='flex' flexDirection='column' gap={1} data-test='inline-comment-thread'>
             {unResolvedThreads.map((resolvedThread) => (
               <ThreadContainer key={resolvedThread.id} elevation={4}>
                 <PageThread
