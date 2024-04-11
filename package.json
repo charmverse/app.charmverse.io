@@ -285,7 +285,6 @@
   "devDependencies": {
     "@ceramicnetwork/streamid": "^3.2.0",
     "@composedb/devtools": "^0.6.1",
-    "@composedb/devtools-node": "^0.6.1",
     "@depay/web3-mock": "^13.18.1",
     "@graphql-codegen/typescript-react-apollo": "^4.1.0",
     "@next/eslint-plugin-next": "^13.5.6",
