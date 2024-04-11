@@ -14,7 +14,7 @@ describe('createRewardFromIssue', () => {
         message: {} as any
       })
     ).toStrictEqual({
-      success: true,
+      success: false,
       message: 'Missing installation ID.'
     });
   });
@@ -90,7 +90,7 @@ describe('createRewardFromIssue', () => {
         } as any
       })
     ).toStrictEqual({
-      success: true,
+      success: false,
       message: 'Space not found or not connected to CharmVerse GitHub App.'
     });
   });
