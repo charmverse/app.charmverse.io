@@ -1,139 +1,28 @@
-import type { Block, FormField } from '@charmverse/core/prisma';
-import { prisma } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma';
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import { prismaToUIBlock } from 'lib/databases/block';
-import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
+import type { IPropertyTemplate } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
   PROPOSAL_STEP_LABELS,
   proposalDbProperties,
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
-import { InvalidStateError } from 'lib/middleware/errors';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 export const excludedFieldTypes = ['project_profile', 'label'];
 
-export async function setDatabaseProposalProperties({
-  boardId,
-  cardProperties
-}: {
-  boardId: string;
-  cardProperties: IPropertyTemplate[];
-}): Promise<Block> {
-  const boardBlock = await prisma.block.findUniqueOrThrow({
-    where: {
-      id: boardId
-    }
-  });
-  const boardFields = boardBlock.fields as unknown as BoardFields;
-
-  if (boardFields.sourceType !== 'proposals') {
-    throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
-  }
-
-  const forms = await prisma.form.findMany({
-    where: {
-      proposal: {
-        some: {
-          page: {
-            type: 'proposal'
-          },
-          spaceId: boardBlock.spaceId
-        }
-      }
-    },
-    select: {
-      proposal: {
-        orderBy: {
-          page: {
-            createdAt: 'asc'
-          }
-        },
-        select: {
-          page: {
-            select: {
-              createdAt: true
-            }
-          }
-        }
-      },
-      id: true,
-      formFields: {
-        orderBy: {
-          index: 'asc'
-        }
-      }
-    }
-  });
-
-  const formFields = forms
-    .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
-    .flatMap((p) => p.formFields);
-  const proposals = await prisma.proposal.findMany({
-    where: {
-      spaceId: boardBlock.spaceId
-    },
-    select: {
-      evaluations: {
-        select: {
-          type: true,
-          title: true
-        },
-        orderBy: {
-          index: 'asc'
-        }
-      }
-    }
-  });
-
-  const evaluationStepTitles: Set<string> = new Set();
-  const rubricStepTitles: Set<string> = new Set();
-
-  proposals.forEach((p) => {
-    p.evaluations.forEach((e) => {
-      evaluationStepTitles.add(e.title);
-      if (e.type === 'rubric') {
-        rubricStepTitles.add(e.title);
-      }
-    });
-  });
-
-  const boardProperties = getBoardProperties({
-    evaluationStepTitles: Array.from(evaluationStepTitles),
-    formFields,
-    cardProperties,
-    currentCardProperties: boardFields.cardProperties,
-    rubricStepTitles: Array.from(rubricStepTitles)
-  });
-
-  const updatedBoardBlock = await prisma.block.update({
-    where: {
-      id: boardBlock.id
-    },
-    data: {
-      fields: {
-        ...(boardBlock.fields as any),
-        cardProperties: boardProperties
-      }
-    }
-  });
-
-  return updatedBoardBlock;
-}
-
-function getBoardProperties({
+export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
   evaluationStepTitles = [],
-  cardProperties = [],
+  proposalCustomProperties = [],
   rubricStepTitles = []
 }: {
   rubricStepTitles?: string[];
-  cardProperties?: IPropertyTemplate[];
+  proposalCustomProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   currentCardProperties: IPropertyTemplate[];
   formFields?: FormField[];
@@ -199,7 +88,7 @@ function getBoardProperties({
     rubricStepTitles
   });
 
-  cardProperties.forEach((cardProp) => {
+  proposalCustomProperties.forEach((cardProp) => {
     const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
 
     if (existingPropIndex > -1) {
@@ -254,7 +143,8 @@ function getBoardProperties({
         options: boardPropertyOptions,
         description: (formField.description as { content: PageContent; contentText: string })?.contentText,
         type: boardPropertyType,
-        formFieldId: formField.id
+        formFieldId: formField.id,
+        private: formField.private
       };
 
       if (existingPropIndex === -1) {

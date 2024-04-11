@@ -10,12 +10,12 @@ import { InvalidStateError } from 'lib/middleware';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
-import { EVALUATION_STATUS_LABELS } from '../proposalDbProperties';
-import { setDatabaseProposalProperties } from '../setDatabaseProposalProperties';
+import { EVALUATION_STATUS_LABELS } from '../../proposalDbProperties';
+import { updateBoardProperties } from '../updateBoardProperties';
 
 const statusPropertyOptions = objectUtils.typedKeys(EVALUATION_STATUS_LABELS);
 
-describe('setDatabaseProposalProperties()', () => {
+describe('updateBoardProperties()', () => {
   let space: Space;
   let user: User;
 
@@ -44,9 +44,8 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -101,9 +100,8 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -161,9 +159,8 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -179,13 +176,11 @@ describe('setDatabaseProposalProperties()', () => {
     const urlProp = properties.find((p) => p.type === 'proposalUrl') as IPropertyTemplate;
 
     // --- Run this a second and third time
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -316,9 +311,8 @@ describe('setDatabaseProposalProperties()', () => {
       }
     });
 
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
 
     const updatedBlock = await prisma.block.findUnique({
@@ -414,9 +408,8 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     // --- Run this a second and third time
-    await setDatabaseProposalProperties({
-      boardId: rootId,
-      cardProperties: []
+    await updateBoardProperties({
+      boardId: rootId
     });
 
     const blockAfterMultiUpdate = await prisma.block.findUniqueOrThrow({
@@ -469,9 +462,8 @@ describe('setDatabaseProposalProperties()', () => {
     });
 
     await expect(
-      setDatabaseProposalProperties({
-        boardId: rootId,
-        cardProperties: []
+      updateBoardProperties({
+        boardId: rootId
       })
     ).rejects.toBeInstanceOf(InvalidStateError);
   });

@@ -11,6 +11,8 @@ import { TbDatabase } from 'react-icons/tb';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookEndpoint } from 'config/constants';
 import type { Board, DataSourceType } from 'lib/databases/board';
@@ -41,6 +43,7 @@ type ViewSourceOptionsProps = {
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const { view: activeView, views, rootBoard, title, closeSourceOptions, closeSidebar, showView } = props;
 
+  const dispatch = useAppDispatch();
   const { onCreateDatabase, onCsvImport, onSelectLinkedDatabase, onSelectSourceGoogleForm } = useSourceOptions({
     rootBoard,
     activeView,
@@ -107,6 +110,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     if (rootDatabaseId) {
       await onCreateDatabase?.({ sourceType: 'proposals' });
       await createProposalSource({ pageId: rootDatabaseId });
+      dispatch(initialDatabaseLoad({ pageId: rootDatabaseId }));
     }
   }
 
