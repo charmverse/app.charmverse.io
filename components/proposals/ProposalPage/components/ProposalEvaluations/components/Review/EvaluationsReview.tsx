@@ -15,6 +15,7 @@ import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { ProposalCredentials } from './components/ProposalCredentials';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
 import { ProposalSocialShareLinks } from './components/SocialShare/ProposalSocialShareLinks';
@@ -38,8 +39,11 @@ export type Props = {
     | 'lensPostLink'
     | 'formId'
     | 'form'
+    | 'selectedCredentialTemplates'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
+  readOnlyCredentialTemplates?: boolean;
+  onChangeSelectedCredentialTemplates?: (templates: string[]) => void;
   refreshProposal?: VoidFunction;
   templateId: string | null | undefined;
   pagePath?: string;
@@ -53,6 +57,8 @@ export function EvaluationsReview({
   pageId,
   proposal,
   onChangeEvaluation,
+  onChangeSelectedCredentialTemplates,
+  readOnlyCredentialTemplates,
   refreshProposal,
   expanded: expandedContainer,
   templateId
@@ -112,6 +118,8 @@ export function EvaluationsReview({
   }, [proposal?.currentEvaluationId, isRewardsActive, setExpandedEvaluationId]);
 
   const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
+
+  const hasCredentials = !!proposal?.selectedCredentialTemplates.length;
 
   return (
     <LoadingComponent isLoading={!proposal}>
@@ -208,6 +216,24 @@ export function EvaluationsReview({
           </EvaluationStepRow>
         );
       })}
+      {hasCredentials && (
+        <EvaluationStepRow
+          expanded={expandedEvaluationId === 'rewards'}
+          expandedContainer={expandedContainer}
+          isCurrent={isRewardsActive}
+          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
+          index={proposal ? proposal.evaluations.length + 1 : 0}
+          result={isRewardsComplete ? 'pass' : null}
+          title='Credentials'
+        >
+          <ProposalCredentials
+            selectedCredentialTemplates={proposal.selectedCredentialTemplates}
+            setSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+            readOnly={readOnlyCredentialTemplates ?? false}
+            proposalId={proposal.id}
+          />
+        </EvaluationStepRow>
+      )}
       {hasRewardsStep && (
         <EvaluationStepRow
           expanded={expandedEvaluationId === 'rewards'}

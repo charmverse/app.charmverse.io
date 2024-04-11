@@ -18,7 +18,7 @@ type CredentialTemplateOption =
   | typeof ADD_CREDENTIAL_TEMPLATE;
 
 type CredentialsSelectProps = {
-  onChange: (templateIds: string[]) => void;
+  onChange?: (templateIds: string[]) => void;
   selectedCredentialTemplates?: string[] | null;
   readOnly?: boolean;
   sx?: SxProps<Theme>;
@@ -60,14 +60,6 @@ export function CredentialSelect({
 
   const { openSettings } = useSettingsDialog();
 
-  function _onChange(val: string | string[]) {
-    if (Array.isArray(val)) {
-      onChange(val);
-    } else {
-      onChange([val]);
-    }
-  }
-
   const baseOptions = useMemo(() => {
     const options =
       templateType === 'proposal'
@@ -99,13 +91,13 @@ export function CredentialSelect({
         forcePopupIcon
         onChange={(_, _value) => {
           if (_value) {
-            onChange(
+            onChange?.(
               _value
                 .filter((v) => (typeof v === 'string' && stringUtils.isUUID(v)) || !!(v as CredentialTemplate).id)
                 .map((v) => (typeof v === 'string' ? v : (v as CredentialTemplate).id))
             );
           } else {
-            onChange([]);
+            onChange?.([]);
           }
         }}
         getOptionLabel={(option) => (typeof option === 'string' ? '' : option.name)}

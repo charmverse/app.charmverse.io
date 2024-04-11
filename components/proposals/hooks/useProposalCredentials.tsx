@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -17,7 +18,10 @@ import type {
 import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 
-export function useProposalCredentials() {
+/**
+ * @proposalId - Pass this param to get the credentials for a specific proposal
+ */
+export function useProposalCredentials({ proposalIds }: { proposalIds?: string[] } = {}) {
   const { space } = useCurrentSpace();
   const {
     data: issuableProposalCredentials,
@@ -25,7 +29,7 @@ export function useProposalCredentials() {
     isLoading: isLoadingIssuableProposalCredentials,
     mutate: refreshIssuableCredentials
   } = useSWR(space ? `/api/credentials/proposals/issuable?spaceId=${space.id}` : null, () =>
-    charmClient.credentials.getIssuableProposalCredentials({ spaceId: space?.id as string })
+    charmClient.credentials.getIssuableProposalCredentials({ spaceId: space?.id as string, proposalIds })
   );
 
   const { account } = useWeb3Account();

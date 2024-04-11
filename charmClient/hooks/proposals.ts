@@ -2,6 +2,7 @@ import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -158,4 +159,8 @@ export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) 
 
 export function useArchiveProposals() {
   return usePOST<{ archived: boolean; proposalIds: string[] }>(`/api/proposals/archive`);
+}
+
+export function useGetIssuedProposalCredentials({ proposalId }: { proposalId: string }) {
+  return useGET<EASAttestationFromApi[]>(`/api/credentials/proposals/issued`, { proposalId });
 }

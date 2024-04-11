@@ -54,7 +54,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     isLoadingIssuableProposalCredentials,
     userWalletCanIssueCredentialsForSpace,
     gnosisSafeForCredentials
-  } = useProposalCredentials();
+  } = useProposalCredentials({ proposalIds: selectedPageIds });
   const { showMessage } = useSnackbar();
 
   const [publishingCredential, setPublishingCredential] = useState(false);

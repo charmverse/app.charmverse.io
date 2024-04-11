@@ -1,5 +1,7 @@
 import { memo } from 'react';
 
+import { useIsAdmin } from 'hooks/useIsAdmin';
+
 import type { Props as EvaluationsReviewProps } from './components/Review/EvaluationsReview';
 import { EvaluationsReview } from './components/Review/EvaluationsReview';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
@@ -43,6 +45,8 @@ export function ProposalEvaluations({
   isStructuredProposal,
   expanded = true
 }: ProposalEvaluationsProps) {
+  const isAdmin = useIsAdmin();
+
   if (isUnpublishedProposal) {
     const isNotNewProposal = !!proposal;
     return (
@@ -68,6 +72,8 @@ export function ProposalEvaluations({
         pageId={pageId}
         proposal={proposal}
         onChangeEvaluation={onChangeEvaluation}
+        readOnlyCredentialTemplates={!isAdmin}
+        onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         refreshProposal={refreshProposal}
         templateId={templateId}
         expanded={expanded}
