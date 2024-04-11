@@ -240,7 +240,7 @@ export function EvaluationsReview({
           expandedContainer={expandedContainer}
           isCurrent={isRewardsActive}
           onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
-          index={proposal ? proposal.evaluations.length + 1 : 0}
+          index={proposal ? proposal.evaluations.length + (hasCredentials ? 2 : 1) : 0}
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
         >
