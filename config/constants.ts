@@ -54,5 +54,4 @@ export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as string;
 
 // Github
-export const decodedGithubPrivateKey = Buffer.from(process.env.GITHUB_APP_PRIVATE_KEY!, 'base64').toString('utf8');
 export const githubAppId = Number(process.env.GITHUB_APP_ID);

@@ -278,7 +278,7 @@ export function ConnectGithubRepoForm({
               color='primary'
               loading={isConnectingGithubRepository || isUpdatingGithubRepoWithReward}
               disabled={!formState.isValid || disabled || Object.keys(formState.dirtyFields).length === 0}
-              disabledTooltip={!formState.isValid ? `Please provide all required fields` : undefined}
+              disabledTooltip={!formState.isValid ? `Please select Github Repository and Reward Author` : undefined}
               onClick={handleConnectGithubRepository}
             >
               Save
