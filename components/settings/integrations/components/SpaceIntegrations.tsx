@@ -2,6 +2,7 @@ import type { KycOption, Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -21,6 +22,10 @@ import { ConnectCollabland } from './ConnectCollabland';
 import { SnapshotIntegration } from './SnapshotDomain';
 import { SpaceKyc } from './SpaceKyc';
 import { SynapsModal } from './SynapsModal';
+
+const PersonaModalWithConfirmationWithoutSSR = dynamic(() => import('./PersonaModal'), {
+  ssr: false
+});
 
 const schema = yup.object({
   snapshotDomain: yup
@@ -144,6 +149,19 @@ export function SpaceIntegrations({ space }: { space: Space }) {
             <SynapsModal spaceId={space.id} />
           </Grid>
         )}
+        {isAllowedSpace &&
+          space.kycOption === 'persona' &&
+          kycCredentials?.persona?.apiKey &&
+          kycCredentials.persona.envId &&
+          kycCredentials.persona.templateId && (
+            <Grid item>
+              <PersonaModalWithConfirmationWithoutSSR
+                spaceId={space.id}
+                templateId={kycCredentials.persona.templateId}
+                environmentId={kycCredentials.persona.envId}
+              />
+            </Grid>
+          )}
       </Grid>
       {isAdmin && (
         <Box

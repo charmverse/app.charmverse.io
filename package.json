@@ -217,6 +217,7 @@
     "node-cron": "^3.0.0",
     "otpauth": "^9.2.1",
     "papaparse": "^5.3.2",
+    "persona": "^4.13.0",
     "pg": "^8.11.3",
     "promise-retry": "^2.0.1",
     "prosemirror-changeset": "^2.2.0",
