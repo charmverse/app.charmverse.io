@@ -166,7 +166,7 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
   const link = getNFTUrl({ chain: chainId, contract: nft.contract.address, token: tokenIdBigInt }) ?? '';
 
   // not sure if 'raw' or 'gateway' is best, but for this NFT, the 'raw' url no longer exists: https://opensea.io/assets/ethereum/0x1821d56d2f3bc5a5aba6420676a4bbcbccb2f7fd/3382
-  const image = nft.image.thumbnailUrl?.startsWith('https://') ? nft.image.thumbnailUrl : nft.image.originalUrl;
+  const image = nft.image.thumbnailUrl?.startsWith('https://') ? nft.image.thumbnailUrl : nft.image.originalUrl || '';
   return {
     id: `${nft.contract.address}:${nft.tokenId}`,
     tokenId: tokenIdBigInt,
@@ -174,8 +174,8 @@ function mapNFTData(nft: AlchemyNft, walletId: string | null, chainId: Supported
     imageRaw: nft.image.originalUrl,
     image,
     imageThumb: nft.image.thumbnailUrl,
-    title: nft.name,
-    description: nft.description,
+    title: nft.name || '',
+    description: nft.description || '',
     chainId,
     timeLastUpdated: nft.timeLastUpdated,
     isHidden: false,
