@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
 
@@ -191,13 +192,22 @@ export async function createRewardFromIssue({
   );
 
   if (createIssueComment) {
-    const appOctokit = createOctokitApp(installationId);
-    appOctokit.rest.issues.createComment({
-      owner: message.repository.owner.login,
-      repo: message.repository.name,
-      issue_number: message.issue.number,
-      body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
-    });
+    try {
+      const appOctokit = createOctokitApp(installationId);
+      await appOctokit.rest.issues.createComment({
+        owner: message.repository.owner.login,
+        repo: message.repository.name,
+        issue_number: message.issue.number,
+        body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
+      });
+    } catch (err) {
+      log.error('Failed to create issue comment', {
+        error: err,
+        issueId: message.issue.id,
+        repoId: message.repository.id,
+        installationId
+      });
+    }
   }
 
   trackUserAction('github_issue_reward_create', {

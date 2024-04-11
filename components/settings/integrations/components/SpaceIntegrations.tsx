@@ -8,7 +8,6 @@ import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { isTruthy } from 'lib/utils/types';
 
@@ -36,7 +35,6 @@ export type FormValues = yup.InferType<typeof schema>;
 export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const isCharmverseSpace = useIsCharmverseSpace();
   const { trigger: updateSpace } = useUpdateSpace(space.id);
   const {
     handleSubmit,
@@ -75,12 +73,10 @@ export function SpaceIntegrations({ space }: { space: Space }) {
           <FieldLabel>Send events to Discord/Telegram</FieldLabel>
           <ConnectBoto />
         </Grid>
-        {isCharmverseSpace && (
-          <Grid item>
-            <FieldLabel>Sync with Github Repo</FieldLabel>
-            <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
-          </Grid>
-        )}
+        <Grid item>
+          <FieldLabel>Sync with Github Repo</FieldLabel>
+          <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
+        </Grid>
       </Grid>
     </form>
   );
