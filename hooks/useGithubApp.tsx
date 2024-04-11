@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -32,6 +33,7 @@ export const useGithubApp = ({ spaceId }: { spaceId: string }) => {
         })
         .catch(() => {
           showMessage('Failed to connect with Github application', 'error');
+          log.error('Failed to connect with Github application', { spaceId, githubInstallationId });
         })
         .finally(() => {
           setLoading(false);

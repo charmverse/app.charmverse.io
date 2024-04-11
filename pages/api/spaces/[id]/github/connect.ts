@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -45,6 +46,8 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
     spaceId,
     userId
   });
+
+  log.info('Connected Github application', { installationId, spaceId, userId });
 
   return res.status(200).end();
 }

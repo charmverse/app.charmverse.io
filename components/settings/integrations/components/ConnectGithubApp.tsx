@@ -1,4 +1,4 @@
-import { Box, Grid, Stack, Typography } from '@mui/material';
+import { Grid, Stack, Typography } from '@mui/material';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
