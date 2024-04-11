@@ -6,11 +6,13 @@ import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
+import { useGetIssuableProposalCredentials, useGetIssuedProposalCredentials } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type {
   IssuableProposalCredentialContent,
   PartialIssuableProposalCredentialContent
@@ -21,16 +23,16 @@ import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 /**
  * @proposalId - Pass this param to get the credentials for a specific proposal
  */
-export function useProposalCredentials({ proposalIds }: { proposalIds?: string[] } = {}) {
+export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: string[] | null | undefined } = {}) {
   const { space } = useCurrentSpace();
   const {
     data: issuableProposalCredentials,
     error,
     isLoading: isLoadingIssuableProposalCredentials,
     mutate: refreshIssuableCredentials
-  } = useSWR(space ? `/api/credentials/proposals/issuable?spaceId=${space.id}` : null, () =>
-    charmClient.credentials.getIssuableProposalCredentials({ spaceId: space?.id as string, proposalIds })
-  );
+  } = useGetIssuableProposalCredentials({
+    proposalIds
+  });
 
   const { account } = useWeb3Account();
 
@@ -128,5 +130,23 @@ export function useProposalCredentials({ proposalIds }: { proposalIds?: string[]
     issueAndSaveProposalCredentials,
     userWalletCanIssueCredentialsForSpace,
     gnosisSafeForCredentials
+  };
+}
+
+export function useProposalCredentials({ proposalId }: { proposalId: MaybeString }) {
+  const { space } = useCurrentSpace();
+  const { data: issuedCredentials, isLoading: isLoadingIssuedCredentials } = useGetIssuedProposalCredentials({
+    proposalId
+  });
+  const multiCredentials = useMultiProposalCredentials({ proposalIds: proposalId ? [proposalId] : null });
+
+  return {
+    ...multiCredentials,
+    issuedCredentials,
+    isLoadingIssuedCredentials,
+    hasPendingOnchainCredentials:
+      !!space?.useOnchainCredentials &&
+      (multiCredentials.issuableProposalCredentials as IssuableProposalCredentialContent[])?.length >
+        (issuedCredentials as EASAttestationFromApi[])?.length
   };
 }

@@ -8,7 +8,7 @@ import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
 import Link from 'components/common/Link';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
+import { useMultiProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -54,7 +54,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     isLoadingIssuableProposalCredentials,
     userWalletCanIssueCredentialsForSpace,
     gnosisSafeForCredentials
-  } = useProposalCredentials({ proposalIds: selectedPageIds });
+  } = useMultiProposalCredentials({ proposalIds: selectedPageIds });
   const { showMessage } = useSnackbar();
 
   const [publishingCredential, setPublishingCredential] = useState(false);

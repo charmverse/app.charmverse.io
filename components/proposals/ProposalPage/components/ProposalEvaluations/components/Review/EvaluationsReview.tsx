@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
+import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
@@ -71,9 +72,12 @@ export function EvaluationsReview({
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
+  const { hasPendingOnchainCredentials } = useProposalCredentials({ proposalId: proposal?.id });
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
+  const hasCredentials = !!proposal?.selectedCredentialTemplates.length;
+  const isCredentialsComplete = hasCredentials && !hasPendingOnchainCredentials;
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
@@ -122,8 +126,6 @@ export function EvaluationsReview({
   }, [proposal?.currentEvaluationId, isRewardsActive, setExpandedEvaluationId]);
 
   const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
-
-  const hasCredentials = !!proposal?.selectedCredentialTemplates.length;
 
   return (
     <LoadingComponent isLoading={!proposal}>
@@ -222,12 +224,12 @@ export function EvaluationsReview({
       })}
       {hasCredentials && (
         <EvaluationStepRow
-          expanded={expandedEvaluationId === 'rewards'}
+          expanded={expandedEvaluationId === 'credentials'}
           expandedContainer={expandedContainer}
           isCurrent={isRewardsActive}
-          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
+          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'credentials' : undefined)}
           index={proposal ? proposal.evaluations.length + 1 : 0}
-          result={isRewardsComplete ? 'pass' : null}
+          result={isCredentialsComplete ? 'pass' : null}
           title='Credentials'
           actions={
             <EditStepButton
