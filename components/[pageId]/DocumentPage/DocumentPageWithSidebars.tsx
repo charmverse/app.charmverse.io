@@ -31,7 +31,14 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
   });
 
@@ -134,6 +141,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardSettings={onChangeRewardSettings}
+          onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         />
       )}
     </DocumentColumnLayout>

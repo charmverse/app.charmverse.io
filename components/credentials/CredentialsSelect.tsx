@@ -6,6 +6,7 @@ import { Autocomplete, Box, Chip, Stack, TextField, Typography } from '@mui/mate
 import { useMemo, type HTMLAttributes } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
+import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { credentialEventLabels } from 'lib/credentials/constants';
@@ -71,7 +72,7 @@ export function CredentialSelect({
     return options ?? [];
   }, [proposalCredentialTemplates, rewardCredentialTemplates, templateType]);
 
-  const populatedValues = useMemo(
+  const filteredValues = useMemo(
     () => [...(baseOptions ?? []).filter((opt) => selectedCredentialTemplates?.includes(opt.id)).map((v) => v.id)],
     [baseOptions, selectedCredentialTemplates]
   );
@@ -80,8 +81,8 @@ export function CredentialSelect({
     return null;
   }
 
-  if (readOnly && !selectedCredentialTemplates?.length) {
-    return null;
+  if (readOnly) {
+    return <SelectPreview value={filteredValues} options={credentialTemplates ?? []} />;
   }
 
   return (
@@ -100,16 +101,19 @@ export function CredentialSelect({
             onChange?.([]);
           }
         }}
+        isOptionEqualToValue={(opt, val) => (typeof opt === 'object' ? opt.id === val : false)}
         getOptionLabel={(option) => (typeof option === 'string' ? '' : option.name)}
         multiple
         data-test='token-list'
-        value={populatedValues}
+        value={filteredValues}
         // onInputChange={(event, newInputValue) => {
         //   if (newInputValue !== ADD_CREDENTIAL_TEMPLATE) {
         //     setInputValue(newInputValue);
         //   }
         // }}
         options={[...baseOptions, ADD_CREDENTIAL_TEMPLATE]}
+        disableCloseOnSelect
+        filterSelectedOptions
         disableClearable
         autoHighlight
         size='small'
@@ -154,7 +158,7 @@ export function CredentialSelect({
           return (
             <TextField
               {...params}
-              variant='standard'
+              variant='outlined'
               InputProps={{
                 ...params.InputProps,
                 disableUnderline: true,
