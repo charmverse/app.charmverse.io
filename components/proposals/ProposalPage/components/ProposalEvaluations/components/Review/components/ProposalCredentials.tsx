@@ -20,7 +20,7 @@ export function ProposalCredentials({
   selectedCredentialTemplates: string[];
   proposalId: string;
 }) {
-  const { issuedCredentials, isLoadingIssuedCredentials } = useProposalCredentials({
+  const { issuedCredentials, isLoadingIssuedCredentials, issuableProposalCredentials } = useProposalCredentials({
     proposalId
   });
   const { space } = useCurrentSpace();
@@ -31,19 +31,19 @@ export function ProposalCredentials({
       </Typography>
       <CredentialSelect readOnly templateType='proposal' selectedCredentialTemplates={selectedCredentialTemplates} />
 
-      {space?.useOnchainCredentials && space.credentialsWallet && (
+      {space?.useOnchainCredentials && space.credentialsWallet && issuableProposalCredentials?.length ? (
         <Box width='fit-content'>
           <IssueProposalCredentials selectedPageIds={[proposalId]} />
         </Box>
-      )}
+      ) : null}
 
       {isLoadingIssuedCredentials && !issuedCredentials && <LoadingComponent />}
       {!isLoadingIssuedCredentials && !issuedCredentials?.length && (
         <Typography>No credentials issued for this proposal</Typography>
       )}
       {issuedCredentials?.length && (
-        <Stack>
-          <FormLabel sx={{ mb: 1 }}>
+        <Stack gap={1.5}>
+          <FormLabel>
             <Typography variant='subtitle1'>Issued Credentials</Typography>
           </FormLabel>
           {issuedCredentials.map((c) => (

@@ -147,6 +147,6 @@ export function useProposalCredentials({ proposalId }: { proposalId: MaybeString
     hasPendingOnchainCredentials:
       !!space?.useOnchainCredentials &&
       (multiCredentials.issuableProposalCredentials as IssuableProposalCredentialContent[])?.length >
-        (issuedCredentials as EASAttestationFromApi[])?.length
+        (issuedCredentials?.filter((c) => c.type === 'onchain') as EASAttestationFromApi[])?.length
   };
 }

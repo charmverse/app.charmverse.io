@@ -15,7 +15,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { EASAttestationFromApi, EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
-import type { CredentialDataInput } from 'lib/credentials/schemas';
+import { charmverseCredentialSchemas, type CredentialDataInput } from 'lib/credentials/schemas';
 import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
@@ -68,13 +68,16 @@ export function UserCredentialRow({
   }
 
   const charmCredential = credential.content as CredentialDataInput;
+
   const credentialInfo: {
     title: string;
     subtitle: string | string[];
     iconUrl: string | OverridableComponent<SvgIconTypeMap>;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'charmverse' && 'Organization' in charmCredential
+    (credential.type === 'charmverse' ||
+      (credential.type === 'onchain' && charmverseCredentialSchemas.includes(credential.schemaId))) &&
+    'Organization' in charmCredential
       ? {
           title: charmCredential.Name,
           subtitle: charmCredential.Organization,

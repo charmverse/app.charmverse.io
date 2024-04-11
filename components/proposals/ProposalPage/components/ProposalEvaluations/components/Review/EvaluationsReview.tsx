@@ -72,17 +72,18 @@ export function EvaluationsReview({
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
-  const { hasPendingOnchainCredentials, refreshIssuableCredentials } = useProposalCredentials({
+  const { hasPendingOnchainCredentials } = useProposalCredentials({
     proposalId: proposal?.id
   });
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
-  const hasCredentials = !!proposal?.selectedCredentialTemplates.length;
-  const isCredentialsComplete = hasCredentials && !hasPendingOnchainCredentials;
+  const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length;
+  const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
+  const isCredentialsActive = currentEvaluation?.result === 'pass' && !isCredentialsComplete;
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
-  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
+  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass' && !!isCredentialsComplete;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -224,11 +225,11 @@ export function EvaluationsReview({
           </EvaluationStepRow>
         );
       })}
-      {hasCredentials && (
+      {hasCredentialsStep && (
         <EvaluationStepRow
           expanded={expandedEvaluationId === 'credentials'}
           expandedContainer={expandedContainer}
-          isCurrent={isRewardsActive}
+          isCurrent={isCredentialsActive}
           onChange={(e, expand) => setExpandedEvaluationId(expand ? 'credentials' : undefined)}
           index={proposal ? proposal.evaluations.length + 1 : 0}
           result={isCredentialsComplete ? 'pass' : null}
@@ -253,7 +254,7 @@ export function EvaluationsReview({
           expandedContainer={expandedContainer}
           isCurrent={isRewardsActive}
           onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
-          index={proposal ? proposal.evaluations.length + (hasCredentials ? 2 : 1) : 0}
+          index={proposal ? proposal.evaluations.length + (hasCredentialsStep ? 2 : 1) : 0}
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
         >
