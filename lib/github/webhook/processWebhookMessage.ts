@@ -1,8 +1,7 @@
 import { createHmac } from 'crypto';
 
-import { createAppAuth } from '@octokit/auth-app';
-import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
-import { Octokit } from 'octokit';
+import { prisma } from '@charmverse/core/prisma-client';
+import type { InstallationDeletedEvent, IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
 
 import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
 
@@ -22,27 +21,59 @@ type GithubWebhookPayload = {
 type MessageHandlers = {
   labeled: (message: IssuesLabeledEvent) => Promise<WebhookMessageProcessResult>;
   opened: (message: IssuesOpenedEvent) => Promise<WebhookMessageProcessResult>;
+  deleted: (message: InstallationDeletedEvent) => Promise<WebhookMessageProcessResult>;
 };
 
 const messageHandlers: MessageHandlers = {
-  labeled: async (message: IssuesLabeledEvent) => {
+  labeled: async (message) => {
     return createRewardFromIssue({
       message,
       createIssueComment: true
     });
   },
 
-  opened: async (message: IssuesOpenedEvent) => {
+  opened: async (message) => {
     return createRewardFromIssue({
       message,
       createIssueComment: true
     });
+  },
+
+  deleted: async (message) => {
+    const installationId = message.installation.id.toString();
+    const space = await prisma.spaceGithubConnection.findFirst({
+      where: {
+        installationId
+      },
+      select: {
+        spaceId: true
+      }
+    });
+
+    if (!space) {
+      return {
+        success: true,
+        message: `Installation ${installationId} not found.`
+      };
+    }
+
+    await prisma.spaceGithubConnection.deleteMany({
+      where: {
+        installationId
+      }
+    });
+
+    return {
+      spaceId: space.spaceId,
+      success: true,
+      message: `Installation ${installationId} deleted.`
+    };
   }
 };
 
 export async function processWebhookMessage(message: GithubWebhookPayload): Promise<WebhookMessageProcessResult> {
   const data = message?.body;
-  const action = data?.action as 'labeled';
+  const action = data?.action as keyof MessageHandlers;
 
   if (!messageHandlers[action]) {
     // we cannot process this message, just remove from queue
@@ -52,7 +83,6 @@ export async function processWebhookMessage(message: GithubWebhookPayload): Prom
     };
   }
 
-  const handler = messageHandlers[action];
   const hasPermission = await verifyWebhookMessagePermission(message);
   if (!hasPermission) {
     return {
@@ -61,7 +91,8 @@ export async function processWebhookMessage(message: GithubWebhookPayload): Prom
     };
   }
 
-  return handler(message.body as IssuesLabeledEvent);
+  const handler = messageHandlers[action];
+  return handler(data as any);
 }
 
 export async function verifyWebhookMessagePermission(message: GithubWebhookPayload) {
