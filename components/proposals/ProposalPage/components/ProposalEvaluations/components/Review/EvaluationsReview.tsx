@@ -79,10 +79,14 @@ export function EvaluationsReview({
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
   const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length;
-  const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
-  const isCredentialsActive = currentEvaluation?.result === 'pass' && !isCredentialsComplete;
+
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
+
+  const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
+  const isCredentialsActive =
+    hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
+
   const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass' && !!isCredentialsComplete;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
@@ -158,7 +162,7 @@ export function EvaluationsReview({
       />
       {proposal?.evaluations.map((evaluation, index) => {
         const isCurrentEval = currentEvaluation?.id === evaluation.id;
-        const isCurrent = isCurrentEval && !isRewardsActive;
+        const isCurrent = isCurrentEval && !isCredentialsActive && !isRewardsActive;
         return (
           <EvaluationStepRow
             key={evaluation.id}

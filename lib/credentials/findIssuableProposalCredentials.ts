@@ -18,14 +18,23 @@ import { credentialEventLabels } from './constants';
 import type { TypedPendingGnosisSafeTransaction } from './indexGnosisSafeCredentialTransaction';
 import type { CredentialDataInput } from './schemas';
 
+export type IssuableProposalCredentialAuthor = {
+  author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
+};
+
+export type IssuableProposalCredentialSpace = Pick<Space, 'id' | 'features'> & {
+  credentialTemplates: Pick<
+    CredentialTemplate,
+    'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
+  >[];
+};
+
 export type ProposalWithJoinedData = {
   id: string;
   status: ProposalStatus;
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result'>[];
   selectedCredentialTemplates: string[];
-  authors: {
-    author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
-  }[];
+  authors: IssuableProposalCredentialAuthor[];
   issuedCredentials: Pick<
     IssuedCredential,
     'userId' | 'credentialTemplateId' | 'credentialEvent' | 'onchainAttestationId'
@@ -54,12 +63,7 @@ export type PartialIssuableProposalCredentialContent = Pick<
  */
 type GenerateCredentialsParams = {
   proposal: ProposalWithJoinedData;
-  space: Pick<Space, 'id' | 'features'> & {
-    credentialTemplates: Pick<
-      CredentialTemplate,
-      'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
-    >[];
-  };
+  space: IssuableProposalCredentialSpace;
   pendingIssuableCredentials?: PartialIssuableProposalCredentialContent[];
 };
 

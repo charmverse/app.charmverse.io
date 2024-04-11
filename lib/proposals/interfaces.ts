@@ -28,7 +28,7 @@ export type ProposalEvaluationStatus =
   | 'unpublished'
   | 'published'
   | 'archived';
-export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
+export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'credentials' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
 export type VoteSettings = Pick<

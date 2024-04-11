@@ -1,21 +1,30 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
+  IssuedCredential,
   Proposal,
   ProposalAuthor,
-  ProposalReviewer,
   ProposalEvaluation,
   ProposalEvaluationResult,
-  ProposalEvaluationType
+  ProposalEvaluationType,
+  ProposalReviewer
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { sortBy } from 'lodash';
 
-import { getCurrentStep } from './getCurrentStep';
+import type {
+  IssuableProposalCredentialAuthor,
+  IssuableProposalCredentialSpace,
+  ProposalWithJoinedData
+} from 'lib/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+
 import type { ProposalStep } from './getCurrentStep';
+import { getCurrentStep } from './getCurrentStep';
 import type { ProposalFields } from './interfaces';
 
-export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id'> & {
+export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selectedCredentialTemplates'> & {
   archived?: boolean;
   authors: ProposalAuthor[];
   fields: ProposalFields | null;
@@ -53,7 +62,17 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
       }
     },
     include: {
-      authors: true,
+      authors: {
+        include: {
+          author: {
+            select: {
+              id: true,
+              primaryWallet: true,
+              wallets: true
+            }
+          }
+        }
+      },
       rewards: true,
       page: {
         select: {
@@ -62,6 +81,14 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
           createdAt: true,
           updatedAt: true,
           updatedBy: true
+        }
+      },
+      issuedCredentials: {
+        select: {
+          userId: true,
+          credentialTemplateId: true,
+          credentialEvent: true,
+          onchainAttestationId: true
         }
       },
       evaluations: {
@@ -84,33 +111,66 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
     }
   });
 
+  const spaces = await prisma.space.findMany({
+    where: {
+      id: {
+        in: arrayUtils.uniqueValues(proposals.map((p) => p.spaceId))
+      }
+    },
+    include: {
+      credentialTemplates: {
+        where: {
+          schemaType: 'proposal'
+        }
+      }
+    }
+  });
+
   return proposals.map((proposal) => {
-    return mapDbProposalToProposalLite({ proposal });
+    return mapDbProposalToProposalLite({
+      proposal,
+      space: spaces.find((s) => s.id === proposal.spaceId) as IssuableProposalCredentialSpace
+    });
   });
 }
 
 // used for mapping data for proposal blocks/tables which dont need all the evaluation data
 function mapDbProposalToProposalLite({
   proposal,
-  permissions
+  permissions,
+  space
 }: {
   proposal: Proposal & {
-    authors: ProposalAuthor[];
+    authors: (ProposalAuthor & IssuableProposalCredentialAuthor)[];
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
     rewards: { id: string }[];
     page: { id: string; title: string; updatedAt: Date; createdAt: Date; updatedBy: string } | null;
+    issuedCredentials: Pick<
+      IssuedCredential,
+      'userId' | 'credentialTemplateId' | 'credentialEvent' | 'onchainAttestationId'
+    >[];
   };
+  space: IssuableProposalCredentialSpace & { useOnchainCredentials?: boolean | null };
   permissions?: ProposalPermissionFlags;
 }): ProposalWithUsersLite {
   const { rewards, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const pendingCredentials = generateCredentialInputsForProposal({
+    proposal: proposal as ProposalWithJoinedData,
+    space
+  });
   const fields = (rest.fields as ProposalFields) ?? null;
+
+  const validSelectedCredentials = proposal.selectedCredentialTemplates.filter((templateId) =>
+    space.credentialTemplates.some((t) => t.id === templateId)
+  );
 
   const proposalWithUsers: ProposalWithUsersLite = {
     id: rest.id,
     createdAt: (proposal.page?.createdAt || new Date()).toISOString(),
     createdBy: rest.createdBy,
     authors: proposal.authors,
+    selectedCredentialTemplates: validSelectedCredentials,
     archived: proposal.archived || undefined,
     formId: rest.formId || undefined,
     // spaceId: rest.spaceId,
@@ -126,7 +186,9 @@ function mapDbProposalToProposalLite({
       evaluations: proposal.evaluations,
       hasPendingRewards: (fields?.pendingRewards ?? []).length > 0,
       proposalStatus: proposal.status,
-      hasPublishedRewards: rewards.length > 0
+      hasPublishedRewards: rewards.length > 0,
+      credentialsEnabled: !!validSelectedCredentials.length,
+      hasPendingOnchainCredentials: !!pendingCredentials.length
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     // status: proposal.status,

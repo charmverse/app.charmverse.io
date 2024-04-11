@@ -21,7 +21,7 @@ export function getProposalEvaluationStatus({
     } else if (result === 'pass') {
       return 'passed';
     }
-  } else if (step === 'rewards') {
+  } else if (step === 'rewards' || step === 'credentials') {
     return result === 'in_progress' ? 'unpublished' : 'published';
   }
 
