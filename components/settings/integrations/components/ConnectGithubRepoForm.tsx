@@ -251,7 +251,7 @@ export function ConnectGithubRepoForm({
                 </MenuItem>
               ))}
               <MenuItem value='none'>
-                <Typography>None</Typography>
+                <Typography>No template</Typography>
               </MenuItem>
             </Select>
           </Stack>
