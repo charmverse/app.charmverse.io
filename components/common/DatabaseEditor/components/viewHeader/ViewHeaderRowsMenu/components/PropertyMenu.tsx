@@ -4,11 +4,16 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
-export const StyledMenuItem = styled(MenuItem)<{ firstChild?: boolean; lastChild?: boolean }>(
-  ({ firstChild, lastChild, theme }) => `
+export const StyledMenuItem = styled(MenuItem)<{
+  firstChild?: boolean;
+  lastChild?: boolean;
+  showRightBorder?: boolean;
+}>(
+  ({ firstChild, lastChild, showRightBorder, theme }) => `
   border-left: 1px solid ${theme.palette.divider};
   border-top: 1px solid ${theme.palette.divider};
   border-bottom: 1px solid ${theme.palette.divider};
+  ${showRightBorder ? `border-right: 1px solid ${theme.palette.divider};` : ''}
   padding: ${theme.spacing(0.5, 1)};
   display: flex;
   align-items: center;
@@ -37,12 +42,14 @@ export function PropertyMenu({
   disabledTooltip,
   propertyTemplate,
   children,
-  lastChild
+  lastChild,
+  showRightBorder
 }: {
   disabledTooltip?: string;
   propertyTemplate: { icon?: ReactNode; name: string };
   children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
   lastChild: boolean;
+  showRightBorder?: boolean;
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
@@ -55,6 +62,7 @@ export function PropertyMenu({
           <StyledMenuItem
             disabled={!!disabledTooltip}
             lastChild={lastChild}
+            showRightBorder={showRightBorder}
             ref={ref}
             onClick={() => {
               popupState.open();

@@ -192,6 +192,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     <PropertyMenu
       lastChild={false}
       disabledTooltip={disableIssueCredentialsMenu}
+      showRightBorder
       // add fontSize to icon to override MUI styles
       propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue Onchain Credentials' }}
     >

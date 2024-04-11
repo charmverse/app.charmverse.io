@@ -14,14 +14,10 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 const preventAccordionToggle = (e: any) => e.stopPropagation();
 
 export function ProposalCredentials({
-  readOnly,
   selectedCredentialTemplates,
-  setSelectedCredentialTemplates,
   proposalId
 }: {
   selectedCredentialTemplates: string[];
-  setSelectedCredentialTemplates?: (templates: string[]) => void;
-  readOnly?: boolean;
   proposalId: string;
 }) {
   const { issuedCredentials, isLoadingIssuedCredentials } = useProposalCredentials({
@@ -33,15 +29,12 @@ export function ProposalCredentials({
       <Typography variant='body2'>
         Issue credentials to proposal authors for passing the proposal review process
       </Typography>
-      <CredentialSelect
-        readOnly={readOnly}
-        onChange={setSelectedCredentialTemplates}
-        templateType='proposal'
-        selectedCredentialTemplates={selectedCredentialTemplates}
-      />
+      <CredentialSelect readOnly templateType='proposal' selectedCredentialTemplates={selectedCredentialTemplates} />
 
       {space?.useOnchainCredentials && space.credentialsWallet && (
-        <IssueProposalCredentials selectedPageIds={[proposalId]} />
+        <Box width='fit-content'>
+          <IssueProposalCredentials selectedPageIds={[proposalId]} />
+        </Box>
       )}
 
       {isLoadingIssuedCredentials && !issuedCredentials && <LoadingComponent />}

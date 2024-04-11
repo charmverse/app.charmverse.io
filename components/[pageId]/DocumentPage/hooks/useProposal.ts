@@ -7,6 +7,7 @@ import {
   useUpdateWorkflow,
   useUpdateProposal
 } from 'charmClient/hooks/proposals';
+import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { ProposalFields } from 'lib/proposals/interfaces';
@@ -19,6 +20,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
   const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
   const { subscribe } = useWebSocketClient();
+  const { refreshIssuableCredentials } = useProposalCredentials({ proposalId });
 
   useEffect(() => {
     function handleUpdateEvent(proposals: WebSocketPayload<'proposals_updated'>) {
@@ -85,6 +87,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
             selectedCredentialTemplates: templateIds
           });
           await refreshProposal();
+          await refreshIssuableCredentials();
         }
       }
     }),
