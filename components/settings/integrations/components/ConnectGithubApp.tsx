@@ -25,7 +25,7 @@ export function ConnectGithubApp({ spaceId, spaceDomain }: { spaceId: string; sp
   return (
     <Grid container direction='row' gap={1} justifyContent='space-between' alignItems='center'>
       <Grid item>
-        <Typography variant='body2'>Connect your space to Github to sync rewards and issues.</Typography>
+        <Typography variant='body2'>Connect your space to GitHub to create Rewards from GitHub issues.</Typography>
       </Grid>
       {!githubApplicationData ? (
         <Grid item>

@@ -1,9 +1,8 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { createAppAuth } from '@octokit/auth-app';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Octokit } from 'octokit';
 
+import { createOctokitApp } from 'lib/github/app';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -26,15 +25,7 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const appOctokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: Number(process.env.GITHUB_APP_ID),
-      // Replace newlines with actual newlines
-      privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      installationId
-    }
-  });
+  const appOctokit = createOctokitApp(installationId);
 
   const { data: app } = await appOctokit.request('GET /app');
   const appName = app.name;

@@ -1,10 +1,9 @@
 import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { createAppAuth } from '@octokit/auth-app';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
-import { Octokit } from 'octokit';
 
+import { createOctokitApp } from 'lib/github/app';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -42,14 +41,7 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
     }
   });
 
-  const appOctokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: Number(process.env.GITHUB_APP_ID),
-      privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-      installationId
-    }
-  });
+  const appOctokit = createOctokitApp(installationId);
 
   let page = 1;
   const perPage = 30;

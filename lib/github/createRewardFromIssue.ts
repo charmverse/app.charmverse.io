@@ -1,7 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { createAppAuth } from '@octokit/auth-app';
 import type { IssuesLabeledEvent, IssuesOpenedEvent } from '@octokit/webhooks-types';
-import { Octokit } from 'octokit';
 
 import { baseUrl } from 'config/constants';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
@@ -9,6 +7,8 @@ import { createReward } from 'lib/rewards/createReward';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { relay } from 'lib/websockets/relay';
+
+import { createOctokitApp } from './app';
 
 export async function createRewardFromIssue({
   createIssueComment,
@@ -189,20 +189,12 @@ export async function createRewardFromIssue({
   );
 
   if (createIssueComment) {
-    const appOctokit = new Octokit({
-      authStrategy: createAppAuth,
-      auth: {
-        appId: Number(process.env.GITHUB_APP_ID),
-        privateKey: process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-        installationId
-      }
-    });
-
+    const appOctokit = createOctokitApp(installationId);
     appOctokit.rest.issues.createComment({
       owner: message.repository.owner.login,
       repo: message.repository.name,
       issue_number: message.issue.number,
-      body: `[Link to created CharmVerse reward](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
+      body: `[Link to CharmVerse reward for this Issue](${baseUrl}/${spaceGithubConnection.space.domain}/${createdPageId})`
     });
   }
 
