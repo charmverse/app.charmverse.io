@@ -15,8 +15,7 @@ import {
   useGetGithubApplicationData
 } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
-import FieldLabel from 'components/common/form/FieldLabel';
-import { FieldWrapper, FieldWrapperContainer } from 'components/common/form/fields/FieldWrapper';
+import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
@@ -219,14 +218,7 @@ export function ConnectGithubRepoForm({
             >
               {selectedRepository?.labels.map((label) => (
                 <MenuItem key={label.name} value={label.name.toString()}>
-                  <Chip
-                    size='small'
-                    label={label.name}
-                    sx={{
-                      border: `1px solid #${label.color}`,
-                      backgroundColor: alpha(`#${label.color}`, 0.1)
-                    }}
-                  />
+                  <Chip size='small' label={label.name} />
                 </MenuItem>
               ))}
             </Select>

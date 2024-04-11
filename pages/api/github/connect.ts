@@ -47,8 +47,9 @@ async function connectGithub(req: NextApiRequest, res: NextApiResponse) {
       sameSite: 'strict'
     });
   } catch (err) {
-    log.error('Failed to connect Github', {
+    log.error('Failed to connect Github application', {
       installationId,
+      redirect,
       error: err
     });
   }
