@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { SelectChangeEvent } from '@mui/material';
-import { alpha, Chip, Grid, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { alpha, Chip, Grid, Link, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
@@ -168,6 +168,13 @@ export function ConnectGithubRepoForm({
           </Typography>
           <Stack gap={2}>
             <FieldWrapper label='Repository Name' required>
+              <Typography variant='body2' fontWeight={500} mb={1} color='secondary'>
+                Can't find your repository?{' '}
+                <Link target='_blank' href={`https://github.com/settings/installations/${installationId}`}>
+                  Add it
+                </Link>{' '}
+                to your installation configuration under Repository access.
+              </Typography>
               <Select
                 fullWidth
                 disabled={disabled}
@@ -193,6 +200,9 @@ export function ConnectGithubRepoForm({
             </FieldWrapper>
           </Stack>
           <FieldWrapper label='Repository Labels'>
+            <Typography variant='body2' fontWeight={500} mb={1} color='secondary'>
+              Only sync issues with these labels. Leave empty to sync all issues.
+            </Typography>
             <Select
               fullWidth
               disabled={disabled}
