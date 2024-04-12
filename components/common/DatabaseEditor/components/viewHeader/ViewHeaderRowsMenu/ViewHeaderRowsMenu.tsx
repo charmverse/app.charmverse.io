@@ -337,7 +337,7 @@ export function ViewHeaderRowsMenu({
           </div>
         </Tooltip>
       )}
-      {showIssueProposalCredentials && <IssueProposalCredentials selectedPageIds={checkedIds} />}
+      {showIssueProposalCredentials && <IssueProposalCredentials asMenuItem selectedPageIds={checkedIds} />}
       {showIssueRewardCredentials && <IssueRewardCredentials selectedPageIds={checkedIds} />}
       {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
