@@ -134,8 +134,8 @@ export function useUpdateProposalFormFields({ proposalId }: { proposalId: string
   return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
 }
 
-export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
-  return useGET<FormFieldAnswer[]>(`/api/proposals/${proposalId}/form/answers`);
+export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
+  return useGET<FormFieldAnswer[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
 }
 
 export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {

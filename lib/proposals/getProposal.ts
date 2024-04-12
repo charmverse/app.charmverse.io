@@ -44,7 +44,16 @@ export async function getProposal({
       rewards: true,
       project: {
         include: {
-          projectMembers: true
+          projectMembers: {
+            orderBy: [
+              {
+                teamLead: 'desc'
+              },
+              {
+                createdAt: 'asc'
+              }
+            ]
+          }
         }
       },
       form: {
