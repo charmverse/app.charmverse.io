@@ -7,19 +7,10 @@ import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';
-import type { KycCredentials } from 'lib/kyc/getKycCredentials';
 
 import type { FormValues } from './SpaceIntegrations';
 
-export function SpaceKyc({
-  isAdmin,
-  control,
-  kycCredentials
-}: {
-  isAdmin: boolean;
-  control: Control<FormValues>;
-  kycCredentials?: KycCredentials;
-}) {
+export function SpaceKyc({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
   const {
     field: synapsApiKeyField,
     fieldState: { error: synapsApiKeyError }
@@ -95,7 +86,6 @@ export function SpaceKyc({
           labelPlacement='end'
           label='Enable Synaps.io KYC'
         />
-
         <FormControlLabel
           control={
             <Switch

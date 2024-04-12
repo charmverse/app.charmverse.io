@@ -1,7 +1,8 @@
-import type { PaymentMethod, Space, RewardsGithubRepo, SynapsUserKyc } from '@charmverse/core/prisma';
+import type { PaymentMethod, Space, RewardsGithubRepo, SynapsUserKyc, PersonaUserKyc } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import type { KycCredentials } from 'lib/kyc/getKycCredentials';
+import type { PersonaInquiry } from 'lib/kyc/persona/interfaces';
 import type { SynapsSession } from 'lib/kyc/synaps/interfaces';
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
@@ -68,4 +69,12 @@ export function useInitSynapsSession(spaceId: MaybeString) {
 
 export function useGetSynapsSession(spaceId: MaybeString) {
   return useGET<SynapsUserKyc | null>(`/api/spaces/${spaceId}/kyc-credentials/synaps`);
+}
+
+export function useGetPersonaInquiry(spaceId: MaybeString) {
+  return useGET<PersonaInquiry>(`/api/spaces/${spaceId}/kyc-credentials/persona`);
+}
+
+export function useInitPersonaInquiry(spaceId: MaybeString) {
+  return usePOST<undefined, PersonaUserKyc>(`/api/spaces/${spaceId}/kyc-credentials/persona`);
 }

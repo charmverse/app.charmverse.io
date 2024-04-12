@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { createPersonaInquiry } from 'lib/kyc/persona/createPersonaInquiry';
+import { getPersonaInquiryDetails } from 'lib/kyc/persona/getPersonaInquiryDetails';
+import type { PersonaInquiry } from 'lib/kyc/persona/interfaces';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -11,20 +14,22 @@ handler
   .get(getPersonaSession)
   .post(init);
 
-async function getPersonaSession(req: NextApiRequest, res: NextApiResponse<any | null>) {
+async function getPersonaSession(req: NextApiRequest, res: NextApiResponse<PersonaInquiry | null>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id as string;
 
-  // const data = await getSynapsSessionDetails(spaceId, userId);
+  const data = await getPersonaInquiryDetails(spaceId, userId);
 
-  res.status(200).json({});
+  res.status(200).json(data);
 }
 
-async function init(req: NextApiRequest, res: NextApiResponse<any>) {
+async function init(req: NextApiRequest, res: NextApiResponse<PersonaInquiry>) {
   const spaceId = req.query.id as string;
   const userId = req.session.user.id as string;
 
-  res.status(200).json({});
+  const data = await createPersonaInquiry(spaceId, userId);
+
+  res.status(200).json(data);
 }
 
 export default withSessionRoute(handler);

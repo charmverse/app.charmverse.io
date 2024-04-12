@@ -73,7 +73,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   });
 
   useEffect(() => {
-    reset(getDefaultValues(kycCredentials));
+    reset(getDefaultValues({ kycCredentials, space }));
   }, [
     kycCredentials?.synaps?.apiKey,
     kycCredentials?.synaps?.secret,
@@ -150,7 +150,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
         )}
         {kycCredentials && (
           <Grid item>
-            <SpaceKyc control={control} isAdmin={isAdmin} kycCredentials={kycCredentials} />
+            <SpaceKyc control={control} isAdmin={isAdmin} />
           </Grid>
         )}
         {isCharmverseSpace && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
@@ -199,13 +199,15 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   );
 }
 
-function getDefaultValues(kycCredentials?: KycCredentials) {
+function getDefaultValues({ kycCredentials, space }: { kycCredentials?: KycCredentials; space: Space }) {
   return {
     synapsApiKey: kycCredentials?.synaps?.apiKey ?? '',
     synapsSecret: kycCredentials?.synaps?.secret ?? '',
     personaApiKey: kycCredentials?.persona?.apiKey ?? '',
     personaSecret: kycCredentials?.persona?.secret ?? '',
     personaTemplateId: kycCredentials?.persona?.templateId ?? '',
-    personaEnvironmentId: kycCredentials?.persona?.envId ?? ''
+    personaEnvironmentId: kycCredentials?.persona?.envId ?? '',
+    kycOption: space.kycOption,
+    snapshotDomain: space.snapshotDomain
   };
 }
