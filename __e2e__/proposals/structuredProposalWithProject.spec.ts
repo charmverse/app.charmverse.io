@@ -246,8 +246,12 @@ test.describe.serial('Structured proposal template with project', () => {
     // Disabled since no project is selected
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
     await proposalFormFieldPage.clickProjectOption(project.id);
+    let pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
     await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: randomETHWalletAddress() });
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
     await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
+    await pendingApiCall;
     // Type invalid email
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john' });
     // Disabled since project profile has invalid values
@@ -280,9 +284,13 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await proposalPage.projectTeamMembersSelect.click();
     await proposalPage.getSelectOption(project.projectMembers[1].id).click();
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'new-email@gmail.com' });
-    const pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
     await pendingApiCall;
 
@@ -350,14 +358,26 @@ test.describe.serial('Structured proposal template with project', () => {
     await documentPage.documentTitleInput.fill('Proposal structured template');
     await proposalFormFieldPage.clickProjectOption('new');
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
+    let pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Demo Project' });
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
     await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: projectWalletAddress });
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
+    await pendingApiCall;
     await proposalPage.projectTeamMembersSelect.click();
     await proposalPage.getSelectOption('add-team-member').click();
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
+    await pendingApiCall;
+    pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
+    await pendingApiCall;
     await proposalFormFieldPage.getFormFieldInput(shortTextFieldId, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
     await proposalPage.publishNewProposalButton.click();
