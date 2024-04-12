@@ -42,6 +42,11 @@ export async function issueOffchainProposalCredentialsIfNecessary({
           index: 'asc'
         }
       },
+      page: {
+        select: {
+          type: true
+        }
+      },
       space: {
         select: {
           useOnchainCredentials: true
@@ -49,6 +54,10 @@ export async function issueOffchainProposalCredentialsIfNecessary({
       }
     }
   });
+
+  if (baseProposal?.page?.type === 'proposal_template') {
+    return;
+  }
 
   if (baseProposal.status === 'draft') {
     return;

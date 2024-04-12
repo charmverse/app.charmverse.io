@@ -1,6 +1,6 @@
 import type { IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtils, testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 import { optimism } from 'viem/chains';
 
@@ -133,6 +133,34 @@ describe('issueProposalCredentialIfNecessary', () => {
         })
       ])
     );
+  });
+
+  it('should not issue credentials if the proposal is a template', async () => {
+    const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
+      wallet: randomETHWalletAddress(),
+      domain: `cvt-testing-${uuid()}`
+    });
+    const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved', 'proposal_created']
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      authors: [author1.id],
+      userId: author1.id,
+      pageType: 'proposal_template',
+      selectedCredentialTemplateIds: [firstCredentialTemplate.id],
+      proposalStatus: 'published',
+      evaluationInputs: [{ reviewers: [], evaluationType: 'pass_fail', permissions: [], result: 'pass' }]
+    });
+
+    await issueOffchainProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId: proposal.id
+    });
+
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(0);
   });
 
   it('should issue the offchain credentials for a unique combination of user, proposal, event and credential template if it exists onchain, but not offchain', async () => {

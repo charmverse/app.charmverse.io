@@ -72,7 +72,7 @@ export function ProposalCredentials({
   const { space } = useCurrentSpace();
   const isSmallScreen = useSmallScreen();
   const { credentialTemplates } = useGetCredentialTemplates();
-  const { mappedFeatures } = useSpaceFeatures();
+  const { getFeatureTitle } = useSpaceFeatures();
 
   const pendingCredentials = selectedCredentialTemplates
     .map((templateId) => credentialTemplates?.find((ct) => ct.id === templateId))
@@ -81,7 +81,7 @@ export function ProposalCredentials({
   return (
     <Box display='flex' flexDirection='column' gap={2} onClick={preventAccordionToggle}>
       <Typography variant='body2'>
-        Authors receive credentials when the {mappedFeatures.proposals.title} is approved
+        Authors receive credentials when the {getFeatureTitle('proposal')} is approved
       </Typography>
 
       <Stack gap={1.5}>
@@ -108,7 +108,7 @@ export function ProposalCredentials({
       {space?.useOnchainCredentials && space.credentialsWallet && issuableProposalCredentials?.length ? (
         <Box display='flex' justifyContent='flex-end'>
           <Box width='fit-content'>
-            <IssueProposalCredentials color='primary' variant='contained' selectedPageIds={[proposalId]} />
+            <IssueProposalCredentials selectedPageIds={[proposalId]} />
           </Box>
         </Box>
       ) : null}
