@@ -155,6 +155,7 @@ export function useProjectForm(options: {
   defaultRequired?: boolean;
   projectId?: string | null;
   selectedMemberIds?: string[];
+  defaultProjectValues?: ProjectWithMembers | null;
 }) {
   const { defaultRequired, fieldConfig } = options;
   const { user } = useUser();
@@ -185,11 +186,13 @@ export function useProjectForm(options: {
   });
 
   useEffect(() => {
-    const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
+    const projectWithMembers =
+      options.defaultProjectValues ?? projectsWithMembers?.find((project) => project.id === options.projectId);
 
     if (!projectWithMembers) {
       return;
     }
+    // Make sure only the selected members are present in the form
     form.reset(
       convertToProjectValues({
         ...projectWithMembers,
@@ -199,7 +202,7 @@ export function useProjectForm(options: {
         )
       })
     );
-  }, [!!projectsWithMembers, options.projectId, selectedMemberIds?.length]);
+  }, [!!projectsWithMembers, !!options.defaultProjectValues, options.projectId, selectedMemberIds?.length]);
 
   return form;
 }

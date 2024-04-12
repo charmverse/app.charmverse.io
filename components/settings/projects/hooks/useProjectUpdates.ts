@@ -56,7 +56,6 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
           const updatedProject = await updateProject(projectPayload);
           return updatedProject;
         } catch (_) {
-          showMessage('Failed to update project', 'error');
           return null;
         }
       }, 300),
@@ -107,7 +106,6 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
 
             return updatedProjectMember;
           } catch (err) {
-            showMessage('Failed to update project member', 'error');
             return null;
           }
         }

@@ -1,6 +1,6 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
@@ -53,10 +53,8 @@ export function ProjectProfileInputField({
         projectId: _selectedProject.id
       });
     }
-    // else update the projectId field of the form, it might be for a new structured proposal form
-    else {
-      onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
-    }
+    // update the projectId field of the form, it might be for a new structured proposal form
+    onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
     setSelectedProject(_selectedProject);
     reset(
       convertToProjectValues({
