@@ -1,10 +1,12 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { Box, Stack } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
+import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -35,7 +37,7 @@ export type FormValues = yup.InferType<typeof schema>;
 export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
   const { refreshCurrentSpace } = useCurrentSpace();
-  const { trigger: updateSpace } = useUpdateSpace(space.id);
+  const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
   const {
     handleSubmit,
     control,
@@ -59,11 +61,29 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      style={{
+        position: 'relative'
+      }}
+    >
       <Grid container spacing={3} direction='column'>
         <Grid item>
           <FieldLabel>Snapshot.org domain</FieldLabel>
-          <SnapshotIntegration control={control} isAdmin={isAdmin} />
+          <Stack flexDirection='row' alignItems='center' gap={1}>
+            <Box width='100%'>
+              <SnapshotIntegration control={control} isAdmin={isAdmin} />
+            </Box>
+            <Button
+              disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
+              disableElevation
+              disabled={!isAdmin || updateSpaceLoading || !isDirty}
+              type='submit'
+              loading={updateSpaceLoading}
+            >
+              Save
+            </Button>
+          </Stack>
         </Grid>
         <Grid item>
           <FieldLabel>Collab.Land</FieldLabel>
