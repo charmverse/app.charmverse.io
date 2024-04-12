@@ -205,6 +205,12 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     }
   });
 
+  const filteredTemplates = proposal.selectedCredentialTemplates.filter((selectedTemplateId) =>
+    space.credentialTemplates.some((t) => t.id === selectedTemplateId)
+  );
+
+  proposal.selectedCredentialTemplates = filteredTemplates;
+
   const pendingCredentials = generateCredentialInputsForProposal({
     proposal: { ...proposal, page: { id: page.id } } as ProposalWithJoinedData,
     space
@@ -215,7 +221,7 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     hasPendingRewards: ((proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
     proposalStatus: proposal.status,
     hasPublishedRewards: proposal.rewards.length > 0,
-    credentialsEnabled: !!proposal.selectedCredentialTemplates,
+    credentialsEnabled: !!proposal.selectedCredentialTemplates.length,
     hasPendingOnchainCredentials: !!pendingCredentials.length
   });
 

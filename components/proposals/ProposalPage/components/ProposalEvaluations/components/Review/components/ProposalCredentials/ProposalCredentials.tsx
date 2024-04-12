@@ -1,36 +1,18 @@
 import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
-import LaunchIcon from '@mui/icons-material/Launch';
-import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
-import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
-import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
-import { FormLabel, Chip, IconButton, Tooltip } from '@mui/material';
 import Box from '@mui/material/Box';
-import type { OverridableComponent } from '@mui/material/OverridableComponent';
 import Stack from '@mui/material/Stack';
-import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { IssueProposalCredentials } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueProposalCredentials';
-import Link from 'components/common/Link';
-import { CredentialSelect } from 'components/credentials/CredentialsSelect';
-import { UserCredentialRow } from 'components/members/components/MemberProfile/components/UserCredentials/UserCredentialRow';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
-import type { EASAttestationFromApi, EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
-import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
-import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
-import { charmverseCredentialSchemas, type CredentialDataInput } from 'lib/credentials/schemas';
-import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import type { ProposalCredential } from 'lib/credentials/schemas/proposal';
-import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
-import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
-import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { CredentialRow } from './CredentialRow';
 
@@ -90,6 +72,7 @@ export function ProposalCredentials({
   const { space } = useCurrentSpace();
   const isSmallScreen = useSmallScreen();
   const { credentialTemplates } = useGetCredentialTemplates();
+  const { mappedFeatures } = useSpaceFeatures();
 
   const pendingCredentials = selectedCredentialTemplates
     .map((templateId) => credentialTemplates?.find((ct) => ct.id === templateId))
@@ -97,7 +80,9 @@ export function ProposalCredentials({
 
   return (
     <Box display='flex' flexDirection='column' gap={2} onClick={preventAccordionToggle}>
-      <Typography variant='body2'>Authors receive credentials when the proposal is approved</Typography>
+      <Typography variant='body2'>
+        Authors receive credentials when the {mappedFeatures.proposals.title} is approved
+      </Typography>
 
       <Stack gap={1.5}>
         {!issuedCredentials?.length &&
