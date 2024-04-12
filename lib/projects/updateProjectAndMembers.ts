@@ -3,6 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
+import { projectInclude } from './constants';
+import { getProjectById } from './getProjectById';
 import {
   findCharmVerseUserIdWithProjectMember,
   getProjectMemberCreateTransaction
@@ -138,23 +140,7 @@ export async function updateProjectAndMembers({
     )
   ]);
 
-  const projectWithMembers = await prisma.project.findUniqueOrThrow({
-    where: {
-      id: projectId
-    },
-    include: {
-      projectMembers: {
-        orderBy: [
-          {
-            teamLead: 'desc'
-          },
-          {
-            createdAt: 'asc'
-          }
-        ]
-      }
-    }
-  });
+  const projectWithMembers = await getProjectById(projectId);
 
   return projectWithMembers;
 }

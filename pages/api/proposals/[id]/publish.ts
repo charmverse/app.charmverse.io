@@ -135,6 +135,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
 
   if (proposalForm?.projectId) {
     await validateProposalProject({
+      formAnswers: proposalForm?.formAnswers,
       projectId: proposalForm.projectId,
       formFields: proposalForm?.form?.formFields
     });
