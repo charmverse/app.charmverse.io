@@ -5,20 +5,20 @@ import * as React from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
-import { AnnouncementBanner } from 'components/common/PageLayout/components/AnnouncementBanner';
-import { BlocksExceededBanner } from 'components/common/PageLayout/components/BlocksExceededBanner';
-import { SharedPageLayout } from 'components/common/PageLayout/SharedPageLayout';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 
+import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { AppBar } from './components/AppBar';
+import { BlocksExceededBanner } from './components/BlocksExceededBanner';
 import CurrentPageFavicon from './components/CurrentPageFavicon';
 import { Header, HeaderSpacer } from './components/Header/Header';
 import { LayoutProviders } from './components/LayoutProviders';
 import PageContainer from './components/PageContainer';
 import { useNavigationSidebar } from './components/Sidebar/hooks/useNavigationSidebar';
 import { NavigationSidebarDrawer } from './components/Sidebar/NavigationSidebarDrawer';
+import { SharedPageLayout } from './SharedPageLayout';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -85,8 +85,9 @@ function PageLayout({ children }: PageLayoutProps) {
             </AppBar>
             <NavigationSidebarDrawer
               enabled={enableSidebar}
-              enableResize={enableResize}
               enableResizing={!!user}
+              enableSpaceFeatures={true}
+              enableResize={enableResize}
               isResizing={isResizing}
               open={open}
               width={sidebarWidth}

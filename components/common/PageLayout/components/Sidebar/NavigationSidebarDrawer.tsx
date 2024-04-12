@@ -75,8 +75,9 @@ const DraggableHandle = styled.div<{ isActive?: boolean; disabled?: boolean }>`
 
 export function NavigationSidebarDrawer({
   enabled,
-  enableResize,
   enableResizing,
+  enableSpaceFeatures,
+  enableResize,
   isResizing,
   width: sidebarWidth,
   open,
@@ -84,6 +85,7 @@ export function NavigationSidebarDrawer({
 }: {
   enabled: boolean;
   enableResizing: boolean;
+  enableSpaceFeatures: boolean;
   enableResize: (e: any) => void;
   isResizing: boolean;
   width: number;
@@ -100,7 +102,11 @@ export function NavigationSidebarDrawer({
       !enabled ? (
         <div></div>
       ) : (
-        <NavigationSidebar closeSidebar={closeSidebar} navAction={isMobile ? closeSidebar : undefined} />
+        <NavigationSidebar
+          enableSpaceFeatures={enableSpaceFeatures}
+          closeSidebar={closeSidebar}
+          navAction={isMobile ? closeSidebar : undefined}
+        />
       ),
     [closeSidebar, enabled, isMobile]
   );

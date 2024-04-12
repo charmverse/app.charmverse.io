@@ -9,19 +9,19 @@ import useSWR from 'swr';
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { PageDialogGlobal } from 'components/common/PageDialog/PageDialogGlobal';
-import { AppBar } from 'components/common/PageLayout/components/AppBar';
-import CurrentPageFavicon from 'components/common/PageLayout/components/CurrentPageFavicon';
-import { PageTitleWithBreadcrumbs } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
-import { HeaderSpacer, StyledToolbar } from 'components/common/PageLayout/components/Header/Header';
-import PageContainer from 'components/common/PageLayout/components/PageContainer';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 
+import { AppBar } from './components/AppBar';
+import CurrentPageFavicon from './components/CurrentPageFavicon';
+import { PageTitleWithBreadcrumbs } from './components/Header/components/PageTitleWithBreadcrumbs';
+import { HeaderSpacer, StyledToolbar, ToggleSidebarIcon } from './components/Header/Header';
 import { LayoutProviders } from './components/LayoutProviders';
 import { LoggedOutButtons } from './components/LoggedOutButtons';
+import PageContainer from './components/PageContainer';
 import { useNavigationSidebar } from './components/Sidebar/hooks/useNavigationSidebar';
 import { NavigationSidebarDrawer } from './components/Sidebar/NavigationSidebarDrawer';
 
@@ -82,6 +82,7 @@ export function SharedPageLayout({ children, basePageId, basePageType, enableSid
           <>
             <AppBar open={open} sidebarWidth={sidebarWidth} position='fixed'>
               <StyledToolbar variant='dense'>
+                <ToggleSidebarIcon open={open} openSidebar={handleDrawerOpen} />
                 <Box
                   sx={{
                     display: 'flex',
@@ -125,8 +126,9 @@ export function SharedPageLayout({ children, basePageId, basePageType, enableSid
             </AppBar>
             <NavigationSidebarDrawer
               enabled={enableSidebar}
-              enableResize={enableResize}
               enableResizing={!!user}
+              enableSpaceFeatures={false}
+              enableResize={enableResize}
               isResizing={isResizing}
               open={open}
               width={sidebarWidth}
