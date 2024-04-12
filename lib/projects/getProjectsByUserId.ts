@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { projectInclude } from './constants';
 import type { ProjectWithMembers } from './interfaces';
 
 export async function getProjectsByUserId({ userId }: { userId: string }): Promise<ProjectWithMembers[]> {
@@ -11,18 +12,7 @@ export async function getProjectsByUserId({ userId }: { userId: string }): Promi
         }
       }
     },
-    include: {
-      projectMembers: {
-        orderBy: [
-          {
-            teamLead: 'desc'
-          },
-          {
-            createdAt: 'asc'
-          }
-        ]
-      }
-    }
+    include: projectInclude
   });
 
   return projects.map((project) => {

@@ -113,10 +113,11 @@ export async function createProposal({
     throw new InvalidInputError(errors.join('\n'));
   }
 
-  if (!isDraft && projectId) {
+  if (!isDraft && formAnswers && projectId) {
     await validateProposalProject({
       projectId,
-      formFields
+      formFields,
+      formAnswers
     });
   }
 
