@@ -247,9 +247,8 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
-  const projectFormFieldAnswer = proposalFormFieldAnswers.find(
-    (answer) => answer.fieldId === projectProfileField?.id
-  ) as { projectId: string; selectedMemberIds: string[] } | undefined;
+  const projectFormFieldAnswer = proposalFormFieldAnswers.find((answer) => answer.fieldId === projectProfileField?.id)
+    ?.value as { projectId: string; selectedMemberIds: string[] } | undefined;
 
   const form = useProjectForm({
     projectId,

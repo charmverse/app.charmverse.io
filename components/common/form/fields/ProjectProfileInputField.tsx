@@ -45,12 +45,6 @@ export function ProjectProfileInputField({
   const { reset } = useFormContext<ProjectAndMembersPayload>();
   const { trigger: createProject } = useCreateProject();
 
-  useEffect(() => {
-    if (project) {
-      reset(convertToProjectValues(project));
-    }
-  }, [!!project]);
-
   const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
 
   function onOptionClick(_selectedProject: ProjectWithMembers) {
@@ -64,7 +58,13 @@ export function ProjectProfileInputField({
       onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
     }
     setSelectedProject(_selectedProject);
-    reset(convertToProjectValues(_selectedProject));
+    reset(
+      convertToProjectValues({
+        ..._selectedProject,
+        // Just add the team lead to the project members since selectedMemberIds is empty
+        projectMembers: [_selectedProject.projectMembers[0]]
+      })
+    );
   }
 
   return (

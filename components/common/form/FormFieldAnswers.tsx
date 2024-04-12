@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -95,6 +96,9 @@ export function FormFieldAnswersControlled({
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
+  const { mutate } = useGetProposalFormFieldAnswers({
+    proposalId
+  });
   const { user } = useUser();
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
@@ -184,6 +188,7 @@ export function FormFieldAnswersControlled({
                             value: projectFormValues
                           }
                         ]);
+                        mutate();
                       }}
                       inputEndAdornment={
                         pageId &&
