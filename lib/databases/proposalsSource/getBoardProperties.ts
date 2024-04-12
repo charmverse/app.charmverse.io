@@ -24,7 +24,7 @@ export function getBoardProperties({
   rubricStepTitles?: string[];
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
-  currentCardProperties: IPropertyTemplate[];
+  currentCardProperties?: IPropertyTemplate[];
   formFields?: FormField[];
 }) {
   // TODO: we shouldn't have to filter out the excluded field types here after week of April 3, 2024.

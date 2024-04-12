@@ -43,7 +43,7 @@ export type PropertyType =
   | 'relation'
   | ProposalPropertyType;
 
-interface IPropertyOption<T = string> {
+export interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
@@ -96,12 +96,17 @@ export type BoardFields = {
   sourceData?: GoogleFormSourceData;
 };
 
-type Board = UIBlockWithDetails & {
+export type Board = UIBlockWithDetails & {
   pageType: Exclude<UIBlockWithDetails['pageType'], undefined>;
   fields: BoardFields;
 };
 
-function createBoard({
+export type BoardGroup = {
+  option: IPropertyOption;
+  cards: Card[];
+};
+
+export function createBoard({
   block,
   addDefaultProperty
 }: { block?: Partial<UIBlockWithDetails>; addDefaultProperty?: boolean } | undefined = {}): Board {
@@ -158,11 +163,3 @@ function createBoard({
     }
   };
 }
-
-type BoardGroup = {
-  option: IPropertyOption;
-  cards: Card[];
-};
-
-export { createBoard };
-export type { Board, IPropertyOption, BoardGroup };
