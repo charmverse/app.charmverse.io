@@ -11,7 +11,7 @@
     "ceramic:graphql:stg": "npx dotenv -e .env.staging --  tsx background/ceramicServer/ceramic-client.ts",
     "build": "NODE_OPTIONS=\"--max_old_space_size=4096\" npx next build && npm run esbuild",
     "build:analyze": "cross-env ANALYZE=true next build",
-    "esbuild": "tsx esbuild.config.ts",
+    "esbuild": "tsx esbuild.config.ts && tsx esbuild.ceramic.ts",
     "verifydeps": "npx depcruise --ts-config ./tsconfig.json --config .dependency-cruiser.js -- ./",
     "deploy:staging": "npx cdk deploy \"stg-charmverse-${STAGE}\" --outputs-file cdk.out.json",
     "postdeploy:staging": "node --eval \"console.log('env_url=' + require('./cdk.out.json')['stg-charmverse-${STAGE}'].DeploymentUrl)\"  >> $GITHUB_OUTPUT",
