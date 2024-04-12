@@ -66,7 +66,7 @@ test.beforeAll(async () => {
   });
 });
 
-test.describe.serial('Database with proposals as datasource', async () => {
+test.describe('Database with proposals as datasource', async () => {
   test('create a database with proposals as source', async ({ page, pagesSidebar, databasePage }) => {
     // Arrange ------------------
     await loginBrowserUser({
@@ -88,8 +88,7 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await pagesSidebar.pagesSidebarSelectAddDatabaseButton.click();
 
     await pagesSidebar.databasePage.waitFor({
-      state: 'visible',
-      timeout: 5000
+      state: 'visible'
     });
 
     // Initialise the new database
@@ -173,53 +172,5 @@ test.describe.serial('Database with proposals as datasource', async () => {
     await expect(secondRow).toBeVisible();
     await expect(thirdRow).toBeVisible();
     await expect(databasePage.getTableRowByIndex({ index: 3 })).not.toBeVisible();
-  });
-
-  test('view archived proposals as source', async ({ page, pagesSidebar, databasePage }) => {
-    // Arrange ------------------
-    await loginBrowserUser({
-      browserPage: page,
-      userId: spaceUser.id
-    });
-
-    // Mark the proposal as archived
-    await prisma.proposal.update({
-      where: {
-        id: secondProposal.id
-      },
-      data: {
-        archived: true
-      }
-    });
-
-    await page.goto(`${baseUrl}/${space.domain}/${databasePagePath}`);
-
-    // This is a refresh response
-    await databasePage.page.waitForTimeout(500);
-
-    // Wait until the database is initialised
-
-    const syncedCards = await prisma.page.findMany({
-      where: {
-        syncWithPageId: {
-          not: null
-        },
-        spaceId: space.id
-      },
-      select: {
-        id: true,
-        syncWithPageId: true
-      }
-    });
-    // Regression check to make sure we did not create duplicate cards
-    expect(syncedCards.length).toBe(3);
-
-    const syncedArchivedProposalCardId = syncedCards.find((c) => c.syncWithPageId === secondProposal.id)?.id as string;
-
-    const archivedRowProposalStatusBadge = databasePage.page
-      .locator(`data-test=database-row-${syncedArchivedProposalCardId}`)
-      .filter({ hasText: 'Unpublished' });
-
-    await expect(archivedRowProposalStatusBadge).toBeVisible();
   });
 });

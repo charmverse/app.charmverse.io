@@ -782,8 +782,10 @@ export class DocumentEventHandler {
     const galleryImage =
       room.doc.type === 'card' || room.doc.type === 'card_synced' ? extractPreviewImage(room.doc.content) : null;
 
-    const res = await prisma.page.update({
-      where: { id: room.doc.id },
+    await prisma.page.updateMany({
+      where: {
+        OR: [{ id: room.doc.id }, { syncWithPageId: room.doc.id }]
+      },
       data: {
         content: room.doc.content,
         contentText,
@@ -792,9 +794,6 @@ export class DocumentEventHandler {
         version: room.doc.version,
         updatedAt: new Date(),
         updatedBy: userId
-      },
-      select: {
-        spaceId: true
       }
     });
 
@@ -806,9 +805,9 @@ export class DocumentEventHandler {
       this.relay.broadcast(
         {
           type: 'pages_meta_updated',
-          payload: [{ galleryImage, hasContent, spaceId: res.spaceId, id: room.doc.id }]
+          payload: [{ galleryImage, hasContent, spaceId: room.doc.spaceId, id: room.doc.id }]
         },
-        res.spaceId
+        room.doc.spaceId
       );
     }
   }

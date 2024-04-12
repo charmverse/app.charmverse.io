@@ -19,6 +19,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import { ConnectBoto } from './ConnectBoto';
 import { ConnectCollabland } from './ConnectCollabland';
+import { ConnectGithubApp } from './ConnectGithubApp';
 import { SnapshotIntegration } from './SnapshotDomain';
 import { SpaceKyc } from './SpaceKyc';
 import { SynapsModal } from './SynapsModal';
@@ -56,11 +57,11 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   const { data: kycCredentials, mutate: mutateKycCredentials } = useGetKycCredentials(space.id);
   const { trigger: updateKycCredential, isMutating: kycUpdateCredentialsLoading } = useUpdateKycCredentials(space.id);
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
-  const isAllowedSpace = useIsCharmverseSpace();
+  const isCharmverseSpace = useIsCharmverseSpace();
   const {
     handleSubmit,
-    reset,
     control,
+    reset,
     formState: { isDirty, dirtyFields }
   } = useForm<FormValues>({
     defaultValues: {
@@ -141,15 +142,23 @@ export function SpaceIntegrations({ space }: { space: Space }) {
           <FieldLabel>Send events to Discord/Telegram</FieldLabel>
           <ConnectBoto />
         </Grid>
-        <Grid item>
-          <SpaceKyc control={control} isAdmin={isAdmin} kycCredentials={kycCredentials} />
-        </Grid>
-        {isAllowedSpace && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
+        {isCharmverseSpace && (
+          <Grid item>
+            <FieldLabel>Sync with Github Repo</FieldLabel>
+            <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
+          </Grid>
+        )}
+        {kycCredentials && (
+          <Grid item>
+            <SpaceKyc control={control} isAdmin={isAdmin} kycCredentials={kycCredentials} />
+          </Grid>
+        )}
+        {isCharmverseSpace && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
           <Grid item>
             <SynapsModal spaceId={space.id} />
           </Grid>
         )}
-        {isAllowedSpace &&
+        {isCharmverseSpace &&
           space.kycOption === 'persona' &&
           kycCredentials?.persona?.apiKey &&
           kycCredentials.persona.envId &&

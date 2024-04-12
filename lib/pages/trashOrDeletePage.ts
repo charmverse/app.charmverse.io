@@ -34,9 +34,18 @@ export async function trashOrDeletePage(pageId: string, userId: string, action: 
       }),
       prisma.page.deleteMany({
         where: {
-          id: {
-            in: modifiedChildPageIds
-          }
+          OR: [
+            {
+              id: {
+                in: modifiedChildPageIds
+              }
+            },
+            {
+              syncWithPageId: {
+                in: modifiedChildPageIds
+              }
+            }
+          ]
         }
       }),
       prisma.block.deleteMany({
@@ -75,9 +84,18 @@ export async function trashOrDeletePage(pageId: string, userId: string, action: 
 
     await prisma.page.updateMany({
       where: {
-        id: {
-          in: modifiedChildPageIds
-        }
+        OR: [
+          {
+            id: {
+              in: modifiedChildPageIds
+            }
+          },
+          {
+            syncWithPageId: {
+              in: modifiedChildPageIds
+            }
+          }
+        ]
       },
       data: {
         ...data,

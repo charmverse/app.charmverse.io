@@ -1,41 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { uniq } from 'lodash';
+
+import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
 /**
  * Use this script to perform database searches.
  */
 
-const userId = '4e1d4522-6437-4393-8ed1-9c56e53235f4';
-
 async function search() {
-  const acc = await prisma.userSpaceAction.findFirst({
-    where: {
-      createdBy: userId,
-      action: 'view_page',
-      // pageType: {
-      //   in: pageTypes
-      // },
-      spaceId: 'bc9e8464-4166-4f7c-8a14-bb293cc30d2a'
-    },
-    orderBy: {
-      createdAt: 'desc'
-    },
-    select: {
-      meta: true,
-      spaceId: true,
-      pageType: true,
-      page: {
-        select: {
-          id: true,
-          path: true
-        }
-      },
-      post: {
-        select: {
-          id: true,
-          path: true
-        }
-      }
-    }
+  const acc = await getSafeTxStatus({
+    chainId: 1,
+    safeTxHash: '0xa73fccc71ff9f9224419e24d7354900095c9f4ab5284f1dcb0f5341ec09e83b2'
   });
   console.log(acc);
 }

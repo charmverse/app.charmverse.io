@@ -160,7 +160,6 @@ function DraggableTreeNode({
   const views = useAppSelector((state) => selectSortedViews(state, item.id));
   const hasSelectedChildView = views.some((view) => view.id === selectedNodeId);
   const { expanded } = useTreeItem(item.id);
-
   useEffect(() => {
     if (expanded && loadedViews && item.type.match(/board/) && !loadedViews[item.id]) {
       dispatch(databaseViewsLoad({ pageId: item.id }));
@@ -168,7 +167,6 @@ function DraggableTreeNode({
   }, [expanded, loadedViews?.[item.id]]);
 
   const hideChildren = !expanded;
-
   useEffect(() => {
     const focalboardViewId = viewsRecord[item.id];
     if (views && focalboardViewId && item.type.match(/board/) && !views.some((view) => view.id === focalboardViewId)) {
