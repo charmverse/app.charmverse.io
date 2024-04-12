@@ -126,6 +126,7 @@ export function ProposalProjectFormAnswers({
       <FieldLabel>Team Members</FieldLabel>
       <Select
         displayEmpty
+        data-test='project-team-members-select'
         disabled={disabled}
         renderValue={() => {
           return 'Select a team member';
@@ -136,6 +137,7 @@ export function ProposalProjectFormAnswers({
             {nonSelectedProjectMembers.map((projectMember, index) => (
               <MenuItem
                 key={`project-member-${index.toString()}`}
+                data-test={`select-option-${projectMember.id}`}
                 onClick={() => {
                   onChange(projectMember.id as string);
                 }}
@@ -150,6 +152,7 @@ export function ProposalProjectFormAnswers({
         ) : null}
         <MenuItem
           value='ADD_TEAM_MEMBER'
+          data-test='select-option-add-team-member'
           disabled={!isTeamLead || disabled}
           onClick={() => {
             onChange('ADD_TEAM_MEMBER');

@@ -143,7 +143,16 @@ export async function updateProjectAndMembers({
       id: projectId
     },
     include: {
-      projectMembers: true
+      projectMembers: {
+        orderBy: [
+          {
+            teamLead: 'desc'
+          },
+          {
+            createdAt: 'asc'
+          }
+        ]
+      }
     }
   });
 
