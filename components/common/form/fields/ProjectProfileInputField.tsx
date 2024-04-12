@@ -53,7 +53,7 @@ export function ProjectProfileInputField({
     }
   }, [!!project]);
 
-  const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
+  const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   function onOptionClick(_selectedProject: ProjectWithMembers) {
     if (proposalId) {
