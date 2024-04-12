@@ -58,5 +58,5 @@
     }
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "scripts/esbuild.ceramic.ts"]
+  "include": ["**/*.ts", "**/*.tsx"]
 }

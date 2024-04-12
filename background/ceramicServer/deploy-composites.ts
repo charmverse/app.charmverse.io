@@ -1,13 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import fs from 'node:fs/promises';
 
-import {
-  createComposite,
-  readEncodedComposite,
-  writeEncodedComposite,
-  writeEncodedCompositeRuntime
-} from '@composedb/devtools-node';
-import type { Ora as OraSpinner } from 'ora';
+import { createComposite, readEncodedComposite, writeEncodedComposite } from '@composedb/devtools-node';
 import ora from 'ora';
 
 import { getCeramicClient } from './authenticate';
@@ -21,26 +14,28 @@ function getCompositesFolder(filename: string) {
 export const compositeDefinitionFile = getCompositesFolder('composite-definition.json');
 
 /**
- * @param {Ora} spinner - to provide progress status.
- * @return {Promise<void>} - return void when composite finishes deploying.
+ * One off method for generating the ceramic composite
  */
-export async function writeComposite({ spinner }: { spinner: OraSpinner } = { spinner: ora() }) {
+export async function writeCompositeJson() {
+  const spinner = ora();
   const ceramic = await getCeramicClient();
 
-  const result = await fs.readdir(getCompositesFolder('')).catch(() => null);
-
-  if (!result) {
-    await fs.mkdir(getCompositesFolder(''));
-  }
-
-  const testComposite = await createComposite(ceramic, `${folder}/credentials.gql`);
-  await writeEncodedComposite(testComposite, compositeDefinitionFile);
-
   spinner.info('creating composite for runtime usage');
-  await writeEncodedCompositeRuntime(ceramic, compositeDefinitionFile, getCompositesFolder('composite-definition.js'));
-  spinner.info('deploying composite');
-  const deployComposite = await readEncodedComposite(ceramic, compositeDefinitionFile);
 
-  await deployComposite.startIndexingOn(ceramic);
+  const compositeGraphQLDefinition = await createComposite(ceramic, `${folder}/credentials.gql`);
+  await writeEncodedComposite(compositeGraphQLDefinition, compositeDefinitionFile);
+}
+
+/**
+ * Deploy composite to the target server
+ */
+export async function deployComposite() {
+  const ceramic = await getCeramicClient();
+  const spinner = ora();
+  const deployableComposite = await readEncodedComposite(ceramic, compositeDefinitionFile);
+  spinner.info('deploying composite');
+
+  await deployableComposite.startIndexingOn(ceramic);
+
   spinner.succeed('composite deployed & ready for use');
 }

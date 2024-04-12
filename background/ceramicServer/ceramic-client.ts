@@ -3,13 +3,13 @@ import { log } from '@charmverse/core/log';
 import { serveEncodedDefinition } from '@composedb/devtools-node';
 
 import { ceramicHost, getCeramicClient } from './authenticate';
-import { compositeDefinitionFile, writeComposite } from './deploy-composites';
+import { compositeDefinitionFile } from './deploy-composites';
 
 // Start the GraphQL server
 async function bootstrapGqlServer() {
   const ceramic = await getCeramicClient();
 
-  await writeComposite();
+  // await writeComposite();
 
   log.info(`GraphQL Composedb server started`);
 
