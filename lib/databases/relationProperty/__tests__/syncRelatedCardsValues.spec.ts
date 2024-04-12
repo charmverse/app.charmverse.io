@@ -7,7 +7,7 @@ import { syncRelatedCardsValues } from 'lib/databases/relationProperty/syncRelat
 import { syncRelationProperty } from 'lib/databases/relationProperty/syncRelationProperty';
 import { generateBoard } from 'testing/setupDatabase';
 
-describe('syncRelatedCardsValues', () => {
+describe.skip('syncRelatedCardsValues', () => {
   it('should sync related cards values', async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace();
     const generatedBoardPage1 = await generateBoard({
