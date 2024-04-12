@@ -4,7 +4,7 @@ import nc from 'next-connect';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { createProject } from 'lib/projects/createProject';
-import { getProjectsByUserId } from 'lib/projects/getProjectsByUserId';
+import { getProjects } from 'lib/projects/getProjects';
 import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -24,7 +24,7 @@ async function createProjectController(req: NextApiRequest, res: NextApiResponse
 
 async function getProjectsController(req: NextApiRequest, res: NextApiResponse<ProjectWithMembers[]>) {
   const userId = req.session.user.id;
-  const projectsWithMembers = await getProjectsByUserId({ userId });
+  const projectsWithMembers = await getProjects({ userId });
   return res.status(200).json(projectsWithMembers);
 }
 

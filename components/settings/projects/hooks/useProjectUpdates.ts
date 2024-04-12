@@ -3,71 +3,40 @@ import { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import charmClient from 'charmClient';
-import { useAddProjectMember, useGetProjects, usePatchProject } from 'charmClient/hooks/projects';
+import type { MaybeString } from 'charmClient/hooks/helpers';
+import { useGetProjects } from 'charmClient/hooks/projects';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import type { UpdateProjectPayload } from 'lib/projects/updateProject';
-import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
+import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
-export function useProjectUpdates({ projectId }: { projectId: string }) {
+import { convertToProjectValues } from './useProjectForm';
+
+export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const { user } = useUser();
-  const { trigger: updateProject } = usePatchProject(projectId);
   const project = projectsWithMembers?.find((_project) => _project.id === projectId);
   const isTeamLead = project?.projectMembers[0].userId === user?.id;
-  const { trigger: addProjectMember } = useAddProjectMember(projectId);
-  const { reset } = useFormContext<ProjectWithMembers>();
+
+  const { reset } = useFormContext<ProjectAndMembersPayload>();
+
   const { showMessage } = useSnackbar();
 
   const onProjectUpdate = useMemo(
     () =>
-      debounce(async (projectPayload: UpdateProjectPayload) => {
-        if (!projectId || !isTeamLead) {
+      debounce(async (projectAndMembersPayload: ProjectAndMembersPayload) => {
+        if (!projectId) {
           return null;
         }
 
         try {
-          // Optimistically update the project in the cache
-          mutate(
-            (projects) => {
-              if (!projects) {
-                return projects;
-              }
+          if (isTeamLead) {
+            const updatedProjectWithMember = await charmClient.projects.updateProject(
+              projectId,
+              projectAndMembersPayload
+            );
 
-              return projects.map((_project) => {
-                if (_project.id === projectId) {
-                  return {
-                    ..._project,
-                    ...projectPayload,
-                    projectMembers: _project.projectMembers
-                  };
-                }
+            reset(convertToProjectValues(updatedProjectWithMember));
 
-                return _project;
-              });
-            },
-            {
-              revalidate: false
-            }
-          );
-
-          const updatedProject = await updateProject(projectPayload);
-          return updatedProject;
-        } catch (_) {
-          showMessage('Failed to update project', 'error');
-          return null;
-        }
-      }, 300),
-    [projectId, user?.id, isTeamLead]
-  );
-
-  const onProjectMemberUpdate = useMemo(
-    () =>
-      debounce(async (projectMemberPayload: UpdateProjectMemberPayload & { userId?: string }) => {
-        if ((isTeamLead || projectMemberPayload.userId === user?.id) && projectMemberPayload.id) {
-          try {
             mutate(
               (projects) => {
                 if (!projects) {
@@ -75,21 +44,8 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
                 }
 
                 return projects.map((_project) => {
-                  if (_project.id === projectId) {
-                    const updatedProject = {
-                      ..._project,
-                      projectMembers: _project.projectMembers.map((_projectMember) => {
-                        if (_projectMember.id === projectMemberPayload.id) {
-                          return {
-                            ..._projectMember,
-                            ...projectMemberPayload
-                          };
-                        }
-
-                        return _projectMember;
-                      })
-                    };
-                    return updatedProject;
+                  if (_project.id === updatedProjectWithMember.id) {
+                    return updatedProjectWithMember;
                   }
 
                   return _project;
@@ -99,62 +55,54 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
                 revalidate: false
               }
             );
+          } else {
+            const updatedProjectMemberPayload = projectAndMembersPayload.projectMembers.find(
+              (projectMember) => projectMember.userId === user?.id
+            );
+            if (updatedProjectMemberPayload && updatedProjectMemberPayload.id && updatedProjectMemberPayload.userId) {
+              const updatedProjectMember = await charmClient.projects.updateProjectMember({
+                memberId: updatedProjectMemberPayload.id,
+                payload: updatedProjectMemberPayload,
+                projectId
+              });
 
-            const updatedProjectMember = await charmClient.projects.updateProjectMember({
-              payload: projectMemberPayload,
-              projectId
-            });
+              mutate(
+                (projects) => {
+                  if (!projects) {
+                    return projects;
+                  }
 
-            return updatedProjectMember;
-          } catch (err) {
-            showMessage('Failed to update project member', 'error');
-            return null;
+                  return projects.map((_project) => {
+                    if (_project.id === projectId) {
+                      return {
+                        ..._project,
+                        projectMembers: _project.projectMembers.map((_projectMember) => {
+                          if (_projectMember.id === updatedProjectMember.id) {
+                            return updatedProjectMember;
+                          }
+
+                          return _projectMember;
+                        })
+                      };
+                    }
+
+                    return _project;
+                  });
+                },
+                {
+                  revalidate: false
+                }
+              );
+            }
           }
+        } catch (_) {
+          showMessage('Failed to update project', 'error');
         }
       }, 300),
     [projectId, user?.id, isTeamLead]
   );
 
-  const onProjectMemberAdd = async (projectMemberPayload: AddProjectMemberPayload) => {
-    if (isTeamLead && project) {
-      try {
-        const createdProjectMember = await addProjectMember(projectMemberPayload);
-        reset({
-          ...project,
-          projectMembers: [...project.projectMembers, createdProjectMember]
-        });
-        mutate(
-          (projects) => {
-            if (!projects) {
-              return projects;
-            }
-
-            return projects.map((_project) => {
-              if (_project.id === projectId) {
-                return {
-                  ..._project,
-                  projectMembers: [..._project.projectMembers, createdProjectMember]
-                };
-              }
-
-              return _project;
-            });
-          },
-          {
-            revalidate: false
-          }
-        );
-        return createdProjectMember;
-      } catch (err) {
-        showMessage('Failed to add project member', 'error');
-        return null;
-      }
-    }
-  };
-
   return {
-    onProjectMemberUpdate,
-    onProjectUpdate,
-    onProjectMemberAdd
+    onProjectUpdate
   };
 }

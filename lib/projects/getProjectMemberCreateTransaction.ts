@@ -100,7 +100,7 @@ async function getOrCreateUserByEmail(email: string) {
 }
 
 export async function findCharmVerseUserIdWithProjectMember(
-  projectMember: Partial<Pick<ProjectMember, 'walletAddress' | 'email'>>
+  projectMember: Pick<ProjectMember, 'walletAddress' | 'email'>
 ) {
   const walletAddress = projectMember.walletAddress;
   const email = projectMember.email;

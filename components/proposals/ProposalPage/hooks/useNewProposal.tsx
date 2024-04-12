@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
@@ -9,7 +9,7 @@ import { useProjectForm } from 'components/settings/projects/hooks/useProjectFor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -47,19 +47,14 @@ export function useNewProposal({ newProposal }: Props) {
     // Only set the initial state with fields when we are creating a structured proposal
     fields: isStructured && formInputs.type === 'proposal' ? proposalFormFields : []
   });
+
   const projectField = formInputs.formFields?.find((field) => field.type === 'project_profile');
-  const projectFieldValue = projectField
-    ? (values[projectField.id] as { projectId: string; selectedMemberIds: string[] })
-    : undefined;
-  const selectedProjectId = projectFieldValue?.projectId;
-  const selectedMemberIds = projectFieldValue?.selectedMemberIds;
+  const selectedProjectId = projectField ? (values[projectField.id] as { projectId: string })?.projectId : undefined;
 
   const projectForm = useProjectForm({
     projectId: selectedProjectId,
-    fieldConfig: (projectField?.fieldConfig ??
-      createDefaultProjectAndMembersFieldConfig()) as ProjectAndMembersFieldConfig,
-    defaultRequired: true,
-    selectedMemberIds
+    fieldConfig: (projectField?.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig,
+    defaultRequired: true
   });
 
   const setFormInputs = useCallback(
@@ -170,7 +165,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: createDefaultProjectAndMembersFieldConfig()
+            fieldConfig: defaultProjectAndMembersFieldConfig
           } as FormFieldInput
         ]
       : [],

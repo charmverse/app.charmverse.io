@@ -1,9 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 
-import {
-  createDefaultProjectAndMembersFieldConfig,
-  createDefaultProjectAndMembersPayload
-} from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig, defaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -14,7 +11,7 @@ describe('validateProposalProject', () => {
     const { user } = await generateUserAndSpaceWithApiToken();
     const createdProject = await createProject({
       userId: user.id,
-      project: createDefaultProjectAndMembersPayload()
+      project: defaultProjectAndMembersPayload
     });
 
     await expect(
@@ -24,7 +21,7 @@ describe('validateProposalProject', () => {
           {
             type: 'project_profile',
             fieldConfig: {
-              ...createDefaultProjectAndMembersFieldConfig(),
+              ...defaultProjectAndMembersFieldConfig,
               name: {
                 required: true
               }
@@ -37,7 +34,6 @@ describe('validateProposalProject', () => {
 
   it('Should not throw error if proposal project information is valid', async () => {
     const { user } = await generateUserAndSpaceWithApiToken();
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
     const createdProject = await createProject({
       userId: user.id,
       project: {
@@ -60,7 +56,7 @@ describe('validateProposalProject', () => {
           {
             type: 'project_profile',
             fieldConfig: {
-              ...createDefaultProjectAndMembersFieldConfig(),
+              ...defaultProjectAndMembersFieldConfig,
               name: {
                 required: true
               }
