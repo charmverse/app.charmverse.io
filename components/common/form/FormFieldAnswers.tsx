@@ -168,13 +168,12 @@ export function FormFieldAnswersControlled({
             <Controller
               name={formField.id}
               control={control}
-              render={({ field }) => {
-                return formField.type === 'project_profile' ? (
+              render={({ field }) =>
+                formField.type === 'project_profile' ? (
                   <FieldWrapper required label='Project'>
                     <ProjectProfileInputField
                       disabled={disabled}
                       proposalId={proposalId}
-                      formFieldValue={field.value as { selectedMemberIds: string[] }}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                       onChange={(projectFormValues) => {
                         setIsFormDirty(true);
@@ -268,8 +267,8 @@ export function FormFieldAnswersControlled({
                       ]);
                     }}
                   />
-                );
-              }}
+                )
+              }
             />
           </StyledStack>
         );

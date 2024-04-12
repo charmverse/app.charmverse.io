@@ -1,6 +1,6 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 
-export type ProjectPayload = Pick<
+type ProjectPayload = Pick<
   Project,
   | 'name'
   | 'excerpt'
@@ -17,7 +17,7 @@ export type ProjectPayload = Pick<
 
 export type ProjectField = keyof ProjectPayload;
 
-export type ProjectMemberPayload = Pick<
+type ProjectMemberPayload = Pick<
   ProjectMember,
   | 'email'
   | 'github'

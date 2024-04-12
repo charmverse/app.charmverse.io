@@ -22,31 +22,6 @@ export class FormField extends DocumentPage {
     return this.formFieldNameInput.getByPlaceholder('Title (required)').nth(index);
   }
 
-  async fillProjectField({
-    content,
-    fieldName,
-    textArea = false
-  }: {
-    textArea?: boolean;
-    fieldName: string;
-    content: string;
-  }) {
-    let pendingApiCall: Promise<any>;
-
-    if (fieldName.startsWith('projectMember')) {
-      pendingApiCall = this.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
-    } else {
-      pendingApiCall = this.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
-    }
-    const result = await this.page
-      .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
-      .first()
-      .fill(content);
-
-    await pendingApiCall;
-    return result;
-  }
-
   getFormFieldInput(fieldId: string, fieldType: FormFieldType) {
     const baseLocator = this.page.locator(`data-test=form-field-input-${fieldId}`);
 

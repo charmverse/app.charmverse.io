@@ -21,7 +21,6 @@ export type FormFieldValue =
   | UploadedFileInfo
   | {
       projectId: string;
-      selectedMemberIds: string[];
     };
 
 export type ControlFieldProps<T extends FormFieldValue = FormFieldValue> = {

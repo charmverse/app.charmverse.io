@@ -22,6 +22,7 @@ test.describe.serial('Create and edit project from user settings', () => {
   let spaceUser: User;
   let projectId: string;
   const verifiedEmail = `${v4()}@charmverse.com`;
+  let walletUser: User;
   let verifiedEmailUser: User;
 
   test('Create a project from user settings', async ({ page, projectSettings }) => {
@@ -42,6 +43,7 @@ test.describe.serial('Create and edit project from user settings', () => {
       })
     ]);
 
+    walletUser = spaceUserWithWallet;
     verifiedEmailUser = spaceUserWithVerifiedEmail;
 
     await prisma.verifiedEmail.create({
@@ -149,10 +151,6 @@ test.describe.serial('Create and edit project from user settings', () => {
 
     const updatedWalletAddress = randomETHWallet().address;
     await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: updatedWalletAddress });
-    await projectSettings.fillProjectField({
-      fieldName: 'projectMembers[0].name',
-      content: 'Updated Project Member Team Lead'
-    });
     const responsePromise = projectSettings.page.waitForResponse((response) => {
       return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
     });
@@ -165,18 +163,12 @@ test.describe.serial('Create and edit project from user settings', () => {
       },
       select: {
         name: true,
-        walletAddress: true,
-        projectMembers: {
-          select: {
-            name: true
-          }
-        }
+        walletAddress: true
       }
     });
 
     expect(updatedProject.name).toBe('Updated Test Project');
     expect(updatedProject.walletAddress).toBe(updatedWalletAddress.toLowerCase());
-    expect(updatedProject.projectMembers[0].name).toBe(`Updated Project Member Team Lead`);
   });
 
   test('Delete a project member from user settings', async ({ page, projectSettings }) => {
@@ -187,11 +179,7 @@ test.describe.serial('Create and edit project from user settings', () => {
 
     await projectSettings.clickProject({ projectId });
     await projectSettings.deleteProjectMemberButton.nth(1).click();
-    const responsePromise = projectSettings.page.waitForResponse((response) => {
-      return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
-    });
     await projectSettings.saveProjectButton.click();
-    await responsePromise;
 
     const updatedProjectWithMembers = await prisma.project.findFirstOrThrow({
       where: {

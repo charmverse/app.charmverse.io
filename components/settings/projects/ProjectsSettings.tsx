@@ -24,12 +24,11 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
-import { SettingsProjectFormAnswers } from './components/ProjectForm';
+import { ProjectFormAnswers } from './components/ProjectForm';
 import { useProjectForm } from './hooks/useProjectForm';
 
 function ProjectRow({
@@ -47,10 +46,10 @@ function ProjectRow({
 }) {
   const { user } = useUser();
   const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
-  const { trigger: updateProjectAndMembers, isMutating } = useUpdateProject(projectWithMembers.id);
+  const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
     projectId: projectWithMembers.id,
-    fieldConfig: createDefaultProjectAndMembersFieldConfig()
+    fieldConfig: defaultProjectAndMembersFieldConfig
   });
   const removeProjectMemberPopupState = usePopupState({
     variant: 'popover',
@@ -83,7 +82,7 @@ function ProjectRow({
   function onUpdateProject() {
     const projectValues = form.getValues();
     if (isTeamLead) {
-      updateProjectAndMembers(
+      updateProject(
         {
           ...projectValues,
           projectMembers: projectValues.projectMembers.map((member, index) => ({
@@ -126,7 +125,8 @@ function ProjectRow({
 
       charmClient.projects
         .updateProjectMember({
-          payload: projectMemberValue as UpdateProjectMemberPayload,
+          memberId: projectMemberValue.id,
+          payload: projectMemberValue,
           projectId: projectWithMembers.id
         })
         .then((updatedProjectMember) => {
@@ -202,7 +202,11 @@ function ProjectRow({
         </AccordionSummary>
         <AccordionDetails>
           <FormProvider {...form}>
-            <SettingsProjectFormAnswers isTeamLead={isTeamLead} />
+            <ProjectFormAnswers
+              defaultRequired={false}
+              isTeamLead={isTeamLead}
+              fieldConfig={defaultProjectAndMembersFieldConfig}
+            />
           </FormProvider>
         </AccordionDetails>
       </Accordion>
@@ -245,7 +249,7 @@ export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
   const { data: projectsWithMembers, mutate } = useGetProjects();
   const form = useProjectForm({
-    fieldConfig: createDefaultProjectAndMembersFieldConfig()
+    fieldConfig: defaultProjectAndMembersFieldConfig
   });
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
   const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);

@@ -2,11 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { deleteProjectMember } from 'lib/projects/deleteProjectMember';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { updateProjectMember } from 'lib/projects/updateProjectMember';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -19,27 +17,14 @@ async function updateProjectMemberController(
   res: NextApiResponse<ProjectWithMembers['projectMembers'][number]>
 ) {
   const userId = req.session.user.id;
-  const projectId = req.query.id as string;
-  const project = await prisma.project.findUniqueOrThrow({
+  const projectMemberId = req.query.memberId as string;
+  await prisma.projectMember.findFirstOrThrow({
     where: {
-      id: projectId
-    },
-    select: {
-      projectMembers: {
-        select: {
-          userId: true
-        }
-      }
+      id: projectMemberId,
+      userId
     }
   });
-
-  const isProjectMember = project.projectMembers.find((member) => member.userId === userId);
-
-  if (!isProjectMember) {
-    throw new ActionNotPermittedError('You are not allowed to update project member');
-  }
-
-  const projectMemberValues = req.body as UpdateProjectMemberPayload;
+  const projectMemberValues = req.body as ProjectAndMembersPayload['projectMembers'][0];
 
   const projectMember = await updateProjectMember({
     projectMemberValues
@@ -66,17 +51,16 @@ async function deleteProjectMemberController(req: NextApiRequest, res: NextApiRe
     }
   });
 
-  const isProjectMember = project.projectMembers.find((member) => member.userId === userId);
+  const isUserProjectLead = project.projectMembers.find((member) => member.userId === userId)?.teamLead;
+  const isUserProjectMember = project.projectMembers.find((member) => member.userId === userId);
 
-  if (!isProjectMember) {
+  if (!isUserProjectLead && !isUserProjectMember) {
     throw new ActionNotPermittedError('You are not allowed to delete project member');
   }
 
   await deleteProjectMember({
     projectMemberId
   });
-
-  trackUserAction('remove_project_member', { userId, projectId, projectMemberId });
 
   return res.status(200).end();
 }

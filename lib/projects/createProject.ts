@@ -73,16 +73,7 @@ export async function createProject(payload: {
       }
     },
     include: {
-      projectMembers: {
-        orderBy: [
-          {
-            teamLead: 'desc'
-          },
-          {
-            createdAt: 'asc'
-          }
-        ]
-      }
+      projectMembers: true
     }
   });
 

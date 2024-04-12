@@ -1,5 +1,7 @@
+import { useFormContext } from 'react-hook-form';
+
 import { projectMemberFieldProperties } from 'lib/projects/constants';
-import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -15,8 +17,10 @@ export function ProjectMemberFieldAnswers({
   fieldConfig?: FieldConfig;
   defaultRequired?: boolean;
   disabled?: boolean;
-  onChange?: (projectMemberPayload: Record<string, any>) => any;
+  onChange?: (projectAndMembersPayload: ProjectAndMembersPayload) => any;
 }) {
+  const { getValues } = useFormContext<ProjectAndMembersPayload>();
+
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}
@@ -24,7 +28,16 @@ export function ProjectMemberFieldAnswers({
       name={`projectMembers[${projectMemberIndex}]`}
       fieldConfig={fieldConfig}
       properties={projectMemberFieldProperties}
-      onChange={onChange}
+      onChange={(updatedProjectMemberPayload) => {
+        const projectWithMembers = getValues();
+        const updatedProjectMembers = projectWithMembers.projectMembers.map((projectMember, index) =>
+          index === projectMemberIndex ? { ...projectMember, ...updatedProjectMemberPayload } : projectMember
+        );
+        onChange?.({
+          ...projectWithMembers,
+          projectMembers: updatedProjectMembers
+        });
+      }}
     />
   );
 }

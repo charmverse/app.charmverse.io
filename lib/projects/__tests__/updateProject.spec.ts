@@ -4,14 +4,12 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { createDefaultProjectAndMembersPayload } from '../constants';
+import { defaultProjectAndMembersPayload } from '../constants';
 import { createProject } from '../createProject';
-import { updateProjectAndMembers } from '../updateProjectAndMembers';
+import { updateProject } from '../updateProject';
 
-describe('updateProjectAndMembers', () => {
+describe('updateProject', () => {
   it('should update a project with members and connect with new users', async () => {
-    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
-
     const { user: projectTeamLead } = await testUtilsUser.generateUserAndSpace();
     const projectTeamLeadEmail = `${v4()}@gmail.com`;
     const projectTeamLeadAddress = randomETHWallet().address.toLowerCase();
@@ -135,7 +133,7 @@ describe('updateProjectAndMembers', () => {
       }
     });
 
-    const updatedProjectWithMembers = await updateProjectAndMembers({
+    const updatedProjectWithMembers = await updateProject({
       projectId: createdProject.id,
       userId: projectTeamLead.id,
       payload: {
