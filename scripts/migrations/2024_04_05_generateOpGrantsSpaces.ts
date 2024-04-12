@@ -1,17 +1,16 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
+import { parse } from 'csv-parse/sync';
+import { addCharms } from 'lib/charms/addCharms';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { createWorkspace } from 'lib/spaces/createSpace';
-import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
 import { appendFileSync, readFileSync } from 'node:fs';
-import { parse } from 'csv-parse/sync';
+import path from 'node:path';
 import { unparse } from 'papaparse';
-import { addCharms } from 'lib/charms/addCharms';
 
-const spaceDomain = "op-grants";
-const FILE_INPUT_PATH = './op.csv';
-const FILE_OUTPUT_PATH = './op-output.csv';
+const spaceDomain = "reduced-rugpull-snipe";
+const FILE_INPUT_PATH = path.join(__dirname, 'op.csv');
+const FILE_OUTPUT_PATH = path.join(__dirname, 'op-output.csv');
 
 function getCsvData<T>(path: string): T[] {
   try {
@@ -19,7 +18,8 @@ function getCsvData<T>(path: string): T[] {
     const records = parse(content, { columns: true }) as T[];
 
     return records;
-  } catch (e) {}
+  } catch (e) {
+  }
 
   return [];
 }
@@ -37,8 +37,17 @@ type ExtractedProjectData = {
 }
 
 function extractTwitterUsername(twitterValue: string) {
-  const match = twitterValue.match(/(?:https?:\/\/(?:www\.)?twitter\.com\/|@)?(\w+)/i);
-  return match ? match[1] : null;
+  if (twitterValue.startsWith('@')) {
+    return twitterValue.slice(1);
+  } else if (twitterValue.startsWith('https://')) {
+    const url = new URL(twitterValue);
+    if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
+      const [,username] = url.pathname.split('/');
+      return username
+    }
+  }
+
+  return twitterValue;
 }
 
 export async function generateOpGrantSpaces() {
@@ -115,32 +124,20 @@ export async function generateOpGrantSpaces() {
     for (const proposal of proposals) {
       const projectNameField = proposal.form?.formFields.find(formField => formField.name === "Project name:" || formField.name === "Project Name:" || formField.name === "Project Name");
       const projectTitle = (projectNameField?.answers.find(answer => answer.proposalId === proposal.id)?.value as string)?.replace(/[\p{Emoji}]/gu, '').trim();
-      if (!projectTitle) {
-        continue;
-      }
-
       const projectData = uniqueProjectsData.find(projectData => projectData['Project Name'] === projectTitle);
 
-      if (extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle) || !projectData) {
+      if (!projectTitle || extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle) || !projectData) {
+        current++;
+        console.log(`Project ${current} of ${total} done.`)
         continue;
       }
 
       try {
         const authors = proposal.authors.map(author => author.userId);
-        let spaceImageUrl = '';
-        if (spaceImageUrl) {
-          const pathInS3 = getUserS3FilePath({ userId: proposal.createdBy, url: getFilenameWithExtension(spaceImageUrl) });
-          try {
-            const { url } = await uploadUrlToS3({ pathInS3, url: spaceImageUrl });
-            spaceImageUrl = url;
-          } catch (error) {
-            log.error(`error uploading space image ${projectTitle}`, spaceImageUrl, error);
-          }
-        }
         const space = await createWorkspace({
           spaceData: {
             name: projectTitle,
-            spaceImage: spaceImageUrl,
+            spaceImage: '',
             origin: spaceDomain,
           },
           userId: proposal.createdBy,
