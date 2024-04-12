@@ -67,7 +67,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
 
 export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id'>;
 
-function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
+export function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
   let parsed = {} as any;
 
   if (typeof credential.content === 'object') {

@@ -1,10 +1,11 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { EasSchemaChain } from './connectors';
 import { getOnchainCredentialsById, type EASAttestationFromApi } from './external/getOnchainCredentials';
-import { getCharmverseOffchainCredentialsByIds } from './queriesAndMutations';
+import { getCharmverseOffchainCredentialsByIds, getParsedCredential } from './queriesAndMutations';
 
 export async function getProposalCredentials({ proposalId }: { proposalId: string }): Promise<EASAttestationFromApi[]> {
   if (!proposalId) {
@@ -32,6 +33,12 @@ export async function getProposalCredentials({ proposalId }: { proposalId: strin
 
   const offchainData = await getCharmverseOffchainCredentialsByIds({
     ceramicIds: issuedCredentials.offchain.map((offchain) => offchain.ceramicId as string)
+  }).catch((err) => {
+    log.error('Error fetching offchain credentials', err);
+
+    return issuedCredentials.offchain
+      .map((offchain) => (offchain.ceramicRecord ? getParsedCredential(offchain.ceramicRecord as any) : null))
+      .filter(Boolean) as EASAttestationFromApi[];
   });
 
   const onChainData = await getOnchainCredentialsById({
