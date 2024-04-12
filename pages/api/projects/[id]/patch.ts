@@ -4,8 +4,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import type { UpdateProjectPayload } from 'lib/projects/patchProject';
-import { patchProject } from 'lib/projects/patchProject';
+import type { UpdateProjectPayload } from 'lib/projects/updateProject';
+import { updateProject } from 'lib/projects/updateProject';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -27,7 +27,7 @@ async function patchProjectController(req: NextApiRequest, res: NextApiResponse<
     throw new ActionNotPermittedError('Only team lead can update project');
   }
 
-  const updatedProject = await patchProject({
+  const updatedProject = await updateProject({
     projectValues: {
       ...projectUpdatePayload,
       id: projectId

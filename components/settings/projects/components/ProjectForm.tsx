@@ -48,7 +48,7 @@ export function ProposalProjectFormAnswers({
     if (selectedMemberValue !== 'ADD_TEAM_MEMBER') {
       onFormFieldChange([...selectedProjectMemberIds, selectedMemberValue]);
     } else {
-      const newProjectMember = await onProjectMemberAdd({});
+      const newProjectMember = await onProjectMemberAdd(defaultProjectAndMembersPayload.projectMembers[0]);
       if (newProjectMember) {
         onFormFieldChange([...selectedProjectMemberIds, newProjectMember.id]);
       }

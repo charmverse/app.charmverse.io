@@ -23,7 +23,7 @@ async function addProjectMemberController(req: NextApiRequest, res: NextApiRespo
   trackUserAction('add_project_member', {
     userId: req.session.user.id,
     projectId,
-    connectedUserId: projectMemberPayload.userId,
+    connectedUserId: createdProjectMember.userId ?? undefined,
     email: projectMemberPayload.email,
     walletAddress: projectMemberPayload.walletAddress
   });

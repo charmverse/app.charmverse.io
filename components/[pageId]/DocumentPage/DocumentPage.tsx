@@ -108,7 +108,7 @@ function DocumentPageComponent({
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
-  const { data: proposalFormFieldAnswers = [], isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
+  const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({
     proposalId
   });
   // We can only edit the proposal from the top level

@@ -8,13 +8,13 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import type { UpdateProjectPayload } from 'lib/projects/patchProject';
+import type { UpdateProjectPayload } from 'lib/projects/updateProject';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 export function useProjectUpdates({ projectId }: { projectId: string }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const { user } = useUser();
-  const { trigger: patchProject } = usePatchProject(projectId);
+  const { trigger: updateProject } = usePatchProject(projectId);
   const project = projectsWithMembers?.find((_project) => _project.id === projectId);
   const isTeamLead = project?.projectMembers[0].userId === user?.id;
   const { trigger: addProjectMember } = useAddProjectMember(projectId);
@@ -53,7 +53,7 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
             }
           );
 
-          const updatedProject = await patchProject(projectPayload);
+          const updatedProject = await updateProject(projectPayload);
           return updatedProject;
         } catch (_) {
           showMessage('Failed to update project', 'error');
@@ -101,7 +101,6 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
             );
 
             const updatedProjectMember = await charmClient.projects.updateProjectMember({
-              memberId: projectMemberPayload.id,
               payload: projectMemberPayload,
               projectId
             });

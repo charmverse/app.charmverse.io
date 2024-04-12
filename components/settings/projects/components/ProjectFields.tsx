@@ -24,11 +24,7 @@ export function ProjectFieldAnswers({
       disabled={disabled}
       fieldConfig={fieldConfig}
       properties={projectFieldProperties}
-      onChange={(updatedProject) => {
-        if (onChange) {
-          onChange(updatedProject);
-        }
-      }}
+      onChange={onChange}
     />
   );
 }

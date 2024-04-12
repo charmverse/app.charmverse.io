@@ -47,7 +47,7 @@ function ProjectRow({
 }) {
   const { user } = useUser();
   const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
-  const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
+  const { trigger: updateProjectAndMembers, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
     projectId: projectWithMembers.id,
     fieldConfig: defaultProjectAndMembersFieldConfig
@@ -83,7 +83,7 @@ function ProjectRow({
   function onUpdateProject() {
     const projectValues = form.getValues();
     if (isTeamLead) {
-      updateProject(
+      updateProjectAndMembers(
         {
           ...projectValues,
           projectMembers: projectValues.projectMembers.map((member, index) => ({

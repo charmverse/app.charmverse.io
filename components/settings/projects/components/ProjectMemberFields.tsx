@@ -24,9 +24,7 @@ export function ProjectMemberFieldAnswers({
       name={`projectMembers[${projectMemberIndex}]`}
       fieldConfig={fieldConfig}
       properties={projectMemberFieldProperties}
-      onChange={(updatedProjectMemberPayload) => {
-        onChange?.(updatedProjectMemberPayload);
-      }}
+      onChange={onChange}
     />
   );
 }
