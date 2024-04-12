@@ -338,6 +338,7 @@ function DocumentPageComponent({
                 parentId={_showParentChip && card ? card.parentId : null}
                 insideModal={insideModal}
                 pageId={page.id}
+                githubIssueUrl={reward?.githubIssueUrl}
                 focusDocumentEditor={focusDocumentEditor}
               />
             ) : (

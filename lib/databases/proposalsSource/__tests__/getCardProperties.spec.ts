@@ -1,25 +1,23 @@
-import { InvalidInputError } from '@charmverse/core/errors';
-import type { FormField, Page, Prisma, Space, User } from '@charmverse/core/prisma-client';
+import type { FormField, Space, User, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
-import isEqual from 'lodash/isEqual';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
+import { prismaToBlock } from 'lib/databases/block';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { generateBoard, generateProposal, generateUserAndSpace } from 'testing/setupDatabase';
+import { generateProposalSourceDb } from 'testing/utils/proposals';
 import { addUserToSpace } from 'testing/utils/spaces';
 import { generateUser } from 'testing/utils/users';
 
-import type { BoardViewFields } from '../boardView';
-import type { CardFields } from '../card';
-import { createCardsFromProposals } from '../createCardsFromProposals';
+import { getCardPropertiesFromProposals } from '../getCardProperties';
 
-describe('createCardsFromProposals', () => {
+describe('getCardPropertiesFromProposals', () => {
   let user: User;
   let space: Space;
-  let board: Page;
+  let board: Board;
 
   beforeAll(async () => {
     const generated = await testUtilsUser.generateUserAndSpace();
@@ -30,7 +28,12 @@ describe('createCardsFromProposals', () => {
       spaceId: space.id,
       viewDataSource: 'proposals'
     });
-    board = generatedBoard;
+    const boardBlock = await prisma.block.findUniqueOrThrow({
+      where: {
+        id: generatedBoard.id
+      }
+    });
+    board = prismaToBlock(boardBlock) as Board;
   });
 
   beforeEach(async () => {
@@ -51,34 +54,7 @@ describe('createCardsFromProposals', () => {
     ]);
   });
 
-  it('should create cards from proposals', async () => {
-    const newProposal = await testUtilsProposals.generateProposal({
-      authors: [user.id],
-      proposalStatus: 'published',
-      reviewers: [
-        {
-          group: 'user',
-          id: user.id
-        }
-      ],
-      spaceId: space.id,
-      userId: user.id
-    });
-    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-    expect(cards.length).toBe(1);
-    expect(
-      cards.every(
-        (card) =>
-          card.syncWithPageId === newProposal.id &&
-          card.title === newProposal.page.title &&
-          card.contentText === newProposal.page.contentText &&
-          card.hasContent === newProposal.page.hasContent &&
-          isEqual(newProposal.page.content, card.content)
-      )
-    ).toBeTruthy();
-  });
-
-  it('should not create cards from draft proposals', async () => {
+  it('should not return cards from draft proposals', async () => {
     await generateProposal({
       authors: [],
       proposalStatus: 'draft',
@@ -86,12 +62,15 @@ describe('createCardsFromProposals', () => {
       userId: user.id
     });
 
-    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
+    const cards = await getCardPropertiesFromProposals({
+      spaceId: board.spaceId,
+      cardProperties: board.fields.cardProperties
+    });
 
-    expect(cards.length).toBe(0);
+    expect(Object.keys(cards).length).toBe(0);
   });
 
-  it('should initialise the database with all proposal properties visible', async () => {
+  it('should return cards applied with proposal properties', async () => {
     const generated = await testUtilsUser.generateUserAndSpace();
     const admin = generated.user;
     const proposalReviewer = await testUtilsUser.generateSpaceUser({
@@ -248,17 +227,14 @@ describe('createCardsFromProposals', () => {
       }
     });
 
-    const database = await generateBoard({
+    const database = await generateProposalSourceDb({
       createdBy: admin.id,
-      spaceId: generated.space.id,
-      views: 1,
-      viewDataSource: 'proposals'
+      spaceId: generated.space.id
     });
 
-    const cards = await createCardsFromProposals({
-      boardId: database.id,
-      spaceId: generated.space.id,
-      userId: user.id
+    const cards = await getCardPropertiesFromProposals({
+      spaceId: database.spaceId,
+      cardProperties: database.fields.cardProperties
     });
 
     const databaseAfterUpdate = await prisma.block.findUnique({
@@ -317,16 +293,9 @@ describe('createCardsFromProposals', () => {
       expect(visibleProperties.includes(propertyKey as string)).toBe(true);
     });
 
-    const card = await prisma.block.findFirstOrThrow({
-      where: {
-        id: cards[0].cardId as string
-      },
-      select: {
-        fields: true
-      }
-    });
+    const card = Object.values(cards)[0];
 
-    const cardFieldProperties = (card.fields as CardFields).properties;
+    const cardFieldProperties = card.fields.properties;
 
     expect(cardFieldProperties[proposalUrlProp.id as string]).toStrictEqual(generatedProposal.page.path);
     expect(cardFieldProperties[proposalStatusProp.id as string]).toStrictEqual('pass');
@@ -344,7 +313,7 @@ describe('createCardsFromProposals', () => {
     expect(cardFieldProperties[rubricEvaluation2EvaluationAverageProp.id as string]).toStrictEqual(4);
   });
 
-  it(`should add custom proposal properties as card properties and add them to visible properties for all views as an admin`, async () => {
+  it(`should add custom proposal properties as card properties`, async () => {
     const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace({
       isAdmin: true
     });
@@ -434,40 +403,20 @@ describe('createCardsFromProposals', () => {
       }
     });
 
-    const databaseBoard = await generateBoard({
+    const databaseBoard = await generateProposalSourceDb({
       createdBy: proposalAuthor.id,
-      spaceId: testSpace.id,
-      views: 1,
-      viewDataSource: 'proposals'
+      spaceId: testSpace.id
     });
 
-    const [cardPage] = await createCardsFromProposals({
-      boardId: databaseBoard.id,
-      spaceId: testSpace.id,
-      userId: proposalAuthor.id
+    const cards = await getCardPropertiesFromProposals({
+      spaceId: databaseBoard.spaceId,
+      cardProperties: databaseBoard.fields.cardProperties
     });
+    const cardBlock = Object.values(cards)[0];
 
-    const cardBlock = await prisma.block.findUniqueOrThrow({
-      where: {
-        id: cardPage.cardId!
-      },
-      select: {
-        fields: true
-      }
-    });
+    const cardBlockFields = cardBlock?.fields;
 
-    const cardBlockFields = cardBlock?.fields as unknown as CardFields;
-
-    const databaseBlock = await prisma.block.findUniqueOrThrow({
-      where: {
-        id: databaseBoard.boardId!
-      },
-      select: {
-        fields: true
-      }
-    });
-
-    const boardCardProperties = (databaseBlock?.fields as unknown as BoardFields)?.cardProperties ?? [];
+    const boardCardProperties = databaseBoard.fields.cardProperties;
 
     const textProperty = boardCardProperties.find(
       (prop) => prop.id === customProperties[0].id && prop.proposalFieldId === customProperties[0].id
@@ -481,23 +430,9 @@ describe('createCardsFromProposals', () => {
 
     expect(cardBlockFields.properties[customProperties[0].id]).toBe('Text');
     expect(cardBlockFields.properties[customProperties[1].id]).toBe(customProperties[1].options[0].id);
-
-    const views = await prisma.block.findMany({
-      where: {
-        parentId: databaseBoard.id,
-        type: 'view'
-      },
-      select: {
-        fields: true
-      }
-    });
-
-    const viewFields = views[0]?.fields as unknown as BoardViewFields;
-    expect(viewFields.visiblePropertyIds.includes(customProperties[0].id)).toBe(true);
-    expect(viewFields.visiblePropertyIds.includes(customProperties[1].id)).toBe(true);
   });
 
-  it(`should add proposal form fields as card properties and add them to visible properties for all views as an admin`, async () => {
+  it(`should add proposal form fields as card properties`, async () => {
     const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace({
       isAdmin: true
     });
@@ -569,222 +504,26 @@ describe('createCardsFromProposals', () => {
       ]
     });
 
-    const database1 = await generateBoard({
+    const database1 = await generateProposalSourceDb({
       createdBy: proposalAuthor.id,
-      spaceId: testSpace.id,
-      views: 1,
-      viewDataSource: 'proposals'
+      spaceId: testSpace.id
     });
 
-    const [cardPage] = await createCardsFromProposals({
-      boardId: database1.id,
-      spaceId: testSpace.id,
-      userId: proposalAuthor.id
+    const cards = await getCardPropertiesFromProposals({
+      spaceId: database1.spaceId,
+      cardProperties: database1.fields.cardProperties
     });
 
-    const database1Block = await prisma.block.findUnique({
-      where: {
-        id: database1.boardId!
-      },
-      select: {
-        fields: true
-      }
-    });
+    const databaseCard = Object.values(cards)[0];
 
-    const database1Properties = (database1Block?.fields as unknown as BoardFields).cardProperties;
+    const database1Properties = database1.fields.cardProperties;
     const shortText1Prop = database1Properties.find(
       (prop) => prop.formFieldId === shortTextFormField.id
     ) as IPropertyTemplate;
     const email1Prop = database1Properties.find((prop) => prop.formFieldId === emailFormField.id) as IPropertyTemplate;
 
-    const databaseCard = await prisma.block.findUnique({
-      where: {
-        id: cardPage.cardId!
-      },
-      select: {
-        fields: true
-      }
-    });
-
-    const cardProperties = (databaseCard?.fields as unknown as CardFields).properties;
+    const cardProperties = databaseCard.fields.properties;
     expect(cardProperties[shortText1Prop.id]).toBe('Short Text Answer');
     expect(cardProperties[email1Prop.id]).toBe('john.doe@gmail.com');
-
-    // Testing with a regular space member to check if private fields are transferred to card properties or not
-    const database2 = await generateBoard({
-      createdBy: spaceMember.id,
-      spaceId: testSpace.id,
-      views: 1,
-      viewDataSource: 'proposals'
-    });
-
-    const [cardPage2] = await createCardsFromProposals({
-      boardId: database2.id,
-      spaceId: testSpace.id,
-      userId: spaceMember.id
-    });
-
-    const database2Block = await prisma.block.findUnique({
-      where: {
-        id: database2.boardId!
-      },
-      select: {
-        fields: true
-      }
-    });
-
-    const database2Properties = (database2Block?.fields as unknown as BoardFields).cardProperties;
-    const shortText2Prop = database2Properties.find(
-      (prop) => prop.formFieldId === shortTextFormField.id
-    ) as IPropertyTemplate;
-    const email2Prop = database2Properties.find((prop) => prop.formFieldId === emailFormField.id) as IPropertyTemplate;
-
-    const databaseCard2 = await prisma.block.findUnique({
-      where: {
-        id: cardPage2.cardId!
-      },
-      select: {
-        fields: true
-      }
-    });
-
-    const card2Properties = (databaseCard2?.fields as unknown as CardFields).properties;
-    expect(card2Properties[shortText2Prop.id]).toBeUndefined();
-    expect(card2Properties[email2Prop.id]).toBe('john.doe@gmail.com');
-  });
-
-  it('should not create cards from proposals if board is not found', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: v4(), spaceId: space.id, userId: user.id })
-    ).rejects.toThrowError();
-  });
-
-  it('should not create cards from proposals if a board is not inside a space', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: board.id, spaceId: v4(), userId: user.id })
-    ).rejects.toThrowError();
-  });
-
-  it('should throw an error if boardId or spaceId is invalid', async () => {
-    await expect(
-      createCardsFromProposals({ boardId: board.id, spaceId: 'Bad space id', userId: user.id })
-    ).rejects.toThrowError(InvalidInputError);
-
-    await expect(
-      createCardsFromProposals({ boardId: 'bad board id', spaceId: space.id, userId: user.id })
-    ).rejects.toThrowError(InvalidInputError);
-  });
-
-  it('should not create cards if no proposals are found', async () => {
-    const cards = await createCardsFromProposals({ boardId: board.id, spaceId: space.id, userId: user.id });
-
-    expect(cards.length).toBe(0);
-  });
-
-  // TODO ---- Cleanup tests above. They are mutating the same board, and only returning newly created cards.
-  it('should not create cards from archived proposals', async () => {
-    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
-
-    const testBoard = await generateBoard({
-      createdBy: testUser.id,
-      spaceId: testSpace.id,
-      viewDataSource: 'proposals'
-    });
-
-    const visibleProposal = await testUtilsProposals.generateProposal({
-      authors: [],
-      proposalStatus: 'published',
-      reviewers: [],
-      spaceId: testSpace.id,
-      userId: testUser.id
-    });
-
-    const ignoredProposal = await testUtilsProposals.generateProposal({
-      authors: [],
-      archived: true,
-      proposalStatus: 'published',
-      reviewers: [],
-      spaceId: testSpace.id,
-      userId: testUser.id
-    });
-
-    const cards = await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
-
-    expect(cards.length).toBe(1);
-
-    expect(cards[0].syncWithPageId).toBe(visibleProposal.id);
-  });
-
-  it('should create cards with permissions matching the parent', async () => {
-    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
-
-    const role = await testUtilsMembers.generateRole({
-      createdBy: testUser.id,
-      spaceId: testSpace.id
-    });
-
-    const testBoard = await generateBoard({
-      createdBy: testUser.id,
-      spaceId: testSpace.id,
-      viewDataSource: 'proposals',
-      cardCount: 0,
-      permissions: [
-        {
-          permissionLevel: 'editor',
-          userId: testUser.id
-        },
-        {
-          permissionLevel: 'full_access',
-          roleId: role.id
-        }
-      ]
-    });
-
-    const rootBoardPermissions = await prisma.pagePermission.findMany({
-      where: {
-        pageId: testBoard.id
-      }
-    });
-
-    expect(rootBoardPermissions).toMatchObject(
-      expect.arrayContaining([
-        expect.objectContaining({ userId: testUser.id, permissionLevel: 'editor' }),
-        expect.objectContaining({ roleId: role.id, permissionLevel: 'full_access' })
-      ])
-    );
-
-    const visibleProposal = await testUtilsProposals.generateProposal({
-      authors: [],
-      proposalStatus: 'published',
-      reviewers: [],
-      spaceId: testSpace.id,
-      userId: testUser.id
-    });
-
-    await createCardsFromProposals({ boardId: testBoard.id, spaceId: testSpace.id, userId: testUser.id });
-
-    const pages = await prisma.page.findMany({
-      where: {
-        parentId: testBoard.id
-      },
-      include: {
-        permissions: true
-      }
-    });
-
-    expect(pages).toHaveLength(1);
-
-    const cardPermissions = pages[0].permissions;
-
-    expect(cardPermissions).toMatchObject(
-      expect.arrayContaining(
-        rootBoardPermissions.map((p) => ({
-          ...p,
-          id: expect.any(String),
-          inheritedFromPermission: p.id,
-          pageId: pages[0].id
-        }))
-      )
-    );
   });
 });

@@ -53,3 +53,7 @@ export const awsS3Bucket = process.env.S3_UPLOAD_BUCKET as string;
 
 // Ceramic Node
 export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as string;
+
+// Github
+export const githubPrivateKey = process.env.GITHUB_APP_PRIVATE_KEY as string;
+export const githubAppId = Number(process.env.GITHUB_APP_ID);

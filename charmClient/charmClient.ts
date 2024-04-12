@@ -328,10 +328,6 @@ class CharmClient {
     return http.POST<void>(`/api/pages/${pageId}/proposal-source`);
   }
 
-  updateProposalSource({ pageId }: { pageId: string }) {
-    return http.PUT<void>(`/api/pages/${pageId}/proposal-source`);
-  }
-
   getBuildId() {
     return http.GET<{ buildId: string }>('/api/build-id');
   }

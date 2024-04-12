@@ -32,7 +32,8 @@ const boardsSlice = createSlice({
         if (board.fields.isTemplate) {
           state.templates[board.id] = board;
         } else {
-          state.boards[board.id] = board;
+          const updated = Object.assign(state.boards[board.id] || {}, board);
+          state.boards[board.id] = updated;
         }
       }
     },

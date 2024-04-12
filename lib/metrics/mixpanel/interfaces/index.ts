@@ -4,6 +4,7 @@ import type { ApiEventMap } from './ApiEvent';
 import type { BountyEventMap } from './BountyEvent';
 import type { CredentialEventMap } from './CredentialEvent';
 import type { ForumEventMap } from './ForumEvent';
+import type { GithubAppEventMap } from './GithubAppEvent';
 import type { PageEventMap } from './PageEvent';
 import type { ProjectEventMap } from './ProjectEvent';
 import type { ProposalEventMap } from './ProposalEvent';
@@ -35,6 +36,8 @@ export type MixpanelEventMap = UserEventMap &
   ApiEventMap &
   CredentialEventMap &
   FarcasterEventMap &
-  ProjectEventMap;
+  ProjectEventMap &
+  GithubAppEventMap;
+
 export type MixpanelEvent = MixpanelEventMap[keyof MixpanelEventMap];
 export type MixpanelEventName = keyof MixpanelEventMap;

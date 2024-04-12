@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import type { DatabaseProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
+import type { ProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
 import type {
   ProposalEvaluationResultExtended,
@@ -10,7 +10,7 @@ import type {
 import type { BrandColor } from 'theme/colors';
 
 export const proposalDbProperties: {
-  [key in DatabaseProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
+  [key in ProposalPropertyType]: (id?: string, name?: string) => IPropertyTemplate;
 } = {
   proposalReviewerNotes: (id?: string, name?: string) => ({
     id: id || uuid(),

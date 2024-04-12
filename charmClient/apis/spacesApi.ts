@@ -1,5 +1,5 @@
 import type { SpaceDefaultPublicPageToggle } from '@charmverse/core/permissions';
-import type { Space, Prisma } from '@charmverse/core/prisma';
+import type { Space, Prisma, RewardsGithubRepo } from '@charmverse/core/prisma';
 
 import * as http from 'adapters/http';
 import type { CreateSpaceProps } from 'lib/spaces/createSpace';
@@ -7,8 +7,8 @@ import type { CustomDomainVerification } from 'lib/spaces/interfaces';
 import type { SpaceRequireProposalTemplateToggle } from 'lib/spaces/toggleRequireProposalTemplate';
 import type { SpacePublicProposalToggle } from 'lib/spaces/toggleSpacePublicProposals';
 import type { SpacePublicProposalTemplatesToggle } from 'lib/spaces/toggleSpacePublicProposalTemplates';
-import type { UpdateCustomDomainResponse } from 'lib/spaces/updateSpaceCustomDomain';
 import type { ZippedDataRequest } from 'pages/api/spaces/[id]/export-data';
+import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
 import type { SetSpaceWebhookBody, SetSpaceWebhookResponse } from 'pages/api/spaces/[id]/set-webhook';
 import type { Response as CheckDomainResponse } from 'pages/api/spaces/checkDomain';
 
@@ -102,5 +102,21 @@ export class SpacesApi {
 
   exportSpaceData({ spaceId, data }: { spaceId: string; data: ZippedDataRequest }) {
     return http.POST(`/api/spaces/${spaceId}/export-data`, data);
+  }
+
+  connectWithGithubApplication({ spaceId, installationId }: { spaceId: string; installationId: string }) {
+    return http.POST(`/api/spaces/${spaceId}/github/connect`, { installationId });
+  }
+
+  updateGithubRewardsRepo({
+    spaceId,
+    repoId,
+    payload
+  }: {
+    spaceId: string;
+    repoId: string;
+    payload: UpdateGithubRepoWithReward;
+  }) {
+    return http.PUT<RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo/${repoId}`, payload);
   }
 }
