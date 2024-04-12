@@ -29,12 +29,12 @@ import {
   createDefaultProjectAndMembersFieldConfig,
   createDefaultProjectAndMembersPayload
 } from 'lib/projects/constants';
+import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
 import { SettingsProjectFormAnswers } from './components/ProjectForm';
-import { createProjectYupSchema, useProjectForm } from './hooks/useProjectForm';
 
 function ProjectRow({
   projectWithMembers,

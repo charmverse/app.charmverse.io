@@ -31,13 +31,9 @@ export class FormField extends DocumentPage {
     fieldName: string;
     content: string;
   }) {
-    let pendingApiCall: Promise<any>;
-
-    if (fieldName.startsWith('projectMember')) {
-      pendingApiCall = this.page.waitForResponse(/\/api\/projects\/[^\\/]+\/members\/[^\\/]+/);
-    } else {
-      pendingApiCall = this.page.waitForResponse(/\/api\/projects\/[^\\/]+\/patch/);
-    }
+    const pendingApiCall = this.page.waitForResponse((response) => {
+      return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
+    });
     const result = await this.page
       .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
       .first()

@@ -2,7 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import type { Prisma } from '@charmverse/core/prisma-client';
 
 import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
-import { convertToProjectValues, createProjectYupSchema } from 'components/settings/projects/hooks/useProjectForm';
+import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
+import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import { getProjectById } from 'lib/projects/getProjectById';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 

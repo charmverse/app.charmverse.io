@@ -251,7 +251,7 @@ function DocumentPageComponent({
     ?.value as { projectId: string; selectedMemberIds: string[] } | undefined;
 
   const form = useProjectForm({
-    defaultProjectValues: proposal?.project,
+    initialProjectValues: proposal?.project,
     projectId,
     selectedMemberIds: projectFormFieldAnswer?.selectedMemberIds,
     fieldConfig:

@@ -6,9 +6,9 @@ import { useFormContext } from 'react-hook-form';
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { ProposalProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
-import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { useUser } from 'hooks/useUser';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type {
   ProjectAndMembersFieldConfig,
   ProjectAndMembersPayload,
