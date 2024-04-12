@@ -15,7 +15,7 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const { user } = useUser();
   const project = projectsWithMembers?.find((_project) => _project.id === projectId);
-  const isTeamLead = project?.projectMembers[0].userId === user?.id;
+  const isTeamLead = !!project?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   const { reset } = useFormContext<ProjectAndMembersPayload>();
 

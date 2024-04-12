@@ -1,5 +1,4 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { ethers } from 'ethers';
 import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -178,8 +177,17 @@ export function useProjectForm(options: {
   });
 
   useEffect(() => {
-    if (options.projectId) {
-      form.reset(projectWithMembers);
+    if (options.projectId && projectWithMembers) {
+      const teamLead = projectWithMembers.projectMembers.find((member) => member.teamLead);
+      const nonTeamLeadMembers = projectWithMembers.projectMembers
+        .filter((member) => !member.teamLead)
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+      form.reset(
+        convertToProjectValues({
+          ...projectWithMembers,
+          projectMembers: [teamLead!, ...nonTeamLeadMembers]
+        })
+      );
     } else {
       form.reset(defaultProjectAndMembersPayload);
     }
