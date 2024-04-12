@@ -1,4 +1,5 @@
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import type { Prisma } from '@charmverse/core/prisma-client';
 
 import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
@@ -51,6 +52,10 @@ export async function validateProposalProject({
   try {
     await projectSchema.validate(convertToProjectValues(project), { abortEarly: false });
   } catch (error) {
+    log.error(`Project profile validation failed`, {
+      error,
+      projectId
+    });
     throw new InvalidInputError(`Project profile validation failed`);
   }
 }
