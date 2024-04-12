@@ -7,6 +7,7 @@ import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
 import { appendFileSync, readFileSync } from 'node:fs';
 import { parse } from 'csv-parse/sync';
 import { unparse } from 'papaparse';
+import { addCharms } from 'lib/charms/addCharms';
 
 const spaceDomain = "op-grants";
 const FILE_INPUT_PATH = './op.csv';
@@ -30,10 +31,14 @@ type ProjectData = {
 }
 
 type ExtractedProjectData = {
-  title: string
-  twitterHandle: string
-  joinUrl: string
-  authors: string[]
+  "Project name": string
+  "Twitter handle": string
+  "Invite link": string
+}
+
+function extractTwitterUsername(twitterValue: string) {
+  const match = twitterValue.match(/(?:https?:\/\/(?:www\.)?twitter\.com\/|@)?(\w+)/i);
+  return match ? match[1] : null;
 }
 
 export async function generateOpGrantSpaces() {
@@ -114,7 +119,9 @@ export async function generateOpGrantSpaces() {
         continue;
       }
 
-      if (extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle)) {
+      const projectData = uniqueProjectsData.find(projectData => projectData['Project Name'] === projectTitle);
+
+      if (extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle) || !projectData) {
         continue;
       }
 
@@ -142,12 +149,18 @@ export async function generateOpGrantSpaces() {
         });
         await updateTrackGroupProfile(space, spaceDomain);
         extractedProjectsData.push({
-          authors,
-          title: projectTitle,
-          joinUrl: `https://app.charmverse.io/join?domain=${space.domain}`,
-          twitterHandle: ''
+          "Project name": projectTitle,
+          "Invite link": `https://app.charmverse.io/join?domain=${space.domain}`,
+          "Twitter handle": extractTwitterUsername(projectData["Twitter"]) ?? '',
         })
         extractedProjectsTitles.add(projectTitle);
+        await addCharms({
+          amount: projectData["Won?"] === "Yes" ? 10 : 2,
+          recipient: {
+            spaceId: space.id,
+          },
+          actorId: proposal.createdBy,
+        })
       } catch (err) {
         log.error(`Error creating space for project ${projectTitle}`, err);
       } finally {

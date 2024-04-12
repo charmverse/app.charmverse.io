@@ -1,4 +1,4 @@
-import { Prisma, prisma } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 import { VoteSettings } from 'lib/proposals/interfaces';
 
 export async function updateVoteStrategy() {
