@@ -24,7 +24,7 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
@@ -50,7 +50,7 @@ function ProjectRow({
   const { trigger: updateProjectAndMembers, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
     projectId: projectWithMembers.id,
-    fieldConfig: defaultProjectAndMembersFieldConfig
+    fieldConfig: createDefaultProjectAndMembersFieldConfig()
   });
   const removeProjectMemberPopupState = usePopupState({
     variant: 'popover',
@@ -245,7 +245,7 @@ export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
   const { data: projectsWithMembers, mutate } = useGetProjects();
   const form = useProjectForm({
-    fieldConfig: defaultProjectAndMembersFieldConfig
+    fieldConfig: createDefaultProjectAndMembersFieldConfig()
   });
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
   const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);

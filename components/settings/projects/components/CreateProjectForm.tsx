@@ -3,7 +3,6 @@ import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectWithMembers, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { SettingsProjectFormAnswers } from './ProjectForm';

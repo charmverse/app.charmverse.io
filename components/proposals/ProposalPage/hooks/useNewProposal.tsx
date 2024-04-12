@@ -9,7 +9,7 @@ import { useProjectForm } from 'components/settings/projects/hooks/useProjectFor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -56,7 +56,8 @@ export function useNewProposal({ newProposal }: Props) {
 
   const projectForm = useProjectForm({
     projectId: selectedProjectId,
-    fieldConfig: (projectField?.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig,
+    fieldConfig: (projectField?.fieldConfig ??
+      createDefaultProjectAndMembersFieldConfig()) as ProjectAndMembersFieldConfig,
     defaultRequired: true,
     selectedMemberIds
   });
@@ -169,7 +170,7 @@ function emptyState({
             private: false,
             required: true,
             id: uuid(),
-            fieldConfig: defaultProjectAndMembersFieldConfig
+            fieldConfig: createDefaultProjectAndMembersFieldConfig()
           } as FormFieldInput
         ]
       : [],

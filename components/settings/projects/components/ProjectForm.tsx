@@ -7,7 +7,10 @@ import { useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectAndMembersFieldConfig, defaultProjectAndMembersPayload } from 'lib/projects/constants';
+import {
+  createDefaultProjectAndMembersFieldConfig,
+  createDefaultProjectAndMembersPayload
+} from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { useProjectUpdates } from '../hooks/useProjectUpdates';
@@ -48,7 +51,7 @@ export function ProposalProjectFormAnswers({
     if (selectedMemberValue !== 'ADD_TEAM_MEMBER') {
       onFormFieldChange([...selectedProjectMemberIds, selectedMemberValue]);
     } else {
-      const newProjectMember = await onProjectMemberAdd(defaultProjectAndMembersPayload.projectMembers[0]);
+      const newProjectMember = await onProjectMemberAdd(createDefaultProjectAndMembersPayload().projectMembers[0]);
       if (newProjectMember) {
         onFormFieldChange([...selectedProjectMemberIds, newProjectMember.id]);
       }
@@ -167,7 +170,7 @@ export function SettingsProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean
   const projectValues = getValues();
   const { user } = useUser();
   const extraProjectMembers = projectValues.projectMembers.slice(1);
-  const fieldConfig = defaultProjectAndMembersFieldConfig;
+  const fieldConfig = createDefaultProjectAndMembersFieldConfig();
 
   const { remove } = useFieldArray({
     control,
@@ -237,7 +240,10 @@ export function SettingsProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean
           startIcon={<AddIcon fontSize='small' />}
           data-test='add-project-member-button'
           onClick={() => {
-            const projectMembers = [...projectValues.projectMembers, defaultProjectAndMembersPayload.projectMembers[0]];
+            const projectMembers = [
+              ...projectValues.projectMembers,
+              createDefaultProjectAndMembersPayload().projectMembers[0]
+            ];
 
             setValue('projectMembers', projectMembers, {
               shouldValidate: true,

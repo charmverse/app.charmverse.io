@@ -8,7 +8,7 @@ import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { ProposalProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
 import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import type {
   ProjectAndMembersFieldConfig,
   ProjectAndMembersPayload,
@@ -108,7 +108,7 @@ export function ProjectProfileInputField({
           <MenuItem
             data-test='project-option-new'
             onClick={() => {
-              createProject(defaultProjectAndMembersPayload, {
+              createProject(createDefaultProjectAndMembersPayload(), {
                 onSuccess: async (createdProject) => {
                   mutate(
                     (_projects) => {

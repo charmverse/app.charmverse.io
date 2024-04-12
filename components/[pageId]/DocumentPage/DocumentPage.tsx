@@ -38,7 +38,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -254,8 +254,8 @@ function DocumentPageComponent({
   const form = useProjectForm({
     projectId,
     selectedMemberIds: projectFormFieldAnswer?.selectedMemberIds,
-    fieldConfig: (projectProfileField?.fieldConfig ??
-      defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig
+    fieldConfig:
+      (projectProfileField?.fieldConfig as ProjectAndMembersFieldConfig) ?? createDefaultProjectAndMembersFieldConfig()
   });
 
   return (

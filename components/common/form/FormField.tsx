@@ -23,7 +23,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -200,7 +200,9 @@ function ExpandedFormField({
       {formField.type === 'project_profile' ? (
         <ProjectFormEditor
           defaultRequired
-          fieldConfig={(formField.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig}
+          fieldConfig={
+            (formField.fieldConfig ?? createDefaultProjectAndMembersFieldConfig()) as ProjectAndMembersFieldConfig
+          }
           onChange={(fieldConfig) => {
             updateFormField({
               id: formField.id,
@@ -346,7 +348,8 @@ export function FormField(
               {formField.type === 'project_profile' ? (
                 <ProjectFormEditor
                   fieldConfig={
-                    (formField.fieldConfig as ProjectAndMembersFieldConfig) ?? defaultProjectAndMembersFieldConfig
+                    (formField.fieldConfig as ProjectAndMembersFieldConfig) ??
+                    createDefaultProjectAndMembersFieldConfig()
                   }
                   defaultRequired
                 />
