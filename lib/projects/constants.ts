@@ -101,50 +101,54 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export const defaultProjectAndMembersPayload: ProjectAndMembersPayload = {
-  name: '',
-  excerpt: '',
-  description: '',
-  twitter: '',
-  website: '',
-  github: '',
-  blog: '',
-  demoUrl: '',
-  communityUrl: '',
-  otherUrl: '',
-  walletAddress: '',
-  projectMembers: [
-    {
-      name: '',
-      walletAddress: '',
-      email: '',
-      twitter: '',
-      warpcast: '',
-      github: '',
-      linkedin: '',
-      telegram: '',
-      otherUrl: '',
-      previousProjects: ''
-    }
-  ]
-};
+export function createDefaultProjectAndMembersPayload() {
+  return {
+    name: '',
+    excerpt: '',
+    description: '',
+    twitter: '',
+    website: '',
+    github: '',
+    blog: '',
+    demoUrl: '',
+    communityUrl: '',
+    otherUrl: '',
+    walletAddress: '',
+    projectMembers: [
+      {
+        name: '',
+        walletAddress: '',
+        email: '',
+        twitter: '',
+        warpcast: '',
+        github: '',
+        linkedin: '',
+        telegram: '',
+        otherUrl: '',
+        previousProjects: ''
+      }
+    ]
+  } as ProjectAndMembersPayload;
+}
 
-export const defaultProjectAndMembersFieldConfig = {
-  name: {
-    required: true
-  },
-  walletAddress: {
-    private: true
-  },
-  projectMember: {
+export function createDefaultProjectAndMembersFieldConfig() {
+  return {
     name: {
       required: true
     },
-    email: {
-      private: true
-    },
     walletAddress: {
       private: true
+    },
+    projectMember: {
+      name: {
+        required: true
+      },
+      email: {
+        private: true
+      },
+      walletAddress: {
+        private: true
+      }
     }
-  }
-} as ProjectAndMembersFieldConfig;
+  } as ProjectAndMembersFieldConfig;
+}
