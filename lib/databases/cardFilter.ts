@@ -101,6 +101,7 @@ class CardFilter {
         return v.toString();
       }
     );
+
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
@@ -199,14 +200,13 @@ class CardFilter {
                 ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
                 : null;
               if (proposalEvaluationType) {
-                contains = valueArray.some((sourceValue) => {
-                  return filter.values.includes(
-                    getProposalEvaluationStatus({
-                      result: sourceValue as ProposalEvaluationResultExtended,
-                      step: proposalEvaluationType
-                    })
-                  );
-                });
+                const mappedValues = valueArray.map((sourceValue) =>
+                  getProposalEvaluationStatus({
+                    result: sourceValue as ProposalEvaluationResultExtended,
+                    step: proposalEvaluationType
+                  })
+                );
+                contains = mappedValues.some((v) => filter.values.includes(v));
               }
             } else {
               contains =
