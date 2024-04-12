@@ -20,7 +20,7 @@ export async function getSynapsSessionDetails(spaceId: string, userId: string): 
   ]);
 
   if (!synapsCredential?.apiKey) {
-    throw new DataNotFoundError('Synaps API key not found');
+    return null;
   }
 
   if (!synapsUserKyc?.sessionId) {

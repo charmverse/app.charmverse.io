@@ -67,5 +67,5 @@ export function useInitSynapsSession(spaceId: MaybeString) {
 }
 
 export function useGetSynapsSession(spaceId: MaybeString) {
-  return useGET<SynapsUserKyc>(`/api/spaces/${spaceId}/kyc-credentials/synaps`);
+  return useGET<SynapsUserKyc | null>(`/api/spaces/${spaceId}/kyc-credentials/synaps`);
 }

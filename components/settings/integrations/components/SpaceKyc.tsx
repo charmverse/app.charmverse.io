@@ -79,40 +79,38 @@ export function SpaceKyc({
         <FieldLabel>KYC</FieldLabel>
         <Typography variant='body2'>Choose your provider</Typography>
       </Box>
-      {(kycCredentials?.synaps?.apiKey || kycCredentials?.persona?.apiKey) && (
-        <Box>
-          <FormControlLabel
-            control={
-              <Switch
-                name='snapsKyc'
-                checked={kycOption.value === 'synaps'}
-                value={kycOption.value === 'synaps'}
-                onChange={(e) => {
-                  kycOption.onChange(e.target.checked ? 'synaps' : null);
-                }}
-              />
-            }
-            disabled={!isAdmin}
-            labelPlacement='end'
-            label='Enable Synaps.io KYC'
-          />
+      <Box>
+        <FormControlLabel
+          control={
+            <Switch
+              name='snapsKyc'
+              checked={kycOption.value === 'synaps'}
+              value={kycOption.value === 'synaps'}
+              onChange={(e) => {
+                kycOption.onChange(e.target.checked ? 'synaps' : null);
+              }}
+            />
+          }
+          disabled={!isAdmin}
+          labelPlacement='end'
+          label='Enable Synaps.io KYC'
+        />
 
-          <FormControlLabel
-            control={
-              <Switch
-                value={kycOption.value === 'persona'}
-                checked={kycOption.value === 'persona'}
-                onChange={(e) => {
-                  kycOption.onChange(e.target.checked ? 'persona' : null);
-                }}
-              />
-            }
-            disabled={!isAdmin}
-            labelPlacement='end'
-            label='Enable Persona KYC'
-          />
-        </Box>
-      )}
+        <FormControlLabel
+          control={
+            <Switch
+              value={kycOption.value === 'persona'}
+              checked={kycOption.value === 'persona'}
+              onChange={(e) => {
+                kycOption.onChange(e.target.checked ? 'persona' : null);
+              }}
+            />
+          }
+          disabled={!isAdmin}
+          labelPlacement='end'
+          label='Enable Persona KYC'
+        />
+      </Box>
       {kycOption.value === 'synaps' && (
         <>
           <Box>

@@ -1,63 +1,12 @@
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import persona from 'persona';
-import { useEffect, useMemo } from 'react';
+import Persona from 'persona';
 
 import { useGetSynapsSession } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useUser } from 'hooks/useUser';
-
-function PersonaModalWithConfirmation({
-  userId,
-  onClose,
-  open,
-  templateId,
-  environmentId
-}: {
-  userId: string;
-  open: boolean;
-  onClose: () => void;
-  templateId: string;
-  environmentId: string;
-}) {
-  const { onClose: closeSettingsModal } = useSettingsDialog();
-
-  const client = useMemo(() => {
-    return new persona.Client({
-      templateId,
-      environmentId,
-      referenceId: userId,
-      onReady: () => {},
-      onComplete: ({ inquiryId, status, fields }) => {}
-    });
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      client?.destroy();
-    };
-  }, []);
-
-  const handleOpen = () => {
-    onClose();
-    closeSettingsModal();
-    client?.open();
-  };
-
-  return (
-    <ModalWithButtons
-      title='KYC aknowledgement'
-      buttonText='Confirm'
-      onConfirm={handleOpen}
-      onClose={onClose}
-      open={open}
-    >
-      <Typography>You will be redirected to our partner Persona to finish your KYC.</Typography>
-    </ModalWithButtons>
-  );
-}
 
 export default function PersonaModal({
   spaceId,
@@ -70,33 +19,49 @@ export default function PersonaModal({
 }) {
   const { user } = useUser();
   const { data: synapsUserKyc, isLoading: isSynapsUserKycLoading } = useGetSynapsSession(spaceId);
-  const popupState = usePopupState({ variant: 'popover', popupId: 'confirm-kyc' });
+  const popupConfirmationState = usePopupState({ variant: 'popover', popupId: 'confirm-kyc' });
+  const popupPersonaState = usePopupState({ variant: 'popover', popupId: 'kyc-persona' });
   const disabled = ['APPROVED', 'PENDING_VERIFICATION'].includes(synapsUserKyc?.status || '');
 
-  const openModal = async () => {
-    if (disabled) {
-      return;
-    }
-
-    popupState.open();
+  const handleConfirm = () => {
+    popupConfirmationState.close();
+    popupPersonaState.open();
   };
-
-  if (!user) {
-    return null;
-  }
 
   return (
     <>
-      <Button onClick={openModal} disabled={isSynapsUserKycLoading || disabled}>
+      <Button onClick={popupConfirmationState.open} disabled={isSynapsUserKycLoading || disabled}>
         Start KYC
       </Button>
-      <PersonaModalWithConfirmation
-        userId={user?.id}
-        onClose={popupState.close}
-        open={popupState.isOpen}
-        templateId={templateId}
-        environmentId={environmentId}
-      />
+      <ModalWithButtons
+        title='KYC aknowledgement'
+        buttonText='Confirm'
+        onConfirm={handleConfirm}
+        onClose={popupConfirmationState.close}
+        open={popupConfirmationState.isOpen}
+      >
+        <Typography>You will be redirected to our partner Persona to finish your KYC.</Typography>
+      </ModalWithButtons>
+      <Modal
+        size='fluid'
+        onClose={popupPersonaState.close}
+        open={popupPersonaState.isOpen}
+        sx={{
+          '& iframe': { minWidth: '375px', width: '100%', minHeight: '600px', height: '100%' }
+        }}
+      >
+        <Persona.Inquiry
+          templateId={templateId}
+          environmentId={environmentId}
+          referenceId={user?.id}
+          onLoad={() => {}}
+          onComplete={({ inquiryId, status, fields }) => {
+            // Inquiry completed. Optionally tell your server about it.
+            // console.log(`Sending finished inquiry ${inquiryId} to backend`);
+            popupPersonaState.close();
+          }}
+        />
+      </Modal>
     </>
   );
 }
