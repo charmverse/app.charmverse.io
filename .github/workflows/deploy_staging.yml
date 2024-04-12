@@ -166,7 +166,11 @@ jobs:
           rm -rf .ebextensions && mv .ebextensions_ceramic .ebextensions
           cat files_to_zip.txt | zip --symlinks -r@ deploy_ceramic.zip
 
+      
       - name: Deploy ceramic to Beanstalk
+        if: |
+        (github.event.action == 'labeled' && github.event.label.name == 'deploy-ceramic') ||
+        (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'deploy-ceramic'))
         uses: einaregilsson/beanstalk-deploy@v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
