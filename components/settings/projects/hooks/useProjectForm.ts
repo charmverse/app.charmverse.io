@@ -151,17 +151,15 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
 }
 
 export function useProjectForm(options: {
-  defaultValues?: ProjectAndMembersPayload;
   fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
   projectId?: string | null;
   selectedMemberIds?: string[];
 }) {
-  const { defaultRequired, defaultValues, fieldConfig } = options;
+  const { defaultRequired, fieldConfig } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
   const { data: projectsWithMembers } = useGetProjects();
-  const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
   const selectedMemberIds = options.selectedMemberIds;
 
   const defaultProjectAndMembersPayload = useMemo(
@@ -178,21 +176,8 @@ export function useProjectForm(options: {
     });
   }, [fieldConfig, defaultRequired]);
 
-  const defaultProjectWithMembers = useMemo(() => {
-    if (!projectWithMembers) {
-      return undefined;
-    }
-    return convertToProjectValues({
-      ...projectWithMembers,
-      projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
-        // 0th index is the team lead which is always present
-        member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
-      )
-    });
-  }, [projectWithMembers, selectedMemberIds?.length]);
-
   const form = useForm({
-    defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectAndMembersPayload,
+    defaultValues: defaultProjectAndMembersPayload,
     reValidateMode: 'onChange',
     resolver: yupResolver(yupSchema.current),
     criteriaMode: 'all',
@@ -200,25 +185,21 @@ export function useProjectForm(options: {
   });
 
   useEffect(() => {
-    if (options.projectId && projectWithMembers) {
-      form.reset(
-        {
-          ...projectWithMembers,
-          projectMembers: selectedMemberIds
-            ? projectWithMembers.projectMembers.filter((member, index) =>
-                // 0th index is the team lead which is always present
-                member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
-              )
-            : projectWithMembers.projectMembers
-        },
-        {
-          keepIsValid: false
-        }
-      );
-    } else {
-      form.reset(defaultProjectAndMembersPayload);
+    const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
+
+    if (!projectWithMembers) {
+      return;
     }
-  }, [options.projectId, selectedMemberIds?.length]);
+    form.reset(
+      convertToProjectValues({
+        ...projectWithMembers,
+        projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
+          // 0th index is the team lead which is always present
+          member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
+        )
+      })
+    );
+  }, [!!projectsWithMembers, options.projectId, selectedMemberIds?.length]);
 
   return form;
 }
