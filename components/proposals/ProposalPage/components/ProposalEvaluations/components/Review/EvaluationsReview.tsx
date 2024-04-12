@@ -19,7 +19,7 @@ import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
-import { ProposalCredentials } from './components/ProposalCredentials';
+import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
 import { ProposalSocialShareLinks } from './components/SocialShare/ProposalSocialShareLinks';

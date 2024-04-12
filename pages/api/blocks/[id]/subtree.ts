@@ -80,6 +80,17 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
   // use the most recent the card properties
   block.fields = updatedBoard.fields as unknown as BoardFields;
 
+  const space = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: block.spaceId
+    },
+    select: {
+      id: true,
+      features: true,
+      credentialTemplates: true
+    }
+  });
+
   const [permissionsById, newCardBlocks, proposalCardProperties] = await Promise.all([
     // get permissions for each propsoal based on the database author
     permissionsApiClient.proposals.bulkComputeProposalPermissions({
@@ -89,7 +100,10 @@ async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockW
     // create missing blocks for new proposals
     createMissingCards({ boardId: block.id }),
     // get properties for proposals
-    getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
+    getCardPropertiesFromProposals({
+      cardProperties: block.fields.cardProperties,
+      space
+    })
   ]);
   // combine blocks with proposal cards and permissions
   const assembled = applyPropertiesToCards({

@@ -138,7 +138,7 @@ export function IssueProposalCredentials({
         : `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
       : undefined;
 
-  const disableIssueCredentialRows =
+  const disableIssueCredentialButton =
     !!disableIssueCredentialsMenu || publishingCredential || chainId !== space?.credentialsChainId;
 
   const chainComponent = useMemo(() => {
@@ -201,50 +201,13 @@ export function IssueProposalCredentials({
           onClick={() => handleIssueCredentials(issuableProposalCredentials ?? [])}
           variant={variant}
           color={color}
-          disabled={!!disableIssueCredentialsMenu}
+          loading={publishingCredential}
+          disabled={!!disableIssueCredentialsMenu || disableIssueCredentialButton}
         >
           Issue {issuableProposalCredentials?.length || ''} Onchain{' '}
           {conditionalPlural({ word: 'Credential', count: issuableProposalCredentials?.length || 0 })}
         </Button>
       </Box>
     </Tooltip>
-  );
-
-  return (
-    <PropertyMenu
-      lastChild={false}
-      disabledTooltip={disableIssueCredentialsMenu}
-      showRightBorder
-      // add fontSize to icon to override MUI styles
-      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue Onchain Credentials' }}
-    >
-      {chainComponent}
-      <Divider />
-
-      <IssueCredentialRow
-        disabled={disableIssueCredentialRows}
-        issuableCredentials={proposalCreated ?? []}
-        handleIssueCredentials={handleIssueCredentials}
-        label={`${proposalLabel} Created`}
-      />
-      <IssueCredentialRow
-        disabled={disableIssueCredentialRows}
-        issuableCredentials={proposalApproved ?? []}
-        handleIssueCredentials={handleIssueCredentials}
-        label={`${proposalLabel} Approved`}
-      />
-      <IssueCredentialRow
-        disabled={disableIssueCredentialRows}
-        issuableCredentials={all ?? []}
-        handleIssueCredentials={handleIssueCredentials}
-        label='All credentials'
-      />
-      {publishingCredential && (
-        <MenuItem sx={{ gap: 2 }}>
-          <LoadingComponent size={20} />
-          <ListItemText primary='Publishing credentials' />
-        </MenuItem>
-      )}
-    </PropertyMenu>
   );
 }

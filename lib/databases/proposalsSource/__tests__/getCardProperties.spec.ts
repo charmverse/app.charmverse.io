@@ -63,7 +63,11 @@ describe('getCardPropertiesFromProposals', () => {
     });
 
     const cards = await getCardPropertiesFromProposals({
-      spaceId: board.spaceId,
+      space: {
+        features: space.features,
+        credentialTemplates: [],
+        id: space.id
+      },
       cardProperties: board.fields.cardProperties
     });
 
@@ -233,7 +237,11 @@ describe('getCardPropertiesFromProposals', () => {
     });
 
     const cards = await getCardPropertiesFromProposals({
-      spaceId: database.spaceId,
+      space: {
+        features: generated.space.features,
+        credentialTemplates: [],
+        id: generated.space.id
+      },
       cardProperties: database.fields.cardProperties
     });
 
@@ -409,7 +417,11 @@ describe('getCardPropertiesFromProposals', () => {
     });
 
     const cards = await getCardPropertiesFromProposals({
-      spaceId: databaseBoard.spaceId,
+      space: {
+        features: testSpace.features,
+        credentialTemplates: [],
+        id: testSpace.id
+      },
       cardProperties: databaseBoard.fields.cardProperties
     });
     const cardBlock = Object.values(cards)[0];
@@ -510,7 +522,11 @@ describe('getCardPropertiesFromProposals', () => {
     });
 
     const cards = await getCardPropertiesFromProposals({
-      spaceId: database1.spaceId,
+      space: {
+        features: testSpace.features,
+        credentialTemplates: [],
+        id: testSpace.id
+      },
       cardProperties: database1.fields.cardProperties
     });
 
