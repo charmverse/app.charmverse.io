@@ -204,10 +204,12 @@ export function useProjectForm(options: {
       form.reset(
         {
           ...projectWithMembers,
-          projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
-            // 0th index is the team lead which is always present
-            member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
-          )
+          projectMembers: selectedMemberIds
+            ? projectWithMembers.projectMembers.filter((member, index) =>
+                // 0th index is the team lead which is always present
+                member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
+              )
+            : projectWithMembers.projectMembers
         },
         {
           keepIsValid: false

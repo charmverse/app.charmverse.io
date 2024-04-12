@@ -6,7 +6,7 @@ import { expect, test } from '__e2e__/testWithFixtures';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
@@ -72,6 +72,7 @@ test.beforeAll(async () => {
     }
   ];
 
+  const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
   project = await createProject({
     project: {
       ...defaultProjectAndMembersPayload,
@@ -81,6 +82,11 @@ test.beforeAll(async () => {
           ...defaultProjectAndMembersPayload.projectMembers[0],
           email: `test@${v4()}.com`,
           name: 'Test Member'
+        },
+        {
+          ...defaultProjectAndMembersPayload.projectMembers[0],
+          email: `test@${v4()}.com`,
+          name: 'Test Member 2'
         }
       ]
     },
@@ -264,7 +270,6 @@ test.describe.serial('Structured proposal template with project', () => {
     await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     const pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects/);
     await projectSettings.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
-
     await pendingApiCall;
 
     // Assert that the project member values were auto updated
