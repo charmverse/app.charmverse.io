@@ -3,8 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 async function wipeTestData() {
   if (process.env.NODE_ENV === 'test') {
-    await prisma.projectMember.deleteMany({});
-
     await prisma.space.deleteMany({});
 
     await prisma.user.deleteMany({});
