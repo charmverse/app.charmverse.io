@@ -100,7 +100,7 @@ export function ProposalProjectFormAnswers({
           <Stack direction='row' justifyContent='space-between' alignItems='center' mb={2}>
             <Typography variant='h6'>Team member</Typography>
             <IconButton
-              data-test='delete-project-member-button'
+              data-test='remove-project-member-button'
               disabled={disabled}
               onClick={() => {
                 onFormFieldChange(selectedProjectMemberIds.filter((id) => id !== projectMember.id));
@@ -137,7 +137,7 @@ export function ProposalProjectFormAnswers({
             {nonSelectedProjectMembers.map((projectMember, index) => (
               <MenuItem
                 key={`project-member-${index.toString()}`}
-                data-test={`select-option-${projectMember.id}`}
+                data-test='project-member-option'
                 onClick={() => {
                   onChange(projectMember.id as string);
                 }}
@@ -152,7 +152,7 @@ export function ProposalProjectFormAnswers({
         ) : null}
         <MenuItem
           value='ADD_TEAM_MEMBER'
-          data-test='select-option-add-team-member'
+          data-test='project-member-option'
           disabled={!isTeamLead || disabled}
           onClick={() => {
             onChange('ADD_TEAM_MEMBER');

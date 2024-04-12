@@ -281,8 +281,9 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(projectAfterUpdate.excerpt).toBe('This is my project');
     expect(projectAfterUpdate.projectMembers[0].email).toBe('john@gmail.com');
 
+    // Add a new project member and update their project fields
     await proposalPage.projectTeamMembersSelect.click();
-    await proposalPage.getSelectOption(project.projectMembers[1].id).click();
+    await proposalPage.getProjectMemberOption(0).click();
     await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     await proposalFormFieldPage.fillProjectField({
       fieldName: 'projectMembers[1].email',
@@ -357,12 +358,27 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalFormFieldPage.fillProjectField({ fieldName: 'walletAddress', content: projectWalletAddress });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
-    await proposalPage.projectTeamMembersSelect.click();
-    await proposalPage.getSelectOption('add-team-member').click();
-    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
-    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
+
     await proposalFormFieldPage.getFormFieldInput(shortTextFieldId, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
+
+    await proposalPage.projectTeamMembersSelect.click();
+    // Add a new project member
+    await proposalPage.getProjectMemberOption(0).click();
+    // Should be disabled since project profile has invalid values
+    expect(proposalPage.publishNewProposalButton).toBeDisabled();
+    // Remove the project member
+    await proposalPage.getRemoveProjectMemberButton(0).click();
+    // Should be now enabled
+    expect(proposalPage.publishNewProposalButton).toBeEnabled();
+    // Add the newly created project member again
+    await proposalPage.projectTeamMembersSelect.click();
+    await proposalPage.getProjectMemberOption(0).click();
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
+    // Click on body to close the dropdown
+    await proposalFormFieldPage.page.click('body');
+
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-structured-template*');
 
