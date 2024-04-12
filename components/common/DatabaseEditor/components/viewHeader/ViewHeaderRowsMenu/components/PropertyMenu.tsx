@@ -9,13 +9,11 @@ import { Button } from 'components/common/Button';
 export const StyledMenuItem = styled(MenuItem)<{
   firstChild?: boolean;
   lastChild?: boolean;
-  showRightBorder?: boolean;
 }>(
-  ({ firstChild, lastChild, showRightBorder, theme }) => `
+  ({ firstChild, lastChild, theme }) => `
   border-left: 1px solid ${theme.palette.divider};
   border-top: 1px solid ${theme.palette.divider};
   border-bottom: 1px solid ${theme.palette.divider};
-  ${showRightBorder ? `border-right: 1px solid ${theme.palette.divider};` : ''}
   padding: ${theme.spacing(0.5, 1)};
   display: flex;
   align-items: center;
@@ -44,14 +42,12 @@ export function PropertyMenu({
   disabledTooltip,
   propertyTemplate,
   children,
-  lastChild,
-  showRightBorder
+  lastChild
 }: {
   disabledTooltip?: string;
   propertyTemplate: { icon?: ReactNode; name: string };
   children: ReactNode | ((option: { isPropertyOpen: boolean; closeMenu: VoidFunction }) => ReactNode);
   lastChild: boolean;
-  showRightBorder?: boolean;
 }) {
   const popupState = usePopupState({ variant: 'popover' });
   // Without this state, the options menu list is not placed in the correct position
@@ -64,7 +60,6 @@ export function PropertyMenu({
           <StyledMenuItem
             disabled={!!disabledTooltip}
             lastChild={lastChild}
-            showRightBorder={showRightBorder}
             ref={ref}
             onClick={() => {
               popupState.open();
@@ -78,7 +73,6 @@ export function PropertyMenu({
               <ListItemIcon sx={{ minWidth: '20px !important' }}>{propertyTemplate.icon}</ListItemIcon>
             )}
             <ListItemText>{propertyTemplate.name}</ListItemText>
-            <Button>Primary</Button>
           </StyledMenuItem>
         </div>
       </Tooltip>
