@@ -9,8 +9,6 @@ import { compositeDefinitionFile } from './deploy-composites';
 async function bootstrapGqlServer() {
   const ceramic = await getCeramicClient();
 
-  // await writeComposite();
-
   log.info(`GraphQL Composedb server started`);
 
   return serveEncodedDefinition({
