@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy:
     if: |
-      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy') ||
+      (github.event.action == 'labeled' && (github.event.label.name == ':rocket: deploy' || github.event.label.name == 'deploy-ceramic')) ||
       (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy'))
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
