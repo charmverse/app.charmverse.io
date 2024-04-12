@@ -5,6 +5,7 @@ import { useCallback } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetIssuableProposalCredentials, useGetIssuedProposalCredentials } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';

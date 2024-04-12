@@ -1,6 +1,6 @@
 import type { SystemError } from '@charmverse/core/errors';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
-import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
+import { Box, Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
 
@@ -19,6 +19,7 @@ import type { EasSchemaChain } from 'lib/credentials/connectors';
 import { getOnChainSchemaUrl } from 'lib/credentials/connectors';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
+import { conditionalPlural } from 'lib/utils/strings';
 
 import { PropertyMenu } from './PropertyMenu';
 
@@ -41,7 +42,15 @@ function IssueCredentialRow({
   );
 }
 
-export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds: string[] }) {
+export function IssueProposalCredentials({
+  selectedPageIds,
+  variant = 'outlined',
+  color = 'secondary'
+}: {
+  selectedPageIds: string[];
+  variant?: string;
+  color?: string;
+}) {
   const { getFeatureTitle } = useSpaceFeatures();
 
   const { space } = useCurrentSpace();
@@ -158,22 +167,19 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
             <Chain info={chain} />
           </Link>
         ) : (
-          <>
-            <Chain info={chain} />
-            <Tooltip title='Your wallet must on the correct chain to issue credentials for this space'>
-              <Button
-                sx={{ mt: 1 }}
-                fullWidth
-                onClick={() =>
-                  space.credentialsChainId && switchChainAsync?.({ chainId: space.credentialsChainId }).catch()
-                }
-                variant='outlined'
-                size='small'
-              >
-                Switch chain
-              </Button>
-            </Tooltip>
-          </>
+          <Tooltip title='Your wallet must on the correct chain to issue credentials for this space'>
+            <Button
+              sx={{ mt: 1 }}
+              fullWidth
+              onClick={() =>
+                space.credentialsChainId && switchChainAsync?.({ chainId: space.credentialsChainId }).catch()
+              }
+              variant='outlined'
+              size='small'
+            >
+              Switch chain
+            </Button>
+          </Tooltip>
         )}
       </MenuItem>
     );
@@ -187,6 +193,22 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
   ) {
     return null;
   }
+
+  return (
+    <Tooltip title={disableIssueCredentialsMenu}>
+      <Box>
+        <Button
+          onClick={() => handleIssueCredentials(issuableProposalCredentials ?? [])}
+          variant={variant}
+          color={color}
+          disabled={!!disableIssueCredentialsMenu}
+        >
+          Issue {issuableProposalCredentials?.length || ''} Onchain{' '}
+          {conditionalPlural({ word: 'Credential', count: issuableProposalCredentials?.length || 0 })}
+        </Button>
+      </Box>
+    </Tooltip>
+  );
 
   return (
     <PropertyMenu

@@ -4,6 +4,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
+import { Button } from 'components/common/Button';
+
 export const StyledMenuItem = styled(MenuItem)<{
   firstChild?: boolean;
   lastChild?: boolean;
@@ -76,6 +78,7 @@ export function PropertyMenu({
               <ListItemIcon sx={{ minWidth: '20px !important' }}>{propertyTemplate.icon}</ListItemIcon>
             )}
             <ListItemText>{propertyTemplate.name}</ListItemText>
+            <Button>Primary</Button>
           </StyledMenuItem>
         </div>
       </Tooltip>
