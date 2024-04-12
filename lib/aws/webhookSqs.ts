@@ -3,20 +3,19 @@ import { SQSClient, ReceiveMessageCommand, DeleteMessageCommand } from '@aws-sdk
 import { getLogger } from '@charmverse/core/log';
 
 import { AWS_REGION } from 'lib/aws/config';
-import { SQS_WEBHOOK_COLLABLAND_QUEUE_NAME } from 'lib/collabland/config';
-import type { WebhookMessage, WebhookMessageProcessResult } from 'lib/webhookConsumer/interfaces';
+import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
 
 const log = getLogger('sqs');
 
-type ProcessMssagesInput = {
+type ProcessMessagesInput<MessageBody> = {
   maxNumOfMessages?: number;
-  processorFn: (messageBody: WebhookMessage) => Promise<WebhookMessageProcessResult>;
+  processorFn: (messageBody: MessageBody) => Promise<WebhookMessageProcessResult>;
+  queueUrl: string;
 };
 
 const AWS_API_KEY = process.env.AWS_ACCESS_KEY_ID as string;
 const AWS_API_SECRET = process.env.AWS_SECRET_ACCESS_KEY as string;
 const SQS_REGION = (process.env.AWS_REGION as string) || AWS_REGION;
-log.info('Queue url:', SQS_WEBHOOK_COLLABLAND_QUEUE_NAME);
 
 const config: SQSClientConfig = { region: SQS_REGION };
 if (AWS_API_KEY && AWS_API_SECRET) {
@@ -24,9 +23,8 @@ if (AWS_API_KEY && AWS_API_SECRET) {
 }
 
 const client = new SQSClient(config);
-const queueUrl = SQS_WEBHOOK_COLLABLAND_QUEUE_NAME || '';
 
-export async function getNextMessage() {
+export async function getNextMessage(queueUrl: string) {
   try {
     if (queueUrl) {
       // 20s polling time
@@ -43,20 +41,20 @@ export async function getNextMessage() {
   }
 }
 
-export async function deleteMessage(receipt: string) {
+export async function deleteMessage(receipt: string, queueUrl: string) {
   const command = new DeleteMessageCommand({ ReceiptHandle: receipt, QueueUrl: queueUrl });
   const res = await client.send(command);
 
   return res.$metadata.httpStatusCode === 200;
 }
 
-export async function processMessages({ processorFn }: ProcessMssagesInput) {
+export async function processMessages<MessageBody>({ processorFn, queueUrl }: ProcessMessagesInput<MessageBody>) {
   if (!queueUrl) {
     log.warn('SQS queue url not found. Aborting process messages.');
     return;
   }
 
-  const message = await getNextMessage();
+  const message = await getNextMessage(queueUrl);
 
   if (message) {
     let msgBody: Record<string, any> | string = '';
@@ -69,7 +67,7 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
     try {
       // process message
       log.debug('Processing message', { message: msgBody, receiptHandle: message.ReceiptHandle });
-      const result = await processorFn(msgBody as WebhookMessage);
+      const result = await processorFn(msgBody as MessageBody);
 
       if (result.success) {
         log.info(`Message process successful: ${result.message}`, {
@@ -78,7 +76,7 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
           receiptHandle: message.ReceiptHandle
         });
         try {
-          await deleteMessage(message.ReceiptHandle || '');
+          await deleteMessage(message.ReceiptHandle || '', queueUrl);
         } catch (e) {
           log.error('Could not delete message', {
             receiptHandle: message.ReceiptHandle,
@@ -102,5 +100,5 @@ export async function processMessages({ processorFn }: ProcessMssagesInput) {
   }
 
   // process next message
-  processMessages({ processorFn });
+  processMessages({ processorFn, queueUrl });
 }
