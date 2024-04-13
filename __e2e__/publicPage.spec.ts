@@ -208,7 +208,6 @@ test.describe('Public pages', async () => {
 
   test('show the sidebar for free tier spaces', async ({ page, documentPage, pagesSidebar }) => {
     const { space, user } = await generateUserAndSpace({ paidTier: 'community' });
-    const anonUser = await generateUser();
 
     const publicPage = await generatePage({
       createdBy: user.id,
@@ -237,6 +236,7 @@ test.describe('Public pages', async () => {
     await page.goto(shareUrl);
     await expect(pagesSidebar.pagesSidebar).toBeVisible();
 
+    const anonUser = await generateUser();
     await login({ userId: anonUser.id, page });
 
     // Check sidebar is visible
