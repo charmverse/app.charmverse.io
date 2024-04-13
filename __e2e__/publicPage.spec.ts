@@ -12,7 +12,6 @@ import { generateUserAndSpace, logoutBrowserUser } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
-let browser: Browser;
 type Fixtures = {
   pagePermissions: PagePermissionsDialog;
   databasePage: DatabasePage;
@@ -23,43 +22,25 @@ const test = base.extend<Fixtures>({
   databasePage: ({ page }, use) => use(new DatabasePage(page))
 });
 
-test.beforeAll(async ({ browser: _browser }) => {
-  browser = _browser;
-});
-
-test.describe.serial('Make a page public and visit it', async () => {
-  // Will be set by the first test
-  let shareUrl = '';
-  let boardPage: Page;
-  let cardPage: Page;
-  let spaceUser: User;
-
-  test('make a page public', async ({ pagePermissions, page }) => {
-    // Arrange ------------------
-    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-
+test.describe('Public pages', async () => {
+  test('make a page public', async ({ browser, databasePage, pagePermissions, page }) => {
     const { space, user } = await generateUserAndSpace();
-    boardPage = await generateBoard({
+    const boardPage = await generateBoard({
       spaceId: space.id,
       createdBy: user.id,
       viewType: 'gallery'
     });
 
-    spaceUser = user;
     await login({ userId: user.id, page });
 
-    const domain = space.domain;
-
-    cardPage = (await prisma.page.findFirst({
+    const cardPage = await prisma.page.findFirstOrThrow({
       where: {
         type: 'card',
         parentId: boardPage.id
       }
-    })) as Page;
+    });
 
-    expect(cardPage).toBeDefined();
-
-    const targetPage = `${baseUrl}/${domain}/${boardPage.path}`;
+    const targetPage = `${baseUrl}/${space.domain}/${boardPage.path}`;
 
     await page.goto(targetPage);
 
@@ -67,7 +48,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     // Part A - Prepare the page as a logged in user
     // 1. Make sure the board page exists and cards are visible
 
-    await await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
+    await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
     const permissionDialog = pagePermissions.permissionDialog;
@@ -82,7 +63,7 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     await pagePermissions.publicShareToggle.click();
 
-    shareUrl = `${baseUrl}/${domain}/${boardPage.path}`;
+    const shareUrl = `${baseUrl}/${space.domain}/${boardPage.path}`;
 
     await page.waitForResponse(/\/api\/permissions/);
 
@@ -90,25 +71,28 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     // 3. Copy the public link to the clipboard
     const shareLinkInput = page.locator('data-test=share-link').locator('input');
+    await expect(shareLinkInput).toHaveValue(new RegExp(shareUrl));
 
-    await expect(shareLinkInput).toBeVisible();
+    // Part B - Visit this page as a non logged in user
 
-    const inputValue = await shareLinkInput.inputValue();
+    const anonContext = await browser.newContext();
+    const anonPage = await anonContext.newPage();
 
-    expect(inputValue.match(shareUrl)).not.toBe(null);
+    // 1. Visit the page
+    await anonPage.goto(shareUrl);
+
+    // 2. Make sure the board renders
+    const boardTitle = new DatabasePage(anonPage).boardTitle();
+    await expect(boardTitle).toHaveValue(boardPage?.title);
   });
 
-  test('visit a public page with embedded poll', async () => {
-    // Arrange ------------------
-    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
-    const page = await userContext.newPage();
-
+  test('visit a public page with embedded poll', async ({ page }) => {
     const { space, user } = await generateUserAndSpace();
 
     const createdPage = await generatePage({
-      content: [],
       createdBy: user.id,
-      spaceId: space.id
+      spaceId: space.id,
+      pagePermissions: [{ public: true, permissionLevel: 'view' }]
     });
 
     const createdVote = await createVote({
@@ -139,13 +123,13 @@ test.describe.serial('Make a page public and visit it', async () => {
       }
     });
 
-    await prisma.pagePermission.create({
-      data: {
-        page: { connect: { id: createdPage.id } },
-        permissionLevel: 'view',
-        public: true
-      }
-    });
+    // await prisma.pagePermission.create({
+    //   data: {
+    //     page: { connect: { id: createdPage.id } },
+    //     permissionLevel: 'view',
+    //     public: true
+    //   }
+    // });
 
     const domain = space.domain;
 
@@ -156,11 +140,7 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(page.locator(`data-test=view-poll-details-button`).first()).not.toBeDisabled();
   });
 
-  test('open a page with invalid domain and path', async ({ databasePage }) => {
-    const publicContext = await browser.newContext({});
-
-    const page = await publicContext.newPage();
-
+  test('open a page with invalid domain and path', async ({ page }) => {
     await page.goto('invalid-domain/not-existing-page-id');
 
     const loginPageContent = page.locator('data-test=login-page-content');
@@ -168,19 +148,30 @@ test.describe.serial('Make a page public and visit it', async () => {
     await expect(loginPageContent).toBeVisible();
   });
 
-  test('visit the public page', async ({ databasePage, page }) => {
-    // Part B - Visit this page as a non logged in user
-    await logoutBrowserUser({ browserPage: page });
+  test('open a card on a public database', async ({ databasePage, page }) => {
+    const { space, user } = await generateUserAndSpace();
+    const boardPage = await generateBoard({
+      spaceId: space.id,
+      createdBy: user.id,
+      viewType: 'gallery',
+      permissions: [{ public: true, permissionLevel: 'view' }]
+    });
+
+    const cardPage = await prisma.page.findFirstOrThrow({
+      where: {
+        type: 'card',
+        parentId: boardPage.id
+      }
+    });
+
+    const shareUrl = `${baseUrl}/${space.domain}/${boardPage.path}`;
 
     // 1. Visit the page
     await page.goto(shareUrl);
 
     // 2. Make sure the board renders
     const boardTitle = databasePage.boardTitle();
-
-    await expect(boardTitle).toBeVisible();
-
-    expect(await boardTitle.inputValue()).toBe(boardPage?.title);
+    await expect(boardTitle).toHaveValue(boardPage?.title);
 
     // 3. Wait for the card, click on it
     const cardToOpen = page.locator(`data-test=gallery-card-${cardPage.id}`);
@@ -207,31 +198,35 @@ test.describe.serial('Make a page public and visit it', async () => {
 
     await expect(documentTitle).toBeVisible();
 
-    expect(await documentTitle.innerText()).toMatch(cardPage.title);
+    await expect(documentTitle).toHaveText(cardPage.title);
 
     // 5. Make sure page is displayed using public layout
     const publicPageLayout = page.locator('data-test=public-page-layout');
     await expect(publicPageLayout).toBeVisible();
   });
 
-  test('visit shared page as logged in user', async () => {
-    const userContext = await browser.newContext({ permissions: ['clipboard-read', 'clipboard-write'] });
+  test('visit shared page as logged in user', async ({ page }) => {
+    const { space, user } = await generateUserAndSpace();
 
-    const page = await userContext.newPage();
-    await login({ userId: spaceUser.id, page });
+    const createdPage = await generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [{ public: true, permissionLevel: 'view' }]
+    });
+
+    await login({ userId: user.id, page });
+
+    const shareUrl = `${baseUrl}/${space.domain}/${createdPage.path}`;
 
     // 1. Visit the page
     await page.goto(shareUrl);
 
-    // 2. Make sure the board renders
-    const boardTitle = page.locator('data-test=board-title').locator('input');
-
-    await expect(boardTitle).toBeVisible();
-
-    expect(await boardTitle.inputValue()).toBe(boardPage?.title);
-
     // 3. Make sure page is displayed using space layout
     const spacePageLayout = page.locator('data-test=space-page-layout');
     await expect(spacePageLayout).toBeVisible();
+
+    // 2. Make sure the content renders
+    const pageTitle = page.locator('data-test=editor-page-title');
+    await expect(pageTitle).toHaveText(createdPage.title);
   });
 });
