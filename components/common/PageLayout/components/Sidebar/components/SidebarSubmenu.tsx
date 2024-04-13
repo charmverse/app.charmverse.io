@@ -35,16 +35,24 @@ import { NotificationCountBox } from './NotificationsPopover';
 import SpaceListItem from './SpaceListItem';
 import WorkspaceAvatar from './WorkspaceAvatar';
 
-const StyledButton = styled(Button)(
-  ({ theme, fullWidth }) => `
+const StyledButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== 'enableHover'
+})<{ enableHover: boolean }>(
+  ({ theme, enableHover, fullWidth }) => `
   justify-content: flex-start;
   padding: ${fullWidth ? theme.spacing(0.3, 5, 0.3, 2) : theme.spacing(0.5, 1)};
 
-  // disable hover UX on ios which converts first click to a hover event
+  ${!enableHover && `background-color: transparent !important; cursor: default;`}
+
+  ${
+    // disable hover UX on ios which converts first click to a hover event
+    enableHover &&
+    `
   @media (pointer: fine) {
     &:hover: {
-      backgroundColor: ${theme.palette.action.hover};
+      background-color: ${theme.palette.action.hover};
     }
+  }`
   }
   ${theme.breakpoints.up('lg')} {
     padding-right: ${fullWidth ? theme.spacing(2) : 0};
@@ -70,11 +78,10 @@ const SidebarHeader = styled(Box)(
     border-radius: 4px;
     padding: 2px;
   }
-
   & .MuiIconButton-root:hover {
     background-color: ${theme.palette.background.default};
   }
-  `
+`
 );
 
 const StyledCreateSpaceForm = styled(CreateSpaceForm)`
@@ -134,6 +141,7 @@ export default function SidebarSubmenu({
     <SidebarHeader className='sidebar-header' position='relative'>
       <StyledButton
         data-test='sidebar-space-menu'
+        enableHover={!!user}
         endIcon={user ? <KeyboardArrowDownIcon fontSize='small' /> : null}
         variant='text'
         color='inherit'
