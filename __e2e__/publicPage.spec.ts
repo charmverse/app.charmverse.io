@@ -207,7 +207,7 @@ test.describe('Public pages', async () => {
   });
 
   test('show the sidebar for free tier spaces', async ({ page, documentPage, pagesSidebar }) => {
-    const { space, user } = await generateUserAndSpace();
+    const { space, user } = await generateUserAndSpace({ paidTier: 'community' });
     const anonUser = await generateUser();
 
     const publicPage = await generatePage({
@@ -218,7 +218,7 @@ test.describe('Public pages', async () => {
 
     const shareUrl = `${baseUrl}/${space.domain}/${publicPage.path}`;
 
-    // Check sidebar is not visible
+    // Check sidebar is not visible for normal tier
     await page.goto(shareUrl);
     await expect(documentPage.documentTitle).toBeVisible();
     await expect(pagesSidebar.pagesSidebar).not.toBeVisible();
