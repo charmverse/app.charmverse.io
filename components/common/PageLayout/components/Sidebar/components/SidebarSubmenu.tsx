@@ -64,7 +64,7 @@ const SidebarHeader = styled(Box)(
       duration: theme.transitions.duration.shorter
     })}
   }
-  
+
   & .MuiIconButton-root {
     background-color: ${theme.palette.background.light};
     border-radius: 4px;
@@ -134,11 +134,11 @@ export default function SidebarSubmenu({
     <SidebarHeader className='sidebar-header' position='relative'>
       <StyledButton
         data-test='sidebar-space-menu'
-        endIcon={<KeyboardArrowDownIcon fontSize='small' />}
+        endIcon={user ? <KeyboardArrowDownIcon fontSize='small' /> : null}
         variant='text'
         color='inherit'
         fullWidth={!!currentSpace}
-        {...bindTrigger(menuPopupState)}
+        {...(user ? bindTrigger(menuPopupState) : {})}
       >
         {currentSpace ? (
           <>
