@@ -44,7 +44,8 @@ function PageLayout({ children }: PageLayoutProps) {
     enabled: enableSidebar
   });
 
-  if (!accessChecked || !isUserLoaded || isSpacesLoading) {
+  // skip access check if space is free tier, since accessChecked becomes false between each page transition
+  if (!(accessChecked || isFreeTierSpace) || !isUserLoaded || isSpacesLoading) {
     return (
       <Box display='flex' height='100%' alignSelf='stretch' justifyContent='center' flex={1}>
         <LoadingComponent isLoading />

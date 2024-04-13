@@ -70,9 +70,7 @@ export const useSharedPage = () => {
     (!!hasPublicRewards && isRewardsPagePath(pathname)) ||
     isForumPagePath(pathname) ||
     (!!hasPublicProposals && isProposalsPagePath(pathname));
-  // all pages are visible if space tier is free. Dont wait for page to load to avoid flicker between navigation
-  const isCheckingContent = isPublicPageLoading && space?.paidTier !== 'free';
-  const accessChecked = isRouterReady && !isSpaceLoading && !isCheckingContent;
+  const accessChecked = isRouterReady && !isSpaceLoading && !isPublicPageLoading;
 
   return {
     accessChecked,
