@@ -9,8 +9,6 @@ import { login } from './utils/session';
 test.describe.serial('Add a new space from sidebar and load it', async () => {
   test('Fill the form and create a new space', async ({ page }) => {
     // Arrange ------------------
-    // const userContext = await browser.newContext();
-    // const page = await userContext.newPage();
 
     const { space, user } = await generateUserAndSpace({
       email: undefined

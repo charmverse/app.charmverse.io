@@ -1,29 +1,17 @@
-import type { Page, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Browser } from '@playwright/test';
-import { chromium, expect, test as base } from '@playwright/test';
+import { expect } from '@playwright/test';
 
 import { baseUrl } from 'config/constants';
 import { createVote, generateBoard } from 'testing/setupDatabase';
 
 import { DatabasePage } from './po/databasePage.po';
-import { PagePermissionsDialog } from './po/pagePermissions.po';
-import { generateUserAndSpace, logoutBrowserUser } from './utils/mocks';
+import { test } from './testWithFixtures';
+import { generateUserAndSpace, generateUser } from './utils/mocks';
 import { generatePage } from './utils/pages';
 import { login } from './utils/session';
 
-type Fixtures = {
-  pagePermissions: PagePermissionsDialog;
-  databasePage: DatabasePage;
-};
-
-const test = base.extend<Fixtures>({
-  pagePermissions: ({ page }, use) => use(new PagePermissionsDialog(page)),
-  databasePage: ({ page }, use) => use(new DatabasePage(page))
-});
-
 test.describe('Public pages', async () => {
-  test('make a page public', async ({ browser, databasePage, pagePermissions, page }) => {
+  test('make a page public', async ({ browser, pagePermissionsDialog, page }) => {
     const { space, user } = await generateUserAndSpace();
     const boardPage = await generateBoard({
       spaceId: space.id,
@@ -51,23 +39,23 @@ test.describe('Public pages', async () => {
     await expect(page.locator(`data-test=gallery-card-${cardPage.id}`)).toBeVisible();
 
     // 2. Open the share dialog and make the page public
-    const permissionDialog = pagePermissions.permissionDialog;
+    const permissionDialog = pagePermissionsDialog.permissionDialog;
 
     await permissionDialog.click();
 
-    const publishTab = pagePermissions.publishTab;
+    const publishTab = pagePermissionsDialog.publishTab;
 
     await expect(publishTab).toBeVisible();
 
     await publishTab.click({ force: true });
 
-    await pagePermissions.publicShareToggle.click();
+    await pagePermissionsDialog.publicShareToggle.click();
 
     const shareUrl = `${baseUrl}/${space.domain}/${boardPage.path}`;
 
     await page.waitForResponse(/\/api\/permissions/);
 
-    await pagePermissions.allowDiscoveryToggle.click();
+    await pagePermissionsDialog.allowDiscoveryToggle.click();
 
     // 3. Copy the public link to the clipboard
     const shareLinkInput = page.locator('data-test=share-link').locator('input');
@@ -122,14 +110,6 @@ test.describe('Public pages', async () => {
         }
       }
     });
-
-    // await prisma.pagePermission.create({
-    //   data: {
-    //     page: { connect: { id: createdPage.id } },
-    //     permissionLevel: 'view',
-    //     public: true
-    //   }
-    // });
 
     const domain = space.domain;
 
@@ -195,9 +175,6 @@ test.describe('Public pages', async () => {
     await expect(cardPopup).toBeVisible();
 
     const documentTitle = cardPopup.locator('data-test=editor-page-title');
-
-    await expect(documentTitle).toBeVisible();
-
     await expect(documentTitle).toHaveText(cardPage.title);
 
     // 5. Make sure page is displayed using public layout
@@ -205,7 +182,7 @@ test.describe('Public pages', async () => {
     await expect(publicPageLayout).toBeVisible();
   });
 
-  test('visit shared page as logged in user', async ({ page }) => {
+  test('visit shared page as logged in user', async ({ page, documentPage }) => {
     const { space, user } = await generateUserAndSpace();
 
     const createdPage = await generatePage({
@@ -226,7 +203,44 @@ test.describe('Public pages', async () => {
     await expect(spacePageLayout).toBeVisible();
 
     // 2. Make sure the content renders
-    const pageTitle = page.locator('data-test=editor-page-title');
-    await expect(pageTitle).toHaveText(createdPage.title);
+    await expect(documentPage.documentTitle).toHaveText(createdPage.title);
+  });
+
+  test('show the sidebar for free tier spaces', async ({ page, documentPage, pagesSidebar }) => {
+    const { space, user } = await generateUserAndSpace();
+    const anonUser = await generateUser();
+
+    const publicPage = await generatePage({
+      createdBy: user.id,
+      spaceId: space.id,
+      pagePermissions: [{ public: true, permissionLevel: 'view' }]
+    });
+
+    const shareUrl = `${baseUrl}/${space.domain}/${publicPage.path}`;
+
+    // Check sidebar is not visible
+    await page.goto(shareUrl);
+    await expect(documentPage.documentTitle).toBeVisible();
+    await expect(pagesSidebar.pagesSidebar).not.toBeVisible();
+
+    // Set space to 'free' tier
+    await prisma.space.update({
+      where: {
+        id: space.id
+      },
+      data: {
+        paidTier: 'free'
+      }
+    });
+
+    // Check sidebar is visible
+    await page.goto(shareUrl);
+    await expect(pagesSidebar.pagesSidebar).toBeVisible();
+
+    await login({ userId: anonUser.id, page });
+
+    // Check sidebar is visible
+    await page.goto(shareUrl);
+    await expect(pagesSidebar.pagesSidebar).toBeVisible();
   });
 });
