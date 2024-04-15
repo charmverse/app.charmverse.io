@@ -47,6 +47,7 @@ export function EvaluationsSettings({
   const { data: proposalTemplate } = useGetProposalTemplate(templateId);
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
+  const showRewards = isTemplate && onChangeRewardSettings;
   return (
     <LoadingComponent isLoading={!proposal} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
@@ -101,24 +102,13 @@ export function EvaluationsSettings({
               </EvaluationStepRow>
             );
           })}
-          <Box mb={8}>
+          <Box mb={showRewards ? 0 : 8}>
             <EvaluationStepRow
               index={proposal ? proposal.evaluations.length + 1 : 0}
               result={null}
               title='Credentials'
               expanded={expandedContainer}
               expandedContainer={expandedContainer}
-              actions={
-                isStructuredProposal && (
-                  <Stack direction='row' alignItems='center' gap={1}>
-                    {!proposal.fields?.enableRewards && <Chip label='Disabled' size='small' />}
-                    <Switch
-                      checked={proposal.fields?.enableRewards}
-                      onChange={(e, checked) => ({ enableRewards: checked })}
-                    />
-                  </Stack>
-                )
-              }
             >
               <ProposalCredentialSettings
                 readOnly={readOnly}
@@ -128,7 +118,7 @@ export function EvaluationsSettings({
             </EvaluationStepRow>
           </Box>
           {/* reward settings */}
-          {isTemplate && onChangeRewardSettings && (
+          {showRewards && (
             <Box mb={8}>
               <EvaluationStepRow
                 index={proposal ? proposal.evaluations.length + 2 : 0}

@@ -63,7 +63,7 @@ export function EvaluationsReview({
   onChangeEvaluation,
   onChangeSelectedCredentialTemplates,
   readOnlyCredentialTemplates,
-  refreshProposal,
+  refreshProposal: _refreshProposal,
   expanded: expandedContainer,
   templateId
 }: Props) {
@@ -72,9 +72,11 @@ export function EvaluationsReview({
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
-  const { hasPendingOnchainCredentials } = useProposalCredentials({
-    proposalId: proposal?.id
-  });
+  const { hasPendingOnchainCredentials, refreshIssuedCredentials, refreshIssuableCredentials } = useProposalCredentials(
+    {
+      proposalId: proposal?.id
+    }
+  );
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
@@ -119,6 +121,12 @@ export function EvaluationsReview({
     } catch (error) {
       showMessage((error as Error).message ?? 'Something went wrong', 'error');
     }
+  }
+
+  async function refreshProposal() {
+    await refreshIssuableCredentials();
+    await refreshIssuedCredentials();
+    await _refreshProposal?.();
   }
 
   useEffect(() => {
