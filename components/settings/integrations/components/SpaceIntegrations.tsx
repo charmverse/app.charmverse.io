@@ -2,6 +2,7 @@ import type { KycOption, Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -128,11 +129,29 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   const isLoading = updateSpaceLoading || kycUpdateCredentialsLoading;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      style={{
+        position: 'relative'
+      }}
+    >
       <Grid container spacing={3} direction='column'>
         <Grid item>
           <FieldLabel>Snapshot.org domain</FieldLabel>
-          <SnapshotIntegration control={control} isAdmin={isAdmin} />
+          <Stack flexDirection='row' alignItems='center' gap={1}>
+            <Box width='100%'>
+              <SnapshotIntegration control={control} isAdmin={isAdmin} />
+            </Box>
+            <Button
+              disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
+              disableElevation
+              disabled={!isAdmin || updateSpaceLoading || !isDirty}
+              type='submit'
+              loading={updateSpaceLoading}
+            >
+              Save
+            </Button>
+          </Stack>
         </Grid>
         <Grid item>
           <FieldLabel>Collab.Land</FieldLabel>

@@ -69,7 +69,7 @@ export async function createWorkspace({
     }
   }
 
-  const userList = [userId, ...extraAdmins];
+  const userList = Array.from(new Set([userId, ...extraAdmins]));
 
   let signingSecret: string | null = null;
   if (webhookUrl) {
