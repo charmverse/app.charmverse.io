@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
@@ -7,12 +6,12 @@ import { getSynapsIndividualSession } from '../getSynapsIndividualSession';
 import type { SynapsEventData } from '../interfaces';
 
 export async function processWebhookMessage(payload: {
-  body: { message: SynapsEventData };
-  headers: { secret: string };
+  body: SynapsEventData;
+  headers: any;
+  query: { secret: string };
 }): Promise<WebhookMessageProcessResult> {
-  // console.log('payload', payload);
-  const secret = payload?.headers?.secret;
-  const data = payload?.body?.message;
+  const secret = payload?.query?.secret;
+  const data = payload?.body;
 
   const synapsCredential = await prisma.synapsCredential.findFirst({
     where: {

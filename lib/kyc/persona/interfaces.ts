@@ -1,8 +1,10 @@
+import type { PersonaUserKycStatus } from '@charmverse/core/prisma-client';
+
 export type PersonaInquiryAPIResponse = {
   data: {
     id: string;
     attributes: {
-      status: string;
+      status: PersonaUserKycStatus;
       'reference-id'?: string;
       'name-first'?: string;
       'name-middle'?: string;
@@ -34,7 +36,7 @@ export type PersonaInquiryAPIResponse = {
       creator?: string;
       fields: object;
     };
-    relashioships: object;
+    relashioships?: object;
     type: 'inquiry';
   };
   included: any[];
@@ -45,4 +47,16 @@ export type PersonaInquiry = {
   inquiryId: string;
   sessionId?: string;
   sandbox?: boolean;
+};
+
+export type PersonaEventData = {
+  data: {
+    id: string;
+    type: string;
+    attributes: {
+      name: string;
+      payload: PersonaInquiryAPIResponse;
+      'created-at': string;
+    };
+  };
 };
