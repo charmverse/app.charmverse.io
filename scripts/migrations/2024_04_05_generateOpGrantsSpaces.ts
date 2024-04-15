@@ -8,7 +8,7 @@ import { appendFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { unparse } from 'papaparse';
 
-const spaceDomain = "reduced-rugpull-snipe";
+const spaceDomain = "concrete-floor-sailfish";
 const FILE_INPUT_PATH = path.join(__dirname, 'op.csv');
 const FILE_OUTPUT_PATH = path.join(__dirname, 'op-output.csv');
 
@@ -33,7 +33,8 @@ type ProjectData = {
 type ExtractedProjectData = {
   "Project name": string
   "Twitter handle": string
-  "Invite link": string
+  "Invite link": string,
+  "Space id": string
 }
 
 function extractTwitterUsername(twitterValue: string) {
@@ -86,7 +87,6 @@ export async function generateOpGrantSpaces() {
             gte: new Date("2024-01-01T00:00:00Z")
           }
         },
-        archived: false,
         status: "published",
       },
       select: {
@@ -122,10 +122,11 @@ export async function generateOpGrantSpaces() {
     lastId = proposals[proposals.length - 1].id;
 
     for (const proposal of proposals) {
-      const projectNameField = proposal.form?.formFields.find(formField => formField.name === "Project name:" || formField.name === "Project Name:" || formField.name === "Project Name");
+      const projectNameField = proposal.form?.formFields.find(formField => formField.name.toLowerCase().startsWith('project name'));
       const projectTitle = (projectNameField?.answers.find(answer => answer.proposalId === proposal.id)?.value as string)?.replace(/[\p{Emoji}]/gu, '').trim();
       const projectData = uniqueProjectsData.find(projectData => projectData['Project Name'] === projectTitle);
 
+      // If project title is not found in the CSV, or if it's already processed, or if it's not in the list of unique projects, or if the project data is not found, skip
       if (!projectTitle || extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle) || !projectData) {
         current++;
         console.log(`Project ${current} of ${total} done.`)
@@ -149,6 +150,7 @@ export async function generateOpGrantSpaces() {
           "Project name": projectTitle,
           "Invite link": `https://app.charmverse.io/join?domain=${space.domain}`,
           "Twitter handle": extractTwitterUsername(projectData["Twitter"]) ?? '',
+          "Space id": space.id,
         })
         extractedProjectsTitles.add(projectTitle);
         await addCharms({
