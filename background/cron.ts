@@ -12,6 +12,7 @@ import { task as archiveTask } from './tasks/deleteArchivedPages';
 import { indexPendingCredentialsTask } from './tasks/indexPendingCredentialsTask';
 import { task as processCollablandWebhookMessages } from './tasks/processCollablandWebhookMessages';
 import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
+import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages.ts';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
@@ -28,6 +29,9 @@ processCollablandWebhookMessages();
 
 // Start processing github webhook messages
 processGithubWebhookMessages();
+
+// Start processing synaps webhook messages
+processSynapsWebhookMessages();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);

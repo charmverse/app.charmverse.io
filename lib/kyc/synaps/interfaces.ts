@@ -44,3 +44,11 @@ export type SynapsIndividualSession = {
 };
 
 export type SynapsSessionDetails = Pick<SynapsIndividualSession['session'], 'id' | 'sandbox' | 'status'>;
+
+export type SynapsEventData = {
+  reason: string;
+  service: string;
+  session_id: string;
+  status: SynapsUserKycStatus;
+  step_id: string;
+};

@@ -1,4 +1,3 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getSynapsIndividualSession } from './getSynapsIndividualSession';
