@@ -72,7 +72,7 @@ export function useGetSynapsSession(spaceId: MaybeString) {
 }
 
 export function useGetPersonaInquiry(spaceId: MaybeString) {
-  return useGET<PersonaInquiry>(`/api/spaces/${spaceId}/kyc-credentials/persona`);
+  return useGET<PersonaInquiry | null>(spaceId ? `/api/spaces/${spaceId}/kyc-credentials/persona` : null);
 }
 
 export function useInitPersonaInquiry(spaceId: MaybeString) {

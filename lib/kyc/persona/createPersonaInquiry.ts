@@ -30,18 +30,20 @@ export async function createPersonaInquiry(spaceId: string, userId: string): Pro
       apiKey: personaCredential.apiKey
     });
 
-    const isReadOnly = ['pending', 'completed', 'needs_review', 'approved'].includes(
-      individualInquiry.data.attributes.status
-    );
+    const status = individualInquiry.data?.attributes?.status;
+
+    const isReadOnly = ['pending', 'completed', 'needs_review', 'approved'].includes(status);
 
     if (isReadOnly) {
-      throw new UnauthorisedActionError(
-        `You can't create a data for this user because of his status: ${individualInquiry.data.attributes.status}`
-      );
+      throw new UnauthorisedActionError(`You can't create a data for this user because of his status: ${status}`);
     }
   }
 
-  const inquiry = await initPersonaSession({ userId, apiKey: personaCredential.apiKey });
+  const inquiry = await initPersonaSession({
+    userId,
+    apiKey: personaCredential.apiKey,
+    templateId: personaCredential.templateId
+  });
 
   await prisma.personaUserKyc.upsert({
     where: {

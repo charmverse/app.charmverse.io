@@ -25,9 +25,7 @@ import { SnapshotIntegration } from './SnapshotDomain';
 import { SpaceKyc } from './SpaceKyc';
 import { SynapsModal } from './SynapsModal';
 
-const PersonaModalWithConfirmationWithoutSSR = dynamic(() => import('./PersonaModal'), {
-  ssr: false
-});
+const PersonaModal = dynamic(() => import('./PersonaModal'), { ssr: false });
 
 const schema = yup.object({
   snapshotDomain: yup
@@ -172,22 +170,19 @@ export function SpaceIntegrations({ space }: { space: Space }) {
             <SpaceKyc control={control} isAdmin={isAdmin} />
           </Grid>
         )}
-        {isCharmverseSpace && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
+        {isCharmverseSpace && isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
           <Grid item>
             <SynapsModal spaceId={space.id} />
           </Grid>
         )}
         {isCharmverseSpace &&
+          isAdmin &&
           space.kycOption === 'persona' &&
           kycCredentials?.persona?.apiKey &&
           kycCredentials.persona.envId &&
           kycCredentials.persona.templateId && (
             <Grid item>
-              <PersonaModalWithConfirmationWithoutSSR
-                spaceId={space.id}
-                templateId={kycCredentials.persona.templateId}
-                environmentId={kycCredentials.persona.envId}
-              />
+              <PersonaModal spaceId={space.id} />
             </Grid>
           )}
       </Grid>

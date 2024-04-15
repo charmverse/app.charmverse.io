@@ -22,7 +22,7 @@ export type SynapsIndividualSession = {
   session: {
     id: string;
     status: SynapsUserKycStatus;
-    sandbox: boolean;
+    sandbox?: boolean;
     steps: [
       {
         id: string;
@@ -43,7 +43,7 @@ export type SynapsIndividualSession = {
   };
 };
 
-export type SynapsSessionDetails = Pick<SynapsIndividualSession['session'], 'id' | 'sandbox' | 'status'>;
+export type SynapsSessionDetails = Pick<SynapsIndividualSession['session'], 'id' | 'status'>;
 
 export type SynapsEventData = {
   reason: string;

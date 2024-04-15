@@ -4,17 +4,32 @@ import { personaUrl, personaVersion } from '../config';
 
 import type { PersonaInquiryAPIResponse } from './interfaces';
 
-export async function initPersonaSession({ userId, apiKey }: { userId: string; apiKey: string }) {
-  return POST<PersonaInquiryAPIResponse>(
+export async function initPersonaSession({
+  userId,
+  apiKey,
+  templateId
+}: {
+  userId: string;
+  apiKey: string;
+  templateId: string;
+}) {
+  const resp = await POST<PersonaInquiryAPIResponse>(
     `${personaUrl}/inquiries`,
     {
+      data: {
+        attributes: {
+          'inquiry-template-id': templateId
+        }
+      },
       meta: {
         'auto-create-account': true,
         'auto-create-account-reference-id': userId
       }
     },
     {
-      headers: { 'persona-version': personaVersion, Authorization: `Bearer ${apiKey}` }
+      headers: { 'Persona-Version': personaVersion, authorization: `Bearer ${apiKey}` }
     }
   );
+
+  return resp;
 }

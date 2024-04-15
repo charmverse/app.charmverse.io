@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPersonaInquiryData } from './getPersonaInquiry';
 import type { PersonaInquiry } from './interfaces';
 
 export async function getPersonaInquiryDetails(spaceId: string, userId: string): Promise<PersonaInquiry | null> {
@@ -18,22 +17,12 @@ export async function getPersonaInquiryDetails(spaceId: string, userId: string):
     })
   ]);
 
-  if (!personaCredential?.apiKey) {
+  if (!personaCredential?.apiKey || !personaUserKyc?.inquiryId || !personaUserKyc.status) {
     return null;
   }
-
-  if (!personaUserKyc?.inquiryId) {
-    return null;
-  }
-
-  const inquiry = await getPersonaInquiryData({
-    inquiryId: personaUserKyc.inquiryId,
-    apiKey: personaCredential.apiKey
-  });
 
   return {
-    inquiryId: inquiry.data.id,
-    status: inquiry.data.attributes.status,
-    sandbox: false // @TODO check to see if I can get the sandbox status from the API
+    inquiryId: personaUserKyc.inquiryId,
+    status: personaUserKyc.status
   };
 }
