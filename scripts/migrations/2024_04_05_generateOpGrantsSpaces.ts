@@ -4,11 +4,11 @@ import { parse } from 'csv-parse/sync';
 import { addCharms } from 'lib/charms/addCharms';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
 import { createWorkspace } from 'lib/spaces/createSpace';
-import { appendFileSync, readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { unparse } from 'papaparse';
 
-const spaceDomain = "concrete-floor-sailfish";
+const spaceDomain = "op-grants";
 const FILE_INPUT_PATH = path.join(__dirname, 'op.csv');
 const FILE_OUTPUT_PATH = path.join(__dirname, 'op-output.csv');
 
@@ -16,7 +16,6 @@ function getCsvData<T>(path: string): T[] {
   try {
     const content = readFileSync(path).toString();
     const records = parse(content, { columns: true }) as T[];
-
     return records;
   } catch (e) {
   }
@@ -33,8 +32,7 @@ type ProjectData = {
 type ExtractedProjectData = {
   "Project name": string
   "Twitter handle": string
-  "Invite link": string,
-  "Space id": string
+  "Invite link": string
 }
 
 function extractTwitterUsername(twitterValue: string) {
@@ -44,7 +42,7 @@ function extractTwitterUsername(twitterValue: string) {
     const url = new URL(twitterValue);
     if (url.hostname === 'twitter.com' || url.hostname === 'x.com') {
       const [,username] = url.pathname.split('/');
-      return username
+      return username.split("?")[0]
     }
   }
 
@@ -53,23 +51,15 @@ function extractTwitterUsername(twitterValue: string) {
 
 export async function generateOpGrantSpaces() {
   const projectsData = getCsvData<ProjectData>(FILE_INPUT_PATH);
-  const projectTitles: Set<string> = new Set();
-  const uniqueProjectsData: ProjectData[] = [];
+  const projectTitles: Set<string> = new Set(projectsData.map(projectData => projectData['Project Name'].trim()));
 
-  for (const projectData of projectsData) {
-    if (!projectTitles.has(projectData['Project Name'])) {
-      projectTitles.add(projectData['Project Name']);
-      uniqueProjectsData.push(projectData);
-    }
-  }
-
-  const total = uniqueProjectsData.length;
+  const total = projectsData.length;
   let current = 0;
 
   const extractedProjectsTitles = new Set<string>();
   const extractedProjectsData: ExtractedProjectData[]= []
 
-  let lastId = '';
+  let lastId = '1662b274-264c-4142-8ad5-50b79a25d11c';
   const batchSize = 100;
 
   while (true) {
@@ -123,13 +113,10 @@ export async function generateOpGrantSpaces() {
 
     for (const proposal of proposals) {
       const projectNameField = proposal.form?.formFields.find(formField => formField.name.toLowerCase().startsWith('project name'));
-      const projectTitle = (projectNameField?.answers.find(answer => answer.proposalId === proposal.id)?.value as string)?.replace(/[\p{Emoji}]/gu, '').trim();
-      const projectData = uniqueProjectsData.find(projectData => projectData['Project Name'] === projectTitle);
-
+      const projectTitle = (projectNameField?.answers.find(answer => answer.proposalId === proposal.id)?.value as string)?.replace(/[^\p{L}\p{N}\p{P}\p{Z}|^$\n]/gu, '').trim();
+      const projectData = projectsData.find(projectData => projectData['Project Name'].trim() === projectTitle);
       // If project title is not found in the CSV, or if it's already processed, or if it's not in the list of unique projects, or if the project data is not found, skip
       if (!projectTitle || extractedProjectsTitles.has(projectTitle) || !projectTitles.has(projectTitle) || !projectData) {
-        current++;
-        console.log(`Project ${current} of ${total} done.`)
         continue;
       }
 
@@ -149,27 +136,26 @@ export async function generateOpGrantSpaces() {
         extractedProjectsData.push({
           "Project name": projectTitle,
           "Invite link": `https://app.charmverse.io/join?domain=${space.domain}`,
-          "Twitter handle": extractTwitterUsername(projectData["Twitter"]) ?? '',
-          "Space id": space.id,
+          "Twitter handle": extractTwitterUsername(projectData["Twitter"]) || ''
         })
         extractedProjectsTitles.add(projectTitle);
-        await addCharms({
-          amount: projectData["Won?"] === "Yes" ? 10 : 2,
+        await Promise.all(authors.map(author => addCharms({
+          amount: projectData["Won?"] === "Yes" ? 100 : 20,
           recipient: {
-            spaceId: space.id,
+            userId: author,
           },
           actorId: proposal.createdBy,
-        })
+        })))
       } catch (err) {
         log.error(`Error creating space for project ${projectTitle}`, err);
       } finally {
         current++;
-        console.log(`Project ${current} of ${total} done.`)
+        console.log(`Project ${current} of ${total} done. ID: ${proposal.id}`)
       }
     }
   }
 
-  appendFileSync(FILE_OUTPUT_PATH, unparse(extractedProjectsData));
+  writeFileSync(FILE_OUTPUT_PATH, unparse(extractedProjectsData));
 }
 
 generateOpGrantSpaces().then(() => console.log('Done'));
