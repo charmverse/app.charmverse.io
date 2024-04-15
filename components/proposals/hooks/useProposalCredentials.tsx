@@ -2,10 +2,8 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
 import { useCallback } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetIssuableProposalCredentials, useGetIssuedProposalCredentials } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -13,7 +11,6 @@ import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
-import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type {
   IssuableProposalCredentialContent,
   PartialIssuableProposalCredentialContent
@@ -119,7 +116,8 @@ export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: str
       userWalletCanIssueCredentialsForSpace,
       gnosisSafeForCredentials,
       refreshIssuableCredentials,
-      proposeTransaction
+      proposeTransaction,
+      space?.id
     ]
   );
 
@@ -136,7 +134,11 @@ export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: str
 
 export function useProposalCredentials({ proposalId }: { proposalId: MaybeString }) {
   const { space } = useCurrentSpace();
-  const { data: issuedCredentials, isLoading: isLoadingIssuedCredentials } = useGetIssuedProposalCredentials({
+  const {
+    data: issuedCredentials,
+    isLoading: isLoadingIssuedCredentials,
+    mutate: refreshIssuedCredentials
+  } = useGetIssuedProposalCredentials({
     proposalId
   });
   const multiCredentials = useMultiProposalCredentials({ proposalIds: proposalId ? [proposalId] : null });
@@ -145,6 +147,7 @@ export function useProposalCredentials({ proposalId }: { proposalId: MaybeString
     ...multiCredentials,
     issuedCredentials,
     isLoadingIssuedCredentials,
+    refreshIssuedCredentials,
     hasPendingOnchainCredentials:
       !!space?.useOnchainCredentials && !!multiCredentials.issuableProposalCredentials?.length
   };

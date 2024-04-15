@@ -12,6 +12,7 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
@@ -49,7 +50,7 @@ export type IssuableProposalCredentialContent = {
   credentialTemplateId: string;
   proposalId: string;
   pageId: string;
-  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
+  event: Extract<CredentialEventType, 'proposal_approved'>;
 };
 
 // A partial subtype to reduce data passed around the system
@@ -67,7 +68,7 @@ type GenerateCredentialsParams = {
   pendingIssuableCredentials?: PartialIssuableProposalCredentialContent[];
 };
 
-const events: CredentialEventType[] = ['proposal_created', 'proposal_approved'];
+const events: CredentialEventType[] = ['proposal_approved'];
 
 export function generateCredentialInputsForProposal({
   proposal,
@@ -75,6 +76,13 @@ export function generateCredentialInputsForProposal({
   pendingIssuableCredentials
 }: GenerateCredentialsParams): IssuableProposalCredentialContent[] {
   if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length) {
+    return [];
+  }
+
+  const currentStep = getCurrentEvaluation(proposal.evaluations);
+
+  // We only support proposal_approved, so proposal needs to have reached final evaluation
+  if (currentStep?.result !== 'pass') {
     return [];
   }
 
@@ -88,7 +96,7 @@ export function generateCredentialInputsForProposal({
     currentEvaluation?.result === 'pass' &&
     currentEvaluation.index === Math.max(...proposal.evaluations.map((e) => e.index));
 
-  const issuableEvents: CredentialEventType[] = isApprovedProposal ? [...events] : ['proposal_created'];
+  const issuableEvents: CredentialEventType[] = ['proposal_approved'];
 
   proposal.authors.forEach(({ author }) => {
     const targetWallet = author.primaryWallet?.address ?? author.wallets[0]?.address;
@@ -136,7 +144,7 @@ export function generateCredentialInputsForProposal({
               proposalId: proposal.id,
               recipientUserId: author.id,
               pageId: proposal.page.id,
-              event: event as Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>,
+              event: event as Extract<CredentialEventType, 'proposal_approved'>,
               credential: {
                 Name: credentialTemplate.name,
                 Description: credentialTemplate.description ?? '',
@@ -163,7 +171,9 @@ function proposalCredentialInputFieldsSelect() {
       select: {
         id: true,
         result: true,
-        index: true
+        index: true,
+        type: true,
+        title: true
       }
     },
     issuedCredentials: {

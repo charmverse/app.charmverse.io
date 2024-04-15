@@ -43,11 +43,11 @@ describe('issueProposalCredentialIfNecessary', () => {
     const author2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, wallet: randomETHWalletAddress() });
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_approved', 'proposal_created']
+      credentialEvents: ['proposal_approved']
     });
     const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_approved', 'proposal_created']
+      credentialEvents: ['proposal_approved']
     });
 
     const proposal = await testUtilsProposals.generateProposal({
@@ -68,17 +68,8 @@ describe('issueProposalCredentialIfNecessary', () => {
       event: 'proposal_approved',
       proposalId: proposal.id
     });
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_created',
-      proposalId: proposal.id
-    });
 
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_created',
-      proposalId: proposal.id
-    });
-
-    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(8);
+    expect(mockedPublishSignedCredential).toHaveBeenCalledTimes(4);
 
     const issuedCredentials = await prisma.issuedCredential.findMany({
       where: {
@@ -86,8 +77,8 @@ describe('issueProposalCredentialIfNecessary', () => {
       }
     });
 
-    // 2 event types * 2 credential templates * 2 authors
-    expect(issuedCredentials).toHaveLength(8);
+    // 1 event types * 2 credential templates * 2 authors
+    expect(issuedCredentials).toHaveLength(4);
 
     expect(issuedCredentials).toMatchObject(
       expect.arrayContaining<Partial<IssuedCredential>>([
@@ -110,26 +101,6 @@ describe('issueProposalCredentialIfNecessary', () => {
           userId: author2.id,
           credentialEvent: 'proposal_approved',
           credentialTemplateId: secondCredentialTemplate.id
-        }),
-        expect.objectContaining({
-          userId: author1.id,
-          credentialEvent: 'proposal_created',
-          credentialTemplateId: firstCredentialTemplate.id
-        }),
-        expect.objectContaining({
-          userId: author2.id,
-          credentialEvent: 'proposal_created',
-          credentialTemplateId: firstCredentialTemplate.id
-        }),
-        expect.objectContaining({
-          userId: author1.id,
-          credentialEvent: 'proposal_created',
-          credentialTemplateId: secondCredentialTemplate.id
-        }),
-        expect.objectContaining({
-          userId: author2.id,
-          credentialEvent: 'proposal_created',
-          credentialTemplateId: secondCredentialTemplate.id
         })
       ])
     );
@@ -142,7 +113,7 @@ describe('issueProposalCredentialIfNecessary', () => {
     });
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_approved', 'proposal_created']
+      credentialEvents: ['proposal_approved']
     });
 
     const proposal = await testUtilsProposals.generateProposal({
@@ -248,11 +219,6 @@ describe('issueProposalCredentialIfNecessary', () => {
 
     await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
-      proposalId: proposal.id
-    });
-
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_created',
       proposalId: proposal.id
     });
 
@@ -440,7 +406,7 @@ describe('issueProposalCredentialIfNecessary', () => {
     expect(issuedCredentials).toHaveLength(0);
   });
 
-  it('should not issue a proposal_created credential if the proposal status is draft', async () => {
+  it('should not issue a proposal_approved credential if the proposal status is draft', async () => {
     const { space, user: author1 } = await testUtilsUser.generateUserAndSpace({
       wallet: randomETHWalletAddress(),
       domain: `cvt-testing-${uuid()}`
@@ -448,7 +414,7 @@ describe('issueProposalCredentialIfNecessary', () => {
 
     const firstCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_created']
+      credentialEvents: ['proposal_approved']
     });
 
     const proposal = await testUtilsProposals.generateProposal({
@@ -461,7 +427,7 @@ describe('issueProposalCredentialIfNecessary', () => {
     });
 
     await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_created',
+      event: 'proposal_approved',
       proposalId: proposal.id
     });
 

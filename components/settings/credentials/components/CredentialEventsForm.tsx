@@ -6,7 +6,7 @@ import type { CredentialToggled } from './CredentialEventToggle';
 import { CredentialEventToggle } from './CredentialEventToggle';
 
 const availableCredentialEvents: Record<AttestationType, CredentialEventType[]> = {
-  proposal: ['proposal_approved', 'proposal_created'],
+  proposal: ['proposal_approved'],
   reward: ['reward_submission_approved'],
   external: ['proposal_approved']
 };

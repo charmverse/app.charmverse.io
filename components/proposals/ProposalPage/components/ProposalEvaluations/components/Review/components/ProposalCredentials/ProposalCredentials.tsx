@@ -22,41 +22,6 @@ export type UserCredentialRowProps = {
   verificationUrl?: string;
 };
 
-function PendngCredentialRow({ credential, isSmallScreen, verificationUrl }: UserCredentialRowProps) {
-  const { showMessage } = useSnackbar();
-  const { user } = useUser();
-  const { space } = useCurrentSpace();
-
-  const credentialInfo = {
-    title: credential.title,
-    subtitle: credential.subtitle,
-    iconUrl: space?.credentialLogo || '/images/logo_black_lightgrey.png'
-  };
-
-  return (
-    <Stack gap={1} alignItems='center' justifyContent='space-between' flexDirection='row'>
-      <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='50%'>
-        <Image
-          src={credentialInfo.iconUrl}
-          alt='charmverse-logo'
-          height={isSmallScreen ? 40 : 30}
-          width={isSmallScreen ? 40 : 30}
-        />
-        <Box display='flex' flexDirection='column' flexGrow={1}>
-          <Typography variant='body1' fontWeight='bold'>
-            {credentialInfo.title}
-          </Typography>
-          <Typography variant='caption'>{credentialInfo.subtitle}</Typography>
-        </Box>
-      </Box>
-      {/* <Stack justifyContent='space-between' alignItems='center' flexDirection='row' width='50%'>
-        {attestationContentComponent}
-        {favoriteAndVerificationIconsComponent}
-      </Stack> */}
-    </Stack>
-  );
-}
-
 const preventAccordionToggle = (e: any) => e.stopPropagation();
 
 export function ProposalCredentials({
@@ -66,7 +31,7 @@ export function ProposalCredentials({
   selectedCredentialTemplates: string[];
   proposalId: string;
 }) {
-  const { issuedCredentials, issuableProposalCredentials } = useProposalCredentials({
+  const { issuedCredentials, issuableProposalCredentials, refreshIssuedCredentials } = useProposalCredentials({
     proposalId
   });
   const { space } = useCurrentSpace();
@@ -108,7 +73,10 @@ export function ProposalCredentials({
       {space?.useOnchainCredentials && space.credentialsWallet && issuableProposalCredentials?.length ? (
         <Box display='flex' justifyContent='flex-end'>
           <Box width='fit-content'>
-            <IssueProposalCredentials selectedPageIds={[proposalId]} />
+            <IssueProposalCredentials
+              selectedPageIds={[proposalId]}
+              onIssueCredentialsSuccess={refreshIssuedCredentials}
+            />
           </Box>
         </Box>
       ) : null}

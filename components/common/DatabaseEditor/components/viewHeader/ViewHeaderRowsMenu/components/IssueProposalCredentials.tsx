@@ -1,5 +1,5 @@
 import type { SystemError } from '@charmverse/core/errors';
-import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
+import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Box, ListItemText, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useState } from 'react';
@@ -18,10 +18,12 @@ import { conditionalPlural } from 'lib/utils/strings';
 
 export function IssueProposalCredentials({
   selectedPageIds,
-  asMenuItem
+  asMenuItem,
+  onIssueCredentialsSuccess
 }: {
   selectedPageIds: string[];
   asMenuItem?: boolean;
+  onIssueCredentialsSuccess?: () => void;
 }) {
   const { getFeatureTitle } = useSpaceFeatures();
 
@@ -61,8 +63,9 @@ export function IssueProposalCredentials({
       if (result === 'gnosis') {
         showMessage('Transaction submitted to Gnosis Safe. Please execute it there');
       } else {
-        showMessage(`Issued ${_issuableProposalCredentials.length} proposal credentials`);
+        showMessage(`Issued ${_issuableProposalCredentials.length} ${proposalLabel} credentials`);
       }
+      onIssueCredentialsSuccess?.();
     } catch (err: any) {
       if (err.code === 'ACTION_REJECTED') {
         showMessage('Transaction rejected', 'warning');
@@ -123,7 +126,7 @@ export function IssueProposalCredentials({
         {asMenuItem ? (
           <div>
             <StyledMenuItem onClick={_handleIssueCredentials} disabled={!!disableIssueCredentials}>
-              <CheckCircleOutlinedIcon
+              <MedalIcon
                 fontSize='small'
                 sx={{
                   mr: 1

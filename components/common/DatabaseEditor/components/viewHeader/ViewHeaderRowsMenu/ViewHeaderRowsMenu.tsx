@@ -112,6 +112,7 @@ export type ViewHeaderRowsMenuProps = {
   showTrashIcon?: boolean;
   onMarkRewardsAsPaid?: () => Promise<void>;
   onMarkRewardsAsComplete?: () => Promise<void>;
+  onIssueCredentialsSuccess?: () => void;
   sx?: SxProps;
 };
 
@@ -143,6 +144,7 @@ export function ViewHeaderRowsMenu({
   onMarkRewardsAsComplete,
   onMarkRewardsAsPaid,
   onChangeRewardsToken,
+  onIssueCredentialsSuccess,
   sx
 }: ViewHeaderRowsMenuProps) {
   const isAdmin = useIsAdmin();
@@ -337,7 +339,13 @@ export function ViewHeaderRowsMenu({
           </div>
         </Tooltip>
       )}
-      {showIssueProposalCredentials && <IssueProposalCredentials asMenuItem selectedPageIds={checkedIds} />}
+      {showIssueProposalCredentials && (
+        <IssueProposalCredentials
+          asMenuItem
+          selectedPageIds={checkedIds}
+          onIssueCredentialsSuccess={onIssueCredentialsSuccess}
+        />
+      )}
       {showIssueRewardCredentials && <IssueRewardCredentials selectedPageIds={checkedIds} />}
       {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (

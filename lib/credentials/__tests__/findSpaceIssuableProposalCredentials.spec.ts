@@ -23,7 +23,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_approved', 'proposal_created'],
+      credentialEvents: ['proposal_approved'],
       schemaType: 'proposal',
       schemaAddress: '0x1234',
       description: 'Description 1',
@@ -52,27 +52,12 @@ describe('findSpaceIssuableProposalCredentials', () => {
     const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
 
     // 1 author * 2 proposals * 1 credential template * 2 events
-    expect(result).toHaveLength(4);
+    expect(result).toHaveLength(2);
 
     expect(result).toMatchObject(
       expect.arrayContaining<IssuableProposalCredentialContent>([
         {
           proposalId: proposal.id,
-          recipientUserId: space.createdBy,
-          recipientAddress: authorWalletAddress,
-          credentialTemplateId: credentialTemplate.id,
-          event: 'proposal_created',
-          pageId: proposal.page.id,
-          credential: {
-            Description: credentialTemplate.description,
-            Name: credentialTemplate.name,
-            Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
-            URL: getPagePermalink({ pageId: proposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: proposal.id,
           recipientUserId: author.id,
           recipientAddress: authorWalletAddress,
           credentialTemplateId: credentialTemplate.id,
@@ -98,21 +83,6 @@ describe('findSpaceIssuableProposalCredentials', () => {
             Name: credentialTemplate.name,
             Organization: credentialTemplate.organization,
             Event: `Proposal ${proposalApprovedVerb}`,
-            URL: getPagePermalink({ pageId: secondProposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: secondProposal.id,
-          recipientUserId: space.createdBy,
-          recipientAddress: authorWalletAddress,
-          credentialTemplateId: credentialTemplate.id,
-          event: 'proposal_created',
-          pageId: secondProposal.page.id,
-          credential: {
-            Description: credentialTemplate.description,
-            Name: credentialTemplate.name,
-            Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
             URL: getPagePermalink({ pageId: secondProposal.page.id })
           }
         } as IssuableProposalCredentialContent
@@ -124,7 +94,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
       proposalIds: [secondProposal.id]
     });
 
-    expect(resultWithSelectedProposalId).toHaveLength(2);
+    expect(resultWithSelectedProposalId).toHaveLength(1);
 
     expect(resultWithSelectedProposalId).toMatchObject(
       expect.arrayContaining<IssuableProposalCredentialContent>([
@@ -140,21 +110,6 @@ describe('findSpaceIssuableProposalCredentials', () => {
             Name: credentialTemplate.name,
             Organization: credentialTemplate.organization,
             Event: `Proposal ${proposalApprovedVerb}`,
-            URL: getPagePermalink({ pageId: secondProposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: secondProposal.id,
-          recipientUserId: space.createdBy,
-          recipientAddress: authorWalletAddress,
-          credentialTemplateId: credentialTemplate.id,
-          event: 'proposal_created',
-          pageId: secondProposal.page.id,
-          credential: {
-            Description: credentialTemplate.description,
-            Name: credentialTemplate.name,
-            Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
             URL: getPagePermalink({ pageId: secondProposal.page.id })
           }
         } as IssuableProposalCredentialContent
@@ -174,7 +129,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_approved', 'proposal_created'],
+      credentialEvents: ['proposal_approved'],
       schemaType: 'proposal',
       schemaAddress: '0x1234',
       description: 'Description 1',
@@ -184,7 +139,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
 
     const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_approved', 'proposal_created'],
+      credentialEvents: ['proposal_approved'],
       schemaType: 'proposal',
       schemaAddress: '0x1234',
       description: 'Description 2',
@@ -236,7 +191,7 @@ describe('findSpaceIssuableProposalCredentials', () => {
           [proposal.id]: [
             {
               credentialTemplateId: secondCredentialTemplate.id,
-              event: 'proposal_created',
+              event: 'proposal_approved',
               proposalId: proposal.id,
               recipientAddress: secondAuthorWalletAddress
             }
@@ -247,41 +202,10 @@ describe('findSpaceIssuableProposalCredentials', () => {
 
     const result = await findSpaceIssuableProposalCredentials({ spaceId: space.id });
 
-    // Missing 1 event from first credential, and both events from second credential
-    // expect(result).toHaveLength(7);
+    expect(result).toHaveLength(2);
 
     expect(result).toMatchObject(
       expect.arrayContaining<IssuableProposalCredentialContent>([
-        {
-          proposalId: proposal.id,
-          recipientUserId: space.createdBy,
-          recipientAddress: userWalletAddress,
-          credentialTemplateId: credentialTemplate.id,
-          event: 'proposal_created',
-          pageId: proposal.page.id,
-          credential: {
-            Description: credentialTemplate.description,
-            Name: credentialTemplate.name,
-            Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
-            URL: getPagePermalink({ pageId: proposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: proposal.id,
-          recipientUserId: space.createdBy,
-          recipientAddress: userWalletAddress,
-          credentialTemplateId: secondCredentialTemplate.id,
-          event: 'proposal_created',
-          pageId: proposal.page.id,
-          credential: {
-            Description: secondCredentialTemplate.description,
-            Name: secondCredentialTemplate.name,
-            Organization: secondCredentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
-            URL: getPagePermalink({ pageId: proposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
         {
           proposalId: proposal.id,
           recipientUserId: user.id,
@@ -303,42 +227,12 @@ describe('findSpaceIssuableProposalCredentials', () => {
           recipientUserId: secondAuthor.id,
           recipientAddress: secondAuthorWalletAddress,
           credentialTemplateId: credentialTemplate.id,
-          event: 'proposal_created',
-          pageId: proposal.page.id,
-          credential: {
-            Description: credentialTemplate.description,
-            Name: credentialTemplate.name,
-            Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
-            URL: getPagePermalink({ pageId: proposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: proposal.id,
-          recipientUserId: secondAuthor.id,
-          recipientAddress: secondAuthorWalletAddress,
-          credentialTemplateId: credentialTemplate.id,
-          event: 'proposal_created',
-          pageId: proposal.page.id,
-          credential: {
-            Description: credentialTemplate.description,
-            Name: credentialTemplate.name,
-            Organization: credentialTemplate.organization,
-            Event: `${proposalCreatedVerb} Proposal`,
-            URL: getPagePermalink({ pageId: proposal.page.id })
-          }
-        } as IssuableProposalCredentialContent,
-        {
-          proposalId: proposal.id,
-          recipientUserId: secondAuthor.id,
-          recipientAddress: secondAuthorWalletAddress,
-          credentialTemplateId: secondCredentialTemplate.id,
           event: 'proposal_approved',
           pageId: proposal.page.id,
           credential: {
-            Description: secondCredentialTemplate.description,
-            Name: secondCredentialTemplate.name,
-            Organization: secondCredentialTemplate.organization,
+            Description: credentialTemplate.description,
+            Name: credentialTemplate.name,
+            Organization: credentialTemplate.organization,
             Event: `Proposal ${proposalApprovedVerb}`,
             URL: getPagePermalink({ pageId: proposal.page.id })
           }
@@ -399,7 +293,7 @@ describe('generateCredentialInputsForProposal', () => {
           name: 'Template 1',
           description: 'Description 1',
           organization: 'Org 1',
-          credentialEvents: ['proposal_approved', 'proposal_created']
+          credentialEvents: ['proposal_approved']
         }
       ] as Pick<
         CredentialTemplate,
@@ -435,36 +329,6 @@ describe('generateCredentialInputsForProposal', () => {
           Name: space.credentialTemplates[0].name,
           Organization: space.credentialTemplates[0].organization,
           Event: 'Proposal Approved',
-          URL: getPagePermalink({ pageId: proposal.page.id })
-        }
-      },
-      {
-        proposalId,
-        credentialTemplateId: credentialTemplateId1,
-        recipientAddress: authorWalletAddress1,
-        recipientUserId: authorId1,
-        pageId: proposal.page.id,
-        event: 'proposal_created',
-        credential: {
-          Description: space.credentialTemplates[0].description,
-          Name: space.credentialTemplates[0].name,
-          Organization: space.credentialTemplates[0].organization,
-          Event: 'Published Proposal',
-          URL: getPagePermalink({ pageId: proposal.page.id })
-        }
-      },
-      {
-        proposalId,
-        credentialTemplateId: credentialTemplateId1,
-        recipientAddress: authorWalletAddress2,
-        recipientUserId: authorId2,
-        pageId: proposal.page.id,
-        event: 'proposal_created',
-        credential: {
-          Description: space.credentialTemplates[0].description,
-          Name: space.credentialTemplates[0].name,
-          Organization: space.credentialTemplates[0].organization,
-          Event: 'Published Proposal',
           URL: getPagePermalink({ pageId: proposal.page.id })
         }
       }
@@ -509,7 +373,7 @@ describe('generateCredentialInputsForProposal', () => {
           name: 'Template 1',
           description: 'Description 1',
           organization: 'Org 1',
-          credentialEvents: ['proposal_approved', 'proposal_created']
+          credentialEvents: ['proposal_approved']
         }
       ] as Pick<
         CredentialTemplate,
@@ -555,7 +419,7 @@ describe('generateCredentialInputsForProposal', () => {
           name: 'Template 1',
           description: 'Description 1',
           organization: 'Org 1',
-          credentialEvents: ['proposal_approved', 'proposal_created']
+          credentialEvents: ['proposal_approved']
         }
       ] as Pick<
         CredentialTemplate,
@@ -609,7 +473,7 @@ describe('generateCredentialInputsForProposal', () => {
           name: 'Template 1',
           description: 'Description 1',
           organization: 'Org 1',
-          credentialEvents: ['proposal_approved', 'proposal_created']
+          credentialEvents: ['proposal_approved']
         }
       ] as Pick<
         CredentialTemplate,
@@ -698,7 +562,7 @@ describe('generateCredentialInputsForProposal', () => {
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_created'],
+      credentialEvents: ['proposal_approved'],
       schemaType: 'reward'
     });
 
@@ -716,7 +580,7 @@ describe('generateCredentialInputsForProposal', () => {
 
     // Simulate having issued this credential already
     await testUtilsCredentials.generateIssuedOnchainCredential({
-      credentialEvent: 'proposal_created',
+      credentialEvent: 'proposal_approved',
       credentialTemplateId: credentialTemplate.id,
       proposalId: proposal.id,
       userId: user.id
@@ -733,7 +597,7 @@ describe('generateCredentialInputsForProposal', () => {
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
-      credentialEvents: ['proposal_created'],
+      credentialEvents: ['proposal_approved'],
       schemaType: 'reward'
     });
 
@@ -751,7 +615,7 @@ describe('generateCredentialInputsForProposal', () => {
 
     // Simulate having issued this credential already
     await testUtilsCredentials.generateIssuedOffchainCredential({
-      credentialEvent: 'proposal_created',
+      credentialEvent: 'proposal_approved',
       credentialTemplateId: credentialTemplate.id,
       proposalId: proposal.id,
       userId: user.id

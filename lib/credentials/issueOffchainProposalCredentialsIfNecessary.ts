@@ -19,14 +19,14 @@ export async function issueOffchainProposalCredentialsIfNecessary({
   event
 }: {
   proposalId: string;
-  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
+  event: Extract<CredentialEventType, 'proposal_approved'>;
 }): Promise<void> {
   if (disablePublishedCredentials) {
     log.warn('Published credentials are disabled');
     return;
   }
 
-  if (event !== 'proposal_approved' && event !== 'proposal_created') {
+  if (event !== 'proposal_approved') {
     throw new InvalidInputError(`Invalid event type: ${event} for proposal credentials`);
   }
 
@@ -65,17 +65,15 @@ export async function issueOffchainProposalCredentialsIfNecessary({
   if (!baseProposal.selectedCredentialTemplates?.length) {
     return;
   }
-  if (event === 'proposal_approved') {
-    const currentEvaluation = getCurrentEvaluation(baseProposal.evaluations);
+  const currentEvaluation = getCurrentEvaluation(baseProposal.evaluations);
 
-    if (!currentEvaluation) {
-      return;
-    } else if (
-      currentEvaluation.id !== baseProposal.evaluations[baseProposal.evaluations.length - 1].id ||
-      currentEvaluation.result !== 'pass'
-    ) {
-      return;
-    }
+  if (!currentEvaluation) {
+    return;
+  } else if (
+    currentEvaluation.id !== baseProposal.evaluations[baseProposal.evaluations.length - 1].id ||
+    currentEvaluation.result !== 'pass'
+  ) {
+    return;
   }
 
   const proposalWithSpaceConfig = await prisma.proposal.findFirstOrThrow({
