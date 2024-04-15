@@ -52,11 +52,13 @@ import { boardWithCardsArgs } from './generateBoardStub';
 export async function generateSpaceUser({
   spaceId,
   isAdmin,
-  isGuest
+  isGuest,
+  onboarded
 }: {
   spaceId: string;
   isAdmin?: boolean;
   isGuest?: boolean;
+  onboarded?: boolean;
 }): Promise<LoggedInUser> {
   return prisma.user.create({
     data: {
@@ -75,6 +77,7 @@ export async function generateSpaceUser({
               id: spaceId
             }
           },
+          onboarded,
           isAdmin,
           isGuest: !isAdmin && isGuest
         }
@@ -95,7 +98,7 @@ export async function generateUserAndSpaceWithApiToken(
   isAdmin = true,
   spaceName = 'Example space'
 ) {
-  const user = await createUserFromWallet({ email, address: walletAddress });
+  const user = await createUserFromWallet({ email, address: walletAddress ?? randomETHWalletAddress() });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
@@ -247,6 +250,9 @@ export async function generateUserAndSpace({
   };
 }
 
+/**
+ * @customPageId used for different reward and page ids to test edge cases where these ended up different
+ */
 export async function generateBounty({
   proposalId,
   content = undefined,
@@ -266,7 +272,8 @@ export async function generateBounty({
   type = 'bounty',
   id,
   allowMultipleApplications,
-  selectedCredentialTemplates
+  selectedCredentialTemplates,
+  customPageId
 }: Pick<Bounty, 'createdBy' | 'spaceId'> &
   Partial<
     Pick<
@@ -284,11 +291,13 @@ export async function generateBounty({
     >
   > &
   Partial<Pick<Page, 'title' | 'content' | 'contentText' | 'type'>> & {
+    customPageId?: string;
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
     page?: Partial<Pick<Page, 'deletedAt'>>;
   }): Promise<Bounty & { applications: ApplicationMeta[] }> {
-  const pageId = id ?? v4();
+  const rewardId = id ?? v4();
+  const pageId = customPageId ?? rewardId;
 
   const bountyPermissionsToAssign: Omit<Prisma.BountyPermissionCreateManyInput, 'bountyId'>[] = typedKeys(
     bountyPermissions
@@ -316,7 +325,7 @@ export async function generateBounty({
     // Step 1 - Initialise bounty with page and bounty permissions
     prisma.bounty.create({
       data: {
-        id: pageId,
+        id: rewardId,
         createdBy,
         allowMultipleApplications,
         chainId,
@@ -360,7 +369,7 @@ export async function generateBounty({
     })
   ]);
 
-  return getRewardOrThrow({ rewardId: pageId });
+  return getRewardOrThrow({ rewardId });
 }
 
 export async function generateComment({
@@ -691,6 +700,13 @@ export function createPage(
           id: options.spaceId as string
         }
       },
+      parent: options.parentId
+        ? {
+            connect: {
+              id: options.parentId
+            }
+          }
+        : undefined,
       permissions: options.pagePermissions
         ? {
             createMany: {
@@ -698,7 +714,6 @@ export function createPage(
             }
           }
         : undefined,
-      parentId: options.parentId,
       deletedAt: options.deletedAt ?? null,
       boardId: options.boardId ?? null,
       additionalPaths: options.additionalPaths

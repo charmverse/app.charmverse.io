@@ -9,8 +9,6 @@ import { login } from './utils/session';
 test.describe.serial('Add a new space from sidebar and load it', async () => {
   test('Fill the form and create a new space', async ({ page }) => {
     // Arrange ------------------
-    // const userContext = await browser.newContext();
-    // const page = await userContext.newPage();
 
     const { space, user } = await generateUserAndSpace({
       email: undefined
@@ -62,15 +60,14 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await page.waitForURL(`**/${createdSpace.domain}/*`);
 
     // Await new onboarding form popup so we can close it and click on new space
-    let closePropertiesModalBtn = page.locator('data-test=close-modal');
+    let closePropertiesModalBtn = page.locator('data-test=onboarding-dialog >> data-test=close-modal');
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
     await page.locator('text=[Your DAO] Home').first().waitFor();
 
     // check sidebar space name
-    const sidebarSpaceName = await page.locator('data-test=sidebar-space-name').textContent();
-    expect(sidebarSpaceName).toBe(createdSpace.domain);
+    await expect(page.locator('data-test=sidebar-space-name')).toHaveText(createdSpace.domain);
 
     // Create and verify 2nd space
     await spaceMenuBtn.click();
@@ -88,7 +85,6 @@ test.describe.serial('Add a new space from sidebar and load it', async () => {
     await expect(closePropertiesModalBtn).toBeVisible();
     await closePropertiesModalBtn.click();
 
-    const sidebarSpaceName2 = await page.locator('data-test=sidebar-space-name').textContent();
-    expect(sidebarSpaceName2).toBe(uniqueDomainName2);
+    await expect(page.locator('data-test=sidebar-space-name')).toHaveText(uniqueDomainName2);
   });
 });

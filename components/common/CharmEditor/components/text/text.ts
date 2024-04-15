@@ -1,4 +1,4 @@
-import type { Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
 
 import type { BaseRawNodeSpec } from '../@bangle.dev/core/specRegistry';
 

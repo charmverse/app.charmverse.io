@@ -1,4 +1,5 @@
-import type { EditorState, Node } from '@bangle.dev/pm';
+import type { Node } from 'prosemirror-model';
+import type { EditorState } from 'prosemirror-state';
 
 import { getSelectedChanges } from '../fiduswriter/state_plugins/track';
 import type { TrackAttribute, TrackType } from '../fiduswriter/track/interfaces';

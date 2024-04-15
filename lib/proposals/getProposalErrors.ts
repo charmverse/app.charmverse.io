@@ -30,7 +30,7 @@ export function getProposalErrors({
   if (isDraft) {
     return errors;
   }
-  if (!page.title) {
+  if (!page.title?.trim()) {
     errors.push('Title is required');
   }
   if (!proposal.workflowId) {
@@ -58,7 +58,6 @@ export function getProposalErrors({
   } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }
-
   // get the first validation error from the evaluations
   errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
 
@@ -70,12 +69,14 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
     case 'feedback':
       return false;
     case 'rubric':
-      return !evaluation.title
+      return !evaluation.title.trim()
         ? 'Title is required for rubric criteria'
         : evaluation.reviewers.length === 0
         ? `Reviewers are required for the "${evaluation.title}" step`
         : evaluation.rubricCriteria.length === 0
         ? `At least one rubric criteria is required for the "${evaluation.title}" step`
+        : evaluation.rubricCriteria.some((c) => !c.title?.trim())
+        ? `Rubric criteria is missing a label in the "${evaluation.title}" step`
         : false;
     case 'pass_fail':
       return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;

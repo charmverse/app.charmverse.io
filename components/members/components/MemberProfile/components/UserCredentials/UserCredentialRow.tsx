@@ -1,8 +1,11 @@
 import LaunchIcon from '@mui/icons-material/Launch';
 import StarBorderOutlinedIcon from '@mui/icons-material/StarBorderOutlined';
 import StarOutlinedIcon from '@mui/icons-material/StarOutlined';
+import WorkspacePremiumIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import type { OverridableComponent } from '@mui/material/OverridableComponent';
+import type { SvgIconTypeMap } from '@mui/material/SvgIcon';
 import Image from 'next/image';
 
 import Link from 'components/common/Link';
@@ -13,21 +16,20 @@ import { useUser } from 'hooks/useUser';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
 import type { CredentialDataInput } from 'lib/credentials/schemas';
+import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
 
-export function UserCredentialRow({
-  credential,
-  readOnly = false,
-  smallScreen
-}: {
+export type UserCredentialRowProps = {
   credential: EASAttestationWithFavorite;
   readOnly?: boolean;
   smallScreen?: boolean;
-}) {
+};
+
+export function UserCredentialRow({ credential, readOnly = false, smallScreen }: UserCredentialRowProps) {
   const isSmallScreen = useSmallScreen() || smallScreen;
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
@@ -46,7 +48,10 @@ export function UserCredentialRow({
       } else {
         await addFavorite({
           chainId: credential.chainId,
-          attestationId: credential.type === 'onchain' ? credential.id : undefined,
+          attestationId:
+            (credential.type === 'onchain' || credential.type === 'charmverse') && credential.id.startsWith('0x')
+              ? credential.id
+              : undefined,
           issuedCredentialId: credential.type === 'charmverse' ? credential.issuedCredentialId : undefined,
           gitcoinWalletAddress: credential.type === 'gitcoin' ? credential.recipient : undefined
         });
@@ -59,15 +64,35 @@ export function UserCredentialRow({
   const charmCredential = credential.content as CredentialDataInput;
   const credentialInfo: {
     title: string;
-    subtitle: string;
-    iconUrl: string;
+    subtitle: string | string[];
+    iconUrl: string | OverridableComponent<SvgIconTypeMap>;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'charmverse'
+    credential.type === 'charmverse' && 'Organization' in charmCredential
       ? {
           title: charmCredential.Name,
           subtitle: charmCredential.Organization,
           iconUrl: credential.iconUrl ?? '/images/logo_black_lightgrey.png',
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+        }
+      : credential.type === 'charmverse' &&
+        credential.schemaId === externalCredentialSchemaId &&
+        'GrantRound' in charmCredential &&
+        charmCredential.Source === 'Gitcoin'
+      ? {
+          title: charmCredential.Name,
+          subtitle: ['Gitcoin Round', charmCredential.GrantRound],
+          iconUrl: credential.iconUrl ?? '/images/logos/gitcoin-logo.png',
+          attestationContent: [{ name: 'Event', value: charmCredential.Event }]
+        }
+      : credential.type === 'charmverse' &&
+        credential.schemaId === externalCredentialSchemaId &&
+        'GrantRound' in charmCredential &&
+        charmCredential.Source === 'Questbook'
+      ? {
+          title: charmCredential.Name,
+          subtitle: charmCredential.GrantRound,
+          iconUrl: credential.iconUrl ?? WorkspacePremiumIcon,
           attestationContent: [{ name: 'Event', value: charmCredential.Event }]
         }
       : credential.type === 'gitcoin'
@@ -114,7 +139,7 @@ export function UserCredentialRow({
           <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
         </Link>
       )}
-      {isUserRecipient && !readOnly && (
+      {isUserRecipient && !readOnly && credential.schemaId !== externalCredentialSchemaId && (
         <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
           <div>
             <IconButton sx={{ p: 0 }} size='small' onClick={toggleFavorite} disabled={isMutating}>
@@ -140,19 +165,31 @@ export function UserCredentialRow({
 
   const credentialOrganizationComponent = (
     <>
-      <Image
-        src={credentialInfo.iconUrl}
-        alt='charmverse-logo'
-        height={isSmallScreen ? 40 : 30}
-        width={isSmallScreen ? 40 : 30}
-      />
+      {typeof credentialInfo.iconUrl === 'string' ? (
+        <Image
+          src={credentialInfo.iconUrl}
+          alt='charmverse-logo'
+          height={isSmallScreen ? 40 : 30}
+          width={isSmallScreen ? 40 : 30}
+        />
+      ) : (
+        <credentialInfo.iconUrl fontSize='large' />
+      )}
       <Box display='flex' flexDirection='column' flexGrow={1}>
         <Typography variant='body1' fontWeight='bold'>
           {credentialInfo.title}
         </Typography>
-        <Typography variant='caption' fontWeight='bold'>
-          {credentialInfo.subtitle}
-        </Typography>
+        {typeof credentialInfo.subtitle === 'string' ? (
+          <Typography variant='caption'>{credentialInfo.subtitle}</Typography>
+        ) : (
+          <>
+            {credentialInfo.subtitle.map((sub) => (
+              <Typography variant='caption' key={sub}>
+                {sub}
+              </Typography>
+            ))}
+          </>
+        )}
       </Box>
     </>
   );

@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
 import { Box, Link, Stack } from '@mui/material';
@@ -171,6 +172,8 @@ function PropertyValueElement(props: Props) {
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
+  const showUnlimited =
+    propertyTemplate.id === REWARDS_AVAILABLE_BLOCK_ID && value.toString() === '' ? 'Unlimited' : '';
   const router = useRouter();
   const domain = router.query.domain as string;
 
@@ -662,7 +665,7 @@ function PropertyValueElement(props: Props) {
 
   const commonProps = {
     className: 'octo-propertyvalue',
-    placeholderText: emptyDisplayValue,
+    placeholderText: emptyDisplayValue || showUnlimited,
     readOnly: props.readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any),
     value: value.toString(),
     autoExpand: true,
@@ -710,9 +713,14 @@ function PropertyValueElement(props: Props) {
       </div>
     );
   } else if (propertyValueElement === null) {
+    const displayValueStr =
+      typeof displayValue === 'string' || typeof displayValue === 'number' ? displayValue.toString() : '';
+    if (typeof displayValue !== 'string') {
+      log.error('displayValue for card property is not a string', { displayValue, template: props.propertyTemplate });
+    }
     propertyValueElement = (
       <div className={clsx('octo-propertyvalue', { readonly: readOnly })}>
-        {displayValue || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
+        {displayValueStr || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}
       </div>
     );
   }

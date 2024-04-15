@@ -1,6 +1,8 @@
 // playwright-dev-page.ts
 import type { Locator, Page } from '@playwright/test';
 
+import { baseUrl } from 'config/constants';
+
 // capture actions on the pages in signup flow
 export class TokenGatePage {
   readonly page: Page;
@@ -19,6 +21,10 @@ export class TokenGatePage {
 
   readonly joinWorkspaceTextField: Locator;
 
+  readonly signInButton: Locator;
+
+  readonly verifyButton: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.tokenGateEmptyState = page.locator('data-test=token-gate-empty-state');
@@ -28,6 +34,12 @@ export class TokenGatePage {
     this.joinWorkspaceButton = page.locator('data-test=join-space-button');
     this.tokenGateFailureState = page.locator('data-test=token-gate-failure-alert');
     this.joinWorkspaceTextField = page.locator('[data-test=join-workspace-textfield] input');
+    this.signInButton = page.locator('data-test=signin-button');
+    this.verifyButton = page.locator('data-test=verify-token-gate-btn');
+  }
+
+  async goToWorkspaceUrl({ domain }: { domain: string }) {
+    await this.page.goto(`${baseUrl ? `${baseUrl}/` : '/'}join?domain=${domain}`);
   }
 
   async waitForWorkspaceURL({ domain }: { domain: string }) {

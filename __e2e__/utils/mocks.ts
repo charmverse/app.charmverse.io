@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { baseUrl } from 'config/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
 import { createPage } from 'testing/setupDatabase';
@@ -87,19 +88,6 @@ export async function createSpace({
 }
 
 /**
- * @deprecated - mock data should be generated directly, not using webapp features
- */
-export async function getPages({
-  browserPage,
-  spaceId
-}: {
-  browserPage: BrowserPage;
-  spaceId: string;
-}): Promise<PageWithPermissions[]> {
-  return browserPage.request.get(`${baseUrl}/api/spaces/${spaceId}/pages`).then((res) => res.json());
-}
-
-/**
  *
  * @deprecated - Use generateUserAndSpace() instead. Mock data should be generated directly, not using webapp features
  *
@@ -124,14 +112,12 @@ export async function createUserAndSpace({
   address: string;
   privateKey: string;
   space: Space;
-  pages: PageWithPermissions[];
 }> {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
   const user = await createUser({ browserPage, address });
   const space = await createSpace({ browserPage, createdBy: user.id, permissionConfigurationMode, paidTier });
-  const pages = await getPages({ browserPage, spaceId: space.id });
 
   const updatedRole = await prisma.spaceRole.update({
     where: {
@@ -168,8 +154,7 @@ export async function createUserAndSpace({
     space,
     address,
     privateKey: wallet.privateKey,
-    user,
-    pages
+    user
   };
 }
 
@@ -295,6 +280,8 @@ type UserAndSpaceInput = {
   skipOnboarding?: boolean;
   email?: string;
   memberSpacePermissions?: SpaceOperation[];
+  pageContent?: PageContent;
+  paidTier?: Space['paidTier'];
 };
 
 export async function generateUserAndSpace({
@@ -304,7 +291,9 @@ export async function generateUserAndSpace({
   publicBountyBoard,
   skipOnboarding = true,
   email = `${uuid()}@gmail.com`,
-  memberSpacePermissions
+  memberSpacePermissions,
+  pageContent,
+  paidTier
 }: UserAndSpaceInput = {}) {
   const wallet = Wallet.createRandom();
   const address = wallet.address;
@@ -351,7 +340,8 @@ export async function generateUserAndSpace({
             operations: memberSpacePermissions ?? ['reviewProposals'],
             spaceId
           }
-        }
+        },
+        paidTier
       }
     });
   }
@@ -360,6 +350,7 @@ export async function generateUserAndSpace({
     spaceId: space.id,
     createdBy: user.id,
     title: 'Test Page',
+    content: pageContent,
     pagePermissions: [
       {
         spaceId: space.id,

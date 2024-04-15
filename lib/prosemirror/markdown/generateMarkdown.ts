@@ -1,6 +1,6 @@
-import { Node } from '@bangle.dev/pm';
+import { Node } from 'prosemirror-model';
 
-import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage';
+import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage/nestedPage.utils';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import type { Member } from 'lib/members/interfaces';
 

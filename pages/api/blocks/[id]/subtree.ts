@@ -5,11 +5,14 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
+import { applyPropertiesToCards } from 'lib/databases/proposalsSource/applyPropertiesToCards';
+import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
+import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { isTruthy } from 'lib/utils/types';
-
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
 
@@ -54,19 +57,12 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
 
   const { blocks } = await getRelatedBlocks(blockId);
   const block = blocks.find((b) => b.id === blockId);
-  if ((block?.fields as BoardFields).sourceType === 'proposals') {
-    // Filter blocks based on proposal permissions
-    const permissionsById = await permissionsApiClient.proposals.bulkComputeProposalPermissions({
-      spaceId: page.spaceId,
-      userId: req.session.user?.id
-    });
-    // Remmeber to allow normal blocks that do not have a page, like views, to be shown
-    const filtered = blocks.filter(
-      (b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view
-    );
-    return res.status(200).json(filtered);
+
+  // Hydrate and filter blocks based on proposal permissions
+  if (block && (block.fields as BoardFields).sourceType === 'proposals') {
+    const result = await _getProposalSourceSubtree(block, blocks);
+    return res.status(200).json(result);
   } else {
-    const x = Math.random();
     const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
       pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
       userId: req.session.user?.id
@@ -75,6 +71,35 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
     const filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
     return res.status(200).json(filtered);
   }
+}
+
+// retrieve blocks for databases using "proposal as a source"
+async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockWithDetails[]) {
+  // Update board and view blocks before computing proposal cards
+  const updatedBoard = await updateBoardProperties({ boardId: block.id });
+  // use the most recent the card properties
+  block.fields = updatedBoard.fields as unknown as BoardFields;
+
+  const [permissionsById, newCardBlocks, proposalCardProperties] = await Promise.all([
+    // get permissions for each propsoal based on the database author
+    permissionsApiClient.proposals.bulkComputeProposalPermissions({
+      spaceId: block.spaceId,
+      userId: block.createdBy
+    }),
+    // create missing blocks for new proposals
+    createMissingCards({ boardId: block.id }),
+    // get properties for proposals
+    getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
+  ]);
+  // combine blocks with proposal cards and permissions
+  const assembled = applyPropertiesToCards({
+    boardProperties: block.fields.cardProperties,
+    blocks: blocks.concat(newCardBlocks),
+    permissions: permissionsById,
+    proposalCards: proposalCardProperties
+  });
+  // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
+  return assembled.filter((b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view);
 }
 
 export default withSessionRoute(handler);

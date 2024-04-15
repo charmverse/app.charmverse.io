@@ -1,8 +1,9 @@
 import type { DateTimeUnit as LuxonTimeUnit, DurationLikeObject } from 'luxon';
 import { Duration, DateTime } from 'luxon';
 
-export type DateInput = DateTime | Date | string | number;
+import { capitalize } from './strings';
 
+export type DateInput = DateTime | Date | string | number;
 export type DateTimeFormat = 'relative' | 'absolute';
 
 export type TimeUnit = 'millisecond' | 'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'year';
@@ -88,6 +89,23 @@ export const getRelativeTimeInThePast = (date: Date): string => {
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     default:
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+};
+
+// For grouping search results: today, yesterday, past week, past 30 days, older
+export const getRelativeDateInThePast = (dateStr: string, now: DateTime = DateTime.local()): string => {
+  const date = DateTime.fromISO(dateStr);
+  const daysAgo = date.diff(now, 'days').days * -1;
+
+  switch (true) {
+    case daysAgo > 30:
+      return 'Older';
+    case daysAgo > 7:
+      return `Past 30 days`;
+    case daysAgo > 2:
+      return `Past week`;
+    default:
+      return capitalize(date.toRelativeCalendar({ base: now, unit: 'days' }) || '');
   }
 };
 

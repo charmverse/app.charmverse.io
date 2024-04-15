@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
@@ -11,7 +10,7 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
 
-export const getServerSideProps: GetServerSideProps = withSessionSsr(async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = withSessionSsr(async (context) => {
   const template = context.query?.template;
 
   // retrieve space by domain, and then last page view by spaceId

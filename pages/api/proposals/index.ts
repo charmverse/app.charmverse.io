@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
+import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -101,7 +101,7 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
   });
 
   if (proposalPage.proposal.status === 'published') {
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_created',
       proposalId: proposalPage.proposal.id
     });

@@ -1,4 +1,4 @@
-import type { DOMOutputSpec } from '@bangle.dev/pm';
+import type { DOMOutputSpec } from 'prosemirror-model';
 
 import type { BaseRawNodeSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 

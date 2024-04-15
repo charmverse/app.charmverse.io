@@ -86,12 +86,13 @@ export const getViews = (state: RootState): { [key: string]: BoardView } => stat
 // export a factory to be memoized, so multiple instances can be used at once
 export const makeSelectSortedViews = () =>
   createSelector(
+    (state: RootState, boardId: string) => boardId,
     (state: RootState, boardId: string) => state.boards.boards[boardId],
     getViews,
-    (board, views) => {
-      const viewIds = board?.fields.viewIds ? board?.fields.viewIds : Object.keys(views);
+    (boardId, board, views) => {
+      const viewIds = board?.fields.viewIds?.length ? board?.fields.viewIds : Object.keys(views);
       return Object.values(views)
-        .filter((v) => v.parentId === board?.id)
+        .filter((v) => v.parentId === boardId)
         .sort((a, b) => (viewIds.indexOf(a.id) > viewIds.indexOf(b.id) ? 1 : -1))
         .map((v) => createBoardView(v));
     }

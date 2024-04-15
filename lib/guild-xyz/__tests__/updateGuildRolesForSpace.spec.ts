@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { createUserFromWallet } from 'lib/users/createUser';
+import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import type { LoggedInUser } from 'models';
 import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
 
@@ -19,7 +20,9 @@ let guild2Role2: Role;
 beforeAll(async () => {
   const { space: createdSpace, user } = await generateUserAndSpaceWithApiToken();
   user1 = user;
-  user2 = await createUserFromWallet();
+  user2 = await createUserFromWallet({
+    address: randomETHWalletAddress()
+  });
   space = createdSpace;
   user1SpaceRole = (await prisma.spaceRole.findFirst({
     where: {

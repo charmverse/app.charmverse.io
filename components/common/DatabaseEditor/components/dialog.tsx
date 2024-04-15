@@ -16,6 +16,7 @@ type Props = {
   onClose?: () => void;
   fullWidth?: boolean;
   footerActions?: React.ReactNode;
+  'data-test'?: string;
 };
 
 const Toolbar = styled(Box)`
@@ -54,7 +55,7 @@ function FBDialog(props: Props) {
 
   return (
     <Modal open={true}>
-      <div data-test='dialog' className={`Dialog dialog-back ${props.className}`}>
+      <div data-test={props['data-test'] || 'dialog'} className={`Dialog dialog-back ${props.className}`}>
         <div
           className='wrapper'
           onClick={(e) => {

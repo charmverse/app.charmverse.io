@@ -1,4 +1,3 @@
-import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
 import {
   Edit as EditIcon,
@@ -24,7 +23,7 @@ import { bindMenu, bindTrigger, usePopupState } from 'material-ui-popup-state/ho
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import type { MouseEvent, ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import type { IntlShape } from 'react-intl';
 import { injectIntl } from 'react-intl';
@@ -123,6 +122,68 @@ function ViewMenuItem({
   );
 }
 
+export const StyledTab = React.forwardRef(
+  (
+    {
+      icon,
+      label,
+      href,
+      isActive,
+      onClick,
+      sx,
+      viewId
+    }: {
+      icon?: JSX.Element;
+      label: string;
+      href?: string;
+      onClick: (event: MouseEvent<HTMLElement>) => void;
+      isActive?: boolean;
+      sx?: any;
+      viewId?: string;
+    },
+    ref: any
+  ) => {
+    return (
+      <TabButton
+        className='disable-drag-selection'
+        ref={ref}
+        disableRipple
+        href={href}
+        onClick={onClick}
+        variant='text'
+        size='small'
+        // DONT DELETE: this id is used in viewTabs.tsx when selecting a tab as `dataset.viewId`
+        data-view-id={viewId}
+        sx={{
+          p: 0,
+          opacity: 1,
+          overflow: 'unset',
+          transition: `background-color 150ms ease-in-out`,
+          flexDirection: 'row',
+          // The tab indicator is not shown anymore since its located in a separate component
+          borderBottom: `1px solid ${isActive ? 'var(--primary-text)' : 'transparent'}`,
+          ...sx
+        }}
+        label={
+          <StyledTabContent
+            color={isActive ? 'textPrimary' : 'secondary'}
+            display='flex'
+            alignItems='center'
+            fontSize='small'
+            fontWeight={500}
+            gap={1}
+          >
+            <span>
+              {icon}
+              {label}
+            </span>
+          </StyledTabContent>
+        }
+      />
+    );
+  }
+);
+
 function ViewTab({
   view,
   onClick,
@@ -136,43 +197,17 @@ function ViewTab({
   view: BoardView;
   onClick: (event: MouseEvent<HTMLElement>) => void;
 }) {
-  const theme = useTheme();
   const [isDragging, isOver, columnRef] = useSortable<BoardView, HTMLButtonElement>('view', view, true, onDrop);
   return (
-    <TabButton
-      className='disable-drag-selection'
-      ref={columnRef as any}
-      disableRipple
+    <StyledTab
+      icon={iconForViewType(view.fields.viewType)}
+      label={view.title || formatViewTitle(view)}
       href={href}
+      isActive={isActive}
       onClick={onClick}
-      variant='text'
-      size='small'
-      data-view-id={view.id}
-      sx={{
-        p: 0,
-        overflow: 'unset',
-        opacity: isDragging ? 0.5 : 1,
-        transition: `background-color 150ms ease-in-out`,
-        backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial',
-        flexDirection: 'row',
-        // The tab indicator is not shown anymore since its located in a separate component
-        borderBottom: `1px solid ${isActive ? theme.palette.text.primary : 'transparent'}`
-      }}
-      label={
-        <StyledTabContent
-          color={isActive ? 'textPrimary' : 'secondary'}
-          display='flex'
-          alignItems='center'
-          fontSize='small'
-          fontWeight={500}
-          gap={1}
-        >
-          <span>
-            {iconForViewType(view.fields.viewType)}
-            {view.title || formatViewTitle(view)}
-          </span>
-        </StyledTabContent>
-      }
+      ref={columnRef}
+      viewId={view.id}
+      sx={{ opacity: isDragging ? 0.5 : 1, backgroundColor: isOver ? 'var(--charmeditor-active)' : 'initial' }}
     />
   );
 }

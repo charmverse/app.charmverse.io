@@ -92,6 +92,7 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       ]
     },
     select: {
+      deletedAt: true,
       id: true,
       icon: true,
       title: true,
@@ -126,8 +127,8 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       }
       return block as BlockWithDetails;
     })
-    // remove orphan blocks
-    .filter((block) => !!block.pageId || block.type === 'view' || block.type === 'board');
+    // remove orphan and deleted blocks
+    .filter((block) => !block.deletedAt && (!!block.pageId || block.type === 'view' || block.type === 'board'));
 
   return { blocks: validBlocks, source };
 }

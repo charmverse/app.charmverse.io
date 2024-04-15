@@ -7,6 +7,7 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -21,6 +22,9 @@ export function ProposalStickyFooter({
   refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
+  const projectForm = useFormContext<ProjectAndMembersPayload>();
+  const projectField = proposal.form?.formFields?.find((field) => field.type === 'project_profile');
+
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
@@ -31,10 +35,7 @@ export function ProposalStickyFooter({
     } catch (error) {
       showMessage((error as Error).message, 'error');
     }
-    // refreshProposal();
   }
-
-  const projectForm = useFormContext();
 
   const disabledTooltip = getProposalErrors({
     page: {
@@ -53,7 +54,7 @@ export function ProposalStickyFooter({
     requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
 
-  const isProjectFormValid = proposal.projectId ? projectForm.formState.isValid : true;
+  const isProjectFormValid = projectField ? projectForm.formState.isValid : true;
 
   return (
     <StickyFooterContainer>

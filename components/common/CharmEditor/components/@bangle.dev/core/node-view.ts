@@ -1,7 +1,9 @@
 /* eslint-disable no-use-before-define */
-import type { Decoration, DOMOutputSpec, EditorProps, EditorView, Node, Transaction } from '@bangle.dev/pm';
-import { Plugin, PluginKey } from '@bangle.dev/pm';
 import { log as _log } from '@charmverse/core/log';
+import type { DOMOutputSpec, Node } from 'prosemirror-model';
+import type { Transaction } from 'prosemirror-state';
+import { Plugin, PluginKey } from 'prosemirror-state';
+import type { EditorProps, EditorView, Decoration } from 'prosemirror-view';
 
 import { isDevEnv } from 'config/constants';
 

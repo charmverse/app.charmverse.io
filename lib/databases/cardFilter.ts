@@ -15,7 +15,6 @@ import type {
 } from 'lib/databases/filterClause';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { isAFilterGroupInstance } from 'lib/databases/filterGroup';
-import { PROPOSAL_EVALUATION_TYPE_ID } from 'lib/proposals/blocks/constants';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 
@@ -65,11 +64,10 @@ class CardFilter {
   static isClauseMet(filter: FilterClause, templates: readonly IPropertyTemplate[], card: Card): boolean {
     const filterProperty = templates.find((o) => o.id === filter.propertyId);
     let value = card.fields.properties[filter.propertyId] as CardPropertyValue | undefined;
-
     if (filter.propertyId === Constants.titleColumnId) {
-      value = card.title.toLowerCase();
-    }
-    if (!value) {
+      value = card.title?.toLowerCase() ?? '';
+    } else if (!value) {
+      // retrieve values from card that are not in fields.properties
       switch (filterProperty?.type) {
         case 'updatedBy': {
           value = card.updatedBy;
@@ -103,6 +101,7 @@ class CardFilter {
         return v.toString();
       }
     );
+
     if (filterProperty) {
       const filterPropertyDataType = propertyConfigs[filterProperty.type].datatype;
       if (filterPropertyDataType === 'text') {
@@ -196,21 +195,19 @@ class CardFilter {
           case 'does_not_contain': {
             let contains = false;
             if (filterProperty.type === 'proposalStatus') {
-              const proposalEvaluationTypeProperty = templates.find((o) => o.id === PROPOSAL_EVALUATION_TYPE_ID);
+              const proposalEvaluationTypeProperty = templates.find((o) => o.type === 'proposalEvaluationType');
               const proposalEvaluationType = proposalEvaluationTypeProperty
                 ? (card.fields.properties[proposalEvaluationTypeProperty.id] as ProposalEvaluationStep)
                 : null;
-              contains =
-                valueArray.length !== 0 &&
-                !!proposalEvaluationType &&
-                (valueArray as ProposalEvaluationResultExtended[]).some((sourceValue) => {
-                  return filter.values.includes(
-                    getProposalEvaluationStatus({
-                      result: sourceValue,
-                      step: proposalEvaluationType
-                    })
-                  );
-                });
+              if (proposalEvaluationType) {
+                const mappedValues = valueArray.map((sourceValue) =>
+                  getProposalEvaluationStatus({
+                    result: sourceValue as ProposalEvaluationResultExtended,
+                    step: proposalEvaluationType
+                  })
+                );
+                contains = mappedValues.some((v) => filter.values.includes(v));
+              }
             } else {
               contains =
                 valueArray.length !== 0 && valueArray.some((sourceValue) => filter.values.includes(sourceValue));

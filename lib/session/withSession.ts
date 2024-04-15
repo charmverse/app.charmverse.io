@@ -1,22 +1,32 @@
-import type { IronSessionData } from 'iron-session';
-import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
-import type { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next';
+import { getIronSession } from 'iron-session';
+import type {
+  GetServerSidePropsContext,
+  GetServerSidePropsResult,
+  NextApiHandler,
+  NextApiRequest,
+  NextApiResponse
+} from 'next';
 
 import { getIronOptions } from './getIronOptions';
 
-// Code Source: the Readme at https://github.com/vvo/iron-session
-
+// For API requests
 export function withSessionRoute(handler: NextApiHandler) {
-  return withIronSessionApiRoute(handler, getIronOptions);
+  return async (req: NextApiRequest, res: NextApiResponse) => {
+    req.session = await getIronSession(req, res, getIronOptions());
+    return handler(req, res);
+  };
 }
 
-type SessionContext = GetServerSidePropsContext & {
-  session?: IronSessionData;
+type SSRContext = GetServerSidePropsContext & {
+  session?: NextApiRequest['session'];
 };
-
-// Theses types are compatible with InferGetStaticPropsType https://nextjs.org/docs/basic-features/data-fetching#typescript-use-getstaticprops
+// For SSR requests
+// Reference: https://github.com/vvo/iron-session/blob/v6/next/index.ts#L54
 export function withSessionSsr<P extends { [key: string]: unknown } = { [key: string]: unknown }>(
-  handler: (context: SessionContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
+  handler: (context: SSRContext) => GetServerSidePropsResult<P> | Promise<GetServerSidePropsResult<P>>
 ) {
-  return withIronSessionSsr(handler, getIronOptions);
+  return async (context: SSRContext) => {
+    context.req.session = await getIronSession(context.req, context.res, getIronOptions());
+    return handler(context);
+  };
 }

@@ -3,13 +3,13 @@ import type { Space, User } from '@charmverse/core/prisma';
 import { createFormResponseCard } from 'lib/pages/createFormResponseCard';
 import { getDatabaseDetails } from 'lib/pages/getDatabaseDetails';
 import { createDatabase } from 'lib/public-api/createDatabase';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 let user: User;
 let space: Space;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
   user = generated.user;
   space = generated.space;
 });

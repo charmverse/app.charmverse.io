@@ -1,4 +1,3 @@
-import { DataNotFoundError } from '@charmverse/core/errors';
 import type { Page, Block, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
@@ -14,18 +13,6 @@ export async function createCardPage(
       permissions?: Prisma.PagePermissionUncheckedCreateWithoutPageInput[];
     }
 ): Promise<{ page: Page; block: Block }> {
-  const board = await prisma.block.findFirst({
-    where: {
-      type: 'board',
-      id: pageInfo.boardId as string,
-      spaceId: pageInfo.spaceId
-    }
-  });
-
-  if (!board) {
-    throw new DataNotFoundError('Database was not found');
-  }
-
   const cardBlock = await prisma.block.create({
     data: {
       id: v4(),
@@ -77,7 +64,11 @@ export async function createCardPage(
       path: getPagePath(),
       type: 'card',
       title: pageInfo.title || '',
-      parentId: pageInfo.boardId,
+      parent: {
+        connect: {
+          id: pageInfo.boardId
+        }
+      },
       id: cardBlock.id,
       space: {
         connect: {

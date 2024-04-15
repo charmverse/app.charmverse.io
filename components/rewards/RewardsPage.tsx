@@ -85,7 +85,6 @@ export function RewardsPage({ title }: { title: string }) {
   const { board: activeBoard, views, cards, activeView } = useRewardsBoardAndBlocks();
 
   const [showSidebar, setShowSidebar] = useState(false);
-  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
 
   const groupByProperty = useMemo(() => {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
@@ -331,12 +330,7 @@ export function RewardsPage({ title }: { title: string }) {
 
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
 
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards as Card[]}
-                viewSortPopup={viewSortPopup}
-              />
+              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards as Card[]} />
 
               {isAdmin && (
                 <ToggleViewSidebarButton

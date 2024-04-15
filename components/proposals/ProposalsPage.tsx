@@ -3,7 +3,6 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { debounce } from 'lodash';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
@@ -64,7 +63,6 @@ export function ProposalsPage({ title }: { title: string }) {
   const { user } = useUser();
   const { board: activeBoard, views, activeView, cards, isLoading, refreshProposals } = useProposalsBoard();
   const [showSidebar, setShowSidebar] = useState(false);
-  const viewSortPopup = usePopupState({ variant: 'popover', popupId: 'view-sort' });
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
 
   const onShowDescription = useCallback(() => {
@@ -239,12 +237,7 @@ export function ProposalsPage({ title }: { title: string }) {
             <div className='octo-spacer' />
             <Box className='view-actions'>
               <ViewFilterControl activeBoard={activeBoard} activeView={activeView} />
-              <ViewSortControl
-                activeBoard={activeBoard}
-                activeView={activeView}
-                cards={cards}
-                viewSortPopup={viewSortPopup}
-              />
+              <ViewSortControl activeBoard={activeBoard} activeView={activeView} cards={cards} />
               {user && (
                 <ToggleViewSidebarButton
                   onClick={(e) => {

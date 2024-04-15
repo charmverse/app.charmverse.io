@@ -8,14 +8,15 @@ import * as http from 'adapters/http';
 export type MaybeString = string | null | undefined;
 
 // eslint-disable-next-line default-param-last
-export function useGET<T = unknown>(path: string | undefined | null, query: any = {}, swrOptions?: SWRConfiguration) {
+export function useGET<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration) {
   const requestUrl = path ? path + getQueryString(query) : null;
   return useSWR<T>(requestUrl, http.GET, swrOptions);
 }
 
-export function useGETImmutable<T = unknown>(path: string | undefined | null, query: any = {}) {
+// eslint-disable-next-line default-param-last
+export function useGETImmutable<T = unknown>(path: MaybeString, query: any = {}, swrOptions?: SWRConfiguration) {
   const requestUrl = path ? path + getQueryString(query) : null;
-  return useSWRImmutable<T>(requestUrl, http.GET);
+  return useSWRImmutable<T>(requestUrl, http.GET, swrOptions);
 }
 
 export function useDELETE<T>(path: string) {

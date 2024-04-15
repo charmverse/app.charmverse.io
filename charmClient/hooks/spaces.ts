@@ -1,7 +1,9 @@
-import type { PaymentMethod, Space } from '@charmverse/core/prisma';
+import type { PaymentMethod, RewardsGithubRepo, Space } from '@charmverse/core/prisma';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
+import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
+import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
 
 import type { MaybeString } from './helpers';
 import { useDELETE, useGETImmutable, usePOST, usePUT } from './helpers';
@@ -36,4 +38,16 @@ function stripUrlParts(maybeUrl: string) {
 
 export function useUpdateSpace(spaceId: MaybeString) {
   return usePUT<UpdateableSpaceFields, Space>(`/api/spaces/${spaceId}`);
+}
+
+export function useDisconnectGithubApplication(spaceId: string) {
+  return useDELETE(`/api/spaces/${spaceId}/github/disconnect`);
+}
+
+export function useGetGithubApplicationData(spaceId: string) {
+  return useGETImmutable<GithubApplicationData>(`/api/spaces/${spaceId}/github`);
+}
+
+export function useConnectGithubRepository(spaceId: string) {
+  return usePOST<ConnectRewardGithubRepoPayload, RewardsGithubRepo>(`/api/spaces/${spaceId}/github/repo`);
 }

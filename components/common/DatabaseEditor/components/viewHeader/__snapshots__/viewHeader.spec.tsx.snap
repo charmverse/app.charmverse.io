@@ -23,7 +23,7 @@ exports[`components/viewHeader/viewHeader return viewHeader 1`] = `
               role="tablist"
             >
               <button
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
                 data-view-id="view-id-1"
                 draggable="true"
                 role="tab"
@@ -210,7 +210,7 @@ exports[`components/viewHeader/viewHeader return viewHeader readonly 1`] = `
               role="tablist"
             >
               <button
-                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1dlgg0k-MuiButtonBase-root-MuiTab-root"
+                class="MuiButtonBase-root MuiTab-root MuiTab-textColorInherit disable-drag-selection css-1u84bip-MuiButtonBase-root-MuiTab-root"
                 data-view-id="view-id-1"
                 draggable="true"
                 role="tab"

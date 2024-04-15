@@ -1,10 +1,10 @@
 import { log } from '@charmverse/core/log';
 
-import { domSerializationHelpers } from 'components/common/CharmEditor/components/@bangle.dev/core/domSerializationHelpers';
-import type { RawSpecs, BaseRawMarkSpec } from 'components/common/CharmEditor/components/@bangle.dev/core/specRegistry';
 import { getTwitterEmoji } from 'components/common/Emoji';
 
-import * as suggestTooltip from '../@bangle.dev/tooltip/suggest-tooltip';
+import { domSerializationHelpers } from '../@bangle.dev/core/domSerializationHelpers';
+import type { RawSpecs, BaseRawMarkSpec } from '../@bangle.dev/core/specRegistry';
+import { spec as suggestTooltipSpec } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { markName } from './emojiSuggest.constants';
 
@@ -69,7 +69,7 @@ function specMark({
 }: {
   trigger?: string;
 } = {}): BaseRawMarkSpec {
-  const _spec = suggestTooltip.spec({ markName, trigger });
+  const _spec = suggestTooltipSpec({ markName, trigger });
 
   return {
     ..._spec,

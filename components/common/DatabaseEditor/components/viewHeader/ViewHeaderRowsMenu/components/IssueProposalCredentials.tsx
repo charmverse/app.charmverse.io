@@ -3,7 +3,6 @@ import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { Chip, Divider, ListItemText, MenuItem, Tooltip } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
-import { useSwitchNetwork } from 'wagmi';
 
 import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
@@ -15,6 +14,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWeb3Account } from 'hooks/useWeb3Account';
 import { useWeb3Signer } from 'hooks/useWeb3Signer';
+import { useSwitchChain } from 'hooks/wagmi';
 import type { EasSchemaChain } from 'lib/credentials/connectors';
 import { getOnChainSchemaUrl } from 'lib/credentials/connectors';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
@@ -61,7 +61,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
 
   const { account, chainId } = useWeb3Account();
   const { signer } = useWeb3Signer();
-  const { switchNetworkAsync } = useSwitchNetwork({ chainId: space?.credentialsChainId as number });
+  const { switchChainAsync } = useSwitchChain();
 
   const { all, proposalApproved, proposalCreated } = (issuableProposalCredentials ?? []).reduce(
     (acc, val) => {
@@ -89,7 +89,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
     }
 
     if (chainId !== space.credentialsChainId) {
-      await switchNetworkAsync?.(space.credentialsChainId);
+      await switchChainAsync?.({ chainId: space.credentialsChainId });
       return;
     }
 
@@ -152,7 +152,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
             sx={{ color: 'black' }}
             href={getOnChainSchemaUrl({
               chainId: space.credentialsChainId as EasSchemaChain,
-              schemaId: proposalCredentialSchemaId
+              schema: proposalCredentialSchemaId
             })}
           >
             <Chain info={chain} />
@@ -164,7 +164,9 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
               <Button
                 sx={{ mt: 1 }}
                 fullWidth
-                onClick={() => switchNetworkAsync?.(space.credentialsChainId as number).catch()}
+                onClick={() =>
+                  space.credentialsChainId && switchChainAsync?.({ chainId: space.credentialsChainId }).catch()
+                }
                 variant='outlined'
                 size='small'
               >
@@ -175,7 +177,7 @@ export function IssueProposalCredentials({ selectedPageIds }: { selectedPageIds:
         )}
       </MenuItem>
     );
-  }, [space?.credentialsChainId, chainId, switchNetworkAsync]);
+  }, [space?.credentialsChainId, chainId, switchChainAsync]);
 
   // We only enable this feature if the space has onchain credentials enabled
   if (

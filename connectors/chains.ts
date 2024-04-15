@@ -80,7 +80,7 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: [mainnet.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-mainnet.safe.global',
     iconUrl: '/images/cryptoLogos/ethereum-eth-logo.svg',
-    rpcUrls: mainnet.rpcUrls.public.http,
+    rpcUrls: mainnet.rpcUrls.default.http,
     shortName: 'eth',
     unlockNetwork: true,
     hypersubNetwork: true
@@ -160,10 +160,10 @@ export const RPC: Record<string, IChainDetails> = {
     chainId: zora.id,
     viem: zora,
     chainName: zora.name,
-    rpcUrls: zora.rpcUrls.public.http,
+    rpcUrls: zora.rpcUrls.default.http,
     blockExplorerUrls: [zora.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zora-logo.svg',
-    shortName: zora.network
+    shortName: 'zora'
   },
   POLYGON: {
     chainId: polygon.id,
@@ -181,7 +181,7 @@ export const RPC: Record<string, IChainDetails> = {
     blockExplorerUrls: ['https://polygonscan.com'],
     gnosisUrl: 'https://safe-transaction-polygon.safe.global',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    shortName: polygon.network,
+    shortName: 'matic',
     unlockNetwork: true
   },
   POLYGON_ZKEVM: {
@@ -195,11 +195,11 @@ export const RPC: Record<string, IChainDetails> = {
       address: '0x0000000000000000000000000000000000000000',
       logoURI: 'https://assets.coingecko.com/asset_platforms/images/122/small/polygonzkevm.jpg'
     },
-    rpcUrls: polygonZkEvm.rpcUrls.public.http,
+    rpcUrls: polygonZkEvm.rpcUrls.default.http,
     blockExplorerUrls: [polygonZkEvm.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zkevm.safe.global/',
     iconUrl: '/images/cryptoLogos/polygon-matic-logo.svg',
-    shortName: polygonZkEvm.network,
+    shortName: 'polygon-zkevm',
     unlockNetwork: true
   },
   MUMBAI: {
@@ -395,20 +395,20 @@ export const RPC: Record<string, IChainDetails> = {
     chainId: taikoJolnir.id,
     viem: taikoJolnir,
     chainName: 'Taiko Jolnir',
-    rpcUrls: taikoJolnir.rpcUrls.public.http,
+    rpcUrls: taikoJolnir.rpcUrls.default.http,
     blockExplorerUrls: [taikoJolnir.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/taiko-logo.svg',
-    shortName: taikoJolnir.network
+    shortName: 'tko-jolnir'
   },
   TAIKO_DEV: {
     ...EVM_DEFAULT,
     chainId: taikoTestnetSepolia.id,
     viem: taikoTestnetSepolia,
     chainName: 'Taiko Sepolia - Testnet',
-    rpcUrls: taikoTestnetSepolia.rpcUrls.public.http,
+    rpcUrls: taikoTestnetSepolia.rpcUrls.default.http,
     blockExplorerUrls: [taikoTestnetSepolia.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/taiko-logo.svg',
-    shortName: taikoTestnetSepolia.network,
+    shortName: 'taiko-sepolia',
     testnet: true
   },
   ZKSYNC: {
@@ -416,7 +416,7 @@ export const RPC: Record<string, IChainDetails> = {
     chainId: zkSync.id,
     viem: zkSync,
     chainName: zkSync.name,
-    rpcUrls: zkSync.rpcUrls.public.http,
+    rpcUrls: zkSync.rpcUrls.default.http,
     blockExplorerUrls: [zkSync.blockExplorers.default.url],
     gnosisUrl: 'https://safe-transaction-zksync.safe.global',
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
@@ -428,7 +428,7 @@ export const RPC: Record<string, IChainDetails> = {
     chainId: zkSyncTestnet.id,
     viem: zkSyncTestnet,
     chainName: zkSyncTestnet.name,
-    rpcUrls: zkSyncTestnet.rpcUrls.public.http,
+    rpcUrls: zkSyncTestnet.rpcUrls.default.http,
     blockExplorerUrls: [zkSyncTestnet.blockExplorers.default.url],
     iconUrl: '/images/cryptoLogos/zksync-era-logo.svg',
     testnet: true,

@@ -21,10 +21,6 @@ export class PagesApi {
     return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { archived: true });
   }
 
-  searchPages(spaceId: string, search: string, limit?: number) {
-    return http.GET<PageMeta[]>(`/api/spaces/${spaceId}/pages`, { search, limit });
-  }
-
   getPage(pageId: string, spaceId?: string) {
     return http.GET<PageWithContent>(`/api/pages/${pageId}`, { spaceId });
   }
@@ -67,7 +63,15 @@ export class PagesApi {
     return http.POST(`/api/pages/${pageId}/sync-page-comments`);
   }
 
-  exportZippedDatabasePage({ databaseId, filter }: { databaseId: string; filter?: FilterGroup | null }) {
+  exportZippedDatabasePage({
+    databaseId,
+    filter,
+    viewId
+  }: {
+    viewId?: string;
+    databaseId: string;
+    filter?: FilterGroup | null;
+  }) {
     let customFilter = '';
     try {
       customFilter = JSON.stringify(filter);
@@ -77,7 +81,7 @@ export class PagesApi {
 
     return http.GET(
       `/api/pages/${databaseId}/export-database`,
-      filter && customFilter ? { filter: customFilter } : undefined
+      (filter && customFilter) || viewId ? { viewId, filter: customFilter } : undefined
     );
   }
 }

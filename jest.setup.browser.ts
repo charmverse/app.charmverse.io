@@ -4,10 +4,12 @@
 // Used for __tests__/testing-library.js
 // Learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
-import { TextEncoder } from 'util';
+import { TextDecoder, TextEncoder } from 'util';
 
 import { configure } from '@testing-library/react';
 
+// @ts-ignore expose global Node.js elements to js-dom environment
+global.TextDecoder = TextDecoder;
 global.TextEncoder = TextEncoder;
 
 configure({

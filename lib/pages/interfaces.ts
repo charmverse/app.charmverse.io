@@ -1,4 +1,9 @@
-import type { PageMeta, PageNode, PageNodeWithChildren, PageWithPermissions } from '@charmverse/core/pages';
+import type {
+  PageMeta as PageMetaFromCore,
+  PageNode,
+  PageNodeWithChildren,
+  PageWithPermissions
+} from '@charmverse/core/pages';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import type { Page, Space } from '@charmverse/core/prisma';
 
@@ -10,6 +15,10 @@ import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
 export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
+};
+
+export type PageMeta = PageMetaFromCore & {
+  hideFromSidebar?: boolean;
 };
 
 export type PageWithChildren = PageNodeWithChildren<PageWithPermissions>;
@@ -74,4 +83,6 @@ export interface PublicPageResponse {
 }
 
 // This type, for the most part, is used for showing links to pages in the UI
-export type PageMetaLite = Pick<Page, 'id' | 'title' | 'icon' | 'path' | 'type' | 'hasContent'>;
+type RequiredMetaFields = Pick<Page, 'id' | 'path' | 'type'>;
+type OptionalMetaFields = Partial<Pick<Page, 'parentId' | 'title' | 'icon' | 'path' | 'type' | 'hasContent'>>;
+export type PageMetaLite = RequiredMetaFields & OptionalMetaFields;

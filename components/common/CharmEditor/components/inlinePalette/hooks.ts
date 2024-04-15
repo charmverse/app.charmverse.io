@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react';
 
 import { useEditorViewContext, usePluginState } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 
-import { suggestTooltip } from '../@bangle.dev/tooltip';
+import { removeSuggestMark } from '../@bangle.dev/tooltip/suggestTooltipSpec';
 
 import { getSuggestTooltipKey } from './inlinePalette';
 import type { InlinePaletteItem } from './paletteItem';
@@ -45,7 +45,7 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
   const view = useEditorViewContext();
 
   const dismissPalette = useCallback(() => {
-    return suggestTooltip.removeSuggestMark(palettePluginKey)(view.state, view.dispatch, view);
+    return removeSuggestMark(palettePluginKey)(view.state, view.dispatch, view);
   }, [view, palettePluginKey]);
 
   const activeIndex = getActiveIndex(counter, items.length);
@@ -55,7 +55,7 @@ export function useInlinePaletteItems<T extends InlinePaletteItem>(
       const item = items[itemIndex];
 
       if (!item) {
-        return suggestTooltip.removeSuggestMark(palettePluginKey);
+        return removeSuggestMark(palettePluginKey);
       }
 
       if (isItemDisabled?.(item)) {

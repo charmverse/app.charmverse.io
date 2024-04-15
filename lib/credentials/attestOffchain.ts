@@ -19,6 +19,7 @@ import type { EasSchemaChain } from './connectors';
 import { easSchemaChains, getEasConnector, getEasInstance } from './connectors';
 import type { PublishedSignedCredential } from './queriesAndMutations';
 import { publishSignedCredential } from './queriesAndMutations';
+import { saveIssuedCredential } from './saveIssuedCredential';
 import { encodeAttestation, attestationSchemaIds, type CredentialData } from './schemas';
 
 type AttestationInput<T extends AttestationType = AttestationType> = {
@@ -30,7 +31,7 @@ type AttestationInput<T extends AttestationType = AttestationType> = {
   linkedAttestationUid?: string;
 };
 
-export async function attestOffchain({
+async function attestOffchain({
   credential,
   recipient,
   attester,
@@ -93,7 +94,10 @@ export type SignedAttestation = {
   timestamp: number;
 };
 
-export async function signCharmverseAttestation({
+/**
+ *  Only the raw offchain signed credential is returned. The call will handle persisting or publishing this signature
+ * */
+async function signCharmverseAttestation({
   chainId,
   credential,
   recipient
@@ -126,7 +130,39 @@ export async function signCharmverseAttestation({
   return signedCredential;
 }
 
+/**
+ * Sign the credential offchain and send to IPFS
+ *
+ * Only useful for scripts. Prefer signPublishAndRecordCharmverseCredential for production use with existing users
+ */
 export async function signAndPublishCharmverseCredential({
+  chainId,
+  credential,
+  recipient
+}: CharmVerseCredentialInput) {
+  const signedCredential = await signCharmverseAttestation({ chainId, credential, recipient });
+
+  const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
+    chainId,
+    recipient: signedCredential.recipient,
+    content: credential.data,
+    timestamp: new Date(signedCredential.timestamp),
+    type: credential.type,
+    verificationUrl: signedCredential.verificationUrl,
+    issuer: signedCredential.signer,
+    schemaId: attestationSchemaIds[credential.type],
+    sig: JSON.stringify(signedCredential.sig)
+  };
+
+  const published = await publishSignedCredential(contentToPublish);
+
+  return published;
+}
+
+/**
+ * Sign the credential offchain, send to IPFS, record as Issued Credential
+ * */
+export async function signPublishAndRecordCharmverseCredential({
   chainId,
   credential,
   recipient,
@@ -157,6 +193,8 @@ export async function signAndPublishCharmverseCredential({
 
   const publishedCredentialId = uuid();
 
+  const schemaId = attestationSchemaIds[credential.type];
+
   const contentToPublish: Omit<PublishedSignedCredential, 'author' | 'id'> = {
     chainId,
     recipient: signedCredential.recipient,
@@ -165,24 +203,25 @@ export async function signAndPublishCharmverseCredential({
     type: credential.type,
     verificationUrl: signedCredential.verificationUrl,
     issuer: signedCredential.signer,
-    schemaId: attestationSchemaIds[credential.type],
+    schemaId,
     sig: JSON.stringify(signedCredential.sig),
     charmverseId: publishedCredentialId
   };
 
   const published = await publishSignedCredential(contentToPublish);
 
-  await prisma.issuedCredential.create({
-    data: {
-      id: publishedCredentialId,
-      ceramicId: published.id,
-      ceramicRecord: published,
+  await saveIssuedCredential({
+    credentialProps: {
       credentialEvent: event,
-      credentialTemplate: { connect: { id: credentialTemplateId } },
-      user: { connect: { id: recipientUserId } },
-      proposal: proposalId ? { connect: { id: proposalId } } : undefined,
-      rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined,
-      schemaId: attestationSchemaIds[credential.type]
+      credentialTemplateId,
+      schemaId: attestationSchemaIds[credential.type],
+      userId: recipientUserId,
+      proposalId,
+      rewardApplicationId
+    },
+    offchainData: {
+      ceramicId: published.id,
+      ceramicRecord: published
     }
   });
 
@@ -197,6 +236,7 @@ export async function signAndPublishCharmverseCredential({
     pageId,
     event,
     proposalId,
+    rewardApplicationId,
     userId: recipientUserId,
     credentialTemplateId
   });

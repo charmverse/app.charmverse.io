@@ -8,7 +8,6 @@ import { useTrackPageView } from 'charmClient/hooks/track';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { UpdateableSpaceFields } from 'lib/spaces/updateSpace';
 
 import Legend from '../Legend';
@@ -24,8 +23,6 @@ export function SpaceCredentialSettings() {
   const isAdmin = useIsAdmin();
   const [credentialLogo, setCredentialLogo] = useState(space?.credentialLogo ?? '');
   const { trigger, isMutating } = useUpdateSpace(space?.id);
-
-  const showOnChainCredentialConfig = useIsCharmverseSpace();
 
   const [spaceOnChainCredentialSettings, setSpaceOnChainCredentialSettings] = useState<
     Partial<UpdateableCredentialProps>
@@ -85,19 +82,15 @@ export function SpaceCredentialSettings() {
         />
       </Box>
 
-      {showOnChainCredentialConfig && (
-        <>
-          <Typography variant='h6'>Onchain Credentials</Typography>
+      <Typography variant='h6'>Onchain Credentials</Typography>
 
-          <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
-            <CredentialsOnChainConfig
-              readOnly={!isAdmin}
-              onChange={handleCredentialSettingsChange}
-              {...spaceOnChainCredentialSettings}
-            />
-          </Box>
-        </>
-      )}
+      <Box display='flex' flexDirection='column' alignItems='left' mb={2}>
+        <CredentialsOnChainConfig
+          readOnly={!isAdmin}
+          onChange={handleCredentialSettingsChange}
+          {...spaceOnChainCredentialSettings}
+        />
+      </Box>
 
       {isAdmin && (
         <Button

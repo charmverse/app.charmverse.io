@@ -42,6 +42,11 @@ export async function getProposal({
       authors: true,
       page: { select: { id: true, content: true, contentText: true, sourceTemplateId: true, type: true } },
       rewards: true,
+      project: {
+        include: {
+          projectMembers: true
+        }
+      },
       form: {
         include: {
           formFields: {

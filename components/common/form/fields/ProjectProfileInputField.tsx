@@ -1,84 +1,148 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useFormContext } from 'react-hook-form';
 
-import { useGetProjects } from 'charmClient/hooks/projects';
-import { ProjectFormAnswers } from 'components/settings/projects/ProjectForm';
-import type { ProjectWithMembers, ProjectEditorFieldConfig } from 'lib/projects/interfaces';
+import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
+import { useUpdateProposal } from 'charmClient/hooks/proposals';
+import { ProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
+import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
+import { useProjectUpdates } from 'components/settings/projects/hooks/useProjectUpdates';
+import { useUser } from 'hooks/useUser';
+import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
+import type {
+  ProjectAndMembersFieldConfig,
+  ProjectAndMembersPayload,
+  ProjectWithMembers
+} from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
 
 export function ProjectProfileInputField({
   onChange,
-  formField
+  fieldConfig,
+  disabled,
+  project,
+  inputEndAdornment,
+  proposalId
 }: {
-  formField: {
-    value?: FormFieldValue;
-    fieldConfig?: ProjectEditorFieldConfig;
-  };
+  proposalId?: string;
+  inputEndAdornment?: React.ReactNode;
+  disabled?: boolean;
+  fieldConfig?: ProjectAndMembersFieldConfig;
+  project?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
 }) {
-  const { data } = useGetProjects();
-  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(null);
-  const [showCreateProjectForm, setShowCreateProjectForm] = useState(false);
+  const { trigger: updateProposal } = useUpdateProposal({
+    proposalId
+  });
+  const { user } = useUser();
+  const [selectedProject, setSelectedProject] = useState<ProjectWithMembers | null>(project ?? null);
+  const { data: projectsWithMembers, mutate } = useGetProjects();
+  const projectId = project?.id;
+  const { reset } = useFormContext<ProjectAndMembersPayload>();
+  const { trigger: createProject } = useCreateProject();
+
+  const { onProjectUpdate } = useProjectUpdates({
+    projectId: selectedProject?.id
+  });
 
   useEffect(() => {
-    if (formField.value && data) {
-      const project = data.find((_project) => _project.id === (formField.value as { projectId: string }).projectId);
-      if (project) {
-        setSelectedProject(project);
-      } else {
-        setSelectedProject(null);
-      }
+    if (project) {
+      reset(convertToProjectValues(project));
     }
-  }, [data, formField.value]);
+  }, [!!project]);
+
+  const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
+
+  function onOptionClick(_selectedProject: ProjectWithMembers) {
+    if (proposalId) {
+      updateProposal({
+        projectId: _selectedProject.id
+      });
+    }
+    // else update the projectId field of the form, it might be for a new structured proposal form
+    else {
+      onChange({ projectId: _selectedProject.id });
+    }
+    setSelectedProject(_selectedProject);
+    reset(convertToProjectValues(_selectedProject));
+  }
 
   return (
-    <Stack gap={1} width='100%'>
-      <Select
-        displayEmpty
-        value={selectedProject?.id}
-        onChange={(e) => {
-          const projectId = e.target.value as string;
-          if (projectId === 'ADD_PROFILE') {
-            onChange({ projectId: '' });
-            setShowCreateProjectForm(true);
-          } else {
-            onChange({ projectId });
-            setShowCreateProjectForm(false);
-          }
-        }}
-        data-test='project-profile-select'
-        renderValue={(value) => {
-          if (value === 'ADD_PROFILE') {
-            return <Typography>Add a new project profile</Typography>;
-          }
-          if (!selectedProject) {
-            return <Typography>Select a project profile</Typography>;
-          }
-          return selectedProject.name;
-        }}
-      >
-        {data?.map((project) => (
-          <MenuItem data-test={`project-option-${project.id}`} value={project.id} key={project.id}>
-            <Typography>{project.name}</Typography>
+    <Stack gap={1} width='100%' mb={1}>
+      <Stack flexDirection='row' gap={1} alignItems='center'>
+        <Select
+          sx={{
+            width: '100%'
+          }}
+          key={projectId}
+          // only proposal author is able to change the project profile, not even team lead can change it
+          disabled={disabled}
+          displayEmpty
+          value={projectId ?? ''}
+          data-test='project-profile-select'
+          renderValue={() => {
+            if (!selectedProject) {
+              return <Typography color='secondary'>Select a project profile</Typography>;
+            }
+            // Selected project might have stale name if it was changed, so find the correct project from the list
+            const selectedProjectName =
+              projectsWithMembers?.find((_project) => _project.id === selectedProject?.id)?.name || 'Untitled';
+            return selectedProjectName;
+          }}
+        >
+          {projectsWithMembers?.map((_project) => {
+            return (
+              <MenuItem
+                key={_project.id}
+                data-test={`project-option-${_project.id}`}
+                value={_project.id}
+                onClick={() => {
+                  onOptionClick(_project);
+                }}
+              >
+                <Typography color={_project.name ? '' : 'secondary'}>{_project.name || 'Untitled Project'}</Typography>
+              </MenuItem>
+            );
+          })}
+          <Divider />
+          <MenuItem
+            data-test='project-option-new'
+            onClick={() => {
+              createProject(defaultProjectAndMembersPayload, {
+                onSuccess: async (createdProject) => {
+                  mutate(
+                    (_projects) => {
+                      return [...(_projects ?? []), createdProject];
+                    },
+                    {
+                      revalidate: false
+                    }
+                  );
+                  onOptionClick(createdProject);
+                }
+              });
+            }}
+          >
+            <Stack flexDirection='row' alignItems='center' gap={0.05}>
+              <MuiAddIcon fontSize='small' />
+              <Typography>Add a new project profile</Typography>
+            </Stack>
           </MenuItem>
-        ))}
-        <Divider />
-        <MenuItem value='ADD_PROFILE' data-test='project-option-new'>
-          <Stack flexDirection='row' alignItems='center' gap={0.05}>
-            <MuiAddIcon fontSize='small' />
-            <Typography>Add a new project profile</Typography>
-          </Stack>
-        </MenuItem>
-      </Select>
-      {(showCreateProjectForm || selectedProject) && (
+        </Select>
+        {/** Required for support form field comments */}
+        {inputEndAdornment}
+      </Stack>
+      {selectedProject && (
         <Box p={2} mb={1} border={(theme) => `1px solid ${theme.palette.divider}`}>
           <ProjectFormAnswers
             defaultRequired
-            key={selectedProject?.id ?? 'new-project'}
-            fieldConfig={formField.fieldConfig as ProjectEditorFieldConfig}
-            isTeamLead
+            key={selectedProject.id}
+            fieldConfig={fieldConfig}
+            isTeamLead={isTeamLead}
+            disabled={disabled}
+            onProjectUpdate={onProjectUpdate}
           />
         </Box>
       )}

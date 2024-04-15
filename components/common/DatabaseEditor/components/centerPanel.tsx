@@ -15,7 +15,6 @@ import type { WrappedComponentProps } from 'react-intl';
 import { injectIntl } from 'react-intl';
 import type { ConnectedProps } from 'react-redux';
 import { connect } from 'react-redux';
-import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { useGetPageMeta } from 'charmClient/hooks/pages';
@@ -44,8 +43,7 @@ import {
   addTemplate,
   getAllCards
 } from '../store/cards';
-import { initialDatabaseLoad } from '../store/databaseBlocksLoad';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppSelector } from '../store/hooks';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
@@ -106,7 +104,6 @@ function CenterPanel(props: Props) {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const localViewSettings = useLocalDbViewSettings(activeView?.id);
-  const dispatch = useAppDispatch();
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -494,19 +491,14 @@ function CenterPanel(props: Props) {
     }
   }, [`${activeView?.fields.sourceData?.formId}${activeView?.fields.sourceData?.boardId}`]);
 
-  const { trigger: updateProposalSource } = useSWRMutation(
-    `/api/pages/${activeBoard?.id}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.updateProposalSource(arg)
-  );
-
-  useEffect(() => {
-    if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
-      updateProposalSource({ pageId: currentRootPageId }).then(() => {
-        // Refetch database after updating proposal source board, otherwise the UI will be out of sync
-        dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
-      });
-    }
-  }, [currentRootPageId, activeBoard?.id]);
+  // useEffect(() => {
+  //   if (currentRootPageId && activeBoard?.fields.sourceType === 'proposals' && activeBoard?.id === currentRootPageId) {
+  //     updateProposalSource({ pageId: currentRootPageId }).then(() => {
+  //       // Refetch database after updating proposal source board, otherwise the UI will be out of sync
+  //       dispatch(initialDatabaseLoad({ pageId: currentRootPageId }));
+  //     });
+  //   }
+  // }, [currentRootPageId, activeBoard?.id]);
 
   const isLoadingSourceData = !activeBoard && (!views || views.length === 0);
   const readOnlyTitle = activeBoard?.fields.sourceType === 'proposals';
@@ -605,7 +597,7 @@ function CenterPanel(props: Props) {
                 {activeBoard && activePage && isEmbedded && boardPageType === 'inline_board' && (
                   <InlineViewTitle
                     key={activePage.id + activePage.title}
-                    pageTitle={activePage.title}
+                    pageTitle={activePage.title || ''}
                     readOnly={props.readOnly}
                     setPage={props.setPage}
                   />

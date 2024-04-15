@@ -1,17 +1,24 @@
-import type { ProjectFieldProperty, ProjectMemberPayload, ProjectPayload, ProjectValues } from './interfaces';
+import type { ProjectAndMembersFieldConfig, ProjectFieldProperty, ProjectAndMembersPayload } from './interfaces';
 
 export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
-    label: 'Name'
+    label: 'Name',
+    alwaysRequired: true
   },
   {
     field: 'walletAddress',
-    label: 'Wallet Address'
+    label: 'Wallet Address',
+    allowPrivate: true
+  },
+  {
+    field: 'email',
+    label: 'Email',
+    allowPrivate: true
   },
   {
     field: 'twitter',
-    label: 'Twitter'
+    label: 'X.com'
   },
   {
     field: 'warpcast',
@@ -24,10 +31,6 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'linkedin',
     label: 'LinkedIn'
-  },
-  {
-    field: 'email',
-    label: 'Email'
   },
   {
     field: 'telegram',
@@ -45,23 +48,11 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export const projectMemberDefaultValues: ProjectMemberPayload = {
-  name: '',
-  walletAddress: '',
-  email: '',
-  twitter: '',
-  warpcast: '',
-  github: '',
-  linkedin: '',
-  telegram: '',
-  otherUrl: '',
-  previousProjects: ''
-};
-
 export const projectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
-    label: 'Project Name'
+    label: 'Project Name',
+    alwaysRequired: true
   },
   {
     field: 'excerpt',
@@ -77,7 +68,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   },
   {
     field: 'twitter',
-    label: 'Twitter'
+    label: 'X.com'
   },
   {
     field: 'website',
@@ -105,11 +96,12 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   },
   {
     field: 'walletAddress',
-    label: 'Wallet Address to receive funds'
+    label: 'Primary Project Wallet to receive funds',
+    allowPrivate: true
   }
 ];
 
-export const projectDefaultValues: ProjectPayload = {
+export const defaultProjectAndMembersPayload: ProjectAndMembersPayload = {
   name: '',
   excerpt: '',
   description: '',
@@ -120,21 +112,39 @@ export const projectDefaultValues: ProjectPayload = {
   demoUrl: '',
   communityUrl: '',
   otherUrl: '',
-  walletAddress: ''
+  walletAddress: '',
+  projectMembers: [
+    {
+      name: '',
+      walletAddress: '',
+      email: '',
+      twitter: '',
+      warpcast: '',
+      github: '',
+      linkedin: '',
+      telegram: '',
+      otherUrl: '',
+      previousProjects: ''
+    }
+  ]
 };
 
-export const defaultProjectValues: ProjectValues = {
-  ...projectDefaultValues,
-  projectMembers: [projectMemberDefaultValues]
-};
-
-export const defaultProjectFieldConfig = {
+export const defaultProjectAndMembersFieldConfig = {
   name: {
     required: true
+  },
+  walletAddress: {
+    private: true
   },
   projectMember: {
     name: {
       required: true
+    },
+    email: {
+      private: true
+    },
+    walletAddress: {
+      private: true
     }
   }
-};
+} as ProjectAndMembersFieldConfig;
