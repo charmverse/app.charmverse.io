@@ -168,20 +168,7 @@ export function mapProposalToCard({
     ...proposalFields.properties,
     // [Constants.titleColumnId]: proposal.title,
     // add default field values on the fly
-    [PROPOSAL_STATUS_BLOCK_ID]: proposal.archived ? 'archived' : proposal.currentStep?.result ?? 'in_progress',
-    [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
-    [PROPOSAL_STEP_BLOCK_ID]: proposal.currentStep?.title ?? 'Draft',
-    [PROPOSAL_EVALUATION_TYPE_ID]: proposal.currentStep?.step ?? 'draft',
-    [PROPOSAL_REVIEWERS_BLOCK_ID]:
-      proposal && 'reviewers' in proposal
-        ? proposal.reviewers.map(
-            (r) =>
-              ({
-                group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
-                id: r.userId ?? r.roleId ?? r.systemRole
-              } as TargetPermissionGroup<'user' | 'role'>)
-          )
-        : []
+    [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || ''
   };
   const card: Card<ProposalPropertyValue> = {
     id: proposal.id,
