@@ -9,14 +9,13 @@ import type {
 } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { arrayUtils } from '@charmverse/core/utilities';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
-import type { TypedPendingGnosisSafeTransaction } from './indexOnChainProposalCredential';
+import type { TypedPendingGnosisSafeTransaction } from './indexGnosisSafeCredentialTransaction';
 import type { CredentialDataInput } from './schemas';
 
 export type ProposalWithJoinedData = {
@@ -27,7 +26,10 @@ export type ProposalWithJoinedData = {
   authors: {
     author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
   }[];
-  issuedCredentials: Pick<IssuedCredential, 'userId' | 'credentialTemplateId' | 'credentialEvent'>[];
+  issuedCredentials: Pick<
+    IssuedCredential,
+    'userId' | 'credentialTemplateId' | 'credentialEvent' | 'onchainAttestationId'
+  >[];
   page: { id: string };
 };
 
@@ -38,13 +40,13 @@ export type IssuableProposalCredentialContent = {
   credentialTemplateId: string;
   proposalId: string;
   pageId: string;
-  event: CredentialEventType;
+  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
 };
 
 // A partial subtype to reduce data passed around the system
 export type PartialIssuableProposalCredentialContent = Pick<
   IssuableProposalCredentialContent,
-  'proposalId' | 'event' | 'credentialTemplateId' | 'recipientAddress'
+  'proposalId' | 'credentialTemplateId' | 'recipientAddress' | 'recipientUserId' | 'event'
 >;
 
 /**
@@ -100,10 +102,10 @@ export function generateCredentialInputsForProposal({
       for (const event of issuableEvents) {
         if (
           !pendingIssuableCredentials?.some(
-            (pic) =>
-              pic.credentialTemplateId === credentialTemplateId &&
-              pic.event === event &&
-              lowerCaseEqual(pic.recipientAddress, targetWallet)
+            (pendingIssuableCred) =>
+              pendingIssuableCred.credentialTemplateId === credentialTemplateId &&
+              pendingIssuableCred.event === event &&
+              lowerCaseEqual(pendingIssuableCred.recipientAddress, targetWallet)
           )
         ) {
           const credentialTemplate = templateMap.get(credentialTemplateId);
@@ -115,7 +117,8 @@ export function generateCredentialInputsForProposal({
               (ic) =>
                 ic.userId === author.id &&
                 ic.credentialTemplateId === credentialTemplateId &&
-                ic.credentialEvent === event
+                ic.credentialEvent === event &&
+                !!ic.onchainAttestationId
             );
 
           if (canIssueCredential) {
@@ -129,7 +132,7 @@ export function generateCredentialInputsForProposal({
               proposalId: proposal.id,
               recipientUserId: author.id,
               pageId: proposal.page.id,
-              event,
+              event: event as Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>,
               credential: {
                 Name: credentialTemplate.name,
                 Description: credentialTemplate.description ?? '',
@@ -148,7 +151,7 @@ export function generateCredentialInputsForProposal({
   return credentialsToIssue;
 }
 
-export function proposalCredentialInputFieldsSelect() {
+function proposalCredentialInputFieldsSelect() {
   return {
     id: true,
     status: true,
@@ -163,7 +166,8 @@ export function proposalCredentialInputFieldsSelect() {
       select: {
         userId: true,
         credentialTemplateId: true,
-        credentialEvent: true
+        credentialEvent: true,
+        onchainAttestationId: true
       }
     },
     selectedCredentialTemplates: true,
@@ -211,7 +215,9 @@ export async function findSpaceIssuableProposalCredentials({
   const proposals = await prisma.proposal.findMany({
     where: {
       spaceId,
-      page: {}
+      page: {
+        type: 'proposal'
+      }
     },
     select: proposalCredentialInputFieldsSelect()
   });
@@ -232,7 +238,7 @@ export async function findSpaceIssuableProposalCredentials({
   const pendingProposalsInSafe = pendingSafeTransactions.reduce((acc, pendingTx) => {
     for (const proposalId of pendingTx.proposalIds) {
       const pendingProposalCredentials =
-        (pendingTx as TypedPendingGnosisSafeTransaction).credentialContent?.[proposalId] ?? [];
+        (pendingTx as TypedPendingGnosisSafeTransaction<'proposal'>).credentialContent?.[proposalId] ?? [];
 
       if (!acc[proposalId]) {
         acc[proposalId] = [];

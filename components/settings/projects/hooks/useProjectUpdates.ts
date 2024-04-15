@@ -15,7 +15,7 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
   const { mutate, data: projectsWithMembers } = useGetProjects();
   const { user } = useUser();
   const project = projectsWithMembers?.find((_project) => _project.id === projectId);
-  const isTeamLead = project?.projectMembers[0].userId === user?.id;
+  const isTeamLead = !!project?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   const { reset } = useFormContext<ProjectAndMembersPayload>();
 
@@ -66,35 +66,40 @@ export function useProjectUpdates({ projectId }: { projectId: MaybeString }) {
                 projectId
               });
 
-              mutate((projects) => {
-                if (!projects) {
-                  return projects;
-                }
-
-                return projects.map((_project) => {
-                  if (_project.id === projectId) {
-                    return {
-                      ..._project,
-                      projectMembers: _project.projectMembers.map((_projectMember) => {
-                        if (_projectMember.id === updatedProjectMember.id) {
-                          return updatedProjectMember;
-                        }
-
-                        return _projectMember;
-                      })
-                    };
+              mutate(
+                (projects) => {
+                  if (!projects) {
+                    return projects;
                   }
 
-                  return _project;
-                });
-              });
+                  return projects.map((_project) => {
+                    if (_project.id === projectId) {
+                      return {
+                        ..._project,
+                        projectMembers: _project.projectMembers.map((_projectMember) => {
+                          if (_projectMember.id === updatedProjectMember.id) {
+                            return updatedProjectMember;
+                          }
+
+                          return _projectMember;
+                        })
+                      };
+                    }
+
+                    return _project;
+                  });
+                },
+                {
+                  revalidate: false
+                }
+              );
             }
           }
         } catch (_) {
           showMessage('Failed to update project', 'error');
         }
       }, 300),
-    [projectId]
+    [projectId, user?.id, isTeamLead]
   );
 
   return {

@@ -21,6 +21,14 @@ export type SelectionTooltipProps = {
   tooltipRenderOpts?: Omit<TooltipRenderOpts, 'getReferenceElement'>;
 };
 
+type SelectionTooltipStateType = {
+  type: string | null;
+  tooltipContentDOM: HTMLElement;
+  skipSelection: boolean;
+  show: boolean;
+  calculateType: CalculateTypeFunction;
+};
+
 function selectionTooltip({
   key = new PluginKey('selectionTooltipPlugin'),
   calculateType = (state, _prevType) => {
@@ -75,12 +83,20 @@ function selectionTooltipState({
           tooltipContentDOM: tooltipDOMSpec.contentDOM,
           // For tooltipPlacement plugin
           show: typeof type === 'string',
+          skipSelection: false,
           // helpers
           calculateType
         };
       },
-      apply: (tr: Transaction, pluginState: any) => {
+      apply: (tr: Transaction, pluginState: SelectionTooltipStateType) => {
         const meta = tr.getMeta(key);
+        const skipSelection = tr.getMeta('skip-selection-tooltip');
+        if (skipSelection) {
+          return { ...pluginState, skipSelection: true };
+        } else {
+          // always reset skipSelection
+          pluginState.skipSelection = false;
+        }
         if (meta === undefined) {
           return pluginState;
         }
@@ -90,10 +106,11 @@ function selectionTooltipState({
           return pluginState;
         }
 
-        log.debug('update tooltip state to ', meta.type);
+        // log.debug('update tooltip state to ', meta.type);
         return {
           ...pluginState,
           type: meta.type,
+          skipSelection: false,
           show: typeof meta.type === 'string'
         };
       }
@@ -154,18 +171,13 @@ function selectionTooltipController({ stateKey }: { stateKey: PluginKey }) {
   });
 }
 
-interface SelectionTooltipStateType {
-  type: string | null;
-  tooltipContentDOM: HTMLElement;
-  show: boolean;
-  calculateType: CalculateTypeFunction;
-}
-
 function _syncTooltipOnUpdate(key: PluginKey<SelectionTooltipStateType>): Command {
   return (state, dispatch, view) => {
     const tooltipState = key.getState(state)!;
+    if (tooltipState.skipSelection) {
+      return false;
+    }
     const newType = tooltipState.calculateType(state, tooltipState.type);
-
     if (typeof newType === 'string') {
       return updateSelectionTooltipType(key, newType)(state, dispatch, view);
     }

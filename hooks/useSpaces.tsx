@@ -51,21 +51,24 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     }
   }, [user?.id, isUserLoaded]);
 
-  const createNewSpace = useCallback(async (newSpace: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => {
-    setIsCreatingSpace(true);
+  const createNewSpace = useCallback(
+    async (newSpace: Pick<CreateSpaceProps, 'spaceTemplate' | 'spaceData'>) => {
+      setIsCreatingSpace(true);
 
-    try {
-      const space = await charmClient.spaces.createSpace(newSpace);
-      setSpaces((s) => [...s, space]);
-      // refresh user permissions
-      await refreshUser();
-      setIsCreatingSpace(false);
-      return space;
-    } catch (e) {
-      setIsCreatingSpace(false);
-      throw e;
-    }
-  }, []);
+      try {
+        const space = await charmClient.spaces.createSpace(newSpace);
+        setSpaces((s) => [...s, space]);
+        // refresh user permissions
+        await refreshUser();
+        setIsCreatingSpace(false);
+        return space;
+      } catch (e) {
+        setIsCreatingSpace(false);
+        throw e;
+      }
+    },
+    [setIsCreatingSpace, setSpaces]
+  );
 
   const setSpace = useCallback(
     (_space: Space) => {
@@ -75,9 +78,10 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
     [spaces, setSpaces]
   );
 
-  const memberSpaces = !user
-    ? []
-    : spaces.filter((s) => !!user?.spaceRoles.find((sr) => sr.spaceId === s.id && !sr.isGuest));
+  const memberSpaces = useMemo(
+    () => (!user ? [] : spaces.filter((s) => !!user?.spaceRoles.find((sr) => sr.spaceId === s.id && !sr.isGuest))),
+    [user, spaces]
+  );
 
   const value = useMemo(
     () =>
@@ -90,7 +94,7 @@ export function SpacesProvider({ children }: { children: ReactNode }) {
         createNewSpace,
         isCreatingSpace
       } as IContext),
-    [spaces, isLoaded, isCreatingSpace]
+    [spaces, memberSpaces, isLoaded, setSpace, createNewSpace, isCreatingSpace]
   );
 
   return <SpacesContext.Provider value={value}>{children}</SpacesContext.Provider>;

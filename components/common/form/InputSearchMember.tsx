@@ -143,6 +143,7 @@ export function InputSearchMemberMultiple({
   onChange,
   disableCloseOnSelect,
   defaultValue,
+  multiple = true,
   ...props
 }: IInputSearchMemberMultipleProps) {
   const { members, membersRecord } = useMembers();
@@ -169,7 +170,7 @@ export function InputSearchMemberMultiple({
   return (
     <InputSearchMemberBase
       filterSelectedOptions
-      multiple
+      multiple={multiple}
       value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}

@@ -25,11 +25,10 @@ import { useUser } from 'hooks/useUser';
 import { insertAndFocusFirstLine } from 'lib/prosemirror/insertAndFocusFirstLine';
 import { insertAndFocusLineAtEndofDoc } from 'lib/prosemirror/insertAndFocusLineAtEndofDoc';
 import { isTouchScreen } from 'lib/utils/browser';
-import { slugify } from 'lib/utils/strings';
 
 import { FidusEditor } from '../../fiduswriter/fiduseditor';
 import type { ConnectionEvent } from '../../fiduswriter/ws';
-import { scrollIntoHeadingNode } from '../../heading';
+import { scrollToHeadingNode } from '../../heading';
 import { threadPluginKey } from '../../thread/thread.plugins';
 import { convertFileToBase64, imageFileDropEventName } from '../base-components/image';
 import { BangleEditor as CoreBangleEditor } from '../core/bangle-editor';
@@ -151,13 +150,17 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
   }, [(threadIds ?? []).join(','), isLoadingRef.current]);
 
   useEffect(() => {
-    if (editor && !isLoadingRef.current && floatingMenuPluginKey) {
-      scrollIntoHeadingNode({
-        editor,
-        pluginKey: floatingMenuPluginKey
+    const locationHash = window.location.hash.slice(1);
+    if (editor && locationHash && !isLoadingRef.current) {
+      // delay scrolling to allow images and embeds to be loaded
+      setTimeout(() => {
+        scrollToHeadingNode({
+          view: editor.view,
+          headingSlug: locationHash
+        });
       });
     }
-  }, [isLoadingRef.current]);
+  }, [isLoadingRef.current, !!editor]);
 
   function _onConnectionEvent(_editor: CoreBangleEditor, event: ConnectionEvent) {
     if (onConnectionEvent) {

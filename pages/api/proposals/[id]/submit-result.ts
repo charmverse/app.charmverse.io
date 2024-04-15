@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { issueProposalCredentialsIfNecessary } from 'lib/credentials/issueProposalCredentialsIfNecessary';
+import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
@@ -66,7 +66,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   });
 
   if (result === 'pass') {
-    await issueProposalCredentialsIfNecessary({
+    await issueOffchainProposalCredentialsIfNecessary({
       event: 'proposal_approved',
       proposalId
     });

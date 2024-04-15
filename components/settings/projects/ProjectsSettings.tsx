@@ -45,7 +45,7 @@ function ProjectRow({
   mutate: KeyedMutator<ProjectWithMembers[]>;
 }) {
   const { user } = useUser();
-  const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
+  const isTeamLead = !!projectWithMembers.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
   const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useProjectForm({
     projectId: projectWithMembers.id,
@@ -82,46 +82,39 @@ function ProjectRow({
   function onUpdateProject() {
     const projectValues = form.getValues();
     if (isTeamLead) {
-      const updatedProject = {
-        ...projectValues,
-        id: projectWithMembers.id,
-        projectMembers: projectValues.projectMembers.map((member, index) => ({
-          ...projectWithMembers.projectMembers[index],
-          ...member
-        }))
-      };
-
-      updateProject(updatedProject);
-
-      form.reset(updatedProject, {
-        keepDirty: false
-      });
-
-      mutate(
-        (projects) => {
-          if (!projects || !projectWithMembers) {
-            return projects;
-          }
-
-          return projects.map((_project) => {
-            if (_project.id === projectWithMembers.id) {
-              return {
-                ..._project,
-                ...updatedProject,
-                projectMembers: _project.projectMembers.map((projectMember, index) => {
-                  return {
-                    ...projectMember,
-                    ...updatedProject.projectMembers[index]
-                  };
-                })
-              };
-            }
-
-            return _project;
-          });
+      updateProject(
+        {
+          ...projectValues,
+          projectMembers: projectValues.projectMembers.map((member, index) => ({
+            ...projectWithMembers.projectMembers[index],
+            ...member
+          }))
         },
         {
-          revalidate: false
+          onSuccess(updatedProject) {
+            form.reset(updatedProject, {
+              keepDirty: false
+            });
+
+            mutate(
+              (projects) => {
+                if (!projects || !projectWithMembers) {
+                  return projects;
+                }
+
+                return projects.map((_project) => {
+                  if (_project.id === projectWithMembers.id) {
+                    return updatedProject;
+                  }
+
+                  return _project;
+                });
+              },
+              {
+                revalidate: false
+              }
+            );
+          }
         }
       );
     } else {
@@ -184,7 +177,7 @@ function ProjectRow({
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
           <Stack width='100%' flexDirection='row' justifyContent='space-between' alignItems='center'>
             <Typography data-test={`project-title-${projectWithMembers.id}`}>
-              {projectWithMembers.name ?? 'Untitled'}
+              {projectWithMembers.name || 'Untitled'}
             </Typography>
             {!isTeamLead && (
               <Stack

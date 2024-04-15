@@ -12,6 +12,7 @@ import { Constants } from 'lib/databases/constants';
 import { getPropertyName } from 'lib/databases/getPropertyName';
 
 import mutator from '../../mutator';
+import { iconForPropertyType } from '../../widgets/iconForPropertyType';
 
 type Props = {
   properties: readonly IPropertyTemplate[];
@@ -22,8 +23,8 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
   const sortDisplayOptions = properties
     ?.filter((o) => o.type !== 'proposalReviewerNotes')
-    ?.map((o) => ({ id: o.id, name: getPropertyName(o) }));
-  sortDisplayOptions?.unshift({ id: Constants.titleColumnId, name: 'Name' });
+    ?.map((o) => ({ id: o.id, name: getPropertyName(o), icon: iconForPropertyType(o.type) }));
+  sortDisplayOptions?.unshift({ id: Constants.titleColumnId, icon: iconForPropertyType('text'), name: 'Title' });
   const localViewSettings = useLocalDbViewSettings();
 
   const sortOptions = useViewSortOptions(activeView);
@@ -86,16 +87,18 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
           const sortOption = sortOptions[0];
           if (sortOption.propertyId === option.id) {
             rightIcon = sortOption.reversed ? (
-              <ArrowDownwardOutlinedIcon fontSize='small' />
+              <ArrowDownwardOutlinedIcon color='secondary' fontSize='small' />
             ) : (
-              <ArrowUpwardOutlinedIcon fontSize='small' />
+              <ArrowUpwardOutlinedIcon color='secondary' fontSize='small' />
             );
           }
         }
         return (
           <MenuItem key={option.id} id={option.id} onClick={() => sortChanged(option.id)}>
+            {option.icon && <ListItemIcon>{option.icon}</ListItemIcon>}
             <ListItemText>{option.name}</ListItemText>
-            <ListItemIcon>{rightIcon}</ListItemIcon>
+            {/* override minWidth from global theme */}
+            <ListItemIcon sx={{ minWidth: '0 !important' }}>{rightIcon}</ListItemIcon>
           </MenuItem>
         );
       })}

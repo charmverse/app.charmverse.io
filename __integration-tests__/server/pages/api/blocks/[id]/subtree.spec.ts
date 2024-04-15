@@ -6,12 +6,14 @@ import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import request from 'supertest';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import { createCardsFromProposals } from 'lib/databases/createCardsFromProposals';
+import type { BoardFields } from 'lib/databases/board';
+import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
+import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBoard } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 
-let space: Space;
+let adminSpace: Space;
 
 let adminUser: User;
 
@@ -30,12 +32,12 @@ beforeAll(async () => {
     isAdmin: true
   });
 
-  space = generated.space;
+  adminSpace = generated.space;
   adminUser = generated.user;
 
   const generatedDatabase = await generateBoard({
     createdBy: adminUser.id,
-    spaceId: space.id,
+    spaceId: adminSpace.id,
     views: sourceDatabaseViewsCount,
     cardCount: sourceDatabaseCardsCount
   });
@@ -118,7 +120,7 @@ describe('GET /api/blocks/[id]/subtree', () => {
   it('Should return only the pages a user can access', async () => {
     const sharedDatabase = await generateBoard({
       createdBy: adminUser.id,
-      spaceId: space.id,
+      spaceId: adminSpace.id,
       views: sourceDatabaseViewsCount,
       cardCount: sourceDatabaseCardsCount,
       permissions: [
@@ -159,9 +161,13 @@ describe('GET /api/blocks/[id]/subtree', () => {
     const cardBlocks = databaseBlocks.filter((b) => b.type === 'card');
     expect(cardBlocks).toHaveLength(cards.length - 1);
   });
+});
 
-  // This test uses public permissions to enable access to cards
-  it('Should return only the cards from proposals that a user can access', async () => {
+describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
+  it('Should return only the cards from proposals that the author can access', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
     // set up test user
     const reviewer = await testUtilsUser.generateUser();
     await addUserToSpace({
@@ -171,7 +177,7 @@ describe('GET /api/blocks/[id]/subtree', () => {
 
     // set up proposal-as-a-source db
     const sharedDatabase = await generateBoard({
-      createdBy: adminUser.id,
+      createdBy: reviewer.id,
       spaceId: space.id,
       viewDataSource: 'proposals',
       cardCount: 0,
@@ -185,8 +191,8 @@ describe('GET /api/blocks/[id]/subtree', () => {
     const visibleProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'published',
       spaceId: space.id,
-      userId: adminUser.id,
-      authors: [adminUser.id],
+      userId: admin.id,
+      authors: [admin.id],
       evaluationInputs: [
         {
           evaluationType: 'feedback',
@@ -207,8 +213,8 @@ describe('GET /api/blocks/[id]/subtree', () => {
     await testUtilsProposals.generateProposal({
       proposalStatus: 'published',
       spaceId: space.id,
-      userId: adminUser.id,
-      authors: [adminUser.id],
+      userId: admin.id,
+      authors: [admin.id],
       evaluationInputs: [
         {
           evaluationType: 'feedback',
@@ -219,13 +225,136 @@ describe('GET /api/blocks/[id]/subtree', () => {
       ]
     });
     const sessionCookie = await loginUser(reviewer.id);
-    await createCardsFromProposals({ boardId: sharedDatabase.id, spaceId: space.id, userId: adminUser.id });
 
     const databaseBlocks = (
       await request(baseUrl).get(`/api/blocks/${sharedDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
     ).body as BlockWithDetails[];
 
-    const cardBlocks = databaseBlocks.filter((b) => b.type === 'card');
-    expect(cardBlocks.map((c) => c.syncWithPageId)).toEqual([visibleProposal.id]);
+    const cardPageIds = databaseBlocks.filter((b) => b.type === 'card').map((c) => c.syncWithPageId);
+    expect(cardPageIds).toEqual([visibleProposal.id]);
+  });
+
+  it('Should not return archived proposals', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+
+    // set up proposal-as-a-source db
+    const proposalDatabase = await generateBoard({
+      createdBy: admin.id,
+      spaceId: space.id,
+      viewDataSource: 'proposals',
+      cardCount: 0
+    });
+    // proposal is hidden
+    const testProposal = await testUtilsProposals.generateProposal({
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: admin.id,
+      authors: [admin.id],
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          permissions: [],
+          reviewers: []
+        }
+      ]
+    });
+    // generate cards
+    await createMissingCards({ boardId: proposalDatabase.id });
+
+    // mark proposal as archived
+    await prisma.proposal.update({
+      where: {
+        id: testProposal.id
+      },
+      data: {
+        archived: true
+      }
+    });
+
+    const sessionCookie = await loginUser(admin.id);
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${proposalDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const cards = databaseBlocks.filter((c) => c.type === 'card');
+    expect(cards).toHaveLength(0);
+  });
+
+  it('Should create new cards', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    // set up proposal-as-a-source db
+    const proposalsDatabase = await generateBoard({
+      createdBy: admin.id,
+      spaceId: space.id,
+      viewDataSource: 'proposals',
+      cardCount: 0
+    });
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: admin.id
+    });
+    const sessionCookie = await loginUser(admin.id);
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${proposalsDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const cardPageIds = databaseBlocks.filter((b) => b.type === 'card').map((c) => c.syncWithPageId);
+    expect(cardPageIds).toEqual([visibleProposal.id]);
+  });
+
+  it('Should return proposal properties', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    // set up proposal-as-a-source db
+    const proposalsDatabase = await generateBoard({
+      createdBy: admin.id,
+      spaceId: space.id,
+      viewDataSource: 'proposals',
+      cardCount: 0
+    });
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: admin.id,
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          permissions: [],
+          reviewers: []
+        }
+      ]
+    });
+    const sessionCookie = await loginUser(admin.id);
+
+    const databaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${proposalsDatabase.id}/subtree`).set('Cookie', sessionCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const boardBlock = await prisma.block.findFirstOrThrow({
+      where: {
+        id: proposalsDatabase.boardId!
+      }
+    });
+    const proposalProperties = getCardPropertyTemplates(boardBlock.fields as any as BoardFields);
+    const cardBlock = databaseBlocks.find((b) => b.syncWithPageId === visibleProposal.id);
+
+    expect(cardBlock).toBeTruthy();
+
+    expect(cardBlock?.fields.properties).toEqual(
+      expect.objectContaining({
+        [proposalProperties.proposalStep!.id]: 'Feedback',
+        [proposalProperties.proposalEvaluationType!.id]: 'feedback'
+      })
+    );
   });
 });

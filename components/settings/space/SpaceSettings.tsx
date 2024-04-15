@@ -28,16 +28,12 @@ import { useSpaces } from 'hooks/useSpaces';
 import type { Feature } from 'lib/features/constants';
 import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
-import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
 import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
-import { isTruthy } from 'lib/utils/types';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
-import { ConnectBoto } from './components/ConnectBoto';
-import { ConnectCollabland } from './components/ConnectCollabland';
 import Avatar from './components/LargeAvatar';
 import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { PrimaryMemberIdentity } from './components/PrimaryMemberIdentity';
@@ -55,7 +51,6 @@ export type FormValues = {
   requireMembersTwoFactorAuth: boolean;
   primaryMemberIdentity?: IdentityType | null;
   customDomain?: string | null;
-  snapshotDomain?: string | null;
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
@@ -76,18 +71,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   customDomain: yup
     .string()
     .nullable()
-    .test('isCusotmDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value)),
-  snapshotDomain: yup
-    .string()
-    .nullable()
-    .min(3, 'Snapshot domain must be at least 3 characters')
-    .test('checkDomain', 'Snapshot domain not found', async (domain) => {
-      if (domain) {
-        const foundSpace = await getSnapshotSpace(domain);
-        return isTruthy(foundSpace);
-      }
-      return true;
-    })
+    .test('isCusotmDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value))
 });
 
 export function SpaceSettings({
@@ -168,8 +152,7 @@ export function SpaceSettings({
         spaceArtwork: values.spaceArtwork,
         enableTestnets: values.enableTestnets,
         requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
-        customDomain: values.customDomain || null,
-        snapshotDomain: values.snapshotDomain
+        customDomain: values.customDomain || null
       },
       {
         onSuccess: (updatedSpace) => {
@@ -406,32 +389,6 @@ export function SpaceSettings({
             <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
           <Grid item>
-            <Legend>Integrations</Legend>
-            <FieldLabel>Snapshot.org domain</FieldLabel>
-            {!space?.snapshotDomain && !isAdmin ? (
-              <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
-            ) : (
-              <TextField
-                {...register('snapshotDomain')}
-                InputProps={{
-                  startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
-                }}
-                disabled={!isAdmin}
-                fullWidth
-                error={!!errors.snapshotDomain}
-                helperText={errors.snapshotDomain?.message}
-              />
-            )}
-          </Grid>
-          <Grid item>
-            <FieldLabel>Collab.Land</FieldLabel>
-            <ConnectCollabland />
-          </Grid>
-          <Grid item>
-            <FieldLabel>Send events to Discord/Telegram</FieldLabel>
-            <ConnectBoto />
-          </Grid>
-          <Grid item>
             <Legend>Members</Legend>
           </Grid>
           <Grid item>
@@ -626,7 +583,6 @@ function _getFormValues(space: Space): FormValues {
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
     notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
     customDomain: space.customDomain,
-    snapshotDomain: space.snapshotDomain,
     primaryMemberIdentity: space.primaryMemberIdentity
   };
 }
