@@ -7,6 +7,7 @@ import type { FilterGroup } from 'lib/databases/filterGroup';
 import type { PageCommentWithVote } from 'lib/pages/comments/interface';
 import type { DuplicatePageResponse } from 'lib/pages/duplicatePage';
 import type { PageWithContent } from 'lib/pages/interfaces';
+import type { PageLockToggle, PageLockToggleResult } from 'lib/pages/togglePageLock';
 
 export interface UpdateProfileItemRequest {
   profileItems: Omit<ProfileItem, 'userId'>[];
@@ -84,4 +85,6 @@ export class PagesApi {
       (filter && customFilter) || viewId ? { viewId, filter: customFilter } : undefined
     );
   }
+
+  togglePageLock({ isLocked, pageId }: PageLockToggle): Promise<PageLockToggleResult> {}
 }
