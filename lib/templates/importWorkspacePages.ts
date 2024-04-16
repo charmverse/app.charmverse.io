@@ -4,6 +4,7 @@ import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid, validate } from 'uuid';
 
+import type { BoardViewFields } from 'lib/databases/boardView';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
 import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
@@ -300,6 +301,13 @@ async function generateImportWorkspacePages({
         [boardBlock, ...viewBlocks].forEach((block) => {
           if (block.type === 'board') {
             block.id = newId;
+          } else if (block.type === 'view') {
+            const fields = block.fields as BoardViewFields;
+            if (fields.linkedSourceId) {
+              const newBoardId = oldNewRecordIdHashMap[fields.linkedSourceId] || uuid(); // create a new id if we have not processed this board yet
+              oldNewRecordIdHashMap[fields.linkedSourceId] = newBoardId;
+              fields.linkedSourceId = newBoardId;
+            }
           }
 
           block.rootId = newId;
@@ -310,6 +318,7 @@ async function generateImportWorkspacePages({
           block.createdBy = space.createdBy;
           block.updatedBy = space.updatedBy;
           block.spaceId = space.id;
+
           blockArgs.push(block as Prisma.BlockCreateManyInput);
         });
         pageArgs.push(newPageContent);
