@@ -26,7 +26,7 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
   const onProjectUpdate = useMemo(
     () =>
       debounce(async (projectPayload: UpdateProjectPayload) => {
-        if (!projectId || !isTeamLead) {
+        if (!isTeamLead) {
           return null;
         }
 
@@ -60,95 +60,97 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
         } catch (_) {
           return null;
         }
-      }, 300),
+      }, 150),
     [projectId, user?.id, isTeamLead]
   );
 
   const onProjectMemberUpdate = useMemo(
     () =>
       debounce(async (projectMemberPayload: UpdateProjectMemberPayload & { userId?: string }) => {
-        if ((isTeamLead || projectMemberPayload.userId === user?.id) && projectMemberPayload.id) {
-          try {
-            mutate(
-              (projects) => {
-                if (!projects) {
-                  return projects;
+        if (!isTeamLead && projectMemberPayload.userId !== user?.id && !projectMemberPayload.id) {
+          return null;
+        }
+        try {
+          mutate(
+            (projects) => {
+              if (!projects) {
+                return projects;
+              }
+
+              return projects.map((_project) => {
+                if (_project.id === projectId) {
+                  const updatedProject = {
+                    ..._project,
+                    projectMembers: _project.projectMembers.map((_projectMember) => {
+                      if (_projectMember.id === projectMemberPayload.id) {
+                        return {
+                          ..._projectMember,
+                          ...projectMemberPayload
+                        };
+                      }
+
+                      return _projectMember;
+                    })
+                  };
+                  return updatedProject;
                 }
 
-                return projects.map((_project) => {
-                  if (_project.id === projectId) {
-                    const updatedProject = {
-                      ..._project,
-                      projectMembers: _project.projectMembers.map((_projectMember) => {
-                        if (_projectMember.id === projectMemberPayload.id) {
-                          return {
-                            ..._projectMember,
-                            ...projectMemberPayload
-                          };
-                        }
+                return _project;
+              });
+            },
+            {
+              revalidate: false
+            }
+          );
 
-                        return _projectMember;
-                      })
-                    };
-                    return updatedProject;
-                  }
+          const updatedProjectMember = await charmClient.projects.updateProjectMember({
+            payload: projectMemberPayload,
+            projectId
+          });
 
-                  return _project;
-                });
-              },
-              {
-                revalidate: false
-              }
-            );
-
-            const updatedProjectMember = await charmClient.projects.updateProjectMember({
-              payload: projectMemberPayload,
-              projectId
-            });
-
-            return updatedProjectMember;
-          } catch (err) {
-            return null;
-          }
+          return updatedProjectMember;
+        } catch (err) {
+          return null;
         }
-      }, 300),
+      }, 150),
     [projectId, user?.id, isTeamLead]
   );
 
   const onProjectMemberAdd = async (projectMemberPayload: AddProjectMemberPayload) => {
-    if (isTeamLead && project) {
-      try {
-        const createdProjectMember = await addProjectMember(projectMemberPayload);
-        reset({
-          ...project,
-          projectMembers: [...project.projectMembers, createdProjectMember]
-        });
-        mutate(
-          (projects) => {
-            if (!projects) {
-              return projects;
+    if (!isTeamLead || !project) {
+      return null;
+    }
+    try {
+      const createdProjectMember = await addProjectMember(projectMemberPayload);
+      reset({
+        ...project,
+        projectMembers: [...project.projectMembers, createdProjectMember]
+      });
+      mutate(
+        (projects) => {
+          if (!projects) {
+            return projects;
+          }
+
+          return projects.map((_project) => {
+            if (_project.id === projectId) {
+              return {
+                ..._project,
+                projectMembers: [..._project.projectMembers, createdProjectMember]
+              };
             }
 
-            return projects.map((_project) => {
-              if (_project.id === projectId) {
-                return {
-                  ..._project,
-                  projectMembers: [..._project.projectMembers, createdProjectMember]
-                };
-              }
-
-              return _project;
-            });
-          },
-          {
-            revalidate: false
-          }
-        );
-        return createdProjectMember;
-      } catch (err) {
-        showMessage('Failed to add project member', 'error');
-        return null;
-      }
+            return _project;
+          });
+        },
+        {
+          revalidate: false
+        }
+      );
+      return createdProjectMember;
+    } catch (err) {
+      showMessage('Failed to add project member', 'error');
+      return null;
     }
   };
 

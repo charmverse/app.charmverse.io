@@ -1,6 +1,6 @@
 import type { Project, ProjectMember } from '@charmverse/core/prisma-client';
 
-import { useDELETE, useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
+import { useGET, usePOST, usePUT } from 'charmClient/hooks/helpers';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
