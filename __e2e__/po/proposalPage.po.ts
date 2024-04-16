@@ -15,6 +15,7 @@ export class ProposalPage extends DocumentPage {
     public createVoteButton = page.locator('data-test=create-vote-button'),
     public voteContainer = page.locator('data-test=vote-container'),
     public currentStatus = page.locator('data-test=current-proposal-status'),
+    public projectTeamMembersSelect = page.locator('data-test=project-team-members-select'),
     public templateSelect = page.locator('data-test=proposal-template-select'),
     public workflowSelect = page.locator('data-test=proposal-workflow-select'),
     public voterSelect = page.locator('data-test=proposal-vote-select'),
@@ -73,6 +74,14 @@ export class ProposalPage extends DocumentPage {
     public saveRubricAnswers = page.locator('data-test=save-rubric-answers')
   ) {
     super(page);
+  }
+
+  getRemoveProjectMemberButton(index: number) {
+    return this.page.locator(`data-test=remove-project-member-button`).nth(index);
+  }
+
+  getProjectMemberOption(index: number) {
+    return this.page.locator('data-test=project-member-option').nth(index);
   }
 
   getSelectOption(optionId: string) {

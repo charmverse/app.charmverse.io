@@ -1,13 +1,14 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import type { Project, Space, User } from '@charmverse/core/prisma-client';
+import type { Space, User } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { loginBrowserUser } from '__e2e__/utils/mocks';
 import { v4 } from 'uuid';
 
-import { defaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getDefaultFeedbackEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
 import { defaultWorkflowTitle } from 'lib/proposals/workflows/defaultWorkflows';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
@@ -16,7 +17,7 @@ let space: Space;
 let spaceAdmin: User;
 let spaceMember: User;
 let defaultWorkflows: ProposalWorkflowTyped[];
-let project: Project;
+let project: ProjectWithMembers;
 let proposalTemplateId: string;
 let shortTextFieldId: string;
 
@@ -72,6 +73,7 @@ test.beforeAll(async () => {
     }
   ];
 
+  const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
   project = await createProject({
     project: {
       ...defaultProjectAndMembersPayload,
@@ -81,6 +83,11 @@ test.beforeAll(async () => {
           ...defaultProjectAndMembersPayload.projectMembers[0],
           email: `test@${v4()}.com`,
           name: 'Test Member'
+        },
+        {
+          ...defaultProjectAndMembersPayload.projectMembers[0],
+          email: `test@${v4()}.com`,
+          name: 'Test Member 2'
         }
       ]
     },
@@ -216,12 +223,11 @@ test.describe.serial('Structured proposal template with project', () => {
     shortTextFieldId = proposalTemplate.form!.formFields.find((field) => field.type === 'short_text')!.id;
   });
 
-  test('Publish a structured proposal with existing project and update project fields', async ({
+  test('Publish a structured proposal with existing project, update project fields and add/update existing project member', async ({
     proposalPage,
     documentPage,
     proposalFormFieldPage,
-    proposalsListPage,
-    projectSettings
+    proposalsListPage
   }) => {
     await loginBrowserUser({
       browserPage: proposalsListPage.page,
@@ -235,58 +241,105 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalPage.getSelectOption(proposalTemplateId).click();
     await proposalPage.waitForNewProposalPage(space.domain);
     await documentPage.documentTitleInput.fill('Proposal from structured template');
+
     // Disabled since no project is selected
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
     await proposalFormFieldPage.clickProjectOption(project.id);
-    await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: randomETHWalletAddress() });
-    await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'walletAddress', content: randomETHWalletAddress() });
+    await proposalFormFieldPage.fillProjectField({
+      fieldName: 'excerpt',
+      content: 'This is my project',
+      textArea: true
+    });
     // Type invalid email
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john' });
     // Disabled since project profile has invalid values
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john@gmail.com' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'john@gmail.com' });
     await proposalFormFieldPage.getFormFieldInput(shortTextFieldId, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-from-structured-template*');
 
-    let projectAfterUpdate = await prisma.project.findUniqueOrThrow({
+    const projectAfterUpdate = await prisma.project.findUniqueOrThrow({
       where: {
         id: project.id
       },
       include: {
-        projectMembers: true
+        projectMembers: {
+          orderBy: [
+            {
+              teamLead: 'desc'
+            },
+            {
+              createdAt: 'asc'
+            }
+          ]
+        }
       }
     });
     expect(projectAfterUpdate.excerpt).toBe('This is my project');
     expect(projectAfterUpdate.projectMembers[0].email).toBe('john@gmail.com');
 
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
-    const pendingApiCall = projectSettings.page.waitForResponse(/\/api\/projects/);
-    await projectSettings.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
-
-    await pendingApiCall;
+    // Add a new project member and update their project fields
+    await proposalPage.projectTeamMembersSelect.click();
+    await proposalPage.getProjectMemberOption(0).click();
+    await proposalPage.page.waitForResponse((response) => {
+      return response.request().method() === 'PUT' && response.url().endsWith('/form/answers');
+    });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
+    await proposalFormFieldPage.fillProjectField({
+      fieldName: 'projectMembers[1].email',
+      content: 'new-email@gmail.com'
+    });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
 
     // Assert that the project member values were auto updated
-    projectAfterUpdate = await prisma.project.findUniqueOrThrow({
+    const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({
       where: {
         id: project.id
       },
       include: {
-        projectMembers: true
+        projectMembers: {
+          orderBy: [
+            {
+              teamLead: 'desc'
+            },
+            {
+              createdAt: 'asc'
+            }
+          ]
+        },
+        proposals: {
+          select: {
+            formAnswers: {
+              where: {
+                type: 'project_profile'
+              },
+              select: {
+                value: true
+              }
+            }
+          }
+        }
       }
     });
+    const projectProfileFormAnswer = projectAfterUpdate2.proposals[0].formAnswers[0].value;
 
-    expect(projectAfterUpdate.name).toBe('Updated Project Name');
-    expect(projectAfterUpdate.projectMembers[0].email).toBe('doe@gmail.com');
+    expect(projectAfterUpdate2.name).toBe('Updated Project Name');
+    expect(projectAfterUpdate2.projectMembers[0].email).toBe('doe@gmail.com');
+    expect(projectAfterUpdate2.projectMembers[1].email).toBe('new-email@gmail.com');
+    expect(projectProfileFormAnswer).toStrictEqual({
+      projectId: project.id,
+      selectedMemberIds: [projectAfterUpdate2.projectMembers[1].id]
+    });
   });
 
-  test('Publish a structured proposal with a new project and update project fields', async ({
+  test('Publish a structured proposal with a new project, add new project members, update project fields with members', async ({
     proposalPage,
     documentPage,
     proposalFormFieldPage,
-    proposalsListPage,
-    projectSettings
+    proposalsListPage
   }) => {
     await loginBrowserUser({
       browserPage: proposalsListPage.page,
@@ -297,22 +350,38 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalsListPage.waitForProposalsList();
     await proposalsListPage.proposalTemplateSelect.click();
 
-    const projectWalletAddress = randomETHWalletAddress();
+    const projectWalletAddress = randomETHWalletAddress().toLowerCase();
 
     await proposalPage.getSelectOption(proposalTemplateId).click();
     await proposalPage.waitForNewProposalPage(space.domain);
     await documentPage.documentTitleInput.fill('Proposal structured template');
     await proposalFormFieldPage.clickProjectOption('new');
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
-    await projectSettings.fillProjectField({ fieldName: 'name', content: 'Demo Project' });
-    await projectSettings.fillProjectField({ fieldName: 'walletAddress', content: projectWalletAddress });
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
-    await projectSettings.addProjectMemberButton.click();
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
-    await projectSettings.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'name', content: 'Demo Project' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'walletAddress', content: projectWalletAddress });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
+
     await proposalFormFieldPage.getFormFieldInput(shortTextFieldId, 'short_text').click();
     await proposalFormFieldPage.page.keyboard.type('Short text field');
+
+    await proposalPage.projectTeamMembersSelect.click();
+    // Add a new project member
+    await proposalPage.getProjectMemberOption(0).click();
+    // Should be disabled since project profile has invalid values
+    expect(proposalPage.publishNewProposalButton).toBeDisabled();
+    // Remove the project member
+    await proposalPage.getRemoveProjectMemberButton(0).click();
+    // Should be now enabled
+    expect(proposalPage.publishNewProposalButton).toBeEnabled();
+    // Add the newly created project member again
+    await proposalPage.projectTeamMembersSelect.click();
+    await proposalPage.getProjectMemberOption(0).click();
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[1].name', content: 'Jane Doe' });
+    await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[1].email', content: 'jane@gmail.com' });
+    // Click on body to close the dropdown
+    await proposalFormFieldPage.page.click('body');
+
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-structured-template*');
 
@@ -326,6 +395,14 @@ test.describe.serial('Structured proposal template with project', () => {
         }
       },
       select: {
+        formAnswers: {
+          where: {
+            type: 'project_profile'
+          },
+          select: {
+            value: true
+          }
+        },
         id: true,
         project: {
           select: {
@@ -335,6 +412,7 @@ test.describe.serial('Structured proposal template with project', () => {
             walletAddress: true,
             projectMembers: {
               select: {
+                id: true,
                 email: true,
                 name: true
               }
@@ -343,51 +421,18 @@ test.describe.serial('Structured proposal template with project', () => {
         }
       }
     });
+    const projectProfileFormAnswer = proposal.formAnswers[0].value;
     const createdProject = proposal.project!;
     expect(createdProject.name).toBe('Demo Project');
     expect(createdProject.projectMembers[0].name).toBe('John Doe');
     expect(createdProject.projectMembers[0].email).toBe('doe@gmail.com');
     expect(createdProject.projectMembers[1].name).toBe('Jane Doe');
     expect(createdProject.projectMembers[1].email).toBe('jane@gmail.com');
-    expect(createdProject.walletAddress).toBe(projectWalletAddress.toLowerCase());
-
-    await projectSettings.fillProjectField({ fieldName: 'excerpt', content: 'This is my project', textArea: true });
-
-    await projectSettings.page.waitForResponse((response) => {
-      return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
+    expect(createdProject.walletAddress).toBe(projectWalletAddress);
+    expect(projectProfileFormAnswer).toStrictEqual({
+      projectId: createdProject.id,
+      selectedMemberIds: [createdProject.projectMembers[1].id]
     });
-
-    const projectAfterUpdate = await prisma.project.findUniqueOrThrow({
-      where: {
-        id: createdProject.id
-      },
-      select: {
-        excerpt: true
-      }
-    });
-
-    expect(projectAfterUpdate.excerpt).toBe('This is my project');
-
-    await proposalFormFieldPage.clickProjectOption(project.id);
-
-    expect(
-      (await projectSettings.getProjectField({ fieldName: 'name' }).inputValue()) === 'Updated Project Name'
-    ).toBeTruthy();
-
-    const proposalAfterUpdate = await prisma.proposal.findFirstOrThrow({
-      where: {
-        id: proposal.id
-      },
-      select: {
-        project: {
-          select: {
-            id: true
-          }
-        }
-      }
-    });
-
-    expect(proposalAfterUpdate.project!.id).toBe(project.id);
   });
 
   test('Visit an existing proposal as a space member should hide private project fields', async ({
@@ -407,12 +452,7 @@ test.describe.serial('Structured proposal template with project', () => {
     const proposal = await prisma.proposal.findFirstOrThrow({
       where: {
         spaceId: space.id,
-        page: {
-          type: 'proposal',
-          path: {
-            startsWith: 'proposal-from-structured-template'
-          }
-        }
+        projectId: project.id
       },
       select: {
         page: {
