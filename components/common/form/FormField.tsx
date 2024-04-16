@@ -218,6 +218,15 @@ function ExpandedFormField({
           onCreateOption={onCreateOption}
           onDeleteOption={onDeleteOption}
           onUpdateOption={onUpdateOption}
+          walletInputConfig={{
+            chainId: (formField.fieldConfig as { chainId: number } | undefined)?.chainId,
+            onChangeChainId: (chainId) => {
+              updateFormField({
+                fieldConfig: { chainId },
+                id: formField.id
+              });
+            }
+          }}
           placeholder={fieldTypePlaceholderRecord[formField.type]}
           // Enable select and multiselect fields to be able to create options
           disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
@@ -357,6 +366,14 @@ export function FormField(
                 <FieldTypeRenderer
                   labelEndAdornment={
                     formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
+                  }
+                  walletInputConfig={
+                    // Only show if chainId is present
+                    (formField.fieldConfig as { chainId: number } | undefined)?.chainId
+                      ? {
+                          chainId: (formField.fieldConfig as { chainId: number } | undefined)?.chainId
+                        }
+                      : undefined
                   }
                   type={formField.type as any}
                   description={formField.description as PageContent}
