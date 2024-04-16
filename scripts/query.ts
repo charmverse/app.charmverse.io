@@ -1,16 +1,49 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getSafeTxStatus } from 'lib/gnosis/getSafeTxStatus';
+import { prettyPrint } from 'lib/utils/strings';
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const acc = await getSafeTxStatus({
-    chainId: 1,
-    safeTxHash: '0xa73fccc71ff9f9224419e24d7354900095c9f4ab5284f1dcb0f5341ec09e83b2'
+  const acc = await prisma.pagePermission.count({
+    where: {
+      permissionLevel: 'proposal_editor',
+      page: {
+        type: 'proposal',
+      }
+    }
   });
-  console.log(acc);
+
+  const pages = await prisma.page.findMany({
+    where: {
+      type: {
+        not: 'proposal',
+      },
+      permissions: {
+        some: {
+          permissionLevel: 'proposal_editor'
+        }
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      type: true,
+      createdAt: true,
+      space: {
+        select: {
+          domain: true
+        }
+      },
+      permissions: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+
+  prettyPrint(pages);
 }
 
-search().then(() => console.log('Done'));
+search().then(() =>null);
