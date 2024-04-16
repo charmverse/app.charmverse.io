@@ -1,7 +1,5 @@
-import { useFormContext } from 'react-hook-form';
-
 import { projectFieldProperties } from 'lib/projects/constants';
-import type { FieldConfig, ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';
@@ -17,7 +15,6 @@ export function ProjectFieldAnswers({
   defaultRequired?: boolean;
   onChange?: (updatedProjectValues: Record<string, any>) => any;
 }) {
-  const { getValues } = useFormContext<ProjectAndMembersPayload>();
   return (
     <FieldAnswers
       defaultRequired={defaultRequired}

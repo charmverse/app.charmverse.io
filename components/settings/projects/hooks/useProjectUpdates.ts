@@ -67,7 +67,7 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
   const onProjectMemberUpdate = useMemo(
     () =>
       debounce(async (projectMemberPayload: UpdateProjectMemberPayload & { userId?: string }) => {
-        if (!isTeamLead && projectMemberPayload.userId !== user?.id && !projectMemberPayload.id) {
+        if (!isTeamLead && projectMemberPayload.userId !== user?.id) {
           return null;
         }
         try {
