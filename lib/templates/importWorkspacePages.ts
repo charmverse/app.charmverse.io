@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid, validate } from 'uuid';
@@ -8,7 +7,7 @@ import { v4 as uuid, validate } from 'uuid';
 import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import { createPage } from 'lib/pages/server/createPage';
 import { generatePagePathFromPathAndTitle, getPagePath } from 'lib/pages/utils';
-import type { PageContent, TextContent, TextMark } from 'lib/prosemirror/interfaces';
+import { updateEntityIds } from 'lib/prosemirror/updateEntityIds';
 import type { Reward } from 'lib/rewards/interfaces';
 import { getSpace } from 'lib/spaces/getSpace';
 import { typedKeys } from 'lib/utils/objects';
@@ -29,91 +28,6 @@ type WorkspaceImportOptions = ImportParams & {
   oldNewCustomRewardPropertyIdHashMap?: Record<string, string>;
   oldNewProposalWorkflowIdHashMap?: Record<string, string>;
 };
-type UpdateRefs = {
-  oldNewRecordIdHashMap: Record<string, string>;
-  pages: Page[];
-};
-
-function recurse(node: PageContent, cb: (node: PageContent | TextContent) => void) {
-  if (node?.content) {
-    node?.content.forEach((childNode) => {
-      recurse(childNode, cb);
-    });
-  }
-  if (node) {
-    cb(node);
-  }
-}
-
-/**
- * Mutates the provided content to replace nested page refs
- */
-function updateReferences({ oldNewRecordIdHashMap, pages }: UpdateRefs) {
-  const extractedPolls: Map<string, { pageId: string; newPollId: string; originalId: string }> = new Map();
-
-  for (const page of pages) {
-    recurse(page.content as PageContent, (node) => {
-      if (node.type === 'poll') {
-        const attrs = node.attrs as { pollId: string };
-        if (attrs.pollId) {
-          const newPollId = uuid();
-          extractedPolls.set(attrs.pollId, { newPollId, pageId: page.id, originalId: attrs.pollId });
-          attrs.pollId = newPollId;
-        }
-      } else if (node.type === 'page' || node.type === 'linkedPage') {
-        const attrs = node.attrs as { id: string };
-        const oldPageId = attrs.id;
-        let newPageId = oldPageId ? oldNewRecordIdHashMap[oldPageId] : undefined;
-
-        if (oldPageId && !newPageId) {
-          newPageId = uuid();
-          oldNewRecordIdHashMap[oldPageId] = newPageId;
-          oldNewRecordIdHashMap[newPageId] = oldPageId;
-        }
-        if (oldPageId && newPageId) {
-          attrs.id = newPageId;
-        }
-      } else if (node.type === 'mention' && node.attrs?.type === 'page') {
-        const attrs = node.attrs as { value: string };
-        const oldPageId = attrs.value;
-        let newPageId = oldPageId ? oldNewRecordIdHashMap[oldPageId] : undefined;
-
-        if (oldPageId && !newPageId) {
-          newPageId = uuid();
-          oldNewRecordIdHashMap[oldPageId] = newPageId;
-          oldNewRecordIdHashMap[newPageId] = oldPageId;
-        }
-        if (oldPageId && newPageId) {
-          attrs.value = newPageId;
-        }
-      } else if (node.type === 'inlineDatabase') {
-        const attrs = node.attrs as { pageId: string };
-        const oldPageId = attrs.pageId;
-        let newPageId = oldPageId ? oldNewRecordIdHashMap[oldPageId] : undefined;
-
-        if (oldPageId && !newPageId) {
-          newPageId = uuid();
-          oldNewRecordIdHashMap[oldPageId] = newPageId;
-          oldNewRecordIdHashMap[newPageId] = oldPageId;
-        }
-
-        if (oldPageId && newPageId) {
-          attrs.pageId = newPageId;
-        }
-      }
-
-      const marks: TextMark[] = node.marks;
-
-      if (marks) {
-        node.marks = marks.filter((mark) => mark.type !== 'inline-comment');
-      }
-    });
-  }
-
-  return {
-    extractedPolls
-  };
-}
 
 type WorkspaceImportResult = {
   pages: PageMeta[];
@@ -539,22 +453,22 @@ async function generateImportWorkspacePages({
       pageArgs.push(newPageContent);
     }
 
-    const { extractedPolls } = updateReferences({
+    const { extractedPolls } = updateEntityIds({
       oldNewRecordIdHashMap,
       pages: [node]
     });
 
     if (pageVotes) {
       extractedPolls.forEach((extractedPoll) => {
-        const pageVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
+        const originalVote = pageVotes.find((_pageVote) => _pageVote.id === extractedPoll.originalId);
 
-        if (pageVote && pageVote.pageId) {
-          const { voteOptions, ...vote } = pageVote;
+        if (originalVote && originalVote.pageId) {
+          const { voteOptions, ...vote } = originalVote;
           voteArgs.push({
             ...vote,
             spaceId: space.id,
             createdBy: space.createdBy,
-            pageId: oldNewRecordIdHashMap[pageVote.pageId],
+            pageId: oldNewRecordIdHashMap[originalVote.pageId],
             id: extractedPoll.newPollId as string,
             content: vote.content ?? Prisma.DbNull,
             contentText: vote.contentText
