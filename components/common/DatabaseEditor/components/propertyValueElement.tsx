@@ -715,7 +715,7 @@ function PropertyValueElement(props: Props) {
   } else if (propertyValueElement === null) {
     const displayValueStr =
       typeof displayValue === 'string' || typeof displayValue === 'number' ? displayValue.toString() : '';
-    if (typeof displayValue !== 'string') {
+    if (typeof displayValue !== 'string' && typeof displayValue !== 'undefined') {
       log.error('displayValue for card property is not a string', { displayValue, template: props.propertyTemplate });
     }
     propertyValueElement = (
