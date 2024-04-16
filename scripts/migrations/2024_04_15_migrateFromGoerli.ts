@@ -86,4 +86,24 @@ async function migratePaymentMethods() {
 
 }
 
-migratePaymentMethods().then(() => console.log('Done'));
+// migratePaymentMethods().then(() => console.log('Done'));
+
+
+// https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-json-fields#filtering-on-object-key-value-inside-array
+
+// lib/tokenGates/validateTokenGateCondition.ts
+
+// async function migrateTokenGates() {
+//   const tokenGates = await prisma.tokenGate.findMany({
+//     where: {
+//       conditions: {
+//         path: ['accessControlConditions']
+//         accessControlConditions: {
+//           some: {
+//             operator: 'OR'
+//           }
+//         }
+//       }
+//     }
+//   })
+// }
