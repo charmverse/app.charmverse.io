@@ -2,7 +2,7 @@ import type { SynapsUserKycStatus } from '@charmverse/core/dist/cjs/prisma-clien
 
 export type SynapsSession = {
   session_id: string;
-  sandbox: boolean;
+  sandbox?: boolean;
 };
 
 export type SessionType = {
@@ -46,9 +46,10 @@ export type SynapsIndividualSession = {
 export type SynapsSessionDetails = Pick<SynapsIndividualSession['session'], 'id' | 'status'>;
 
 export type SynapsEventData = {
-  reason: string;
+  reason?: string;
   service: string;
   session_id: string;
-  status: SynapsUserKycStatus;
-  step_id: string;
+  state?: SynapsUserKycStatus;
+  status?: SynapsUserKycStatus;
+  step_id?: string;
 };

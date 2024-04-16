@@ -2,29 +2,22 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
 
-import { getPersonaInquiryData } from '../getPersonaInquiry';
 import type { PersonaEventData } from '../interfaces';
 
 import { checkSignature } from './checkSignature';
 
 export async function processWebhookMessage(payload: {
   body: PersonaEventData;
-  headers: any;
+  headers: { 'Persona-Signature'?: string };
 }): Promise<WebhookMessageProcessResult> {
-  const data = payload?.body;
+  const data = payload?.body?.data;
+  const headers = payload?.headers;
 
-  const inquiryId = data?.data?.attributes?.payload?.data?.id;
+  const inquiryId = data?.attributes?.payload?.data?.id;
 
   const personaUserKyc = await prisma.personaUserKyc.findFirst({
     where: {
       inquiryId
-    },
-    include: {
-      space: {
-        include: {
-          personaCredential: true
-        }
-      }
     }
   });
 
@@ -35,39 +28,41 @@ export async function processWebhookMessage(payload: {
     };
   }
 
-  if (!personaUserKyc.space.personaCredential?.apiKey || !personaUserKyc.space.personaCredential?.secret) {
+  const spaceId = personaUserKyc.spaceId;
+
+  const personaCredential = await prisma.personaCredential.findUnique({
+    where: {
+      spaceId
+    }
+  });
+
+  if (!personaCredential?.apiKey) {
     return {
       success: true,
-      message: `Persona API key not found for space ${personaUserKyc.spaceId}`
+      spaceIds: [spaceId],
+      message: `Persona API key not found for space ${spaceId}`
+    };
+  }
+
+  if (!personaCredential?.secret) {
+    return {
+      success: true,
+      spaceIds: [spaceId],
+      message: `Space does not have a Persona secret ${spaceId}`
     };
   }
 
   const checkedSignature = checkSignature({
-    body: data,
-    headers: payload.headers,
-    secret: personaUserKyc.space.personaCredential?.secret
+    body: payload.body,
+    headers,
+    secret: personaCredential.secret
   });
 
-  if (!checkedSignature) {
+  if (checkedSignature === false) {
     return {
       success: false,
-      message: `Persona signature not valid for space ${personaUserKyc.spaceId}`
-    };
-  }
-
-  try {
-    const individualSession = await getPersonaInquiryData({
-      inquiryId: personaUserKyc.inquiryId,
-      apiKey: personaUserKyc.space.personaCredential?.apiKey || ''
-    });
-
-    if (!individualSession) {
-      throw new Error();
-    }
-  } catch (err) {
-    return {
-      success: true,
-      message: `Persona inquiry not found with inquiry id ${personaUserKyc.inquiryId}`
+      spaceIds: [spaceId],
+      message: `Persona signature not valid for space ${spaceId}`
     };
   }
 
@@ -76,12 +71,13 @@ export async function processWebhookMessage(payload: {
       id: personaUserKyc.id
     },
     data: {
-      status: data.data.attributes.payload.data.attributes.status
+      status: data.attributes.payload.data.attributes.status
     }
   });
 
   return {
     success: true,
+    spaceIds: [spaceId],
     message: `Persona event processed for user kyc ${personaUserKyc.id}`
   };
 }

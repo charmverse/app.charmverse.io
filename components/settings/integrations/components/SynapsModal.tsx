@@ -12,7 +12,7 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
   const { data: synapsUserKyc, isLoading: isSynapsUserKycLoading } = useGetSynapsSession(spaceId);
   const { trigger: initSession, data: synapsSession, isMutating: initSessionLoading } = useInitSynapsSession(spaceId);
   const popupState = usePopupState({ variant: 'popover', popupId: 'confirm-kyc' });
-  const disabled = ['APPROVED', 'PENDING_VERIFICATION'].includes(synapsUserKyc?.status || '');
+  const disabled = ['APPROVED', 'PENDING_VERIFICATION', 'REJECTED'].includes(synapsUserKyc?.status || '');
 
   const openModal = async () => {
     if (disabled) {
@@ -28,7 +28,7 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
       <Button
         onClick={openModal}
         loading={initSessionLoading}
-        disabled={initSessionLoading || isSynapsUserKycLoading || disabled}
+        disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading || disabled}
       >
         Start KYC
       </Button>

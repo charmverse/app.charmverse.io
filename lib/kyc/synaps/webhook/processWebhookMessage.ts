@@ -2,7 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import type { WebhookMessageProcessResult } from 'lib/collabland/webhook/interfaces';
 
-import { getSynapsIndividualSession } from '../getSynapsIndividualSession';
 import type { SynapsEventData } from '../interfaces';
 
 export async function processWebhookMessage(payload: {
@@ -12,19 +11,6 @@ export async function processWebhookMessage(payload: {
 }): Promise<WebhookMessageProcessResult> {
   const secret = payload?.query?.secret;
   const data = payload?.body;
-
-  const synapsCredential = await prisma.synapsCredential.findFirst({
-    where: {
-      secret
-    }
-  });
-
-  if (!synapsCredential) {
-    return {
-      success: true,
-      message: `Synaps credential not found with secret id ${secret}`
-    };
-  }
 
   const synapsUserKyc = await prisma.synapsUserKyc.findFirst({
     where: {
@@ -39,19 +25,18 @@ export async function processWebhookMessage(payload: {
     };
   }
 
-  try {
-    const individualSession = await getSynapsIndividualSession({
-      sessionId: synapsUserKyc.sessionId,
-      apiKey: synapsCredential.apiKey
-    });
-
-    if (!individualSession) {
-      throw new Error();
+  const synapsCredential = await prisma.synapsCredential.findUnique({
+    where: {
+      secret,
+      spaceId: synapsUserKyc.spaceId
     }
-  } catch (err) {
+  });
+
+  if (!synapsCredential) {
     return {
       success: true,
-      message: `Synaps individual session not found with session id ${synapsUserKyc.sessionId}`
+      spaceIds: [synapsUserKyc.spaceId],
+      message: `Synaps credential not found with secret id ${secret}`
     };
   }
 
@@ -60,12 +45,13 @@ export async function processWebhookMessage(payload: {
       id: synapsUserKyc.id
     },
     data: {
-      status: data.status
+      status: data.status || data.state
     }
   });
 
   return {
     success: true,
+    spaceIds: [synapsUserKyc.spaceId],
     message: `Synaps event processed for user kyc ${synapsUserKyc.id}`
   };
 }
