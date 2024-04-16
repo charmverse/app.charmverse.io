@@ -1,6 +1,9 @@
-import { prisma } from "@charmverse/core/prisma-client";
-import { prettyPrint } from "lib/utils/strings";
+import { arrayUtils } from "@charmverse/core/utilities";
+import { PaymentMethod, prisma } from "@charmverse/core/prisma-client";
+import { baseUrl } from "config/constants";
+import { lowerCaseEqual, prettyPrint } from "lib/utils/strings";
 import { goerli } from "viem/chains";
+import { UnsignedTransaction } from "@lens-protocol/domain/entities";
 
 
 async function migratePaymentMethods() {
@@ -47,7 +50,11 @@ async function migratePaymentMethods() {
         in: paymentMethodsRequiringResolution.map(pm => pm.contractAddress).filter(Boolean) as string[]
       },
       applications: {
-        some: {}
+        some: {
+          status: {
+            in: ['complete', 'paid', 'processing']
+          }
+        }
       }
     },
     select: {
@@ -59,34 +66,64 @@ async function migratePaymentMethods() {
           path: true,
           title: true
         }
+      },
+      space: {
+        select: {
+          domain: true
+        }
       }
+    },
+    orderBy: {
+      spaceId: 'asc'
     }
   })
 
+  const uniqueSpaces = [] as string[];
+
   const rewardsByPaymentMethod = paymentMethodsRequiringResolution.reduce((acc, method) => {
-    const relevantRewards = rewards.filter(reward => reward.rewardToken === method.contractAddress);
+    const relevantRewards = rewards.filter(reward =>  !!reward.rewardToken && lowerCaseEqual(reward.rewardToken, method.contractAddress));
+
+    for (const reward of relevantRewards) {
+      if (!uniqueSpaces.includes(reward.space.domain)) {
+        uniqueSpaces.push(reward.space.domain)
+      }
+    }
+
     if (relevantRewards.length > 0) {
         relevantRewards.sort((a, b) => b.id.localeCompare(a.id)); // Sort by id in descending order
         acc.used.push({
             ...method,
-            rewards: relevantRewards.length
+            rewards: relevantRewards.map(reward => ({
+              ...reward,
+              fullPath: `${baseUrl}/${reward.space.domain}/${reward.page?.path}`
+            }))
         });
     } else {
         acc.unused.push(method);
     }
     return acc;
-}, { used: [] as any, unused: [] as any});
+}, { used: [] as (Pick<PaymentMethod, 'contractAddress'> & {rewards: any})[], unused: [] as any });
 
 
-  console.log('\r\n---------------\r\n')
+  const uniqueUsedTokens = arrayUtils.uniqueValues(rewardsByPaymentMethod.used.map(pm => pm.contractAddress?.toLowerCase()))
+
+
+  // console.log('\r\n---------------\r\n')
   prettyPrint({
-    rewardsByPaymentMethod
+    rewardsByPaymentMethod,
+    uniqueUsedTokens,
+    uniqueSpaces
   });
 
+ 
+
+  prettyPrint({
+    uniqueUsedTokens
+  });
 
 }
 
-// migratePaymentMethods().then(() => console.log('Done'));
+migratePaymentMethods().then(() => console.log('Done'));
 
 
 // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-json-fields#filtering-on-object-key-value-inside-array
