@@ -68,7 +68,7 @@ export default function PaidShareToWeb({ pageId, pagePermissions, refreshPermiss
   const disabledToolip =
     !!space?.publicProposals && currentPage?.type === 'proposal'
       ? 'This toggle is disabled because your space uses public proposals.'
-      : currentPagePermissions?.edit_isPublic !== true
+      : currentPagePermissions?.grant_permissions !== true
       ? 'You cannot update permissions for this page'
       : null;
 

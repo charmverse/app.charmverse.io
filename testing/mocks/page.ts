@@ -33,7 +33,6 @@ export function createMockPage(input: Partial<PageWithContent> = {}): PageWithCo
       delete: true,
       edit_position: true,
       edit_content: true,
-      edit_isPublic: true,
       edit_path: true,
       comment: true,
       grant_permissions: true,

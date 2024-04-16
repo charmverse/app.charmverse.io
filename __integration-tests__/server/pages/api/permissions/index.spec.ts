@@ -49,7 +49,7 @@ describe('POST /api/permissions - Add page permissions', () => {
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(201);
   });
 
-  it('should add a permission if the user is creating a public permission and has the edit_isPublic operation and respond 201', async () => {
+  it('should add a permission if the user is creating a public permission and has the grant_permissions operation and respond 201', async () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id,
@@ -81,7 +81,7 @@ describe('POST /api/permissions - Add page permissions', () => {
     await prisma.pagePermission.create({
       data: {
         permissionLevel: 'custom',
-        permissions: ['edit_isPublic'],
+        permissions: ['edit_content'],
         user: {
           connect: {
             id: user.id
@@ -220,7 +220,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
       .expect(200);
   });
 
-  it('should delete a public permission if the user has the edit_isPublic operation and respond 200', async () => {
+  it('should delete a public permission if the user has the grant_permissions operation and respond 200', async () => {
     const page = await testUtilsPages.generatePage({
       createdBy: user.id,
       spaceId: space.id
@@ -268,7 +268,7 @@ describe('DELETE /api/permissions - Delete page permissions', () => {
     await prisma.pagePermission.create({
       data: {
         permissionLevel: 'custom',
-        permissions: ['edit_isPublic'],
+        permissions: ['edit_content'],
         user: {
           connect: {
             id: user.id

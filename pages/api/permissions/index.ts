@@ -53,17 +53,29 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
     permission: PagePermissionAssignmentByValues;
   };
 
+  const pageWithType = await prisma.page.findUniqueOrThrow({
+    where: {
+      id: pageId as string
+    },
+    select: {
+      type: true
+    }
+  });
+
+  if (
+    (pageWithType.type === 'proposal' || pageWithType.type === 'proposal_template') &&
+    permissionData.assignee.group !== 'public'
+  ) {
+    throw new ActionNotPermittedError('You cannot manually update permissions for proposals.');
+  }
+
   const computedPermissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId: req.session.user.id
   });
 
-  if (permissionData.assignee.group === 'public' && computedPermissions.edit_isPublic !== true) {
-    throw new ActionNotPermittedError('You cannot make page public.');
-  } else if (permissionData.assignee.group !== 'public' && computedPermissions.grant_permissions !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  } else if (permissionData.permissionLevel === 'proposal_editor') {
-    throw new ActionNotPermittedError('This permission level can only be created automatically by proposals.');
+  if (!computedPermissions.grant_permissions) {
+    throw new ActionNotPermittedError('You cannot edit permissions for this page');
   } else if (permissionData.assignee.group === 'public' && permissionData.permissionLevel !== 'view') {
     throw new ActionNotPermittedError('Only view permissions can be provided to public.');
   }
@@ -173,10 +185,8 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
     userId: req.session.user.id
   });
 
-  if (permission.public && computedPermissions.edit_isPublic !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
-  } else if (!permission.public && computedPermissions.grant_permissions !== true) {
-    throw new ActionNotPermittedError('You cannot manage permissions for this page');
+  if (!computedPermissions.grant_permissions) {
+    throw new ActionNotPermittedError('You cannot edit permissions for this page');
   }
 
   await req.premiumPermissionsClient.pages.deletePagePermission({ permissionId });
