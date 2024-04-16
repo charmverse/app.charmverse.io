@@ -229,6 +229,13 @@ export function FormFieldAnswersControlled({
                     labelEndAdornment={
                       formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
                     }
+                    walletInputConfig={
+                      (formField.fieldConfig as { chainId: number })?.chainId
+                        ? {
+                            chainId: (formField.fieldConfig as { chainId: number })?.chainId
+                          }
+                        : undefined
+                    }
                     inputEndAdornment={
                       pageId &&
                       formField.type !== 'label' &&
