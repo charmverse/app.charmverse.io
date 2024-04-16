@@ -157,12 +157,19 @@ describe('syncRelatedCardsValues', () => {
     const board2Card1 = board2CardsUpdated.find((c) => c.id === board2CardPages[0].id);
     const board2Card2 = board2CardsUpdated.find((c) => c.id === board2CardPages[1].id);
 
-    expect((board2Card1!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id
-    ]);
-    expect((board2Card2!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id
-    ]);
+    const board1Card1Page = await prisma.page.findFirstOrThrow({
+      where: {
+        cardId: board1Cards[0].id
+      },
+      select: {
+        id: true
+      }
+    });
+
+    expect([
+      (board2Card1!.fields as any).properties[connectedRelationProperty.id],
+      (board2Card2!.fields as any).properties[connectedRelationProperty.id]
+    ]).toStrictEqual([[board1Card1Page.id], [board1Card1Page.id]]);
 
     // Board 1 Card 2 -> Board 2 Card 1, 2
     await syncRelatedCardsValues({
@@ -225,7 +232,7 @@ describe('syncRelatedCardsValues', () => {
     );
 
     expect((board2Card2Updated2!.fields as any).properties[connectedRelationProperty.id]).toStrictEqual([
-      board1CardPages[0].id
+      board1Card1Page.id
     ]);
   });
 });

@@ -20,7 +20,7 @@ const test = base.extend<Fixtures>({
 });
 
 test('login - redirects a logged in user on the site to their workspace', async ({ loginPage }) => {
-  const { space, address, privateKey, pages } = await createUserAndSpace({
+  const { space, address, privateKey } = await createUserAndSpace({
     browserPage: loginPage.page,
     permissionConfigurationMode: 'collaborative'
   });

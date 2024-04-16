@@ -50,19 +50,25 @@ export function useProjectForm(options: {
     const projectWithMembers =
       options.initialProjectValues ?? projectsWithMembers?.find((project) => project.id === options.projectId);
 
-    if (!projectWithMembers) {
-      return;
+    if (options.projectId && projectWithMembers) {
+      const teamLead = projectWithMembers.projectMembers.find((member) => member.teamLead);
+      const nonTeamLeadMembers = projectWithMembers.projectMembers
+        .filter((member) => !member.teamLead)
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        .filter((member) =>
+          // Make sure only the selected members are present in the form
+          member.id ? selectedMemberIds?.includes(member.id) : false
+        );
+
+      form.reset(
+        convertToProjectValues({
+          ...projectWithMembers,
+          projectMembers: [teamLead!, ...nonTeamLeadMembers]
+        })
+      );
+    } else {
+      form.reset(defaultProjectAndMembersPayload);
     }
-    // Make sure only the selected members are present in the form
-    form.reset(
-      convertToProjectValues({
-        ...projectWithMembers,
-        projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
-          // 0th index is the team lead which is always present
-          member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
-        )
-      })
-    );
   }, [!!projectsWithMembers, !!options.initialProjectValues, options.projectId, selectedMemberIds?.length]);
 
   return form;

@@ -7,7 +7,7 @@ import { useAddProjectMember, useGetProjects, usePatchProject } from 'charmClien
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { AddProjectMemberPayload } from 'lib/projects/addProjectMember';
-import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 import type { UpdateProjectPayload } from 'lib/projects/updateProject';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
@@ -16,9 +16,11 @@ export function useProjectUpdates({ projectId }: { projectId: string }) {
   const { user } = useUser();
   const { trigger: updateProject } = usePatchProject(projectId);
   const project = projectsWithMembers?.find((_project) => _project.id === projectId);
-  const isTeamLead = project?.projectMembers[0].userId === user?.id;
   const { trigger: addProjectMember } = useAddProjectMember(projectId);
-  const { reset } = useFormContext<ProjectWithMembers>();
+  const isTeamLead = !!project?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
+
+  const { reset } = useFormContext<ProjectAndMembersPayload>();
+
   const { showMessage } = useSnackbar();
 
   const onProjectUpdate = useMemo(

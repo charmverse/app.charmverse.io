@@ -50,7 +50,7 @@ function ProjectRow({
   mutate: KeyedMutator<ProjectWithMembers[]>;
 }) {
   const { user } = useUser();
-  const isTeamLead = projectWithMembers.projectMembers[0].userId === user?.id;
+  const isTeamLead = !!projectWithMembers.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
   const { trigger: updateProjectAndMembers, isMutating } = useUpdateProject(projectWithMembers.id);
   const form = useForm({
     defaultValues: projectWithMembers,

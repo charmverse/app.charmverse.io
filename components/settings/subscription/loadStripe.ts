@@ -8,7 +8,11 @@ let stripePromise: Promise<Stripe | null>;
 
 export function loadStripe() {
   if (!stripePromise) {
-    stripePromise = _loadStripe(stripePublicKey);
+    if (stripePublicKey) {
+      stripePromise = _loadStripe(stripePublicKey);
+    } else {
+      stripePromise = Promise.resolve(null);
+    }
   }
   return stripePromise;
 }
