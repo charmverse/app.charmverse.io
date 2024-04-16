@@ -51,7 +51,8 @@ export async function createSynapsSession(spaceId: string, userId: string): Prom
       sessionId: session.session_id
     },
     update: {
-      sessionId: session.session_id
+      sessionId: session.session_id,
+      status: 'SUBMISSION_REQUIRED'
     }
   });
 

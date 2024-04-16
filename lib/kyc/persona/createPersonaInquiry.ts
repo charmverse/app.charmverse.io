@@ -53,10 +53,12 @@ export async function createPersonaInquiry(spaceId: string, userId: string): Pro
     create: {
       userId,
       spaceId,
-      inquiryId: inquiry.data.id
+      inquiryId: inquiry.data.id,
+      status: inquiry.data.attributes.status || 'created'
     },
     update: {
-      inquiryId: inquiry.data.id
+      inquiryId: inquiry.data.id,
+      status: inquiry.data.attributes.status || 'created'
     }
   });
 

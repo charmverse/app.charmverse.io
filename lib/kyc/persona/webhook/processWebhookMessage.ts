@@ -60,7 +60,7 @@ export async function processWebhookMessage(payload: {
 
   if (checkedSignature === false) {
     return {
-      success: false,
+      success: true,
       spaceIds: [spaceId],
       message: `Persona signature not valid for space ${spaceId}`
     };
