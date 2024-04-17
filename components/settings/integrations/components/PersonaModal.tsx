@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Persona from 'persona';
@@ -28,12 +29,15 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
 
   return (
     <>
-      <Button
-        onClick={popupConfirmationState.open}
-        disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
-      >
-        Start KYC
-      </Button>
+      <Box display='flex' justifyContent='space-between'>
+        <Typography variant='body2'>Test your Synaps KYC flow</Typography>
+        <Button
+          onClick={popupConfirmationState.open}
+          disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
+        >
+          Start KYC
+        </Button>
+      </Box>
       <ModalWithButtons
         title='KYC aknowledgement'
         buttonText='Confirm'

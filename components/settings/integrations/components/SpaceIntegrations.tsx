@@ -2,7 +2,7 @@ import type { KycOption, Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 import dynamic from 'next/dynamic';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -15,8 +15,6 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { KycCredentials } from 'lib/kyc/getKycCredentials';
-import { getSnapshotSpace } from 'lib/snapshot/getSpace';
-import { isTruthy } from 'lib/utils/types';
 
 import { ConnectBoto } from './ConnectBoto';
 import { ConnectCollabland } from './ConnectCollabland';
@@ -28,17 +26,6 @@ import { SynapsModal } from './SynapsModal';
 const PersonaModal = dynamic(() => import('./PersonaModal'), { ssr: false });
 
 const schema = yup.object({
-  snapshotDomain: yup
-    .string()
-    .nullable()
-    .min(3, 'Snapshot domain must be at least 3 characters')
-    .test('checkDomain', 'Snapshot domain not found', async (domain) => {
-      if (domain) {
-        const foundSpace = await getSnapshotSpace(domain);
-        return isTruthy(foundSpace);
-      }
-      return true;
-    }),
   synapsApiKey: yup.string(),
   synapsSecret: yup.string().nullable(),
   personaApiKey: yup.string().nullable(),
@@ -63,10 +50,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
     reset,
     formState: { isDirty, dirtyFields }
   } = useForm<FormValues>({
-    defaultValues: {
-      snapshotDomain: space.snapshotDomain,
-      kycOption: space.kycOption
-    },
+    defaultValues: getDefaultValues({ kycCredentials, space }),
     resolver: yupResolver(schema),
     mode: 'onSubmit'
   });
@@ -87,14 +71,8 @@ export function SpaceIntegrations({ space }: { space: Space }) {
       return;
     }
 
-    if (dirtyFields.snapshotDomain || dirtyFields.kycOption) {
-      await updateSpace(
-        {
-          snapshotDomain: values.snapshotDomain,
-          kycOption: values.kycOption || null
-        },
-        { onSuccess: () => refreshCurrentSpace() }
-      );
+    if (dirtyFields.kycOption) {
+      await updateSpace({ kycOption: values.kycOption || null }, { onSuccess: () => refreshCurrentSpace() });
     }
 
     if (
@@ -127,29 +105,10 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   const isLoading = updateSpaceLoading || kycUpdateCredentialsLoading;
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      style={{
-        position: 'relative'
-      }}
-    >
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3} direction='column'>
         <Grid item>
-          <FieldLabel>Snapshot.org domain</FieldLabel>
-          <Stack flexDirection='row' alignItems='center' gap={1}>
-            <Box width='100%'>
-              <SnapshotIntegration control={control} isAdmin={isAdmin} />
-            </Box>
-            <Button
-              disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
-              disableElevation
-              disabled={!isAdmin || updateSpaceLoading || !isDirty}
-              type='submit'
-              loading={updateSpaceLoading}
-            >
-              Save
-            </Button>
-          </Stack>
+          <SnapshotIntegration isAdmin={isAdmin} space={space} />
         </Grid>
         <Grid item>
           <FieldLabel>Collab.Land</FieldLabel>
@@ -185,30 +144,30 @@ export function SpaceIntegrations({ space }: { space: Space }) {
               <PersonaModal spaceId={space.id} />
             </Grid>
           )}
+        {isAdmin && (
+          <Grid item>
+            <Box display='flex' justifyContent='space-between'>
+              <Typography variant='body2'>Save your settings and test your KYC flow</Typography>
+              <Box>
+                {isDirty && (
+                  <Button
+                    disableElevation
+                    variant='outlined'
+                    disabled={isLoading || !isDirty}
+                    onClick={reset}
+                    sx={{ mr: 2 }}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button disableElevation disabled={isLoading || !isDirty} type='submit' loading={isLoading}>
+                  Save
+                </Button>
+              </Box>
+            </Box>
+          </Grid>
+        )}
       </Grid>
-      {isAdmin && (
-        <Box
-          sx={{
-            py: 1,
-            px: { xs: 5, md: 3 },
-            position: 'sticky',
-            mt: 3,
-            bottom: '0',
-            background: (theme) => theme.palette.background.paper,
-            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
-            textAlign: 'right'
-          }}
-        >
-          {isDirty && (
-            <Button disableElevation variant='outlined' disabled={isLoading || !isDirty} onClick={reset} sx={{ mr: 2 }}>
-              Cancel
-            </Button>
-          )}
-          <Button disableElevation disabled={isLoading || !isDirty} type='submit' loading={isLoading}>
-            Save
-          </Button>
-        </Box>
-      )}
     </form>
   );
 }
@@ -221,7 +180,6 @@ function getDefaultValues({ kycCredentials, space }: { kycCredentials?: KycCrede
     personaSecret: kycCredentials?.persona?.secret ?? '',
     personaTemplateId: kycCredentials?.persona?.templateId ?? '',
     personaEnvironmentId: kycCredentials?.persona?.envId ?? '',
-    kycOption: space.kycOption,
-    snapshotDomain: space.snapshotDomain
+    kycOption: space.kycOption
   };
 }

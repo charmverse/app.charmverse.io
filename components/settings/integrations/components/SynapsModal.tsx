@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Synaps } from '@synaps-io/verify-sdk';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -25,13 +26,16 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
 
   return (
     <>
-      <Button
-        onClick={openModal}
-        loading={initSessionLoading}
-        disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading || disabled}
-      >
-        Start KYC
-      </Button>
+      <Box display='flex' justifyContent='space-between'>
+        <Typography variant='body2'>Test your Synaps KYC flow</Typography>
+        <Button
+          onClick={openModal}
+          loading={initSessionLoading}
+          disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading || disabled}
+        >
+          Start KYC
+        </Button>
+      </Box>
       {synapsSession && (
         <SynapsModalWithConfirmation
           sessionId={synapsSession.session_id}
