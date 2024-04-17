@@ -1,4 +1,4 @@
-import { Stack, type SxProps } from '@mui/material';
+import { type SxProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
@@ -57,17 +57,21 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       }
       case 'wallet': {
         return (
-          <Stack gap={1}>
-            {walletInputConfig && (
-              <InputSearchBlockchain
-                chainId={walletInputConfig.chainId}
-                readOnly={!walletInputConfig.onChangeChainId}
-                disabled={!walletInputConfig.onChangeChainId}
-                onChange={walletInputConfig.onChangeChainId}
-              />
-            )}
-            <TextInputField {...fieldProps} ref={ref} multiline />
-          </Stack>
+          <TextInputField
+            topComponent={
+              walletInputConfig ? (
+                <InputSearchBlockchain
+                  chainId={walletInputConfig.chainId}
+                  readOnly={!walletInputConfig.onChangeChainId}
+                  disabled={!walletInputConfig.onChangeChainId}
+                  onChange={walletInputConfig.onChangeChainId}
+                />
+              ) : undefined
+            }
+            {...fieldProps}
+            ref={ref}
+            multiline
+          />
         );
       }
       case 'long_text': {
