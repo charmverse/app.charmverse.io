@@ -4,7 +4,7 @@ import { personaUrl, personaVersion } from '../config';
 
 import type { PersonaInquiryAPIResponse } from './interfaces';
 
-export async function initPersonaSession({
+export async function initPersonaInquiry({
   userId,
   apiKey,
   templateId

@@ -1,8 +1,7 @@
 import { DataNotFoundError, UnauthorisedActionError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { getPersonaInquiryData } from './getPersonaInquiry';
-import { initPersonaSession } from './initPersonaInquiry';
+import { initPersonaInquiry } from './initPersonaInquiry';
 import type { PersonaInquiry } from './interfaces';
 
 export async function createPersonaInquiry(spaceId: string, userId: string): Promise<PersonaInquiry> {
@@ -25,21 +24,16 @@ export async function createPersonaInquiry(spaceId: string, userId: string): Pro
   }
 
   if (personaUserKyc?.inquiryId) {
-    const individualInquiry = await getPersonaInquiryData({
-      inquiryId: personaUserKyc.inquiryId,
-      apiKey: personaCredential.apiKey
-    });
+    const status = personaUserKyc.status;
 
-    const status = individualInquiry.data?.attributes?.status;
-
-    const isReadOnly = ['pending', 'completed', 'needs_review', 'approved'].includes(status);
+    const isReadOnly = ['pending', 'completed', 'needs_review', 'approved'].includes(status || '');
 
     if (isReadOnly) {
       throw new UnauthorisedActionError(`You can't create a data for this user because of his status: ${status}`);
     }
   }
 
-  const inquiry = await initPersonaSession({
+  const inquiry = await initPersonaInquiry({
     userId,
     apiKey: personaCredential.apiKey,
     templateId: personaCredential.templateId

@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { createSynapsSession } from 'lib/kyc/synaps/createSynapsSesstion';
+import { createSynapsSession } from 'lib/kyc/synaps/createSynapsSession';
 import { getSynapsSessionDetails } from 'lib/kyc/synaps/getSynapsSessionDetails';
 import type { SynapsSession, SynapsSessionDetails } from 'lib/kyc/synaps/interfaces';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';

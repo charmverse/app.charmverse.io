@@ -34,7 +34,7 @@ export async function upsertKycCredentials({ spaceId, ...payload }: KycCredentia
     });
   }
 
-  if (!payload.synaps || !payload.persona) {
+  if (!payload.synaps && !payload.persona) {
     throw new InvalidInputError('No credentials provided');
   }
 
