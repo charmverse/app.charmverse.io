@@ -9,7 +9,6 @@ import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import type { PageActionMeta } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';

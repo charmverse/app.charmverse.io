@@ -6,10 +6,12 @@ import { Divider, ListItemIcon, ListItemText, Menu, MenuItem, Stack, Typography 
 import { useRouter } from 'next/router';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
+import charmClient from 'charmClient';
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useMembers } from 'hooks/useMembers';
 import { usePagePermissions } from 'hooks/usePagePermissions';
 import { usePostPermissions } from 'hooks/usePostPermissions';
+import { lockablePageTypes } from 'lib/pages/constants';
 import { getAbsolutePath } from 'lib/utils/browser';
 
 import { ArchiveProposalAction } from './ArchiveProposalAction';
@@ -35,11 +37,13 @@ export function PageActionsMenu({
   onClickEdit,
   anchorEl,
   page,
+  refreshPage,
   setAnchorEl,
   readOnly
 }: {
   onClickDelete?: VoidFunction;
   onClickEdit?: VoidFunction;
+  refreshPage?: VoidFunction;
   children?: ReactNode;
   setAnchorEl: Dispatch<SetStateAction<HTMLElement | null>>;
   anchorEl: HTMLElement | null;
@@ -56,6 +60,16 @@ export function PageActionsMenu({
   const postPermissions = usePostPermissions({
     postIdOrPath: router.pathname.startsWith('/[domain]/forum') ? page.id : (null as any)
   });
+
+  const isLockablePageType = lockablePageTypes.includes(page.type as PageType);
+
+  async function onTogglePageLock() {
+    await charmClient.pages.togglePageLock({
+      pageId: page.id,
+      isLocked: !page.isLocked
+    });
+    await refreshPage?.();
+  }
 
   const pagePath = `/${page.path || page.id}`;
   const updatedAt = typeof page.updatedAt === 'number' ? new Date(page.updatedAt) : page.updatedAt;
