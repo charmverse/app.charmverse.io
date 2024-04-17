@@ -95,7 +95,14 @@ export function FullPageActionsMenuButton({
       />
     );
   } else if (isBasePageDatabase && page) {
-    pageOptionsList = <DatabasePageActionList page={page} pagePermissions={pagePermissions} onComplete={closeMenu} />;
+    pageOptionsList = (
+      <DatabasePageActionList
+        page={page}
+        pagePermissions={pagePermissions}
+        onComplete={closeMenu}
+        refreshPage={refreshPage}
+      />
+    );
   } else if (isForumPost && post) {
     pageOptionsList = (
       <ForumPostActionList

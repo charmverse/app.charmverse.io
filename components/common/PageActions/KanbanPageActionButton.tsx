@@ -3,8 +3,8 @@ import { IconButton } from '@mui/material';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import type { PageActionMeta } from './components/PageActionsMenu';
-import { PageActionsMenu } from './components/PageActionsMenu';
+import type { PageActionMeta } from './components/DatabaseRowActionsMenu';
+import { DatabaseRowActionsMenu } from './components/DatabaseRowActionsMenu';
 
 type Props = {
   page?: PageActionMeta;
@@ -27,7 +27,7 @@ export function KanbanPageActionsMenuButton({ page, onClickDelete, onClickEdit, 
         <MoreHorizIcon color='secondary' fontSize='small' />
       </IconButton>
       {page && (
-        <PageActionsMenu
+        <DatabaseRowActionsMenu
           anchorEl={anchorEl}
           setAnchorEl={setAnchorEl}
           page={page}
