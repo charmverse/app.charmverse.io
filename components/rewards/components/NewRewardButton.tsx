@@ -120,7 +120,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   return (
     <>
       <ButtonGroup variant='contained' ref={buttonRef}>
-        <Button disabled={isDisabled} data-test='create-suggest-bounty' onClick={createNewReward}>
+        <Button disabled={isDisabled} data-test='create-suggest-bounty' href='/rewards/new'>
           Create
         </Button>
         <Button disabled={isDisabled} data-test='reward-template-select' size='small' onClick={popupState.open}>

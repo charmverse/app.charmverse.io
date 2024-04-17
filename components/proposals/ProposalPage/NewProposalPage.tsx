@@ -129,9 +129,6 @@ export function NewProposalPage({
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const pendingRewards = formInputs.fields?.pendingRewards || [];
 
-  // console.log('isValid', form.formState.isValid);
-  // console.log('fieldConfig', projectField?.fieldConfig);
-
   let disabledTooltip = _disabledTooltip;
   if (
     !disabledTooltip &&
@@ -186,6 +183,7 @@ export function NewProposalPage({
       proposalTemplateId: _templateId
     });
   }
+
   function applyTemplate(template: ProposalWithUsersAndRubric) {
     const formFields = template.form?.formFields ?? [];
     const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));

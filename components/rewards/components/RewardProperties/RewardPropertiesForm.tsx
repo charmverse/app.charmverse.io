@@ -23,7 +23,7 @@ import {
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardApplicationType } from 'lib/rewards/getApplicationType';
 import { getApplicationType } from 'lib/rewards/getApplicationType';
@@ -489,7 +489,7 @@ export function RewardPropertiesForm({
               reward={values as unknown as BoardReward}
               onChange={(properties: RewardPropertiesField) => {
                 applyUpdates({
-                  fields: { properties: properties ? { ...properties } : {} } as Reward['fields']
+                  fields: { properties: properties ? { ...properties } : {} }
                 });
               }}
             />

@@ -4,6 +4,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utils/errors';
 
+import type { RewardFields } from './blocks/interfaces';
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
 import type { RewardReviewer, RewardWithUsers, RewardType } from './interfaces';
 import { setRewardUsers } from './setRewardUsers';
@@ -19,10 +20,10 @@ export type UpdateableRewardFields = Partial<
     | 'maxSubmissions'
     | 'dueDate'
     | 'customReward'
-    | 'fields'
     | 'selectedCredentialTemplates'
   >
 > & {
+  fields: RewardFields;
   reviewers?: RewardReviewer[];
   allowedSubmitterRoles?: string[] | null;
   assignedSubmitters?: string[] | null;
