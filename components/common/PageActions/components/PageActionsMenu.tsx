@@ -25,6 +25,8 @@ export type PageActionMeta = {
   updatedBy: string;
   path?: string;
   syncWithPageId?: string | null;
+  isLocked?: boolean | null;
+  lockedBy?: string | null;
 };
 
 export function PageActionsMenu({
@@ -47,6 +49,7 @@ export function PageActionsMenu({
   const { getMemberById } = useMembers();
   const router = useRouter();
   const member = getMemberById(page.updatedBy);
+  const lockedByMember = page.isLocked && !!page.lockedBy ? getMemberById(page.lockedBy) : null;
   const open = Boolean(anchorEl);
   const { formatDateTime } = useDateFormatter();
   const { permissions: pagePermissions } = usePagePermissions({ pageIdOrPath: open ? page.id : null });
@@ -132,6 +135,18 @@ export function PageActionsMenu({
           </Typography>
           <Typography variant='caption' color='secondary'>
             at <strong>{formatDateTime(updatedAt)}</strong>
+          </Typography>
+        </Stack>
+      )}
+
+      {lockedByMember && (
+        <Stack
+          sx={{
+            px: 2
+          }}
+        >
+          <Typography variant='caption' color='secondary'>
+            Locked by <strong>{lockedByMember.username}</strong>
           </Typography>
         </Stack>
       )}

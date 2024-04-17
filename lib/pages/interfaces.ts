@@ -59,6 +59,8 @@ export type PageWithContent = PageMeta &
     | 'updatedBy'
     | 'syncWithPageId'
     | 'sourceTemplateId'
+    | 'isLocked'
+    | 'lockedBy'
   > & { permissionFlags: PagePermissionFlags };
 
 export type PageDetails = {

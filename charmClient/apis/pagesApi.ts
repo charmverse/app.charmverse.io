@@ -86,5 +86,7 @@ export class PagesApi {
     );
   }
 
-  togglePageLock({ isLocked, pageId }: PageLockToggle): Promise<PageLockToggleResult> {}
+  togglePageLock({ isLocked, pageId }: PageLockToggle): Promise<PageLockToggleResult> {
+    return http.PUT(`/api/pages/${pageId}/toggle-lock`, { isLocked });
+  }
 }

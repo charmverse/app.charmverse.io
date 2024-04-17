@@ -1,5 +1,8 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
+import { InvalidInputError } from '@charmverse/core/errors';
 import type { Page } from '@charmverse/core/prisma';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { lockablePageTypes } from './constants';
 
 export type PageLockToggle = {
   pageId: string;
@@ -13,6 +16,19 @@ export async function togglePageLock({
   userId,
   isLocked
 }: PageLockToggle & { userId: string }): Promise<PageLockToggleResult> {
+  const { type: pageType } = await prisma.page.findUniqueOrThrow({
+    where: {
+      id: pageId
+    },
+    select: {
+      type: true
+    }
+  });
+
+  if (!lockablePageTypes.includes(pageType)) {
+    throw new InvalidInputError(`Page type "${pageType}" cannot be locked`);
+  }
+
   const updatedPage = await prisma.page.update({
     where: {
       id: pageId

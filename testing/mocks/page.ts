@@ -37,13 +37,16 @@ export function createMockPage(input: Partial<PageWithContent> = {}): PageWithCo
       comment: true,
       grant_permissions: true,
       create_poll: true,
-      delete_attached_bounty: true
+      delete_attached_bounty: true,
+      edit_lock: true
     },
     proposalId: null,
     title: '',
     type: 'page',
     index: -1,
     fullWidth: false,
+    lockedBy: null,
+    isLocked: false,
     ...input
   };
 }

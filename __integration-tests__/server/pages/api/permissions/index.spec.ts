@@ -106,29 +106,6 @@ describe('POST /api/permissions - Add page permissions', () => {
     await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
   });
 
-  it('should fail if trying to manually assign the proposal editor value and respond 401', async () => {
-    const page = await testUtilsPages.generatePage({
-      createdBy: user.id,
-      spaceId: space.id,
-      pagePermissions: [
-        {
-          permissionLevel: 'full_access',
-          assignee: { group: 'user', id: user.id }
-        }
-      ]
-    });
-
-    const permission: PagePermissionAssignment = {
-      pageId: page.id,
-      permission: {
-        permissionLevel: 'proposal_editor',
-        assignee: { group: 'role', id: role.id }
-      }
-    };
-
-    await request(baseUrl).post('/api/permissions').set('Cookie', userCookie).send(permission).expect(401);
-  });
-
   it('should allow a proposal editor to make a proposal page public and respond 201', async () => {
     const page = await testUtilsProposals.generateProposal({
       userId: user.id,

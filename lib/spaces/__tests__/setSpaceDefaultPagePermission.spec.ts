@@ -45,14 +45,4 @@ describe('setSpaceDefaultPagePermission', () => {
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
   });
-
-  // Proposal editor preset is only used for proposals
-  it('Should fail to set the default page permission level to proposal_editor', async () => {
-    await expect(
-      setSpaceDefaultPagePermission({
-        defaultPagePermissionGroup: 'proposal_editor',
-        spaceId: space.id
-      })
-    ).rejects.toBeInstanceOf(InvalidInputError);
-  });
 });

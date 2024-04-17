@@ -36,7 +36,7 @@ export function FullPageActionsMenuButton({
 }: Props) {
   let pageOptionsList: ReactNode = null;
   const router = useRouter();
-  const { page: pageFromId } = usePage({ pageIdOrPath: pageId });
+  const { page: pageFromId, refreshPage } = usePage({ pageIdOrPath: pageId });
   const pageMenuAnchor = useRef();
   const isForumPost = !!post || router.route === '/[domain]/forum/post/[pagePath]';
   const theme = useTheme();
@@ -91,6 +91,7 @@ export function FullPageActionsMenuButton({
         onDelete={onDelete}
         undoEditorChanges={undoEditorChanges}
         isStructuredProposal={!!proposalDetails?.formId}
+        refreshPage={refreshPage}
       />
     );
   } else if (isBasePageDatabase && page) {
