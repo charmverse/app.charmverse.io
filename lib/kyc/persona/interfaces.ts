@@ -43,7 +43,7 @@ export type PersonaInquiryAPIResponse = {
 };
 
 export type PersonaInquiry = {
-  status: string;
+  status: PersonaUserKycStatus;
   inquiryId: string;
   sessionId?: string;
   sandbox?: boolean;

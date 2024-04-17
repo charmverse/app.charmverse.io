@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import Persona from 'persona';
@@ -8,6 +8,17 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useUser } from 'hooks/useUser';
+
+const mapPersonaStatus = {
+  pending: 'Pending',
+  completed: 'Completed',
+  needs_review: 'Needs review',
+  approved: 'Approved',
+  created: 'Created',
+  failed: 'Failed',
+  expired: 'Expired',
+  declined: 'Declined'
+};
 
 export default function PersonaModal({ spaceId }: { spaceId: string }) {
   const { user } = useUser();
@@ -29,16 +40,24 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
 
   return (
     <>
-      <Box display='flex' justifyContent='space-between'>
-        <Typography variant='body2'>Test your Persona KYC flow</Typography>
+      {personaUserKyc && disabled ? (
+        <Chip
+          clickable={false}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          label={`Status: ${personaUserKyc.status ? mapPersonaStatus[personaUserKyc.status] : 'Unknown'}`}
+        />
+      ) : (
         <Button
           onClick={popupConfirmationState.open}
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
           data-test='start-persona-kyc'
         >
-          Start KYC
+          Test KYC
         </Button>
-      </Box>
+      )}
+
       <ModalWithButtons
         title='KYC aknowledgement'
         buttonText='Confirm'

@@ -1,4 +1,4 @@
-import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
 import { Synaps } from '@synaps-io/verify-sdk';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -8,6 +8,14 @@ import { useGetSynapsSession, useInitSynapsSession } from 'charmClient/hooks/spa
 import { Button } from 'components/common/Button';
 import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+
+const mapSynapsStatus = {
+  APPROVED: 'Approved',
+  PENDING_VERIFICATION: 'Pending verification',
+  REJECTED: 'Rejected',
+  RESUBMISSION_REQUIRED: 'Resubmission required',
+  SUBMISSION_REQUIRED: 'Submission required'
+};
 
 export function SynapsModal({ spaceId }: { spaceId: string }) {
   const { data: synapsUserKyc, isLoading: isSynapsUserKycLoading } = useGetSynapsSession(spaceId);
@@ -24,19 +32,30 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
     popupState.open();
   };
 
+  if (synapsUserKyc === undefined) {
+    return null;
+  }
+
   return (
     <>
-      <Box display='flex' justifyContent='space-between'>
-        <Typography variant='body2'>Test your Synaps KYC flow</Typography>
+      {synapsUserKyc && disabled ? (
+        <Chip
+          clickable={false}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          label={`Status: ${synapsUserKyc.status ? mapSynapsStatus[synapsUserKyc.status] : 'Unknown'}`}
+        />
+      ) : (
         <Button
           onClick={openModal}
           loading={initSessionLoading}
-          disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading || disabled}
+          disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading}
           data-test='start-synaps-kyc'
         >
-          Start KYC
+          Test KYC
         </Button>
-      </Box>
+      )}
       {synapsSession && (
         <SynapsModalWithConfirmation
           sessionId={synapsSession.session_id}

@@ -148,33 +148,28 @@ export function SpaceIntegrations({ space }: { space: Space }) {
               <PersonaModal spaceId={space.id} />
             </Grid>
           )}
-        {isAdmin && kycCredentials && (
-          <Grid item>
-            <Box display='flex' justifyContent='space-between'>
-              <Typography variant='body2'>Save your settings and test your KYC flow</Typography>
-              <Box>
-                {isDirty && (
-                  <Button
-                    disableElevation
-                    variant='outlined'
-                    disabled={isLoading || !isDirty}
-                    onClick={resetValues}
-                    sx={{ mr: 2 }}
-                  >
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  disableElevation
-                  disabled={isLoading || !isDirty}
-                  type='submit'
-                  loading={isLoading}
-                  data-test='save-kyc-form'
-                >
-                  Save
-                </Button>
-              </Box>
-            </Box>
+        {isAdmin && kycCredentials && isDirty && (
+          <Grid item alignSelf='end'>
+            {isDirty && (
+              <Button
+                disableElevation
+                variant='outlined'
+                disabled={isLoading || !isDirty}
+                onClick={resetValues}
+                sx={{ mr: 2 }}
+              >
+                Cancel
+              </Button>
+            )}
+            <Button
+              disableElevation
+              disabled={isLoading || !isDirty}
+              type='submit'
+              loading={isLoading}
+              data-test='save-kyc-form'
+            >
+              Save
+            </Button>
           </Grid>
         )}
       </Grid>
