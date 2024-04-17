@@ -117,7 +117,11 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       )}
       {(page.type === 'proposal' || page.type === 'proposal_template') && (
         <ProposalSidebar
-          isOpen={internalSidebarView === 'proposal_evaluation'}
+          sidebarProps={{
+            isOpen: internalSidebarView === 'proposal_evaluation',
+            openSidebar: () => setActiveView('proposal_evaluation'),
+            closeSidebar
+          }}
           pagePath={page.path}
           pageTitle={page.title}
           pageId={page.id}
@@ -125,8 +129,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           readOnlyProposalPermissions={!proposal?.permissions.edit}
           isProposalTemplate={page.type === 'proposal_template'}
           isStructuredProposal={isStructuredProposal}
-          closeSidebar={closeSidebar}
-          openSidebar={() => setActiveView('proposal_evaluation')}
           proposal={proposal}
           proposalInput={proposal}
           templateId={proposal?.page?.sourceTemplateId}

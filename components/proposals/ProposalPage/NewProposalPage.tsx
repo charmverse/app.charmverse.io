@@ -19,6 +19,7 @@ import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ProposalSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/ProposalSidebar';
+import { WorkflowSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/WorkflowSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
@@ -563,13 +564,16 @@ export function NewProposalPage({
             </StickyFooterContainer>
           </Box>
         </DocumentColumn>
+
         <ProposalSidebar
+          sidebarProps={{
+            isOpen: internalSidebarView === 'proposal_evaluation',
+            closeSidebar: () => setActiveView(null),
+            openSidebar: () => setActiveView('proposal_evaluation')
+          }}
           isUnpublishedProposal
-          isOpen={internalSidebarView === 'proposal_evaluation'}
           isProposalTemplate={!!isTemplate}
           isStructuredProposal={isStructured}
-          closeSidebar={() => setActiveView(null)}
-          openSidebar={() => setActiveView('proposal_evaluation')}
           proposalInput={isFormLoaded ? formInputs : undefined}
           templateId={formInputs.proposalTemplateId}
           onChangeEvaluation={(evaluationId, updates) => {
