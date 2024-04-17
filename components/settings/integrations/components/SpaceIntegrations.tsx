@@ -102,6 +102,8 @@ export function SpaceIntegrations({ space }: { space: Space }) {
     }
   };
 
+  const resetValues = () => reset(getDefaultValues({ kycCredentials, space }));
+
   const isLoading = updateSpaceLoading || kycUpdateCredentialsLoading;
 
   return (
@@ -144,7 +146,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
               <PersonaModal spaceId={space.id} />
             </Grid>
           )}
-        {isAdmin && (
+        {isAdmin && kycCredentials && (
           <Grid item>
             <Box display='flex' justifyContent='space-between'>
               <Typography variant='body2'>Save your settings and test your KYC flow</Typography>
@@ -154,7 +156,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
                     disableElevation
                     variant='outlined'
                     disabled={isLoading || !isDirty}
-                    onClick={reset}
+                    onClick={resetValues}
                     sx={{ mr: 2 }}
                   >
                     Cancel

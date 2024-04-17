@@ -30,7 +30,7 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
   return (
     <>
       <Box display='flex' justifyContent='space-between'>
-        <Typography variant='body2'>Test your Synaps KYC flow</Typography>
+        <Typography variant='body2'>Test your Persona KYC flow</Typography>
         <Button
           onClick={popupConfirmationState.open}
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}

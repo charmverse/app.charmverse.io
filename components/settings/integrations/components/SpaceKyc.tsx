@@ -65,7 +65,7 @@ export function SpaceKyc({ isAdmin, control }: { isAdmin: boolean; control: Cont
   });
 
   return (
-    <Box display='flex' flexWrap='wrap' flexDirection='column' mt={2} gap={2}>
+    <Box display='flex' flexWrap='wrap' flexDirection='column' gap={2}>
       <Box>
         <FieldLabel>KYC</FieldLabel>
         <Typography variant='body2'>Choose your provider</Typography>
