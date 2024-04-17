@@ -1,6 +1,5 @@
 import type { KycOption, Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import dynamic from 'next/dynamic';
@@ -13,7 +12,6 @@ import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { KycCredentials } from 'lib/kyc/getKycCredentials';
 
 import { ConnectBoto } from './ConnectBoto';
@@ -43,7 +41,6 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   const { data: kycCredentials, mutate: mutateKycCredentials } = useGetKycCredentials(space.id);
   const { trigger: updateKycCredential, isMutating: kycUpdateCredentialsLoading } = useUpdateKycCredentials(space.id);
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
-  const isCharmverseSpace = useIsCharmverseSpace();
   const {
     handleSubmit,
     control,
@@ -63,7 +60,8 @@ export function SpaceIntegrations({ space }: { space: Space }) {
     kycCredentials?.persona?.apiKey,
     kycCredentials?.persona?.secret,
     kycCredentials?.persona?.templateId,
-    kycCredentials?.persona?.envId
+    kycCredentials?.persona?.envId,
+    space.kycOption
   ]);
 
   const onSubmit = async (values: FormValues) => {
