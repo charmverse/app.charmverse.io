@@ -7,11 +7,11 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
+import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from '../../../WorkflowSelect';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
-import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
