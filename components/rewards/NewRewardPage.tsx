@@ -44,7 +44,7 @@ export function NewRewardPage({
   const { templates: rewardTemplates } = useRewardTemplates();
   const [selectedRewardTemplateId, setSelectedRewardTemplateId] = useState<null | string>();
   const [rewardTemplateId, setRewardTemplateId] = useState<null | string>();
-  const [, setPageTitle] = usePageTitle();
+  const [pageTitle, setPageTitle] = usePageTitle();
   const rewardPageType = isTemplate ? 'bounty_template' : 'bounty';
   const { contentUpdated, createReward, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const sourceTemplate = rewardTemplates?.find((template) => template.page.id === templateIdFromUrl);

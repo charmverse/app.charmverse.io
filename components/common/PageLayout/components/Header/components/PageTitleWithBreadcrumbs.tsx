@@ -15,7 +15,6 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 
 import { PageIcon } from '../../../../PageIcon';
 
@@ -303,10 +302,9 @@ export function PageTitleWithBreadcrumbs({
 }) {
   const router = useRouter();
   const { mappedFeatures } = useSpaceFeatures();
-
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty') {
+  } else if (pageType === 'bounty' || pageType === 'bounty_template' || router.route === '/[domain]/rewards/new') {
     const sectionName = mappedFeatures.rewards.title;
     return <RewardsPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
   } else if (router.route === '/[domain]/rewards/applications/[applicationId]') {
