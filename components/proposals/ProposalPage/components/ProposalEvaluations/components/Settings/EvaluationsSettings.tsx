@@ -8,8 +8,8 @@ import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
+import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from '../../../WorkflowSelect';
-import { EvaluationStepRow } from '../Review/components/EvaluationStepRow';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';
