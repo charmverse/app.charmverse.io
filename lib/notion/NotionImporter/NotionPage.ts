@@ -134,7 +134,7 @@ export class NotionPage {
         this.cache.pagesWithoutIntegrationAccess.add(notionPageId);
       }
       if (notionPage) {
-        log.debug(`[notion] Failed to fetch and create notion page ${notionPage.id}`);
+        log.debug(`[notion] Failed to fetch and create notion page ${notionPage.id}`, { error: err });
       }
       return null;
     }

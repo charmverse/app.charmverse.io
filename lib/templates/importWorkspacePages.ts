@@ -197,6 +197,8 @@ export function _generateNewPages({
 
     const newPageContent: Prisma.PageCreateInput = {
       ...pageWithoutJoins,
+      createdAt: new Date(),
+      updatedAt: new Date(),
       // increase index by 1 for root pages so that Getting started appears first
       index: !currentParentId ? pageWithoutJoins.index + 1 : pageWithoutJoins.index,
       title:
