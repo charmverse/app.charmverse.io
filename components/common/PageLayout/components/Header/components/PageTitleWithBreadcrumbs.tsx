@@ -236,7 +236,7 @@ function RewardsPageTitle({ basePath, sectionName }: { basePath: string; section
           </BreadcrumbPageTitle>
         </Link>
       </BreadCrumb>
-      <BreadcrumbPageTitle>{pageTitle}</BreadcrumbPageTitle>
+      <BreadcrumbPageTitle>{pageTitle || 'Untitled'}</BreadcrumbPageTitle>
     </Box>
   );
 }

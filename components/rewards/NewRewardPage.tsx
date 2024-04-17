@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
 import { DocumentColumn, DocumentColumnLayout } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
@@ -18,6 +18,7 @@ import { PropertyLabel } from 'components/common/DatabaseEditor/components/prope
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePageTitle } from 'hooks/usePageTitle';
@@ -41,6 +42,7 @@ export function NewRewardPage({
   templateId?: string;
 }) {
   const spacePermissions = useCurrentSpacePermissions();
+  const { navigateToSpacePath } = useCharmRouter();
   const { templates: rewardTemplates } = useRewardTemplates();
   const [selectedRewardTemplateId, setSelectedRewardTemplateId] = useState<null | string>();
   const [rewardTemplateId, setRewardTemplateId] = useState<null | string>();
@@ -52,7 +54,6 @@ export function NewRewardPage({
   const containerWidthRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const isAdmin = useIsAdmin();
   const [pageData, setPageData] = useState<{
     title: string;
     content: PageContent | null;
@@ -76,19 +77,6 @@ export function NewRewardPage({
     title: template.page.title
   }));
 
-  // properties with values from templates should be read only
-  const readOnlyCustomProperties =
-    !isAdmin && sourceTemplate?.reward.fields
-      ? Object.entries(sourceTemplate?.reward.fields?.properties || {})?.reduce((acc, [key, value]) => {
-          if (!value) {
-            return acc;
-          }
-
-          acc.push(key);
-          return acc;
-        }, [] as string[])
-      : [];
-
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
     // TODO: use a ref passed down instead
@@ -102,6 +90,12 @@ export function NewRewardPage({
       contentText: rawText
     });
   }
+
+  useEffect(() => {
+    if (templateIdFromUrl) {
+      setRewardTemplateId(templateIdFromUrl);
+    }
+  }, [templateIdFromUrl]);
 
   return (
     <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
