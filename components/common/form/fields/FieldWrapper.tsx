@@ -36,7 +36,7 @@ export function FieldWrapperContainer({
 type ContentProps = {
   children?: ReactNode;
   iconLabel?: ReactNode;
-  error?: boolean;
+  error?: boolean | string;
   required?: boolean;
   description?: PageContent;
   labelEndAdornment?: ReactNode;
