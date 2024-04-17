@@ -36,6 +36,7 @@ export function FieldWrapperContainer({
 type ContentProps = {
   children?: ReactNode;
   iconLabel?: ReactNode;
+  error?: boolean;
   required?: boolean;
   description?: PageContent;
   labelEndAdornment?: ReactNode;
@@ -54,6 +55,7 @@ export function FieldWrapper({
   inline,
   iconLabel,
   inputEndAdornment,
+  error,
   inputEndAdornmentAlignItems = 'center'
 }: ContentProps & FieldWrapperProps) {
   if (!label) {
@@ -66,7 +68,7 @@ export function FieldWrapper({
         <Box alignItems='center' display='flex' gap={1}>
           {iconLabel ?? null}
           {label && (
-            <FieldLabel data-test='field-label'>
+            <FieldLabel data-test='field-label' color={error ? 'error' : undefined}>
               {label}
               {required && (
                 <Typography component='span' color='error'>

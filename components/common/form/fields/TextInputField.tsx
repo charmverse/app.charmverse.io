@@ -34,6 +34,7 @@ export const TextInputField = forwardRef<HTMLDivElement, Props>(
         label={label}
         inline={inline}
         iconLabel={iconLabel}
+        error={!!error}
       >
         {/** Without label the field wrapper wraps its children inside a Fragment and if the container already has spacing it creates an uneven spacing with the extra margin bottom */}
         {topComponent && <Box mb={label ? 1 : 0}>{topComponent}</Box>}
