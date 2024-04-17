@@ -11,7 +11,7 @@ export type Props<T extends string> = Omit<SelectProps, 'onChange' | 'renderValu
   renderValue?: (option: T) => ReactNode;
   defaultValue?: T;
   title?: string;
-  keyAndLabel: Partial<Record<Exclude<T, ''>, string>>;
+  keyAndLabel: Partial<Record<Exclude<T, ''>, string | JSX.Element>>;
 };
 
 export default function InputEnumToOptions<T extends string>({

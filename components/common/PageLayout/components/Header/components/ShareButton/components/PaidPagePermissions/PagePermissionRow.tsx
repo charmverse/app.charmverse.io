@@ -120,7 +120,7 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
                 });
               }
             }}
-            keyAndLabel={permissionOptions as any}
+            keyAndLabel={permissionOptions}
             value={(existingPermission?.permissionLevel as ApplicablePagePermissionLevel | undefined) ?? 'No access'}
           />
         </div>
