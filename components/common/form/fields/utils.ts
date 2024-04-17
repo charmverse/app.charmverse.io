@@ -9,5 +9,5 @@ export function isEmptyValue(value: string | string[] | null | number | undefine
 }
 
 export const isWalletConfig = (fieldConfig: Prisma.JsonValue): fieldConfig is { chainId: number } => {
-  return 'chainId' in (fieldConfig as { chainId: number });
+  return fieldConfig ? 'chainId' in (fieldConfig as { chainId: number }) : false;
 };
