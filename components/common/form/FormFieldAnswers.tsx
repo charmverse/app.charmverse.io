@@ -20,6 +20,7 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
 import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
 import type { SelectOptionType } from './fields/Select/interfaces';
+import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
 import type { FormFieldValue } from './interfaces';
@@ -228,6 +229,13 @@ export function FormFieldAnswersControlled({
                     placeholder={fieldTypePlaceholderRecord[formField.type]}
                     labelEndAdornment={
                       formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
+                    }
+                    walletInputConfig={
+                      isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
+                        ? {
+                            chainId: formField.fieldConfig.chainId
+                          }
+                        : undefined
                     }
                     inputEndAdornment={
                       pageId &&
