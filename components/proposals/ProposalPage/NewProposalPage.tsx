@@ -19,7 +19,6 @@ import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
 import { ProposalSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/ProposalSidebar';
-import { WorkflowSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/WorkflowSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
@@ -34,6 +33,7 @@ import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEdi
 import { getInitialFormFieldValue } from 'components/common/form/hooks/useFormFields';
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
+import { WorkflowSidebar } from 'components/common/workflows/WorkflowSidebar';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';

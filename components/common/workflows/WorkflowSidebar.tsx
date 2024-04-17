@@ -4,10 +4,12 @@ import { memo } from 'react';
 
 import { useMdScreen } from 'hooks/useMediaScreens';
 
-import { SidebarColumn } from '../DocumentColumnLayout';
-
-import { SidebarContentLayout, SidebarHeader } from './components/SidebarContentLayout';
-import { ToggleProposalSidebarButton } from './components/ToggleProposalButton';
+import { SidebarColumn } from '../../[pageId]/DocumentPage/components/DocumentColumnLayout';
+import {
+  SidebarContentLayout,
+  SidebarHeader
+} from '../../[pageId]/DocumentPage/components/Sidebar/components/SidebarContentLayout';
+import { ToggleProposalSidebarButton } from '../../[pageId]/DocumentPage/components/Sidebar/components/ToggleProposalButton';
 
 const sidebarWidth = 430;
 const sidebarMinWidth = 54;
