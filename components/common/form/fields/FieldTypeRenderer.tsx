@@ -38,13 +38,7 @@ type SelectProps = {
 } & FieldProps &
   Required<ControlFieldProps>;
 
-type WalletProps = {
-  type: 'wallet';
-  walletInputConfig?: WalletInputConfig;
-} & FieldProps &
-  Required<ControlFieldProps>;
-
-type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'> | Omit<WalletProps, 'type'>) & {
+type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
   sx?: SxProps;
   type: FieldType;
   textInputConfig?: TextInputConfig;

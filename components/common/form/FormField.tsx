@@ -41,6 +41,7 @@ import {
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
+import { isWalletConfig } from './fields/utils';
 import type { FormFieldInput } from './interfaces';
 
 export const FormFieldContainer = styled(Stack, {
@@ -219,7 +220,7 @@ function ExpandedFormField({
           onDeleteOption={onDeleteOption}
           onUpdateOption={onUpdateOption}
           walletInputConfig={{
-            chainId: (formField.fieldConfig as { chainId: number } | undefined)?.chainId,
+            chainId: isWalletConfig(formField.fieldConfig) ? formField.fieldConfig.chainId : undefined,
             onChangeChainId: (chainId) => {
               updateFormField({
                 fieldConfig: { chainId },
@@ -368,10 +369,10 @@ export function FormField(
                     formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
                   }
                   walletInputConfig={
-                    // Only show if chainId is present
-                    (formField.fieldConfig as { chainId: number } | undefined)?.chainId
+                    // Only show if chainId is present in field config
+                    isWalletConfig(formField.fieldConfig)
                       ? {
-                          chainId: (formField.fieldConfig as { chainId: number } | undefined)?.chainId
+                          chainId: formField.fieldConfig.chainId
                         }
                       : undefined
                   }
