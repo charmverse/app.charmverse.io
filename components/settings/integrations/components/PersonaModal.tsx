@@ -34,6 +34,7 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
         <Button
           onClick={popupConfirmationState.open}
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
+          data-test='start-persona-kyc'
         >
           Start KYC
         </Button>
@@ -58,10 +59,8 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
           <Persona.Inquiry
             inquiryId={personaInquiry?.inquiryId}
             referenceId={user?.id}
-            onLoad={() => {}}
-            onComplete={({ inquiryId, status, fields }) => {
-              // Inquiry completed. Optionally tell your server about it.
-              // console.log(`Sending finished inquiry ${inquiryId} to backend`);
+            onComplete={() => {
+              // Inquiry completed. Close the modal
               popupPersonaState.close();
             }}
           />

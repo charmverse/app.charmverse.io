@@ -40,7 +40,7 @@ export default function ModalWithButtons({
       {children}
       <Box sx={{ gap: 2, mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
         {!hideCancelButton && (
-          <Button color='secondary' variant='outlined' onClick={onClose}>
+          <Button color='secondary' variant='outlined' onClick={onClose} data-test='modal-cancel-button'>
             {secondaryButtonText}
           </Button>
         )}

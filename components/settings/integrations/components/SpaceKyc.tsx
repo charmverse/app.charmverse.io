@@ -2,7 +2,6 @@ import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
@@ -67,14 +66,10 @@ export function SpaceKyc({ isAdmin, control }: { isAdmin: boolean; control: Cont
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column' gap={2}>
       <Box>
-        <FieldLabel>KYC</FieldLabel>
-        <Typography variant='body2'>Choose your provider</Typography>
-      </Box>
-      <Box>
         <FormControlLabel
           control={
             <Switch
-              name='snapsKyc'
+              name='synapsKyc'
               checked={kycOption.value === 'synaps'}
               value={kycOption.value === 'synaps'}
               onChange={(e) => {
@@ -89,6 +84,7 @@ export function SpaceKyc({ isAdmin, control }: { isAdmin: boolean; control: Cont
         <FormControlLabel
           control={
             <Switch
+              name='personaKyc'
               value={kycOption.value === 'persona'}
               checked={kycOption.value === 'persona'}
               onChange={(e) => {

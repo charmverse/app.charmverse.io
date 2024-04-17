@@ -110,6 +110,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={3} direction='column'>
         <Grid item>
+          <FieldLabel>Snapshot.org domain</FieldLabel>
           <SnapshotIntegration isAdmin={isAdmin} space={space} />
         </Grid>
         <Grid item>
@@ -120,24 +121,25 @@ export function SpaceIntegrations({ space }: { space: Space }) {
           <FieldLabel>Send events to Discord/Telegram</FieldLabel>
           <ConnectBoto />
         </Grid>
-        {isCharmverseSpace && (
-          <Grid item>
-            <FieldLabel>Sync with Github Repo</FieldLabel>
-            <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
-          </Grid>
-        )}
+        <Grid item>
+          <FieldLabel>Sync with Github Repo</FieldLabel>
+          <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
+        </Grid>
         {kycCredentials && (
           <Grid item>
+            <FieldLabel>KYC</FieldLabel>
+            <Typography variant='body2' mb={2}>
+              Choose your provider
+            </Typography>
             <SpaceKyc control={control} isAdmin={isAdmin} />
           </Grid>
         )}
-        {isCharmverseSpace && isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
+        {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
           <Grid item>
             <SynapsModal spaceId={space.id} />
           </Grid>
         )}
-        {isCharmverseSpace &&
-          isAdmin &&
+        {isAdmin &&
           space.kycOption === 'persona' &&
           kycCredentials?.persona?.apiKey &&
           kycCredentials.persona.envId &&
@@ -162,7 +164,13 @@ export function SpaceIntegrations({ space }: { space: Space }) {
                     Cancel
                   </Button>
                 )}
-                <Button disableElevation disabled={isLoading || !isDirty} type='submit' loading={isLoading}>
+                <Button
+                  disableElevation
+                  disabled={isLoading || !isDirty}
+                  type='submit'
+                  loading={isLoading}
+                  data-test='save-kyc-form'
+                >
                   Save
                 </Button>
               </Box>

@@ -32,6 +32,7 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
           onClick={openModal}
           loading={initSessionLoading}
           disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading || disabled}
+          data-test='start-synaps-kyc'
         >
           Start KYC
         </Button>

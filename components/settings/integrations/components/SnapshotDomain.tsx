@@ -55,36 +55,33 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
 
   return (
     <Box>
-      <FieldLabel>Snapshot.org domain</FieldLabel>
-      <Box>
-        <Stack flexDirection='row' alignItems='center' gap={1}>
-          {!space.snapshotDomain && !isAdmin ? (
-            <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
-          ) : (
-            <TextField
-              {...register('snapshotDomain')}
-              InputProps={{
-                startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
-              }}
-              disabled={!isAdmin}
-              fullWidth
-              error={!!errors.snapshotDomain?.message}
-              helperText={errors.snapshotDomain?.message}
-            />
-          )}
-          {isAdmin && (
-            <Button
-              disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
-              disableElevation
-              disabled={!isAdmin || updateSpaceLoading || !isDirty}
-              loading={updateSpaceLoading}
-              onClick={updateSnapshotDomain}
-            >
-              Save
-            </Button>
-          )}
-        </Stack>
-      </Box>
+      <Stack flexDirection='row' alignItems='center' gap={1}>
+        {!space.snapshotDomain && !isAdmin ? (
+          <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
+        ) : (
+          <TextField
+            {...register('snapshotDomain')}
+            InputProps={{
+              startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
+            }}
+            disabled={!isAdmin}
+            fullWidth
+            error={!!errors.snapshotDomain?.message}
+            helperText={errors.snapshotDomain?.message}
+          />
+        )}
+        {isAdmin && (
+          <Button
+            disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
+            disableElevation
+            disabled={!isAdmin || updateSpaceLoading || !isDirty}
+            loading={updateSpaceLoading}
+            onClick={updateSnapshotDomain}
+          >
+            Save
+          </Button>
+        )}
+      </Stack>
     </Box>
   );
 }
