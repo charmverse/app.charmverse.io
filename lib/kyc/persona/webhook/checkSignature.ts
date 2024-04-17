@@ -19,7 +19,10 @@ export function checkSignature({
   });
 
   if (signatureParams.t && signatureParams.v1) {
-    const hmac = crypto.createHmac('sha256', secret).update(`${signatureParams.t}.${body}`).digest('hex');
+    const hmac = crypto
+      .createHmac('sha256', secret)
+      .update(`${signatureParams.t}.${JSON.stringify(body)}`)
+      .digest('hex');
 
     if (crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signatureParams.v1))) {
       return true;
