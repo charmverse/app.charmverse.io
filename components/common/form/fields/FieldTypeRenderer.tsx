@@ -23,7 +23,7 @@ type TextInputConfig = {
 
 type WalletInputConfig = {
   chainId?: number;
-  onChangeChainId?: (chainId: number) => void;
+  onChangeChainId?: (chainId: number | null) => void;
 };
 
 type TextProps = {
@@ -61,6 +61,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             topComponent={
               walletInputConfig ? (
                 <InputSearchBlockchain
+                  disableClearable={false}
                   chainId={walletInputConfig.chainId}
                   readOnly={!walletInputConfig.onChangeChainId}
                   disabled={!walletInputConfig.onChangeChainId}

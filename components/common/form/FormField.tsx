@@ -369,8 +369,8 @@ export function FormField(
                     formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
                   }
                   walletInputConfig={
-                    // Only show if chainId is present in field config
-                    isWalletConfig(formField.fieldConfig)
+                    // Only show if chainId is present in field config and its a valid chainId
+                    isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
                       ? {
                           chainId: formField.fieldConfig.chainId
                         }

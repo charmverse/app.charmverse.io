@@ -231,7 +231,7 @@ export function FormFieldAnswersControlled({
                       formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
                     }
                     walletInputConfig={
-                      isWalletConfig(formField.fieldConfig)
+                      isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
                         ? {
                             chainId: formField.fieldConfig.chainId
                           }
