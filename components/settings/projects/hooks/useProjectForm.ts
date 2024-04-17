@@ -66,6 +66,8 @@ export function useProjectForm(options: {
           projectMembers: [teamLead!, ...nonTeamLeadMembers]
         })
       );
+      // trigger form so that errors are populated correctly
+      form.trigger();
     } else {
       form.reset(defaultProjectAndMembersPayload);
     }

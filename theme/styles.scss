@@ -122,3 +122,10 @@ body {
 .MuiFormLabel-asterisk {
   color: var(--danger-text);
 }
+
+// show red bordder on inputs that are disabled
+.Mui-error {
+  .MuiOutlinedInput-notchedOutline {
+    border-color: var(--danger-text) !important;
+  }
+}
