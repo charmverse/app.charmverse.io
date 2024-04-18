@@ -21,7 +21,7 @@ export function EvaluationStepSettings(props: EvaluationStepSettingsProps) {
 
   if (evaluationType === 'submit') {
     return <SubmitStepSettings {...props} />;
-  } else if (evaluationType === 'review') {
+  } else if (evaluationType === 'review' || evaluationType === 'application_review') {
     return <ReviewStepSettings {...props} />;
   } else if (evaluationType === 'payment') {
     return <PaymentStepSettings {...props} />;
