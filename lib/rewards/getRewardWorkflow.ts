@@ -1,4 +1,4 @@
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 
 export type RewardInput = Partial<
@@ -11,7 +11,11 @@ export type RewardInput = Partial<
     | 'allowMultipleApplications'
     | 'allowedSubmitterRoles'
     | 'maxSubmissions'
-  >
+    | 'chainId'
+    | 'customReward'
+    | 'rewardToken'
+    | 'rewardAmount'
+  > & { rewardType?: RewardType }
 >;
 
 export function getRewardWorkflow(workflows: RewardWorkflow[], reward: RewardInput | undefined) {
