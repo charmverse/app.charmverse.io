@@ -55,7 +55,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
     if (!board && pageId) {
       dispatch(initialDatabaseLoad({ pageId }));
     }
-  }, [pageId]);
+  }, [!!board, pageId]);
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 

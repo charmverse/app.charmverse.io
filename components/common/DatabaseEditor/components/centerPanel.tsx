@@ -43,7 +43,8 @@ import {
   addTemplate,
   getAllCards
 } from '../store/cards';
-import { useAppSelector } from '../store/hooks';
+import { initialDatabaseLoad } from '../store/databaseBlocksLoad';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { updateView } from '../store/views';
 import { Utils } from '../utils';
 
@@ -104,6 +105,7 @@ function CenterPanel(props: Props) {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const localViewSettings = useLocalDbViewSettings(activeView?.id);
+  const dispatch = useAppDispatch();
   const isEmbedded = !!props.embeddedBoardPath;
   const boardPageType = boardPage?.type;
   // for 'linked' boards, each view has its own board which we use to determine the cards to show
@@ -115,7 +117,6 @@ function CenterPanel(props: Props) {
   }
 
   const { data: activePage } = useGetPageMeta(activeBoardId);
-
   const { keys } = useApiPageKeys(props.page?.id);
   const cardMap = useAppSelector(getAllCards);
   const selectBoard = useMemo(makeSelectBoard, []);
@@ -147,6 +148,13 @@ function CenterPanel(props: Props) {
       setState((s) => ({ ...s, openSettings: null }));
     }
   }, [activeView?.id, views.length, isActiveView, selectedPropertyId]);
+
+  // load the linked board and its subtree when a view links to it
+  useEffect(() => {
+    if (!activeBoard && activeView?.fields.linkedSourceId) {
+      dispatch(initialDatabaseLoad({ pageId: activeView.fields.linkedSourceId }));
+    }
+  }, [!!activeBoard, activeView?.fields.linkedSourceId]);
 
   // filter cards by whats accessible
   const { sortedCards, cardIds } = useMemo(() => {

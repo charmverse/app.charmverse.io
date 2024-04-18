@@ -1,17 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { prettyPrint } from 'lib/utils/strings';
 /**
  * Use this script to perform database searches.
  */
 
 async function search() {
-  const acc = await prisma.pagePermission.count({
+  const acc = await prisma.page.findMany({
     where: {
-      permissionLevel: 'proposal_editor',
-      page: {
-        type: 'proposal',
-      }
+      title: 'daos'
     }
   });
 

@@ -462,6 +462,7 @@ export function NewProposalPage({
                                 if (!updatedFormField) {
                                   return formAnswer;
                                 }
+
                                 return {
                                   ...formAnswer,
                                   value: updatedFormField.value

@@ -163,7 +163,12 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
         <Grid container direction='column' spacing={3}>
           <Grid item xs>
             <InputLabel>Blockchain</InputLabel>
-            <InputSearchBlockchain defaultChainId={defaultChainId} onChange={setChainId} />
+            <InputSearchBlockchain
+              defaultChainId={defaultChainId}
+              onChange={(chainId) => {
+                setChainId(chainId as number);
+              }}
+            />
           </Grid>
 
           <Grid item xs>
