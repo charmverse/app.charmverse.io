@@ -54,7 +54,7 @@ export function EvaluationsSettings({
               expandedContainer={expandedContainer}
               result={null}
               title={evaluation.title}
-              index={index + 1}
+              index={index}
             >
               {/** For apply evaluation use null to disable showing the AccordionDetails */}
               {evaluation.type === 'apply' ? null : (
