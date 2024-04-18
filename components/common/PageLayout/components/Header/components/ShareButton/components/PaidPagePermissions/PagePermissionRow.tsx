@@ -4,7 +4,9 @@ import type {
   AssignedPagePermission,
   PagePermissionAssignmentByValues
 } from '@charmverse/core/permissions';
-import { Box, Tooltip } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import { Box, ListItemText, ListItemIcon, Tooltip } from '@mui/material';
+import { useMemo } from 'react';
 
 import { SmallSelect } from 'components/common/form/InputEnumToOptions';
 import { Typography } from 'components/common/Typography';
@@ -18,10 +20,6 @@ import { GuestChip } from '../common/GuestChip';
 import { ReadonlyPagePermissionRow } from '../common/ReadonlyPagePermissionRow';
 
 import { PermissionInheritedFrom } from './PermissionInheritedFrom';
-// We never use these 2 values in our code
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const permissionsWithRemove = { ...pagePermissionLevels, delete: 'Remove' };
 
 type Props = {
   assignee: TargetPermissionGroup<Exclude<AssignablePagePermissionGroups, 'public'>>;
@@ -30,6 +28,12 @@ type Props = {
   onDelete: (permissionId: string) => void;
   editable: boolean;
 };
+
+const permissionsWithRemove = {
+  ...pagePermissionLevels,
+  delete: 'Remove'
+};
+
 export function PagePermissionRow({ assignee, editable, onChange, onDelete, existingPermission }: Props) {
   const { roles } = useRoles();
   const { members } = useMembers();
@@ -38,16 +42,36 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
 
   const member = assignee.group === 'user' ? members.find((m) => m.id === assignee.id) : null;
 
-  const assigneeLabel =
-    assignee.group === 'space'
-      ? 'Default permissions'
-      : assignee.group === 'role'
-      ? role?.name
-      : assignee.group === 'user'
-      ? member?.username
-      : '';
+  const isDefaultPermission = assignee.group === 'space';
+
+  const assigneeLabel = isDefaultPermission
+    ? 'Default permissions'
+    : assignee.group === 'role'
+    ? role?.name
+    : assignee.group === 'user'
+    ? member?.username
+    : '';
 
   const isGuest = assignee.group === 'user' && !!member?.isGuest;
+  const currentValue = existingPermission?.permissionLevel;
+
+  const permissionOptions = useMemo(() => {
+    const permissionsList = Object.entries(permissionsWithRemove) as [
+      keyof typeof pagePermissionLevels | 'delete',
+      string
+    ][];
+    const options = permissionsList.reduce((acc, [level, label]) => {
+      acc[level] = (
+        <>
+          <ListItemText sx={{ pr: 1 }}>{level === 'delete' && isDefaultPermission ? 'No access' : label}</ListItemText>
+          {currentValue === level && <CheckIcon fontSize='small' />}
+          {level === 'delete' && !currentValue && <CheckIcon fontSize='small' />}
+        </>
+      );
+      return acc;
+    }, {} as Record<keyof typeof pagePermissionLevels | 'delete', JSX.Element>);
+    return options;
+  }, [isDefaultPermission, currentValue]);
 
   if (!editable) {
     return (
@@ -82,7 +106,7 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
           <SmallSelect
             renderValue={(value) => {
               if (!value) {
-                return 'No Access';
+                return 'No access';
               }
               return permissionsWithRemove[value] ?? 'No access';
             }}
@@ -96,8 +120,8 @@ export function PagePermissionRow({ assignee, editable, onChange, onDelete, exis
                 });
               }
             }}
-            keyAndLabel={permissionsWithRemove as Record<string, string>}
-            value={(existingPermission?.permissionLevel as ApplicablePagePermissionLevel | undefined) ?? 'No Access'}
+            keyAndLabel={permissionOptions}
+            value={(existingPermission?.permissionLevel as ApplicablePagePermissionLevel | undefined) ?? 'No access'}
           />
         </div>
       </Box>

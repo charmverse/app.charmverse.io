@@ -11,6 +11,8 @@ async function search() {
     }
   });
   console.log(acc);
+
 }
+
 
 search().then(() => console.log('Done'));

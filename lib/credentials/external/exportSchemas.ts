@@ -5,7 +5,7 @@ import { SchemaRegistry } from '@ethereum-attestation-service/eas-sdk';
 import { getChainById } from 'connectors/chains';
 import type { Chain } from 'viem';
 import { createPublicClient, http } from 'viem';
-import { arbitrum, base, optimism, optimismGoerli, optimismSepolia, sepolia } from 'viem/chains';
+import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
 
 import { clientToProvider } from 'hooks/useWeb3Signer';
 import { typedKeys } from 'lib/utils/objects';
