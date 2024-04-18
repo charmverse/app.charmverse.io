@@ -32,6 +32,7 @@ export function boardWithCardsArgs({
   addPageContent,
   views = 1,
   viewDataSource,
+  isLocked,
   boardPageType,
   boardTitle,
   viewType,
@@ -45,6 +46,7 @@ export function boardWithCardsArgs({
   addPageContent?: boolean;
   views?: number;
   viewType?: IViewType;
+  isLocked?: boolean;
   viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   boardTitle?: string;
@@ -72,6 +74,8 @@ export function boardWithCardsArgs({
     headerImage: null,
     icon: '📝',
     path: `page-${v4()}`,
+    isLocked,
+    lockedBy: isLocked ? createdBy : null,
     isTemplate: false,
     spaceId,
     type: boardPageType ?? 'board',
