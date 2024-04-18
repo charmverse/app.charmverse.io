@@ -18,7 +18,7 @@ export type PageWithPermissionsMeta = Page & {
 };
 
 export type PageMeta = PageMetaFromCore &
-  Pick<Page, 'isLocked' | 'lockedBy'> & {
+  Partial<Pick<Page, 'isLocked' | 'lockedBy'>> & {
     hideFromSidebar?: boolean;
   };
 

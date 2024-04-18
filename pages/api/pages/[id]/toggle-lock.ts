@@ -5,6 +5,7 @@ import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/mi
 import { togglePageLock } from 'lib/pages/togglePageLock';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -28,6 +29,14 @@ async function togglePageLockController(req: NextApiRequest, res: NextApiRespons
     pageId,
     userId
   });
+
+  relay.broadcast(
+    {
+      type: 'pages_meta_updated',
+      payload: [updatedPage]
+    },
+    updatedPage.spaceId
+  );
 
   res.status(200).json(updatedPage);
 }
