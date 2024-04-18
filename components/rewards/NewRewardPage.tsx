@@ -61,7 +61,7 @@ export function NewRewardPage({
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetRewardWorkflows(currentSpace?.id);
 
   const { contentUpdated, createReward, rewardValues, setRewardValues, isSavingReward } = useNewReward();
-  const sourceTemplate = rewardTemplates?.find((template) => template.page.id === templateIdFromUrl);
+  const sourceTemplate = rewardTemplates?.find((template) => template.page.id === rewardTemplateId);
 
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
   const containerWidthRef = useRef<HTMLDivElement>(null);
