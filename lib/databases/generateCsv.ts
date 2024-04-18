@@ -63,7 +63,7 @@ export async function loadAndGenerateCsv({
   }
 
   const cardBlocks = sortBy(
-    fbBlocks.filter((block) => block.type === 'card' && block.parentId === databaseId),
+    blocks.filter((block) => block.type === 'card' && block.parentId === databaseId).map(blockToFBBlock),
     'createdAt'
   ) as Card[];
 
