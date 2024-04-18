@@ -21,6 +21,7 @@ export type FormFieldValue =
   | UploadedFileInfo
   | {
       projectId: string;
+      selectedMemberIds: string[];
     };
 
 export type ControlFieldProps<T extends FormFieldValue = FormFieldValue> = {
@@ -48,6 +49,7 @@ export type FieldProps = {
   description?: PageContent;
   labelEndAdornment?: ReactNode;
   inputEndAdornment?: ReactNode;
+  topComponent?: ReactNode;
   inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 } & SelectFieldProps;
 

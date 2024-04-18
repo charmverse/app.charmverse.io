@@ -19,13 +19,18 @@ import type { WorkflowEvaluationJson, ProposalWorkflowTyped, PermissionJson } fr
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import { prismaToBlock } from 'lib/databases/block';
+import { blockToPrisma, prismaToBlock } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
+import type { BoardViewFields } from 'lib/databases/boardView';
+import { createMockBoard, createMockView } from 'testing/mocks/block';
+import type { MockPageInput } from 'testing/mocks/page';
+import { createMockPage } from 'testing/mocks/page';
+import { createMockSpace } from 'testing/mocks/space';
 import { createPage, generateBoard, generateUserAndSpace } from 'testing/setupDatabase';
 
-import type { WorkspacePagesExport } from '../exportWorkspacePages';
+import type { RelatedPageData, ExportedPage, WorkspacePagesExport } from '../exportWorkspacePages';
 import { exportWorkspacePages, exportWorkspacePagesToDisk } from '../exportWorkspacePages';
-import { importWorkspacePages } from '../importWorkspacePages';
+import { importWorkspacePages, _generateNewPages } from '../importWorkspacePages';
 
 jest.mock('node:fs/promises');
 
@@ -673,3 +678,62 @@ describe('importWorkspacePages - proposal content', () => {
   //   });
   // });
 });
+
+describe('_generateNewPages', () => {
+  it('should replace the source id on views', () => {
+    const oldId = 'old-id';
+    const viewTitle = 'View to replace title';
+    const sourcePages = [
+      mockPageNode({
+        id: oldId,
+        type: 'board',
+        blocks: {
+          board: blockToPrisma(createMockBoard()),
+          views: [blockToPrisma(createMockView())]
+        }
+      }),
+      mockPageNode({
+        type: 'inline_linked_board',
+        blocks: {
+          board: blockToPrisma(createMockBoard()),
+          views: [
+            blockToPrisma(
+              createMockView({
+                fields: {
+                  linkedSourceId: oldId
+                },
+                title: viewTitle
+              })
+            )
+          ]
+        }
+      })
+    ];
+    const targetSpace = createMockSpace();
+    const result = _generateNewPages({
+      sourcePages,
+      targetSpace
+    });
+    expect(result.pageArgs).toHaveLength(2);
+    expect(result.blockArgs).toHaveLength(4);
+    const newBoard = result.pageArgs.find((page) => page.type === 'board')!;
+    const updatedView = result.blockArgs.find((block) => block.title === viewTitle);
+    expect(updatedView).toBeTruthy();
+    expect((updatedView!.fields as BoardViewFields).linkedSourceId).toBe(newBoard.id);
+  });
+});
+
+function mockPageNode({
+  children: _children = [],
+  permissions: _permissions = [],
+  ...input
+}: MockPageInput & { children?: MockPageInput[]; permissions?: any[] } & Partial<RelatedPageData>): ExportedPage {
+  const mockPage = createMockPage(input);
+  const children = _children.map((child) => mockPageNode(child));
+  return {
+    isTemplate: false,
+    permissions: _permissions,
+    ...mockPage,
+    children
+  };
+}

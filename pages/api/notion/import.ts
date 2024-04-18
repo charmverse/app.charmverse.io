@@ -73,6 +73,7 @@ async function importNotion(
         }
       }
     );
+    log.info('[notion] - Importing from notion', { spaceId, token });
     const failedImports = await importFromWorkspace({
       spaceId,
       userId: req.session.user.id,

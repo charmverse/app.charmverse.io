@@ -5,7 +5,7 @@ import { v4 } from 'uuid';
 
 import { randomETHWallet } from 'lib/utils/blockchain';
 
-import { defaultProjectAndMembersPayload } from '../constants';
+import { createDefaultProjectAndMembersPayload } from '../constants';
 import { createProject } from '../createProject';
 
 describe('createProject', () => {
@@ -14,7 +14,7 @@ describe('createProject', () => {
     await expect(
       createProject({
         project: {
-          ...defaultProjectAndMembersPayload,
+          ...createDefaultProjectAndMembersPayload(),
           projectMembers: []
         },
         userId: user.id
@@ -33,6 +33,8 @@ describe('createProject', () => {
     const nonConnectedWalletAddress = randomETHWallet().address.toLowerCase();
     const nonConnectedVerifiedEmail = `${v4()}@gmail.com`;
     const nonConnectedGoogleAccountEmail = `${v4()}@gmail.com`;
+
+    const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
 
     await prisma.user.update({
       where: {

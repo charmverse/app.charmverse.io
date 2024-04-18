@@ -24,11 +24,11 @@ import { isBoardPageType } from 'lib/pages/isBoardPageType';
 import type { PageContent, TextContent } from 'lib/prosemirror/interfaces';
 import { DataNotFoundError } from 'lib/utils/errors';
 
-export type PageWithBlocks = {
+export type RelatedPageData = {
   blocks: {
-    board?: Block;
-    views?: Block[];
-    card?: Block;
+    board?: Omit<Block, 'schema'>;
+    views?: Omit<Block, 'schema'>[];
+    card?: Omit<Block, 'schema'>;
   };
   votes?: (Vote & { voteOptions: VoteOptions[] })[];
   proposal?:
@@ -64,7 +64,7 @@ type ExportWorkspaceOptions = {
 };
 
 export type ExportedPage = PageNodeWithChildren<
-  Page & Partial<PageWithBlocks> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
+  Page & Partial<RelatedPageData> & { permissions: (PagePermission & { sourcePermission?: PagePermission | null })[] }
 >;
 
 export type WorkspacePagesExport = {
