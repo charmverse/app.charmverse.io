@@ -5,8 +5,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardSignupButton } from 'components/rewards/components/RewardProperties/components/RewardSignupButton';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
+import { RewardPropertiesFormV2 } from 'components/rewards/components/RewardProperties/RewardPropertiesFormV2';
 import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
@@ -37,6 +39,7 @@ export function RewardProperties(props: {
     templateId,
     readOnlyTemplate
   } = props;
+  const isCharmverseSpace = useIsCharmverseSpace();
   const { updateReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<RewardsValue | undefined>();
   useEffect(() => {
@@ -70,21 +73,27 @@ export function RewardProperties(props: {
   if (!currentReward) {
     return null;
   }
+
+  const rewardPropertiesFormProps = {
+    pageId,
+    values: currentReward,
+    onChange: applyRewardUpdates,
+    readOnly,
+    expandedByDefault: expandedRewardProperties,
+    templateId,
+    isTemplate,
+    readOnlyTemplate,
+    selectTemplate: () => {},
+    rewardStatus: currentReward.status
+  };
+
   return (
     <Stack flex={1}>
-      <RewardPropertiesForm
-        pageId={pageId}
-        values={currentReward}
-        onChange={applyRewardUpdates}
-        readOnly={readOnly}
-        expandedByDefault={expandedRewardProperties}
-        templateId={templateId}
-        isTemplate={isTemplate}
-        readOnlyTemplate={readOnlyTemplate}
-        // templates are not enabled for existing pages
-        selectTemplate={() => {}}
-        rewardStatus={currentReward.status}
-      />
+      {isCharmverseSpace ? (
+        <RewardPropertiesFormV2 {...rewardPropertiesFormProps} />
+      ) : (
+        <RewardPropertiesForm {...rewardPropertiesFormProps} />
+      )}
 
       {!isTemplate && (
         <>

@@ -6,6 +6,7 @@ import { useGetReward } from 'charmClient/hooks/rewards';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
@@ -35,6 +36,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
+  const isCharmverseSpace = useIsCharmverseSpace();
 
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
@@ -155,7 +157,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeRewardSettings={onChangeRewardSettings}
         />
       )}
-      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && (
+      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && isCharmverseSpace && (
         <RewardSidebar
           sidebarProps={{
             isOpen: internalSidebarView === 'reward_evaluation',

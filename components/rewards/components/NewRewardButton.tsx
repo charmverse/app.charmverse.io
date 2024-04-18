@@ -16,15 +16,19 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import { getRewardType } from 'lib/rewards/getRewardType';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
 export function NewRewardButton({ showPage }: { showPage: (pageId: string) => void }) {
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const router = useRouter();
+  const isCharmverseSpace = useIsCharmverseSpace();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const overrideContentModalPopupState = usePopupState({ variant: 'popover', popupId: 'override-content' });
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
@@ -48,11 +52,14 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
 
   function createNewReward() {
-    navigateToSpacePath('/rewards/new');
-    // clearRewardValues();
-    // openNewPage({
-    //   type: 'bounty'
-    // });
+    if (isCharmverseSpace) {
+      navigateToSpacePath('/rewards/new');
+    } else {
+      clearRewardValues();
+      openNewPage({
+        type: 'bounty'
+      });
+    }
   }
 
   async function saveForm() {
@@ -63,22 +70,31 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
 
   function createRewardFromTemplate(template: RewardTemplate) {
-    navigateToSpacePath(`/rewards/new`, { template: template.page.id });
-    // openNewPage({
-    //   ...template.page,
-    //   content: template.page.content as PageContent,
-    //   title: undefined,
-    //   type: 'bounty',
-    //   templateId: template.page.id
-    // });
-    // setRewardValues({
-    //   rewardType: getRewardType(template.reward),
-    //   ...template.reward
-    // });
+    if (isCharmverseSpace) {
+      navigateToSpacePath(`/rewards/new`, { template: template.page.id });
+    } else {
+      openNewPage({
+        ...template.page,
+        content: template.page.content as PageContent,
+        title: undefined,
+        type: 'bounty',
+        templateId: template.page.id
+      });
+      setRewardValues({
+        rewardType: getRewardType(template.reward),
+        ...template.reward
+      });
+    }
   }
 
   function createTemplate() {
-    navigateToSpacePath('/rewards/new', { type: 'reward_template' });
+    if (isCharmverseSpace) {
+      navigateToSpacePath('/rewards/new', { type: 'reward_template' });
+    } else {
+      openNewPage({
+        type: 'bounty_template'
+      });
+    }
   }
 
   function editTemplate(templateId: string) {
@@ -124,7 +140,12 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   return (
     <>
       <ButtonGroup variant='contained' ref={buttonRef}>
-        <Button disabled={isDisabled} data-test='create-suggest-bounty' href='/rewards/new'>
+        <Button
+          disabled={isDisabled}
+          data-test='create-suggest-bounty'
+          href={isCharmverseSpace ? '/rewards/new' : undefined}
+          onClick={isCharmverseSpace ? undefined : createNewReward}
+        >
           Create
         </Button>
         <Button disabled={isDisabled} data-test='reward-template-select' size='small' onClick={popupState.open}>

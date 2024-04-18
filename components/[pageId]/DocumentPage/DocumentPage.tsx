@@ -33,6 +33,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -103,6 +104,7 @@ function DocumentPageComponent({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
+  const isCharmverseSpace = useIsCharmverseSpace();
 
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
@@ -423,6 +425,7 @@ function DocumentPageComponent({
                       pagePath={page.path}
                       readOnly={readOnly}
                       showApplications
+                      expandedRewardProperties={!isCharmverseSpace}
                       templateId={page.sourceTemplateId || undefined}
                       isTemplate={page.type === 'bounty_template'}
                     />
