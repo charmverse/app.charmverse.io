@@ -163,7 +163,7 @@ export function NewRewardPage({
   const saveForm = async () => {
     setSubmittedDraft(true);
     const createdReward = await createReward({
-      content: pageData.contentText,
+      content: pageData.content,
       contentText: pageData.contentText,
       title: pageData.title,
       type: rewardPageType,
