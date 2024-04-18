@@ -42,7 +42,7 @@ type RewardEvaluation = {
 };
 
 export type RewardWorkflow = {
-  id: string;
+  id: 'direct_submission' | 'application_required' | 'assigned';
   title: string;
   evaluations: RewardEvaluation[];
 };

@@ -3,7 +3,7 @@ import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
 export type RewardEvaluationsProps = {
-  reward?: RewardWithUsers;
+  reward?: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>>;
   templateId?: string | null;
   expanded?: boolean;
 };

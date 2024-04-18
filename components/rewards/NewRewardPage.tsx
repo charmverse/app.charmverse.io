@@ -5,12 +5,16 @@ import { Box, Divider, useMediaQuery } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
+import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import { DocumentColumn, DocumentColumnLayout } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
 import { PageTitleInput } from 'components/[pageId]/DocumentPage/components/PageTitleInput';
+import { RewardSidebar } from 'components/[pageId]/DocumentPage/components/Sidebar/RewardSidebar';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
 import { defaultPageTop } from 'components/[pageId]/DocumentPage/DocumentPage';
+import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
@@ -20,11 +24,16 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import { getRewardType } from 'lib/rewards/getRewardType';
+import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
+import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 import { fontClassName } from 'theme/fonts';
 
 import { CustomPropertiesAdapter } from './components/RewardProperties/CustomPropertiesAdapter';
@@ -43,13 +52,17 @@ export function NewRewardPage({
 }) {
   const spacePermissions = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
+  const { space: currentSpace } = useCurrentSpace();
+  const { activeView: sidebarView, setActiveView } = usePageSidebar();
   const { templates: rewardTemplates } = useRewardTemplates();
   const [selectedRewardTemplateId, setSelectedRewardTemplateId] = useState<null | string>();
   const [rewardTemplateId, setRewardTemplateId] = useState<null | string>();
-  const [pageTitle, setPageTitle] = usePageTitle();
-  const rewardPageType = isTemplate ? 'bounty_template' : 'bounty';
+  const [, setPageTitle] = usePageTitle();
+  const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetRewardWorkflows(currentSpace?.id);
+
   const { contentUpdated, createReward, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const sourceTemplate = rewardTemplates?.find((template) => template.page.id === templateIdFromUrl);
+
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
   const containerWidthRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
@@ -65,6 +78,8 @@ export function NewRewardPage({
   });
   const canCreateReward = !spacePermissions || !!spacePermissions[0]?.createBounty;
 
+  const rewardPageType = isTemplate ? 'bounty_template' : 'bounty';
+
   let disabledTooltip = '';
 
   if (!canCreateReward) {
@@ -79,7 +94,6 @@ export function NewRewardPage({
 
   function focusDocumentEditor() {
     const focusEvent = new CustomEvent(focusEventName);
-    // TODO: use a ref passed down instead
     document.querySelector(`.bangle-editor-core`)?.dispatchEvent(focusEvent);
   }
 
@@ -91,11 +105,94 @@ export function NewRewardPage({
     });
   }
 
-  useEffect(() => {
-    if (templateIdFromUrl) {
-      setRewardTemplateId(templateIdFromUrl);
+  function applyTemplate(template: RewardTemplate) {
+    setPageData({
+      content: template.page.content as PageContent,
+      contentText: template.page.contentText,
+      title: template.page.title
+    });
+    setRewardValues({
+      assignedSubmitters: template.reward.assignedSubmitters,
+      allowedSubmitterRoles: template.reward.allowedSubmitterRoles,
+      allowMultipleApplications: template.reward.allowMultipleApplications,
+      approveSubmitters: template.reward.approveSubmitters,
+      chainId: template.reward.chainId,
+      customReward: template.reward.customReward,
+      dueDate: template.reward.dueDate,
+      maxSubmissions: template.reward.maxSubmissions,
+      reviewers: template.reward.reviewers,
+      rewardAmount: template.reward.rewardAmount,
+      rewardToken: template.reward.rewardToken,
+      rewardType: getRewardType(template.reward),
+      selectedCredentialTemplates: template.reward.selectedCredentialTemplates,
+      fields: template.reward.fields
+    });
+    setRewardTemplateId(template.page.id);
+    const workflow = getRewardWorkflow(workflowOptions ?? [], template.reward);
+    if (workflow) {
+      applyWorkflow(workflow);
     }
-  }, [templateIdFromUrl]);
+  }
+
+  function applyWorkflow(workflow: RewardWorkflow) {
+    if (workflow.id === 'application_required') {
+      setRewardValues({
+        approveSubmitters: true,
+        assignedSubmitters: null
+      });
+    } else if (workflow.id === 'direct_submission') {
+      setRewardValues({
+        approveSubmitters: false,
+        assignedSubmitters: null
+      });
+    } else if (workflow.id === 'assigned') {
+      setRewardValues({
+        approveSubmitters: false,
+        allowMultipleApplications: false
+      });
+    }
+  }
+
+  const saveForm = async () => {
+    setSubmittedDraft(true);
+    const createdReward = await createReward({
+      content: pageData.contentText,
+      contentText: pageData.contentText,
+      title: pageData.title,
+      type: rewardPageType,
+      sourceTemplateId: sourceTemplate?.page.id
+    });
+
+    if (createdReward) {
+      navigateToSpacePath(`/${createdReward.id}`);
+    }
+  };
+
+  const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>('reward_evaluation');
+  const internalSidebarView = defaultSidebarView || sidebarView;
+
+  useEffect(() => {
+    // clear out page title on load
+    setPageTitle('');
+    setActiveView('reward_evaluation');
+    setDefaultView(null);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoadingWorkflows) {
+      if (templateIdFromUrl) {
+        setRewardTemplateId(templateIdFromUrl);
+      } else if (workflowOptions?.length) {
+        applyWorkflow(workflowOptions[0]);
+      }
+    }
+  }, [templateIdFromUrl, isLoadingWorkflows]);
+
+  useEffect(() => {
+    if (sourceTemplate) {
+      applyTemplate(sourceTemplate);
+    }
+  }, [sourceTemplate]);
 
   return (
     <Box display='flex' flexGrow={1} minHeight={0} /** add minHeight so that flexGrow expands to correct heigh */>
@@ -192,15 +289,7 @@ export function NewRewardPage({
                 data-test='publish-new-reward-button'
                 disabled={Boolean(disabledTooltip) || isSavingReward}
                 disabledTooltip={disabledTooltip}
-                onClick={() =>
-                  createReward({
-                    content: pageData.contentText,
-                    contentText: pageData.contentText,
-                    title: pageData.title,
-                    type: rewardPageType,
-                    sourceTemplateId: sourceTemplate?.page.id
-                  })
-                }
+                onClick={saveForm}
                 loading={isSavingReward && !submittedDraft}
               >
                 Publish
@@ -208,6 +297,16 @@ export function NewRewardPage({
             </StickyFooterContainer>
           </Box>
         </DocumentColumn>
+        <RewardSidebar
+          sidebarProps={{
+            isOpen: internalSidebarView === 'reward_evaluation',
+            closeSidebar: () => setActiveView(null),
+            openSidebar: () => setActiveView('reward_evaluation')
+          }}
+          expanded
+          reward={rewardValues}
+          templateId={rewardTemplateId}
+        />
         <ConfirmDeleteModal
           onClose={() => {
             setSelectedRewardTemplateId(null);

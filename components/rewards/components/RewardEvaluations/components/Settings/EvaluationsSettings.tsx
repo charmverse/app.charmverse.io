@@ -5,26 +5,15 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 export type Props = {
-  reward?: RewardWithUsers;
+  reward?: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>>;
   templateId?: string | null;
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
 };
-
-function getRewardWorkflowId(reward: RewardWithUsers | undefined) {
-  if (!reward) {
-    return null;
-  }
-
-  if (reward.assignedSubmitters === null) {
-    return reward.approveSubmitters ? 'application_required' : 'direct_submission';
-  }
-
-  return 'assigned';
-}
 
 export function EvaluationsSettings({
   reward,
@@ -35,13 +24,13 @@ export function EvaluationsSettings({
   const isAdmin = useIsAdmin();
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflowId = getRewardWorkflowId(reward);
+  const workflow = getRewardWorkflow(workflowOptions, reward);
   return (
     <LoadingComponent isLoading={!reward} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
         <WorkflowSelect
           options={workflowOptions}
-          value={workflowId}
+          value={workflow?.id}
           readOnly={!!templateId && !isAdmin}
           required
           disableAddNew

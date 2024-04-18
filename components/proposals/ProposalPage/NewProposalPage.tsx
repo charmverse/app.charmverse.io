@@ -33,7 +33,6 @@ import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEdi
 import { getInitialFormFieldValue } from 'components/common/form/hooks/useFormFields';
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
-import { WorkflowSidebar } from 'components/common/workflows/WorkflowSidebar';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useCharmRouter } from 'hooks/useCharmRouter';
