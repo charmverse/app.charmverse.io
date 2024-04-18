@@ -5,8 +5,10 @@ import { useState } from 'react';
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { TokenBadge } from 'components/common/TokenBadge';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
@@ -23,7 +25,7 @@ export type Props = Omit<
   EvaluationSettingsProps,
   'onChangeWorkflow' | 'requireWorkflowChangeConfirmation' | 'rewardInput'
 > & {
-  reward?: RewardWithUsers;
+  reward: RewardWithUsers;
 };
 
 export function EvaluationsReview({ reward, onChangeReward, expanded: expandedContainer, readOnly }: Props) {
@@ -98,6 +100,14 @@ export function EvaluationsReview({ reward, onChangeReward, expanded: expandedCo
                   readOnly={true}
                   value={reward?.reviewers ?? []}
                   onChange={() => {}}
+                />
+              </Box>
+            ) : evaluation.type === 'payment' ? (
+              <Box mb={2}>
+                <TokenBadge
+                  tokenAmount={reward.rewardAmount}
+                  chainId={reward.chainId}
+                  tokenAddress={reward.rewardToken}
                 />
               </Box>
             ) : null}

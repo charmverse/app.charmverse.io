@@ -29,9 +29,11 @@ export function RewardEvaluations({
         onChangeReward={onChangeReward}
       />
     );
-  } else {
+  } else if (reward) {
     return (
       <EvaluationsReview expanded={expanded} readOnly={readOnly} reward={reward} onChangeReward={onChangeReward} />
     );
   }
+
+  return null;
 }
