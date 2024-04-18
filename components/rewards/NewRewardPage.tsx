@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
@@ -30,6 +30,7 @@ import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
@@ -59,10 +60,8 @@ export function NewRewardPage({
   const [rewardTemplateId, setRewardTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetRewardWorkflows(currentSpace?.id);
-
   const { contentUpdated, createReward, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const sourceTemplate = rewardTemplates?.find((template) => template.page.id === rewardTemplateId);
-
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
   const containerWidthRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
@@ -80,11 +79,18 @@ export function NewRewardPage({
 
   const rewardPageType = isTemplate ? 'bounty_template' : 'bounty';
 
-  let disabledTooltip = '';
+  const disabledTooltip = useMemo(() => {
+    const errors = getRewardErrors({
+      page: { title: pageData.title, type: rewardPageType },
+      reward: rewardValues,
+      rewardType: rewardValues.rewardType
+    });
+    if (!canCreateReward) {
+      errors.push('You do not have permission to create reward');
+    }
 
-  if (!canCreateReward) {
-    disabledTooltip = 'You do not have permission to create reward';
-  }
+    return errors.join('\n');
+  }, [rewardValues, canCreateReward, rewardPageType, pageData.title]);
 
   usePreventReload(contentUpdated);
   const templatePageOptions = (rewardTemplates || []).map((template) => ({
