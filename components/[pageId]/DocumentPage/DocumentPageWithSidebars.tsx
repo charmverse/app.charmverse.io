@@ -1,9 +1,8 @@
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
+import { useGetReward } from 'charmClient/hooks/rewards';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
-import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -39,10 +38,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     proposalId
   });
 
-  const { getRewardById } = useRewards();
-  const { getRewardPage } = useRewardPage();
-  const reward = rewardId ? getRewardById(rewardId) : null;
-  const rewardPage = rewardId ? getRewardPage(rewardId) : null;
+  const { data: reward } = useGetReward({ rewardId });
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
@@ -147,7 +143,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeRewardSettings={onChangeRewardSettings}
         />
       )}
-      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && rewardPage && (
+      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && (
         <RewardSidebar
           sidebarProps={{
             isOpen: internalSidebarView === 'reward_evaluation',
@@ -155,7 +151,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             closeSidebar
           }}
           reward={reward}
-          templateId={rewardPage?.sourceTemplateId}
+          readOnly={props.readOnly}
         />
       )}
     </DocumentColumnLayout>

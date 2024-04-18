@@ -305,7 +305,6 @@ export function NewRewardPage({
           }}
           expanded
           reward={rewardValues}
-          templateId={rewardTemplateId}
         />
         <ConfirmDeleteModal
           onClose={() => {

@@ -4,16 +4,16 @@ import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
 export type RewardEvaluationsProps = {
   reward?: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>>;
-  templateId?: string | null;
+  readOnly?: boolean;
   expanded?: boolean;
 };
 
-export function RewardEvaluations({ reward, templateId, expanded = true }: RewardEvaluationsProps) {
+export function RewardEvaluations({ reward, readOnly, expanded = true }: RewardEvaluationsProps) {
   const isNotNewReward = !!reward;
   return (
     <EvaluationsSettings
       reward={reward}
-      templateId={templateId}
+      readOnly={readOnly}
       requireWorkflowChangeConfirmation={isNotNewReward}
       expanded={expanded}
     />

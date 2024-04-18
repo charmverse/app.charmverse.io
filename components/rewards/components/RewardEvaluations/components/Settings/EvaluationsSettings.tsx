@@ -10,14 +10,14 @@ import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 export type Props = {
   reward?: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>>;
-  templateId?: string | null;
+  readOnly?: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
 };
 
 export function EvaluationsSettings({
   reward,
-  templateId,
+  readOnly,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer
 }: Props) {
@@ -31,7 +31,7 @@ export function EvaluationsSettings({
         <WorkflowSelect
           options={workflowOptions}
           value={workflow?.id}
-          readOnly={!!templateId && !isAdmin}
+          readOnly={readOnly}
           required
           disableAddNew
           requireConfirmation={requireWorkflowChangeConfirmation}
