@@ -60,16 +60,9 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   const { blocks } = await getRelatedBlocks(blockId);
   const block = blocks.find((b) => b.id === blockId);
 
-  const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
-    pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
-    userId: req.session.user?.id
-  });
-
   // Hydrate and filter blocks based on proposal permissions
   if (block && (block.fields as BoardFields).sourceType === 'proposals') {
-    let result = await getBlocksAndRefresh(block, blocks).then((_blocks) =>
-      _blocks.filter((b) => !b.pageId || !!permissionsById[b.pageId]?.read)
-    );
+    let result = await getBlocksAndRefresh(block, blocks);
 
     // Only edit
     if (page.isLocked && block?.type === 'board' && !computed.edit_lock && block) {
@@ -86,7 +79,10 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
 
     return res.status(200).json(result);
   } else {
-    // const filteredBlocks = CardFilter.applyFilterGroup({})
+    const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
+      pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
+      userId: req.session.user?.id
+    });
 
     // Rememeber to allow normal blocks that do not have a page, like views, to be shown
     let filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
