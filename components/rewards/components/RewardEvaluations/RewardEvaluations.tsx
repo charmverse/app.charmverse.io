@@ -3,7 +3,13 @@ import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
 export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkflowChangeConfirmation' | 'expanded'>;
 
-export function RewardEvaluations({ reward, readOnly, expanded = true, onChangeEvaluation }: EvaluationSettingsProps) {
+export function RewardEvaluations({
+  reward,
+  readOnly,
+  expanded = true,
+  onChangeEvaluation,
+  onChangeWorkflow
+}: EvaluationSettingsProps) {
   const isNotNewReward = !!reward;
   return (
     <EvaluationsSettings
@@ -11,6 +17,7 @@ export function RewardEvaluations({ reward, readOnly, expanded = true, onChangeE
       readOnly={readOnly}
       requireWorkflowChangeConfirmation={isNotNewReward}
       expanded={expanded}
+      onChangeWorkflow={onChangeWorkflow}
       onChangeEvaluation={onChangeEvaluation}
     />
   );

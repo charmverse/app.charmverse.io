@@ -148,7 +148,8 @@ export function NewRewardPage({
     } else if (workflow.id === 'assigned') {
       setRewardValues({
         approveSubmitters: false,
-        allowMultipleApplications: false
+        allowMultipleApplications: false,
+        assignedSubmitters: []
       });
     }
   }
@@ -298,6 +299,7 @@ export function NewRewardPage({
           </Box>
         </DocumentColumn>
         <RewardSidebar
+          onChangeWorkflow={applyWorkflow}
           sidebarProps={{
             isOpen: internalSidebarView === 'reward_evaluation',
             closeSidebar: () => setActiveView(null),

@@ -8,6 +8,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { RewardInput } from 'lib/rewards/getRewardWorkflow';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
@@ -17,6 +18,7 @@ export type EvaluationSettingsProps = {
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
   onChangeEvaluation: (evaluationId: string, updatedEvaluation: UpdateableRewardFields) => void;
+  onChangeWorkflow: (workflow: RewardWorkflow) => void;
 };
 
 export function EvaluationsSettings({
@@ -24,7 +26,8 @@ export function EvaluationsSettings({
   readOnly,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
-  onChangeEvaluation
+  onChangeEvaluation,
+  onChangeWorkflow
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
@@ -38,6 +41,7 @@ export function EvaluationsSettings({
           readOnly={readOnly}
           required
           disableAddNew
+          onChange={onChangeWorkflow}
           requireConfirmation={requireWorkflowChangeConfirmation}
         />
       </Collapse>
@@ -52,14 +56,17 @@ export function EvaluationsSettings({
               title={evaluation.title}
               index={index + 1}
             >
-              <EvaluationStepSettings
-                evaluation={evaluation}
-                readOnly={readOnly}
-                onChange={(updated) => {
-                  onChangeEvaluation?.(evaluation.id, updated);
-                }}
-                reward={reward}
-              />
+              {/** For apply evaluation use null to disable showing the AccordionDetails */}
+              {evaluation.type === 'apply' ? null : (
+                <EvaluationStepSettings
+                  evaluation={evaluation}
+                  readOnly={readOnly}
+                  onChange={(updated) => {
+                    onChangeEvaluation?.(evaluation.id, updated);
+                  }}
+                  reward={reward}
+                />
+              )}
             </EvaluationStepRow>
           );
         })}
