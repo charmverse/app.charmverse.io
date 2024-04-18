@@ -1,8 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser } from '@charmverse/core/test';
+import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
+import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { generateBoard } from 'testing/setupDatabase';
+import { generateProposalSourceDb } from 'testing/utils/proposals';
 
 import type { IPropertyOption, IPropertyTemplate } from '../board';
 import type { BoardViewFields } from '../boardView';
@@ -11,7 +13,7 @@ import { loadAndGenerateCsv } from '../generateCsv';
 
 describe('loadAndGenerateCsv()', () => {
   it('should throw an error if databaseId is not provided', async () => {
-    await expect(loadAndGenerateCsv({ userId: 'test-user' })).rejects.toThrow('databaseId is required');
+    await expect(loadAndGenerateCsv({ userId: 'test-user', databaseId: '' })).rejects.toThrow('databaseId is required');
   });
 
   it('should return a csv string and childPageIds without hidden columns when generating csv for a database', async () => {
@@ -114,5 +116,40 @@ describe('loadAndGenerateCsv()', () => {
       '"Card 2","Card 2 Text","Red"',
       '"Card 3","Card 3 Text",""'
     ]);
+  });
+
+  it('Should return proposal properties', async () => {
+    const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
+      isAdmin: true
+    });
+    // set up proposal-as-a-source db
+
+    const proposalsDatabase = await generateProposalSourceDb({
+      createdBy: admin.id,
+      spaceId: space.id
+    });
+
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: admin.id,
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          title: 'Feedback',
+          permissions: [],
+          reviewers: []
+        }
+      ]
+    });
+
+    // generate cards
+    await createMissingCards({ boardId: proposalsDatabase.id });
+
+    const { csvData } = await loadAndGenerateCsv({ databaseId: proposalsDatabase.id, userId: admin.id });
+    const firstRow = csvData.trim().split('\n')[1];
+    expect(firstRow).toContain(visibleProposal.page.title);
+    expect(firstRow).toContain('In Progress');
+    expect(firstRow).toContain('Feedback');
   });
 });

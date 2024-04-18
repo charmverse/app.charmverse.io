@@ -22,6 +22,27 @@ export class FormField extends DocumentPage {
     return this.formFieldNameInput.getByPlaceholder('Title (required)').nth(index);
   }
 
+  async fillProjectField({
+    content,
+    fieldName,
+    textArea = false
+  }: {
+    textArea?: boolean;
+    fieldName: string;
+    content: string;
+  }) {
+    const pendingApiCall = this.page.waitForResponse((response) => {
+      return response.request().method() === 'PUT' && /\/api\/projects/.test(response.url());
+    });
+    const result = await this.page
+      .locator(`data-test=project-field-${fieldName} >> ${textArea ? 'textarea' : 'input'}`)
+      .first()
+      .fill(content);
+
+    await pendingApiCall;
+    return result;
+  }
+
   getFormFieldInput(fieldId: string, fieldType: FormFieldType) {
     const baseLocator = this.page.locator(`data-test=form-field-input-${fieldId}`);
 

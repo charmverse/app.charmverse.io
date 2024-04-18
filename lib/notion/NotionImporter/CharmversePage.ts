@@ -9,7 +9,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { convertToPlainText } from '../convertToPlainText';
 import { createPrismaPage } from '../createPrismaPage';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlocksRecord } from '../types';
+import type { BlocksRecord } from '../interfaces';
 
 import { NotionBlock } from './NotionBlock';
 import type { DatabasePageItem, NotionCache, RegularPageItem } from './NotionCache';
@@ -50,10 +50,6 @@ export class CharmversePage {
   }
 
   async create() {
-    const pageContent: PageContent = {
-      type: 'doc',
-      content: []
-    };
     const pageRecord = this.cache.pagesRecord.get(this.notionPageId) as RegularPageItem;
     const notionPage = this.cache.notionPagesRecord[this.notionPageId] as PageObjectResponse;
     const notionParentPageId =
@@ -147,7 +143,6 @@ export class CharmversePage {
       // Optimistically create the page
       const createdCharmversePage = await createPrismaPage({
         id: this.charmversePageId,
-        content: pageContent,
         headerImage: headerImageUrl,
         spaceId: this.notionPage.spaceId,
         createdBy: this.notionPage.userId,
@@ -173,7 +168,10 @@ export class CharmversePage {
 
       const convertedBlocks = await notionBlock.convertBlocks(this.topLevelBlockIds);
 
-      pageContent.content?.push(...convertedBlocks);
+      const pageContent: PageContent = {
+        type: 'doc',
+        content: convertedBlocks
+      };
 
       await prisma.page.update({
         where: {

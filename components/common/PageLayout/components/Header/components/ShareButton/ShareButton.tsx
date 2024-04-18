@@ -6,7 +6,7 @@ import { bindTrigger, bindPopover, usePopupState } from 'material-ui-popup-state
 
 import { Button } from 'components/common/Button';
 
-import { PagePermissionsContainer } from './components/PagePermissionsContainer';
+import { ShareModal } from './components/ShareModal';
 
 type Props = {
   headerHeight: number;
@@ -57,7 +57,7 @@ export function ShareButton({ headerHeight, pageId, pageType }: Props) {
           }
         }}
       >
-        <PagePermissionsContainer pageType={pageType} pageId={pageId} />
+        <ShareModal pageType={pageType} pageId={pageId} closePopup={popupState.close} />
       </Popover>
     </>
   );
