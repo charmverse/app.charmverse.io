@@ -34,16 +34,18 @@ export function PaymentStepSettings({
         rewardAmount: null,
         chainId: null,
         rewardToken: null,
-        customReward: null
+        customReward: null,
+        rewardType: _rewardType
       });
       return;
     }
 
     onChange({
-      customReward: rewardType === 'custom' ? reward?.customReward : undefined,
-      rewardAmount: rewardType === 'token' ? reward?.rewardAmount : undefined,
-      rewardToken: rewardType === 'token' ? reward?.rewardToken : undefined,
-      chainId: rewardType === 'token' ? reward?.chainId : undefined
+      rewardType: _rewardType,
+      customReward: _rewardType === 'custom' ? reward?.customReward : undefined,
+      rewardAmount: _rewardType === 'token' ? reward?.rewardAmount : undefined,
+      rewardToken: _rewardType === 'token' ? reward?.rewardToken : undefined,
+      chainId: _rewardType === 'token' ? reward?.chainId : undefined
     });
   }
 
@@ -78,7 +80,7 @@ export function PaymentStepSettings({
               Token
             </Typography>
           </FormLabel>
-          <Box>
+          <Box width='fit-content'>
             <RewardTokenProperty
               onChange={onRewardTokenUpdate}
               currentReward={
@@ -104,29 +106,30 @@ export function PaymentStepSettings({
               Custom {getFeatureTitle('Reward')}
             </Typography>
           </FormLabel>
-
-          <StyledPropertyTextInput
-            onChange={(e) => {
-              onChange({
-                customReward: e.target.value.trim()
-              });
-            }}
-            value={reward?.customReward ?? ''}
-            required
-            size='small'
-            inputProps={{
-              style: { height: 'auto' },
-              className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
-            }}
-            sx={{
-              width: '100%'
-            }}
-            disabled={readOnly}
-            placeholder='T-shirt'
-            autoFocus
-            rows={1}
-            type='text'
-          />
+          <Box width='fit-content'>
+            <StyledPropertyTextInput
+              onChange={(e) => {
+                onChange({
+                  customReward: e.target.value.trim()
+                });
+              }}
+              value={reward?.customReward ?? ''}
+              required
+              size='small'
+              inputProps={{
+                style: { height: 'auto' },
+                className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+              }}
+              sx={{
+                width: '100%'
+              }}
+              disabled={readOnly}
+              placeholder='T-shirt'
+              autoFocus
+              rows={1}
+              type='text'
+            />
+          </Box>
         </RowStack>
       )}
     </Stack>

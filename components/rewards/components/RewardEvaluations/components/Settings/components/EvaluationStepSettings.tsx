@@ -1,6 +1,5 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
 
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { RewardInput } from 'lib/rewards/getRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
@@ -17,22 +16,15 @@ export type EvaluationStepSettingsProps = {
   rewardStatus?: BountyStatus | null;
 };
 
-export function EvaluationStepSettings({
-  evaluation,
-  rewardStatus,
-  onChange,
-  readOnly: _readOnly,
-  reward
-}: EvaluationStepSettingsProps) {
-  const isAdmin = useIsAdmin();
-  const readOnly = _readOnly || !isAdmin;
+export function EvaluationStepSettings(props: EvaluationStepSettingsProps) {
+  const evaluationType = props.evaluation.type;
 
-  if (evaluation.type === 'submit') {
-    return <SubmitStepSettings onChange={onChange} readOnly={readOnly} reward={reward} />;
-  } else if (evaluation.type === 'review') {
-    return <ReviewStepSettings onChange={onChange} readOnly={readOnly} reward={reward} />;
-  } else if (evaluation.type === 'payment') {
-    return <PaymentStepSettings onChange={onChange} rewardStatus={rewardStatus} readOnly={readOnly} reward={reward} />;
+  if (evaluationType === 'submit') {
+    return <SubmitStepSettings {...props} />;
+  } else if (evaluationType === 'review') {
+    return <ReviewStepSettings {...props} />;
+  } else if (evaluationType === 'payment') {
+    return <PaymentStepSettings {...props} />;
   }
 
   return null;
