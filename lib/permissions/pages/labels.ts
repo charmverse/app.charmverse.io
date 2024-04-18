@@ -9,7 +9,7 @@ export type ApplicablePagePermissionLevel = Extract<
 >;
 
 export const pagePermissionLevels: Record<ApplicablePagePermissionLevel, string> = {
-  full_access: 'Full Access',
+  full_access: 'Full access',
   editor: 'Editor',
   view_comment: 'View & Comment',
   view: 'View'
