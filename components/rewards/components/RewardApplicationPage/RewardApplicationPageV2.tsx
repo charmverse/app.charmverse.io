@@ -77,9 +77,9 @@ export function RewardApplicationPageV2({ applicationId, rewardId, closeDialog }
   }, []);
 
   async function updateReward(updateContent: UpdateableRewardFields) {
-    if (rewardId) {
+    if (application?.bountyId) {
       await charmClient.rewards.updateReward({
-        rewardId,
+        rewardId: application.bountyId,
         updateContent
       });
       refreshReward();
