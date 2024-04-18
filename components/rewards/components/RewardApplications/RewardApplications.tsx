@@ -7,6 +7,7 @@ import { useGetReward } from 'charmClient/hooks/rewards';
 import UserDisplay from 'components/common/UserDisplay';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { submissionStatuses } from 'lib/rewards/constants';
@@ -51,6 +52,9 @@ function ApplicationRows({
   openApplication: (applicationId: string) => void;
   applications: ApplicationMeta[];
 }) {
+  const { navigateToSpacePath } = useCharmRouter();
+  const isCharmverseSpace = useIsCharmverseSpace();
+
   const { getMemberById } = useMembers();
 
   return (
@@ -99,7 +103,16 @@ function ApplicationRows({
 
               <Grid item xs={1}>
                 <Tooltip title={`View ${isApplication ? 'application' : 'submission'} details`}>
-                  <IconButton size='small' onClick={() => openApplication(application.id)}>
+                  <IconButton
+                    size='small'
+                    onClick={() => {
+                      if (isCharmverseSpace) {
+                        navigateToSpacePath(`/rewards/applications/${application.id}`);
+                      } else {
+                        openApplication(application.id);
+                      }
+                    }}
+                  >
                     <ArrowForwardIosIcon fontSize='small' color='secondary' />
                   </IconButton>
                 </Tooltip>
