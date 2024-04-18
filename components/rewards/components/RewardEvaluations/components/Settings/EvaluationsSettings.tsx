@@ -13,16 +13,16 @@ import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type EvaluationSettingsProps = {
-  reward?: RewardInput;
+  rewardInput?: RewardInput;
   readOnly?: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
-  onChangeEvaluation: (evaluationId: string, updatedEvaluation: UpdateableRewardFields) => void;
-  onChangeWorkflow: (workflow: RewardWorkflow) => void;
+  onChangeEvaluation?: (evaluationId: string, updatedEvaluation: UpdateableRewardFields) => void;
+  onChangeWorkflow?: (workflow: RewardWorkflow) => void;
 };
 
 export function EvaluationsSettings({
-  reward,
+  rewardInput,
   readOnly,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
@@ -31,9 +31,9 @@ export function EvaluationsSettings({
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = getRewardWorkflow(workflowOptions, reward);
+  const workflow = getRewardWorkflow(workflowOptions, rewardInput);
   return (
-    <LoadingComponent isLoading={!reward} data-test='evaluation-settings-sidebar'>
+    <LoadingComponent isLoading={!rewardInput} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
         <WorkflowSelect
           options={workflowOptions}
@@ -64,7 +64,7 @@ export function EvaluationsSettings({
                   onChange={(updated) => {
                     onChangeEvaluation?.(evaluation.id, updated);
                   }}
-                  reward={reward}
+                  rewardInput={rewardInput}
                 />
               )}
             </EvaluationStepRow>

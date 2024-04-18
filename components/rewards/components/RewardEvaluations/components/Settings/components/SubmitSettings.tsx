@@ -20,11 +20,11 @@ const RowStack = styled(Stack)`
 `;
 
 export function SubmitStepSettings({
-  reward,
+  rewardInput,
   readOnly,
   onChange
 }: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
-  const isAssignedReward = !!reward?.assignedSubmitters;
+  const isAssignedReward = !!rewardInput?.assignedSubmitters;
 
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
     onChange({
@@ -46,7 +46,7 @@ export function SubmitStepSettings({
           <DateTimePicker
             variant='card_property'
             minDate={DateTime.fromMillis(Date.now())}
-            value={reward?.dueDate ? DateTime.fromISO(reward.dueDate.toString()) : null}
+            value={rewardInput?.dueDate ? DateTime.fromISO(rewardInput.dueDate.toString()) : null}
             disabled={readOnly}
             disablePast
             placeholder='Select due date'
@@ -73,7 +73,7 @@ export function SubmitStepSettings({
             </FormLabel>
             <Box width='fit-content'>
               <Checkbox
-                isOn={Boolean(reward?.allowMultipleApplications)}
+                isOn={Boolean(rewardInput?.allowMultipleApplications)}
                 onChanged={(isOn) => {
                   onChange({
                     allowMultipleApplications: !!isOn
@@ -94,7 +94,7 @@ export function SubmitStepSettings({
               <UserAndRoleSelect
                 type='role'
                 readOnly={readOnly}
-                value={(reward?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
+                value={(rewardInput?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
                 onChange={(options) => {
                   const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
 
@@ -120,7 +120,7 @@ export function SubmitStepSettings({
                   });
                 }}
                 required
-                defaultValue={reward?.maxSubmissions}
+                defaultValue={rewardInput?.maxSubmissions}
                 type='number'
                 size='small'
                 inputProps={{
@@ -147,12 +147,14 @@ export function SubmitStepSettings({
           </FormLabel>
           <Box width='fit-content'>
             <UserSelect
-              memberIds={reward.assignedSubmitters ?? []}
+              memberIds={rewardInput.assignedSubmitters ?? []}
               readOnly={readOnly}
               onChange={updateAssignedSubmitters}
               wrapColumn
               showEmptyPlaceholder
-              error={!reward.assignedSubmitters?.length && !readOnly ? 'Requires at least one assignee' : undefined}
+              error={
+                !rewardInput.assignedSubmitters?.length && !readOnly ? 'Requires at least one assignee' : undefined
+              }
             />
           </Box>
         </RowStack>

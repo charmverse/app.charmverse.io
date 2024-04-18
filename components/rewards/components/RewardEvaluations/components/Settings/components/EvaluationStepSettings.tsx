@@ -12,7 +12,7 @@ export type EvaluationStepSettingsProps = {
   evaluation: RewardEvaluation;
   onChange: (updatedReward: UpdateableRewardFields) => void;
   readOnly?: boolean;
-  reward?: RewardInput;
+  rewardInput?: RewardInput;
   rewardStatus?: BountyStatus | null;
 };
 

@@ -19,12 +19,12 @@ const RowStack = styled(Stack)`
 `;
 
 export function PaymentStepSettings({
-  reward,
+  rewardInput,
   readOnly,
   onChange,
   rewardStatus
 }: Omit<EvaluationStepSettingsProps, 'evaluation'>) {
-  const rewardType = reward ? reward?.rewardType ?? getRewardType(reward) : 'token';
+  const rewardType = rewardInput ? rewardInput?.rewardType ?? getRewardType(rewardInput) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
 
@@ -42,10 +42,10 @@ export function PaymentStepSettings({
 
     onChange({
       rewardType: _rewardType,
-      customReward: _rewardType === 'custom' ? reward?.customReward : undefined,
-      rewardAmount: _rewardType === 'token' ? reward?.rewardAmount : undefined,
-      rewardToken: _rewardType === 'token' ? reward?.rewardToken : undefined,
-      chainId: _rewardType === 'token' ? reward?.chainId : undefined
+      customReward: _rewardType === 'custom' ? rewardInput?.customReward : undefined,
+      rewardAmount: _rewardType === 'token' ? rewardInput?.rewardAmount : undefined,
+      rewardToken: _rewardType === 'token' ? rewardInput?.rewardToken : undefined,
+      chainId: _rewardType === 'token' ? rewardInput?.chainId : undefined
     });
   }
 
@@ -84,12 +84,12 @@ export function PaymentStepSettings({
             <RewardTokenProperty
               onChange={onRewardTokenUpdate}
               currentReward={
-                reward
+                rewardInput
                   ? {
-                      chainId: reward.chainId ?? null,
-                      customReward: reward.customReward ?? null,
-                      rewardAmount: reward.rewardAmount ?? null,
-                      rewardToken: reward.rewardToken ?? null
+                      chainId: rewardInput.chainId ?? null,
+                      customReward: rewardInput.customReward ?? null,
+                      rewardAmount: rewardInput.rewardAmount ?? null,
+                      rewardToken: rewardInput.rewardToken ?? null
                     }
                   : null
               }
@@ -113,7 +113,7 @@ export function PaymentStepSettings({
                   customReward: e.target.value.trim()
                 });
               }}
-              value={reward?.customReward ?? ''}
+              value={rewardInput?.customReward ?? ''}
               required
               size='small'
               inputProps={{

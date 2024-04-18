@@ -1,12 +1,14 @@
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 
 import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
@@ -38,7 +40,17 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     proposalId
   });
 
-  const { data: reward } = useGetReward({ rewardId });
+  const { data: reward, mutate: refreshReward } = useGetReward({ rewardId });
+
+  async function updateReward(updateContent: UpdateableRewardFields) {
+    if (rewardId) {
+      await charmClient.rewards.updateReward({
+        rewardId,
+        updateContent
+      });
+      refreshReward();
+    }
+  }
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
@@ -150,7 +162,9 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('reward_evaluation'),
             closeSidebar
           }}
-          onChangeEvaluation={() => {}}
+          onChangeEvaluation={(_, updatedEvaluation) => {
+            updateReward(updatedEvaluation);
+          }}
           reward={reward}
           readOnly={props.readOnly}
         />

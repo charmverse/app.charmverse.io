@@ -7,7 +7,7 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
 
 export function ReviewStepSettings({
-  reward,
+  rewardInput,
   readOnly,
   onChange
 }: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
@@ -28,7 +28,7 @@ export function ReviewStepSettings({
         <UserAndRoleSelect
           data-test='reward-review-select'
           emptyPlaceholderContent='Select user or role'
-          value={(reward?.reviewers ?? []) as SelectOption[]}
+          value={(rewardInput?.reviewers ?? []) as SelectOption[]}
           readOnly={readOnly}
           variant='outlined'
           onChange={handleOnChangeReviewers}

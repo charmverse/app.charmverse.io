@@ -311,7 +311,8 @@ export function NewRewardPage({
             closeSidebar: () => setActiveView(null),
             openSidebar: () => setActiveView('reward_evaluation')
           }}
-          reward={rewardValues}
+          isUnpublishedReward
+          rewardInput={rewardValues}
           onChangeEvaluation={(_, updates) => {
             setRewardValues(updates);
           }}

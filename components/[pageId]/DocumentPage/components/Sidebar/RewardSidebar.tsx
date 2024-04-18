@@ -6,7 +6,7 @@ import { RewardEvaluations } from 'components/rewards/components/RewardEvaluatio
 
 import { SIDEBAR_VIEWS } from './constants';
 
-type Props = RewardEvaluationsProps & {
+type Props = Omit<RewardEvaluationsProps, 'expanded'> & {
   sidebarProps: SidebarProps;
 };
 
