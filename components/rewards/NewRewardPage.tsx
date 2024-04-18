@@ -313,7 +313,7 @@ export function NewRewardPage({
           }}
           isUnpublishedReward
           rewardInput={rewardValues}
-          onChangeEvaluation={(_, updates) => {
+          onChangeReward={(updates) => {
             setRewardValues(updates);
           }}
         />

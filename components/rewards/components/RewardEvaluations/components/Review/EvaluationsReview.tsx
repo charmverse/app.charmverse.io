@@ -8,13 +8,16 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
+import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 
 export type Props = Omit<
   EvaluationSettingsProps,
@@ -23,16 +26,36 @@ export type Props = Omit<
   reward?: RewardWithUsers;
 };
 
-export function EvaluationsReview({ reward, onChangeEvaluation, expanded: expandedContainer, readOnly }: Props) {
+export function EvaluationsReview({ reward, onChangeReward, expanded: expandedContainer, readOnly }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = getRewardWorkflow(workflowOptions, reward);
   const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(undefined);
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
+  const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
+  const { showMessage } = useSnackbar();
 
   function openSettings(evaluation: RewardEvaluation) {
-    // use clone deep to avoid changing deeply-nested objects like rubric criteria
     setEvaluationInput(cloneDeep(evaluation));
+  }
+
+  function closeSettings() {
+    setEvaluationInput(null);
+    setTempRewardUpdates(null);
+  }
+
+  function updateEvaluation(updates: UpdateableRewardFields) {
+    setTempRewardUpdates(updates);
+  }
+
+  async function saveEvaluation() {
+    if (!tempRewardUpdates) return;
+    try {
+      await onChangeReward?.(tempRewardUpdates);
+      closeSettings();
+    } catch (error) {
+      showMessage((error as Error).message ?? 'Something went wrong', 'error');
+    }
   }
 
   const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
@@ -81,6 +104,18 @@ export function EvaluationsReview({ reward, onChangeEvaluation, expanded: expand
           </EvaluationStepRow>
         );
       })}
+      {evaluationInput && reward && (
+        <EvaluationStepSettingsModal
+          close={closeSettings}
+          evaluationInput={evaluationInput}
+          saveEvaluation={saveEvaluation}
+          updateEvaluation={updateEvaluation}
+          reward={{
+            ...reward,
+            ...tempRewardUpdates
+          }}
+        />
+      )}
     </LoadingComponent>
   );
 }

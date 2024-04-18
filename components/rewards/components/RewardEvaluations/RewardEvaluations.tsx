@@ -13,7 +13,7 @@ export function RewardEvaluations({
   rewardInput,
   readOnly,
   expanded = true,
-  onChangeEvaluation,
+  onChangeReward,
   onChangeWorkflow,
   isUnpublishedReward,
   reward
@@ -26,17 +26,12 @@ export function RewardEvaluations({
         requireWorkflowChangeConfirmation
         expanded={expanded}
         onChangeWorkflow={onChangeWorkflow}
-        onChangeEvaluation={onChangeEvaluation}
+        onChangeReward={onChangeReward}
       />
     );
   } else {
     return (
-      <EvaluationsReview
-        expanded={expanded}
-        readOnly={readOnly}
-        reward={reward}
-        onChangeEvaluation={onChangeEvaluation}
-      />
+      <EvaluationsReview expanded={expanded} readOnly={readOnly} reward={reward} onChangeReward={onChangeReward} />
     );
   }
 }

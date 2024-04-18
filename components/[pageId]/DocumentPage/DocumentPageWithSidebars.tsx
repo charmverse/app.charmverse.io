@@ -162,8 +162,8 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('reward_evaluation'),
             closeSidebar
           }}
-          onChangeEvaluation={(_, updatedEvaluation) => {
-            updateReward(updatedEvaluation);
+          onChangeReward={(rewardUpdates) => {
+            updateReward(rewardUpdates);
           }}
           reward={reward}
           readOnly={props.readOnly}

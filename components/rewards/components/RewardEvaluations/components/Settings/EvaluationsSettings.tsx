@@ -17,7 +17,7 @@ export type EvaluationSettingsProps = {
   readOnly?: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
-  onChangeEvaluation?: (evaluationId: string, updatedEvaluation: UpdateableRewardFields) => void;
+  onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
   onChangeWorkflow?: (workflow: RewardWorkflow) => void;
 };
 
@@ -26,7 +26,7 @@ export function EvaluationsSettings({
   readOnly,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
-  onChangeEvaluation,
+  onChangeReward,
   onChangeWorkflow
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
@@ -62,7 +62,7 @@ export function EvaluationsSettings({
                   evaluation={evaluation}
                   readOnly={readOnly}
                   onChange={(updated) => {
-                    onChangeEvaluation?.(evaluation.id, updated);
+                    onChangeReward?.(updated);
                   }}
                   rewardInput={rewardInput}
                 />

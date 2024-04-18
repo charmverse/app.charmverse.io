@@ -1,38 +1,36 @@
 import { Box } from '@mui/material';
 
-import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { getEvaluationFormError } from 'lib/proposals/getProposalErrors';
+import { getEvaluationFormError } from 'lib/rewards/getRewardErrors';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
-import type { ProposalEvaluationValues } from '../../Settings/components/EvaluationStepSettings';
 import { EvaluationStepSettings } from '../../Settings/components/EvaluationStepSettings';
 
 export function EvaluationStepSettingsModal({
   close,
-  evaluationInput,
-  templateId,
+  reward,
   saveEvaluation,
-  updateEvaluation
+  updateEvaluation,
+  evaluationInput
 }: {
+  evaluationInput: RewardEvaluation;
   close: VoidFunction;
-  evaluationInput: ProposalEvaluationValues;
-  templateId?: string | null;
-  saveEvaluation: (evaluation: ProposalEvaluationValues) => void;
-  updateEvaluation: (evaluation: Partial<ProposalEvaluationValues>) => void;
+  reward: RewardWithUsers;
+  saveEvaluation: () => void;
+  updateEvaluation: (updates: UpdateableRewardFields) => void;
 }) {
-  const { data: proposalTemplate } = useGetProposalTemplate(templateId);
-  const evaluationInputError = evaluationInput && getEvaluationFormError(evaluationInput);
-  // find matching template step, and allow editing if there were no reviewers set
-  const matchingTemplateStep = proposalTemplate?.evaluations?.find((e) => e.title === evaluationInput.title);
+  const evaluationInputError = getEvaluationFormError(evaluationInput, reward);
   return (
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
       <Box mb={1}>
         <EvaluationStepSettings
           evaluation={evaluationInput}
-          evaluationTemplate={matchingTemplateStep}
           readOnly={false}
-          isPublishedProposal
+          rewardInput={reward}
+          rewardStatus={reward.status}
           onChange={updateEvaluation}
         />
       </Box>
@@ -40,11 +38,7 @@ export function EvaluationStepSettingsModal({
         <Button color='secondary' variant='outlined' onClick={close}>
           Cancel
         </Button>
-        <Button
-          disabled={evaluationInputError}
-          disabledTooltip={evaluationInputError}
-          onClick={() => saveEvaluation(evaluationInput)}
-        >
+        <Button disabled={evaluationInputError} disabledTooltip={evaluationInputError} onClick={() => saveEvaluation()}>
           Save
         </Button>
       </Box>
