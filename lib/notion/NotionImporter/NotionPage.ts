@@ -14,7 +14,7 @@ import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
 import { convertPropertyType } from '../convertPropertyType';
-import type { BlocksRecord, ChildBlockListResponse } from '../types';
+import type { BlocksRecord, ChildBlockListResponse } from '../interfaces';
 
 import { CharmverseDatabasePage } from './CharmverseDatabasePage';
 import { CharmversePage } from './CharmversePage';
@@ -134,7 +134,10 @@ export class NotionPage {
         this.cache.pagesWithoutIntegrationAccess.add(notionPageId);
       }
       if (notionPage) {
-        log.debug(`[notion] Failed to fetch and create notion page ${notionPage.id}`, { error: err });
+        log.warn(`[notion] Failed to fetch and create notion page ${notionPage.id}`, {
+          error: err,
+          userId: this.userId
+        });
       }
       return null;
     }
@@ -354,7 +357,7 @@ export class NotionPage {
         page_id: notionPageId
       })) as unknown as PageObjectResponse;
       this.cache.notionPagesRecord[notionPageId] = pageResponse;
-      log.debug(`[notion]: Retrieved page ${notionPageId} manually`);
+      log.debug(`[notion] Retrieved page ${notionPageId} manually`, { userId: this.userId });
     }
 
     return this.cache.notionPagesRecord[notionPageId];

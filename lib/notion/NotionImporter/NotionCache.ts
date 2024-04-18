@@ -5,7 +5,8 @@ import { RateLimit } from 'async-sema';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 
-import type { BlocksRecord, CreatePageInput, FailedImportsError } from '../types';
+import type { CreatePageInput } from '../createPrismaPage';
+import type { BlocksRecord, FailedImportsError } from '../interfaces';
 
 export type RegularPageItem = {
   charmversePage?: Page;
