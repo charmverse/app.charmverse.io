@@ -2,6 +2,8 @@ import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
+import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
+import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useMdScreen } from 'hooks/useMediaScreens';
@@ -11,6 +13,7 @@ import { isTruthy } from 'lib/utils/types';
 import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
+import { RewardSidebar } from './components/Sidebar/RewardSidebar';
 import type { DocumentPageProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
@@ -30,10 +33,16 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const isMdScreen = useMdScreen();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const rewardId = page.bountyId;
 
   const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
     proposalId
   });
+
+  const { getRewardById } = useRewards();
+  const { getRewardPage } = useRewardPage();
+  const reward = rewardId ? getRewardById(rewardId) : null;
+  const rewardPage = rewardId ? getRewardPage(rewardId) : null;
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
@@ -136,6 +145,17 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardSettings={onChangeRewardSettings}
+        />
+      )}
+      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && rewardPage && (
+        <RewardSidebar
+          sidebarProps={{
+            isOpen: internalSidebarView === 'reward_evaluation',
+            openSidebar: () => setActiveView('reward_evaluation'),
+            closeSidebar
+          }}
+          reward={reward}
+          templateId={rewardPage?.sourceTemplateId}
         />
       )}
     </DocumentColumnLayout>

@@ -1,5 +1,3 @@
-import { memo } from 'react';
-
 import type { Props as EvaluationsReviewProps } from './components/Review/EvaluationsReview';
 import { EvaluationsReview } from './components/Review/EvaluationsReview';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
@@ -72,5 +70,3 @@ export function ProposalEvaluations({
     );
   }
 }
-
-export const ProposalSidebar = memo(ProposalEvaluations);
