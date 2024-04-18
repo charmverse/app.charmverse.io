@@ -9,6 +9,7 @@ import { getBlocksAndRefresh } from 'lib/databases/proposalsSource/getBlocks';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
 // TODO: frontend should tell us which space to use
 export type ServerBlockFields = 'spaceId' | 'updatedBy' | 'createdBy';
@@ -44,12 +45,12 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   });
 
   if (computed.read !== true) {
-    return res.status(404).json({ error: 'page not found' });
+    throw new DataNotFoundError('Page not found');
   }
 
   const blockId = page.boardId || page.cardId;
   if (!blockId) {
-    return res.status(404).json({ error: 'block not found' });
+    throw new DataNotFoundError('Block not found');
   }
 
   const { blocks } = await getRelatedBlocks(blockId);
