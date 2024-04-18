@@ -2,13 +2,15 @@ import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
-import { WorkflowSelect } from '../../../WorkflowSelect';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
@@ -67,6 +69,9 @@ export function EvaluationsReview({
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
+  const { space: currentSpace } = useCurrentSpace();
+  const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
+
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -118,7 +123,7 @@ export function EvaluationsReview({
       <Collapse in={expandedContainer}>
         <Tooltip title='Workflow can only be changed in Draft step'>
           <span>
-            <WorkflowSelect value={proposal?.workflowId} readOnly />
+            <WorkflowSelect options={workflowOptions} value={proposal?.workflowId} readOnly />
           </span>
         </Tooltip>
       </Collapse>

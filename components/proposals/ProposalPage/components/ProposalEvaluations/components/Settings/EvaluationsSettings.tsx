@@ -2,14 +2,16 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Chip, Collapse, Stack, Switch } from '@mui/material';
 
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
 import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
-import { WorkflowSelect } from '../../../WorkflowSelect';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';
@@ -44,10 +46,14 @@ export function EvaluationsSettings({
   const { data: proposalTemplate } = useGetProposalTemplate(templateId);
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
+  const { space: currentSpace } = useCurrentSpace();
+  const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
+
   return (
     <LoadingComponent isLoading={!proposal} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
         <WorkflowSelect
+          options={workflowOptions}
           value={proposal?.workflowId}
           onChange={onChangeWorkflow}
           readOnly={!!templateId && !isAdmin}
