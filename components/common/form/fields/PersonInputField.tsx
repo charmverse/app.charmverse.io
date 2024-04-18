@@ -10,7 +10,7 @@ type Props = ControlFieldProps & FieldProps;
 export const PersonInputField = forwardRef<HTMLDivElement, Props>(
   ({ onChange, value, error, helperText, disabled, placeholder, ...inputProps }, ref) => {
     return (
-      <FieldWrapper {...inputProps}>
+      <FieldWrapper {...inputProps} error={!!error}>
         <InputSearchMemberMultiple
           onChange={(ids) => {
             onChange?.(ids);

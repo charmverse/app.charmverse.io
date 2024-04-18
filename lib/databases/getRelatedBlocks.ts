@@ -46,36 +46,6 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
 
   blocks.push(...relationalBlocks);
 
-  const viewsWithLinkedSource = blocks.filter((b) => b.type === 'view' && (b.fields as BoardViewFields).linkedSourceId);
-
-  if (viewsWithLinkedSource.length > 0) {
-    const sourceDatabaseIds = viewsWithLinkedSource.map((b) => (b.fields as BoardViewFields).linkedSourceId as string);
-
-    const linkedDatabaseBlocks = await prisma.block.findMany({
-      where: {
-        OR: [
-          {
-            id: {
-              in: sourceDatabaseIds
-            }
-          },
-          {
-            rootId: {
-              in: sourceDatabaseIds
-            }
-          },
-          {
-            parentId: {
-              in: sourceDatabaseIds
-            }
-          }
-        ]
-      }
-    });
-
-    blocks.push(...linkedDatabaseBlocks);
-  }
-
   const pages = await prisma.page.findMany({
     where: {
       OR: [

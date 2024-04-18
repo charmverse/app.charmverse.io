@@ -112,26 +112,26 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
 }
 
 // retrieve blocks for databases using "proposal as a source"
-async function _getProposalSourceSubtree(block: BlockWithDetails, blocks: BlockWithDetails[]) {
+async function _getProposalSourceSubtree(board: BlockWithDetails, blocks: BlockWithDetails[]) {
   // Update board and view blocks before computing proposal cards
-  const updatedBoard = await updateBoardProperties({ boardId: block.id });
+  const updatedBoard = await updateBoardProperties({ boardId: board.id });
   // use the most recent the card properties
-  block.fields = updatedBoard.fields as unknown as BoardFields;
+  board.fields = updatedBoard.fields as unknown as BoardFields;
 
   const [permissionsById, newCardBlocks, proposalCardProperties] = await Promise.all([
     // get permissions for each propsoal based on the database author
     permissionsApiClient.proposals.bulkComputeProposalPermissions({
-      spaceId: block.spaceId,
-      userId: block.createdBy
+      spaceId: board.spaceId,
+      userId: board.createdBy
     }),
     // create missing blocks for new proposals
-    createMissingCards({ boardId: block.id }),
+    createMissingCards({ boardId: board.id }),
     // get properties for proposals
-    getCardPropertiesFromProposals({ cardProperties: block.fields.cardProperties, spaceId: block.spaceId })
+    getCardPropertiesFromProposals({ cardProperties: board.fields.cardProperties, spaceId: board.spaceId })
   ]);
   // combine blocks with proposal cards and permissions
   const assembled = applyPropertiesToCards({
-    boardProperties: block.fields.cardProperties,
+    boardProperties: board.fields.cardProperties,
     blocks: blocks.concat(newCardBlocks),
     permissions: permissionsById,
     proposalCards: proposalCardProperties

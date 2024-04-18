@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { DeleteOutlined } from '@mui/icons-material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
@@ -13,7 +14,7 @@ import {
 } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
-import { FormProvider } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import type { KeyedMutator } from 'swr';
 
 import charmClient from 'charmClient';
@@ -24,12 +25,16 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import {
+  createDefaultProjectAndMembersFieldConfig,
+  createDefaultProjectAndMembersPayload
+} from 'lib/projects/constants';
+import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
+import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
 import { CreateProjectForm } from './components/CreateProjectForm';
-import { ProjectFormAnswers } from './components/ProjectForm';
-import { useProjectForm } from './hooks/useProjectForm';
+import { SettingsProjectFormAnswers } from './components/ProjectForm';
 
 function ProjectRow({
   projectWithMembers,
@@ -46,11 +51,20 @@ function ProjectRow({
 }) {
   const { user } = useUser();
   const isTeamLead = !!projectWithMembers.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
-  const { trigger: updateProject, isMutating } = useUpdateProject(projectWithMembers.id);
-  const form = useProjectForm({
-    projectId: projectWithMembers.id,
-    fieldConfig: defaultProjectAndMembersFieldConfig
+  const { trigger: updateProjectAndMembers, isMutating } = useUpdateProject(projectWithMembers.id);
+  const form = useForm({
+    defaultValues: projectWithMembers,
+    reValidateMode: 'onChange',
+    resolver: yupResolver(
+      createProjectYupSchema({
+        fieldConfig: createDefaultProjectAndMembersFieldConfig(),
+        defaultRequired: false
+      })
+    ),
+    criteriaMode: 'all',
+    mode: 'onChange'
   });
+
   const removeProjectMemberPopupState = usePopupState({
     variant: 'popover',
     popupId: `remove-member-${projectWithMembers.id}`
@@ -82,7 +96,7 @@ function ProjectRow({
   function onUpdateProject() {
     const projectValues = form.getValues();
     if (isTeamLead) {
-      updateProject(
+      updateProjectAndMembers(
         {
           ...projectValues,
           projectMembers: projectValues.projectMembers.map((member, index) => ({
@@ -125,8 +139,7 @@ function ProjectRow({
 
       charmClient.projects
         .updateProjectMember({
-          memberId: projectMemberValue.id,
-          payload: projectMemberValue,
+          payload: projectMemberValue as UpdateProjectMemberPayload,
           projectId: projectWithMembers.id
         })
         .then((updatedProjectMember) => {
@@ -202,11 +215,7 @@ function ProjectRow({
         </AccordionSummary>
         <AccordionDetails>
           <FormProvider {...form}>
-            <ProjectFormAnswers
-              defaultRequired={false}
-              isTeamLead={isTeamLead}
-              fieldConfig={defaultProjectAndMembersFieldConfig}
-            />
+            <SettingsProjectFormAnswers isTeamLead={isTeamLead} />
           </FormProvider>
         </AccordionDetails>
       </Accordion>
@@ -248,8 +257,17 @@ function ProjectRow({
 export function ProjectsSettings() {
   useTrackPageView({ type: 'settings/my-projects' });
   const { data: projectsWithMembers, mutate } = useGetProjects();
-  const form = useProjectForm({
-    fieldConfig: defaultProjectAndMembersFieldConfig
+  const form = useForm({
+    defaultValues: createDefaultProjectAndMembersPayload(),
+    reValidateMode: 'onChange',
+    resolver: yupResolver(
+      createProjectYupSchema({
+        fieldConfig: createDefaultProjectAndMembersFieldConfig(),
+        defaultRequired: false
+      })
+    ),
+    criteriaMode: 'all',
+    mode: 'onChange'
   });
   const [openedAccordion, setOpenedAccordion] = useState<null | string>(null);
   const [isCreateProjectFormOpen, setIsCreateProjectFormOpen] = useState(false);

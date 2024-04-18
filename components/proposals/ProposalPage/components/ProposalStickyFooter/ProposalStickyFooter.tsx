@@ -14,12 +14,10 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 export function ProposalStickyFooter({
   proposal,
   page,
-  refreshProposal,
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
   page: { title: string; content?: any; sourceTemplateId: string | null; type: PageType };
-  refreshProposal: VoidFunction;
   isStructuredProposal: boolean;
 }) {
   const projectForm = useFormContext<ProjectAndMembersPayload>();
@@ -60,11 +58,7 @@ export function ProposalStickyFooter({
     <StickyFooterContainer>
       <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
         <Button
-          disabledTooltip={
-            disabledTooltip || !isProjectFormValid
-              ? 'Please fill out all required project fields before publishing'
-              : undefined
-          }
+          disabledTooltip={disabledTooltip || !isProjectFormValid ? 'Project fields are missing or invalid' : undefined}
           disabled={!!disabledTooltip || !isProjectFormValid}
           data-test='complete-draft-button'
           loading={isMutating}

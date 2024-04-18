@@ -128,6 +128,7 @@ export const SelectField = forwardRef<HTMLDivElement, Props>(
         inline={inline}
         iconLabel={iconLabel}
         inputEndAdornment={inputEndAdornment}
+        error={!!inputProps.error}
       >
         <Autocomplete
           data-test={dataTest || 'autocomplete'}
