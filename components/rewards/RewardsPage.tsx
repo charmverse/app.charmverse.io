@@ -3,7 +3,6 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { debounce } from 'lodash';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -126,14 +125,8 @@ export function RewardsPage({ title }: { title: string }) {
 
   function openPage(rewardId: string | null) {
     if (!rewardId) return;
-
     const pageId = getRewardPage(rewardId)?.id || rewardId;
-
-    if (openPageIn === 'center_peek') {
-      updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page') {
-      navigateToSpacePath(`/${pageId}`);
-    }
+    navigateToSpacePath(`/${pageId}`);
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
@@ -144,11 +137,7 @@ export function RewardsPage({ title }: { title: string }) {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
-      if (openPageIn === 'center_peek') {
-        updateURLQuery({ applicationId: id });
-      } else if (openPageIn === 'full_page') {
-        navigateToSpacePath(`/rewards/applications/${id}`);
-      }
+      navigateToSpacePath(`/rewards/applications/${id}`);
     }
   };
 
@@ -442,7 +431,7 @@ export function RewardsPage({ title }: { title: string }) {
                 view={activeView}
                 isOpen={!!showSidebar}
                 closeSidebar={() => setShowSidebar(false)}
-                hideLayoutSelectOptions={defaultRewardViews.includes(activeView?.id || '')}
+                hideLayoutOptions
                 hideSourceOptions
                 hideGroupOptions
                 groupByProperty={groupByProperty}
