@@ -86,7 +86,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    proposalId ? 'proposal_evaluation' : null
+    proposalId ? 'proposal_evaluation' : rewardId ? 'reward_evaluation' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
