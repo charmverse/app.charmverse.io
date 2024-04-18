@@ -8,7 +8,7 @@ import { StepperResultIcon } from './StepperResultIcon';
 
 type Props = {
   title: string;
-  result: Result;
+  result: Result | null;
   index: number;
   isCurrent?: boolean;
   expanded?: boolean;

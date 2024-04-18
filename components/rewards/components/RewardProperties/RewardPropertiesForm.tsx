@@ -1,5 +1,5 @@
 import { ProposalSystemRole } from '@charmverse/core/prisma';
-import { type BountyStatus } from '@charmverse/core/prisma-client';
+import type { Prisma, BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack, Tooltip } from '@mui/material';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
@@ -489,7 +489,7 @@ export function RewardPropertiesForm({
               reward={values as unknown as BoardReward}
               onChange={(properties: RewardPropertiesField) => {
                 applyUpdates({
-                  fields: { properties: properties ? { ...properties } : {} }
+                  fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
                 });
               }}
             />

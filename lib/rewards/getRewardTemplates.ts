@@ -7,11 +7,8 @@ import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-import type { RewardFields } from './blocks/interfaces';
-
 export type RewardTemplate = {
-  reward: Omit<Bounty, 'fields'> & {
-    fields: RewardFields;
+  reward: Bounty & {
     reviewers: RewardReviewer[];
     allowedSubmitterRoles: string[] | null;
   };
@@ -53,10 +50,7 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
           const { applications, ...mappedReward } = mapDbRewardToReward(reward);
 
           return {
-            reward: {
-              ...mappedReward,
-              fields: reward.fields as RewardFields
-            },
+            reward: mappedReward,
             page
           };
         })

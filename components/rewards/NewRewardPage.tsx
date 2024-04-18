@@ -1,3 +1,4 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
 import { Box, Divider, useMediaQuery } from '@mui/material';
@@ -165,7 +166,7 @@ export function NewRewardPage({
                         }}
                         onChange={(properties: RewardPropertiesField) => {
                           setRewardValues({
-                            fields: { properties: properties ? { ...properties } : {} } as RewardFields
+                            fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
                           });
                         }}
                       />
