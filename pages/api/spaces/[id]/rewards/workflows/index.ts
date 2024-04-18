@@ -39,6 +39,7 @@ export type RewardEvaluation = {
   id: string;
   title: string;
   type: 'submit' | 'review' | 'payment' | 'apply' | 'application_review';
+  result?: 'pass' | 'fail' | null;
 };
 
 export type RewardWorkflow = {

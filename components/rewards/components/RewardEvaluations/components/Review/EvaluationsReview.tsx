@@ -1,18 +1,18 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
-import { Box, Collapse, FormLabel, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Collapse, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
-import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { TokenBadge } from 'components/common/TokenBadge';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
-import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
+import { getRewardWorkflowWithApplication } from 'lib/rewards/getRewardWorkflowWithApplication';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
@@ -45,6 +45,16 @@ export function EvaluationsReview({
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
+
+  const updatedWorkflow =
+    application && workflow
+      ? getRewardWorkflowWithApplication({
+          application,
+          workflow
+        })
+      : workflow;
+
+  const currentEvaluation = updatedWorkflow ? getCurrentRewardEvaluation(updatedWorkflow) : null;
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));
@@ -80,33 +90,18 @@ export function EvaluationsReview({
           </span>
         </Tooltip>
       </Collapse>
-      {workflow?.evaluations.map((evaluation, index) => {
-        const isCurrent = false;
-        const result: ProposalEvaluationResult | null = null;
-        // if (application) {
-        //   if (application.status === "applied") {
-        //     isCurrent = workflow.id === "application_required" ? evaluation.type === "apply" : evaluation.type === "submit";
-        //   } else if (application.status === "submission_rejected") {
-        //     isCurrent = evaluation.type === "review"
-        //     result = "fail"
-        //   } else if (application.status === "cancelled") {
-        //     isCurrent = workflow.id === "application_required" ? evaluation.type === "apply" : evaluation.type === "submit";
-        //     result = "fail"
-        //   } else if (application.status === "inProgress") {
-        //     isCurrent = evaluation.type === "review" || evaluation.type === "application_review";
-        //   }
-        // }
-
+      {updatedWorkflow?.evaluations.map((evaluation, index) => {
+        const isCurrent = currentEvaluation?.id === evaluation.id;
         return (
           <EvaluationStepRow
             key={evaluation.id}
             expanded={evaluation.id === expandedEvaluationId}
             expandedContainer={expandedContainer}
-            isCurrent={isCurrent}
+            isCurrent={application ? isCurrent : false}
             onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
             index={index}
             title={evaluation.title}
-            result={result}
+            result={application ? evaluation.result ?? null : null}
             actions={
               evaluation.type === 'apply' ? null : (
                 <EvaluationStepActions canEdit={!readOnly} openSettings={() => openSettings(evaluation)} />
@@ -114,7 +109,12 @@ export function EvaluationsReview({
             }
           >
             {evaluation.type === 'application_review' || evaluation.type === 'review' ? (
-              <ReviewStepReview reviewers={reward.reviewers ?? []} rewardId={reward.id} application={application} />
+              <ReviewStepReview
+                reviewers={reward.reviewers ?? []}
+                rewardId={reward.id}
+                application={application}
+                evaluation={evaluation}
+              />
             ) : evaluation.type === 'payment' ? (
               <Box mb={2}>
                 <TokenBadge

@@ -1,7 +1,5 @@
 import type { Bounty, Page } from '@charmverse/core/prisma';
 
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
-import { isTruthy } from 'lib/utils/types';
 import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import { getRewardType } from './getRewardType';
