@@ -2,7 +2,6 @@ import type { BountyStatus } from '@charmverse/core/prisma';
 import { Divider, Stack } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
 
-import { useGetPermissions } from 'charmClient/hooks/permissions';
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardSignupButton } from 'components/rewards/components/RewardProperties/components/RewardSignupButton';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';

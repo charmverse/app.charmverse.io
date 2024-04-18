@@ -23,13 +23,13 @@ import {
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardApplicationType } from 'lib/rewards/getApplicationType';
 import { getApplicationType } from 'lib/rewards/getApplicationType';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 

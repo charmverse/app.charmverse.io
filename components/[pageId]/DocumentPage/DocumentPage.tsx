@@ -423,7 +423,6 @@ function DocumentPageComponent({
                       pagePath={page.path}
                       readOnly={readOnly}
                       showApplications
-                      expandedRewardProperties
                       templateId={page.sourceTemplateId || undefined}
                       isTemplate={page.type === 'bounty_template'}
                     />

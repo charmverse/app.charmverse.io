@@ -21,7 +21,6 @@ import { TemplateSelect } from 'components/proposals/ProposalPage/components/Tem
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import type { PageContent } from 'lib/prosemirror/interfaces';
