@@ -15,9 +15,16 @@ type Props = {
   reviewType: 'application' | 'submission';
   readOnly?: boolean;
   hasApplicationSlots: boolean;
+  usePaleColor?: boolean;
 };
 
-export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, hasApplicationSlots }: Props) {
+export function AcceptOrRejectButtons({
+  usePaleColor = false,
+  onConfirmReview,
+  reviewType,
+  readOnly,
+  hasApplicationSlots
+}: Props) {
   const [reviewDecision, setReviewDecision] = useState<ReviewDecision | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { showMessage } = useSnackbar();
@@ -44,8 +51,8 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
     <Box my={1} gap={1}>
       <Grid item display='flex' gap={1}>
         <Button
-          color='success'
-          variant='outlined'
+          color={usePaleColor ? 'successPale' : 'success'}
+          variant={usePaleColor ? 'contained' : 'outlined'}
           disabled={readOnly || !hasApplicationSlots}
           data-test='approve-reward-button'
           onClick={() => setReviewDecision('approve')}
@@ -53,8 +60,8 @@ export function AcceptOrRejectButtons({ onConfirmReview, reviewType, readOnly, h
           {approveLabel}
         </Button>
         <Button
-          color='error'
-          variant='outlined'
+          color={usePaleColor ? 'errorPale' : 'error'}
+          variant={usePaleColor ? 'contained' : 'outlined'}
           disabled={readOnly}
           data-test='reject-reward-button'
           onClick={() => setReviewDecision('reject')}

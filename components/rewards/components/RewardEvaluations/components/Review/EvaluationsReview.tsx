@@ -1,4 +1,5 @@
-import { Box, Collapse, FormLabel, Tooltip, Typography } from '@mui/material';
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import { Box, Collapse, FormLabel, Stack, Tooltip, Typography } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 
@@ -12,7 +13,7 @@ import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBad
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
@@ -20,15 +21,23 @@ import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
+import { ReviewStepReview } from './components/ReviewStepReview';
 
 export type Props = Omit<
   EvaluationSettingsProps,
   'onChangeWorkflow' | 'requireWorkflowChangeConfirmation' | 'rewardInput'
 > & {
   reward: RewardWithUsers;
+  application?: ApplicationWithTransactions;
 };
 
-export function EvaluationsReview({ reward, onChangeReward, expanded: expandedContainer, readOnly }: Props) {
+export function EvaluationsReview({
+  application,
+  reward,
+  onChangeReward,
+  expanded: expandedContainer,
+  readOnly
+}: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = getRewardWorkflow(workflowOptions, reward);
@@ -72,16 +81,32 @@ export function EvaluationsReview({ reward, onChangeReward, expanded: expandedCo
         </Tooltip>
       </Collapse>
       {workflow?.evaluations.map((evaluation, index) => {
+        const isCurrent = false;
+        const result: ProposalEvaluationResult | null = null;
+        // if (application) {
+        //   if (application.status === "applied") {
+        //     isCurrent = workflow.id === "application_required" ? evaluation.type === "apply" : evaluation.type === "submit";
+        //   } else if (application.status === "submission_rejected") {
+        //     isCurrent = evaluation.type === "review"
+        //     result = "fail"
+        //   } else if (application.status === "cancelled") {
+        //     isCurrent = workflow.id === "application_required" ? evaluation.type === "apply" : evaluation.type === "submit";
+        //     result = "fail"
+        //   } else if (application.status === "inProgress") {
+        //     isCurrent = evaluation.type === "review" || evaluation.type === "application_review";
+        //   }
+        // }
+
         return (
           <EvaluationStepRow
             key={evaluation.id}
             expanded={evaluation.id === expandedEvaluationId}
             expandedContainer={expandedContainer}
-            isCurrent={false}
+            isCurrent={isCurrent}
             onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
             index={index}
             title={evaluation.title}
-            result={null}
+            result={result}
             actions={
               evaluation.type === 'apply' ? null : (
                 <EvaluationStepActions canEdit={!readOnly} openSettings={() => openSettings(evaluation)} />
@@ -89,19 +114,7 @@ export function EvaluationsReview({ reward, onChangeReward, expanded: expandedCo
             }
           >
             {evaluation.type === 'application_review' || evaluation.type === 'review' ? (
-              <Box mb={2}>
-                <FormLabel>
-                  <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                    Reviewers
-                  </Typography>
-                </FormLabel>
-                <UserAndRoleSelect
-                  data-test='evaluation-reviewer-select'
-                  readOnly={true}
-                  value={reward?.reviewers ?? []}
-                  onChange={() => {}}
-                />
-              </Box>
+              <ReviewStepReview reviewers={reward.reviewers ?? []} rewardId={reward.id} application={application} />
             ) : evaluation.type === 'payment' ? (
               <Box mb={2}>
                 <TokenBadge
