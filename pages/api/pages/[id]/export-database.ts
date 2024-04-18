@@ -30,6 +30,10 @@ async function requestZip(req: NextApiRequest, res: NextApiResponse) {
       log.warn('Could not parse filter when exporting database', { error: err, filter: customFilter });
     }
   }
+  const computed = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: pageId,
+    userId: req.session.user?.id
+  });
 
   const csvData = await loadAndGenerateCsv({
     userId: req.session.user.id,

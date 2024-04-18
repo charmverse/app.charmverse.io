@@ -13,4 +13,6 @@ async function search() {
   console.log(acc);
 }
 
+var x = await 4;
+
 search().then(() => console.log('Done'));

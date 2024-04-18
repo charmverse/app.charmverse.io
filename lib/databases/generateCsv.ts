@@ -1,19 +1,23 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import { resolvePageTree } from '@charmverse/core/pages';
 import { prisma } from '@charmverse/core/prisma-client';
+import { sortBy } from 'lodash';
 
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
 import { OctoUtils } from 'components/common/DatabaseEditor/octoUtils';
 import { Utils } from 'components/common/DatabaseEditor/utils';
+import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
 import { baseUrl } from 'config/constants';
 import { CardFilter } from 'lib/databases/cardFilter';
 import type { FilterGroup } from 'lib/databases/filterGroup';
+import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
+import { getBlocks as getBlocksForProposalSource } from 'lib/databases/proposalsSource/getBlocks';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { formatDate, formatDateTime } from 'lib/utils/dates';
+import { isTruthy } from 'lib/utils/types';
 
-import type { Board, BoardFields, IPropertyTemplate, PropertyType } from './board';
-import type { BoardView, BoardViewFields } from './boardView';
-import type { Card, CardFields } from './card';
+import type { Board, IPropertyTemplate, PropertyType } from './board';
+import type { BoardView } from './boardView';
+import type { Card } from './card';
 import { Constants } from './constants';
 
 export async function loadAndGenerateCsv({
@@ -23,7 +27,7 @@ export async function loadAndGenerateCsv({
   viewId
 }: {
   viewId?: string;
-  databaseId?: string;
+  databaseId: string;
   userId: string;
   customFilter?: FilterGroup | null;
 }): Promise<{ csvData: string; childPageIds: string[] }> {
@@ -31,161 +35,83 @@ export async function loadAndGenerateCsv({
     throw new InvalidInputError('databaseId is required');
   }
 
-  const { targetPage, flatChildren } = await resolvePageTree({ pageId: databaseId, flattenChildren: true });
+  let { blocks } = await getRelatedBlocks(databaseId);
+  const fbBlocks = blocks.map((block) => blockToFBBlock(block));
+  const boardBlock = fbBlocks.find((b) => b.id === databaseId) as Board | undefined;
+  if (!boardBlock) {
+    throw new Error('Database block not found');
+  }
+  const viewBlocks = fbBlocks.filter((block) => block.type === 'view') as BoardView[];
+  const viewBlock =
+    viewBlocks.find((block) => (viewId ? block.id === viewId : block.fields.viewType === 'table')) || viewBlocks[0];
 
-  const pageIds = flatChildren.map((c) => c.id);
-
-  const accessibleCardIds = await permissionsApiClient.pages
-    .bulkComputePagePermissions({
-      userId,
-      pageIds
-    })
-    .then((permissions) =>
-      Object.entries(permissions)
-        .filter(([pageId, computed]) => !!computed.read)
-        .map(([pageId]) => pageId)
-    );
-
-  const space = await prisma.space.findUniqueOrThrow({
-    where: {
-      id: targetPage.spaceId
-    },
-    select: {
-      domain: true
-    }
-  });
-
-  const [boardBlocks, cardBlocks, cardPages] = await Promise.all([
-    prisma.block.findMany({
-      where: {
-        rootId: targetPage.id,
-        type: {
-          in: ['board', 'view']
-        }
-      }
-    }),
-    prisma.block.findMany({
-      where: {
-        id: {
-          in: accessibleCardIds
-        },
-        rootId: targetPage.id,
-        type: 'card'
-      },
-      orderBy: {
-        createdAt: 'asc'
-      }
-    }),
-    // Necessary as card title may not be synced to page
-    prisma.page
-      .findMany({
-        where: {
-          id: {
-            in: accessibleCardIds
-          },
-          parentId: targetPage.id,
-          type: 'card'
-        },
-        select: {
-          id: true,
-          title: true
-        }
-      })
-      .then((_cardPages) =>
-        _cardPages.reduce((acc, page) => {
-          acc[page.id] = {
-            title: page.title
-          };
-          return acc;
-        }, {} as Record<string, { title: string }>)
-      )
-  ]);
-
-  cardBlocks.forEach((block) => {
-    block.title = cardPages[block.id]?.title ?? 'Untitled';
-  });
-
-  const boardBlock = boardBlocks.find((block) => block.type === 'board');
-
-  const viewBlocks = boardBlocks.filter((block) => block.type === 'view');
-  const viewBlock: BoardView = (viewBlocks.find((block) =>
-    viewId ? block.id === viewId : (block.fields as BoardViewFields).viewType === 'table'
-  ) ||
-    viewBlocks[0] ||
-    boardBlocks[0]) as unknown as BoardView;
-
-  if (customFilter && viewBlock?.fields) {
+  // apply custom filter from user if one exists
+  if (customFilter) {
     viewBlock.fields.filter = customFilter;
   }
 
-  const spaceMembers = await prisma.user
-    .findMany({
+  if (boardBlock && boardBlock.fields.sourceType === 'proposals') {
+    // Hydrate and filter blocks based on proposal permissions
+    blocks = await getBlocksForProposalSource(boardBlock, blocks);
+  } else {
+    const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
+      pageIds: blocks.map((b) => b.pageId).filter(isTruthy),
+      userId
+    });
+    // Remmeber to allow normal blocks that do not have a page, like views, to be shown
+    blocks = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
+  }
+
+  const cardBlocks = sortBy(
+    fbBlocks.filter((block) => block.type === 'card' && block.parentId === databaseId),
+    'createdAt'
+  ) as Card[];
+
+  const [space, spaceMembers] = await Promise.all([
+    prisma.space.findUniqueOrThrow({
       where: {
-        spaceRoles: {
-          some: {
-            spaceId: targetPage.spaceId
-          }
-        }
+        id: boardBlock.spaceId
       },
       select: {
-        id: true,
-        username: true
+        domain: true
       }
-    })
-    .then((users) =>
-      users.reduce((acc, user) => {
-        acc[user.id] = {
-          username: user.username
-        };
-        return acc;
-      }, {} as Record<string, { username: string }>)
-    );
+    }),
+    prisma.user
+      .findMany({
+        where: {
+          spaceRoles: {
+            some: {
+              spaceId: boardBlock.spaceId
+            }
+          }
+        },
+        select: {
+          id: true,
+          username: true
+        }
+      })
+      .then((users) =>
+        users.reduce<Record<string, { username: string }>>((acc, user) => {
+          acc[user.id] = {
+            username: user.username
+          };
+          return acc;
+        }, {})
+      )
+  ]);
 
-  const relationProperties = (boardBlock?.fields as unknown as BoardFields).cardProperties.filter(
-    (property) => property.type === 'relation'
-  );
-
-  const cardPropertyPageIds = relationProperties
-    .map((relationProperty) => {
-      return cardBlocks.map((cardBlock) => {
-        const connectedPageIds = (cardBlock.fields as CardFields).properties[relationProperty.id] as string[];
-        return connectedPageIds || [];
-      });
-    })
-    .flat(2);
-
-  const connectedAccessiblePageIds = await permissionsApiClient.pages
-    .bulkComputePagePermissions({
-      userId,
-      pageIds: cardPropertyPageIds
-    })
-    .then((permissions) =>
-      Object.entries(permissions)
-        .filter(([pageId, computed]) => !!computed.read)
-        .map(([pageId]) => pageId)
-    );
-
-  const connectedPages = await prisma.page.findMany({
-    where: {
-      id: {
-        in: connectedAccessiblePageIds
-      }
-    },
-    select: {
-      id: true,
-      title: true
+  // geenrate card map for relation properties
+  const cardMap = blocks.reduce<Record<string, { title: string }>>((acc, block) => {
+    if (block.type === 'card') {
+      acc[block.id] = { title: block.title || '' };
     }
-  });
-
-  const cardMap = connectedPages.reduce<Record<string, { title: string }>>((acc, page) => {
-    acc[page.id] = page;
     return acc;
   }, {});
 
   const csvData = generateCSV(
-    boardBlock as any,
-    viewBlock as any,
-    cardBlocks as any,
+    boardBlock,
+    viewBlock,
+    cardBlocks,
     {
       date: formatDate,
       dateTime: formatDateTime

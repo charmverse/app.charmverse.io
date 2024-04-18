@@ -11,7 +11,7 @@ import { loadAndGenerateCsv } from '../generateCsv';
 
 describe('loadAndGenerateCsv()', () => {
   it('should throw an error if databaseId is not provided', async () => {
-    await expect(loadAndGenerateCsv({ userId: 'test-user' })).rejects.toThrow('databaseId is required');
+    await expect(loadAndGenerateCsv({ userId: 'test-user', databaseId: '' })).rejects.toThrow('databaseId is required');
   });
 
   it('should return a csv string and childPageIds without hidden columns when generating csv for a database', async () => {

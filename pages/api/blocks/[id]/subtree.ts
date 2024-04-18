@@ -5,10 +5,7 @@ import nc from 'next-connect';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { getRelatedBlocks } from 'lib/databases/getRelatedBlocks';
-import { applyPropertiesToCards } from 'lib/databases/proposalsSource/applyPropertiesToCards';
-import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
-import { getCardPropertiesFromProposals } from 'lib/databases/proposalsSource/getCardProperties';
-import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
+import { getBlocksAndRefresh } from 'lib/databases/proposalsSource/getBlocks';
 import { onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -58,9 +55,9 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   const { blocks } = await getRelatedBlocks(blockId);
   const block = blocks.find((b) => b.id === blockId);
 
-  // Hydrate and filter blocks based on proposal permissions
   if (block && (block.fields as BoardFields).sourceType === 'proposals') {
-    const result = await _getProposalSourceSubtree(block, blocks);
+    // Hydrate and filter blocks based on proposal permissions
+    const result = await getBlocksAndRefresh(block, blocks);
     return res.status(200).json(result);
   } else {
     const permissionsById = await permissionsApiClient.pages.bulkComputePagePermissions({
@@ -71,35 +68,6 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
     const filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
     return res.status(200).json(filtered);
   }
-}
-
-// retrieve blocks for databases using "proposal as a source"
-async function _getProposalSourceSubtree(board: BlockWithDetails, blocks: BlockWithDetails[]) {
-  // Update board and view blocks before computing proposal cards
-  const updatedBoard = await updateBoardProperties({ boardId: board.id });
-  // use the most recent the card properties
-  board.fields = updatedBoard.fields as unknown as BoardFields;
-
-  const [permissionsById, newCardBlocks, proposalCardProperties] = await Promise.all([
-    // get permissions for each propsoal based on the database author
-    permissionsApiClient.proposals.bulkComputeProposalPermissions({
-      spaceId: board.spaceId,
-      userId: board.createdBy
-    }),
-    // create missing blocks for new proposals
-    createMissingCards({ boardId: board.id }),
-    // get properties for proposals
-    getCardPropertiesFromProposals({ cardProperties: board.fields.cardProperties, spaceId: board.spaceId })
-  ]);
-  // combine blocks with proposal cards and permissions
-  const assembled = applyPropertiesToCards({
-    boardProperties: board.fields.cardProperties,
-    blocks: blocks.concat(newCardBlocks),
-    permissions: permissionsById,
-    proposalCards: proposalCardProperties
-  });
-  // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
-  return assembled.filter((b) => typeof b.syncWithPageId === 'undefined' || !!permissionsById[b.syncWithPageId]?.view);
 }
 
 export default withSessionRoute(handler);
