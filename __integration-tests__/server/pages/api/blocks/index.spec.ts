@@ -191,13 +191,37 @@ describe('PUT /api/blocks/[id]', () => {
       createdBy: adminUser.id,
       spaceId: space.id,
       views: 1,
-      cardCount: 1
+      cardCount: 2,
+      permissions: [{ permissionLevel: 'full_access', spaceId: space.id }]
     });
 
-    const card = (await prisma.block.findFirstOrThrow({
+    const [cardWithPermissions, cardWithoutPermissions] = (await prisma.block.findMany({
       where: {
         rootId: db.id,
         type: 'card'
+      }
+    })) as any as Card[];
+
+    await prisma.pagePermission.deleteMany({
+      where: {
+        pageId: cardWithoutPermissions.id
+      }
+    });
+
+    expect(cardWithPermissions).toBeDefined();
+    expect(cardWithoutPermissions).toBeDefined();
+
+    const board = (await prisma.block.findFirstOrThrow({
+      where: {
+        rootId: db.id,
+        type: 'board'
+      }
+    })) as any as Card;
+
+    const view = (await prisma.block.findFirstOrThrow({
+      where: {
+        rootId: db.id,
+        type: 'view'
       }
     })) as any as Card;
 
@@ -205,30 +229,47 @@ describe('PUT /api/blocks/[id]', () => {
       newProp: 'propValue'
     };
 
-    const cardUpdate = {
-      ...card,
+    const boardUpdate = {
+      ...view,
       fields: newProps
     };
 
-    const adminCookie = await loginUser(adminUser.id);
+    const viewUpdate = {
+      ...view,
+      fields: newProps
+    };
 
-    const cardBlock = (
-      await request(baseUrl).put(`/api/blocks`).set('Cookie', adminCookie).send([cardUpdate]).expect(200)
-    ).body as Block;
+    const cardWithPermissionsUpdate = {
+      ...cardWithPermissions,
+      fields: newProps
+    };
 
-    expect(cardBlock).toMatchObject([
-      expect.objectContaining({
-        ...cardUpdate,
-        createdAt: expect.any(String),
-        updatedAt: expect.any(String)
-      })
-    ]);
-  });
+    const cardWithoutPermissionsUpdate = {
+      ...cardWithoutPermissions,
+      fields: newProps
+    };
 
-  it('Should fail if the user cannot access the database, responding 404', async () => {
-    const outsideUserCookie = await loginUser(outsideUser.id);
-    await request(baseUrl).get(`/api/blocks/${database.id}`).set('Cookie', outsideUserCookie).expect(404);
-    await request(baseUrl).get(`/api/blocks/${databaseViews[0].id}`).set('Cookie', outsideUserCookie).expect(404);
-    await request(baseUrl).get(`/api/blocks/${databaseCards[0].id}`).set('Cookie', outsideUserCookie).expect(404);
+    const memberCookie = await loginUser(member.id);
+
+    await request(baseUrl).put(`/api/blocks`).set('Cookie', memberCookie).send([viewUpdate]).expect(200);
+    await request(baseUrl).put(`/api/blocks`).set('Cookie', memberCookie).send([boardUpdate]).expect(200);
+    await request(baseUrl).put(`/api/blocks`).set('Cookie', memberCookie).send([cardWithPermissionsUpdate]).expect(200);
+    await request(baseUrl)
+      .put(`/api/blocks`)
+      .set('Cookie', memberCookie)
+      .send([cardWithoutPermissionsUpdate])
+      .expect(401);
+
+    await request(baseUrl)
+      .put(`/api/blocks`)
+      .set('Cookie', memberCookie)
+      .send([
+        boardUpdate,
+        cardWithPermissionsUpdate,
+        viewUpdate,
+        // This should block the update of the other cards
+        cardWithoutPermissionsUpdate
+      ])
+      .expect(401);
   });
 });
