@@ -1,5 +1,5 @@
 import { arrayUtils } from "@charmverse/core/utilities";
-import { PaymentMethod, prisma } from "@charmverse/core/prisma-client";
+import { PaymentMethod, TokenGate, prisma } from "@charmverse/core/prisma-client";
 import { baseUrl } from "config/constants";
 import { lowerCaseEqual, prettyPrint } from "lib/utils/strings";
 import { goerli, sepolia } from "viem/chains";
@@ -31,6 +31,26 @@ async function migratePaymentMethods() {
 
 }
 
+async function clearGoerliTokenGates() {
+  const tokenGates = await prisma.$queryRaw`SELECT id, conditions, "spaceId" FROM "TokenGate"
+  WHERE conditions::jsonb @> 
+      '{
+          "accessControlConditions": [
+              {
+                  "chain": 5
+              }
+          ]
+      }'` as TokenGate[]
+
+  await prisma.tokenGate.deleteMany({
+    where: {
+      id: {
+        in: tokenGates.map(tg => tg.id)
+      }
+    }
+  })
+}
+
 
 async function clearOldRewardsToken () {
   await prisma.bounty.updateMany({
@@ -50,7 +70,11 @@ async function clearOldRewardsToken () {
 async function migrateFromGoerli() {
   await migratePaymentMethods();
   await clearOldRewardsToken();
+  await clearGoerliTokenGates();
+
 }
+
+migrateFromGoerli().then(() => null);
 
 // https://www.prisma.io/docs/orm/prisma-client/special-fields-and-types/working-with-json-fields#filtering-on-object-key-value-inside-array
 
