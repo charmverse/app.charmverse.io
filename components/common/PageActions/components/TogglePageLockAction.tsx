@@ -19,6 +19,7 @@ export function TogglePageLockAction({
       <div>
         <ListItemButton data-test='header--delete-current-page' disabled={disabled} onClick={onClick}>
           <Icon
+            color='secondary'
             fontSize='small'
             sx={{
               mr: 1

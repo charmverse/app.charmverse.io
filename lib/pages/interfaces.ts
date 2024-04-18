@@ -17,9 +17,10 @@ export type PageWithPermissionsMeta = Page & {
   permissions: PagePermissionMeta[];
 };
 
-export type PageMeta = PageMetaFromCore & {
-  hideFromSidebar?: boolean;
-};
+export type PageMeta = PageMetaFromCore &
+  Pick<Page, 'isLocked' | 'lockedBy'> & {
+    hideFromSidebar?: boolean;
+  };
 
 export type PageWithChildren = PageNodeWithChildren<PageWithPermissions>;
 
@@ -86,5 +87,7 @@ export interface PublicPageResponse {
 
 // This type, for the most part, is used for showing links to pages in the UI
 type RequiredMetaFields = Pick<Page, 'id' | 'path' | 'type'>;
-type OptionalMetaFields = Partial<Pick<Page, 'parentId' | 'title' | 'icon' | 'path' | 'type' | 'hasContent'>>;
+type OptionalMetaFields = Partial<
+  Pick<Page, 'parentId' | 'title' | 'icon' | 'path' | 'type' | 'hasContent' | 'isLocked'>
+>;
 export type PageMetaLite = RequiredMetaFields & OptionalMetaFields;
