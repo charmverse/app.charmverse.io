@@ -54,7 +54,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
 import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
-import { ProposalNotesBaner } from './components/ProposalNotesBanner';
+import { ProposalNotesBanner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
@@ -298,7 +298,7 @@ function DocumentPageComponent({
           )}
           {page.type === 'proposal_notes' && (
             <AlertContainer>
-              <ProposalNotesBaner />
+              <ProposalNotesBanner />
             </AlertContainer>
           )}
           <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
