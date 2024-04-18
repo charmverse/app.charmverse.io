@@ -98,18 +98,18 @@ export function NewRewardPage({
   }
 
   function applyRewardContent({ doc, rawText }: ICharmEditorOutput) {
-    setPageData({
-      ...pageData,
+    setPageData((_pageData) => ({
+      ..._pageData,
       content: doc,
       contentText: rawText
-    });
+    }));
   }
 
   function applyTemplate(template: RewardTemplate) {
     setPageData({
       content: template.page.content as PageContent,
       contentText: template.page.contentText,
-      title: template.page.title
+      title: pageData.title
     });
     setRewardValues({
       assignedSubmitters: template.reward.assignedSubmitters,
