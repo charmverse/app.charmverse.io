@@ -2,26 +2,30 @@ import { Collapse } from '@mui/material';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
+import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
+import type { RewardInput } from 'lib/rewards/getRewardWorkflow';
 import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
-export type Props = {
-  reward?: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>>;
+import { EvaluationStepSettings } from './components/EvaluationStepSettings';
+
+export type EvaluationSettingsProps = {
+  reward?: RewardInput;
   readOnly?: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded: boolean;
+  onChangeEvaluation: (evaluationId: string, updatedEvaluation: UpdateableRewardFields) => void;
 };
 
 export function EvaluationsSettings({
   reward,
   readOnly,
   requireWorkflowChangeConfirmation,
-  expanded: expandedContainer
-}: Props) {
-  const isAdmin = useIsAdmin();
+  expanded: expandedContainer,
+  onChangeEvaluation
+}: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = getRewardWorkflow(workflowOptions, reward);
@@ -37,6 +41,28 @@ export function EvaluationsSettings({
           requireConfirmation={requireWorkflowChangeConfirmation}
         />
       </Collapse>
+      {workflow &&
+        workflow.evaluations.map((evaluation, index) => {
+          return (
+            <EvaluationStepRow
+              key={evaluation.id}
+              expanded={expandedContainer}
+              expandedContainer={expandedContainer}
+              result={null}
+              title={evaluation.title}
+              index={index + 1}
+            >
+              <EvaluationStepSettings
+                evaluation={evaluation}
+                readOnly={readOnly}
+                onChange={(updated) => {
+                  onChangeEvaluation?.(evaluation.id, updated);
+                }}
+                reward={reward}
+              />
+            </EvaluationStepRow>
+          );
+        })}
     </LoadingComponent>
   );
 }

@@ -35,7 +35,7 @@ const rewardApplicationReviewEvaluation = {
   type: 'application_review'
 };
 
-type RewardEvaluation = {
+export type RewardEvaluation = {
   id: string;
   title: string;
   type: 'submit' | 'review' | 'payment' | 'apply' | 'application_review';
@@ -47,35 +47,34 @@ export type RewardWorkflow = {
   evaluations: RewardEvaluation[];
 };
 
+const workflows = [
+  {
+    id: 'direct_submission',
+    title: 'Direct Submission',
+    evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardPaymentEvaluation]
+  },
+  {
+    id: 'application_required',
+    title: 'Application Required',
+    evaluations: [
+      rewardApplyEvaluation,
+      rewardApplicationReviewEvaluation,
+      rewardSubmitEvaluation,
+      rewardReviewEvaluation,
+      rewardPaymentEvaluation
+    ]
+  },
+  {
+    id: 'assigned',
+    title: 'Assigned',
+    evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardPaymentEvaluation]
+  }
+] as RewardWorkflow[];
+
 handler.get(getWorkflowsController);
 
 async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<RewardWorkflow[]>) {
   const spaceId = req.query.id as string;
-
-  const workflows = [
-    {
-      id: 'direct_submission',
-      title: 'Direct Submission',
-      evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardPaymentEvaluation]
-    },
-    {
-      id: 'application_required',
-      title: 'Application Required',
-      evaluations: [
-        rewardApplyEvaluation,
-        rewardApplicationReviewEvaluation,
-        rewardSubmitEvaluation,
-        rewardReviewEvaluation,
-        rewardPaymentEvaluation
-      ]
-    },
-    {
-      id: 'assigned',
-      title: 'Assigned',
-      evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardPaymentEvaluation]
-    }
-  ] as RewardWorkflow[];
-
   return res.status(200).json(workflows);
 }
 

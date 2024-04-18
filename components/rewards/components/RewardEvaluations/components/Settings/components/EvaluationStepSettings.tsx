@@ -1,124 +1,159 @@
-import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Typography, FormLabel } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, FormLabel, Stack, Typography } from '@mui/material';
+import clsx from 'clsx';
+import { DateTime } from 'luxon';
 
+import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
-import {
-  authorSystemRole,
-  allMembersSystemRole,
-  tokenHoldersSystemRole
-} from 'components/settings/proposals/components/EvaluationPermissions';
+import Checkbox from 'components/common/DatabaseEditor/widgets/checkbox';
+import { DateTimePicker } from 'components/common/DateTimePicker';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
-import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
-
-import { RubricCriteriaSettings } from './RubricCriteriaSettings';
-import type { RangeProposalCriteria } from './RubricCriteriaSettings';
-import { VoteSettings } from './VoteSettings';
-
-// result and id are not used for creating evaluations, so add them here
-// leave out permissions which are picked up on the backend based on workflowId
-export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permissions'> &
-  Pick<ProposalEvaluation, 'result' | 'id'>;
+import type { RewardInput } from 'lib/rewards/getRewardWorkflow';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 type Props = {
-  evaluation: ProposalEvaluationValues;
-  evaluationTemplate?: Pick<PopulatedEvaluation, 'reviewers' | 'rubricCriteria' | 'voteSettings'>;
-  onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
-  readOnly: boolean;
-  isPublishedProposal?: boolean;
+  evaluation: RewardEvaluation;
+  onChange: (updatedReward: UpdateableRewardFields) => void;
+  readOnly?: boolean;
+  reward?: RewardInput;
 };
 
-export function EvaluationStepSettings({
-  evaluation,
-  evaluationTemplate,
-  isPublishedProposal,
-  onChange,
-  readOnly
-}: Props) {
+export function EvaluationStepSettings({ evaluation, onChange, readOnly: _readOnly, reward }: Props) {
   const isAdmin = useIsAdmin();
-  // reviewers are also readOnly when using a template with reviewers pre-selected
-  const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
-  // rubric criteria should also be editable by reviewers, and not if a template with rubric critera was used
-  const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
-  // vote settings are also readonly when using a template with vote settings pre-selected
-  const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
-  const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
-    group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
-    id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
-  }));
-  const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
-
+  const readOnly = _readOnly || !isAdmin;
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
-      reviewers: reviewers.map((r) => ({
-        roleId: r.group === 'role' ? r.id : null,
-        systemRole: r.group === 'system_role' ? (r.id as ProposalSystemRole) : null,
-        userId: r.group === 'user' ? r.id : null
-      }))
+      reviewers: reviewers as UpdateableRewardFields['reviewers']
     });
   }
 
-  useEffect(() => {
-    if (isTokenVoting) {
-      handleOnChangeReviewers([tokenHoldersSystemRole]);
-    }
-  }, [isTokenVoting]);
-
-  return (
-    <>
-      <FormLabel required>
-        <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote' ? 'Voters' : 'Reviewers'}
-        </Typography>
-      </FormLabel>
-      <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
-        <UserAndRoleSelect
-          data-test={`proposal-${evaluation.type}-select`}
-          emptyPlaceholderContent='Select user or role'
-          value={reviewerOptions as SelectOption[]}
-          readOnly={readOnlyReviewers || isTokenVoting}
-          systemRoles={[authorSystemRole, isTokenVoting ? tokenHoldersSystemRole : allMembersSystemRole]}
-          variant='outlined'
-          onChange={handleOnChangeReviewers}
-          required
-        />
-      </Box>
-      {evaluation.type === 'rubric' && (
-        <>
-          <FormLabel required>
+  if (evaluation.type === 'submit') {
+    return (
+      <Stack gap={1.5}>
+        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+          <FormLabel>
             <Typography component='span' variant='subtitle1'>
-              Rubric criteria
+              Duration (days)
             </Typography>
           </FormLabel>
-          <Box display='flex' flex={1} flexDirection='column'>
-            <RubricCriteriaSettings
-              readOnly={readOnlyRubricCriteria}
-              showDeleteConfirmation={!!isPublishedProposal}
-              value={evaluation.rubricCriteria as RangeProposalCriteria[]}
-              onChange={(rubricCriteria) =>
+          <Box width='fit-content'>
+            <DateTimePicker
+              variant='card_property'
+              minDate={DateTime.fromMillis(Date.now())}
+              value={reward?.dueDate ? DateTime.fromISO(reward.dueDate.toString()) : null}
+              disabled={readOnly}
+              disablePast
+              placeholder='Select due date'
+              onAccept={(date) => {
                 onChange({
-                  rubricCriteria: rubricCriteria as ProposalEvaluationInput['rubricCriteria']
-                })
-              }
-              answers={[]}
+                  dueDate: date?.toJSDate() || undefined
+                });
+              }}
+              onChange={(value) => {
+                onChange({
+                  dueDate: value?.toJSDate() || undefined
+                });
+              }}
             />
           </Box>
-        </>
-      )}
-      {evaluation.type === 'vote' && (
-        <VoteSettings
-          readOnly={readOnlyVoteSettings}
-          value={evaluation.voteSettings}
-          isPublishedProposal={isPublishedProposal}
-          onChange={(voteSettings) =>
-            onChange({
-              voteSettings
-            })
-          }
-        />
-      )}
-    </>
-  );
+        </Stack>
+        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Allow multiple entries
+            </Typography>
+          </FormLabel>
+          <Box width='fit-content'>
+            <Checkbox
+              isOn={Boolean(reward?.allowMultipleApplications)}
+              onChanged={(isOn) => {
+                onChange({
+                  allowMultipleApplications: !!isOn
+                });
+              }}
+              disabled={readOnly}
+              readOnly={readOnly}
+            />
+          </Box>
+        </Stack>
+        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Applicant Roles
+            </Typography>
+          </FormLabel>
+          <Box width='fit-content'>
+            <UserAndRoleSelect
+              type='role'
+              readOnly={readOnly}
+              value={(reward?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
+              onChange={(options) => {
+                const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
+
+                onChange({
+                  allowedSubmitterRoles: roleIds
+                });
+              }}
+            />
+          </Box>
+        </Stack>
+        <Stack direction='row' alignItems='center' gap={2} justifyContent='space-between'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              # Available
+            </Typography>
+          </FormLabel>
+          <Box width='fit-content'>
+            <StyledPropertyTextInput
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                onChange({
+                  maxSubmissions: value <= 0 ? null : value
+                });
+              }}
+              required
+              defaultValue={reward?.maxSubmissions}
+              type='number'
+              size='small'
+              inputProps={{
+                step: 1,
+                min: 1,
+                style: { height: 'auto' },
+                className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+              }}
+              sx={{
+                width: '100%'
+              }}
+              disabled={readOnly}
+              placeholder='Unlimited'
+            />
+          </Box>
+        </Stack>
+      </Stack>
+    );
+  } else if (evaluation.type === 'review') {
+    return (
+      <>
+        <FormLabel required>
+          <Typography component='span' variant='subtitle1'>
+            Reviewers
+          </Typography>
+        </FormLabel>
+        <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
+          <UserAndRoleSelect
+            data-test={`reward-${evaluation.type}-select`}
+            emptyPlaceholderContent='Select user or role'
+            value={(reward?.reviewers ?? []) as SelectOption[]}
+            readOnly={readOnly}
+            variant='outlined'
+            onChange={handleOnChangeReviewers}
+            required
+          />
+        </Box>
+      </>
+    );
+  }
+
+  return null;
 }

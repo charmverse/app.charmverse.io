@@ -1,10 +1,20 @@
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 
-export function getRewardWorkflow(
-  workflows: RewardWorkflow[],
-  reward: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>> | undefined
-) {
+export type RewardInput = Partial<
+  Pick<
+    RewardWithUsers,
+    | 'assignedSubmitters'
+    | 'approveSubmitters'
+    | 'reviewers'
+    | 'dueDate'
+    | 'allowMultipleApplications'
+    | 'allowedSubmitterRoles'
+    | 'maxSubmissions'
+  >
+>;
+
+export function getRewardWorkflow(workflows: RewardWorkflow[], reward: RewardInput | undefined) {
   if (!reward) {
     return null;
   }

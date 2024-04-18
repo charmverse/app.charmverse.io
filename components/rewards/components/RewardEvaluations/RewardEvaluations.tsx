@@ -1,14 +1,9 @@
-import type { RewardWithUsers } from 'lib/rewards/interfaces';
-
+import type { EvaluationSettingsProps } from './components/Settings/EvaluationsSettings';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
-export type RewardEvaluationsProps = {
-  reward?: Partial<Pick<RewardWithUsers, 'assignedSubmitters' | 'approveSubmitters'>>;
-  readOnly?: boolean;
-  expanded?: boolean;
-};
+export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkflowChangeConfirmation' | 'expanded'>;
 
-export function RewardEvaluations({ reward, readOnly, expanded = true }: RewardEvaluationsProps) {
+export function RewardEvaluations({ reward, readOnly, expanded = true, onChangeEvaluation }: EvaluationSettingsProps) {
   const isNotNewReward = !!reward;
   return (
     <EvaluationsSettings
@@ -16,6 +11,7 @@ export function RewardEvaluations({ reward, readOnly, expanded = true }: RewardE
       readOnly={readOnly}
       requireWorkflowChangeConfirmation={isNotNewReward}
       expanded={expanded}
+      onChangeEvaluation={onChangeEvaluation}
     />
   );
 }

@@ -304,6 +304,9 @@ export function NewRewardPage({
             openSidebar: () => setActiveView('reward_evaluation')
           }}
           reward={rewardValues}
+          onChangeEvaluation={(_, updates) => {
+            setRewardValues(updates);
+          }}
         />
         <ConfirmDeleteModal
           onClose={() => {
