@@ -10,7 +10,36 @@ async function search() {
       title: 'daos'
     }
   });
-  console.log(acc);
+
+  const pages = await prisma.page.findMany({
+    where: {
+      type: {
+        not: 'proposal',
+      },
+      permissions: {
+        some: {
+          permissionLevel: 'proposal_editor'
+        }
+      }
+    },
+    select: {
+      id: true,
+      title: true,
+      type: true,
+      createdAt: true,
+      space: {
+        select: {
+          domain: true
+        }
+      },
+      permissions: true
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  })
+
+  prettyPrint(pages);
 }
 
-search().then(() => console.log('Done'));
+search().then(() =>null);
