@@ -5,10 +5,10 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { RewardInput } from 'lib/rewards/getRewardWorkflow';
-import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
+import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
+import type { RewardInput } from 'lib/rewards/inferRewardWorkflow';
+import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
@@ -31,7 +31,7 @@ export function EvaluationsSettings({
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = getRewardWorkflow(workflowOptions, rewardInput);
+  const workflow = inferRewardWorkflow(workflowOptions, rewardInput);
   return (
     <LoadingComponent isLoading={!rewardInput} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>

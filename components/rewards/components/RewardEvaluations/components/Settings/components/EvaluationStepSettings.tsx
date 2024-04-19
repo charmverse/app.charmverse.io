@@ -1,8 +1,8 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
 
-import type { RewardInput } from 'lib/rewards/getRewardWorkflow';
+import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
+import type { RewardInput } from 'lib/rewards/inferRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import { PaymentStepSettings } from './PaymentSettings';
 import { ReviewStepSettings } from './ReviewSettings';

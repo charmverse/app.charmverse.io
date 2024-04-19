@@ -8,8 +8,8 @@ import type {
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
-import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import type { MaybeString } from './helpers';
 import { useGET, usePOST, usePUT, useDELETE, useGETImmutable } from './helpers';

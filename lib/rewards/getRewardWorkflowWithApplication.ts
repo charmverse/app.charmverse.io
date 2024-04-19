@@ -1,5 +1,4 @@
-import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
-
+import type { RewardWorkflow } from './getRewardWorkflows';
 import type { ApplicationWithTransactions } from './interfaces';
 
 export function getRewardWorkflowWithApplication({

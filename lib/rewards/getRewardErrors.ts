@@ -1,8 +1,7 @@
 import type { Bounty, Page } from '@charmverse/core/prisma';
 
-import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
-
 import { getRewardType } from './getRewardType';
+import type { RewardEvaluation } from './getRewardWorkflows';
 import type { RewardType, RewardWithUsers } from './interfaces';
 
 type ValidationInput = {

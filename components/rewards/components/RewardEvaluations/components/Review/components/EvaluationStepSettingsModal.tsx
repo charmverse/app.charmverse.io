@@ -3,9 +3,9 @@ import { Box } from '@mui/material';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { getEvaluationFormError } from 'lib/rewards/getRewardErrors';
+import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import { EvaluationStepSettings } from '../../Settings/components/EvaluationStepSettings';
 

@@ -33,8 +33,8 @@ import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/int
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
-import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
+import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
+import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import { fontClassName } from 'theme/fonts';
 
 import { CustomPropertiesAdapter } from './components/RewardProperties/CustomPropertiesAdapter';
@@ -134,7 +134,7 @@ export function NewRewardPage({
       fields: template.reward.fields
     });
     setRewardTemplateId(template.page.id);
-    const workflow = getRewardWorkflow(workflowOptions ?? [], template.reward);
+    const workflow = inferRewardWorkflow(workflowOptions ?? [], template.reward);
     if (workflow) {
       applyWorkflow(workflow);
     }

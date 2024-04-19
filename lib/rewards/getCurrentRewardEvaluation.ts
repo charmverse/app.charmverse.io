@@ -1,4 +1,4 @@
-import type { RewardEvaluation, RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
+import type { RewardEvaluation, RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 
 export function getCurrentRewardEvaluation(workflow: RewardWorkflow): RewardEvaluation {
   const currentEvaluation = workflow.evaluations.find(

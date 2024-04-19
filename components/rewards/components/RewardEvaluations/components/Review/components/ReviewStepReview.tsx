@@ -6,8 +6,8 @@ import type { SelectOption } from 'components/common/DatabaseEditor/components/p
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { AcceptOrRejectButtons } from 'components/rewards/components/RewardApplicationPage/components/AcceptOrRejectButtons';
 import { useApplication } from 'components/rewards/hooks/useApplication';
+import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
-import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 export function ReviewStepReview({
   reviewers,

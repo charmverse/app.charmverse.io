@@ -1,4 +1,4 @@
-import { Box, Collapse, Tooltip } from '@mui/material';
+import { Collapse, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
@@ -10,11 +10,11 @@ import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBad
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
-import { getRewardWorkflow } from 'lib/rewards/getRewardWorkflow';
+import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import { getRewardWorkflowWithApplication } from 'lib/rewards/getRewardWorkflowWithApplication';
+import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
-import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
 import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
@@ -40,7 +40,7 @@ export function EvaluationsReview({
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = getRewardWorkflow(workflowOptions, reward);
+  const workflow = inferRewardWorkflow(workflowOptions, reward);
   const updatedWorkflow = workflow
     ? getRewardWorkflowWithApplication({
         application,

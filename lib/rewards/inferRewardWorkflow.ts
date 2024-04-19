@@ -1,5 +1,6 @@
 import type { RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
-import type { RewardWorkflow } from 'pages/api/spaces/[id]/rewards/workflows';
+
+import type { RewardWorkflow } from './getRewardWorkflows';
 
 export type RewardInput = Partial<
   Pick<
@@ -18,7 +19,7 @@ export type RewardInput = Partial<
   > & { rewardType?: RewardType }
 >;
 
-export function getRewardWorkflow(workflows: RewardWorkflow[], reward: RewardInput | undefined) {
+export function inferRewardWorkflow(workflows: RewardWorkflow[], reward: RewardInput | undefined) {
   if (!reward) {
     return null;
   }
