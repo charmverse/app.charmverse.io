@@ -5,7 +5,7 @@ import type { BoardFields, DataSourceType, IPropertyOption, IPropertyTemplate } 
 import type { BoardViewFields, IViewType } from 'lib/databases/boardView';
 import type { CardFields } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import type { PageWithBlocks } from 'lib/templates/exportWorkspacePages';
+import type { RelatedPageData } from 'lib/templates/exportWorkspacePages';
 import { typedKeys } from 'lib/utils/objects';
 
 import { pageContentStub } from './generatePageStub';
@@ -32,6 +32,7 @@ export function boardWithCardsArgs({
   addPageContent,
   views = 1,
   viewDataSource,
+  isLocked,
   boardPageType,
   boardTitle,
   viewType,
@@ -45,6 +46,7 @@ export function boardWithCardsArgs({
   addPageContent?: boolean;
   views?: number;
   viewType?: IViewType;
+  isLocked?: boolean;
   viewDataSource?: DataSourceType;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
   boardTitle?: string;
@@ -72,6 +74,8 @@ export function boardWithCardsArgs({
     headerImage: null,
     icon: '📝',
     path: `page-${v4()}`,
+    isLocked,
+    lockedBy: isLocked ? createdBy : null,
     isTemplate: false,
     spaceId,
     type: boardPageType ?? 'board',
@@ -365,7 +369,7 @@ export function boardWithCardsArgs({
       proposal,
       votes,
       ...pageWithoutExtraProps
-    } = page as any as Page & PageWithBlocks & { children: any };
+    } = page as any as Page & RelatedPageData & { children: any };
 
     // Prisma throws if passing null creation values
     typedKeys(pageWithoutExtraProps).forEach((key) => {
@@ -404,16 +408,16 @@ export function boardWithCardsArgs({
       data: pageCreateInput
     });
 
-    const blocks: Block[] = [];
+    const blocks: Omit<Block, 'schema'>[] = [];
 
     if (page.type.match('board')) {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const boardBlock = (page as any as PageWithBlocks).blocks.board!;
-      const viewBlocks = (page as any as PageWithBlocks).blocks.views!;
+      const boardBlock = (page as any as RelatedPageData).blocks.board!;
+      const viewBlocks = (page as any as RelatedPageData).blocks.views!;
 
       blocks.push(boardBlock, ...viewBlocks);
     } else if (page.type === 'card') {
-      const cardBlock = (page as any as PageWithBlocks).blocks.card!;
+      const cardBlock = (page as any as RelatedPageData).blocks.card!;
       // First index is the root board node, thus we need to subtract 1
       const cardPropertyValue = (Array.isArray(customProps?.cardPropertyValues)
         ? customProps?.cardPropertyValues[index - 1]
@@ -440,6 +444,7 @@ export function boardWithCardsArgs({
 
       blockCreateInput.push({
         ...block,
+        schema: 1,
         fields: block.fields as Prisma.InputJsonValue
       });
     });

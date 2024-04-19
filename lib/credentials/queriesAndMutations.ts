@@ -51,7 +51,6 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
     createCharmverseCredential(input: $i) {
       document {
         id
-        sig
         type
         issuer
         chainId
@@ -68,7 +67,7 @@ const CREATE_SIGNED_CREDENTIAL_MUTATION = gql`
 
 export type CredentialToPublish = Omit<PublishedSignedCredential, 'author' | 'id'>;
 
-function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
+export function getParsedCredential(credential: CredentialFromCeramic): EASAttestationFromApi {
   let parsed = {} as any;
 
   if (typeof credential.content === 'object') {
@@ -121,7 +120,6 @@ const GET_CREDENTIALS = gql`
           issuer
           recipient
           content
-          sig
           type
           verificationUrl
           chainId
@@ -133,6 +131,58 @@ const GET_CREDENTIALS = gql`
     }
   }
 `;
+
+const GET_CREDENTIALS_BY_ID = gql`
+  query GetCredentialsById($ids: [ID!]!) {
+    nodes(ids: $ids) {
+      id
+      __typename
+      ... on CharmverseCredential {
+        id
+        issuer
+        recipient
+        content
+        type
+        verificationUrl
+        chainId
+        schemaId
+        timestamp
+        charmverseId
+      }
+    }
+  }
+`;
+
+export async function getCharmverseOffchainCredentialsByIds({
+  ceramicIds
+}: {
+  ceramicIds: string[];
+}): Promise<EASAttestationFromApi[]> {
+  if (!ceramicIds.length) {
+    return [];
+  }
+
+  const charmverseCredentials: EASAttestationFromApi[] | null = await ceramicGraphQlClient
+    .query({
+      query: GET_CREDENTIALS_BY_ID,
+      variables: {
+        ids: ceramicIds
+      }
+      // For now, let's refetch each time and rely on http endpoint-level caching
+      // https://www.apollographql.com/docs/react/data/queries/#supported-fetch-policies
+    })
+    .then((response) =>
+      response
+        ? response.data.nodes.map((e: any) => getParsedCredential(e))
+        : Promise.reject(new Error('Unknown error'))
+    )
+    .catch((err) => {
+      log.error('Failed to fetch offchain credentials from ceramic', { error: err, ceramicIds });
+      return null;
+    });
+
+  return charmverseCredentials ?? [];
+}
 
 export async function getCharmverseOffchainCredentialsByWallets({
   wallets

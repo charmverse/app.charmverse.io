@@ -13,6 +13,7 @@ export type ProjectAddEvent = BaseEventWithoutGroup & {
 
 export type ProjectRemoveMemberEvent = BaseEventWithoutGroup & {
   projectId: string;
+  projectMemberId: string;
 };
 
 export interface ProjectEventMap {

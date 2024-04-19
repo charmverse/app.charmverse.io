@@ -135,6 +135,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
 
   if (proposalForm?.projectId) {
     await validateProposalProject({
+      formAnswers: proposalForm?.formAnswers,
       projectId: proposalForm.projectId,
       formFields: proposalForm?.form?.formFields
     });
@@ -153,11 +154,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       currentEvaluationId
     });
   }
-
-  await issueOffchainProposalCredentialsIfNecessary({
-    event: 'proposal_created',
-    proposalId
-  });
 
   trackUserAction('new_proposal_stage', {
     userId,

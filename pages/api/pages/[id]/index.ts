@@ -81,7 +81,8 @@ async function getPageRoute(req: NextApiRequest, res: NextApiResponse<PageWithCo
       hasContent: result.hasContent,
       type: result.type,
       icon: result.icon,
-      path: result.path
+      path: result.path,
+      isLocked: result.isLocked
     };
     return res.status(200).json(pageMeta);
   }

@@ -11,15 +11,17 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isTruthy } from 'lib/utils/types';
 import type { NestedDataTest } from 'testing/e2eType';
 
-interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, true, true>>, 'onChange'> {
-  onChange?: (chainId: number) => void;
+interface Props extends Omit<Partial<AutocompleteProps<IChainDetails, false, boolean, true>>, 'onChange'> {
+  onChange?: (chainId: number | null) => void;
   defaultChainId?: number; // allow setting a default
   hideInputIcon?: boolean;
   chainId?: number; // allow overriding from the parent
   sx?: SxProps<Theme>;
   chains?: number[];
   fullWidth?: boolean;
+  disableClearable?: boolean;
 }
+
 export function InputSearchBlockchain({
   defaultChainId,
   chainId,
@@ -29,7 +31,8 @@ export function InputSearchBlockchain({
   sx = {},
   disabled,
   readOnly,
-  fullWidth
+  fullWidth,
+  disableClearable = true
 }: Props) {
   const [value, setValue] = useState<IChainDetails | null>(null);
   const { space } = useCurrentSpace();
@@ -66,16 +69,14 @@ export function InputSearchBlockchain({
       // @ts-ignore - autocomplete types are a mess
       // dummy bounty object with chainName to show N/A for empty value
       value={value}
-      onChange={(_, _value: IChainDetails) => {
-        if (_value?.chainId) {
-          onChange(_value.chainId);
-          setValue(_value);
-        }
+      onChange={(_, _value: IChainDetails | null) => {
+        onChange(_value?.chainId ?? null);
+        setValue(_value);
       }}
       sx={{ minWidth: 150, ...sx }}
       options={options}
       data-test='chain-options'
-      disableClearable
+      disableClearable={disableClearable}
       autoHighlight
       size='small'
       getOptionLabel={(option) => `${option.chainName}`}

@@ -14,17 +14,19 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
+import { ProposalCredentialSettings } from './components/ProposalCredentialSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';
 import { RewardSettings } from './components/RewardSettings';
 import { RubricTemplatesButton } from './components/RubricTemplatesButton';
 
 export type Props = {
-  proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId'>;
+  proposal?: Pick<ProposalPropertiesInput, 'fields' | 'evaluations' | 'workflowId' | 'selectedCredentialTemplates'>;
   isTemplate?: boolean;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   onChangeWorkflow: (workflow: ProposalWorkflowTyped) => void;
   onChangeRewardSettings?: RewardSettingsProps['onChange'];
+  onChangeSelectedCredentialTemplates: (templateIds: string[]) => void;
   templateId?: string | null;
   isStructuredProposal: boolean;
   requireWorkflowChangeConfirmation?: boolean;
@@ -38,6 +40,7 @@ export function EvaluationsSettings({
   readOnly,
   onChangeWorkflow,
   onChangeRewardSettings,
+  onChangeSelectedCredentialTemplates,
   templateId,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
@@ -49,6 +52,7 @@ export function EvaluationsSettings({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
 
+  const showRewards = isTemplate && onChangeRewardSettings;
   return (
     <LoadingComponent isLoading={!proposal} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
@@ -104,11 +108,26 @@ export function EvaluationsSettings({
               </EvaluationStepRow>
             );
           })}
+          <Box mb={showRewards ? 0 : 8}>
+            <EvaluationStepRow
+              index={proposal ? proposal.evaluations.length + 1 : 0}
+              result={null}
+              title='Credentials'
+              expanded={expandedContainer}
+              expandedContainer={expandedContainer}
+            >
+              <ProposalCredentialSettings
+                readOnly={readOnly}
+                selectedCredentialTemplates={proposal.selectedCredentialTemplates ?? []}
+                setSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+              />
+            </EvaluationStepRow>
+          </Box>
           {/* reward settings */}
-          {isTemplate && onChangeRewardSettings && (
+          {showRewards && (
             <Box mb={8}>
               <EvaluationStepRow
-                index={proposal ? proposal.evaluations.length + 1 : 0}
+                index={proposal ? proposal.evaluations.length + 2 : 0}
                 result={null}
                 title={mappedFeatures.rewards.title}
                 expanded={expandedContainer}

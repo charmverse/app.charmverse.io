@@ -157,8 +157,6 @@ export function NewProposalPage({
     title: template.title
   }));
 
-  const readOnlySelectedCredentialTemplates = sourceTemplate?.selectedCredentialTemplates && !isAdmin;
-
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
     !isAdmin && sourceTemplate?.fields
@@ -427,7 +425,6 @@ export function NewProposalPage({
                           setProposalFormInputs={setFormInputs}
                           readOnlyAuthors={!isAdmin && !!sourceTemplate?.authors.length}
                           readOnlyCustomProperties={readOnlyCustomProperties}
-                          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
                           isStructuredProposal={isStructured}
                           isProposalTemplate={!!isTemplate}
                         />
@@ -460,6 +457,7 @@ export function NewProposalPage({
                                 if (!updatedFormField) {
                                   return formAnswer;
                                 }
+
                                 return {
                                   ...formAnswer,
                                   value: updatedFormField.value
@@ -592,6 +590,9 @@ export function NewProposalPage({
             });
           }}
           onChangeWorkflow={applyWorkflow}
+          onChangeSelectedCredentialTemplates={(selectedCredentialTemplates) => {
+            setFormInputs({ ...formInputs, selectedCredentialTemplates });
+          }}
         />
         <ConfirmDeleteModal
           onClose={() => {

@@ -2,6 +2,9 @@ import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
 import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
+import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,
@@ -134,8 +137,8 @@ export function useUpdateProposalFormFields({ proposalId }: { proposalId: string
   return usePUT<{ formFields: FormFieldInput[] }, FormFieldInput[]>(`/api/proposals/${proposalId}/form`);
 }
 
-export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
-  return useGET<FormFieldAnswer[]>(`/api/proposals/${proposalId}/form/answers`);
+export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
+  return useGET<FormFieldAnswer[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
 }
 
 export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
@@ -158,4 +161,19 @@ export function useArchiveProposal({ proposalId }: { proposalId: MaybeString }) 
 
 export function useArchiveProposals() {
   return usePOST<{ archived: boolean; proposalIds: string[] }>(`/api/proposals/archive`);
+}
+
+export function useGetIssuedProposalCredentials({ proposalId }: { proposalId: MaybeString }) {
+  return useGET<EASAttestationFromApi[]>(proposalId ? `/api/credentials/proposals/issued` : null, { proposalId });
+}
+
+export function useGetIssuableProposalCredentials({ proposalIds }: { proposalIds: string[] | null | undefined }) {
+  const { space } = useCurrentSpace();
+  return useGET<IssuableProposalCredentialContent[]>(
+    space && proposalIds?.length ? `/api/credentials/proposals/issuable` : null,
+    {
+      spaceId: space?.id,
+      proposalIds
+    }
+  );
 }

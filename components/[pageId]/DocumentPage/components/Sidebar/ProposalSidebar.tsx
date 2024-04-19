@@ -13,6 +13,7 @@ type Props = ProposalEvaluationsProps & {
 
 function SidebarComponent(props: Props) {
   const { sidebarProps, ...proposalProps } = props;
+
   return (
     <WorkflowSidebar
       title={SIDEBAR_VIEWS.proposal_evaluation.title}

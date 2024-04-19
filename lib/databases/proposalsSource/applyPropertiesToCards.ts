@@ -7,6 +7,29 @@ import type { IPropertyTemplate } from '../board';
 
 import type { ProposalCardData } from './getCardProperties';
 
+export function applyPropertiesToCardsAndFilter({
+  blocks,
+  boardProperties,
+  permissions,
+  proposalCards
+}: {
+  boardProperties: IPropertyTemplate[];
+  blocks: BlockWithDetails[];
+  permissions: Record<string, SmallProposalPermissionFlags>;
+  proposalCards: Record<string, ProposalCardData>;
+}): BlockWithDetails[] {
+  return (
+    applyPropertiesToCards({
+      blocks,
+      boardProperties,
+      permissions,
+      proposalCards
+    })
+      // Filter by permissions, but remember to allow normal blocks that do not have a page, like views, to be shown
+      .filter((b) => typeof b.syncWithPageId === 'undefined' || !!permissions[b.syncWithPageId]?.view)
+  );
+}
+
 // apply information from proposals onto the card blocks
 export function applyPropertiesToCards({
   blocks,

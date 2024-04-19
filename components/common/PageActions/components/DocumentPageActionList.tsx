@@ -24,6 +24,7 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageUpdates, PageWithContent } from 'lib/pages';
+import { lockablePageTypes } from 'lib/pages/constants';
 import { fontClassName } from 'theme/fonts';
 
 import { exportMarkdown } from '../utils/exportMarkdown';
@@ -37,6 +38,7 @@ import { ExportMarkdownAction } from './ExportMarkdownAction';
 import { ExportToPDFAction } from './ExportToPDFAction';
 import { PublishProposalAction } from './PublishProposalAction';
 import { RewardActions } from './RewardActions';
+import { TogglePageLockAction } from './TogglePageLockAction';
 import { UndoAction } from './UndoAction';
 
 export type PageActionMeta = Pick<
@@ -57,6 +59,8 @@ export type PageActionMeta = Pick<
   | 'type'
   | 'updatedAt'
   | 'updatedBy'
+  | 'isLocked'
+  | 'lockedBy'
 >;
 
 export const documentTypes: PageType[] = [
@@ -104,6 +108,7 @@ type Props = {
   onDelete?: VoidFunction;
   isInsideDialog?: boolean;
   isStructuredProposal?: boolean;
+  refreshPage: VoidFunction;
 };
 export function DocumentPageActionList({
   isInsideDialog,
@@ -112,7 +117,8 @@ export function DocumentPageActionList({
   onDelete,
   pagePermissions,
   undoEditorChanges,
-  isStructuredProposal
+  isStructuredProposal,
+  refreshPage
 }: Props) {
   const pageId = page.id;
   const { navigateToSpacePath } = useCharmRouter();
@@ -127,6 +133,8 @@ export function DocumentPageActionList({
   const basePageBounty = rewards?.find((r) => r.id === pageId);
 
   const canCreateProposal = spacePermissions?.createProposals;
+
+  const isLockablePageType = lockablePageTypes.includes(page.type);
 
   function setPageProperty(prop: Partial<PageUpdates>) {
     updatePage({
@@ -145,6 +153,15 @@ export function DocumentPageActionList({
 
   function setFontFamily(fontFamily: 'serif' | 'mono' | 'default') {
     setPageProperty({ fontFamily });
+  }
+
+  async function onTogglePageLock() {
+    await charmClient.pages.togglePageLock({
+      pageId,
+      isLocked: !page.isLocked
+    });
+    await refreshPage();
+    onComplete();
   }
 
   async function onDeletePage() {
@@ -277,6 +294,13 @@ export function DocumentPageActionList({
           <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
           <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
         </>
+      )}
+      {isLockablePageType && (
+        <TogglePageLockAction
+          isLocked={!!page.isLocked}
+          onClick={onTogglePageLock}
+          disabled={!pagePermissions?.edit_lock}
+        />
       )}
       {page && (
         <DuplicatePageAction

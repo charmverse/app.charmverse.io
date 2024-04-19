@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
+import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -19,6 +20,7 @@ import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import { FieldWrapper } from './fields/FieldWrapper';
 import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
 import type { SelectOptionType } from './fields/Select/interfaces';
+import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
 import type { FormFieldValue } from './interfaces';
@@ -95,6 +97,9 @@ export function FormFieldAnswersControlled({
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
+  const { mutate } = useGetProposalFormFieldAnswers({
+    proposalId
+  });
   const { user } = useUser();
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
@@ -168,12 +173,13 @@ export function FormFieldAnswersControlled({
             <Controller
               name={formField.id}
               control={control}
-              render={({ field }) =>
-                formField.type === 'project_profile' ? (
+              render={({ field }) => {
+                return formField.type === 'project_profile' ? (
                   <FieldWrapper required label='Project'>
                     <ProjectProfileInputField
                       disabled={disabled}
                       proposalId={proposalId}
+                      formFieldValue={field.value as { selectedMemberIds: string[] }}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
                       onChange={(projectFormValues) => {
                         setIsFormDirty(true);
@@ -183,6 +189,7 @@ export function FormFieldAnswersControlled({
                             value: projectFormValues
                           }
                         ]);
+                        mutate();
                       }}
                       inputEndAdornment={
                         pageId &&
@@ -222,6 +229,13 @@ export function FormFieldAnswersControlled({
                     placeholder={fieldTypePlaceholderRecord[formField.type]}
                     labelEndAdornment={
                       formField.private ? <Chip sx={{ ml: 1 }} label='Private' size='small' /> : undefined
+                    }
+                    walletInputConfig={
+                      isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
+                        ? {
+                            chainId: formField.fieldConfig.chainId
+                          }
+                        : undefined
                     }
                     inputEndAdornment={
                       pageId &&
@@ -267,8 +281,8 @@ export function FormFieldAnswersControlled({
                       ]);
                     }}
                   />
-                )
-              }
+                );
+              }}
             />
           </StyledStack>
         );

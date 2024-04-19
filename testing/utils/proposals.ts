@@ -223,7 +223,8 @@ export async function generateProposalSourceDb({ createdBy, spaceId }: { created
     createdBy,
     spaceId,
     views: 1,
-    viewDataSource: 'proposals'
+    viewDataSource: 'proposals',
+    cardCount: 0
   });
 
   // sync board properties

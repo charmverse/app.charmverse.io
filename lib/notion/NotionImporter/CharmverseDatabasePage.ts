@@ -53,7 +53,9 @@ export class CharmverseDatabasePage {
               notionPageId:
                 notionPage.parent.type === 'page_id'
                   ? notionPage.parent.page_id
-                  : this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? notionPage.parent.block_id
+                  : notionPage.parent.type === 'block_id'
+                  ? this.cache.blockPageIdRecord.get(notionPage.parent.block_id) ?? notionPage.parent.block_id
+                  : this.cache.blockPageIdRecord.get(notionPage.parent.database_id) ?? notionPage.parent.database_id
             })
           : null;
 

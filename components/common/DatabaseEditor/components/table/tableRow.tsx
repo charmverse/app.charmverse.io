@@ -9,8 +9,7 @@ import React, { memo, useContext, useEffect, useMemo, useRef, useState } from 'r
 import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
-import type { PageActionMeta } from 'components/common/PageActions/components/PageActionsMenu';
-import { PageActionsMenu } from 'components/common/PageActions/components/PageActionsMenu';
+import { DatabaseRowActionsMenu } from 'components/common/PageActions/components/DatabaseRowActionsMenu';
 import { PageIcon } from 'components/common/PageIcon';
 import { RewardApplicationStatusIcon } from 'components/rewards/components/RewardApplicationStatusChip';
 import { SelectionContext, useSelected } from 'hooks/useAreaSelection';
@@ -370,7 +369,12 @@ function TableRow(props: Props) {
         );
       })}
       {!props.readOnly && (
-        <PageActionsMenu onClickDelete={handleDeleteCard} anchorEl={anchorEl} setAnchorEl={setAnchorEl} page={card} />
+        <DatabaseRowActionsMenu
+          onClickDelete={handleDeleteCard}
+          anchorEl={anchorEl}
+          setAnchorEl={setAnchorEl}
+          page={card}
+        />
       )}
       {/* empty column for actions on header row */}
       <div className='octo-table-cell' style={{ flexGrow: 1, borderRight: '0 none' }}></div>

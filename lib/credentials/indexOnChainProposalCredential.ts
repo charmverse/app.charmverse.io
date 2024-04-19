@@ -84,9 +84,7 @@ async function indexSingleOnchainProposalCredential({
     );
   }
 
-  const credentialEvent: CredentialEventType | null = decodedContent.Event.match(proposalCreatedVerb)
-    ? 'proposal_created'
-    : decodedContent.Event.match(proposalApprovedVerb)
+  const credentialEvent: CredentialEventType | null = decodedContent.Event.match(proposalApprovedVerb)
     ? 'proposal_approved'
     : null;
 

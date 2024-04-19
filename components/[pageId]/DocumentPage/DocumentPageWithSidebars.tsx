@@ -38,7 +38,14 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const rewardId = page.bountyId;
   const isCharmverseSpace = useIsCharmverseSpace();
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
   });
 
@@ -155,6 +162,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardSettings={onChangeRewardSettings}
+          onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         />
       )}
       {(page.type === 'bounty' || page.type === 'bounty_template') && reward && isCharmverseSpace && (

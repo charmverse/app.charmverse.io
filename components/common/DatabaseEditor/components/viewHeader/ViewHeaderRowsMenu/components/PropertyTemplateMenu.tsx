@@ -289,6 +289,7 @@ export function PropertyTemplateMenu({
                   currentStep: firstCheckedProposal.currentStep,
                   id: firstCheckedProposal.id,
                   evaluations: firstCheckedProposal.evaluations,
+                  hasCredentials: !!firstCheckedProposal.selectedCredentialTemplates.length,
                   currentEvaluationId: firstCheckedProposal.currentEvaluationId,
                   hasRewards:
                     (firstCheckedProposal.rewardIds ?? []).length > 0 ||

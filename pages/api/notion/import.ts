@@ -6,7 +6,7 @@ import nc from 'next-connect';
 import { isTestEnv } from 'config/constants';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { importFromWorkspace } from 'lib/notion/importFromWorkspace';
-import type { FailedImportsError } from 'lib/notion/types';
+import type { FailedImportsError } from 'lib/notion/interfaces';
 import { withSessionRoute } from 'lib/session/withSession';
 import { MissingDataError } from 'lib/utils/errors';
 
@@ -73,6 +73,7 @@ async function importNotion(
         }
       }
     );
+    log.info('[notion] - Importing from notion', { spaceId, token, userId: req.session.user.id });
     const failedImports = await importFromWorkspace({
       spaceId,
       userId: req.session.user.id,
@@ -85,7 +86,7 @@ async function importNotion(
       failedImports
     });
   } catch (err: any) {
-    log.warn('Error importing from notion', err);
+    log.warn('Error importing from notion', { userId: req.session.user.id, error: err, spaceId });
 
     if (err.error === 'invalid_grant' || err.error === 'invalid_request') {
       res.status(400).json({ error: 'Invalid code. Please try importing again' });

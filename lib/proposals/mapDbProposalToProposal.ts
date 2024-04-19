@@ -11,12 +11,12 @@ import type {
 import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
-import { FieldConfig } from 'lib/projects/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
 
 import { getProposalProjectFormField } from './form/getProposalProjectFormField';
-import type { ProposalFields, PopulatedEvaluation, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
+import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
 
 type FormFieldsIncludeType = {
   form: {
@@ -42,11 +42,13 @@ export function mapDbProposalToProposal({
       page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
       rewards: { id: string }[];
       project?: ProjectWithMembers | null;
+    } & {
+      issuedCredentials?: EASAttestationFromApi[];
     };
   permissions: ProposalPermissionFlags;
   permissionsByStep?: Record<string, ProposalPermissionFlags>;
 }): ProposalWithUsersAndRubric {
-  const { rewards, form, evaluations, fields, page, ...rest } = proposal;
+  const { rewards, form, evaluations, fields, page, issuedCredentials, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
   const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
   const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
@@ -82,6 +84,7 @@ export function mapDbProposalToProposal({
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     status: proposal.status,
     rewardIds: rewards.map((r) => r.id) || null,
+    issuedCredentials: issuedCredentials || [],
     form: form
       ? {
           formFields: (formFields as TypedFormField[]) || null,

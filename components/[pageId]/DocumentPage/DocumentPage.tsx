@@ -7,6 +7,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 
+import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useGetReward } from 'charmClient/hooks/rewards';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
@@ -38,7 +39,7 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -106,10 +107,19 @@ function DocumentPageComponent({
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const isCharmverseSpace = useIsCharmverseSpace();
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
   });
-
+  const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({
+    proposalId
+  });
   // We can only edit the proposal from the top level
   const readonlyProposalProperties = !page.proposalId || readOnly || !!proposal?.archived;
 
@@ -246,11 +256,15 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
+  const projectFormFieldAnswer = proposalFormFieldAnswers.find((answer) => answer.fieldId === projectProfileField?.id)
+    ?.value as { projectId: string; selectedMemberIds: string[] } | undefined;
 
   const form = useProjectForm({
+    initialProjectValues: proposal?.project,
     projectId,
-    fieldConfig: (projectProfileField?.fieldConfig ??
-      defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig
+    selectedMemberIds: projectFormFieldAnswer?.selectedMemberIds,
+    fieldConfig:
+      (projectProfileField?.fieldConfig as ProjectAndMembersFieldConfig) ?? createDefaultProjectAndMembersFieldConfig()
   });
 
   return (
@@ -385,6 +399,7 @@ function DocumentPageComponent({
                 onChangeEvaluation={onChangeEvaluation}
                 refreshProposal={refreshProposal}
                 onChangeWorkflow={onChangeWorkflow}
+                onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
               />
             )}
 
@@ -542,12 +557,7 @@ function DocumentPageComponent({
           </PageEditorContainer>
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
-          <ProposalStickyFooter
-            page={page}
-            proposal={proposal}
-            isStructuredProposal={isStructuredProposal}
-            refreshProposal={refreshProposal}
-          />
+          <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
         )}
       </FormProvider>
     </Box>
