@@ -9,7 +9,10 @@ import { RewardTokenDialog } from './RewardTokenDialog';
 
 type Props = {
   onChange: (value: RewardTokenDetails | null) => void;
-  currentReward: (RewardCreationData & RewardWithUsers) | null;
+  currentReward: Pick<
+    RewardCreationData & RewardWithUsers,
+    'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'
+  > | null;
   readOnly?: boolean;
 };
 

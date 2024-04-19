@@ -1,44 +1,54 @@
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box } from '@mui/material';
 
-import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/databases/board';
 
-type Props = {
-  onChange?: (value: ProposalWorkflowTyped) => void;
+type Props<Option extends { id: string; title: string }> = {
+  onChange?: (value: Option) => void;
   value?: string | null;
   readOnly?: boolean;
   required?: boolean;
   requireConfirmation?: boolean;
+  options: Option[];
+  disableAddNew?: boolean;
 };
 
-export function WorkflowSelect({ onChange, value, readOnly, required, requireConfirmation }: Props) {
+export function WorkflowSelect<Option extends { id: string; title: string }>({
+  onChange,
+  value,
+  options,
+  readOnly,
+  required,
+  requireConfirmation,
+  disableAddNew
+}: Props<Option>) {
   const { openSettings } = useSettingsDialog();
-  const { space: currentSpace } = useCurrentSpace();
-  const { data: workflowOptions } = useGetProposalWorkflows(currentSpace?.id);
   const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
-  const propertyOptions: IPropertyOption[] = (workflowOptions || []).map((option) => ({
-    id: option.id,
-    value: option.title,
-    color: 'grey'
-  }));
-
-  propertyOptions.push({
-    id: 'add_new',
-    value: '+ Add New',
-    color: 'gray',
-    variant: 'plain'
-  });
+  const propertyOptions: IPropertyOption[] = [
+    ...options.map((option) => ({
+      id: option.id,
+      value: option.title,
+      color: 'grey'
+    })),
+    ...(disableAddNew
+      ? []
+      : [
+          {
+            id: 'add_new',
+            value: '+ Add New',
+            color: 'gray',
+            variant: 'plain'
+          } as const
+        ])
+  ];
 
   async function changeWorkflow(newValue: string) {
-    const option = workflowOptions?.find(({ id }) => id === newValue);
+    const option = options?.find(({ id }) => id === newValue);
     if (option && onChange) {
       try {
         await onChange(option);

@@ -2,20 +2,22 @@ import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
+import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
+import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
-import { WorkflowSelect } from '../../../WorkflowSelect';
+import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EditStepButton } from './components/EditStepButton';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
-import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
@@ -82,7 +84,8 @@ export function EvaluationsReview({
 
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
-
+  const { space: currentSpace } = useCurrentSpace();
+  const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
   const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
   const isCredentialsActive =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
@@ -144,7 +147,7 @@ export function EvaluationsReview({
       <Collapse in={expandedContainer}>
         <Tooltip title='Workflow can only be changed in Draft step'>
           <span>
-            <WorkflowSelect value={proposal?.workflowId} readOnly />
+            <WorkflowSelect options={workflowOptions} value={proposal?.workflowId} readOnly />
           </span>
         </Tooltip>
       </Collapse>

@@ -15,7 +15,6 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { PageMeta } from 'lib/pages/interfaces';
 
 import { PageIcon } from '../../../../PageIcon';
@@ -129,11 +128,11 @@ function DocumentPageTitle({
         <BreadcrumbPageTitle sx={{ maxWidth: 240 }}>
           {currentPage.icon && <StyledPageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
-          {pageMeta?.isLocked && (
+          {pageMeta?.isLocked ? (
             <Tooltip placement='right' title='This page is locked and cannot be edited'>
               <LockIcon color='secondary' sx={{ ml: 1 }} fontSize='small' />
             </Tooltip>
-          )}
+          ) : null}
         </BreadcrumbPageTitle>
       )}
       {isSaving && (
@@ -243,7 +242,7 @@ function RewardsPageTitle({ basePath, sectionName }: { basePath: string; section
           </BreadcrumbPageTitle>
         </Link>
       </BreadCrumb>
-      <BreadcrumbPageTitle>{pageTitle}</BreadcrumbPageTitle>
+      <BreadcrumbPageTitle>{pageTitle || 'Untitled'}</BreadcrumbPageTitle>
     </Box>
   );
 }
@@ -251,14 +250,16 @@ function RewardsPageTitle({ basePath, sectionName }: { basePath: string; section
 function RewardApplicationPageTitle({
   basePath,
   sectionName,
-  applicationId
+  applicationId,
+  rewardId
 }: {
+  rewardId?: string;
   basePath: string;
   sectionName: string;
-  applicationId: string;
+  applicationId?: string;
 }) {
   const { data: application } = useGetApplication({ applicationId });
-  const { data: rewardWithPageMeta } = useGetReward({ rewardId: application?.bountyId });
+  const { data: rewardWithPageMeta } = useGetReward({ rewardId: rewardId ?? application?.bountyId });
 
   return (
     <Box display='flex'>
@@ -272,7 +273,7 @@ function RewardApplicationPageTitle({
               <BreadcrumbPageTitle>{rewardWithPageMeta.page.title}</BreadcrumbPageTitle>
             </Link>
           </BreadCrumb>
-          <BreadcrumbPageTitle>Application</BreadcrumbPageTitle>
+          <BreadcrumbPageTitle>{applicationId ? 'Application' : 'New Application'}</BreadcrumbPageTitle>
         </>
       )}
     </Box>
@@ -309,19 +310,21 @@ export function PageTitleWithBreadcrumbs({
 }) {
   const router = useRouter();
   const { mappedFeatures } = useSpaceFeatures();
-
   if (router.route === '/share/[...pageId]' && router.query?.pageId?.[1] === 'bounties') {
     return <PublicBountyPageTitle />;
-  } else if (pageType === 'bounty') {
+  } else if (pageType === 'bounty' || pageType === 'bounty_template' || router.route === '/[domain]/rewards/new') {
     const sectionName = mappedFeatures.rewards.title;
     return <RewardsPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
   } else if (router.route === '/[domain]/rewards/applications/[applicationId]') {
+    const applicationId = router.query.applicationId as string;
+
     const sectionName = mappedFeatures.rewards.title;
     return (
       <RewardApplicationPageTitle
         basePath={`/${router.query.domain}`}
         sectionName={sectionName}
-        applicationId={router.query.applicationId as string}
+        applicationId={applicationId === 'new' ? undefined : applicationId}
+        rewardId={router.query.rewardId as string}
       />
     );
   } else if (

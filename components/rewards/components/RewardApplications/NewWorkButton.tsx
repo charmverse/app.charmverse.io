@@ -8,6 +8,7 @@ import { Button } from 'components/common/Button';
 import { AddIcon } from 'components/common/Icons/AddIcon';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 
@@ -22,7 +23,8 @@ type Props = {
 export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 'contained' }: Props) {
   const { rewards } = useRewards();
   const { user } = useUser();
-  const { updateURLQuery } = useCharmRouter();
+  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
+  const isCharmverseSpace = useIsCharmverseSpace();
 
   const reward = useMemo(() => {
     return rewards?.find((r) => r.id === rewardId);
@@ -39,8 +41,12 @@ export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 
   async function newApplication() {
     if (!reward) return;
 
-    // open modal with empty submission
-    updateURLQuery({ id: rewardId, applicationId: 'new' });
+    if (isCharmverseSpace) {
+      navigateToSpacePath(`/rewards/applications/new`, { rewardId });
+    } else {
+      // open modal with empty submission
+      updateURLQuery({ id: rewardId, applicationId: 'new' });
+    }
   }
 
   if (
