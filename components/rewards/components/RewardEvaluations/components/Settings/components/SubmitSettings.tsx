@@ -1,6 +1,5 @@
 import styled from '@emotion/styled';
 import { Box, Checkbox, FormLabel, Stack, TextField, Typography } from '@mui/material';
-import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
@@ -37,7 +36,7 @@ export function SubmitStepSettings({
       <Box>
         <FormLabel>
           <Typography sx={{ mb: 1 }} variant='subtitle1'>
-            Reviewers
+            Due date
           </Typography>
         </FormLabel>
         <DateTimePicker
@@ -91,21 +90,19 @@ export function SubmitStepSettings({
                 Applicant Roles
               </Typography>
             </FormLabel>
-            <Box width='100%'>
-              <UserAndRoleSelect
-                type='role'
-                readOnly={readOnly}
-                variant='outlined'
-                value={(rewardInput?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
-                onChange={(options) => {
-                  const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
+            <UserAndRoleSelect
+              type='role'
+              readOnly={readOnly}
+              variant='outlined'
+              value={(rewardInput?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
+              onChange={(options) => {
+                const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
 
-                  onChange({
-                    allowedSubmitterRoles: roleIds
-                  });
-                }}
-              />
-            </Box>
+                onChange({
+                  allowedSubmitterRoles: roleIds
+                });
+              }}
+            />
           </Box>
 
           <Box>
@@ -114,51 +111,45 @@ export function SubmitStepSettings({
                 # Available
               </Typography>
             </FormLabel>
-            <Box width='100%'>
-              <TextField
-                onChange={(e) => {
-                  const value = Number(e.target.value);
-                  onChange({
-                    maxSubmissions: value <= 0 ? null : value
-                  });
-                }}
-                variant='outlined'
-                defaultValue={rewardInput?.maxSubmissions}
-                type='number'
-                size='small'
-                inputProps={{
-                  step: 1,
-                  min: 1
-                }}
-                sx={{
-                  width: '100%'
-                }}
-                disabled={readOnly}
-                placeholder='Unlimited'
-              />
-            </Box>
+            <TextField
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                onChange({
+                  maxSubmissions: value <= 0 ? null : value
+                });
+              }}
+              variant='outlined'
+              value={rewardInput?.maxSubmissions}
+              type='number'
+              size='small'
+              inputProps={{
+                step: 1,
+                min: 1
+              }}
+              sx={{
+                width: '100%'
+              }}
+              disabled={readOnly}
+              placeholder='Unlimited'
+            />
           </Box>
         </>
       ) : (
-        <RowStack>
+        <Box>
           <FormLabel>
-            <Typography component='span' variant='subtitle1'>
-              Assigned applicants
+            <Typography sx={{ mb: 1 }} variant='subtitle1'>
+              Assigned applicants roles
             </Typography>
           </FormLabel>
-          <Box width='fit-content'>
-            <UserSelect
-              memberIds={rewardInput.assignedSubmitters ?? []}
-              readOnly={readOnly}
-              onChange={updateAssignedSubmitters}
-              wrapColumn
-              showEmptyPlaceholder
-              error={
-                !rewardInput.assignedSubmitters?.length && !readOnly ? 'Requires at least one assignee' : undefined
-              }
-            />
-          </Box>
-        </RowStack>
+          <UserSelect
+            memberIds={rewardInput.assignedSubmitters ?? []}
+            readOnly={readOnly}
+            onChange={updateAssignedSubmitters}
+            wrapColumn
+            showEmptyPlaceholder
+            error={!rewardInput.assignedSubmitters?.length && !readOnly ? 'Requires at least one assignee' : undefined}
+          />
+        </Box>
       )}
     </Stack>
   );

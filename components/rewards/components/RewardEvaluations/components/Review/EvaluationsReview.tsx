@@ -16,6 +16,7 @@ import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/i
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { RewardEvaluation } from 'pages/api/spaces/[id]/rewards/workflows';
 
+import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
@@ -69,7 +70,10 @@ export function EvaluationsReview({
   }
 
   function updateEvaluation(updates: UpdateableRewardFields) {
-    setTempRewardUpdates(updates);
+    setTempRewardUpdates({
+      ...tempRewardUpdates,
+      ...updates
+    });
   }
 
   async function saveEvaluation() {
@@ -112,19 +116,17 @@ export function EvaluationsReview({
             }
           >
             {evaluation.type === 'application_review' || evaluation.type === 'review' ? (
-              <Box mb={2}>
-                <ReviewStepReview
-                  reviewers={reward.reviewers ?? []}
-                  rewardId={reward.id}
-                  application={application}
-                  evaluation={evaluation}
-                  hideReviewResult={!isCurrent && evaluation.result === null}
-                />
-              </Box>
+              <ReviewStepReview
+                reviewers={reward.reviewers ?? []}
+                rewardId={reward.id}
+                application={application}
+                evaluation={evaluation}
+                hideReviewResult={!isCurrent && evaluation.result === null}
+              />
             ) : evaluation.type === 'payment' ? (
-              <Box mb={2}>
-                <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
-              </Box>
+              <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
+            ) : evaluation.type === 'submit' ? (
+              <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
             ) : null}
           </EvaluationStepRow>
         );
