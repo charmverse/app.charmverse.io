@@ -1,3 +1,6 @@
+import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
+
+import type { IssuableProposalCredentialSpace } from 'lib/credentials/findIssuableProposalCredentials';
 import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -12,6 +15,22 @@ export async function getBlocks(
   board: Pick<BlockWithDetails, 'fields' | 'spaceId' | 'createdBy'>,
   blocks: BlockWithDetails[]
 ) {
+  const space: IssuableProposalCredentialSpace = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: board.spaceId
+    },
+    select: {
+      id: true,
+      useOnchainCredentials: true,
+      features: true,
+      credentialTemplates: {
+        where: {
+          schemaType: 'proposal'
+        }
+      }
+    }
+  });
+
   const [permissionsById, proposalCardProperties] = await Promise.all([
     // get permissions for each propsoal based on the database author
     permissionsApiClient.proposals.bulkComputeProposalPermissions({
@@ -19,7 +38,7 @@ export async function getBlocks(
       userId: board.createdBy
     }),
     // get properties for proposals
-    getCardPropertiesFromProposals({ cardProperties: board.fields.cardProperties, spaceId: board.spaceId })
+    getCardPropertiesFromProposals({ cardProperties: board.fields.cardProperties, space })
   ]);
   // combine blocks with proposal cards and permissions
   return applyPropertiesToCardsAndFilter({
@@ -34,6 +53,23 @@ export async function getBlocks(
 export async function getBlocksAndRefresh(board: BlockWithDetails, blocks: BlockWithDetails[]) {
   // Update board and view blocks before computing proposal cards
   const updatedBoard = await updateBoardProperties({ boardId: board.id });
+
+  const space: IssuableProposalCredentialSpace = await prisma.space.findUniqueOrThrow({
+    where: {
+      id: board.spaceId
+    },
+    select: {
+      id: true,
+      useOnchainCredentials: true,
+      features: true,
+      credentialTemplates: {
+        where: {
+          schemaType: 'proposal'
+        }
+      }
+    }
+  });
+
   // use the most recent the card properties
   board.fields = updatedBoard.fields as unknown as BoardFields;
 
@@ -46,7 +82,7 @@ export async function getBlocksAndRefresh(board: BlockWithDetails, blocks: Block
     // create missing blocks for new proposals
     createMissingCards({ boardId: board.id }),
     // get properties for proposals
-    getCardPropertiesFromProposals({ cardProperties: board.fields.cardProperties, spaceId: board.spaceId })
+    getCardPropertiesFromProposals({ cardProperties: board.fields.cardProperties, space })
   ]);
   // combine blocks with proposal cards and permissions
   return applyPropertiesToCardsAndFilter({
