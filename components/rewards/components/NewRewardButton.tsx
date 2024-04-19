@@ -89,7 +89,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
 
   function createTemplate() {
     if (isCharmverseSpace) {
-      navigateToSpacePath('/rewards/new', { type: 'reward_template' });
+      navigateToSpacePath('/rewards/new', { type: 'bounty_template' });
     } else {
       openNewPage({
         type: 'bounty_template'
