@@ -10,13 +10,14 @@ export default function RewardApplicationPageComponent() {
   const isCharmverseSpace = useIsCharmverseSpace();
 
   const applicationId = router.query.applicationId as string;
+  const rewardId = router.query.rewardId as string;
 
   if (!applicationId) {
     return null;
   }
 
   if (isCharmverseSpace) {
-    return <RewardApplicationPageV2 applicationId={applicationId} />;
+    return <RewardApplicationPageV2 applicationId={applicationId} rewardId={rewardId} />;
   }
 
   // TODO - Add event type

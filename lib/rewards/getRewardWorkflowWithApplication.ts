@@ -7,12 +7,32 @@ export function getRewardWorkflowWithApplication({
   workflow
 }: {
   workflow: RewardWorkflow;
-  application: ApplicationWithTransactions;
+  application?: ApplicationWithTransactions;
 }): RewardWorkflow {
+  if (!application) {
+    return workflow;
+  }
+
   const applicationStatus = application.status;
   switch (applicationStatus) {
     case 'applied': {
-      return workflow;
+      const applyStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'apply');
+      return {
+        ...workflow,
+        evaluations: workflow.evaluations.map((evaluation, index) => {
+          if (evaluation.type === 'apply') {
+            return {
+              ...evaluation,
+              result: 'pass'
+            };
+          }
+
+          return {
+            ...evaluation,
+            result: index < applyStepIndex ? 'pass' : null
+          };
+        })
+      };
     }
     case 'rejected': {
       const applicationReviewStepIndex = workflow.evaluations.findIndex(

@@ -40,13 +40,12 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = getRewardWorkflow(workflowOptions, reward);
-  const updatedWorkflow =
-    application && workflow
-      ? getRewardWorkflowWithApplication({
-          application,
-          workflow
-        })
-      : workflow;
+  const updatedWorkflow = workflow
+    ? getRewardWorkflowWithApplication({
+        application,
+        workflow
+      })
+    : workflow;
 
   const currentEvaluation = updatedWorkflow ? getCurrentRewardEvaluation(updatedWorkflow) : null;
   const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);

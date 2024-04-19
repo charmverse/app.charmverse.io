@@ -37,17 +37,17 @@ import { RewardSubmissionInput } from './components/RewardSubmissionInput';
 type Props = {
   applicationId: string | null;
   rewardId?: string | null;
-  closeDialog?: VoidFunction;
 };
 
 const StyledContainer = styled(PageEditorContainer)`
   margin-bottom: 180px;
 `;
 
-export function RewardApplicationPageV2({ applicationId, rewardId, closeDialog }: Props) {
+export function RewardApplicationPageV2({ applicationId: _applicationId, rewardId }: Props) {
+  const applicationId = _applicationId === 'new' ? null : _applicationId;
   const isNewApplication = !applicationId && !!rewardId;
   const { showMessage } = useSnackbar();
-
+  const { navigateToSpacePath } = useCharmRouter();
   const { application, refreshApplication, applicationRewardPermissions, updateApplication } = useApplication({
     applicationId: applicationId || ''
   });
@@ -92,10 +92,11 @@ export function RewardApplicationPageV2({ applicationId, rewardId, closeDialog }
     try {
       setIsSaving(true);
       if (isNewApplication) {
-        await createNewWork(input);
+        const submission = await createNewWork(input);
         refreshReward();
-        // use nav instead
-        closeDialog?.();
+        if (submission) {
+          navigateToSpacePath(`/rewards/applications/${submission.id}`);
+        }
       } else {
         await updateApplication(input);
       }
