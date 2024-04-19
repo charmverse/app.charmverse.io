@@ -247,11 +247,11 @@ function DocumentPageComponent({
   const proposalAuthors = proposal ? [proposal.createdBy, ...proposal.authors.map((author) => author.userId)] : [];
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const projectId = proposal?.projectId;
-  const projectFormFieldAnswer = proposalFormFieldAnswers.find(
-    (answer) => answer.fieldId === projectProfileField?.id
-  ) as { projectId: string; selectedMemberIds: string[] } | undefined;
+  const projectFormFieldAnswer = proposalFormFieldAnswers.find((answer) => answer.fieldId === projectProfileField?.id)
+    ?.value as { projectId: string; selectedMemberIds: string[] } | undefined;
 
   const form = useProjectForm({
+    initialProjectValues: proposal?.project,
     projectId,
     selectedMemberIds: projectFormFieldAnswer?.selectedMemberIds,
     fieldConfig:
@@ -547,12 +547,7 @@ function DocumentPageComponent({
           </PageEditorContainer>
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
-          <ProposalStickyFooter
-            page={page}
-            proposal={proposal}
-            isStructuredProposal={isStructuredProposal}
-            refreshProposal={refreshProposal}
-          />
+          <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
         )}
       </FormProvider>
     </Box>

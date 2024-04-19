@@ -1,167 +1,27 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useEffect, useMemo, useRef } from 'react';
 import { useForm } from 'react-hook-form';
-import { isAddress } from 'viem';
 import * as yup from 'yup';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/constants';
+import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
+import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type {
-  ProjectField,
-  ProjectMemberField,
-  ProjectAndMembersFieldConfig,
-  ProjectWithMembers,
-  ProjectAndMembersPayload
-} from 'lib/projects/interfaces';
-import { isValidEmail } from 'lib/utils/strings';
-
-function addMatchersToSchema({
-  fieldType,
-  isRequired,
-  schemaObject
-}: {
-  fieldType: ProjectField | ProjectMemberField;
-  isRequired: boolean;
-  schemaObject: Record<string, yup.StringSchema>;
-}) {
-  if (fieldType === 'walletAddress') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-address', 'Invalid wallet address', (value) => {
-      try {
-        if (isRequired && !value) {
-          return false;
-        }
-
-        if (value) {
-          return isAddress(value) || value.endsWith('.eth');
-        }
-
-        return true;
-      } catch {
-        return false;
-      }
-    });
-  } else if (fieldType === 'email') {
-    schemaObject[fieldType] = schemaObject[fieldType]!.test('is-valid-email', 'Invalid email address', (value) => {
-      if (isRequired && !value) {
-        return false;
-      }
-
-      if (value) {
-        return isValidEmail(value);
-      }
-
-      return true;
-    });
-  }
-}
-
-export function createProjectYupSchema({
-  fieldConfig,
-  defaultRequired = false
-}: {
-  fieldConfig: ProjectAndMembersFieldConfig;
-  defaultRequired?: boolean;
-}) {
-  const yupProjectSchemaObject: Partial<Record<ProjectField, yup.StringSchema>> = {};
-  const yupProjectMemberSchemaObject: Partial<Record<ProjectMemberField, yup.StringSchema>> = {};
-  projectFieldProperties.forEach((projectFieldProperty) => {
-    const projectFieldConfig = fieldConfig[projectFieldProperty.field] ?? {
-      required: defaultRequired,
-      show: true
-    };
-
-    projectFieldConfig.required = projectFieldConfig.required ?? defaultRequired;
-
-    if (projectFieldConfig.show !== false) {
-      if (projectFieldConfig.required) {
-        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string().required();
-      } else {
-        yupProjectSchemaObject[projectFieldProperty.field as ProjectField] = yup.string();
-      }
-
-      addMatchersToSchema({
-        fieldType: projectFieldProperty.field as ProjectField | ProjectMemberField,
-        isRequired: !!projectFieldConfig.required,
-        schemaObject: yupProjectSchemaObject
-      });
-    }
-  });
-
-  projectMemberFieldProperties.forEach((projectMemberFieldProperty) => {
-    const projectMemberFieldConfig = fieldConfig.projectMember[projectMemberFieldProperty.field] ?? {
-      required: defaultRequired,
-      show: true
-    };
-    projectMemberFieldConfig.required = projectMemberFieldConfig.required ?? defaultRequired;
-    if (projectMemberFieldConfig.show !== false) {
-      if (projectMemberFieldConfig.required) {
-        yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string().required();
-      } else {
-        yupProjectMemberSchemaObject[projectMemberFieldProperty.field as ProjectMemberField] = yup.string();
-      }
-
-      addMatchersToSchema({
-        fieldType: projectMemberFieldProperty.field as ProjectField | ProjectMemberField,
-        isRequired: !!projectMemberFieldConfig.required,
-        schemaObject: yupProjectMemberSchemaObject
-      });
-    }
-  });
-
-  return yup
-    .object({
-      projectMembers: yup.array().of(yup.object(yupProjectMemberSchemaObject))
-    })
-    .concat(yup.object(yupProjectSchemaObject));
-}
-
-export function convertToProjectValues(projectWithMembers: ProjectWithMembers) {
-  return {
-    blog: projectWithMembers.blog,
-    communityUrl: projectWithMembers.communityUrl,
-    description: projectWithMembers.description,
-    excerpt: projectWithMembers.excerpt,
-    github: projectWithMembers.github,
-    name: projectWithMembers.name,
-    otherUrl: projectWithMembers.otherUrl,
-    demoUrl: projectWithMembers.demoUrl,
-    twitter: projectWithMembers.twitter,
-    walletAddress: projectWithMembers.walletAddress,
-    website: projectWithMembers.website,
-    projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
-      return {
-        warpcast: projectMember.warpcast,
-        email: projectMember.email,
-        github: projectMember.github,
-        linkedin: projectMember.linkedin,
-        name: projectMember.name,
-        otherUrl: projectMember.otherUrl,
-        previousProjects: projectMember.previousProjects,
-        telegram: projectMember.telegram,
-        twitter: projectMember.twitter,
-        walletAddress: projectMember.walletAddress,
-        id: projectMember.id,
-        userId: projectMember.userId
-      };
-    })
-  } as ProjectAndMembersPayload;
-}
+import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function useProjectForm(options: {
-  defaultValues?: ProjectAndMembersPayload;
   fieldConfig: ProjectAndMembersFieldConfig;
   defaultRequired?: boolean;
   projectId?: string | null;
   selectedMemberIds?: string[];
+  initialProjectValues?: ProjectWithMembers | null;
 }) {
-  const { defaultRequired, defaultValues, fieldConfig } = options;
+  const { defaultRequired, fieldConfig } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
   const { data: projectsWithMembers } = useGetProjects();
-  const projectWithMembers = projectsWithMembers?.find((project) => project.id === options.projectId);
   const selectedMemberIds = options.selectedMemberIds;
 
   const defaultProjectAndMembersPayload = useMemo(
@@ -178,21 +38,8 @@ export function useProjectForm(options: {
     });
   }, [fieldConfig, defaultRequired]);
 
-  const defaultProjectWithMembers = useMemo(() => {
-    if (!projectWithMembers) {
-      return undefined;
-    }
-    return convertToProjectValues({
-      ...projectWithMembers,
-      projectMembers: projectWithMembers.projectMembers.filter((member, index) =>
-        // 0th index is the team lead which is always present
-        member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
-      )
-    });
-  }, [projectWithMembers, selectedMemberIds?.length]);
-
   const form = useForm({
-    defaultValues: defaultProjectWithMembers ?? defaultValues ?? defaultProjectAndMembersPayload,
+    defaultValues: defaultProjectAndMembersPayload,
     reValidateMode: 'onChange',
     resolver: yupResolver(yupSchema.current),
     criteriaMode: 'all',
@@ -200,25 +47,31 @@ export function useProjectForm(options: {
   });
 
   useEffect(() => {
+    const projectWithMembers =
+      options.initialProjectValues ?? projectsWithMembers?.find((project) => project.id === options.projectId);
+
     if (options.projectId && projectWithMembers) {
+      const teamLead = projectWithMembers.projectMembers.find((member) => member.teamLead);
+      const nonTeamLeadMembers = projectWithMembers.projectMembers
+        .filter(
+          (member) =>
+            // Make sure only the selected members are present in the form
+            !member.teamLead && selectedMemberIds?.includes(member.id)
+        )
+        .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+
       form.reset(
-        {
+        convertToProjectValues({
           ...projectWithMembers,
-          projectMembers: selectedMemberIds
-            ? projectWithMembers.projectMembers.filter((member, index) =>
-                // 0th index is the team lead which is always present
-                member.id ? index === 0 || selectedMemberIds?.includes(member.id) : false
-              )
-            : projectWithMembers.projectMembers
-        },
-        {
-          keepIsValid: false
-        }
+          projectMembers: [teamLead!, ...nonTeamLeadMembers]
+        })
       );
+      // trigger form so that errors are populated correctly
+      form.trigger();
     } else {
       form.reset(defaultProjectAndMembersPayload);
     }
-  }, [options.projectId, selectedMemberIds?.length]);
+  }, [!!projectsWithMembers, !!options.initialProjectValues, options.projectId, selectedMemberIds?.length]);
 
   return form;
 }

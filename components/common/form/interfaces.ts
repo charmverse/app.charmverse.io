@@ -49,6 +49,7 @@ export type FieldProps = {
   description?: PageContent;
   labelEndAdornment?: ReactNode;
   inputEndAdornment?: ReactNode;
+  topComponent?: ReactNode;
   inputEndAdornmentAlignItems?: React.CSSProperties['alignItems'];
 } & SelectFieldProps;
 

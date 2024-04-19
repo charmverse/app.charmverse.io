@@ -1,3 +1,5 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
+
 import type { ProjectAndMembersFieldConfig, ProjectFieldProperty, ProjectAndMembersPayload } from './interfaces';
 
 export const projectMemberFieldProperties: ProjectFieldProperty[] = [
@@ -152,3 +154,16 @@ export function createDefaultProjectAndMembersFieldConfig() {
     }
   } as ProjectAndMembersFieldConfig;
 }
+
+export const projectInclude = {
+  projectMembers: {
+    orderBy: [
+      {
+        teamLead: 'desc'
+      },
+      {
+        createdAt: 'asc'
+      }
+    ]
+  }
+} satisfies Prisma.ProjectInclude;

@@ -76,6 +76,14 @@ export class ProposalPage extends DocumentPage {
     super(page);
   }
 
+  getRemoveProjectMemberButton(index: number) {
+    return this.page.locator(`data-test=remove-project-member-button`).nth(index);
+  }
+
+  getProjectMemberOption(index: number) {
+    return this.page.locator('data-test=project-member-option').nth(index);
+  }
+
   getSelectOption(optionId: string) {
     return this.page.locator(`data-test=select-option-${optionId}`);
   }

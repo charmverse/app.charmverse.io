@@ -4,6 +4,7 @@ import { v4 } from 'uuid';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 
+import { projectInclude } from './constants';
 import { findCharmVerseUserIdWithProjectMember } from './getProjectMemberCreateTransaction';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from './interfaces';
 
@@ -72,18 +73,7 @@ export async function createProject(payload: {
         }
       }
     },
-    include: {
-      projectMembers: {
-        orderBy: [
-          {
-            teamLead: 'desc'
-          },
-          {
-            createdAt: 'asc'
-          }
-        ]
-      }
-    }
+    include: projectInclude
   });
 
   return projectWithMembers;

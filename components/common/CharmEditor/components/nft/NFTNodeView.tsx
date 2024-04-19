@@ -242,7 +242,9 @@ function NFTForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSub
                   chains={blockchains}
                   chainId={defaultChain}
                   sx={{ width: '100%' }}
-                  onChange={setChain}
+                  onChange={(chainId) => {
+                    setChain(chainId as number);
+                  }}
                 />
               </Box>
             </Box>

@@ -41,6 +41,7 @@ import {
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
+import { isWalletConfig } from './fields/utils';
 import type { FormFieldInput } from './interfaces';
 
 export const FormFieldContainer = styled(Stack, {
@@ -218,6 +219,15 @@ function ExpandedFormField({
           onCreateOption={onCreateOption}
           onDeleteOption={onDeleteOption}
           onUpdateOption={onUpdateOption}
+          walletInputConfig={{
+            chainId: isWalletConfig(formField.fieldConfig) ? formField.fieldConfig.chainId : undefined,
+            onChangeChainId: (chainId) => {
+              updateFormField({
+                fieldConfig: { chainId },
+                id: formField.id
+              });
+            }
+          }}
           placeholder={fieldTypePlaceholderRecord[formField.type]}
           // Enable select and multiselect fields to be able to create options
           disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
@@ -357,6 +367,14 @@ export function FormField(
                 <FieldTypeRenderer
                   labelEndAdornment={
                     formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
+                  }
+                  walletInputConfig={
+                    // Only show if chainId is present in field config and its a valid chainId
+                    isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
+                      ? {
+                          chainId: formField.fieldConfig.chainId
+                        }
+                      : undefined
                   }
                   type={formField.type as any}
                   description={formField.description as PageContent}

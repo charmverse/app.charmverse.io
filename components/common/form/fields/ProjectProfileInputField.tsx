@@ -1,14 +1,14 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { ProposalProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
-import { convertToProjectValues } from 'components/settings/projects/hooks/useProjectForm';
 import { useUser } from 'hooks/useUser';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type {
   ProjectAndMembersFieldConfig,
   ProjectAndMembersPayload,
@@ -45,13 +45,7 @@ export function ProjectProfileInputField({
   const { reset } = useFormContext<ProjectAndMembersPayload>();
   const { trigger: createProject } = useCreateProject();
 
-  useEffect(() => {
-    if (project) {
-      reset(convertToProjectValues(project));
-    }
-  }, [!!project]);
-
-  const isTeamLead = selectedProject?.projectMembers[0].userId === user?.id;
+  const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
 
   function onOptionClick(_selectedProject: ProjectWithMembers) {
     if (proposalId) {
@@ -59,12 +53,16 @@ export function ProjectProfileInputField({
         projectId: _selectedProject.id
       });
     }
-    // else update the projectId field of the form, it might be for a new structured proposal form
-    else {
-      onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
-    }
+    // update the projectId field of the form, it might be for a new structured proposal form
+    onChange({ projectId: _selectedProject.id, selectedMemberIds: [] });
     setSelectedProject(_selectedProject);
-    reset(convertToProjectValues(_selectedProject));
+    reset(
+      convertToProjectValues({
+        ..._selectedProject,
+        // Just add the team lead to the project members since selectedMemberIds is empty
+        projectMembers: [_selectedProject.projectMembers[0]]
+      })
+    );
   }
 
   return (

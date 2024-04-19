@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type { permissionsApiClient } from 'lib/permissions/api/client';
+import { projectInclude } from 'lib/projects/constants';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 import { mapDbProposalToProposal } from './mapDbProposalToProposal';
@@ -43,18 +44,7 @@ export async function getProposal({
       page: { select: { id: true, content: true, contentText: true, sourceTemplateId: true, type: true } },
       rewards: true,
       project: {
-        include: {
-          projectMembers: {
-            orderBy: [
-              {
-                teamLead: 'desc'
-              },
-              {
-                createdAt: 'asc'
-              }
-            ]
-          }
-        }
+        include: projectInclude
       },
       form: {
         include: {
