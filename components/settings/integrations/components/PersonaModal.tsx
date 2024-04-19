@@ -1,13 +1,14 @@
 import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import Persona from 'persona';
+import dynamic from 'next/dynamic';
 
 import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useUser } from 'hooks/useUser';
+
+const PersonaInquiry = dynamic(() => import('persona').then((module) => module.Inquiry), { ssr: false });
 
 const mapPersonaStatus = {
   pending: 'Pending',
@@ -20,7 +21,7 @@ const mapPersonaStatus = {
   declined: 'Declined'
 };
 
-export default function PersonaModal({ spaceId }: { spaceId: string }) {
+export function PersonaModal({ spaceId }: { spaceId: string }) {
   const { user } = useUser();
   const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId);
   const {
@@ -28,14 +29,23 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
     trigger: initPersonaInquiry,
     isMutating: isLoadingPersonaInquiry
   } = useInitPersonaInquiry(spaceId);
-  const popupConfirmationState = usePopupState({ variant: 'popover', popupId: 'confirm-kyc' });
+  const { showConfirmation } = useConfirmationModal();
   const popupPersonaState = usePopupState({ variant: 'popover', popupId: 'kyc-persona' });
   const disabled = ['pending', 'completed', 'needs_review', 'approved'].includes(personaUserKyc?.status || '');
 
-  const handleConfirm = async () => {
+  const onConfirm = async () => {
     await initPersonaInquiry();
-    popupConfirmationState.close();
     popupPersonaState.open();
+  };
+
+  const onStart = async () => {
+    await showConfirmation({
+      message: 'You will be redirected to our partner Persona to finish your KYC.',
+      title: 'KYC aknowledgement',
+      confirmButton: 'Confirm',
+      loading: isPersonaUserKycLoading || isLoadingPersonaInquiry,
+      onConfirm
+    });
   };
 
   return (
@@ -50,24 +60,13 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
         />
       ) : (
         <Button
-          onClick={popupConfirmationState.open}
+          onClick={onStart}
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
           data-test='start-persona-kyc'
         >
           Test KYC
         </Button>
       )}
-
-      <ModalWithButtons
-        title='KYC aknowledgement'
-        buttonText='Confirm'
-        onConfirm={handleConfirm}
-        onClose={popupConfirmationState.close}
-        open={popupConfirmationState.isOpen}
-        loading={isPersonaUserKycLoading || isLoadingPersonaInquiry}
-      >
-        <Typography>You will be redirected to our partner Persona to finish your KYC.</Typography>
-      </ModalWithButtons>
       {personaInquiry?.inquiryId && (
         <Modal
           size='fluid'
@@ -75,7 +74,7 @@ export default function PersonaModal({ spaceId }: { spaceId: string }) {
           open={popupPersonaState.isOpen}
           sx={{ '& iframe': { minWidth: '375px', width: '100%', minHeight: '600px', height: '100%' } }}
         >
-          <Persona.Inquiry
+          <PersonaInquiry
             inquiryId={personaInquiry?.inquiryId}
             referenceId={user?.id}
             onComplete={() => {

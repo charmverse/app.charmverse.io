@@ -7,17 +7,18 @@ export type KycCredentials = {
 };
 
 export async function getKycCredentials(spaceId: string): Promise<KycCredentials> {
-  const synapsCredential = await prisma.synapsCredential.findUnique({
-    where: {
-      spaceId
-    }
-  });
-
-  const personaCredential = await prisma.personaCredential.findUnique({
-    where: {
-      spaceId
-    }
-  });
+  const [synapsCredential, personaCredential] = await prisma.$transaction([
+    prisma.synapsCredential.findUnique({
+      where: {
+        spaceId
+      }
+    }),
+    prisma.personaCredential.findUnique({
+      where: {
+        spaceId
+      }
+    })
+  ]);
 
   return { synaps: synapsCredential, persona: personaCredential };
 }
