@@ -28,7 +28,7 @@ import { isTruthy } from 'lib/utils/types';
 import { convertRichText } from '../convertRichText';
 import { getPageTitleText } from '../getPageTitle';
 import { getPersistentImageUrl } from '../getPersistentImageUrl';
-import type { BlockWithChildren, BlocksRecord } from '../types';
+import type { BlockWithChildren, BlocksRecord } from '../interfaces';
 
 import type { CharmversePage } from './CharmversePage';
 import type { NotionPage } from './NotionPage';
@@ -168,7 +168,10 @@ export class NotionBlock {
       } catch (err) {
         if (block) {
           log.warn(`[notion] Failed to convert notion ${block.type}:${block.id} block to charmverse block`, {
-            spaceId: this.notionPage.spaceId
+            block,
+            spaceId: this.notionPage.spaceId,
+            userId: this.notionPage.userId,
+            error: err
           });
           const notionPage = this.notionPage.cache.notionPagesRecord[
             this.charmversePage.notionPageId
@@ -187,6 +190,13 @@ export class NotionBlock {
               blocks: [...failedImportsRecord.blocks, [block.id, block.type]]
             };
           }
+        } else {
+          log.warn('[notion] Error when converting blocks for a page', {
+            spaceId: this.notionPage.spaceId,
+            userId: this.notionPage.userId,
+            error: err,
+            blockIds
+          });
         }
       }
     }
@@ -532,7 +542,18 @@ export class NotionBlock {
         const charmversePage = await this.notionPage.fetchAndCreatePage({
           notionPageId: block.id
         });
-
+        // Notion api doesn't support linked databases. See: https://developers.notion.com/reference/retrieve-a-database
+        if (!charmversePage && block.type === 'child_database') {
+          return {
+            type: 'paragraph',
+            content: [
+              {
+                type: 'text',
+                text: '[Linked database could not be imported]'
+              }
+            ]
+          };
+        }
         return {
           type: 'page',
           attrs: {

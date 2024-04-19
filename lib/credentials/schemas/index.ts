@@ -26,6 +26,8 @@ export const attestationSchemaIds: Record<AttestationType, string> = {
   external: externalCredentialSchemaId
 };
 
+export const charmverseCredentialSchemas = [attestationSchemaIds.proposal, attestationSchemaIds.reward];
+
 export type CredentialDataInput<T extends AttestationType = AttestationType> = T extends 'proposal'
   ? ProposalCredential
   : T extends 'reward'

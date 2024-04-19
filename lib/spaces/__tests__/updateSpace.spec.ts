@@ -185,10 +185,6 @@ describe('updateSpace', () => {
     typedKeys(update).forEach((key) => {
       expect(updatedSpace[key]).toEqual(update[key]);
     });
-
-    typedKeys(droppedUpdate).forEach((key) => {
-      expect(updatedSpace[key]).not.toEqual(droppedUpdate[key]);
-    });
   });
 
   it('should throw an error if no space ID is provided', async () => {

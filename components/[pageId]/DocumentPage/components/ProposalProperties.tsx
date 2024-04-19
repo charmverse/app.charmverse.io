@@ -33,8 +33,6 @@ export function ProposalProperties({
 
   // further restrict readOnly if user cannot update proposal properties specifically
   const readOnlyProperties = readOnly || !proposal?.permissions.edit;
-  const readOnlySelectedCredentialTemplates =
-    readOnly || !proposal?.permissions.edit || (sourceTemplate?.selectedCredentialTemplates && !isAdmin);
 
   // properties with values from templates should be read only
   const readOnlyCustomProperties =
@@ -89,7 +87,6 @@ export function ProposalProperties({
           readOnlyCustomProperties={readOnlyCustomProperties}
           readOnlyRewards={!proposal?.permissions.edit}
           rewardIds={proposal?.rewardIds}
-          readOnlySelectedCredentialTemplates={readOnlySelectedCredentialTemplates}
           isStructuredProposal={!!proposal?.formId}
           isProposalTemplate={proposalPage.type === 'proposal_template'}
         />

@@ -14,6 +14,7 @@ import type {
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
@@ -28,7 +29,7 @@ export type ProposalEvaluationStatus =
   | 'unpublished'
   | 'published'
   | 'archived';
-export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'draft';
+export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'credentials' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
 export type VoteSettings = Pick<
@@ -75,4 +76,5 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
     formFields: TypedFormField[] | null;
   } | null;
   project?: ProjectWithMembers | null;
+  issuedCredentials: EASAttestationFromApi[];
 };

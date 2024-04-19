@@ -2,7 +2,7 @@ import type { ApolloClient } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
+import { arrayUtils, stringUtils } from '@charmverse/core/utilities';
 import type { SchemaDecodedItem } from '@ethereum-attestation-service/eas-sdk';
 import { getAddress } from 'viem';
 import { arbitrum, base, optimism, optimismSepolia, sepolia } from 'viem/chains';
@@ -260,6 +260,59 @@ export async function getCharmverseOnchainCredentials({
       return attestation;
     })
   };
+}
+
+export async function getOnchainCredentialsById({
+  attestations
+}: {
+  attestations: { id: string; chainId: EasSchemaChain }[];
+}): Promise<EASAttestationFromApi[]> {
+  const groupedByChain = attestations.reduce((acc, val) => {
+    if (!acc[val.chainId]) {
+      acc[val.chainId] = [];
+    }
+
+    acc[val.chainId].push(val.id);
+
+    return acc;
+  }, {} as Record<EasSchemaChain, string[]>);
+
+  const foundAttestations = await Promise.all(
+    Object.entries(groupedByChain).map(([chainId, attestationIds]) => {
+      const query = {
+        id: {
+          in: attestationIds
+        }
+      };
+
+      const numericalChainId = parseInt(chainId) as EasSchemaChain;
+
+      return graphQlClients[numericalChainId]
+        .query({
+          query: GET_EXTERNAL_CREDENTIALS,
+          variables: {
+            where: query
+          }
+        })
+        .then(({ data }) => {
+          return data.attestations.map((attestation: any) => {
+            return {
+              ...attestation,
+              chainId,
+              type: 'onchain',
+              content: JSON.parse(attestation.decodedDataJson).reduce((acc: any, val: SchemaDecodedItem) => {
+                acc[val.name] = val.value.value;
+                return acc;
+              }, {} as any),
+              timeCreated: attestation.timeCreated * 1000,
+              verificationUrl: getOnChainAttestationUrl({ chainId: numericalChainId, attestationId: attestation.id })
+            } as EASAttestationFromApi;
+          });
+        });
+    })
+  ).then((data) => data.flat());
+
+  return foundAttestations;
 }
 
 export async function getAllOnChainAttestations({

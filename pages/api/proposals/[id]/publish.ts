@@ -155,11 +155,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     });
   }
 
-  await issueOffchainProposalCredentialsIfNecessary({
-    event: 'proposal_created',
-    proposalId
-  });
-
   trackUserAction('new_proposal_stage', {
     userId,
     pageId: proposalPage?.id || '',

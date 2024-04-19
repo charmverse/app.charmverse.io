@@ -3,6 +3,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import type { SelectProps } from '@mui/material/Select';
 import Select from '@mui/material/Select';
+import { useMemo } from 'react';
 import type { ReactNode } from 'react';
 
 export type Props<T extends string> = Omit<SelectProps, 'onChange' | 'renderValue'> & {
@@ -10,7 +11,7 @@ export type Props<T extends string> = Omit<SelectProps, 'onChange' | 'renderValu
   renderValue?: (option: T) => ReactNode;
   defaultValue?: T;
   title?: string;
-  keyAndLabel: Partial<Record<Exclude<T, ''>, string>>;
+  keyAndLabel: Partial<Record<Exclude<T, ''>, string | JSX.Element>>;
 };
 
 export default function InputEnumToOptions<T extends string>({
@@ -21,7 +22,7 @@ export default function InputEnumToOptions<T extends string>({
   sx,
   ...props
 }: Props<T>) {
-  const options = Object.entries(keyAndLabel) as [T, string][];
+  const options = useMemo(() => Object.entries(keyAndLabel) as [T, string][], [keyAndLabel]);
 
   return (
     <FormControl fullWidth>

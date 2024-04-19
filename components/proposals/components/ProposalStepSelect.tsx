@@ -12,6 +12,7 @@ type ProposalProp = {
   currentEvaluationId?: ProposalWithUsersLite['currentEvaluationId'];
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;
+  hasCredentials: boolean;
   id: string;
   archived: boolean;
 };
@@ -71,6 +72,7 @@ export function ProposalStepSelectBase({
   onChange: (data: { evaluationId: string; moveForward: boolean }) => void;
 }) {
   const hasRewards = proposal.hasRewards;
+  const hasCredentials = proposal.hasCredentials;
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationIndex = proposal.currentStep.index;
   const currentEvaluationResult = proposal.currentStep.result;
@@ -98,6 +100,15 @@ export function ProposalStepSelectBase({
             {
               id: 'rewards',
               value: 'Rewards',
+              color: 'gray'
+            }
+          ]
+        : []),
+      ...(hasCredentials
+        ? [
+            {
+              id: 'credentials',
+              value: 'Credentials',
               color: 'gray'
             }
           ]

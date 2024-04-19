@@ -12,20 +12,30 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
+import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
 import type { TypedPendingGnosisSafeTransaction } from './indexGnosisSafeCredentialTransaction';
 import type { CredentialDataInput } from './schemas';
 
+export type IssuableProposalCredentialAuthor = {
+  author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
+};
+
+export type IssuableProposalCredentialSpace = Pick<Space, 'id' | 'features'> & {
+  credentialTemplates: Pick<
+    CredentialTemplate,
+    'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
+  >[];
+};
+
 export type ProposalWithJoinedData = {
   id: string;
   status: ProposalStatus;
   evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result'>[];
   selectedCredentialTemplates: string[];
-  authors: {
-    author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
-  }[];
+  authors: IssuableProposalCredentialAuthor[];
   issuedCredentials: Pick<
     IssuedCredential,
     'userId' | 'credentialTemplateId' | 'credentialEvent' | 'onchainAttestationId'
@@ -40,7 +50,7 @@ export type IssuableProposalCredentialContent = {
   credentialTemplateId: string;
   proposalId: string;
   pageId: string;
-  event: Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>;
+  event: Extract<CredentialEventType, 'proposal_approved'>;
 };
 
 // A partial subtype to reduce data passed around the system
@@ -54,16 +64,11 @@ export type PartialIssuableProposalCredentialContent = Pick<
  */
 type GenerateCredentialsParams = {
   proposal: ProposalWithJoinedData;
-  space: Pick<Space, 'id' | 'features'> & {
-    credentialTemplates: Pick<
-      CredentialTemplate,
-      'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
-    >[];
-  };
+  space: IssuableProposalCredentialSpace;
   pendingIssuableCredentials?: PartialIssuableProposalCredentialContent[];
 };
 
-const events: CredentialEventType[] = ['proposal_created', 'proposal_approved'];
+const events: CredentialEventType[] = ['proposal_approved'];
 
 export function generateCredentialInputsForProposal({
   proposal,
@@ -71,6 +76,13 @@ export function generateCredentialInputsForProposal({
   pendingIssuableCredentials
 }: GenerateCredentialsParams): IssuableProposalCredentialContent[] {
   if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length) {
+    return [];
+  }
+
+  const currentStep = getCurrentEvaluation(proposal.evaluations);
+
+  // We only support proposal_approved, so proposal needs to have reached final evaluation
+  if (currentStep?.result !== 'pass') {
     return [];
   }
 
@@ -84,7 +96,7 @@ export function generateCredentialInputsForProposal({
     currentEvaluation?.result === 'pass' &&
     currentEvaluation.index === Math.max(...proposal.evaluations.map((e) => e.index));
 
-  const issuableEvents: CredentialEventType[] = isApprovedProposal ? [...events] : ['proposal_created'];
+  const issuableEvents: CredentialEventType[] = ['proposal_approved'];
 
   proposal.authors.forEach(({ author }) => {
     const targetWallet = author.primaryWallet?.address ?? author.wallets[0]?.address;
@@ -132,7 +144,7 @@ export function generateCredentialInputsForProposal({
               proposalId: proposal.id,
               recipientUserId: author.id,
               pageId: proposal.page.id,
-              event: event as Extract<CredentialEventType, 'proposal_created' | 'proposal_approved'>,
+              event: event as Extract<CredentialEventType, 'proposal_approved'>,
               credential: {
                 Name: credentialTemplate.name,
                 Description: credentialTemplate.description ?? '',
@@ -159,7 +171,9 @@ function proposalCredentialInputFieldsSelect() {
       select: {
         id: true,
         result: true,
-        index: true
+        index: true,
+        type: true,
+        title: true
       }
     },
     issuedCredentials: {
@@ -190,11 +204,15 @@ function proposalCredentialInputFieldsSelect() {
   };
 }
 
-export async function findSpaceIssuableProposalCredentials({
-  spaceId
-}: {
+export type FindIssuableProposalCredentialsInput = {
   spaceId: string;
-}): Promise<IssuableProposalCredentialContent[]> {
+  proposalIds?: string[];
+};
+
+export async function findSpaceIssuableProposalCredentials({
+  spaceId,
+  proposalIds
+}: FindIssuableProposalCredentialsInput): Promise<IssuableProposalCredentialContent[]> {
   const space = await prisma.space.findUniqueOrThrow({
     where: {
       id: spaceId
@@ -212,8 +230,26 @@ export async function findSpaceIssuableProposalCredentials({
     }
   });
 
+  const proposalIdsList = !proposalIds ? undefined : typeof proposalIds === 'string' ? [proposalIds] : proposalIds;
+
   const proposals = await prisma.proposal.findMany({
     where: {
+      OR: proposalIdsList
+        ? [
+            {
+              id: {
+                in: proposalIdsList
+              }
+            },
+            {
+              page: {
+                id: {
+                  in: proposalIdsList
+                }
+              }
+            }
+          ]
+        : undefined,
       spaceId,
       page: {
         type: 'proposal'

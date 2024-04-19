@@ -1,4 +1,5 @@
 import type {
+  IssuedCredential,
   Proposal,
   ProposalEvaluation,
   ProposalRubricCriteria,
@@ -6,6 +7,12 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type {
+  IssuableProposalCredentialAuthor,
+  IssuableProposalCredentialSpace,
+  ProposalWithJoinedData
+} from 'lib/credentials/findIssuableProposalCredentials';
+import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
@@ -30,9 +37,17 @@ const pageSelectObject = {
       id: true,
       authors: {
         select: {
-          userId: true
+          userId: true,
+          author: {
+            select: {
+              id: true,
+              wallets: true,
+              primaryWallet: true
+            }
+          }
         }
       },
+      selectedCredentialTemplates: true,
       fields: true,
       formId: true,
       formAnswers: {
@@ -42,6 +57,7 @@ const pageSelectObject = {
         }
       },
       status: true,
+      issuedCredentials: true,
       evaluations: {
         select: {
           id: true,
@@ -67,14 +83,14 @@ const pageSelectObject = {
 
 export async function getCardPropertiesFromProposals({
   cardProperties,
-  spaceId
+  space
 }: {
   cardProperties: IPropertyTemplate[];
-  spaceId: string;
+  space: IssuableProposalCredentialSpace;
 }): Promise<Record<string, ProposalCardData>> {
   const proposalPages = await prisma.page.findMany({
     where: {
-      spaceId,
+      spaceId: space.id,
       type: 'proposal',
       proposal: {
         archived: {
@@ -94,14 +110,23 @@ export async function getCardPropertiesFromProposals({
       acc[page.id] = getCardProperties({
         page,
         proposal,
-        cardProperties
+        cardProperties,
+        space
       });
     }
     return acc;
   }, {});
 }
 
-export async function getCardPropertiesFromProposal({ boardId, pageId }: { boardId: string; pageId: string }) {
+export async function getCardPropertiesFromProposal({
+  boardId,
+  pageId,
+  space
+}: {
+  boardId: string;
+  pageId: string;
+  space: IssuableProposalCredentialSpace;
+}) {
   const [boardBlock, { proposal, ...page }] = await Promise.all([
     prisma.block.findFirstOrThrow({ where: { id: boardId } }),
     prisma.page.findFirstOrThrow({
@@ -136,29 +161,33 @@ export async function getCardPropertiesFromProposal({ boardId, pageId }: { board
     card: getCardProperties({
       cardProperties: (boardBlock.fields as any as BoardFields).cardProperties,
       proposal,
-      page
+      page,
+      space
     })
   };
 }
 
 type ProposalData = {
   page: {
+    id: string;
     title: string;
     path: string;
   };
-  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status'> & {
-    authors: { userId: string }[];
+  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
+    authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
     evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'> & {
       rubricAnswers: ProposalRubricCriteriaAnswer[];
       rubricCriteria: ProposalRubricCriteria[];
     })[];
     formAnswers: FormAnswerData[];
     rewards: { id: string }[];
+    issuedCredentials: IssuedCredential[];
   };
   cardProperties: IPropertyTemplate[];
+  space: IssuableProposalCredentialSpace;
 };
 
-function getCardProperties({ page, proposal, cardProperties }: ProposalData): ProposalCardData {
+function getCardProperties({ page, proposal, cardProperties, space }: ProposalData): ProposalCardData {
   const proposalProps = getCardPropertyTemplates({ cardProperties });
 
   let properties: Record<string, CardPropertyValue> = {};
@@ -176,11 +205,24 @@ function getCardProperties({ page, proposal, cardProperties }: ProposalData): Pr
     }
   });
 
+  const filteredTemplates = proposal.selectedCredentialTemplates.filter((selectedTemplateId) =>
+    space.credentialTemplates.some((t) => t.id === selectedTemplateId)
+  );
+
+  proposal.selectedCredentialTemplates = filteredTemplates;
+
+  const pendingCredentials = generateCredentialInputsForProposal({
+    proposal: { ...proposal, page: { id: page.id } } as ProposalWithJoinedData,
+    space
+  });
+
   const currentStep = getCurrentStep({
     evaluations: proposal.evaluations,
     hasPendingRewards: ((proposal.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
     proposalStatus: proposal.status,
-    hasPublishedRewards: proposal.rewards.length > 0
+    hasPublishedRewards: proposal.rewards.length > 0,
+    credentialsEnabled: !!proposal.selectedCredentialTemplates.length,
+    hasPendingOnchainCredentials: !!pendingCredentials.length
   });
 
   if (currentStep && proposalProps.proposalStatus) {

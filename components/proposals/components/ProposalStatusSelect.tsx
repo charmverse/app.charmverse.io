@@ -88,7 +88,7 @@ function ProposalStatusSelectBase({
 
     if (evaluationStep === 'draft') {
       return ['published', 'unpublished'];
-    } else if (evaluationStep === 'rewards') {
+    } else if (evaluationStep === 'rewards' || evaluationStep === 'credentials') {
       return ['published', 'unpublished'];
     } else if (evaluationStep === 'feedback') {
       return ['complete', 'in_progress'];

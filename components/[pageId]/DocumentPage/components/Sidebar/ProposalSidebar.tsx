@@ -32,6 +32,7 @@ function SidebarComponent(props: SidebarProps) {
     // this UI appears under a tab on mobile
     return null;
   }
+
   return (
     <SidebarColumn id='proposal-action-sidebar' open={isOpen} width={sidebarWidth} minWidth={sidebarMinWidth}>
       <SidebarContentLayout>

@@ -35,6 +35,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     id: '',
     pageId: '',
     title: '',
+    selectedCredentialTemplates: proposalFromDb?.selectedCredentialTemplates ?? [],
     createdAt: proposalForm.createdAt,
     createdBy: '',
     updatedAt: proposalForm?.createdAt || '',

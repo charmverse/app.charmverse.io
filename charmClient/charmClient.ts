@@ -19,7 +19,7 @@ import type { InviteLinkPopulated } from 'lib/invites/getInviteLink';
 import type { PublicInviteLinkRequest } from 'lib/invites/getPublicInviteLink';
 import type { InviteLinkWithRoles } from 'lib/invites/getSpaceInviteLinks';
 import type { CreateEventPayload } from 'lib/notifications/interfaces';
-import type { FailedImportsError } from 'lib/notion/types';
+import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { TrashOrDeletePageResponse, PageLink } from 'lib/pages';
 import type { PublicPageResponse } from 'lib/pages/interfaces';
 import type { AggregatedProfileData } from 'lib/profile';

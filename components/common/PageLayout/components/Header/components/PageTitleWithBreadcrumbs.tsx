@@ -1,7 +1,7 @@
-import type { PageMeta } from '@charmverse/core/pages';
 import type { PageType } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { Box, Typography, CircularProgress } from '@mui/material';
+import LockIcon from '@mui/icons-material/Lock';
+import { Box, Typography, CircularProgress, Tooltip } from '@mui/material';
 import { useRouter } from 'next/router';
 import type { ReactNode } from 'react';
 
@@ -16,6 +16,7 @@ import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { PostWithVotes } from 'lib/forums/posts/interfaces';
+import type { PageMeta } from 'lib/pages/interfaces';
 
 import { PageIcon } from '../../../../PageIcon';
 
@@ -80,7 +81,7 @@ function DocumentPageTitle({
 }: {
   basePath: string;
   pageId?: string;
-  pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId'>;
+  pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId' | 'isLocked'>;
 }) {
   const { pages } = usePages();
   const { isSaving } = useCharmEditor();
@@ -128,6 +129,11 @@ function DocumentPageTitle({
         <BreadcrumbPageTitle sx={{ maxWidth: 240 }}>
           {currentPage.icon && <StyledPageIcon icon={currentPage.icon} />}
           {currentPage.title || 'Untitled'}
+          {pageMeta?.isLocked && (
+            <Tooltip placement='right' title='This page is locked and cannot be edited'>
+              <LockIcon color='secondary' sx={{ ml: 1 }} fontSize='small' />
+            </Tooltip>
+          )}
         </BreadcrumbPageTitle>
       )}
       {isSaving && (
@@ -298,7 +304,7 @@ export function PageTitleWithBreadcrumbs({
   pageType
 }: {
   pageId?: string;
-  pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId'>; // pass in page meta in case the page is in the trash, in which case it won't be in the pages map
+  pageMeta?: Pick<PageMeta, 'title' | 'icon' | 'parentId' | 'isLocked'>; // pass in page meta in case the page is in the trash, in which case it won't be in the pages map
   pageType?: PageType;
 }) {
   const router = useRouter();
@@ -339,8 +345,6 @@ export function PageTitleWithBreadcrumbs({
   } else if (router.route.includes('/[domain]/forum')) {
     const sectionName = mappedFeatures.forum.title;
     return <ForumPostTitle basePath={`/${router.query.domain}`} pathName={router.pathname} sectionName={sectionName} />;
-  } else if (router.route === '/share/[...pageId]') {
-    return <DocumentPageTitle basePath={`/share/${router.query.domain}`} pageId={pageId} />;
   } else {
     return <DefaultPageTitle />;
   }

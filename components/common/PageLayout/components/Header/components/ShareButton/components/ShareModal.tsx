@@ -16,9 +16,10 @@ import PaidShareToWeb from './PaidPagePermissions/PaidShareToWeb';
 type Props = {
   pageId: string;
   pageType: PageType;
+  closePopup: VoidFunction;
 };
 
-export function PagePermissionsContainer({ pageId, pageType }: Props) {
+export function ShareModal({ pageId, pageType, closePopup }: Props) {
   const [activeTab, setActiveTab] = useState(0);
   const { isFreeSpace } = useIsFreeSpace();
 
@@ -41,7 +42,7 @@ export function PagePermissionsContainer({ pageId, pageType }: Props) {
       <MultiTabs
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        tabPanelSx={{ p: '10px 0' }}
+        tabPanelSx={{ p: '10px 0 0' }}
         tabs={
           pageType === 'proposal' || pageType === 'proposal_template'
             ? [
@@ -65,12 +66,13 @@ export function PagePermissionsContainer({ pageId, pageType }: Props) {
                   'Share',
                   <Box key='0'>
                     {isFreeSpace ? (
-                      <FreePagePermissions pageId={pageId} />
+                      <FreePagePermissions pageId={pageId} onCopyLink={closePopup} />
                     ) : (
                       <PaidPagePermissions
                         pagePermissions={pagePermissions as AssignedPagePermission[]}
                         refreshPermissions={refreshPermissions}
                         pageId={pageId}
+                        onCopyLink={closePopup}
                       />
                     )}
                   </Box>

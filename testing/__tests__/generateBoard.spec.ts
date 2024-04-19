@@ -349,4 +349,17 @@ describe('generateBoard', () => {
       ])
     );
   });
+
+  it('should generate a locked database if this option is provided', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const database = await generateBoard({
+      createdBy: user.id,
+      spaceId: space.id,
+      isLocked: true
+    });
+
+    expect(database.isLocked).toBe(true);
+    expect(database.lockedBy).toBe(user.id);
+  });
 });

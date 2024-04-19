@@ -13,9 +13,9 @@ import { useFavoriteCredentials } from 'hooks/useFavoriteCredentials';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
+import type { EASAttestationFromApi, EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
 import { trackedCharmverseSchemas, trackedSchemas } from 'lib/credentials/external/schemas';
-import type { CredentialDataInput } from 'lib/credentials/schemas';
+import { charmverseCredentialSchemas, type CredentialDataInput } from 'lib/credentials/schemas';
 import { externalCredentialSchemaId } from 'lib/credentials/schemas/external';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
@@ -24,12 +24,18 @@ import { lowerCaseEqual } from 'lib/utils/strings';
 import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
 
 export type UserCredentialRowProps = {
-  credential: EASAttestationWithFavorite;
+  credential: EASAttestationFromApi & Partial<Pick<EASAttestationWithFavorite, 'favoriteCredentialId' | 'index'>>;
   readOnly?: boolean;
   smallScreen?: boolean;
+  hideFavourite?: boolean;
 };
 
-export function UserCredentialRow({ credential, readOnly = false, smallScreen }: UserCredentialRowProps) {
+export function UserCredentialRow({
+  credential,
+  readOnly = false,
+  smallScreen,
+  hideFavourite
+}: UserCredentialRowProps) {
   const isSmallScreen = useSmallScreen() || smallScreen;
   const { addFavorite, removeFavorite, isRemoveFavoriteCredentialLoading, isAddFavoriteCredentialLoading } =
     useFavoriteCredentials();
@@ -62,13 +68,16 @@ export function UserCredentialRow({ credential, readOnly = false, smallScreen }:
   }
 
   const charmCredential = credential.content as CredentialDataInput;
+
   const credentialInfo: {
     title: string;
     subtitle: string | string[];
     iconUrl: string | OverridableComponent<SvgIconTypeMap>;
     attestationContent: { name: string; value: string }[];
   } =
-    credential.type === 'charmverse' && 'Organization' in charmCredential
+    (credential.type === 'charmverse' ||
+      (credential.type === 'onchain' && charmverseCredentialSchemas.includes(credential.schemaId))) &&
+    'Organization' in charmCredential
       ? {
           title: charmCredential.Name,
           subtitle: charmCredential.Organization,
@@ -130,7 +139,8 @@ export function UserCredentialRow({ credential, readOnly = false, smallScreen }:
       {credential.verificationUrl && (
         <Link
           style={{
-            height: 20
+            height: 20,
+            marginTop: 3
           }}
           href={credential.verificationUrl}
           external
@@ -139,7 +149,7 @@ export function UserCredentialRow({ credential, readOnly = false, smallScreen }:
           <LaunchIcon sx={{ alignSelf: 'center' }} fontSize='small' />
         </Link>
       )}
-      {isUserRecipient && !readOnly && credential.schemaId !== externalCredentialSchemaId && (
+      {isUserRecipient && !readOnly && credential.schemaId !== externalCredentialSchemaId && !hideFavourite && (
         <Tooltip title={isMutating ? '' : !credential.favoriteCredentialId ? 'Favorite' : 'Unfavorite'}>
           <div>
             <IconButton sx={{ p: 0 }} size='small' onClick={toggleFavorite} disabled={isMutating}>

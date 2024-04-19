@@ -2,11 +2,12 @@
 import type { Space } from '@charmverse/core/prisma';
 import type { Block, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsUser, testUtilsProposals } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
+import { v4 as uuid } from 'uuid';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import type { BoardFields } from 'lib/databases/board';
+import type { BoardFields, DataSourceType, IPropertyTemplate } from 'lib/databases/board';
 import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -16,6 +17,8 @@ import { addUserToSpace } from 'testing/utils/spaces';
 let adminSpace: Space;
 
 let adminUser: User;
+
+let member: User;
 
 let database: Block;
 let databaseCards: Block[];
@@ -34,6 +37,11 @@ beforeAll(async () => {
 
   adminSpace = generated.space;
   adminUser = generated.user;
+
+  member = await testUtilsUser.generateSpaceUser({
+    spaceId: adminSpace.id,
+    isAdmin: false
+  });
 
   const generatedDatabase = await generateBoard({
     createdBy: adminUser.id,
@@ -160,6 +168,241 @@ describe('GET /api/blocks/[id]/subtree', () => {
     ).body as Block[];
     const cardBlocks = databaseBlocks.filter((b) => b.type === 'card');
     expect(cardBlocks).toHaveLength(cards.length - 1);
+  });
+
+  it('should return only the filtered pages visible in at least 1 view if the database is locked and they do not have edit_lock permission', async () => {
+    const blueOption = {
+      id: uuid(),
+      value: 'Blue',
+      color: 'blue'
+    };
+
+    const redOption = {
+      id: uuid(),
+      value: 'Red',
+      color: 'red'
+    };
+
+    const greenOption = {
+      id: uuid(),
+      value: 'Green',
+      color: 'green'
+    };
+
+    const selectTemplate: IPropertyTemplate = {
+      id: uuid(),
+      name: 'Select',
+      type: 'select',
+      options: [blueOption, redOption, greenOption]
+    };
+
+    const lockedDatabase = await generateBoard({
+      createdBy: adminUser.id,
+      spaceId: adminSpace.id,
+      viewType: 'table',
+      cardCount: 4,
+      views: 2,
+      customProps: {
+        propertyTemplates: [selectTemplate]
+      },
+      permissions: [
+        {
+          permissionLevel: 'full_access',
+          spaceId: adminSpace.id
+        }
+      ],
+      isLocked: true
+    });
+
+    const [redCard, greenCard, blueCard, redCardWithoutPermission] = await prisma.block.findMany({
+      where: {
+        type: 'card',
+        rootId: lockedDatabase.id
+      }
+    });
+
+    await Promise.all([
+      prisma.block.update({
+        where: {
+          id: redCard.id
+        },
+        data: {
+          fields: {
+            ...(redCard.fields as any),
+            properties: {
+              [selectTemplate.id]: redOption.id
+            }
+          }
+        }
+      }),
+      prisma.block.update({
+        where: {
+          id: redCardWithoutPermission.id
+        },
+        data: {
+          fields: {
+            ...(redCardWithoutPermission.fields as any),
+            properties: {
+              [selectTemplate.id]: redOption.id
+            }
+          }
+        }
+      }),
+      prisma.block.update({
+        where: {
+          id: greenCard.id
+        },
+        data: {
+          fields: {
+            ...(greenCard.fields as any),
+            properties: {
+              [selectTemplate.id]: greenOption.id
+            }
+          }
+        }
+      }),
+      prisma.block.update({
+        where: {
+          id: blueCard.id
+        },
+        data: {
+          fields: {
+            ...(blueCard.fields as any),
+            properties: {
+              [selectTemplate.id]: blueOption.id
+            }
+          }
+        }
+      })
+    ]);
+
+    await prisma.pagePermission.deleteMany({
+      where: {
+        pageId: redCardWithoutPermission.id
+      }
+    });
+
+    const [firstView, secondView] = await prisma.block.findMany({
+      where: {
+        type: 'view',
+        rootId: lockedDatabase.id
+      }
+    });
+
+    await Promise.all([
+      prisma.block.update({
+        where: {
+          id: firstView.id
+        },
+        data: {
+          fields: {
+            ...(firstView.fields as any),
+            filter: {
+              filters: [
+                {
+                  values: [redOption.id],
+                  filterId: uuid(),
+                  condition: 'is',
+                  propertyId: selectTemplate.id
+                }
+              ],
+              operation: 'and'
+            }
+          }
+        }
+      }),
+      prisma.block.update({
+        where: {
+          id: secondView.id
+        },
+        data: {
+          fields: {
+            ...(secondView.fields as any),
+            filter: {
+              filters: [
+                {
+                  values: [greenOption.id],
+                  filterId: uuid(),
+                  condition: 'is',
+                  propertyId: selectTemplate.id
+                }
+              ],
+              operation: 'and'
+            }
+          }
+        }
+      })
+    ]);
+
+    const adminCookie = await loginUser(adminUser.id);
+    const memberCookie = await loginUser(member.id);
+
+    // Test admin result
+    const adminDatabaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${lockedDatabase.id}/subtree`).set('Cookie', adminCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const adminCardPageIds = adminDatabaseBlocks.filter((b) => b.type === 'card').map((c) => c.id);
+    const adminDbBlock = adminDatabaseBlocks.find((b) => b.type === 'board');
+    const adminViewBlocks = adminDatabaseBlocks.filter((b) => b.type === 'view').map((v) => v.id);
+
+    expect(adminCardPageIds).toHaveLength(4);
+    expect(adminCardPageIds).toMatchObject(
+      expect.arrayContaining([redCard.id, greenCard.id, blueCard.id, redCardWithoutPermission.id])
+    );
+    expect(adminDbBlock?.id).toEqual(lockedDatabase.id);
+
+    expect(adminViewBlocks).toHaveLength(2);
+    expect(adminViewBlocks).toMatchObject(expect.arrayContaining([firstView.id, secondView.id]));
+
+    // Test member result
+    const memberDatabaseBlocks = (
+      await request(baseUrl).get(`/api/blocks/${lockedDatabase.id}/subtree`).set('Cookie', memberCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const memberCardPageIds = memberDatabaseBlocks.filter((b) => b.type === 'card').map((c) => c.id);
+    const memberDbBlock = memberDatabaseBlocks.find((b) => b.type === 'board');
+    const memberViewBlocks = memberDatabaseBlocks.filter((b) => b.type === 'view').map((v) => v.id);
+
+    // User should still get back all the cards since they can edit, except the card that doesnt have any permissions
+    expect(memberCardPageIds).toHaveLength(3);
+    expect(memberCardPageIds).toMatchObject(expect.arrayContaining([redCard.id, greenCard.id, blueCard.id]));
+    expect(memberDbBlock?.id).toEqual(lockedDatabase.id);
+
+    expect(memberViewBlocks).toHaveLength(2);
+    expect(memberViewBlocks).toMatchObject(expect.arrayContaining([firstView.id, secondView.id]));
+
+    // Test member result when no edit_lock permission
+    await prisma.pagePermission.updateMany({
+      where: {
+        pageId: {
+          in: [lockedDatabase.id, redCard.id, greenCard.id, blueCard.id]
+        }
+      },
+      data: {
+        permissionLevel: 'view'
+      }
+    });
+
+    const memberDatabaseBlocksWhenNoEditPermission = (
+      await request(baseUrl).get(`/api/blocks/${lockedDatabase.id}/subtree`).set('Cookie', memberCookie).expect(200)
+    ).body as BlockWithDetails[];
+
+    const memberCardPageIdsWhenNoEditPermission = memberDatabaseBlocksWhenNoEditPermission
+      .filter((b) => b.type === 'card')
+      .map((c) => c.id);
+    const memberDbBlockWhenNoEditPermission = memberDatabaseBlocksWhenNoEditPermission.find((b) => b.type === 'board');
+    const memberViewBlocksWhenNoEditPermission = memberDatabaseBlocksWhenNoEditPermission
+      .filter((b) => b.type === 'view')
+      .map((v) => v.id);
+
+    // User should only get back filtered cards since they cannot edit
+    expect(memberCardPageIdsWhenNoEditPermission).toHaveLength(2);
+    expect(memberCardPageIdsWhenNoEditPermission).toMatchObject(expect.arrayContaining([redCard.id, greenCard.id]));
+    expect(memberDbBlockWhenNoEditPermission?.id).toEqual(lockedDatabase.id);
+
+    expect(memberViewBlocksWhenNoEditPermission).toHaveLength(2);
+    expect(memberViewBlocksWhenNoEditPermission).toMatchObject(expect.arrayContaining([firstView.id, secondView.id]));
   });
 });
 
