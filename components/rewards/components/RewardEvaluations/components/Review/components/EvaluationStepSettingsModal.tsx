@@ -25,7 +25,7 @@ export function EvaluationStepSettingsModal({
   const evaluationInputError = getEvaluationFormError(evaluationInput, reward);
   return (
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
-      <Box mb={1}>
+      <Box mb={2}>
         <EvaluationStepSettings
           evaluation={evaluationInput}
           readOnly={false}

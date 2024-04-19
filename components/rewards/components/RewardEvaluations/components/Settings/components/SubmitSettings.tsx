@@ -1,13 +1,11 @@
 import styled from '@emotion/styled';
-import { Box, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Checkbox, FormLabel, Stack, TextField, Typography } from '@mui/material';
 import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
-import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
-import Checkbox from 'components/common/DatabaseEditor/widgets/checkbox';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
@@ -35,34 +33,35 @@ export function SubmitStepSettings({
   }, []);
 
   return (
-    <Stack gap={1.5}>
-      <RowStack mb={0.5}>
+    <Stack gap={2}>
+      <Box>
         <FormLabel>
-          <Typography component='span' variant='subtitle1'>
-            Due date
+          <Typography sx={{ mb: 1 }} variant='subtitle1'>
+            Reviewers
           </Typography>
         </FormLabel>
-        <Box width='fit-content'>
-          <DateTimePicker
-            variant='card_property'
-            minDate={DateTime.fromMillis(Date.now())}
-            value={rewardInput?.dueDate ? DateTime.fromISO(rewardInput.dueDate.toString()) : null}
-            disabled={readOnly}
-            disablePast
-            placeholder='Select due date'
-            onAccept={(date) => {
-              onChange({
-                dueDate: date?.toJSDate() || undefined
-              });
-            }}
-            onChange={(value) => {
-              onChange({
-                dueDate: value?.toJSDate() || undefined
-              });
-            }}
-          />
-        </Box>
-      </RowStack>
+        <DateTimePicker
+          sx={{
+            width: '100%'
+          }}
+          minDate={DateTime.fromMillis(Date.now())}
+          value={rewardInput?.dueDate ? DateTime.fromISO(rewardInput.dueDate.toString()) : null}
+          disabled={readOnly}
+          disablePast
+          placeholder='Select due date'
+          onAccept={(date) => {
+            onChange({
+              dueDate: date?.toJSDate() || undefined
+            });
+          }}
+          onChange={(value) => {
+            onChange({
+              dueDate: value?.toJSDate() || undefined
+            });
+          }}
+        />
+      </Box>
+
       {!isAssignedReward ? (
         <>
           <RowStack>
@@ -71,29 +70,32 @@ export function SubmitStepSettings({
                 Allow multiple entries
               </Typography>
             </FormLabel>
-            <Box width='fit-content'>
-              <Checkbox
-                isOn={Boolean(rewardInput?.allowMultipleApplications)}
-                onChanged={(isOn) => {
-                  onChange({
-                    allowMultipleApplications: !!isOn
-                  });
-                }}
-                disabled={readOnly}
-                readOnly={readOnly}
-              />
-            </Box>
+            <Checkbox
+              sx={{
+                p: 0
+              }}
+              size='medium'
+              checked={Boolean(rewardInput?.allowMultipleApplications)}
+              onChange={(e) => {
+                onChange({
+                  allowMultipleApplications: e.target.checked
+                });
+              }}
+              disabled={readOnly}
+              readOnly={readOnly}
+            />
           </RowStack>
-          <RowStack>
+          <Box>
             <FormLabel>
-              <Typography component='span' variant='subtitle1'>
+              <Typography sx={{ mb: 1 }} variant='subtitle1'>
                 Applicant Roles
               </Typography>
             </FormLabel>
-            <Box width='fit-content'>
+            <Box width='100%'>
               <UserAndRoleSelect
                 type='role'
                 readOnly={readOnly}
+                variant='outlined'
                 value={(rewardInput?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
                 onChange={(options) => {
                   const roleIds = options.filter((option) => option.group === 'role').map((option) => option.id);
@@ -104,30 +106,29 @@ export function SubmitStepSettings({
                 }}
               />
             </Box>
-          </RowStack>
-          <RowStack>
+          </Box>
+
+          <Box>
             <FormLabel>
-              <Typography component='span' variant='subtitle1'>
+              <Typography sx={{ mb: 1 }} variant='subtitle1'>
                 # Available
               </Typography>
             </FormLabel>
-            <Box width='fit-content'>
-              <StyledPropertyTextInput
+            <Box width='100%'>
+              <TextField
                 onChange={(e) => {
                   const value = Number(e.target.value);
                   onChange({
                     maxSubmissions: value <= 0 ? null : value
                   });
                 }}
-                required
+                variant='outlined'
                 defaultValue={rewardInput?.maxSubmissions}
                 type='number'
                 size='small'
                 inputProps={{
                   step: 1,
-                  min: 1,
-                  style: { height: 'auto' },
-                  className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                  min: 1
                 }}
                 sx={{
                   width: '100%'
@@ -136,7 +137,7 @@ export function SubmitStepSettings({
                 placeholder='Unlimited'
               />
             </Box>
-          </RowStack>
+          </Box>
         </>
       ) : (
         <RowStack>

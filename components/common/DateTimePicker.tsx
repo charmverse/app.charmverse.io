@@ -16,6 +16,7 @@ export function DateTimePicker<T>({
     <div style={{ position: 'relative' }}>
       <MuiDateTimePicker
         open={open}
+        sx={props.sx}
         // default media query just checks for cursor input
         desktopModeMediaQuery='(min-width: 600px)'
         // disableOpenPicker - this optoin messes up the picker for some reason

@@ -112,13 +112,15 @@ export function EvaluationsReview({
             }
           >
             {evaluation.type === 'application_review' || evaluation.type === 'review' ? (
-              <ReviewStepReview
-                reviewers={reward.reviewers ?? []}
-                rewardId={reward.id}
-                application={application}
-                evaluation={evaluation}
-                hideReviewResult={!isCurrent && evaluation.result === null}
-              />
+              <Box mb={2}>
+                <ReviewStepReview
+                  reviewers={reward.reviewers ?? []}
+                  rewardId={reward.id}
+                  application={application}
+                  evaluation={evaluation}
+                  hideReviewResult={!isCurrent && evaluation.result === null}
+                />
+              </Box>
             ) : evaluation.type === 'payment' ? (
               <Box mb={2}>
                 <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
