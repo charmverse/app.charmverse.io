@@ -23,6 +23,7 @@ import { useNewWork } from 'components/rewards/hooks/useNewApplication';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
+import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -53,6 +54,7 @@ export function RewardApplicationPageV2({ applicationId, rewardId, closeDialog }
 
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
   const currentRewardId = rewardId || reward?.id;
+  const { page } = usePage({ pageIdOrPath: reward?.page.id });
 
   const { data: rewardPageContent } = useGetPage(currentRewardId);
 
@@ -266,6 +268,7 @@ export function RewardApplicationPageV2({ applicationId, rewardId, closeDialog }
             closeSidebar: () => setActiveView(null),
             openSidebar: () => setActiveView('reward_evaluation')
           }}
+          readOnly={!page?.permissionFlags?.edit_content}
           application={application}
           reward={reward}
           onChangeReward={updateReward}

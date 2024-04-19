@@ -101,8 +101,8 @@ export function EvaluationsReview({
             title={evaluation.title}
             result={application ? evaluation.result ?? null : null}
             actions={
-              evaluation.type === 'apply' ? null : (
-                <EvaluationStepActions canEdit={!readOnly} openSettings={() => openSettings(evaluation)} />
+              evaluation.type === 'apply' || readOnly ? null : (
+                <EvaluationStepActions canEdit openSettings={() => openSettings(evaluation)} />
               )
             }
           >
