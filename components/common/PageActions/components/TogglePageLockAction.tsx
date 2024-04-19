@@ -17,7 +17,7 @@ export function TogglePageLockAction({
   return (
     <Tooltip title={disabled ? 'You cannot edit the lock for this page' : ''}>
       <div>
-        <ListItemButton data-test='header--delete-current-page' disabled={disabled} onClick={onClick}>
+        <ListItemButton data-test='header--toggle-current-page-lock' disabled={disabled} onClick={onClick}>
           <Icon
             color='secondary'
             fontSize='small'
