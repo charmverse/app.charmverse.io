@@ -41,7 +41,6 @@ const schema = yup.object({
       then: () => yup.string().required('Field is required'),
       otherwise: () => yup.string()
     }),
-  personaEnvironmentId: yup.string().nullable(),
   kycOption: yup.string().oneOf<KycOption>(['synaps', 'persona']).nullable()
 });
 
@@ -73,7 +72,6 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
     kycCredentials?.persona?.apiKey,
     kycCredentials?.persona?.secret,
     kycCredentials?.persona?.templateId,
-    kycCredentials?.persona?.envId,
     space.kycOption
   ]);
 
@@ -91,8 +89,7 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
       dirtyFields.synapsSecret ||
       dirtyFields.personaApiKey ||
       dirtyFields.personaSecret ||
-      dirtyFields.personaTemplateId ||
-      dirtyFields.personaEnvironmentId
+      dirtyFields.personaTemplateId
     ) {
       const synapsPayload: KycCredentials = {
         synaps: {
@@ -104,7 +101,6 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
           spaceId: space.id,
           apiKey: values.personaApiKey ?? '',
           secret: values.personaSecret ?? '',
-          envId: values.personaEnvironmentId ?? '',
           templateId: values.personaTemplateId ?? ''
         }
       };
@@ -129,7 +125,6 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
         {isAdmin &&
           space.kycOption === 'persona' &&
           kycCredentials?.persona?.apiKey &&
-          kycCredentials.persona.envId &&
           kycCredentials.persona.templateId && (
             <Grid item>
               <PersonaModal spaceId={space.id} />
@@ -171,7 +166,6 @@ function getDefaultValues({ kycCredentials, space }: { kycCredentials?: KycCrede
     personaApiKey: kycCredentials?.persona?.apiKey ?? '',
     personaSecret: kycCredentials?.persona?.secret ?? '',
     personaTemplateId: kycCredentials?.persona?.templateId ?? '',
-    personaEnvironmentId: kycCredentials?.persona?.envId ?? '',
     kycOption: space.kycOption ?? null
   };
 }

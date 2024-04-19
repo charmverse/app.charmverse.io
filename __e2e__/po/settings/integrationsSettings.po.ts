@@ -14,7 +14,6 @@ export class IntegrationsSettings extends SettingsModal {
     public personaApiKey = page.locator('input[name=personaApiKey]'),
     public personaSecret = page.locator('input[name=personaSecret]'),
     public personaTemplateId = page.locator('input[name=personaTemplateId]'),
-    public personaEnvironmentId = page.locator('input[name=personaEnvironmentId]'),
     public personaKycButton = page.locator('data-test=start-persona-kyc')
   ) {
     super(page);

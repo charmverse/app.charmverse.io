@@ -48,7 +48,6 @@ test('Space settings - add kyc integrations', async ({ page, spaceSettings }) =>
   await spaceSettings.personaApiKey.fill('test-api-key');
   await spaceSettings.personaSecret.fill('test-secret');
   await spaceSettings.personaTemplateId.fill('test-template-id');
-  await spaceSettings.personaEnvironmentId.fill('test-env-id');
   await spaceSettings.saveButton.click();
   await expect(spaceSettings.personaKycButton).toBeVisible();
   await expect(spaceSettings.personaKycButton).toBeEnabled();

@@ -16,7 +16,6 @@ export async function generatePersonaCredential({ spaceId }: { spaceId: string }
     data: {
       apiKey: uuid(),
       spaceId,
-      envId: uuid(),
       templateId: uuid()
     }
   });

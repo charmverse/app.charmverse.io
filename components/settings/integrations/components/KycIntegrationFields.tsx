@@ -54,14 +54,6 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
     control
   });
 
-  const {
-    field: personaEnvironmentId,
-    fieldState: { error: personaEnvironmentIdError }
-  } = useController({
-    name: 'personaEnvironmentId',
-    control
-  });
-
   const { field: kycOption } = useController({
     name: 'kycOption',
     control
@@ -157,22 +149,6 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               Select a template from:{' '}
               <Link color='inherit' href='https://app.withpersona.com/dashboard/inquiry-templates' external>
                 https://app.withpersona.com/dashboard/inquiry-templates
-              </Link>
-            </Typography>
-          </Box>
-          <Box>
-            <FieldLabel>Environment Id</FieldLabel>
-            <TextField
-              {...personaEnvironmentId}
-              disabled={!isAdmin}
-              fullWidth
-              error={!!personaEnvironmentIdError?.message}
-              helperText={personaEnvironmentIdError?.message}
-            />
-            <Typography variant='caption'>
-              Select an environment from:{' '}
-              <Link color='inherit' href='https://app.withpersona.com/dashboard/organization' external>
-                https://app.withpersona.com/dashboard/organization
               </Link>
             </Typography>
           </Box>

@@ -21,7 +21,6 @@ describe('upsertKycCredentials', () => {
       persona: {
         apiKey: v4(),
         secret: v4(),
-        envId: v4(),
         templateId: v4(),
         spaceId: space.id
       }
