@@ -26,9 +26,6 @@ async function duplicateRubricCriterias() {
       rubricCriteria: true
     }
   });
-  console.log(sourceProposal.evaluations);
-  console.log(sourceProposal.rubricCriteria.length);
-  console.log(sourceProposal.rubricCriteria.filter((c) => c.proposalId));
 
   for (const proposalIdToUpdate of destinationProposals) {
     try {
