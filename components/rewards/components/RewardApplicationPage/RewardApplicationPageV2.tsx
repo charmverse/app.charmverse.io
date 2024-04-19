@@ -53,7 +53,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
   });
 
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
-  const currentRewardId = rewardId || reward?.id;
+  const currentRewardId = rewardId || reward?.id || application?.bountyId;
   const { page } = usePage({ pageIdOrPath: reward?.page.id });
 
   const { data: rewardPageContent } = useGetPage(currentRewardId);
@@ -62,10 +62,6 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
 
   const { members } = useMembers();
   const { user } = useUser();
-  const {
-    updateURLQuery,
-    router: { query }
-  } = useCharmRouter();
 
   const { createNewWork } = useNewWork(currentRewardId);
   const [isSaving, setIsSaving] = useState(false);
@@ -115,17 +111,17 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
   };
 
   function goToReward() {
-    if (space && rewardPageContent) {
-      updateURLQuery({ applicationId: null });
+    if (!isNewApplication) {
+      navigateToSpacePath(`/${currentRewardId}`);
     }
   }
 
   function onCancelNewSubmission() {
-    if (!rewardId || !isNewApplication) {
+    if (!currentRewardId || !isNewApplication) {
       return;
     }
 
-    navigateToSpacePath(`/${rewardId}`);
+    navigateToSpacePath(`/${currentRewardId}`);
   }
 
   if (!reward) {
@@ -172,7 +168,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
                       onChange={() => null}
                       focusDocumentEditor={() => null}
                     />
-                    {!!query.id && (
+                    {!isNewApplication && (
                       <Button
                         onClick={goToReward}
                         color='secondary'
