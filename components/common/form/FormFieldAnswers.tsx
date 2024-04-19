@@ -9,7 +9,8 @@ import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 

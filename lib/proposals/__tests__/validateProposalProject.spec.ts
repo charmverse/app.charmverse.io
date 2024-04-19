@@ -1,18 +1,16 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { v4 } from 'uuid';
 
-import {
-  createDefaultProjectAndMembersFieldConfig,
-  createDefaultProjectAndMembersPayload
-} from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
 
 describe('validateProposalProject', () => {
   it('Should throw error if proposal project information is not valid', async () => {
-    const { user } = await generateUserAndSpaceWithApiToken();
+    const { user } = await generateUserAndSpace();
     const projectValues = createDefaultProjectAndMembersPayload();
 
     const createdProject = await createProject({
@@ -53,7 +51,7 @@ describe('validateProposalProject', () => {
   });
 
   it('Should not throw error if proposal project information is valid', async () => {
-    const { user } = await generateUserAndSpaceWithApiToken();
+    const { user } = await generateUserAndSpace();
     const defaultProjectAndMembersPayload = createDefaultProjectAndMembersPayload();
     const projectFieldId = v4();
 

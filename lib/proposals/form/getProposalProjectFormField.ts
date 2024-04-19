@@ -1,9 +1,5 @@
-import type {
-  ProjectField,
-  ProjectAndMembersFieldConfig,
-  ProjectMemberField,
-  ProjectWithMembers
-} from 'lib/projects/interfaces';
+import type { ProjectField, ProjectAndMembersFieldConfig, ProjectMemberField } from 'lib/projects/formField';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function getProposalProjectFormField({
   canViewPrivateFields,

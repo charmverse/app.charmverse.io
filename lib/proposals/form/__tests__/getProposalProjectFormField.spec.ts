@@ -3,12 +3,11 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import type { FormFieldInput } from 'components/common/form/interfaces';
-import {
-  createDefaultProjectAndMembersFieldConfig,
-  createDefaultProjectAndMembersPayload
-} from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 
 import { getProposalProjectFormField } from '../getProposalProjectFormField';

@@ -9,7 +9,7 @@ import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { proposalPropertyTypesList } from 'lib/databases/board';
 import { InvalidStateError } from 'lib/middleware';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getFormInput } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';

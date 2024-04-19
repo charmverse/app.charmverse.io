@@ -63,9 +63,9 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
   return [
     getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
-    proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
-    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers'),
-    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
+    proposalDbProperties.proposalAuthor({ name: 'Author' }),
+    proposalDbProperties.proposalReviewer(),
+    proposalDbProperties.proposalCreatedAt(),
     {
       id: `__createdTime`, // these properties are always re-generated so use a static id
       name: 'Last updated time',
@@ -77,7 +77,7 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
 
 export function getDefaultStatusProperty() {
   return {
-    ...proposalDbProperties.proposalStatus(PROPOSAL_STATUS_BLOCK_ID, 'Status'),
+    ...proposalDbProperties.proposalStatus({ name: 'Status' }),
     options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
@@ -88,12 +88,7 @@ export function getDefaultStatusProperty() {
 
 export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
-    ...proposalDbProperties.proposalStep(PROPOSAL_STEP_BLOCK_ID, 'Step'),
-    options: ['Draft', ...evaluationStepTitles, 'Rewards'].map((title) => ({
-      id: title,
-      value: title,
-      color: 'propColorGray'
-    }))
+    ...proposalDbProperties.proposalStep({ name: 'Step', options: ['Draft', ...evaluationStepTitles, 'Rewards'] })
   };
 }
 

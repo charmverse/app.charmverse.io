@@ -9,11 +9,8 @@ import { ProposalProjectFormAnswers } from 'components/settings/projects/compone
 import { useUser } from 'hooks/useUser';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
-import type {
-  ProjectAndMembersFieldConfig,
-  ProjectAndMembersPayload,
-  ProjectWithMembers
-} from 'lib/projects/interfaces';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 
 import type { FormFieldValue } from '../interfaces';
 
