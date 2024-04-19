@@ -3,8 +3,7 @@ import type {
   Proposal,
   ProposalEvaluation,
   ProposalRubricCriteria,
-  ProposalRubricCriteriaAnswer,
-  Prisma
+  ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -25,6 +24,8 @@ import type { CardPropertyValue } from '../card';
 
 import type { FormAnswerData } from './getCardPropertiesFromForm';
 import { getCardPropertiesFromForm } from './getCardPropertiesFromForm';
+import type { ProjectInformation } from './getCardPropertiesFromProject';
+import { getCardPropertiesFromProject } from './getCardPropertiesFromProject';
 import { getCardPropertiesFromRubric } from './getCardPropertiesFromRubric';
 
 export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
@@ -172,10 +173,7 @@ type ProposalData = {
     formAnswers: FormAnswerData[];
     issuedCredentials: IssuedCredential[];
     rewards: { id: string }[];
-    project: {
-      name: string;
-      projectMembers: { name: string }[];
-    } | null;
+    project: ProjectInformation | null;
   };
   cardProperties: IPropertyTemplate[];
   space: IssuableProposalCredentialSpace;
@@ -251,6 +249,10 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     cardProperties,
     formAnswers: proposal.formAnswers
   });
+
+  if (proposal.project) {
+    Object.assign(properties, getCardPropertiesFromProject(proposal.project));
+  }
 
   return {
     title: page.title,

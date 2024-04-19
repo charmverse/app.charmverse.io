@@ -21,9 +21,6 @@ export const PROJECT_OTHER_URL_ID = '__project_otherUrl';
 export const PROJECT_WALLET_ID = '__project_walletAddress';
 // project team members
 export const PROJECT_MEMBER_NAMES_ID = '__projectMembers_name';
-export const PROJECT_TELEGRAM_ID = '__project_telegram';
-
-export const PROJECT_MEMBERS_ID = '__projectMembers_name';
 export const PROJECT_MEMBER_WALLETS_ID = '__projectMembers_walletAddress';
 export const PROJECT_MEMBER_EMAILS_ID = '__projectMembers_email';
 export const PROJECT_MEMBER_TWITTERS_ID = '__projectMembers_twitter';
@@ -33,5 +30,3 @@ export const PROJECT_MEMBER_LINKEDINS_ID = '__projectMembers_linkedin';
 export const PROJECT_MEMBER_TELEGRAMS_ID = '__projectMembers_telegram';
 export const PROJECT_MEMBER_OTHER_URLS_ID = '__projectMembers_otherUrl';
 export const PROJECT_MEMBER_PREVIOUS_PROJECTS_ID = '__projectMembers_previousProjects';
-
-export const proposalPropertyIds = [PROJECT_NAME_ID, PROJECT_WALLET_ID, PROJECT_MEMBERS_ID, PROJECT_MEMBER_WALLETS_ID];
