@@ -11,7 +11,7 @@ import type { ReviewDecision } from 'lib/rewards/reviewApplication';
  * @expandedOnLoad Use this to expand the application initially
  */
 type Props = {
-  onConfirmReview: (review: ReviewDecision) => Promise<void>;
+  onConfirmReview: (review: ReviewDecision) => any;
   reviewType: 'application' | 'submission';
   readOnly?: boolean;
   hasApplicationSlots: boolean;

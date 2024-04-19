@@ -1,6 +1,6 @@
 import { Collapse, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -41,14 +41,23 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
-  const updatedWorkflow = workflow
-    ? getRewardWorkflowWithApplication({
-        application,
-        workflow
-      })
-    : workflow;
 
-  const currentEvaluation = updatedWorkflow ? getCurrentRewardEvaluation(updatedWorkflow) : null;
+  const { currentEvaluation, updatedWorkflow } = useMemo(() => {
+    const _updatedWorkflow = workflow
+      ? getRewardWorkflowWithApplication({
+          application,
+          workflow
+        })
+      : workflow;
+
+    const _currentEvaluation = _updatedWorkflow ? getCurrentRewardEvaluation(_updatedWorkflow) : null;
+
+    return {
+      updatedWorkflow: _updatedWorkflow,
+      currentEvaluation: _currentEvaluation
+    };
+  }, [workflow, application]);
+
   const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
@@ -58,7 +67,7 @@ export function EvaluationsReview({
     if (currentEvaluation) {
       setExpandedEvaluationId(currentEvaluation.id);
     }
-  }, [!currentEvaluation]);
+  }, [currentEvaluation]);
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));

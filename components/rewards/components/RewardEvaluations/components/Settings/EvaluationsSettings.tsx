@@ -16,7 +16,7 @@ export type EvaluationSettingsProps = {
   rewardInput?: RewardInput;
   readOnly?: boolean;
   requireWorkflowChangeConfirmation?: boolean;
-  expanded: boolean;
+  expanded?: boolean;
   onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
   onChangeWorkflow?: (workflow: RewardWorkflow) => void;
 };

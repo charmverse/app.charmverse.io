@@ -21,7 +21,6 @@ import type { WorkInput } from 'components/rewards/hooks/useApplication';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useNewWork } from 'components/rewards/hooks/useNewApplication';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -57,8 +56,6 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
   const { page } = usePage({ pageIdOrPath: reward?.page.id });
 
   const { data: rewardPageContent } = useGetPage(currentRewardId);
-
-  const { space } = useCurrentSpace();
 
   const { members } = useMembers();
   const { user } = useUser();
