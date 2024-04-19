@@ -120,6 +120,14 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
     }
   }
 
+  function onCancelNewSubmission() {
+    if (!rewardId || !isNewApplication) {
+      return;
+    }
+
+    navigateToSpacePath(`/${rewardId}`);
+  }
+
   if (!reward) {
     return null;
   }
@@ -211,6 +219,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
 
                         {applicationStepRequired && (
                           <ApplicationInput
+                            onCancel={application ? undefined : onCancelNewSubmission}
                             application={application}
                             rewardId={reward.id}
                             disableCollapse={!showSubmissionInput}
@@ -232,6 +241,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
 
                         {showSubmissionInput && (
                           <RewardSubmissionInput
+                            onCancel={application ? undefined : onCancelNewSubmission}
                             currentUserIsAuthor={(!!user && user.id === application?.createdBy) || isNewApplication}
                             submission={application}
                             readOnly={readonlySubmission}

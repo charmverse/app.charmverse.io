@@ -21,6 +21,7 @@ import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardAp
  */
 interface IApplicationFormProps {
   onSubmit: (applicationMessage: string) => Promise<boolean>;
+  onCancel?: VoidFunction;
   rewardId: string;
   application?: Application;
   readOnly?: boolean;
@@ -38,6 +39,7 @@ type FormValues = yup.InferType<typeof schema>;
 export function ApplicationInput({
   readOnly = false,
   onSubmit,
+  onCancel,
   rewardId,
   application,
   disableCollapse,
@@ -137,6 +139,11 @@ export function ApplicationInput({
 
             {!readOnly && (
               <Grid item display='flex' gap={1} justifyContent='flex-end'>
+                {onCancel && (
+                  <Button loading={isSaving} onClick={onCancel} color='error' variant='outlined'>
+                    Cancel
+                  </Button>
+                )}
                 <Button
                   disabled={
                     !isValid || (!!currentApplicationMessage && currentApplicationMessage === application?.message)
