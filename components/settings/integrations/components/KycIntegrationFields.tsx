@@ -1,6 +1,8 @@
+import type { KycOption } from '@charmverse/core/prisma-client';
 import Box from '@mui/material/Box';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
@@ -66,22 +68,17 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column' gap={2}>
       <Box>
-        <FormControlLabel
-          control={
-            <Switch
-              name='synapsKyc'
-              checked={kycOption.value === 'synaps'}
-              value={kycOption.value === 'synaps'}
-              onChange={(e) => {
-                kycOption.onChange(e.target.checked ? 'synaps' : null);
-              }}
-            />
-          }
+        <Select<KycOption | null>
+          {...kycOption}
           disabled={!isAdmin}
-          labelPlacement='end'
-          label='Enable Synaps.io KYC'
-        />
-        <FormControlLabel
+          value={kycOption.value || null}
+          renderValue={(val) => val || 'None'}
+        >
+          <MenuItem value=''>None</MenuItem>
+          <MenuItem value='synaps'>Synaps</MenuItem>
+          <MenuItem value='persona'>Persona</MenuItem>
+        </Select>
+        {/* <FormControlLabel
           control={
             <Switch
               name='personaKyc'
@@ -95,7 +92,19 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
           disabled={!isAdmin}
           labelPlacement='end'
           label='Enable Persona KYC'
-        />
+        /> */}
+        {/* renderValue={(selected) => {
+            return (
+              <Stack flexDirection='row' alignItems='center' gap={1}>
+                {selected ? (
+                  <IdentityIcon size='xSmall' type={selected} />
+                ) : (
+                  <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
+                )}
+                <Typography variant='body2'>{selected || "Member's choice"}</Typography>
+              </Stack>
+            );
+          }} */}
       </Box>
       {kycOption.value === 'synaps' && (
         <>

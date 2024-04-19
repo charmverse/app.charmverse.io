@@ -1,5 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -32,6 +33,10 @@ export function SpaceIntegrations({ space }: { space: Space }) {
         <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
       </Grid>
       <Grid item>
+        <FieldLabel>Kyc</FieldLabel>
+        <Typography variant='body2' mb={2}>
+          Choose your provider
+        </Typography>
         <KycIntegration space={space} isAdmin={isAdmin} />
       </Grid>
     </Grid>

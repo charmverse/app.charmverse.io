@@ -1,14 +1,12 @@
 import type { Space, KycOption } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useGetKycCredentials, useUpdateSpace, useUpdateKycCredentials } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
-import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { KycCredentials } from 'lib/kyc/getKycCredentials';
 
@@ -99,10 +97,6 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
       <Grid container spacing={3} direction='column'>
         {kycCredentials && (
           <Grid item>
-            <FieldLabel>KYC</FieldLabel>
-            <Typography variant='body2' mb={2}>
-              Choose your provider
-            </Typography>
             <KycIntegrationFields control={control} isAdmin={isAdmin} />
           </Grid>
         )}
