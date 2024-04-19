@@ -39,7 +39,6 @@ test('Space settings - add kyc integrations', async ({ page, spaceSettings }) =>
   await spaceSettings.synapsApiKey.fill('test-api-key');
   await spaceSettings.synapsSecret.fill('test-secret');
   await spaceSettings.saveButton.click();
-  await spaceSettings.page.pause();
   await expect(spaceSettings.synapsKycButton).toBeVisible();
   await expect(spaceSettings.synapsKycButton).toBeEnabled();
   await spaceSettings.synapsKycButton.click();
