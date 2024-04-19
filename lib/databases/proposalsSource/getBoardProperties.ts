@@ -140,6 +140,18 @@ function applyToPropertiesByType(boardProperties: IPropertyTemplate[], { id, ...
   }
 }
 
+function applyToPropertiesByTypeAndName(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: IPropertyTemplate
+) {
+  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type && p.name === fieldProperty.name);
+  if (!existingProp) {
+    boardProperties.push({ id, ...fieldProperty });
+  } else {
+    Object.assign(existingProp, fieldProperty);
+  }
+}
+
 function applyFormFieldToProperties(boardProperties: IPropertyTemplate[], { id, ...fieldProperty }: IPropertyTemplate) {
   const existingProp = boardProperties.find((p) => p.formFieldId === fieldProperty.formFieldId);
   if (!existingProp) {
@@ -154,19 +166,19 @@ function applyFormFieldToProperties(boardProperties: IPropertyTemplate[], { id, 
 
 function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
   for (const rubricStepTitle of rubricStepTitles) {
-    applyToPropertiesByType(boardProperties, {
+    applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluatedBy',
       name: rubricStepTitle,
       options: []
     });
-    applyToPropertiesByType(boardProperties, {
+    applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationTotal',
       name: rubricStepTitle,
       options: []
     });
-    applyToPropertiesByType(boardProperties, {
+    applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationAverage',
       name: rubricStepTitle,
