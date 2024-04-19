@@ -43,7 +43,6 @@ import {
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
 } from 'lib/proposals/blocks/constants';
-import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -90,7 +89,7 @@ function TableHeader(props: Props): JSX.Element {
   const disableRename =
     proposalPropertyTypesList.includes(type as any) ||
     DEFAULT_BLOCK_IDS.includes(templateId) ||
-    defaultRewardPropertyIds.includes(templateId) ||
+    template.id.startsWith('__') ||
     !!template.formFieldId ||
     !!template.proposalFieldId;
 
@@ -185,7 +184,6 @@ function TableHeader(props: Props): JSX.Element {
 
   const isDisabled =
     proposalPropertyTypesList.includes(type as any) ||
-    defaultRewardPropertyIds.includes(templateId) ||
     template.id.startsWith('__') ||
     !!template.formFieldId ||
     !!template.proposalFieldId;

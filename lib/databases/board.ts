@@ -20,6 +20,7 @@ export const proposalPropertyTypesList = [
   'proposalStep',
   'proposalReviewerNotes'
 ] as const;
+
 export type ProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
 export type PropertyType =

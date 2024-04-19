@@ -5,8 +5,12 @@ import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
+import { proposalPropertyTypesList } from 'lib/databases/board';
 import { InvalidStateError } from 'lib/middleware';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { getFormInput } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
 
@@ -21,6 +25,23 @@ describe('getBoardProperties', () => {
 
   it('Should return universal properties for proposals', () => {
     const result = getBoardProperties({});
-    // console.log('result', result);
+    proposalPropertyTypesList.forEach((property) => {
+      expect(result.some((r) => r.type === property));
+    });
+  });
+
+  it('Should return properties for project profile', () => {
+    const result = getBoardProperties({
+      formFields: [
+        getFormInput({
+          id: 'project-profile-id',
+          type: 'project_profile',
+          fieldConfig: createDefaultProjectAndMembersFieldConfig()
+        })
+      ]
+    });
+    proposalPropertyTypesList.forEach((property) => {
+      expect(result.some((r) => r.type === property));
+    });
   });
 });

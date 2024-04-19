@@ -14,7 +14,6 @@ import { proposalPropertyTypesList } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 import { isTruthy } from 'lib/utils/types';
 
 import type { Mutator } from '../../mutator';
@@ -282,7 +281,7 @@ function CardDetailProperties(props: Props) {
         const isReadonlyTemplateProperty =
           readOnly ||
           proposalPropertyTypesList.includes(propertyTemplate.type as any) ||
-          defaultRewardPropertyIds.includes(propertyTemplate.id) ||
+          propertyTemplate.id.startsWith('__') ||
           !!cardProperty?.formFieldId ||
           !!cardProperty?.proposalFieldId;
 

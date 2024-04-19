@@ -1,6 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import { InvalidStateError } from 'lib/middleware/errors';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
@@ -82,9 +83,9 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     throw new InvalidStateError(`Cannot add proposal cards to a database which does not have proposals as its source`);
   }
 
-  const formFields = forms
+  const formFields: FormFieldInput[] = forms
     .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
-    .flatMap((p) => p.formFields);
+    .flatMap((p) => p.formFields.map((field) => ({ ...field, options: field.options as FormFieldInput['options'] })));
 
   const evaluationStepTitles: Set<string> = new Set();
   const rubricStepTitles: Set<string> = new Set();

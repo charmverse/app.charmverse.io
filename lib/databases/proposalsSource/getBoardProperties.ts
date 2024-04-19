@@ -3,6 +3,7 @@ import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
@@ -25,7 +26,7 @@ export function getBoardProperties({
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
   currentCardProperties?: IPropertyTemplate[];
-  formFields?: FormField[];
+  formFields?: FormFieldInput[];
 }) {
   // TODO: we shouldn't have to filter out the excluded field types here after week of April 3, 2024.
   // We should probably hav ea whitelist of form field answers that we support
@@ -102,7 +103,6 @@ export function getBoardProperties({
   });
 
   formFields.forEach((formField) => {
-    const existingPropIndex = boardProperties.findIndex((p) => p.formFieldId === formField.id);
     let boardPropertyType: IPropertyTemplate['type'] | null = null;
     let boardPropertyOptions: IPropertyTemplate['options'] = [];
 
@@ -131,6 +131,18 @@ export function getBoardProperties({
         }));
         break;
       }
+      case 'project_profile': {
+        applyTypeToProperties(boardProperties, {
+          id: uuid(),
+          name: formField.name,
+          options: [],
+          type: 'projectName',
+          private: formField.private
+        });
+        const properties = getPropertiesForProjectFormField(formField);
+        applyToProperties(boardProperties, properties);
+        break;
+      }
       default: {
         if (!excludedFieldTypes.includes(formField.type)) {
           boardPropertyType = formField.type as IPropertyTemplate['type'];
@@ -138,7 +150,8 @@ export function getBoardProperties({
       }
     }
     if (boardPropertyType) {
-      const boardProperty = {
+      const fieldProperty = {
+        id: uuid(),
         name: formField.name,
         options: boardPropertyOptions,
         description: (formField.description as { content: PageContent; contentText: string })?.contentText,
@@ -147,20 +160,34 @@ export function getBoardProperties({
         private: formField.private
       };
 
-      if (existingPropIndex === -1) {
-        boardProperties.push({
-          id: uuid(),
-          ...boardProperty
-        });
-      } else {
-        boardProperties[existingPropIndex] = {
-          ...boardProperties[existingPropIndex],
-          ...boardProperty
-        };
-      }
+      applyFormFieldToProperties(boardProperties, fieldProperty);
     }
   });
   return boardProperties;
+}
+
+function applyFormFieldToProperties(boardProperties: IPropertyTemplate[], { id, ...fieldProperty }: IPropertyTemplate) {
+  const existingProp = boardProperties.find((p) => p.formFieldId === fieldProperty.formFieldId);
+  if (!existingProp) {
+    boardProperties.push({
+      id,
+      ...fieldProperty
+    });
+  } else {
+    Object.assign(existingProp, fieldProperty);
+  }
+}
+
+function applyTypeToProperties(boardProperties: IPropertyTemplate[], { id, ...fieldProperty }: IPropertyTemplate) {
+  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type);
+  if (!existingProp) {
+    boardProperties.push({
+      id,
+      ...fieldProperty
+    });
+  } else {
+    Object.assign(existingProp, fieldProperty);
+  }
 }
 
 function addProposalEvaluationProperties({

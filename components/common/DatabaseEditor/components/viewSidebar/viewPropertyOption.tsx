@@ -12,7 +12,6 @@ import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import { getPropertyName } from 'lib/databases/getPropertyName';
-import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
 import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
@@ -56,7 +55,7 @@ function ViewPropertyOption({
   const disabled =
     proposalPropertyTypesList.includes(property.type as any) ||
     DEFAULT_BLOCK_IDS.includes(property.id) ||
-    defaultRewardPropertyIds.includes(property.id) ||
+    property.id.startsWith('__') ||
     !!property.formFieldId ||
     !!property.proposalFieldId;
 

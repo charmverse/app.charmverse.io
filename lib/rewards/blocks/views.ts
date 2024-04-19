@@ -23,8 +23,7 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_APPLICANTS_COUNT,
-  defaultRewardPropertyIds
+  REWARD_APPLICANTS_COUNT
 } from './constants';
 
 export const defaultRewardViews = [
@@ -133,7 +132,7 @@ export function getProposalRewardsView({
       } else if (rewardTypes.includes('token') && (id === REWARD_AMOUNT || id === REWARD_CHAIN)) {
         return true;
       } else {
-        return !defaultRewardPropertyIds.includes(id);
+        return !id.startsWith('__');
       }
     });
 
