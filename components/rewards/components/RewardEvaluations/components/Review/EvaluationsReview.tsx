@@ -1,6 +1,6 @@
 import { Box, Collapse, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -53,6 +53,12 @@ export function EvaluationsReview({
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
+
+  useEffect(() => {
+    if (currentEvaluation) {
+      setExpandedEvaluationId(currentEvaluation.id);
+    }
+  }, [!currentEvaluation]);
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));
