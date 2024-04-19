@@ -118,6 +118,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         }}
         options={cryptoOptions as Value[]}
         disableClearable
+        autoComplete={false}
         autoHighlight
         size='small'
         getOptionLabel={getOptionLabel}

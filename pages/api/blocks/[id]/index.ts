@@ -57,9 +57,20 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
       resourceId: page.syncWithPageId,
       userId: page.createdBy
     });
+    const space = await prisma.space.findFirstOrThrow({
+      where: {
+        id: result.spaceId
+      },
+      select: {
+        id: true,
+        features: true,
+        credentialTemplates: true
+      }
+    });
     const { boardBlock, card: proposalCardProps } = await getCardPropertiesFromProposal({
       boardId: block.rootId,
-      pageId: page.syncWithPageId
+      pageId: page.syncWithPageId,
+      space
     });
     const updatedFields = applyPropertiesToCard({
       boardProperties: (boardBlock.fields as any as BoardFields).cardProperties,

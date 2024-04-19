@@ -1,0 +1,1 @@
+export { ProposalCredentials } from './ProposalCredentials';

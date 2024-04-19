@@ -248,7 +248,7 @@ function generateUpdatedProposalStepProperty({
       ...proposalDbProperties.proposalStep(),
       id: uuid()
     }),
-    options: ['Draft', 'Rewards', ...evaluationStepTitles].map((title) => ({
+    options: ['Draft', 'Rewards', 'Credentials', ...evaluationStepTitles].map((title) => ({
       color: 'propColorGray',
       id: title,
       value: title

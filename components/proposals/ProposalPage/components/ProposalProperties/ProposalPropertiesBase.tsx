@@ -3,10 +3,8 @@ import { KeyboardArrowDown } from '@mui/icons-material';
 import { Box, Collapse, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
-import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
-import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { CustomPropertiesAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/components/CustomPropertiesAdapter';
 import { ProposalRewards } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewards';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -39,7 +37,6 @@ type ProposalPropertiesProps = {
   readOnlyRewards?: boolean;
   setProposalFormInputs: (values: Partial<ProposalPropertiesInput>) => Promise<void> | void;
   readOnlyCustomProperties?: string[];
-  readOnlySelectedCredentialTemplates?: boolean;
   rewardIds?: string[] | null;
   proposalId?: string;
   isStructuredProposal: boolean;
@@ -53,7 +50,6 @@ export function ProposalPropertiesBase({
   readOnlyAuthors,
   setProposalFormInputs,
   readOnlyCustomProperties,
-  readOnlySelectedCredentialTemplates,
   readOnlyRewards,
   rewardIds,
   proposalId,
@@ -62,10 +58,6 @@ export function ProposalPropertiesBase({
 }: ProposalPropertiesProps) {
   const { mappedFeatures } = useSpaceFeatures();
   const [detailsExpanded, setDetailsExpanded] = useState(proposalStatus === 'draft');
-
-  const { credentialTemplates } = useGetCredentialTemplates();
-
-  const showCredentialSelect = !!credentialTemplates?.length;
 
   const proposalAuthorIds = proposalFormInputs.authors;
   const proposalReviewers = proposalFormInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat();
@@ -124,18 +116,6 @@ export function ProposalPropertiesBase({
                 wrapColumn
                 showEmptyPlaceholder
               />
-              {showCredentialSelect && (
-                <CredentialSelect
-                  templateType='proposal'
-                  readOnly={readOnlySelectedCredentialTemplates}
-                  selectedCredentialTemplates={proposalFormInputs.selectedCredentialTemplates}
-                  onChange={(selectedCredentialTemplates) =>
-                    setProposalFormInputs({
-                      selectedCredentialTemplates
-                    })
-                  }
-                />
-              )}
             </Box>
           </div>
         </Box>

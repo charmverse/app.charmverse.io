@@ -4,6 +4,7 @@ import { Box, IconButton, Tooltip } from '@mui/material';
 import { ResetResultButton } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Review/components/ResetResultButton';
 import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
+import { EditStepButton } from './EditStepButton';
 import { GoBackButton } from './GoBackButton';
 
 type Props = {
@@ -51,16 +52,12 @@ export function EvaluationStepActions({
       )}
 
       {evaluation && !archived && (
-        <Tooltip
-          disableInteractive
-          title={!permissions?.edit ? 'You do not have permission to edit this evaluation' : 'Edit'}
-        >
-          <span className='show-on-hover' style={{ opacity: !evaluation ? 0 : undefined }}>
-            <IconButton color='secondary' disabled={!permissions?.edit} size='small' onClick={() => openSettings?.()}>
-              <EditIcon fontSize='small' />
-            </IconButton>
-          </span>
-        </Tooltip>
+        <EditStepButton
+          readOnlyTooltip='You do not have permission to edit this evaluation'
+          readOnly={!permissions?.edit}
+          hidden={!evaluation}
+          onClick={openSettings}
+        />
       )}
     </Box>
   );

@@ -90,7 +90,8 @@ export function useProposalsBoardAdapter() {
           currentStep: p.currentStep,
           sourceTemplateId: p.templateId,
           evaluations: p.evaluations,
-          hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0
+          hasRewards: (p.fields?.pendingRewards ?? []).length > 0 || (p.rewardIds ?? []).length > 0,
+          hasCredentials: !!p.selectedCredentialTemplates.length
         }
       } as CardWithRelations;
     });

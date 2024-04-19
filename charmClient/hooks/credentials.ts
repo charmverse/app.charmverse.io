@@ -28,10 +28,6 @@ export function useGetCredentialTemplates() {
   };
 }
 
-export function useCredentialTemplates({ spaceId }: { spaceId: MaybeString }) {
-  return useGET<CredentialTemplate[]>(spaceId ? '/api/credentials/templates' : null, { spaceId });
-}
-
 export function useReorderFavoriteCredentials() {
   return usePUT<ReorderFavoriteCredentialsPayload>(`/api/credentials/favorites`);
 }

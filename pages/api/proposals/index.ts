@@ -100,12 +100,6 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     userId: req.session.user.id
   });
 
-  if (proposalPage.proposal.status === 'published') {
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_created',
-      proposalId: proposalPage.proposal.id
-    });
-  }
   updateTrackPageProfile(proposalPage.page.id);
 
   return res.status(201).json({ id: proposalPage.proposal.id });
