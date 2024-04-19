@@ -8,6 +8,7 @@ import Typography, { type TypographyProps } from '@mui/material/Typography';
 import { getChainById } from 'connectors/chains';
 import millify from 'millify';
 
+import { TokenBadge } from 'components/common/TokenBadge';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
@@ -21,8 +22,15 @@ export interface IRewardBadgeProps {
   truncate?: boolean;
   hideStatus?: boolean;
   showEmptyStatus?: boolean;
+  fullForm?: boolean;
 }
-export function RewardStatusBadge({ truncate = false, showEmptyStatus, hideStatus, reward }: IRewardBadgeProps) {
+export function RewardStatusBadge({
+  fullForm,
+  truncate = false,
+  showEmptyStatus,
+  hideStatus,
+  reward
+}: IRewardBadgeProps) {
   return (
     <Grid container direction='column' alignItems='center'>
       <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
@@ -38,7 +46,7 @@ export function RewardStatusBadge({ truncate = false, showEmptyStatus, hideStatu
             minHeight: '30px'
           }}
         >
-          <RewardAmount reward={reward} truncate={truncate} />
+          <RewardAmount fullForm={fullForm} reward={reward} truncate={truncate} />
           {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
         </Box>
       </Grid>
@@ -50,8 +58,10 @@ export function RewardAmount({
   reward,
   truncate = false,
   truncatePrecision = 4,
-  typographyProps
+  typographyProps,
+  fullForm
 }: {
+  fullForm?: boolean;
   reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>>;
   truncate?: boolean;
   truncatePrecision?: number;
@@ -113,6 +123,8 @@ export function RewardAmount({
               Reward not set
             </Typography>
           </Box>
+        ) : fullForm ? (
+          <TokenBadge tokenAmount={rewardAmount} chainId={chainId} tokenAddress={rewardToken} />
         ) : (
           <>
             <Box

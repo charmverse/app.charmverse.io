@@ -1,13 +1,12 @@
-import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { TokenBadge } from 'components/common/TokenBadge';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
@@ -41,11 +40,6 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = getRewardWorkflow(workflowOptions, reward);
-  const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(undefined);
-  const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
-  const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
-  const { showMessage } = useSnackbar();
-
   const updatedWorkflow =
     application && workflow
       ? getRewardWorkflowWithApplication({
@@ -55,6 +49,10 @@ export function EvaluationsReview({
       : workflow;
 
   const currentEvaluation = updatedWorkflow ? getCurrentRewardEvaluation(updatedWorkflow) : null;
+  const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);
+  const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
+  const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
+  const { showMessage } = useSnackbar();
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));
@@ -95,7 +93,7 @@ export function EvaluationsReview({
         return (
           <EvaluationStepRow
             key={evaluation.id}
-            expanded={evaluation.id === expandedEvaluationId || isCurrent}
+            expanded={evaluation.id === expandedEvaluationId}
             expandedContainer={expandedContainer}
             isCurrent={isCurrent}
             onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
@@ -117,11 +115,7 @@ export function EvaluationsReview({
               />
             ) : evaluation.type === 'payment' ? (
               <Box mb={2}>
-                <TokenBadge
-                  tokenAmount={reward.rewardAmount}
-                  chainId={reward.chainId}
-                  tokenAddress={reward.rewardToken}
-                />
+                <RewardStatusBadge fullForm reward={reward} hideStatus truncate />
               </Box>
             ) : null}
           </EvaluationStepRow>
