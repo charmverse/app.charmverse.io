@@ -404,13 +404,21 @@ const PageTreeItem = forwardRef<any, PageTreeItemProps>((props, ref) => {
         anchorOrigin={anchorOrigin}
         transformOrigin={transformOrigin}
       >
-        {Boolean(anchorEl) && <PageActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
+        {Boolean(anchorEl) && <PageItemActionsMenu closeMenu={closeMenu} pageId={pageId} pagePath={pagePath} />}
       </Menu>
     </>
   );
 });
 
-function PageActionsMenu({ closeMenu, pageId, pagePath }: { closeMenu: () => void; pageId: string; pagePath: string }) {
+function PageItemActionsMenu({
+  closeMenu,
+  pageId,
+  pagePath
+}: {
+  closeMenu: () => void;
+  pageId: string;
+  pagePath: string;
+}) {
   const boards = useAppSelector(getSortedBoards);
   const currentPage = usePageFromPath();
   const { deletePage, pages } = usePages();
