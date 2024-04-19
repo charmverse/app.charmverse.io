@@ -22,15 +22,19 @@ async function duplicateRubricCriterias() {
       }
     },
     select: {
+      evaluations: true,
       rubricCriteria: true
     }
   });
+  console.log(sourceProposal.evaluations);
+  console.log(sourceProposal.rubricCriteria.length);
+  console.log(sourceProposal.rubricCriteria.filter((c) => c.proposalId));
 
-  for (const proposalId of destinationProposals) {
+  for (const proposalIdToUpdate of destinationProposals) {
     try {
       const rubricEvaluations = await prisma.proposalEvaluation.findMany({
         where: {
-          proposalId: proposalId,
+          proposalId: proposalIdToUpdate,
           type: 'rubric'
           // title: rubricEvaluationTitle
         }
@@ -46,7 +50,7 @@ async function duplicateRubricCriterias() {
       await prisma.$transaction([
         prisma.proposalRubricCriteria.deleteMany({
           where: {
-            proposalId: proposalId,
+            proposalId: rubricEvaluation.proposalId,
             evaluationId: rubricEvaluation.id
           }
         }),
@@ -55,15 +59,15 @@ async function duplicateRubricCriterias() {
             data: {
               ...criteria,
               parameters: criteria.parameters as any,
-              proposalId: proposalId,
+              proposalId: rubricEvaluation.proposalId,
               evaluationId: rubricEvaluation.id
             }
           })
         )
       ]);
-      console.log('Updated proposal:', proposalId);
+      console.log('Updated proposal:', proposalIdToUpdate);
     } catch (_) {
-      console.log(`Failed to update rubric for proposal template ${proposalId}`, _);
+      console.log(`Failed to update rubric for proposal template ${proposalIdToUpdate}`, _);
     }
   }
 }
