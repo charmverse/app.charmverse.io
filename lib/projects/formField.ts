@@ -150,11 +150,10 @@ export function createDefaultProjectAndMembersFieldConfig() {
 }
 
 export function getFieldConfig(field?: ProjectFieldConfig): ProjectFieldConfig {
-  return (
-    field || {
-      show: true,
-      required: false,
-      private: false
-    }
-  );
+  return {
+    show: true,
+    required: true,
+    private: false,
+    ...field
+  };
 }
