@@ -8,7 +8,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 (async () => {
   const space = await prisma.space.findUnique({
     where: {
-      domain: 'page-dao'
+      domain: 'cvt-jedi-archives'
     }
   });
 
