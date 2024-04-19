@@ -23,7 +23,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
-import { defaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -41,6 +41,7 @@ import {
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
+import { isWalletConfig } from './fields/utils';
 import type { FormFieldInput } from './interfaces';
 
 export const FormFieldContainer = styled(Stack, {
@@ -200,7 +201,9 @@ function ExpandedFormField({
       {formField.type === 'project_profile' ? (
         <ProjectFormEditor
           defaultRequired
-          fieldConfig={(formField.fieldConfig ?? defaultProjectAndMembersFieldConfig) as ProjectAndMembersFieldConfig}
+          fieldConfig={
+            (formField.fieldConfig ?? createDefaultProjectAndMembersFieldConfig()) as ProjectAndMembersFieldConfig
+          }
           onChange={(fieldConfig) => {
             updateFormField({
               id: formField.id,
@@ -216,6 +219,15 @@ function ExpandedFormField({
           onCreateOption={onCreateOption}
           onDeleteOption={onDeleteOption}
           onUpdateOption={onUpdateOption}
+          walletInputConfig={{
+            chainId: isWalletConfig(formField.fieldConfig) ? formField.fieldConfig.chainId : undefined,
+            onChangeChainId: (chainId) => {
+              updateFormField({
+                fieldConfig: { chainId },
+                id: formField.id
+              });
+            }
+          }}
           placeholder={fieldTypePlaceholderRecord[formField.type]}
           // Enable select and multiselect fields to be able to create options
           disabled={formField.type !== 'select' && formField.type !== 'multiselect'}
@@ -346,7 +358,8 @@ export function FormField(
               {formField.type === 'project_profile' ? (
                 <ProjectFormEditor
                   fieldConfig={
-                    (formField.fieldConfig as ProjectAndMembersFieldConfig) ?? defaultProjectAndMembersFieldConfig
+                    (formField.fieldConfig as ProjectAndMembersFieldConfig) ??
+                    createDefaultProjectAndMembersFieldConfig()
                   }
                   defaultRequired
                 />
@@ -354,6 +367,14 @@ export function FormField(
                 <FieldTypeRenderer
                   labelEndAdornment={
                     formField.private ? <Chip sx={{ mx: 1 }} label='Private' size='small' /> : undefined
+                  }
+                  walletInputConfig={
+                    // Only show if chainId is present in field config and its a valid chainId
+                    isWalletConfig(formField.fieldConfig) && formField.fieldConfig.chainId
+                      ? {
+                          chainId: formField.fieldConfig.chainId
+                        }
+                      : undefined
                   }
                   type={formField.type as any}
                   description={formField.description as PageContent}

@@ -52,20 +52,7 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
 
   return (
     <StyledToolbar variant='dense'>
-      <IconButton
-        color='inherit'
-        onClick={openSidebar}
-        edge='start'
-        sx={{
-          display: 'inline-flex',
-          mr: 2,
-          ...(open && { display: 'none' })
-        }}
-      >
-        <Badge badgeContent={unreadNotifications.length} color='error'>
-          <MenuIcon />
-        </Badge>
-      </IconButton>
+      <ToggleSidebarIcon open={open} openSidebar={openSidebar} badgeContent={unreadNotifications.length} />
 
       <Box
         sx={{
@@ -90,6 +77,33 @@ function HeaderComponent({ open, openSidebar }: HeaderProps) {
         </Box>
       </Box>
     </StyledToolbar>
+  );
+}
+
+export function ToggleSidebarIcon({
+  open,
+  openSidebar,
+  badgeContent
+}: {
+  open: boolean;
+  openSidebar: VoidFunction;
+  badgeContent?: number;
+}) {
+  return (
+    <IconButton
+      color='inherit'
+      onClick={openSidebar}
+      edge='start'
+      sx={{
+        display: 'inline-flex',
+        mr: 2,
+        ...(open && { display: 'none' })
+      }}
+    >
+      <Badge badgeContent={badgeContent} color='error'>
+        <MenuIcon />
+      </Badge>
+    </IconButton>
   );
 }
 

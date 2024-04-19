@@ -144,6 +144,30 @@ describe('src/cardFilter', () => {
       );
       expect(result).toBeTruthy();
     });
+
+    test('should work for proposalStatus multi_select property', () => {
+      const createdBy = v4();
+      const statusId = '567789';
+      const filterClauseIncludes = createFilterClause({
+        propertyId: statusId,
+        condition: 'contains',
+        values: ['in_progress'],
+        filterId: v4()
+      });
+      card1.createdBy = createdBy;
+      const evaluationTypeId = '1234';
+      card1.fields.properties[evaluationTypeId] = 'feedback'; // feedback is mapped internally to "in_progress"
+      card1.fields.properties[statusId] = 'in_progress'; // feedback is mapped internally to "in_progress"
+      const result = CardFilter.isClauseMet(
+        filterClauseIncludes,
+        [
+          { id: evaluationTypeId, name: 'Evaluation type', options: [], type: 'proposalEvaluationType' },
+          { id: statusId, name: 'Proposal status', options: [], type: 'proposalStatus' }
+        ],
+        card1
+      );
+      expect(result).toBeTruthy();
+    });
   });
   describe('verify isFilterGroupMet method', () => {
     test('should return true with no filter', () => {

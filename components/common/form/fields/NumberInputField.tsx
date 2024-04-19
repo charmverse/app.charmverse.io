@@ -55,6 +55,7 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props & NestedDataTes
         label={label}
         inline={inline}
         iconLabel={iconLabel}
+        error={!!error}
       >
         <StyledTextField
           data-test={dataTest}

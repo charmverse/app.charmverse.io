@@ -23,7 +23,7 @@ function UserDescription(props: UserDescriptionProps) {
   const { description = '', error, onChange, readOnly, required } = props;
 
   return (
-    <FieldWrapper label='About me' required={required}>
+    <FieldWrapper label='About me' required={required} error={!!error?.message}>
       <TextField
         value={description}
         disabled={readOnly}

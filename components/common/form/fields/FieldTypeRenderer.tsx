@@ -1,4 +1,4 @@
-import type { SxProps } from '@mui/material';
+import { type SxProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
@@ -6,6 +6,8 @@ import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps, FieldType } from 'components/common/form/interfaces';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
+
+import { InputSearchBlockchain } from '../InputSearchBlockchain';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
@@ -17,6 +19,11 @@ import { PersonInputField } from './PersonInputField';
 type TextInputConfig = {
   rows?: number;
   maxRows?: number;
+};
+
+type WalletInputConfig = {
+  chainId?: number;
+  onChangeChainId?: (chainId: number | null) => void;
 };
 
 type TextProps = {
@@ -35,18 +42,38 @@ type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
   sx?: SxProps;
   type: FieldType;
   textInputConfig?: TextInputConfig;
+  walletInputConfig?: WalletInputConfig;
 } & TextInputConfig;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
-  ({ type, options, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
+  ({ type, options, walletInputConfig, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
     switch (type) {
       case 'text':
       case 'email':
       case 'url':
       case 'phone':
-      case 'short_text':
-      case 'wallet': {
+      case 'short_text': {
         return <TextInputField {...fieldProps} ref={ref} multiline />;
+      }
+      case 'wallet': {
+        return (
+          <TextInputField
+            topComponent={
+              walletInputConfig ? (
+                <InputSearchBlockchain
+                  disableClearable={false}
+                  chainId={walletInputConfig.chainId}
+                  readOnly={!walletInputConfig.onChangeChainId}
+                  disabled={!walletInputConfig.onChangeChainId}
+                  onChange={walletInputConfig.onChangeChainId}
+                />
+              ) : undefined
+            }
+            {...fieldProps}
+            ref={ref}
+            multiline
+          />
+        );
       }
       case 'long_text': {
         return <CharmEditorInputField {...fieldProps} />;

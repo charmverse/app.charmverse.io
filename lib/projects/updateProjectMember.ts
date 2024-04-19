@@ -1,15 +1,27 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { findCharmVerseUserIdWithProjectMember } from './getProjectMemberCreateTransaction';
-import type { ProjectAndMembersPayload } from './interfaces';
+import type { ProjectMemberPayload } from './interfaces';
+
+export type UpdateProjectMemberPayload = Partial<ProjectMemberPayload> & {
+  id: string;
+};
 
 export async function updateProjectMember({
   projectMemberValues
 }: {
-  projectMemberValues: ProjectAndMembersPayload['projectMembers'][0];
+  projectMemberValues: UpdateProjectMemberPayload;
 }) {
-  const connectedUserId =
-    projectMemberValues.userId ?? (await findCharmVerseUserIdWithProjectMember(projectMemberValues));
+  const projectMember = await prisma.projectMember.findUniqueOrThrow({
+    where: {
+      id: projectMemberValues.id
+    },
+    select: {
+      userId: true
+    }
+  });
+
+  const connectedUserId = projectMember.userId ?? (await findCharmVerseUserIdWithProjectMember(projectMemberValues));
 
   return prisma.projectMember.update({
     where: {
