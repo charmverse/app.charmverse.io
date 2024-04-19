@@ -1,11 +1,12 @@
-import { render } from '@testing-library/react';
-import React from 'react';
 import '@testing-library/jest-dom';
+import { render } from '@testing-library/react';
 
 import { TestBlockFactory } from '../../test/testBlockFactory';
 import { wrapDNDIntl } from '../../testUtils';
 
 import TableHeaders from './tableHeaders';
+
+jest.mock('@ethereum-attestation-service/eas-sdk', () => ({}));
 
 describe('components/table/TableHeaders', () => {
   const board = TestBlockFactory.createBoard();
