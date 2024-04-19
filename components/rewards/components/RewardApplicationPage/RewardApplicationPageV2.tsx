@@ -275,6 +275,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
           readOnly={!page?.permissionFlags?.edit_content}
           application={application}
           reward={reward}
+          refreshApplication={refreshApplication}
           onChangeReward={updateReward}
         />
       </DocumentColumnLayout>

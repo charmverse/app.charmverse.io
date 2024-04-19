@@ -9,6 +9,7 @@ export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkf
   reward?: RewardWithUsers;
   application?: ApplicationWithTransactions;
   isTemplate?: boolean;
+  refreshApplication?: VoidFunction;
 };
 
 export function RewardEvaluations({
@@ -20,7 +21,8 @@ export function RewardEvaluations({
   isUnpublishedReward,
   reward,
   application,
-  isTemplate
+  isTemplate,
+  refreshApplication
 }: RewardEvaluationsProps) {
   if (isUnpublishedReward || isTemplate) {
     return (
@@ -41,6 +43,7 @@ export function RewardEvaluations({
         readOnly={readOnly}
         reward={reward}
         onChangeReward={onChangeReward}
+        refreshApplication={refreshApplication}
       />
     );
   }

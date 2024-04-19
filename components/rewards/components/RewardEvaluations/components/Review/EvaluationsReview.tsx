@@ -21,6 +21,7 @@ import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
+import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
 
 export type Props = Omit<
@@ -29,6 +30,7 @@ export type Props = Omit<
 > & {
   reward: RewardWithUsers;
   application?: ApplicationWithTransactions;
+  refreshApplication?: VoidFunction;
 };
 
 export function EvaluationsReview({
@@ -36,7 +38,8 @@ export function EvaluationsReview({
   reward,
   onChangeReward,
   expanded: expandedContainer,
-  readOnly
+  readOnly,
+  refreshApplication
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
@@ -133,7 +136,7 @@ export function EvaluationsReview({
                 hideReviewResult={!isCurrent && evaluation.result === null}
               />
             ) : evaluation.type === 'payment' ? (
-              <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
+              <PaymentStepReview application={application} reward={reward} refreshApplication={refreshApplication} />
             ) : evaluation.type === 'submit' ? (
               <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
             ) : null}
