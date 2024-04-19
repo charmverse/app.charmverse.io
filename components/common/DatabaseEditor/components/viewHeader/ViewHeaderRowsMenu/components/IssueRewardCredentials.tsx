@@ -100,7 +100,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
     !space?.useOnchainCredentials || !space.credentialsChainId || !space.credentialsWallet
       ? 'A space admin must set up onchain credentials to use this functionality'
       : !issuableRewardCredentials?.length
-      ? 'No credentials to issue'
+      ? 'No onchain credentials to issue'
       : !account || !signer
       ? 'Unlock your wallet to issue credentials'
       : !userWalletCanIssueCredentialsForSpace

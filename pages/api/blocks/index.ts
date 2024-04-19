@@ -267,6 +267,8 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 }
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[]>) {
+  const userId = req.session.user.id;
+
   const blocks: BlockWithDetails[] = req.body;
   const dbBlocks = await prisma.block.findMany({
     where: {
@@ -276,11 +278,38 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     },
     select: {
       id: true,
+      rootId: true,
+      type: true,
       spaceId: true,
       fields: true,
       title: true
     }
   });
+
+  // const pages = await prisma.page.findMany({
+  //   where: {
+  //     id: {
+  //       in: [...dbBlocks.map((block) => block.id), ...dbBlocks.map((b) => b.rootId)]
+  //     }
+  //   },
+  //   select: {
+  //     id: true,
+  //     isLocked: true
+  //   }
+  // });
+
+  // const pagePermissions = await permissionsApiClient.pages.bulkComputePagePermissions({
+  //   pageIds: pages.map((p) => p.id),
+  //   userId
+  // });
+
+  // for (const block of dbBlocks) {
+  //   const targetPageId = block.type === 'view' ? block.rootId : block.id;
+
+  //   if (!pagePermissions[targetPageId]?.edit_content) {
+  //     throw new ActionNotPermittedError('You do not have permission to edit this block');
+  //   }
+  // }
 
   // validate access to the space
   const spaceIds: Record<string, boolean> = {};

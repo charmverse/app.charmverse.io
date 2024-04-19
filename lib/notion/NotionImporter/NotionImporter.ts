@@ -90,7 +90,10 @@ export class NotionImporter {
       notionPagesRecord[notionPage.id] = notionPage;
     });
 
-    log.debug(`[notion] Fetching content for ${notionPages.length} pages`, { spaceId: this.spaceId });
+    log.debug(`[notion] Fetching content for ${notionPages.length} pages`, {
+      spaceId: this.spaceId,
+      userId: this.userId
+    });
 
     const workspacePageId = v4();
 

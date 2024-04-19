@@ -9,11 +9,13 @@ import { getAbsolutePath } from 'lib/utils/browser';
 export function CopyPageLinkAction({
   path,
   onComplete,
-  message
+  message,
+  typographyProps
 }: {
   path: string;
   onComplete?: VoidFunction;
   message?: string;
+  typographyProps?: Record<string, unknown>;
 }) {
   const { showMessage } = useSnackbar();
   const router = useRouter();
@@ -29,7 +31,7 @@ export function CopyPageLinkAction({
         <ListItemIcon>
           <LinkIcon fontSize='small' />
         </ListItemIcon>
-        <ListItemText>Copy link</ListItemText>
+        <ListItemText primaryTypographyProps={typographyProps}>Copy link</ListItemText>
       </MenuItem>
     </CopyToClipboard>
   );

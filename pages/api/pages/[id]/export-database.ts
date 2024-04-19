@@ -5,8 +5,10 @@ import nc from 'next-connect';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { loadAndGenerateCsv } from 'lib/databases/generateCsv';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
+import { DataNotFoundError } from 'lib/utils/errors';
 import type { ContentToCompress, MarkdownPageToCompress } from 'lib/utils/file';
 import { zipContent } from 'lib/utils/file';
 import { paginatedPrismaTask } from 'lib/utils/paginatedPrismaTask';
@@ -29,6 +31,14 @@ async function requestZip(req: NextApiRequest, res: NextApiResponse) {
     } catch (err) {
       log.warn('Could not parse filter when exporting database', { error: err, filter: customFilter });
     }
+  }
+  const computed = await permissionsApiClient.pages.computePagePermissions({
+    resourceId: pageId,
+    userId: req.session.user?.id
+  });
+
+  if (computed.read !== true) {
+    throw new DataNotFoundError('No such page exists');
   }
 
   const csvData = await loadAndGenerateCsv({

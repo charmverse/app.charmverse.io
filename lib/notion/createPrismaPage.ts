@@ -1,14 +1,24 @@
-import type { Prisma } from '@charmverse/core/prisma';
+import type { Prisma, Page } from '@charmverse/core/prisma';
 
 import { getPagePath } from 'lib/pages';
 import { createPage } from 'lib/pages/server/createPage';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 
-import type { CreatePageInput } from './types';
+export type CreatePageInput = {
+  id: string;
+  headerImage?: string | null;
+  icon?: string | null;
+  spaceId: string;
+  title: string;
+  type?: Page['type'];
+  createdBy: string;
+  boardId?: string;
+  parentId?: string | null;
+  cardId?: string;
+};
 
 export async function createPrismaPage({
   id,
-  content,
   headerImage = null,
   icon,
   spaceId,
@@ -21,7 +31,6 @@ export async function createPrismaPage({
 }: CreatePageInput) {
   const pageCreateInput: Prisma.PageCreateInput = {
     id,
-    content,
     // TODO: Generate content text
     contentText: '',
     createdAt: new Date(),
@@ -61,8 +70,7 @@ export async function createPrismaPage({
     };
   }
 
-  // eslint-disable-next-line
-  let page = await createPage({ data: pageCreateInput });
+  const page = await createPage({ data: pageCreateInput });
 
   await permissionsApiClient.pages.setupPagePermissionsAfterEvent({
     event: 'created',

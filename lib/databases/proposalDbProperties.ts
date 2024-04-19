@@ -106,7 +106,8 @@ export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
   pass_fail: 'Review',
   rubric: 'Rubric',
   vote: 'Vote',
-  rewards: 'Rewards'
+  rewards: 'Rewards',
+  credentials: 'Credentials'
 };
 
 export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (typeof Constants)['menuColors']> = {
@@ -115,7 +116,8 @@ export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (type
   rubric: 'propColorGray',
   vote: 'propColorGray',
   draft: 'propColorGray',
-  rewards: 'propColorGray'
+  rewards: 'propColorGray',
+  credentials: 'propColorGray'
 };
 
 export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, string> = {

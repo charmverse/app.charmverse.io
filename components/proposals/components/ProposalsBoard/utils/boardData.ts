@@ -89,7 +89,7 @@ export function getDefaultStatusProperty() {
 export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
     ...proposalDbProperties.proposalStep(PROPOSAL_STEP_BLOCK_ID, 'Step'),
-    options: ['Draft', ...evaluationStepTitles, 'Rewards'].map((title) => ({
+    options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'].map((title) => ({
       id: title,
       value: title,
       color: 'propColorGray'

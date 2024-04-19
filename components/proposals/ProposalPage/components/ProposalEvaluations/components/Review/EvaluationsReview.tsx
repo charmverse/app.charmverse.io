@@ -3,6 +3,9 @@ import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 
 import LoadingComponent from 'components/common/LoadingComponent';
+import Modal from 'components/common/Modal';
+import { CredentialSelect } from 'components/credentials/CredentialsSelect';
+import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
@@ -10,11 +13,13 @@ import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { WorkflowSelect } from '../../../WorkflowSelect';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
+import { EditStepButton } from './components/EditStepButton';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepRow } from './components/EvaluationStepRow';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
 import { ProposalSocialShareLinks } from './components/SocialShare/ProposalSocialShareLinks';
@@ -38,8 +43,11 @@ export type Props = {
     | 'lensPostLink'
     | 'formId'
     | 'form'
+    | 'selectedCredentialTemplates'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
+  readOnlyCredentialTemplates?: boolean;
+  onChangeSelectedCredentialTemplates?: (templates: string[]) => void;
   refreshProposal?: VoidFunction;
   templateId: string | null | undefined;
   pagePath?: string;
@@ -53,7 +61,9 @@ export function EvaluationsReview({
   pageId,
   proposal,
   onChangeEvaluation,
-  refreshProposal,
+  onChangeSelectedCredentialTemplates,
+  readOnlyCredentialTemplates,
+  refreshProposal: _refreshProposal,
   expanded: expandedContainer,
   templateId
 }: Props) {
@@ -61,12 +71,23 @@ export function EvaluationsReview({
   const { mappedFeatures } = useSpaceFeatures();
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
+  const [showEditCredentials, setShowEditCredentials] = useState(false);
+  const { hasPendingOnchainCredentials, refreshIssuableCredentials } = useProposalCredentials({
+    proposalId: proposal?.id
+  });
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
+  const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length;
+
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
-  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass';
+
+  const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
+  const isCredentialsActive =
+    hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
+
+  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass' && !!isCredentialsComplete;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
@@ -98,6 +119,11 @@ export function EvaluationsReview({
     } catch (error) {
       showMessage((error as Error).message ?? 'Something went wrong', 'error');
     }
+  }
+
+  async function refreshProposal() {
+    await refreshIssuableCredentials();
+    await _refreshProposal?.();
   }
 
   useEffect(() => {
@@ -141,7 +167,7 @@ export function EvaluationsReview({
       />
       {proposal?.evaluations.map((evaluation, index) => {
         const isCurrentEval = currentEvaluation?.id === evaluation.id;
-        const isCurrent = isCurrentEval && !isRewardsActive;
+        const isCurrent = isCurrentEval && !isCredentialsActive && !isRewardsActive;
         return (
           <EvaluationStepRow
             key={evaluation.id}
@@ -208,13 +234,36 @@ export function EvaluationsReview({
           </EvaluationStepRow>
         );
       })}
+      {hasCredentialsStep && (
+        <EvaluationStepRow
+          expanded={expandedEvaluationId === 'credentials'}
+          expandedContainer={expandedContainer}
+          isCurrent={isCredentialsActive}
+          onChange={(e, expand) => setExpandedEvaluationId(expand ? 'credentials' : undefined)}
+          index={proposal ? proposal.evaluations.length + 1 : 0}
+          result={isCredentialsComplete ? 'pass' : null}
+          title='Credentials'
+          actions={
+            <EditStepButton
+              readOnlyTooltip='You cannot edit credentials'
+              readOnly={readOnlyCredentialTemplates}
+              onClick={() => setShowEditCredentials(true)}
+            />
+          }
+        >
+          <ProposalCredentials
+            selectedCredentialTemplates={proposal.selectedCredentialTemplates}
+            proposalId={proposal.id}
+          />
+        </EvaluationStepRow>
+      )}
       {hasRewardsStep && (
         <EvaluationStepRow
           expanded={expandedEvaluationId === 'rewards'}
           expandedContainer={expandedContainer}
           isCurrent={isRewardsActive}
           onChange={(e, expand) => setExpandedEvaluationId(expand ? 'rewards' : undefined)}
-          index={proposal ? proposal.evaluations.length + 1 : 0}
+          index={proposal ? proposal.evaluations.length + (hasCredentialsStep ? 2 : 1) : 0}
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
         >
@@ -248,6 +297,13 @@ export function EvaluationsReview({
           updateEvaluation={updateEvaluation}
         />
       )}
+      <Modal open={showEditCredentials} onClose={() => setShowEditCredentials(false)} title='Edit proposal credentials'>
+        <CredentialSelect
+          templateType='proposal'
+          selectedCredentialTemplates={proposal?.selectedCredentialTemplates ?? []}
+          onChange={onChangeSelectedCredentialTemplates}
+        />
+      </Modal>
     </LoadingComponent>
   );
 }

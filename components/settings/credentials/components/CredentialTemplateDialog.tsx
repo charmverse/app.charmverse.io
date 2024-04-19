@@ -38,7 +38,7 @@ type Props = {
 };
 
 const defaultEventValues: Record<AttestationType, CredentialEventType[]> = {
-  proposal: ['proposal_created', 'proposal_approved'],
+  proposal: ['proposal_approved'],
   reward: ['reward_submission_approved'],
   external: ['proposal_approved']
 };

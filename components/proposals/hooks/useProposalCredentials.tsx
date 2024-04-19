@@ -2,9 +2,10 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
 import { useCallback } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
+import type { MaybeString } from 'charmClient/hooks/helpers';
+import { useGetIssuableProposalCredentials, useGetIssuedProposalCredentials } from 'charmClient/hooks/proposals';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useGetGnosisSafe } from 'hooks/useGetGnosisSafe';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -17,16 +18,19 @@ import type {
 import { multiAttestOnchain, populateOnChainAttestationTransaction } from 'lib/credentials/multiAttestOnchain';
 import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 
-export function useProposalCredentials() {
+/**
+ * @proposalId - Pass this param to get the credentials for a specific proposal
+ */
+export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: string[] | null | undefined } = {}) {
   const { space } = useCurrentSpace();
   const {
     data: issuableProposalCredentials,
     error,
     isLoading: isLoadingIssuableProposalCredentials,
     mutate: refreshIssuableCredentials
-  } = useSWR(space ? `/api/credentials/proposals/issuable?spaceId=${space.id}` : null, () =>
-    charmClient.credentials.getIssuableProposalCredentials({ spaceId: space?.id as string })
-  );
+  } = useGetIssuableProposalCredentials({
+    proposalIds
+  });
 
   const { account } = useWeb3Account();
 
@@ -112,7 +116,8 @@ export function useProposalCredentials() {
       userWalletCanIssueCredentialsForSpace,
       gnosisSafeForCredentials,
       refreshIssuableCredentials,
-      proposeTransaction
+      proposeTransaction,
+      space?.id
     ]
   );
 
@@ -124,5 +129,17 @@ export function useProposalCredentials() {
     issueAndSaveProposalCredentials,
     userWalletCanIssueCredentialsForSpace,
     gnosisSafeForCredentials
+  };
+}
+
+export function useProposalCredentials({ proposalId }: { proposalId: MaybeString }) {
+  const { space } = useCurrentSpace();
+
+  const multiCredentials = useMultiProposalCredentials({ proposalIds: proposalId ? [proposalId] : null });
+
+  return {
+    ...multiCredentials,
+    hasPendingOnchainCredentials:
+      !!space?.useOnchainCredentials && !!multiCredentials.issuableProposalCredentials?.length
   };
 }

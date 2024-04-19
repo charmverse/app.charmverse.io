@@ -18,6 +18,7 @@ import { usePagePermissions } from 'hooks/usePagePermissions';
 import { canReceiveManualPermissionUpdates } from 'lib/pages';
 
 import { AddPagePermissionsInput } from '../common/AddPagePermissionsInput';
+import { CopyLinkFooter } from '../common/CopyLinkFooter';
 
 import AddPagePermissionsForm from './AddPagePermissionsForm';
 import { PagePermissionRow } from './PagePermissionRow';
@@ -59,9 +60,10 @@ interface Props {
   pageId: string;
   refreshPermissions: () => void;
   pagePermissions: AssignedPagePermission[];
+  onCopyLink: VoidFunction;
 }
 
-export default function PaidPagePermissions({ pageId, pagePermissions, refreshPermissions }: Props) {
+export default function PaidPagePermissions({ pageId, pagePermissions, refreshPermissions, onCopyLink }: Props) {
   const { data: page } = useGetPageMeta(pageId);
   const { space } = useCurrentSpace();
   const { mutateMembers: refreshMembers } = useMembers();
@@ -157,6 +159,7 @@ export default function PaidPagePermissions({ pageId, pagePermissions, refreshPe
           />
         ))}
       </Stack>
+      <CopyLinkFooter pagePath={page?.path} onCopyLink={onCopyLink} />
     </Box>
   );
 }

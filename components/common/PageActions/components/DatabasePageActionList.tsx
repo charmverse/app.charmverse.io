@@ -1,3 +1,4 @@
+import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
@@ -33,19 +34,22 @@ import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import { lockablePageTypes } from 'lib/pages/constants';
 
 import { addNewCards, isValidCsvResult } from '../utils/databasePageOptions';
 
 import { DocumentHistory } from './DocumentHistory';
 import type { PageActionMeta } from './DocumentPageActionList';
+import { TogglePageLockAction } from './TogglePageLockAction';
 
 type Props = {
   onComplete: VoidFunction;
   page: PageActionMeta;
   pagePermissions?: PagePermissionFlags;
+  refreshPage?: VoidFunction;
 };
 
-export function DatabasePageActionList({ pagePermissions, onComplete, page }: Props) {
+export function DatabasePageActionList({ pagePermissions, onComplete, page, refreshPage }: Props) {
   const pageId = page.id;
   const router = useRouter();
   const { pages, deletePage, mutatePagesRemove } = usePages();
@@ -88,6 +92,16 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
       viewId: view?.id ?? ''
     })
   );
+
+  const isLockablePageType = lockablePageTypes.includes(page.type as PageType);
+
+  async function onTogglePageLock() {
+    await charmClient.pages.togglePageLock({
+      pageId: page.id,
+      isLocked: !page.isLocked
+    });
+    refreshPage?.();
+  }
 
   async function onDeletePage() {
     await deletePage({
@@ -209,6 +223,13 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
     <List dense>
       <AddToFavoritesAction pageId={pageId} onComplete={onComplete} />
       <SetAsHomePageAction pageId={pageId} onComplete={onComplete} />
+      {isLockablePageType && (
+        <TogglePageLockAction
+          isLocked={!!page.isLocked}
+          onClick={onTogglePageLock}
+          disabled={!pagePermissions?.edit_lock}
+        />
+      )}
       <DuplicatePageAction
         onComplete={onComplete}
         pageId={pageId}
@@ -284,7 +305,9 @@ export function DatabasePageActionList({ pagePermissions, onComplete, page }: Pr
           createdAt: new Date(board.createdAt),
           createdBy: board.createdBy,
           updatedAt: new Date(board.updatedAt),
-          updatedBy: board.updatedBy
+          updatedBy: board.updatedBy,
+          isLocked: page.isLocked,
+          lockedBy: page.lockedBy
         }}
       />
       <ConfirmImportModal

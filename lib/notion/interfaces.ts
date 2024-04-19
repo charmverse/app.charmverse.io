@@ -1,4 +1,3 @@
-import type { Page, Prisma } from '@charmverse/core/prisma';
 import type { BlockObjectResponse } from '@notionhq/client/build/src/api-endpoints';
 
 export type BaseApiColor =
@@ -20,20 +19,6 @@ export interface FailedImportsError {
   title: string;
   blocks: [string, string][];
 }
-
-export type CreatePageInput = {
-  id: string;
-  content?: Prisma.NullableJsonNullValueInput | Prisma.InputJsonValue;
-  headerImage?: string | null;
-  icon?: string | null;
-  spaceId: string;
-  title: string;
-  type?: Page['type'];
-  createdBy: string;
-  boardId?: string;
-  parentId?: string | null;
-  cardId?: string;
-};
 
 export interface ChildBlockListResponse {
   parent_block_id: string;
