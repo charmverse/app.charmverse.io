@@ -132,15 +132,19 @@ export function getBoardProperties({
         break;
       }
       case 'project_profile': {
-        applyTypeToProperties(boardProperties, {
-          id: uuid(),
-          name: formField.name,
+        // ref: lib/projects/constants.ts
+        applyToPropertiesById(boardProperties, {
+          id: '__project_name',
+          name: 'Project',
           options: [],
-          type: 'projectName',
-          private: formField.private
+          type: 'text'
         });
-        const properties = getPropertiesForProjectFormField(formField);
-        applyToProperties(boardProperties, properties);
+        applyToPropertiesById(boardProperties, {
+          id: '__projectMembers_name',
+          name: 'Project Members',
+          options: [],
+          type: 'multiSelect'
+        });
         break;
       }
       default: {
@@ -178,13 +182,10 @@ function applyFormFieldToProperties(boardProperties: IPropertyTemplate[], { id, 
   }
 }
 
-function applyTypeToProperties(boardProperties: IPropertyTemplate[], { id, ...fieldProperty }: IPropertyTemplate) {
-  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type);
+function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: IPropertyTemplate) {
+  const existingProp = boardProperties.find((p) => p.id === fieldProperty.id);
   if (!existingProp) {
-    boardProperties.push({
-      id,
-      ...fieldProperty
-    });
+    boardProperties.push(fieldProperty);
   } else {
     Object.assign(existingProp, fieldProperty);
   }

@@ -2,7 +2,8 @@ import type {
   Proposal,
   ProposalEvaluation,
   ProposalRubricCriteria,
-  ProposalRubricCriteriaAnswer
+  ProposalRubricCriteriaAnswer,
+  Prisma
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
@@ -39,6 +40,11 @@ const pageSelectObject = {
         select: {
           fieldId: true,
           value: true
+        }
+      },
+      project: {
+        include: {
+          projectMembers: true
         }
       },
       status: true,
@@ -114,22 +120,6 @@ export async function getCardPropertiesFromProposal({ boardId, pageId }: { board
   if (!proposal) {
     throw new Error('Proposal not found');
   }
-  const formFields = proposal.formId
-    ? await prisma.formField.findMany({
-        where: {
-          formId: proposal.formId
-        },
-        select: {
-          formId: true,
-          id: true,
-          type: true,
-          private: true
-        },
-        orderBy: {
-          index: 'asc'
-        }
-      })
-    : [];
 
   return {
     boardBlock,
@@ -154,6 +144,10 @@ type ProposalData = {
     })[];
     formAnswers: FormAnswerData[];
     rewards: { id: string }[];
+    project: {
+      name: string;
+      projectMembers: { name: string }[];
+    } | null;
   };
   cardProperties: IPropertyTemplate[];
 };
