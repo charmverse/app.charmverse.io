@@ -7,6 +7,7 @@ import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+// Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label'];
 
 // apply proposal-related properties to the board
@@ -23,9 +24,9 @@ export function getBoardProperties({
   currentCardProperties?: IPropertyTemplate[];
   formFields?: FormFieldInput[];
 }) {
-  // TODO: we shouldn't have to filter out the excluded field types here after week of April 3, 2024.
-  // We should probably hav ea whitelist of form field answers that we support
-  const boardProperties = [...currentCardProperties].filter((prop) => !excludedFieldTypes.includes(prop.type));
+  const boardProperties = [...currentCardProperties];
+
+  // standard proposal properties
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalReviewerNotes());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalAuthor());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
@@ -36,8 +37,10 @@ export function getBoardProperties({
     proposalDbProperties.proposalStep({ options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'] })
   );
 
+  // properties per each evaluation step
   applyProposalEvaluationProperties(boardProperties, rubricStepTitles);
 
+  // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
     applyToPropertiesById(boardProperties, {
       ...cardProp,
@@ -45,6 +48,7 @@ export function getBoardProperties({
     });
   });
 
+  // properties related to form proposals
   applyFormFieldProperties(boardProperties, formFields);
 
   return boardProperties;
