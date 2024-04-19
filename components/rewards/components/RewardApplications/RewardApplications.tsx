@@ -71,7 +71,7 @@ function ApplicationRows({
           }
           return (
             <Grid container display='flex' gap={2} key={application.id} alignItems='center' minWidth={500}>
-              <Grid item xs={4} md={5} display='flex' flexDirection='row' gap={1}>
+              <Grid item xs={4} display='flex' flexDirection='row' gap={1}>
                 <UserDisplay avatarSize='small' userId={member.id} fontSize='small' hideName showMiniProfile />
                 <Typography
                   sx={{

@@ -28,7 +28,7 @@ export function ReviewStepReview({
 
   return (
     <Stack>
-      <Box mb={2}>
+      <Box>
         <FormLabel>
           <Typography sx={{ mb: 1 }} variant='subtitle1'>
             Reviewers
@@ -36,54 +36,56 @@ export function ReviewStepReview({
         </FormLabel>
         <UserAndRoleSelect readOnly={true} value={reviewers} onChange={() => {}} />
       </Box>
-      <FormLabel>
-        <Typography variant='subtitle1'>Result</Typography>
-      </FormLabel>
-      <Card variant='outlined'>
-        {!evaluation.result && (
-          <Box display='flex' justifyContent='space-between' alignItems='center' p={1} px={2}>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Submit review:
-              </Typography>
-            </FormLabel>
-            {application && (
-              <Box display='flex' justifyContent='flex-end' gap={1}>
-                {application.status === 'applied' && (
-                  <AcceptOrRejectButtons
-                    onConfirmReview={(decision) => reviewApplication({ decision })}
-                    reviewType='application'
-                    readOnly={!rewardPermissions?.approve_applications}
-                    hasApplicationSlots={hasApplicationSlots}
-                    usePaleColor
-                  />
-                )}
-                {application.status === 'review' && (
-                  <AcceptOrRejectButtons
-                    onConfirmReview={(decision) => reviewApplication({ decision })}
-                    reviewType='submission'
-                    readOnly={!rewardPermissions?.review}
-                    hasApplicationSlots={hasApplicationSlots}
-                    usePaleColor
-                  />
-                )}
+      {application && (
+        <>
+          <FormLabel sx={{ mt: 2 }}>
+            <Typography variant='subtitle1'>Result</Typography>
+          </FormLabel>
+          <Card variant='outlined'>
+            {!evaluation.result && (
+              <Box display='flex' justifyContent='space-between' alignItems='center' p={1} px={2}>
+                <FormLabel>
+                  <Typography component='span' variant='subtitle1'>
+                    Submit review:
+                  </Typography>
+                </FormLabel>
+                <Box display='flex' justifyContent='flex-end' gap={1}>
+                  {application.status === 'applied' && (
+                    <AcceptOrRejectButtons
+                      onConfirmReview={(decision) => reviewApplication({ decision })}
+                      reviewType='application'
+                      readOnly={!rewardPermissions?.approve_applications}
+                      hasApplicationSlots={hasApplicationSlots}
+                      usePaleColor
+                    />
+                  )}
+                  {application.status === 'review' && (
+                    <AcceptOrRejectButtons
+                      onConfirmReview={(decision) => reviewApplication({ decision })}
+                      reviewType='submission'
+                      readOnly={!rewardPermissions?.review}
+                      hasApplicationSlots={hasApplicationSlots}
+                      usePaleColor
+                    />
+                  )}
+                </Box>
               </Box>
             )}
-          </Box>
-        )}
-        {evaluation.result === 'pass' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-            <ApprovedIcon color='success' />
-            <Typography variant='body2'>Accepted</Typography>
-          </Stack>
-        )}
-        {evaluation.result === 'fail' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-            <RejectedIcon color='error' />
-            <Typography variant='body2'>Rejected</Typography>
-          </Stack>
-        )}
-      </Card>
+            {evaluation.result === 'pass' && (
+              <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+                <ApprovedIcon color='success' />
+                <Typography variant='body2'>Accepted</Typography>
+              </Stack>
+            )}
+            {evaluation.result === 'fail' && (
+              <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+                <RejectedIcon color='error' />
+                <Typography variant='body2'>Rejected</Typography>
+              </Stack>
+            )}
+          </Card>
+        </>
+      )}
     </Stack>
   );
 }

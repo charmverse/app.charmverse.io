@@ -91,13 +91,13 @@ export function EvaluationsReview({
         </Tooltip>
       </Collapse>
       {updatedWorkflow?.evaluations.map((evaluation, index) => {
-        const isCurrent = currentEvaluation?.id === evaluation.id;
+        const isCurrent = application ? currentEvaluation?.id === evaluation.id : false;
         return (
           <EvaluationStepRow
             key={evaluation.id}
-            expanded={evaluation.id === expandedEvaluationId}
+            expanded={evaluation.id === expandedEvaluationId || isCurrent}
             expandedContainer={expandedContainer}
-            isCurrent={application ? isCurrent : false}
+            isCurrent={isCurrent}
             onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}
             index={index}
             title={evaluation.title}

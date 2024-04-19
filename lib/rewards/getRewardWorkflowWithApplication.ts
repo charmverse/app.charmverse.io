@@ -96,6 +96,7 @@ export function getRewardWorkflowWithApplication({
       };
     }
 
+    case 'complete':
     case 'processing': {
       const paymentStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'payment');
       return {
@@ -116,7 +117,6 @@ export function getRewardWorkflowWithApplication({
       };
     }
 
-    case 'complete':
     case 'paid': {
       return {
         ...workflow,
