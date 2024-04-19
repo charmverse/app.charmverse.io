@@ -129,9 +129,6 @@ export function NewProposalPage({
   const isStructured = formInputs.proposalType === 'structured' || !!formInputs.formId;
   const pendingRewards = formInputs.fields?.pendingRewards || [];
 
-  // console.log('isValid', form.formState.isValid);
-  // console.log('fieldConfig', projectField?.fieldConfig);
-
   let disabledTooltip = _disabledTooltip;
   if (
     !disabledTooltip &&
@@ -184,6 +181,7 @@ export function NewProposalPage({
       proposalTemplateId: _templateId
     });
   }
+
   function applyTemplate(template: ProposalWithUsersAndRubric) {
     const formFields = template.form?.formFields ?? [];
     const authors = Array.from(new Set([user!.id].concat(template.authors.map((author) => author.userId))));
@@ -563,13 +561,16 @@ export function NewProposalPage({
             </StickyFooterContainer>
           </Box>
         </DocumentColumn>
+
         <ProposalSidebar
+          sidebarProps={{
+            isOpen: internalSidebarView === 'proposal_evaluation',
+            closeSidebar: () => setActiveView(null),
+            openSidebar: () => setActiveView('proposal_evaluation')
+          }}
           isUnpublishedProposal
-          isOpen={internalSidebarView === 'proposal_evaluation'}
           isProposalTemplate={!!isTemplate}
           isStructuredProposal={isStructured}
-          closeSidebar={() => setActiveView(null)}
-          openSidebar={() => setActiveView('proposal_evaluation')}
           proposalInput={isFormLoaded ? formInputs : undefined}
           templateId={formInputs.proposalTemplateId}
           onChangeEvaluation={(evaluationId, updates) => {

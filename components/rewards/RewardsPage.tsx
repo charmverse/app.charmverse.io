@@ -3,7 +3,6 @@ import VisibilityOffOutlinedIcon from '@mui/icons-material/VisibilityOffOutlined
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { debounce } from 'lodash';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 import { useCallback, useMemo, useState } from 'react';
 import { FormattedMessage } from 'react-intl';
@@ -41,6 +40,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { createBoard } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
@@ -79,7 +79,7 @@ export function RewardsPage({ title }: { title: string }) {
   const { getRewardPage } = useRewardPage();
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-
+  const isCharmverseSpace = useIsCharmverseSpace();
   const isAdmin = useIsAdmin();
 
   const { board: activeBoard, views, cards, activeView } = useRewardsBoardAndBlocks();
@@ -126,13 +126,11 @@ export function RewardsPage({ title }: { title: string }) {
 
   function openPage(rewardId: string | null) {
     if (!rewardId) return;
-
     const pageId = getRewardPage(rewardId)?.id || rewardId;
-
-    if (openPageIn === 'center_peek') {
-      updateURLQuery({ id: pageId });
-    } else if (openPageIn === 'full_page') {
+    if (isCharmverseSpace) {
       navigateToSpacePath(`/${pageId}`);
+    } else if (openPageIn === 'center_peek') {
+      updateURLQuery({ id: pageId });
     }
   }
 
@@ -144,10 +142,10 @@ export function RewardsPage({ title }: { title: string }) {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
-      if (openPageIn === 'center_peek') {
-        updateURLQuery({ applicationId: id });
-      } else if (openPageIn === 'full_page') {
+      if (isCharmverseSpace) {
         navigateToSpacePath(`/rewards/applications/${id}`);
+      } else if (openPageIn === 'center_peek') {
+        updateURLQuery({ applicationId: id });
       }
     }
   };
@@ -442,7 +440,10 @@ export function RewardsPage({ title }: { title: string }) {
                 view={activeView}
                 isOpen={!!showSidebar}
                 closeSidebar={() => setShowSidebar(false)}
-                hideLayoutSelectOptions={defaultRewardViews.includes(activeView?.id || '')}
+                hideLayoutOptions={isCharmverseSpace ? true : undefined}
+                hideLayoutSelectOptions={
+                  isCharmverseSpace ? undefined : defaultRewardViews.includes(activeView?.id || '')
+                }
                 hideSourceOptions
                 hideGroupOptions
                 groupByProperty={groupByProperty}

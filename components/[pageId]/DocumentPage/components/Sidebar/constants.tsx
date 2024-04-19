@@ -8,6 +8,11 @@ export const SIDEBAR_VIEWS = {
     tooltip: 'View evaluations',
     title: 'Evaluations'
   },
+  reward_evaluation: {
+    icon: <SvgIcon component={RiChatCheckLine} fontSize='small' sx={{ mb: '1px' }} />,
+    tooltip: 'View evaluations',
+    title: 'Evaluations'
+  },
   comments: {
     icon: <MessageOutlined fontSize='small' />,
     tooltip: 'View all comments',

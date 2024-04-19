@@ -9,6 +9,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 export type RewardTemplate = {
   reward: Bounty & {
+    assignedSubmitters: string[] | null;
     reviewers: RewardReviewer[];
     allowedSubmitterRoles: string[] | null;
   };
