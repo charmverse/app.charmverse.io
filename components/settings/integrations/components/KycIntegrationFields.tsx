@@ -1,6 +1,6 @@
 import type { KycOption } from '@charmverse/core/prisma-client';
+import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
@@ -8,6 +8,8 @@ import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
 import FieldLabel from 'components/common/form/FieldLabel';
+import Link from 'components/common/Link';
+import { capitalize } from 'lib/utils/strings';
 
 import type { FormValues } from './KycIntegration';
 
@@ -70,46 +72,20 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
       <Box>
         <Select<KycOption | null>
           {...kycOption}
+          displayEmpty
+          value={kycOption.value || ''}
           disabled={!isAdmin}
-          value={kycOption.value || null}
-          renderValue={(val) => val || 'None'}
+          renderValue={(val) => (val ? capitalize(val) : 'None')}
         >
           <MenuItem value=''>None</MenuItem>
           <MenuItem value='synaps'>Synaps</MenuItem>
           <MenuItem value='persona'>Persona</MenuItem>
         </Select>
-        {/* <FormControlLabel
-          control={
-            <Switch
-              name='personaKyc'
-              value={kycOption.value === 'persona'}
-              checked={kycOption.value === 'persona'}
-              onChange={(e) => {
-                kycOption.onChange(e.target.checked ? 'persona' : null);
-              }}
-            />
-          }
-          disabled={!isAdmin}
-          labelPlacement='end'
-          label='Enable Persona KYC'
-        /> */}
-        {/* renderValue={(selected) => {
-            return (
-              <Stack flexDirection='row' alignItems='center' gap={1}>
-                {selected ? (
-                  <IdentityIcon size='xSmall' type={selected} />
-                ) : (
-                  <PersonOutlinedIcon style={{ width: 18, height: 18 }} />
-                )}
-                <Typography variant='body2'>{selected || "Member's choice"}</Typography>
-              </Stack>
-            );
-          }} */}
       </Box>
       {kycOption.value === 'synaps' && (
         <>
           <Box>
-            <FieldLabel>Synaps.io API key</FieldLabel>
+            <FieldLabel>API key</FieldLabel>
             <TextField
               {...synapsApiKeyField}
               disabled={!isAdmin}
@@ -117,9 +93,12 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               error={!!synapsApiKeyError?.message}
               helperText={synapsApiKeyError?.message}
             />
+            <Typography variant='caption'>
+              {'Select an api key from: Synaps Manager > Integration > Credential'}
+            </Typography>
           </Box>
           <Box>
-            <FieldLabel>Synaps.io Secret</FieldLabel>
+            <FieldLabel>Webhook Secret</FieldLabel>
             <TextField
               {...synapsSecretField}
               disabled={!isAdmin}
@@ -127,13 +106,14 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               error={!!synapsSecretError?.message}
               helperText={synapsSecretError?.message}
             />
+            <Typography variant='caption'>{'Select a secret from: Synaps Manager > Integration > Webhook'}</Typography>
           </Box>
         </>
       )}
       {kycOption.value === 'persona' && (
         <>
           <Box>
-            <FieldLabel>Persona API Key</FieldLabel>
+            <FieldLabel>API Key</FieldLabel>
             <TextField
               {...personaApiKey}
               disabled={!isAdmin}
@@ -141,9 +121,15 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               error={!!personaApiKeyError?.message}
               helperText={personaApiKeyError?.message}
             />
+            <Typography variant='caption'>
+              Select an api key from:{' '}
+              <Link color='inherit' href='https://app.withpersona.com/dashboard/api-keys' external>
+                https://app.withpersona.com/dashboard/api-keys
+              </Link>
+            </Typography>
           </Box>
           <Box>
-            <FieldLabel>Persona Secret</FieldLabel>
+            <FieldLabel>Webhook Secret</FieldLabel>
             <TextField
               {...personaSecret}
               disabled={!isAdmin}
@@ -151,9 +137,15 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               error={!!personaSecretError?.message}
               helperText={personaSecretError?.message}
             />
+            <Typography variant='caption'>
+              Select a secret from:{' '}
+              <Link color='inherit' href='https://app.withpersona.com/dashboard/webhooks' external>
+                https://app.withpersona.com/dashboard/webhooks
+              </Link>
+            </Typography>
           </Box>
           <Box>
-            <FieldLabel>Persona Template Id</FieldLabel>
+            <FieldLabel>Template Id</FieldLabel>
             <TextField
               {...personaTemplateId}
               disabled={!isAdmin}
@@ -161,9 +153,15 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               error={!!personaTemplateIdError?.message}
               helperText={personaTemplateIdError?.message}
             />
+            <Typography variant='caption'>
+              Select a template from:{' '}
+              <Link color='inherit' href='https://app.withpersona.com/dashboard/inquiry-templates' external>
+                https://app.withpersona.com/dashboard/inquiry-templates
+              </Link>
+            </Typography>
           </Box>
           <Box>
-            <FieldLabel>Persona Environment Id</FieldLabel>
+            <FieldLabel>Environment Id</FieldLabel>
             <TextField
               {...personaEnvironmentId}
               disabled={!isAdmin}
@@ -171,6 +169,12 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               error={!!personaEnvironmentIdError?.message}
               helperText={personaEnvironmentIdError?.message}
             />
+            <Typography variant='caption'>
+              Select an environment from:{' '}
+              <Link color='inherit' href='https://app.withpersona.com/dashboard/organization' external>
+                https://app.withpersona.com/dashboard/organization
+              </Link>
+            </Typography>
           </Box>
         </>
       )}

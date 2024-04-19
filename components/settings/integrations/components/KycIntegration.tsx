@@ -15,11 +15,32 @@ import { PersonaModal } from './PersonaModal';
 import { SynapsModal } from './SynapsModal';
 
 const schema = yup.object({
-  synapsApiKey: yup.string(),
+  synapsApiKey: yup
+    .string()
+    .nullable()
+    .when('kycOption', {
+      is: (val: KycOption | null) => val === 'synaps',
+      then: () => yup.string().required('Field is required'),
+      otherwise: () => yup.string()
+    }),
   synapsSecret: yup.string().nullable(),
-  personaApiKey: yup.string().nullable(),
+  personaApiKey: yup
+    .string()
+    .nullable()
+    .when('kycOption', {
+      is: (val: KycOption | null) => val === 'persona',
+      then: () => yup.string().required('Field is required'),
+      otherwise: () => yup.string()
+    }),
   personaSecret: yup.string().nullable(),
-  personaTemplateId: yup.string().nullable(),
+  personaTemplateId: yup
+    .string()
+    .nullable()
+    .when('kycOption', {
+      is: (val: KycOption | null) => val === 'persona',
+      then: () => yup.string().required('Field is required'),
+      otherwise: () => yup.string()
+    }),
   personaEnvironmentId: yup.string().nullable(),
   kycOption: yup.string().oneOf<KycOption>(['synaps', 'persona']).nullable()
 });
@@ -151,6 +172,6 @@ function getDefaultValues({ kycCredentials, space }: { kycCredentials?: KycCrede
     personaSecret: kycCredentials?.persona?.secret ?? '',
     personaTemplateId: kycCredentials?.persona?.templateId ?? '',
     personaEnvironmentId: kycCredentials?.persona?.envId ?? '',
-    kycOption: space.kycOption
+    kycOption: space.kycOption ?? null
   };
 }

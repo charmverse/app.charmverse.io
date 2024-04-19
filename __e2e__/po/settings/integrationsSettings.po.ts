@@ -5,8 +5,7 @@ import { SettingsModal } from './settings.po';
 export class IntegrationsSettings extends SettingsModal {
   constructor(
     page: Page,
-    public enableSynaps = page.getByLabel('Enable Synaps.io KYC'),
-    public enablePersona = page.getByLabel('Enable Persona KYC'),
+    public kycOption = page.locator('input[name=kycOption]'),
     public saveButton = page.locator('data-test=save-kyc-form'),
     public synapsApiKey = page.locator('input[name=synapsApiKey]'),
     public synapsSecret = page.locator('input[name=synapsSecret]'),

@@ -3,9 +3,7 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 
 import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/spaces';
-import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useUser } from 'hooks/useUser';
 
 const PersonaInquiry = dynamic(() => import('persona').then((module) => module.Inquiry), { ssr: false });
@@ -29,23 +27,12 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
     trigger: initPersonaInquiry,
     isMutating: isLoadingPersonaInquiry
   } = useInitPersonaInquiry(spaceId);
-  const { showConfirmation } = useConfirmationModal();
   const popupPersonaState = usePopupState({ variant: 'popover', popupId: 'kyc-persona' });
   const disabled = ['pending', 'completed', 'needs_review', 'approved'].includes(personaUserKyc?.status || '');
 
   const onConfirm = async () => {
     await initPersonaInquiry();
     popupPersonaState.open();
-  };
-
-  const onStart = async () => {
-    await showConfirmation({
-      message: 'You will be redirected to our partner Persona to finish your KYC.',
-      title: 'KYC aknowledgement',
-      confirmButton: 'Confirm',
-      loading: isPersonaUserKycLoading || isLoadingPersonaInquiry,
-      onConfirm
-    });
   };
 
   return (
@@ -59,13 +46,16 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           label={`Status: ${personaUserKyc.status ? mapPersonaStatus[personaUserKyc.status] : 'Unknown'}`}
         />
       ) : (
-        <Button
-          onClick={onStart}
+        <Chip
+          onClick={onConfirm}
+          clickable={true}
+          color='secondary'
+          size='small'
+          variant='outlined'
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
+          label='Test KYC'
           data-test='start-persona-kyc'
-        >
-          Test KYC
-        </Button>
+        />
       )}
       {personaInquiry?.inquiryId && (
         <Modal

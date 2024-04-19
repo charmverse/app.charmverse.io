@@ -33,13 +33,9 @@ test('Space settings - add kyc integrations', async ({ page, spaceSettings }) =>
   await spaceSettings.goToTab('integrations');
 
   await expect(spaceSettings.saveButton).toBeDisabled();
-  await expect(spaceSettings.enableSynaps).toHaveValue('false');
-  await expect(spaceSettings.enablePersona).toHaveValue('false');
+  await expect(spaceSettings.kycOption).toHaveValue('');
 
-  await spaceSettings.enableSynaps.check();
-  await expect(spaceSettings.enableSynaps).toHaveValue('true');
-  await expect(spaceSettings.enablePersona).toHaveValue('false');
-
+  await spaceSettings.kycOption.fill('synaps');
   await spaceSettings.synapsApiKey.fill('test-api-key');
   await spaceSettings.synapsSecret.fill('test-secret');
   await spaceSettings.saveButton.click();
@@ -48,10 +44,7 @@ test('Space settings - add kyc integrations', async ({ page, spaceSettings }) =>
   await spaceSettings.synapsKycButton.click();
   await spaceSettings.modalCancelButton.click();
 
-  await spaceSettings.enablePersona.check();
-  await expect(spaceSettings.enableSynaps).toHaveValue('false');
-  await expect(spaceSettings.enablePersona).toHaveValue('true');
-
+  await spaceSettings.kycOption.fill('persona');
   await spaceSettings.personaApiKey.fill('test-api-key');
   await spaceSettings.personaSecret.fill('test-secret');
   await spaceSettings.personaTemplateId.fill('test-template-id');

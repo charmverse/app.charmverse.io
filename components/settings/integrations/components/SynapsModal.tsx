@@ -1,12 +1,10 @@
+import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
 import { Synaps } from '@synaps-io/verify-sdk';
-import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect } from 'react';
 
 import { useGetSynapsSession, useInitSynapsSession } from 'charmClient/hooks/spaces';
-import { Button } from 'components/common/Button';
-import ModalWithButtons from 'components/common/Modal/ModalWithButtons';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
 
 const mapSynapsStatus = {
@@ -19,8 +17,15 @@ const mapSynapsStatus = {
 
 export function SynapsModal({ spaceId }: { spaceId: string }) {
   const { data: synapsUserKyc, isLoading: isSynapsUserKycLoading } = useGetSynapsSession(spaceId);
-  const { trigger: initSession, data: synapsSession, isMutating: initSessionLoading } = useInitSynapsSession(spaceId);
-  const popupState = usePopupState({ variant: 'popover', popupId: 'confirm-kyc' });
+  const {
+    trigger: initSession,
+    data: synapsSession,
+    isMutating: initSessionLoading,
+    reset
+  } = useInitSynapsSession(spaceId);
+  const { showConfirmation } = useConfirmationModal();
+  const { onClose: closeSettingsModal } = useSettingsDialog();
+
   const disabled = ['APPROVED', 'PENDING_VERIFICATION', 'REJECTED'].includes(synapsUserKyc?.status || '');
 
   const openModal = async () => {
@@ -29,15 +34,45 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
     }
 
     await initSession();
-    popupState.open();
+
+    await showConfirmation({
+      message: 'You will be required to finish your KYC check provided by our partner Persona.',
+      title: 'KYC aknowledgement',
+      confirmButton: 'Confirm',
+      loading: isSynapsUserKycLoading || initSessionLoading,
+      onConfirm: async () => {
+        closeSettingsModal();
+        Synaps.show();
+      }
+    });
   };
 
-  if (synapsUserKyc === undefined) {
-    return null;
-  }
+  useEffect(() => {
+    let init = false;
+
+    if (synapsSession?.session_id) {
+      init = true;
+
+      Synaps.init({
+        sessionId: synapsSession.session_id,
+        service: 'individual',
+        mode: 'modal',
+        onFinish: () => {
+          reset();
+        },
+        onClose: () => {
+          reset();
+        }
+      });
+    }
+
+    return () => {
+      init = false;
+    };
+  }, [synapsSession?.session_id]);
 
   return (
-    <>
+    <Box>
       {synapsUserKyc && disabled ? (
         <Chip
           clickable={false}
@@ -47,68 +82,17 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
           label={`Status: ${synapsUserKyc.status ? mapSynapsStatus[synapsUserKyc.status] : 'Unknown'}`}
         />
       ) : (
-        <Button
+        <Chip
           onClick={openModal}
-          loading={initSessionLoading}
+          clickable={true}
+          color='secondary'
+          size='small'
+          variant='outlined'
           disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading}
+          label='Test KYC'
           data-test='start-synaps-kyc'
-        >
-          Test KYC
-        </Button>
-      )}
-      {synapsSession && (
-        <SynapsModalWithConfirmation
-          sessionId={synapsSession.session_id}
-          onClose={popupState.close}
-          open={popupState.isOpen}
         />
       )}
-    </>
-  );
-}
-
-export function SynapsModalWithConfirmation({
-  sessionId,
-  onClose,
-  open
-}: {
-  sessionId: string;
-  open: boolean;
-  onClose: () => void;
-}) {
-  const { onClose: closeSettingsModal } = useSettingsDialog();
-
-  useEffect(() => {
-    let init = true;
-
-    Synaps.init({
-      sessionId,
-      service: 'individual',
-      mode: 'modal',
-      onFinish: () => {},
-      onClose: () => {}
-    });
-
-    return () => {
-      init = false;
-    };
-  }, []);
-
-  const handleOpen = () => {
-    onClose();
-    closeSettingsModal();
-    Synaps.show();
-  };
-
-  return (
-    <ModalWithButtons
-      title='KYC aknowledgement'
-      buttonText='Confirm'
-      onConfirm={handleOpen}
-      onClose={onClose}
-      open={open}
-    >
-      <Typography>You will be redirected to our partner Synaps.io to finish your KYC.</Typography>
-    </ModalWithButtons>
+    </Box>
   );
 }
