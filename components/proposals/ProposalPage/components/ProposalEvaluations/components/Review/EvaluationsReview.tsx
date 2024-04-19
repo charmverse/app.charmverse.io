@@ -72,11 +72,9 @@ export function EvaluationsReview({
   const { showMessage } = useSnackbar();
   const [evaluationInput, setEvaluationInput] = useState<ProposalEvaluationValues | null>(null);
   const [showEditCredentials, setShowEditCredentials] = useState(false);
-  const { hasPendingOnchainCredentials, refreshIssuedCredentials, refreshIssuableCredentials } = useProposalCredentials(
-    {
-      proposalId: proposal?.id
-    }
-  );
+  const { hasPendingOnchainCredentials, refreshIssuableCredentials } = useProposalCredentials({
+    proposalId: proposal?.id
+  });
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
@@ -125,7 +123,6 @@ export function EvaluationsReview({
 
   async function refreshProposal() {
     await refreshIssuableCredentials();
-    await refreshIssuedCredentials();
     await _refreshProposal?.();
   }
 

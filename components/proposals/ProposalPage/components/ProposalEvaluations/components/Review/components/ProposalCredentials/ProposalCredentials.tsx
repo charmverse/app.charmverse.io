@@ -2,16 +2,14 @@ import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Image from 'next/image';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
+import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { IssueProposalCredentials } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueProposalCredentials';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { useUser } from 'hooks/useUser';
 import type { ProposalCredential } from 'lib/credentials/schemas/proposal';
 
 import { CredentialRow } from './CredentialRow';
@@ -31,9 +29,10 @@ export function ProposalCredentials({
   selectedCredentialTemplates: string[];
   proposalId: string;
 }) {
-  const { issuedCredentials, issuableProposalCredentials, refreshIssuedCredentials } = useProposalCredentials({
+  const { issuableProposalCredentials } = useProposalCredentials({
     proposalId
   });
+  const { proposal, refreshProposal } = useProposal({ proposalId });
   const { space } = useCurrentSpace();
   const isSmallScreen = useSmallScreen();
   const { credentialTemplates } = useGetCredentialTemplates();
@@ -50,7 +49,7 @@ export function ProposalCredentials({
       </Typography>
 
       <Stack gap={1.5}>
-        {!issuedCredentials?.length &&
+        {!proposal?.issuedCredentials?.length &&
           pendingCredentials?.map((cred) => (
             <CredentialRow
               credential={{ title: cred.name, subtitle: cred.organization }}
@@ -58,7 +57,7 @@ export function ProposalCredentials({
               key={cred.id}
             />
           ))}
-        {issuedCredentials?.map((c) => {
+        {proposal?.issuedCredentials?.map((c) => {
           const content = c.content as ProposalCredential;
           return (
             <CredentialRow
@@ -73,10 +72,7 @@ export function ProposalCredentials({
       {space?.useOnchainCredentials && space.credentialsWallet && issuableProposalCredentials?.length ? (
         <Box display='flex' justifyContent='flex-end'>
           <Box width='fit-content'>
-            <IssueProposalCredentials
-              selectedPageIds={[proposalId]}
-              onIssueCredentialsSuccess={refreshIssuedCredentials}
-            />
+            <IssueProposalCredentials selectedPageIds={[proposalId]} onIssueCredentialsSuccess={refreshProposal} />
           </Box>
         </Box>
       ) : null}

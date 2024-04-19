@@ -134,20 +134,11 @@ export function useMultiProposalCredentials({ proposalIds }: { proposalIds?: str
 
 export function useProposalCredentials({ proposalId }: { proposalId: MaybeString }) {
   const { space } = useCurrentSpace();
-  const {
-    data: issuedCredentials,
-    isLoading: isLoadingIssuedCredentials,
-    mutate: refreshIssuedCredentials
-  } = useGetIssuedProposalCredentials({
-    proposalId
-  });
+
   const multiCredentials = useMultiProposalCredentials({ proposalIds: proposalId ? [proposalId] : null });
 
   return {
     ...multiCredentials,
-    issuedCredentials,
-    isLoadingIssuedCredentials,
-    refreshIssuedCredentials,
     hasPendingOnchainCredentials:
       !!space?.useOnchainCredentials && !!multiCredentials.issuableProposalCredentials?.length
   };
