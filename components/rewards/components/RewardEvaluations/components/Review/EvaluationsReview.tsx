@@ -121,7 +121,7 @@ export function EvaluationsReview({
               />
             ) : evaluation.type === 'payment' ? (
               <Box mb={2}>
-                <RewardStatusBadge fullForm reward={reward} hideStatus truncate />
+                <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
               </Box>
             ) : null}
           </EvaluationStepRow>

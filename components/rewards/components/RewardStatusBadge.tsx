@@ -23,13 +23,15 @@ export interface IRewardBadgeProps {
   hideStatus?: boolean;
   showEmptyStatus?: boolean;
   fullForm?: boolean;
+  noRewardText?: string;
 }
 export function RewardStatusBadge({
   fullForm,
   truncate = false,
   showEmptyStatus,
   hideStatus,
-  reward
+  reward,
+  noRewardText
 }: IRewardBadgeProps) {
   return (
     <Grid container direction='column' alignItems='center'>
@@ -46,7 +48,7 @@ export function RewardStatusBadge({
             minHeight: '30px'
           }}
         >
-          <RewardAmount fullForm={fullForm} reward={reward} truncate={truncate} />
+          <RewardAmount noRewardText={noRewardText} fullForm={fullForm} reward={reward} truncate={truncate} />
           {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
         </Box>
       </Grid>
@@ -59,8 +61,10 @@ export function RewardAmount({
   truncate = false,
   truncatePrecision = 4,
   typographyProps,
-  fullForm
+  fullForm,
+  noRewardText
 }: {
+  noRewardText?: string;
   fullForm?: boolean;
   reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>>;
   truncate?: boolean;
@@ -81,7 +85,7 @@ export function RewardAmount({
   }
 
   if (!isTruthy(reward.rewardAmount) || !isTruthy(reward.rewardToken) || !isTruthy(reward.chainId)) {
-    return null;
+    return noRewardText ? <Typography>{noRewardText}</Typography> : null;
   }
 
   const rewardAmount = reward.rewardAmount;
