@@ -117,6 +117,7 @@ export function EvaluationsReview({
                 rewardId={reward.id}
                 application={application}
                 evaluation={evaluation}
+                hideReviewResult={!isCurrent && evaluation.result === null}
               />
             ) : evaluation.type === 'payment' ? (
               <Box mb={2}>

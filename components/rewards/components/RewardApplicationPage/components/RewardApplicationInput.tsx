@@ -140,7 +140,7 @@ export function ApplicationInput({
             {!readOnly && (
               <Grid item display='flex' gap={1} justifyContent='flex-end'>
                 {onCancel && (
-                  <Button loading={isSaving} onClick={onCancel} color='error' variant='outlined'>
+                  <Button disabled={isSaving} onClick={onCancel} color='error' variant='outlined'>
                     Cancel
                   </Button>
                 )}

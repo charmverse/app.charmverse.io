@@ -13,12 +13,14 @@ export function ReviewStepReview({
   reviewers,
   application,
   rewardId,
-  evaluation
+  evaluation,
+  hideReviewResult
 }: {
   evaluation: RewardEvaluation;
   reviewers: SelectOption[];
   application?: ApplicationWithTransactions;
   rewardId: string;
+  hideReviewResult?: boolean;
 }) {
   const { data: rewardPermissions } = useGetRewardPermissions({ rewardId });
 
@@ -36,7 +38,7 @@ export function ReviewStepReview({
         </FormLabel>
         <UserAndRoleSelect readOnly={true} value={reviewers} onChange={() => {}} />
       </Box>
-      {application && (
+      {application && !hideReviewResult && (
         <>
           <FormLabel sx={{ mt: 2 }}>
             <Typography variant='subtitle1'>Result</Typography>

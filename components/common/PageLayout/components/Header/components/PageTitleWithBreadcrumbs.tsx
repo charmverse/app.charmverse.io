@@ -15,7 +15,6 @@ import { useForumCategories } from 'hooks/useForumCategories';
 import { usePages } from 'hooks/usePages';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { PostWithVotes } from 'lib/forums/posts/interfaces';
 import type { PageMeta } from 'lib/pages/interfaces';
 
 import { PageIcon } from '../../../../PageIcon';
