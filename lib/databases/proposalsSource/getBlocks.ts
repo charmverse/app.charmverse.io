@@ -1,4 +1,4 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import type { IssuableProposalCredentialSpace } from 'lib/credentials/findIssuableProposalCredentials';
 import type { BlockWithDetails } from 'lib/databases/block';
