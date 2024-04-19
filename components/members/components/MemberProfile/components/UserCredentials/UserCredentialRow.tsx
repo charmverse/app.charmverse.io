@@ -139,7 +139,8 @@ export function UserCredentialRow({
       {credential.verificationUrl && (
         <Link
           style={{
-            height: 20
+            height: 20,
+            marginTop: 3
           }}
           href={credential.verificationUrl}
           external
