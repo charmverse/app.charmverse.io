@@ -6,7 +6,6 @@ import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
-import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
@@ -61,16 +60,16 @@ export function EvaluationsReview({
     };
   }, [workflow, application]);
 
-  const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);
+  const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
-    if (currentEvaluation) {
+    if (currentEvaluation && application) {
       setExpandedEvaluationId(currentEvaluation.id);
     }
-  }, [currentEvaluation]);
+  }, [currentEvaluation, application]);
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));
@@ -98,8 +97,6 @@ export function EvaluationsReview({
     }
   }
 
-  const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
-
   return (
     <LoadingComponent isLoading={!reward}>
       <Collapse in={expandedContainer}>
@@ -114,7 +111,7 @@ export function EvaluationsReview({
         return (
           <EvaluationStepRow
             key={evaluation.id}
-            expanded={evaluation.id === expandedEvaluationId}
+            expanded={expandedContainer ? evaluation.id === expandedEvaluationId : false}
             expandedContainer={expandedContainer}
             isCurrent={isCurrent}
             onChange={(e, expand) => setExpandedEvaluationId(expand ? evaluation.id : undefined)}

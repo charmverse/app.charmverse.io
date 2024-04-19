@@ -195,6 +195,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('reward_evaluation'),
             closeSidebar
           }}
+          expanded={false}
           onChangeWorkflow={onChangeRewardWorkflow}
           isTemplate={page.type === 'bounty_template'}
           onChangeReward={updateReward}
