@@ -172,8 +172,10 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('reward_evaluation'),
             closeSidebar
           }}
+          isTemplate={page.type === 'bounty_template'}
           onChangeReward={updateReward}
           reward={reward}
+          rewardInput={reward}
           readOnly={props.readOnly}
         />
       )}

@@ -8,6 +8,7 @@ export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkf
   isUnpublishedReward?: boolean;
   reward?: RewardWithUsers;
   application?: ApplicationWithTransactions;
+  isTemplate?: boolean;
 };
 
 export function RewardEvaluations({
@@ -18,9 +19,10 @@ export function RewardEvaluations({
   onChangeWorkflow,
   isUnpublishedReward,
   reward,
-  application
+  application,
+  isTemplate
 }: RewardEvaluationsProps) {
-  if (isUnpublishedReward) {
+  if (isUnpublishedReward || isTemplate) {
     return (
       <EvaluationsSettings
         rewardInput={rewardInput}
