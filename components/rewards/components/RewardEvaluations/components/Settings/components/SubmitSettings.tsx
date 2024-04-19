@@ -138,7 +138,7 @@ export function SubmitStepSettings({
         <Box>
           <FormLabel>
             <Typography sx={{ mb: 1 }} variant='subtitle1'>
-              Assigned applicants roles
+              Assigned applicants
             </Typography>
           </FormLabel>
           <UserSelect

@@ -28,7 +28,7 @@ export function inferRewardWorkflow(workflows: RewardWorkflow[], reward: RewardI
   const directSubmissionWorkflow = workflows.find((workflow) => workflow.id === 'direct_submission');
   const assignedWorkflow = workflows.find((workflow) => workflow.id === 'assigned');
 
-  if (reward.assignedSubmitters === null) {
+  if (reward.assignedSubmitters === null || reward.assignedSubmitters?.length === 0) {
     return reward.approveSubmitters ? applicationRequiredWorkflow : directSubmissionWorkflow;
   }
 

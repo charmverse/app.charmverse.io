@@ -28,6 +28,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
+import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
@@ -51,6 +52,7 @@ export function NewRewardPage({
   isTemplate?: boolean;
   templateId?: string;
 }) {
+  const { user } = useUser();
   const spacePermissions = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
@@ -155,7 +157,7 @@ export function NewRewardPage({
       setRewardValues({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: []
+        assignedSubmitters: [user!.id]
       });
     }
   }
