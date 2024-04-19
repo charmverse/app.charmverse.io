@@ -1,16 +1,23 @@
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
+import charmClient from 'charmClient';
+import { useGetReward } from 'charmClient/hooks/rewards';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
+import { useUser } from 'hooks/useUser';
+import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
+import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 
 import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
+import { RewardSidebar } from './components/Sidebar/RewardSidebar';
 import type { DocumentPageProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
@@ -30,10 +37,32 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const isMdScreen = useMdScreen();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const rewardId = page.bountyId;
+  const isCharmverseSpace = useIsCharmverseSpace();
+  const { user } = useUser();
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
   });
+
+  const { data: reward, mutate: refreshReward } = useGetReward({ rewardId });
+
+  async function updateReward(updateContent: UpdateableRewardFields) {
+    if (rewardId) {
+      await charmClient.rewards.updateReward({
+        rewardId,
+        updateContent
+      });
+      refreshReward();
+    }
+  }
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
@@ -81,7 +110,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
 
   // having `internalSidebarView` allows us to have the sidebar open by default, because usePageSidebar() does not allow us to do this currently
   const [defaultSidebarView, setDefaultView] = useState<PageSidebarView | null>(
-    proposalId ? 'proposal_evaluation' : null
+    proposalId ? 'proposal_evaluation' : rewardId ? 'reward_evaluation' : null
   );
   const internalSidebarView = defaultSidebarView || sidebarView;
 
@@ -89,6 +118,26 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     setActiveView(defaultSidebarView);
     setDefaultView(null);
   }, []);
+
+  async function onChangeRewardWorkflow(workflow: RewardWorkflow) {
+    if (workflow.id === 'application_required') {
+      updateReward({
+        approveSubmitters: true,
+        assignedSubmitters: null
+      });
+    } else if (workflow.id === 'direct_submission') {
+      updateReward({
+        approveSubmitters: false,
+        assignedSubmitters: null
+      });
+    } else if (workflow.id === 'assigned') {
+      updateReward({
+        approveSubmitters: false,
+        allowMultipleApplications: false,
+        assignedSubmitters: [user!.id]
+      });
+    }
+  }
 
   return (
     <DocumentColumnLayout>
@@ -117,7 +166,11 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       )}
       {(page.type === 'proposal' || page.type === 'proposal_template') && (
         <ProposalSidebar
-          isOpen={internalSidebarView === 'proposal_evaluation'}
+          sidebarProps={{
+            isOpen: internalSidebarView === 'proposal_evaluation',
+            openSidebar: () => setActiveView('proposal_evaluation'),
+            closeSidebar
+          }}
           pagePath={page.path}
           pageTitle={page.title}
           pageId={page.id}
@@ -125,8 +178,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           readOnlyProposalPermissions={!proposal?.permissions.edit}
           isProposalTemplate={page.type === 'proposal_template'}
           isStructuredProposal={isStructuredProposal}
-          closeSidebar={closeSidebar}
-          openSidebar={() => setActiveView('proposal_evaluation')}
           proposal={proposal}
           proposalInput={proposal}
           templateId={proposal?.page?.sourceTemplateId}
@@ -134,6 +185,23 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardSettings={onChangeRewardSettings}
+          onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+        />
+      )}
+      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && isCharmverseSpace && (
+        <RewardSidebar
+          sidebarProps={{
+            isOpen: internalSidebarView === 'reward_evaluation',
+            openSidebar: () => setActiveView('reward_evaluation'),
+            closeSidebar
+          }}
+          expanded={false}
+          onChangeWorkflow={onChangeRewardWorkflow}
+          isTemplate={page.type === 'bounty_template'}
+          onChangeReward={updateReward}
+          reward={reward}
+          rewardInput={reward}
+          readOnly={props.readOnly}
         />
       )}
     </DocumentColumnLayout>

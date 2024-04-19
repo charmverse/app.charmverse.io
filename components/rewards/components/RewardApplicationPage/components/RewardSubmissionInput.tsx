@@ -53,6 +53,7 @@ interface Props {
       Pick<WorkUpsertData, 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo' | 'applicationId'>
     >
   ) => Promise<boolean>;
+  onCancel?: VoidFunction;
   readOnly?: boolean;
   permissions?: BountyPermissionFlags;
   expandedOnLoad?: boolean;
@@ -70,7 +71,8 @@ export function RewardSubmissionInput({
   onSubmit: onSubmitProp,
   rewardType,
   currentUserIsAuthor,
-  isSaving
+  isSaving,
+  onCancel
 }: Props) {
   const { user } = useUser();
   const [isEditorTouched, setIsEditorTouched] = useState(false);
@@ -180,6 +182,11 @@ export function RewardSubmissionInput({
 
           {!readOnly && (
             <Grid item display='flex' gap={1} justifyContent='flex-end'>
+              {onCancel && (
+                <Button disabled={isSaving} onClick={onCancel} color='error' variant='outlined'>
+                  Cancel
+                </Button>
+              )}
               <Button
                 disabled={
                   (!isValid && submission?.status === 'inProgress') ||

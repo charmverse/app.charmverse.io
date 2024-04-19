@@ -1,13 +1,12 @@
-import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { Close as CloseIcon, Check as CheckIcon } from '@mui/icons-material';
-import { Stack, Typography } from '@mui/material';
+import { Check as CheckIcon, Close as CloseIcon } from '@mui/icons-material';
+import { Typography } from '@mui/material';
 
 const stepperSize = 25;
 
 const StyledIconContainer = styled.div<{
   isCurrent?: boolean;
-  result: ProposalEvaluationResult | null;
+  result: 'pass' | 'fail' | null;
 }>(({ theme, result, isCurrent }) => {
   const currentColor = isCurrent
     ? result === 'pass'
@@ -34,13 +33,15 @@ const StyledIconContainer = styled.div<{
 `;
 });
 
-export function StepperIcon({
+export type Result = 'pass' | 'fail';
+
+export function StepperResultIcon({
   result,
   isCurrent,
   position
 }: {
   isCurrent?: boolean;
-  result: ProposalEvaluationResult | null;
+  result: Result | null;
   position: number;
 }) {
   return (

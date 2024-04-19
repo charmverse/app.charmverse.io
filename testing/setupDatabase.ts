@@ -991,6 +991,7 @@ export async function generateBoard({
   boardTitle,
   views,
   viewType,
+  isLocked,
   addPageContent,
   viewDataSource,
   boardPageType,
@@ -1005,6 +1006,7 @@ export async function generateBoard({
   boardTitle?: string;
   views?: number;
   viewType?: IViewType;
+  isLocked?: boolean;
   viewDataSource?: DataSourceType;
   addPageContent?: boolean;
   boardPageType?: Extract<PageType, 'board' | 'inline_board' | 'inline_linked_board' | 'linked_board'>;
@@ -1026,7 +1028,8 @@ export async function generateBoard({
     viewType,
     linkedSourceId,
     customProps,
-    deletedAt
+    deletedAt,
+    isLocked
   });
 
   const permissionCreateArgs: Prisma.PagePermissionCreateManyInput[] = [];

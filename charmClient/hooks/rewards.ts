@@ -8,9 +8,11 @@ import type {
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
-import { useGET, usePOST, usePUT, useDELETE } from './helpers';
+import type { MaybeString } from './helpers';
+import { useGET, usePOST, usePUT, useDELETE, useGETImmutable } from './helpers';
 
 export function useGetRewardPermissions({ rewardId }: { rewardId?: string }) {
   return useGET<BountyPermissionFlags>(rewardId ? `/api/rewards/${rewardId}/permissions` : null);
@@ -62,4 +64,8 @@ export function useUpdateRewardBlocks(spaceId: string) {
 
 export function useDeleteRewardBlocks(spaceId: string) {
   return useDELETE<{ blockIds: string[] }>(`/api/spaces/${spaceId}/rewards/blocks`);
+}
+
+export function useGetRewardWorkflows(spaceId: MaybeString) {
+  return useGETImmutable<RewardWorkflow[]>(spaceId ? `/api/spaces/${spaceId}/rewards/workflows` : null);
 }

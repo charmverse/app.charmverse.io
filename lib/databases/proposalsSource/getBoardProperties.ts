@@ -33,7 +33,7 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
   applyToPropertiesByType(
     boardProperties,
-    proposalDbProperties.proposalStep({ options: ['Draft', ...evaluationStepTitles, 'Rewards'] })
+    proposalDbProperties.proposalStep({ options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'] })
   );
 
   applyProposalEvaluationProperties(boardProperties, rubricStepTitles);

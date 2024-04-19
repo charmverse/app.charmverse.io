@@ -126,7 +126,11 @@ describe('applyPropertiesToCard', () => {
     await createMissingCards({ boardId: database1.id });
 
     const cards = await getCardPropertiesFromProposals({
-      spaceId: database1.spaceId,
+      space: {
+        credentialTemplates: [],
+        features: testSpace.features,
+        id: testSpace.id
+      },
       cardProperties: database1.fields.cardProperties
     });
 

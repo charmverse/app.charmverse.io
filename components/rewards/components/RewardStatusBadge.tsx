@@ -8,6 +8,7 @@ import Typography, { type TypographyProps } from '@mui/material/Typography';
 import { getChainById } from 'connectors/chains';
 import millify from 'millify';
 
+import { TokenBadge } from 'components/common/TokenBadge';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
@@ -21,8 +22,17 @@ export interface IRewardBadgeProps {
   truncate?: boolean;
   hideStatus?: boolean;
   showEmptyStatus?: boolean;
+  fullForm?: boolean;
+  noRewardText?: string;
 }
-export function RewardStatusBadge({ truncate = false, showEmptyStatus, hideStatus, reward }: IRewardBadgeProps) {
+export function RewardStatusBadge({
+  fullForm,
+  truncate = false,
+  showEmptyStatus,
+  hideStatus,
+  reward,
+  noRewardText
+}: IRewardBadgeProps) {
   return (
     <Grid container direction='column' alignItems='center'>
       <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
@@ -38,7 +48,7 @@ export function RewardStatusBadge({ truncate = false, showEmptyStatus, hideStatu
             minHeight: '30px'
           }}
         >
-          <RewardAmount reward={reward} truncate={truncate} />
+          <RewardAmount noRewardText={noRewardText} fullForm={fullForm} reward={reward} truncate={truncate} />
           {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
         </Box>
       </Grid>
@@ -50,8 +60,12 @@ export function RewardAmount({
   reward,
   truncate = false,
   truncatePrecision = 4,
-  typographyProps
+  typographyProps,
+  fullForm,
+  noRewardText
 }: {
+  noRewardText?: string;
+  fullForm?: boolean;
   reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>>;
   truncate?: boolean;
   truncatePrecision?: number;
@@ -71,7 +85,7 @@ export function RewardAmount({
   }
 
   if (!isTruthy(reward.rewardAmount) || !isTruthy(reward.rewardToken) || !isTruthy(reward.chainId)) {
-    return null;
+    return noRewardText ? <Typography>{noRewardText}</Typography> : null;
   }
 
   const rewardAmount = reward.rewardAmount;
@@ -113,6 +127,8 @@ export function RewardAmount({
               Reward not set
             </Typography>
           </Box>
+        ) : fullForm ? (
+          <TokenBadge tokenAmount={rewardAmount} chainId={chainId} tokenAddress={rewardToken} />
         ) : (
           <>
             <Box

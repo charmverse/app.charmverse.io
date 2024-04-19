@@ -29,6 +29,7 @@ export type CardPageProposal = {
   sourceTemplateId?: string;
   evaluations: ProposalWithUsersLite['evaluations'];
   hasRewards: boolean;
+  hasCredentials: boolean;
   archived: boolean;
 };
 

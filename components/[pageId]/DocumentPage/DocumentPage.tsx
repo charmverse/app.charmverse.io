@@ -34,6 +34,7 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
@@ -55,7 +56,7 @@ import { PageTemplateBanner } from './components/PageTemplateBanner';
 import { PageTitleInput } from './components/PageTitleInput';
 import { ProposalArchivedBanner } from './components/ProposalArchivedBanner';
 import { ProposalBanner } from './components/ProposalBanner';
-import { ProposalNotesBaner } from './components/ProposalNotesBanner';
+import { ProposalNotesBanner } from './components/ProposalNotesBanner';
 import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
@@ -104,8 +105,16 @@ function DocumentPageComponent({
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
+  const isCharmverseSpace = useIsCharmverseSpace();
 
-  const { proposal, refreshProposal, onChangeEvaluation, onChangeWorkflow, onChangeRewardSettings } = useProposal({
+  const {
+    proposal,
+    refreshProposal,
+    onChangeEvaluation,
+    onChangeWorkflow,
+    onChangeRewardSettings,
+    onChangeSelectedCredentialTemplates
+  } = useProposal({
     proposalId
   });
   const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({
@@ -305,7 +314,7 @@ function DocumentPageComponent({
           )}
           {page.type === 'proposal_notes' && (
             <AlertContainer>
-              <ProposalNotesBaner />
+              <ProposalNotesBanner />
             </AlertContainer>
           )}
           <PageTemplateBanner parentId={page.parentId} pageType={page.type} />
@@ -390,6 +399,7 @@ function DocumentPageComponent({
                 onChangeEvaluation={onChangeEvaluation}
                 refreshProposal={refreshProposal}
                 onChangeWorkflow={onChangeWorkflow}
+                onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
               />
             )}
 
@@ -430,7 +440,7 @@ function DocumentPageComponent({
                       pagePath={page.path}
                       readOnly={readOnly}
                       showApplications
-                      expandedRewardProperties
+                      expandedRewardProperties={!isCharmverseSpace}
                       templateId={page.sourceTemplateId || undefined}
                       isTemplate={page.type === 'bounty_template'}
                     />

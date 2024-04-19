@@ -13,6 +13,8 @@ export class PageHeader {
 
   readonly deleteCurrentPage: Locator;
 
+  readonly toggleCurrentPageLock: Locator;
+
   readonly convertProposalAction: Locator;
 
   public rootSelector: { locator: Locator['locator'] };
@@ -24,6 +26,7 @@ export class PageHeader {
     this.forumPostActions = this.rootSelector.locator('data-test=header--forum-post-actions');
     this.pageActionsMenu = this.rootSelector.locator('data-test=header--page-actions');
     this.deleteCurrentPage = this.rootSelector.locator('data-test=header--delete-current-page');
+    this.toggleCurrentPageLock = this.rootSelector.locator('data-test=header--toggle-current-page-lock');
     this.convertProposalAction = this.rootSelector.locator('data-test=convert-proposal-action');
   }
 

@@ -1,7 +1,10 @@
 import * as http from 'adapters/http';
 import type { CharmVerseCredentialInput } from 'lib/credentials/attestOffchain';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
-import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
+import type {
+  FindIssuableProposalCredentialsInput,
+  IssuableProposalCredentialContent
+} from 'lib/credentials/findIssuableProposalCredentials';
 import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
 import type { GnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
@@ -26,8 +29,11 @@ export class CredentialsApi {
     return http.DELETE(`/api/credentials/templates?templateId=${templateId}`);
   }
 
-  getIssuableProposalCredentials({ spaceId }: { spaceId: string }) {
-    return http.GET<IssuableProposalCredentialContent[]>(`/api/credentials/proposals/issuable`, { spaceId });
+  getIssuableProposalCredentials({ spaceId, proposalIds }: FindIssuableProposalCredentialsInput) {
+    return http.GET<IssuableProposalCredentialContent[]>(`/api/credentials/proposals/issuable`, {
+      spaceId,
+      proposalIds
+    });
   }
 
   requestProposalCredentialIndexing(data: ProposalCredentialsToIndex) {

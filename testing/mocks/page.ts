@@ -38,18 +38,20 @@ export function createMockPage(input: MockPageInput = {}): MockPageOutput {
       delete: true,
       edit_position: true,
       edit_content: true,
-      edit_isPublic: true,
       edit_path: true,
       comment: true,
       grant_permissions: true,
       create_poll: true,
-      delete_attached_bounty: true
+      delete_attached_bounty: true,
+      edit_lock: true
     },
     proposalId: null,
     title: '',
     type: 'page',
     index: -1,
     fullWidth: false,
+    lockedBy: null,
+    isLocked: false,
     version: -1,
     ...input
   };

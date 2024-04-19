@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 
 import type { Props as EvaluationsReviewProps } from './components/Review/EvaluationsReview';
 import { EvaluationsReview } from './components/Review/EvaluationsReview';
@@ -14,6 +14,7 @@ export type ProposalEvaluationsProps = {
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
+  onChangeSelectedCredentialTemplates: ProposalSettingsProps['onChangeSelectedCredentialTemplates'];
   refreshProposal?: VoidFunction;
   pagePath?: string;
   pageTitle?: string;
@@ -33,6 +34,7 @@ export function ProposalEvaluations({
   onChangeWorkflow,
   onChangeRewardSettings,
   refreshProposal,
+  onChangeSelectedCredentialTemplates,
   pagePath,
   pageTitle,
   isUnpublishedProposal,
@@ -41,6 +43,8 @@ export function ProposalEvaluations({
   isStructuredProposal,
   expanded = true
 }: ProposalEvaluationsProps) {
+  const isAdmin = useIsAdmin();
+
   if (isUnpublishedProposal) {
     const isNotNewProposal = !!proposal;
     return (
@@ -54,6 +58,7 @@ export function ProposalEvaluations({
         expanded={expanded}
         isTemplate={isProposalTemplate}
         onChangeRewardSettings={onChangeRewardSettings}
+        onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         isStructuredProposal={!!isStructuredProposal}
       />
     );
@@ -65,6 +70,8 @@ export function ProposalEvaluations({
         pageId={pageId}
         proposal={proposal}
         onChangeEvaluation={onChangeEvaluation}
+        readOnlyCredentialTemplates={!isAdmin}
+        onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         refreshProposal={refreshProposal}
         templateId={templateId}
         expanded={expanded}
@@ -72,5 +79,3 @@ export function ProposalEvaluations({
     );
   }
 }
-
-export const ProposalSidebar = memo(ProposalEvaluations);

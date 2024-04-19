@@ -1,14 +1,14 @@
-import type { ProposalEvaluation } from '@charmverse/core/prisma';
 import styled from '@emotion/styled';
-import { Accordion as MuiAccordion, AccordionDetails, AccordionSummary, Box, Typography } from '@mui/material';
 import type { AccordionProps } from '@mui/material';
+import { AccordionDetails, AccordionSummary, Box, Accordion as MuiAccordion, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
-import { StepperIcon } from './StepperIcon';
+import type { Result } from './StepperResultIcon';
+import { StepperResultIcon } from './StepperResultIcon';
 
 type Props = {
   title: string;
-  result: ProposalEvaluation['result'];
+  result: Result | null;
   index: number;
   isCurrent?: boolean;
   expanded?: boolean;
@@ -55,7 +55,7 @@ export function EvaluationStepRow({
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary sx={{ px: 1 }}>
         <Box display='flex' alignItems='center' gap={1} width='100%'>
-          <StepperIcon result={result} isCurrent={isCurrent} position={index + 1} />
+          <StepperResultIcon result={result} isCurrent={isCurrent} position={index + 1} />
           {expandedContainer && (
             <>
               <Typography variant='h6' sx={{ flexGrow: 1 }}>

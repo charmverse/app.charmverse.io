@@ -88,7 +88,10 @@ export function getDefaultStatusProperty() {
 
 export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
-    ...proposalDbProperties.proposalStep({ name: 'Step', options: ['Draft', ...evaluationStepTitles, 'Rewards'] })
+    ...proposalDbProperties.proposalStep({
+      name: 'Step',
+      options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials']
+    })
   };
 }
 

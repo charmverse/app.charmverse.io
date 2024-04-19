@@ -9,11 +9,19 @@ export async function getCredentialTemplates({ spaceId }: { spaceId: string }): 
     throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
   }
 
-  const credentials = await prisma.credentialTemplate.findMany({
-    where: {
-      spaceId
-    }
-  });
+  const credentials = await prisma.credentialTemplate
+    .findMany({
+      where: {
+        spaceId
+      }
+    })
+    .then((templates) =>
+      templates.map((template) =>
+        template.schemaType === 'reward'
+          ? template
+          : { ...template, credentialEvents: template.credentialEvents.filter((ev) => ev === 'proposal_approved') }
+      )
+    );
 
   return credentials;
 }
