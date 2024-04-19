@@ -32,19 +32,19 @@ function CredentialComponent({
   name,
   ...props
 }: Pick<CredentialTemplate, 'id' | 'name' | 'credentialEvents'>) {
-  const { getFeatureTitle } = useSpaceFeatures();
   return (
     <Box {...props}>
       <Stack>
-        <Typography variant='caption' fontWeight='bold'>
+        <Chip variant='outlined' key={id} size='small' label={name} />
+        {/* <Typography variant='caption' fontWeight='bold'>
           {name}
-        </Typography>
-        <Box display='flex' gap={2}>
+        </Typography> */}
+        {/* <Box display='flex' gap={2}>
           {credentialEvents.map((ev) => {
             const title = credentialEventLabels[ev]?.(getFeatureTitle);
             return <Chip variant='outlined' key={ev} size='small' title={title} label={title} />;
           })}
-        </Box>
+        </Box> */}
       </Stack>
     </Box>
   );
