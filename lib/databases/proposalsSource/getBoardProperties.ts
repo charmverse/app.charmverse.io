@@ -5,6 +5,7 @@ import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FieldConfig } from 'lib/projects/formField';
+import * as constants from 'lib/proposals/blocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
@@ -113,17 +114,40 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
 // field config ref: lib/projects/constants.ts
 function applyProjectProfileProperties(boardProperties: IPropertyTemplate[], fieldConfig: FieldConfig) {
   applyToPropertiesById(boardProperties, {
-    id: '__project_name',
+    id: constants.PROJECT_NAME_ID,
     name: 'Project',
     options: [],
     type: 'text'
   });
   applyToPropertiesById(boardProperties, {
-    id: '__projectMembers_name',
+    id: constants.PROJECT_MEMBER_NAMES_ID,
     name: 'Project Members',
     options: [],
     type: 'multiSelect'
   });
+}
+
+function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
+  for (const rubricStepTitle of rubricStepTitles) {
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluatedBy',
+      name: rubricStepTitle,
+      options: []
+    });
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationTotal',
+      name: rubricStepTitle,
+      options: []
+    });
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationAverage',
+      name: rubricStepTitle,
+      options: []
+    });
+  }
 }
 
 function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: IPropertyTemplate) {
@@ -165,29 +189,6 @@ function applyFormFieldToProperties(boardProperties: IPropertyTemplate[], { id, 
     });
   } else {
     Object.assign(existingProp, fieldProperty);
-  }
-}
-
-function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
-  for (const rubricStepTitle of rubricStepTitles) {
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluatedBy',
-      name: rubricStepTitle,
-      options: []
-    });
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluationTotal',
-      name: rubricStepTitle,
-      options: []
-    });
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluationAverage',
-      name: rubricStepTitle,
-      options: []
-    });
   }
 }
 
