@@ -14,6 +14,7 @@ import type {
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { NewPageValues } from 'components/common/PageDialog/hooks/useNewPage';
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
@@ -75,4 +76,5 @@ export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {
     formFields: TypedFormField[] | null;
   } | null;
   project?: ProjectWithMembers | null;
+  issuedCredentials: EASAttestationFromApi[];
 };

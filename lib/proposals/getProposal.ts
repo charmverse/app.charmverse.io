@@ -1,6 +1,8 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import { getProposalCredentials } from 'lib/credentials/getProposalCredentials';
 import type { permissionsApiClient } from 'lib/permissions/api/client';
 import { projectInclude } from 'lib/projects/constants';
 
@@ -83,8 +85,13 @@ export async function getProposal({
     throw new Error('Could not find permissions for proposal');
   }
 
+  const credentials = await getProposalCredentials({ proposalId: id }).catch((error) => {
+    log.error('Error fetching proposal credentials', { error, proposalId: id });
+    return [];
+  });
+
   return mapDbProposalToProposal({
-    proposal,
+    proposal: { ...proposal, issuedCredentials: credentials },
     permissions: currentPermissions,
     permissionsByStep
   });

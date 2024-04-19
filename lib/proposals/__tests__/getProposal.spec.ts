@@ -23,7 +23,8 @@ describe('getProposal', () => {
     });
     expect(result).toMatchObject(
       expect.objectContaining<Partial<ProposalWithUsersAndRubric>>({
-        id: proposal.id
+        id: proposal.id,
+        issuedCredentials: []
       })
     );
   });
