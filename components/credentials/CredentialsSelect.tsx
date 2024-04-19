@@ -8,8 +8,6 @@ import { useMemo, type HTMLAttributes } from 'react';
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { SelectPreview } from 'components/common/form/fields/Select/SelectPreview';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import { credentialEventLabels } from 'lib/credentials/constants';
 
 const ADD_CREDENTIAL_TEMPLATE = 'ADD_CREDENTIAL_TEMPLATE' as const;
 
@@ -164,11 +162,11 @@ export function CredentialSelect({
           return (
             <TextField
               {...params}
-              variant='outlined'
+              variant={templateType === 'proposal' ? 'outlined' : 'standard'}
               InputProps={{
                 ...params.InputProps,
                 disableUnderline: true,
-                placeholder: '+ Select credentials'
+                placeholder: selectedCredentialTemplates?.length ? '' : '+ Select a credential'
                 // startAdornment: tokenInfo ? <TokenLogo height={20} src={tokenInfo.canonicalLogo} /> : null
               }}
             />
