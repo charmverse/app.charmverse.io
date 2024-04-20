@@ -5,10 +5,10 @@ import { v4 } from 'uuid';
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
+import { getProfectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getProposalProjectFormField } from '../getProposalProjectFormField';
 
@@ -22,13 +22,11 @@ const fieldsInput: FormFieldInput[] = [
     options: [],
     private: false,
     required: true,
-    fieldConfig: {
-      ...createDefaultProjectAndMembersFieldConfig(),
+    fieldConfig: getProfectProfileFieldConfig({
       walletAddress: {
         private: true
       },
       projectMember: {
-        ...createDefaultProjectAndMembersFieldConfig().projectMember,
         walletAddress: {
           private: false
         },
@@ -36,7 +34,7 @@ const fieldsInput: FormFieldInput[] = [
           private: true
         }
       }
-    }
+    })
   }
 ];
 

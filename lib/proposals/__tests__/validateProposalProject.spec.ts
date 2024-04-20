@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { getProfectProfileFieldConfig } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
@@ -38,12 +38,11 @@ describe('validateProposalProject', () => {
           {
             id: projectFieldId,
             type: 'project_profile',
-            fieldConfig: {
-              ...createDefaultProjectAndMembersFieldConfig(),
+            fieldConfig: getProfectProfileFieldConfig({
               name: {
                 required: true
               }
-            }
+            })
           }
         ]
       })
@@ -86,12 +85,11 @@ describe('validateProposalProject', () => {
           {
             id: projectFieldId,
             type: 'project_profile',
-            fieldConfig: {
-              ...createDefaultProjectAndMembersFieldConfig(),
+            fieldConfig: getProfectProfileFieldConfig({
               name: {
                 required: true
               }
-            }
+            })
           }
         ]
       })

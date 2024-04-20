@@ -14,7 +14,7 @@ export type ProjectFieldProperty = {
 export type ProjectField = keyof ProjectPayload;
 export type ProjectMemberField = keyof ProjectMemberPayload;
 
-type ProjectFieldConfig = {
+export type ProjectFieldConfig = {
   required?: boolean;
   show?: boolean;
   private?: boolean;
@@ -127,7 +127,7 @@ export const projectFieldProperties: ProjectFieldProperty[] = [
   }
 ];
 
-export function createDefaultProjectAndMembersFieldConfig() {
+export function createDefaultProjectAndMembersFieldConfig(): ProjectAndMembersFieldConfig {
   return {
     name: {
       required: true
