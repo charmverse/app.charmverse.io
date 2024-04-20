@@ -217,7 +217,7 @@ function applyProjectProfileProperties(
       name: 'Project Member Wallets',
       options: [],
       private: getFieldConfig(fieldConfig.projectMember.walletAddress).private,
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.email).show) {
@@ -226,7 +226,7 @@ function applyProjectProfileProperties(
       name: 'Project Member Emails',
       options: [],
       private: getFieldConfig(fieldConfig.projectMember.email).private,
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.twitter).show) {
@@ -234,7 +234,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_TWITTERS_ID,
       name: 'Project Member X Accounts',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.warpcast).show) {
@@ -242,7 +242,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_WARPCASTS_ID,
       name: 'Project Member Warpcast',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.github).show) {
@@ -250,7 +250,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_GITHUBS_ID,
       name: 'Project Member Github',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.linkedin).show) {
@@ -258,7 +258,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_LINKEDINS_ID,
       name: 'Project Member LinkedIn',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.telegram).show) {
@@ -266,7 +266,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_TELEGRAMS_ID,
       name: 'Project Member Telegram',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.otherUrl).show) {
@@ -274,7 +274,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_OTHER_URLS_ID,
       name: 'Project Member URLs',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
   if (getFieldConfig(fieldConfig.projectMember.previousProjects).show) {
@@ -282,7 +282,7 @@ function applyProjectProfileProperties(
       id: constants.PROJECT_MEMBER_PREVIOUS_PROJECTS_ID,
       name: 'Project Member Previous Projects',
       options: [],
-      type: 'text'
+      type: 'multiSelect'
     });
   }
 }
