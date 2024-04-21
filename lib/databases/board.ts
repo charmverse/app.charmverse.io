@@ -6,6 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
 import type { Card } from './card';
+import { Constants } from './constants';
 
 export const proposalPropertyTypesList = [
   'proposalUrl',
@@ -163,4 +164,13 @@ export function createBoard({
       cardProperties
     }
   };
+}
+
+export function isReadonlyProperty({ type, id: templateId, formFieldId, proposalFieldId }: IPropertyTemplate): boolean {
+  return (
+    proposalPropertyTypesList.includes(type as any) ||
+    (templateId.startsWith('__') && templateId !== Constants.titleColumnId) ||
+    !!formFieldId ||
+    !!proposalFieldId
+  );
 }

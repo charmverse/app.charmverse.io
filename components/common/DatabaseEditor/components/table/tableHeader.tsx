@@ -30,19 +30,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
-import { proposalPropertyTypesList } from 'lib/databases/board';
+import { isReadonlyProperty } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import { getPropertyName } from 'lib/databases/getPropertyName';
-import {
-  AUTHORS_BLOCK_ID,
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_VIEW_BLOCK_ID,
-  PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID,
-  PROPOSAL_STEP_BLOCK_ID
-} from 'lib/proposals/blocks/constants';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -67,15 +59,6 @@ type Props = {
   setSelectedPropertyId?: Dispatch<SetStateAction<string | null>>;
 };
 
-export const DEFAULT_BLOCK_IDS = [
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_VIEW_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID,
-  PROPOSAL_STEP_BLOCK_ID,
-  AUTHORS_BLOCK_ID,
-  PROPOSAL_REVIEWERS_BLOCK_ID
-];
-
 function TableHeader(props: Props): JSX.Element {
   const { activeView, board, views, cards, sorted, template, readOnly } = props;
   const { type } = template;
@@ -86,12 +69,7 @@ function TableHeader(props: Props): JSX.Element {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
 
-  const disableRename =
-    proposalPropertyTypesList.includes(type as any) ||
-    DEFAULT_BLOCK_IDS.includes(templateId) ||
-    template.id.startsWith('__') ||
-    !!template.formFieldId ||
-    !!template.proposalFieldId;
+  const disableRename = isReadonlyProperty(template);
 
   const [tempName, setTempName] = useState(name || '');
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
@@ -182,11 +160,7 @@ function TableHeader(props: Props): JSX.Element {
     await mutator.toggleColumnWrap(activeView.id, templateId, columnWrappedIds);
   }
 
-  const isDisabled =
-    proposalPropertyTypesList.includes(type as any) ||
-    template.id.startsWith('__') ||
-    !!template.formFieldId ||
-    !!template.proposalFieldId;
+  const isDisabled = isReadonlyProperty(template);
 
   const popupContent = (
     <Stack>

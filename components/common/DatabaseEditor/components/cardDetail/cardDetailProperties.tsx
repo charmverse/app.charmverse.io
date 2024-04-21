@@ -9,8 +9,8 @@ import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { isReadonlyProperty } from 'lib/databases/board';
 import { type RelationPropertyData, type Board, type IPropertyTemplate, type PropertyType } from 'lib/databases/board';
-import { proposalPropertyTypesList } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
@@ -274,16 +274,8 @@ function CardDetailProperties(props: Props) {
   return (
     <div className='octo-propertylist' data-test='card-detail-properties'>
       {board.fields?.cardProperties.map((propertyTemplate) => {
-        const cardProperty = (board.fields?.cardProperties ?? []).find(
-          (_cardProperty) => _cardProperty.id === propertyTemplate.id
-        );
         const readOnly = props.readOnly || props.readOnlyProperties?.includes(propertyTemplate.id) || false;
-        const isReadonlyTemplateProperty =
-          readOnly ||
-          proposalPropertyTypesList.includes(propertyTemplate.type as any) ||
-          propertyTemplate.id.startsWith('__') ||
-          !!cardProperty?.formFieldId ||
-          !!cardProperty?.proposalFieldId;
+        const isReadonlyTemplateProperty = readOnly || isReadonlyProperty(propertyTemplate);
 
         if (propertyTemplate.id === Constants.titleColumnId) {
           return null;
