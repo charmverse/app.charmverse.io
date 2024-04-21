@@ -104,6 +104,7 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         description: (formField.description as { content: PageContent; contentText: string })?.contentText,
         type: boardPropertyType,
         formFieldId: formField.id,
+        readOnly: true,
         private: formField.private
       };
 
@@ -120,14 +121,12 @@ function applyProjectProfileProperties(
   applyToPropertiesById(boardProperties, {
     id: constants.PROJECT_NAME_ID,
     name: 'Project',
-    options: [],
     type: 'text'
   });
   if (getFieldConfig(fieldConfig.excerpt).show) {
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_EXCERPT_ID,
       name: 'Project Excerpt',
-      options: [],
       type: 'text'
     });
   }
@@ -135,7 +134,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_DESCRIPTION_ID,
       name: 'Project Excerpt',
-      options: [],
       type: 'text'
     });
   }
@@ -143,7 +141,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_TWITTER_ID,
       name: 'Project X Account',
-      options: [],
       type: 'text'
     });
   }
@@ -151,7 +148,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_WEBSITE_ID,
       name: 'Project Website',
-      options: [],
       type: 'text'
     });
   }
@@ -159,7 +155,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_GITHUB_ID,
       name: 'Project Github',
-      options: [],
       type: 'text'
     });
   }
@@ -167,7 +162,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_BLOG_ID,
       name: 'Project Blog',
-      options: [],
       type: 'text'
     });
   }
@@ -175,7 +169,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_DEMO_URL_ID,
       name: 'Project Demo',
-      options: [],
       type: 'text'
     });
   }
@@ -183,7 +176,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_COMMUNITY_URL_ID,
       name: 'Project Community',
-      options: [],
       type: 'text'
     });
   }
@@ -191,7 +183,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_OTHER_URL_ID,
       name: 'Project Other Url',
-      options: [],
       type: 'text'
     });
   }
@@ -199,7 +190,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_WALLET_ID,
       name: 'Project Wallet',
-      options: [],
       private: getFieldConfig(fieldConfig.walletAddress).private,
       type: 'text'
     });
@@ -208,14 +198,12 @@ function applyProjectProfileProperties(
   applyToPropertiesById(boardProperties, {
     id: constants.PROJECT_MEMBER_NAMES_ID,
     name: 'Project Members',
-    options: [],
     type: 'multiSelect'
   });
   if (getFieldConfig(fieldConfig.projectMember.walletAddress).show) {
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_WALLETS_ID,
       name: 'Project Member Wallets',
-      options: [],
       private: getFieldConfig(fieldConfig.projectMember.walletAddress).private,
       type: 'multiSelect'
     });
@@ -224,7 +212,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_EMAILS_ID,
       name: 'Project Member Emails',
-      options: [],
       private: getFieldConfig(fieldConfig.projectMember.email).private,
       type: 'multiSelect'
     });
@@ -233,7 +220,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_TWITTERS_ID,
       name: 'Project Member X Accounts',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -241,7 +227,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_WARPCASTS_ID,
       name: 'Project Member Warpcast',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -249,7 +234,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_GITHUBS_ID,
       name: 'Project Member Github',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -257,7 +241,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_LINKEDINS_ID,
       name: 'Project Member LinkedIn',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -265,7 +248,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_TELEGRAMS_ID,
       name: 'Project Member Telegram',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -273,7 +255,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_OTHER_URLS_ID,
       name: 'Project Member URLs',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -281,7 +262,6 @@ function applyProjectProfileProperties(
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_MEMBER_PREVIOUS_PROJECTS_ID,
       name: 'Project Member Previous Projects',
-      options: [],
       type: 'multiSelect'
     });
   }
@@ -292,37 +272,43 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluatedBy',
-      name: rubricStepTitle,
-      options: []
+      name: rubricStepTitle
     });
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationTotal',
-      name: rubricStepTitle,
-      options: []
+      name: rubricStepTitle
     });
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationAverage',
-      name: rubricStepTitle,
-      options: []
+      name: rubricStepTitle
     });
   }
 }
 
-function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: IPropertyTemplate) {
+type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
+
+function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: PartialPropertyTemplate) {
   const existingProp = boardProperties.find((p) => p.id === fieldProperty.id);
   if (!existingProp) {
-    boardProperties.push(fieldProperty);
+    boardProperties.push({
+      readOnly: true,
+      options: [],
+      ...fieldProperty
+    });
   } else {
     Object.assign(existingProp, fieldProperty);
   }
 }
 
-function applyToPropertiesByType(boardProperties: IPropertyTemplate[], { id, ...fieldProperty }: IPropertyTemplate) {
+function applyToPropertiesByType(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: PartialPropertyTemplate
+) {
   const existingProp = boardProperties.find((p) => p.type === fieldProperty.type);
   if (!existingProp) {
-    boardProperties.push({ id, ...fieldProperty });
+    boardProperties.push({ id, readOnly: true, options: [], ...fieldProperty });
   } else {
     Object.assign(existingProp, fieldProperty);
   }
@@ -330,21 +316,26 @@ function applyToPropertiesByType(boardProperties: IPropertyTemplate[], { id, ...
 
 function applyToPropertiesByTypeAndName(
   boardProperties: IPropertyTemplate[],
-  { id, ...fieldProperty }: IPropertyTemplate
+  { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
   const existingProp = boardProperties.find((p) => p.type === fieldProperty.type && p.name === fieldProperty.name);
   if (!existingProp) {
-    boardProperties.push({ id, ...fieldProperty });
+    boardProperties.push({ id, readOnly: true, options: [], ...fieldProperty });
   } else {
     Object.assign(existingProp, fieldProperty);
   }
 }
 
-function applyFormFieldToProperties(boardProperties: IPropertyTemplate[], { id, ...fieldProperty }: IPropertyTemplate) {
+function applyFormFieldToProperties(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: PartialPropertyTemplate
+) {
   const existingProp = boardProperties.find((p) => p.formFieldId === fieldProperty.formFieldId);
   if (!existingProp) {
     boardProperties.push({
       id,
+      readOnly: true,
+      options: [],
       ...fieldProperty
     });
   } else {

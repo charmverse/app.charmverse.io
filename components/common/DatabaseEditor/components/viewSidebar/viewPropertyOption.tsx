@@ -7,7 +7,6 @@ import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
-import { isReadonlyProperty } from 'lib/databases/board';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
@@ -52,7 +51,7 @@ function ViewPropertyOption({
   const isVisible = visiblePropertyIdsWithTitle.includes(property.id);
   const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
-  const disabled = isReadonlyProperty(property);
+  const disabled = !!property.readOnly;
 
   const toggleVisibility = () => {
     let newVisiblePropertyIds = [];

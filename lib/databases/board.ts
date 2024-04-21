@@ -72,6 +72,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   private?: boolean; // used for answers to form fields in proposal-as-a-source
   proposalFieldId?: string;
   relationData?: RelationPropertyData;
+  readOnly?: boolean; // whether this property is synced and uneditable
   dynamicOptions?: boolean; // do not rely on a static list of options
 };
 
@@ -167,11 +168,6 @@ export function createBoard({
   };
 }
 
-export function isReadonlyProperty({ type, id: templateId, formFieldId, proposalFieldId }: IPropertyTemplate): boolean {
-  return (
-    proposalPropertyTypesList.includes(type as any) ||
-    (templateId.startsWith('__') && templateId !== Constants.titleColumnId) ||
-    !!formFieldId ||
-    !!proposalFieldId
-  );
+export function isReadonlyPropertyTitle({ id: templateId, readOnly }: IPropertyTemplate): boolean {
+  return (templateId.startsWith('__') && templateId !== Constants.titleColumnId) || !!readOnly;
 }

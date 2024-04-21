@@ -30,7 +30,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocalDbViewSettings } from 'hooks/useLocalDbViewSettings';
 import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
-import { isReadonlyProperty } from 'lib/databases/board';
+import { isReadonlyPropertyTitle } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
@@ -69,7 +69,7 @@ function TableHeader(props: Props): JSX.Element {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);
   };
 
-  const disableRename = isReadonlyProperty(template);
+  const disableRename = isReadonlyPropertyTitle(template);
 
   const [tempName, setTempName] = useState(name || '');
   const addRelationPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-relation-property' });
@@ -160,7 +160,7 @@ function TableHeader(props: Props): JSX.Element {
     await mutator.toggleColumnWrap(activeView.id, templateId, columnWrappedIds);
   }
 
-  const isDisabled = isReadonlyProperty(template);
+  const isDisabled = !!template.readOnly;
 
   const popupContent = (
     <Stack>

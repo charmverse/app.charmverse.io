@@ -28,7 +28,6 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
-import { isReadonlyProperty } from 'lib/databases/board';
 import type { CardWithRelations } from 'lib/databases/card';
 import {
   EVALUATION_STATUS_LABELS,
@@ -156,7 +155,7 @@ function PropertyValueElement(props: Props) {
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
   const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
-  const readOnly = proposal?.archived || props.readOnly || (!!cardProperty && isReadonlyProperty(cardProperty));
+  const readOnly = proposal?.archived || props.readOnly || !!cardProperty?.readOnly;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
