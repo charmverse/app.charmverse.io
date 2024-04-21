@@ -298,7 +298,7 @@ function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProper
       ...fieldProperty
     });
   } else {
-    Object.assign(existingProp, fieldProperty);
+    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
   }
 }
 
@@ -310,7 +310,7 @@ function applyToPropertiesByType(
   if (!existingProp) {
     boardProperties.push({ id, readOnly: true, options: [], ...fieldProperty });
   } else {
-    Object.assign(existingProp, fieldProperty);
+    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
   }
 }
 
@@ -322,7 +322,7 @@ function applyToPropertiesByTypeAndName(
   if (!existingProp) {
     boardProperties.push({ id, readOnly: true, options: [], ...fieldProperty });
   } else {
-    Object.assign(existingProp, fieldProperty);
+    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
   }
 }
 
@@ -339,7 +339,7 @@ function applyFormFieldToProperties(
       ...fieldProperty
     });
   } else {
-    Object.assign(existingProp, fieldProperty);
+    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
   }
 }
 
