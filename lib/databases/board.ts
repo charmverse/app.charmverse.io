@@ -72,6 +72,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   private?: boolean; // used for answers to form fields in proposal-as-a-source
   proposalFieldId?: string;
   relationData?: RelationPropertyData;
+  dynamicOptions?: boolean; // do not rely on a static list of options
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';

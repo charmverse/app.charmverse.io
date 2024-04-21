@@ -12,7 +12,7 @@ import type { IPropertyOption } from 'lib/databases/board';
 import type { PropertyValueDisplayType } from '../../../interfaces';
 import { PopupFieldWrapper } from '../PopupFieldWrapper';
 
-import { mapPropertyOptionToSelectOption, mapSelectOptionToPropertyOption } from './mappers';
+import { mapPropertyOptionToSelectOption, mapValueToSelectOption, mapSelectOptionToPropertyOption } from './mappers';
 
 type ContainerProps = {
   displayType?: PropertyValueDisplayType;
@@ -98,6 +98,7 @@ export type TagSelectProps = {
   propertyValue: string | string[];
   displayType?: PropertyValueDisplayType;
   disableClearable?: boolean;
+  displayValueAsOptions?: boolean;
   onChange: (option: string | string[]) => void;
   onCreateOption?: (option: IPropertyOption) => void;
   onUpdateOption?: (option: IPropertyOption) => void;
@@ -127,6 +128,7 @@ export function TagSelect({
   wrapColumn,
   defaultOpened = false,
   disableClearable = false,
+  displayValueAsOptions = false,
   fluidWidth,
   showEmpty,
   dataTestActive,
@@ -140,10 +142,6 @@ export function TagSelect({
     }
   }, [readOnly]);
 
-  const selectOptions = useMemo(() => {
-    return options.map((o) => mapPropertyOptionToSelectOption(o));
-  }, [options]);
-
   const selectValue = useMemo(() => {
     if (multiselect) {
       return typeof propertyValue === 'string' ? [propertyValue] : propertyValue;
@@ -151,6 +149,14 @@ export function TagSelect({
       return Array.isArray(propertyValue) ? propertyValue[0] || '' : propertyValue;
     }
   }, [multiselect, propertyValue]);
+
+  const selectOptions = useMemo(() => {
+    return displayValueAsOptions
+      ? Array.isArray(selectValue)
+        ? selectValue.map((v) => mapValueToSelectOption(v))
+        : [mapValueToSelectOption(selectValue)]
+      : options.map((o) => mapPropertyOptionToSelectOption(o));
+  }, [options, selectValue]);
 
   const onUpdate = useCallback(
     (selectOption: SelectOptionType) => {
