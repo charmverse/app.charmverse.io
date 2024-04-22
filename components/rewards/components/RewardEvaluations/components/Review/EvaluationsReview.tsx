@@ -8,7 +8,6 @@ import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow
 import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
@@ -72,7 +71,7 @@ export function EvaluationsReview({
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
   const shareLink = `https://app.charmverse.io/${currentSpace?.domain}/${page.path}`;
-  const shareText = `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: ${shareLink}`;
+  const shareText = `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: `;
 
   useEffect(() => {
     if (currentEvaluation && application) {
@@ -165,6 +164,7 @@ export function EvaluationsReview({
         <>
           <Divider />
           <SocialShareLinksStep
+            pageId={page.id}
             lensPostLink={page.lensPostLink}
             onPublish={refreshPage}
             text={shareText}

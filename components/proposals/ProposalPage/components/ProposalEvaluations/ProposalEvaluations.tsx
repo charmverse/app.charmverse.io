@@ -22,6 +22,7 @@ export type ProposalEvaluationsProps = {
   isProposalTemplate: boolean;
   isStructuredProposal: boolean;
   expanded?: boolean;
+  refreshPage?: VoidFunction;
 };
 
 // display evaluation steps or their settings, depending if a proposal is published or not
@@ -41,7 +42,8 @@ export function ProposalEvaluations({
   templateId,
   isProposalTemplate,
   isStructuredProposal,
-  expanded = true
+  expanded = true,
+  refreshPage
 }: ProposalEvaluationsProps) {
   const isAdmin = useIsAdmin();
 
@@ -73,6 +75,7 @@ export function ProposalEvaluations({
         readOnlyCredentialTemplates={!isAdmin}
         onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         refreshProposal={refreshProposal}
+        refreshPage={refreshPage}
         templateId={templateId}
         expanded={expanded}
       />

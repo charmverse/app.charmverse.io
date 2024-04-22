@@ -18,13 +18,15 @@ export function LensSocialShare({
   canPublishToLens,
   onPublish,
   link,
-  content
+  content,
+  pageId
 }: {
   canPublishToLens: boolean;
   onPublish?: VoidFunction;
   link: string;
   content: PageContent;
   lensPostLink?: string | null;
+  pageId: string;
 }) {
   const { lensProfile } = useLensProfile();
   const [isPublishToLensModalOpen, setIsPublishToLensModalOpen] = useState(false);
@@ -38,8 +40,8 @@ export function LensSocialShare({
       onPublish?.();
       setIsPublishToLensModalOpen(false);
     },
-    proposalId: '',
-    proposalLink: link
+    pageId,
+    link
   });
 
   const [lensContent, setLensContent] = useState<ICharmEditorOutput>({

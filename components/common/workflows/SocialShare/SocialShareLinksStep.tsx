@@ -15,7 +15,8 @@ export function SocialShareLinksStep({
   link,
   text,
   readOnly,
-  content
+  content,
+  pageId
 }: {
   readOnly?: boolean;
   onPublish?: VoidFunction;
@@ -23,6 +24,7 @@ export function SocialShareLinksStep({
   text: string;
   lensPostLink?: string | null;
   content: PageContent;
+  pageId: string;
 }) {
   const isAdmin = useIsAdmin();
   const { showMessage } = useSnackbar();
@@ -44,6 +46,7 @@ export function SocialShareLinksStep({
       <SocialShareLink site='x' link={link} text={text} />
       <SocialShareLink site='warpcast' link={link} text={text} />
       <LensSocialShare
+        pageId={pageId}
         onPublish={onPublish}
         lensPostLink={lensPostLink}
         content={content}

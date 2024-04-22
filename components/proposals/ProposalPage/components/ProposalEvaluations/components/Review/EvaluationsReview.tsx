@@ -56,6 +56,7 @@ export type Props = {
   pagePath?: string;
   pageTitle?: string;
   expanded: boolean;
+  refreshPage?: VoidFunction;
 };
 
 export function EvaluationsReview({
@@ -68,7 +69,8 @@ export function EvaluationsReview({
   readOnlyCredentialTemplates,
   refreshProposal: _refreshProposal,
   expanded: expandedContainer,
-  templateId
+  templateId,
+  refreshPage
 }: Props) {
   const [_expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(proposal?.currentEvaluationId);
   const { mappedFeatures } = useSpaceFeatures();
@@ -134,6 +136,7 @@ export function EvaluationsReview({
   async function refreshProposal() {
     await refreshIssuableCredentials();
     await _refreshProposal?.();
+    await refreshPage?.();
   }
 
   useEffect(() => {
@@ -286,10 +289,11 @@ export function EvaluationsReview({
           />
         </EvaluationStepRow>
       )}
-      {pagePath && pageTitle && proposal && expandedContainer && (
+      {pagePath && pageId && pageTitle && proposal && expandedContainer && (
         <>
           <Divider />
           <SocialShareLinksStep
+            pageId={pageId}
             lensPostLink={proposal.lensPostLink}
             onPublish={refreshProposal}
             text={shareText}
