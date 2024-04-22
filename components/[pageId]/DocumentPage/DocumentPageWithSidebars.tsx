@@ -26,10 +26,11 @@ import { useProposal } from './hooks/useProposal';
 type DocumentPageWithSidebarsProps = DocumentPageProps & {
   readOnly?: boolean;
   insideModal?: boolean;
+  refreshPage?: VoidFunction;
 };
 
 function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps) {
-  const { page, readOnly = false } = props;
+  const { page, readOnly = false, refreshPage } = props;
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode } = useCharmEditor();
@@ -195,6 +196,8 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('reward_evaluation'),
             closeSidebar
           }}
+          refreshPage={refreshPage}
+          page={page}
           expanded={false}
           onChangeWorkflow={onChangeRewardWorkflow}
           isTemplate={page.type === 'bounty_template'}

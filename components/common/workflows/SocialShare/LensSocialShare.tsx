@@ -21,7 +21,7 @@ export function LensSocialShare({
   content
 }: {
   canPublishToLens: boolean;
-  onPublish: VoidFunction;
+  onPublish?: VoidFunction;
   link: string;
   content: PageContent;
   lensPostLink?: string | null;
@@ -35,7 +35,7 @@ export function LensSocialShare({
       setIsPublishToLensModalOpen(false);
     },
     onSuccess: () => {
-      onPublish();
+      onPublish?.();
       setIsPublishToLensModalOpen(false);
     },
     proposalId: '',

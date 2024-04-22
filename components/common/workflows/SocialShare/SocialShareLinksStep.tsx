@@ -2,10 +2,8 @@ import LinkIcon from '@mui/icons-material/Link';
 import { IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { useCopyToClipboard } from 'usehooks-ts';
 
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { LensSocialShare } from './LensSocialShare';
@@ -20,7 +18,7 @@ export function SocialShareLinksStep({
   content
 }: {
   readOnly?: boolean;
-  onPublish: VoidFunction;
+  onPublish?: VoidFunction;
   link: string;
   text: string;
   lensPostLink?: string | null;
@@ -32,7 +30,7 @@ export function SocialShareLinksStep({
 
   function copyProposalLink() {
     copyFn(link).then(() => {
-      showMessage('Copied proposal link');
+      showMessage('Copied link');
     });
   }
 
@@ -53,7 +51,7 @@ export function SocialShareLinksStep({
         canPublishToLens={!isDisabled}
       />
       <SocialShareLink site='telegram' link={link} text={text} />
-      <Tooltip title='Copy proposal link'>
+      <Tooltip title='Copy link'>
         <IconButton
           sx={{
             width: 35,
