@@ -122,19 +122,23 @@ function applyProjectProfileProperties(
   fieldConfig: ProjectAndMembersFieldConfig
 ) {
   projectFieldProperties.forEach((field) => {
-    if (getFieldConfig(fieldConfig[field.columnPropertyId]).show) {
+    const config = getFieldConfig(fieldConfig[field.field]);
+    if (config.show) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,
+        private: config.private,
         type: 'text'
       });
     }
   });
   projectMemberFieldProperties.forEach((field) => {
-    if (getFieldConfig(fieldConfig[field.columnPropertyId]).show) {
+    const config = getFieldConfig(fieldConfig[field.field]);
+    if (config.show) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,
+        private: config.private,
         type: 'multiSelect'
       });
     }
