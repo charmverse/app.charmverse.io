@@ -9,8 +9,8 @@ import { useProjectForm } from 'components/settings/projects/hooks/useProjectFor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import { emptyDocument } from 'lib/prosemirror/constants';
 

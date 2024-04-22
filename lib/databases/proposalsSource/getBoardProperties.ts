@@ -1,19 +1,20 @@
-import type { FormField } from '@charmverse/core/prisma';
-import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
-import {
-  EVALUATION_STATUS_LABELS,
-  PROPOSAL_STEP_LABELS,
-  proposalDbProperties,
-  proposalStatusColors
-} from 'lib/databases/proposalDbProperties';
+import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
+import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
+// Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label'];
 
+// define properties that will apply to all source fields
+const defaultOptions = { readOnly: true, readOnlyValues: true, options: [], dynamicOptions: true };
+
+// apply proposal-related properties to the board
 export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
@@ -24,85 +25,41 @@ export function getBoardProperties({
   rubricStepTitles?: string[];
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationStepTitles?: string[];
-  currentCardProperties: IPropertyTemplate[];
-  formFields?: FormField[];
+  currentCardProperties?: IPropertyTemplate[];
+  formFields?: FormFieldInput[];
 }) {
-  // TODO: we shouldn't have to filter out the excluded field types here after week of April 3, 2024.
-  // We should probably hav ea whitelist of form field answers that we support
-  const boardProperties = [...currentCardProperties].filter((prop) => !excludedFieldTypes.includes(prop.type));
-  const statusProp = generateUpdatedProposalStatusProperty({ boardProperties });
-  const proposalUrlProp = generateUpdatedProposalUrlProperty({ boardProperties });
-  const proposalEvaluationTypeProp = generateUpdatedProposalEvaluationTypeProperty({ boardProperties });
-  const stepProp = generateUpdatedProposalStepProperty({ boardProperties, evaluationStepTitles });
-  const proposalAuthorProp = generateUpdatedProposalAuthorProperty({ boardProperties });
-  const proposalReviewerNotes = generateUpdatedProposalReviewerNotesProperty({ boardProperties });
+  const boardProperties = [...currentCardProperties];
 
-  const existingReviewerNotesPropIndex = boardProperties.findIndex((p) => p.type === 'proposalReviewerNotes');
-  if (existingReviewerNotesPropIndex > -1) {
-    boardProperties[existingReviewerNotesPropIndex] = proposalReviewerNotes;
-  } else {
-    boardProperties.push(proposalReviewerNotes);
-  }
-
-  const existingAuthorPropIndex = boardProperties.findIndex((p) => p.type === 'proposalAuthor');
-
-  if (existingAuthorPropIndex > -1) {
-    boardProperties[existingAuthorPropIndex] = proposalAuthorProp;
-  } else {
-    boardProperties.push(proposalAuthorProp);
-  }
-
-  const existingStatusPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStatus');
-
-  if (existingStatusPropIndex > -1) {
-    boardProperties[existingStatusPropIndex] = statusProp;
-  } else {
-    boardProperties.push(statusProp);
-  }
-
-  const existingUrlPropIndex = boardProperties.findIndex((p) => p.type === 'proposalUrl');
-
-  if (existingUrlPropIndex > -1) {
-    boardProperties[existingUrlPropIndex] = proposalUrlProp;
-  } else {
-    boardProperties.push(proposalUrlProp);
-  }
-
-  const existingEvaluationTypePropIndex = boardProperties.findIndex((p) => p.type === 'proposalEvaluationType');
-  const existingStepPropIndex = boardProperties.findIndex((p) => p.type === 'proposalStep');
-
-  if (existingEvaluationTypePropIndex > -1) {
-    boardProperties[existingEvaluationTypePropIndex] = proposalEvaluationTypeProp;
-  } else {
-    boardProperties.push(proposalEvaluationTypeProp);
-  }
-
-  if (existingStepPropIndex > -1) {
-    boardProperties[existingStepPropIndex] = stepProp;
-  } else {
-    boardProperties.push(stepProp);
-  }
-
-  addProposalEvaluationProperties({
+  // standard proposal properties
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalReviewerNotes());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalAuthor());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
+  applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
+  applyToPropertiesByType(
     boardProperties,
-    rubricStepTitles
-  });
+    proposalDbProperties.proposalStep({ options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'] })
+  );
 
+  // properties per each evaluation step
+  applyProposalEvaluationProperties(boardProperties, rubricStepTitles);
+
+  // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
-    const existingPropIndex = boardProperties.findIndex((p) => p.id === cardProp.id);
-
-    if (existingPropIndex > -1) {
-      boardProperties[existingPropIndex] = { ...cardProp, proposalFieldId: cardProp.id };
-    } else {
-      boardProperties.push({
-        ...cardProp,
-        proposalFieldId: cardProp.id
-      });
-    }
+    applyToPropertiesById(boardProperties, {
+      ...cardProp,
+      proposalFieldId: cardProp.id
+    });
   });
 
+  // properties related to form proposals
+  applyFormFieldProperties(boardProperties, formFields);
+
+  return boardProperties;
+}
+
+function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
   formFields.forEach((formField) => {
-    const existingPropIndex = boardProperties.findIndex((p) => p.formFieldId === formField.id);
     let boardPropertyType: IPropertyTemplate['type'] | null = null;
     let boardPropertyOptions: IPropertyTemplate['options'] = [];
 
@@ -131,6 +88,10 @@ export function getBoardProperties({
         }));
         break;
       }
+      case 'project_profile': {
+        applyProjectProfileProperties(boardProperties, formField.fieldConfig as ProjectAndMembersFieldConfig);
+        break;
+      }
       default: {
         if (!excludedFieldTypes.includes(formField.type)) {
           boardPropertyType = formField.type as IPropertyTemplate['type'];
@@ -138,185 +99,132 @@ export function getBoardProperties({
       }
     }
     if (boardPropertyType) {
-      const boardProperty = {
+      const fieldProperty = {
+        id: uuid(),
         name: formField.name,
         options: boardPropertyOptions,
         description: (formField.description as { content: PageContent; contentText: string })?.contentText,
         type: boardPropertyType,
         formFieldId: formField.id,
+        readOnly: true,
+        readOnlyValues: true,
         private: formField.private
       };
 
-      if (existingPropIndex === -1) {
-        boardProperties.push({
-          id: uuid(),
-          ...boardProperty
-        });
-      } else {
-        boardProperties[existingPropIndex] = {
-          ...boardProperties[existingPropIndex],
-          ...boardProperty
-        };
-      }
+      applyFormFieldToProperties(boardProperties, fieldProperty);
     }
   });
-  return boardProperties;
 }
 
-function addProposalEvaluationProperties({
-  rubricStepTitles,
-  boardProperties
-}: {
-  rubricStepTitles: string[];
-  boardProperties: IPropertyTemplate[];
-}) {
+// field config ref: lib/projects/constants.ts
+function applyProjectProfileProperties(
+  boardProperties: IPropertyTemplate[],
+  fieldConfig: ProjectAndMembersFieldConfig
+) {
+  projectFieldProperties.forEach((field) => {
+    const config = getFieldConfig(fieldConfig[field.field]);
+    if (config.show) {
+      applyToPropertiesById(boardProperties, {
+        id: field.columnPropertyId,
+        name: field.columnTitle,
+        private: config.private,
+        type: 'text'
+      });
+    }
+  });
+  projectMemberFieldProperties.forEach((field) => {
+    const config = getFieldConfig(fieldConfig[field.field]);
+    if (config.show) {
+      applyToPropertiesById(boardProperties, {
+        id: field.columnPropertyId,
+        name: field.columnTitle,
+        private: config.private,
+        type: 'multiSelect'
+      });
+    }
+  });
+}
+
+function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
   for (const rubricStepTitle of rubricStepTitles) {
-    const evaluatedByProp = boardProperties.find((p) => p.type === 'proposalEvaluatedBy' && p.name === rubricStepTitle);
-    const evaluationTotalProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluationTotal' && p.name === rubricStepTitle
-    );
-    const evaluationAverageProp = boardProperties.find(
-      (p) => p.type === 'proposalEvaluationAverage' && p.name === rubricStepTitle
-    );
-
-    if (!evaluatedByProp) {
-      boardProperties.push({
-        id: uuid(),
-        type: 'proposalEvaluatedBy',
-        name: rubricStepTitle,
-        options: []
-      });
-    }
-
-    if (!evaluationTotalProp) {
-      boardProperties.push({
-        id: uuid(),
-        type: 'proposalEvaluationTotal',
-        name: rubricStepTitle,
-        options: []
-      });
-    }
-
-    if (!evaluationAverageProp) {
-      boardProperties.push({
-        id: uuid(),
-        type: 'proposalEvaluationAverage',
-        name: rubricStepTitle,
-        options: []
-      });
-    }
-  }
-}
-
-function generateUpdatedProposalReviewerNotesProperty(
-  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
-): IPropertyTemplate {
-  const existingProposalReviewerNotes = boardProperties.find((p) => p.type === 'proposalReviewerNotes');
-
-  return {
-    ...(existingProposalReviewerNotes ?? {
-      ...proposalDbProperties.proposalReviewerNotes(),
-      id: uuid()
-    })
-  };
-}
-
-function generateUpdatedProposalAuthorProperty(
-  { boardProperties }: { boardProperties: IPropertyTemplate[] } = { boardProperties: [] }
-): IPropertyTemplate {
-  const existingProposalAuthorProperty = boardProperties.find((p) => p.type === 'proposalAuthor');
-
-  return {
-    ...(existingProposalAuthorProperty ?? {
-      ...proposalDbProperties.proposalAuthor(),
-      id: uuid()
-    })
-  };
-}
-
-function generateUpdatedProposalStepProperty({
-  boardProperties,
-  evaluationStepTitles
-}: {
-  evaluationStepTitles: string[];
-  boardProperties: IPropertyTemplate[];
-}): IPropertyTemplate {
-  const existingProposalStepProperty = boardProperties.find((p) => p.type === 'proposalStep');
-
-  return {
-    ...(existingProposalStepProperty ?? {
-      ...proposalDbProperties.proposalStep(),
-      id: uuid()
-    }),
-    options: ['Draft', 'Rewards', 'Credentials', ...evaluationStepTitles].map((title) => ({
-      color: 'propColorGray',
-      id: title,
-      value: title
-    }))
-  };
-}
-
-function generateUpdatedProposalEvaluationTypeProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  const proposalEvaluationTypeProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalEvaluationType') ?? {
-      ...proposalDbProperties.proposalEvaluationType(),
-      id: uuid()
-    })
-  };
-
-  if (proposalEvaluationTypeProp) {
-    objectUtils.typedKeys(PROPOSAL_STEP_LABELS).forEach((evaluationType) => {
-      const existingOption = proposalEvaluationTypeProp.options.find((opt) => opt.value === evaluationType);
-      if (!existingOption) {
-        proposalEvaluationTypeProp.options.push({
-          color: 'propColorGray',
-          id: evaluationType,
-          value: evaluationType
-        });
-      }
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluatedBy',
+      name: rubricStepTitle
     });
-
-    return proposalEvaluationTypeProp;
-  }
-
-  return proposalEvaluationTypeProp;
-}
-
-function generateUpdatedProposalStatusProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalStatus') ?? {
-      ...proposalDbProperties.proposalStatus(),
-      id: uuid()
-    })
-  };
-
-  if (proposalStatusProp) {
-    [...objectUtils.typedKeys(EVALUATION_STATUS_LABELS)].forEach((status) => {
-      const existingOption = proposalStatusProp.options.find((opt) => opt.value === status);
-      if (!existingOption) {
-        proposalStatusProp.options.push({
-          color: proposalStatusColors[status],
-          id: status,
-          value: status
-        });
-      }
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationTotal',
+      name: rubricStepTitle
     });
-
-    return proposalStatusProp;
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationAverage',
+      name: rubricStepTitle
+    });
   }
-
-  return proposalStatusProp;
 }
 
-function generateUpdatedProposalUrlProperty({ boardProperties }: { boardProperties: IPropertyTemplate[] }) {
-  // We will mutate and return this property
-  const proposalStatusProp = {
-    ...(boardProperties.find((p) => p.type === 'proposalUrl') ?? {
-      ...proposalDbProperties.proposalUrl(),
-      id: uuid()
-    })
-  };
+type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
 
-  return proposalStatusProp;
+function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: PartialPropertyTemplate) {
+  const existingProp = boardProperties.find((p) => p.id === fieldProperty.id);
+  if (!existingProp) {
+    boardProperties.push({
+      ...defaultOptions,
+      ...fieldProperty
+    });
+  } else {
+    Object.assign(existingProp, defaultOptions, fieldProperty);
+  }
+}
+
+function applyToPropertiesByType(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: PartialPropertyTemplate
+) {
+  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type);
+  if (!existingProp) {
+    boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
+  } else {
+    Object.assign(existingProp, defaultOptions, fieldProperty);
+  }
+}
+
+function applyToPropertiesByTypeAndName(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: PartialPropertyTemplate
+) {
+  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type && p.name === fieldProperty.name);
+  if (!existingProp) {
+    boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
+  } else {
+    Object.assign(existingProp, defaultOptions, fieldProperty);
+  }
+}
+
+function applyFormFieldToProperties(
+  boardProperties: IPropertyTemplate[],
+  { id, ...fieldProperty }: PartialPropertyTemplate
+) {
+  const existingProp = boardProperties.find((p) => p.formFieldId === fieldProperty.formFieldId);
+  if (!existingProp) {
+    boardProperties.push({
+      id,
+      ...defaultOptions,
+      ...fieldProperty
+    });
+  } else {
+    Object.assign(existingProp, defaultOptions, fieldProperty);
+  }
+}
+
+export function getPropertyName(property: IPropertyTemplate) {
+  return property.type === 'proposalEvaluatedBy'
+    ? `${property.name} (Evaluation reviewers)`
+    : property.type === 'proposalEvaluationAverage'
+    ? `${property.name} (Evaluation average)`
+    : property.type === 'proposalEvaluationTotal'
+    ? `${property.name} (Evaluation total)`
+    : undefined;
 }
