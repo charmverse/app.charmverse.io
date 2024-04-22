@@ -16,7 +16,11 @@ const mapSynapsStatus = {
 };
 
 export function SynapsModal({ spaceId }: { spaceId: string }) {
-  const { data: synapsUserKyc, isLoading: isSynapsUserKycLoading } = useGetSynapsSession(spaceId);
+  const {
+    data: synapsUserKyc,
+    isLoading: isSynapsUserKycLoading,
+    mutate: mutateSynapsUserKyc
+  } = useGetSynapsSession(spaceId);
   const {
     trigger: initSession,
     data: synapsSession,
@@ -58,9 +62,11 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
         service: 'individual',
         mode: 'modal',
         onFinish: () => {
+          mutateSynapsUserKyc();
           reset();
         },
         onClose: () => {
+          mutateSynapsUserKyc();
           reset();
         }
       });
