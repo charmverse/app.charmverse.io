@@ -1,7 +1,6 @@
 import { Box, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
-import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { Button } from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
@@ -10,29 +9,25 @@ import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
-export function ProposalLensSocialShare({
-  proposalLink,
-  proposalTitle,
-  proposalId,
+export function LensSocialShare({
   lensPostLink,
-  canPublishToLens
+  canPublishToLens,
+  onPublish,
+  link,
+  content
 }: {
   canPublishToLens: boolean;
-  proposalTitle: string;
-  proposalLink: string;
-  proposalId: string;
+  onPublish: VoidFunction;
+  link: string;
+  content: PageContent;
   lensPostLink?: string | null;
 }) {
   const { lensProfile } = useLensProfile();
   const [isPublishToLensModalOpen, setIsPublishToLensModalOpen] = useState(false);
-  const { space } = useCurrentSpace();
-  const { refreshProposal } = useProposal({
-    proposalId
-  });
 
   const { createLensPublication, isPublishingToLens } = useCreateLensPublication({
     publicationType: 'post',
@@ -40,58 +35,15 @@ export function ProposalLensSocialShare({
       setIsPublishToLensModalOpen(false);
     },
     onSuccess: () => {
-      refreshProposal();
+      onPublish();
       setIsPublishToLensModalOpen(false);
     },
-    proposalId,
-    proposalLink
+    proposalId: '',
+    proposalLink: link
   });
 
   const [lensContent, setLensContent] = useState<ICharmEditorOutput>({
-    doc: {
-      type: 'doc',
-      content: [
-        {
-          type: 'paragraph',
-          content: [
-            {
-              type: 'text',
-              marks: [
-                {
-                  type: 'bold'
-                }
-              ],
-              text: `Proposal: `
-            },
-            {
-              type: 'text',
-              text: `${proposalTitle || 'Untitled'} from ${space?.name} is now open for feedback.`
-            }
-          ]
-        },
-        {
-          type: 'paragraph',
-          content: [
-            {
-              type: 'text',
-              text: `View on CharmVerse `
-            },
-            {
-              type: 'text',
-              marks: [
-                {
-                  type: 'link',
-                  attrs: {
-                    href: proposalLink
-                  }
-                }
-              ],
-              text: proposalLink
-            }
-          ]
-        }
-      ]
-    },
+    doc: content,
     rawText: ''
   });
 

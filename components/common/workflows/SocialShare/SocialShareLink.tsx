@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 import { BsTwitterX } from 'react-icons/bs';
 
 import Link from 'components/common/Link';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { capitalize } from 'lib/utils/strings';
 
 type ShareSite = 'x' | 'telegram' | 'warpcast';
@@ -16,27 +15,15 @@ const siteIconsRecord: Record<ShareSite, ReactNode> = {
   telegram: <TelegramIcon fontSize='small' sx={{ fill: 'white' }} />
 };
 
-export function ProposalSocialShareLink({
-  proposalTitle,
-  proposalLink,
-  site
-}: {
-  proposalTitle: string;
-  proposalLink: string;
-  site: ShareSite;
-}) {
-  const { space } = useCurrentSpace();
-  const linkText = `${proposalTitle || 'Untitled'} from ${
-    space?.name
-  } is now open for feedback.\nView on CharmVerse:\n`;
-  const urlEncodedText = encodeURIComponent(linkText);
+export function SocialShareLink({ text, link, site }: { text: string; link: string; site: ShareSite }) {
+  const urlEncodedText = encodeURIComponent(text);
 
   const shareLink =
     site === 'x'
-      ? `https://twitter.com/intent/tweet?text=${urlEncodedText}&url=${encodeURIComponent(proposalLink)}`
+      ? `https://twitter.com/intent/tweet?text=${urlEncodedText}&url=${encodeURIComponent(link)}`
       : site === 'warpcast'
-      ? `https://warpcast.com/~/compose?text=${urlEncodedText}&embeds%5B%5D=${encodeURIComponent(proposalLink)}`
-      : `https://t.me/share/url?text=${urlEncodedText}&url=${encodeURIComponent(proposalLink)}`;
+      ? `https://warpcast.com/~/compose?text=${urlEncodedText}&embeds%5B%5D=${encodeURIComponent(link)}`
+      : `https://t.me/share/url?text=${urlEncodedText}&url=${encodeURIComponent(link)}`;
 
   return (
     <Tooltip title={`Share on ${capitalize(site)}`}>

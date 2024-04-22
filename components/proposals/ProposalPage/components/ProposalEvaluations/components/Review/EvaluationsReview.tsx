@@ -5,12 +5,14 @@ import { useEffect, useState } from 'react';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
+import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
@@ -24,7 +26,6 @@ import { PassFailEvaluation } from './components/PassFailEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { PublishRewardsButton } from './components/PublishRewardsButton';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
-import { ProposalSocialShareLinks } from './components/SocialShare/ProposalSocialShareLinks';
 import { VoteEvaluation } from './components/VoteEvaluation/VoteEvaluation';
 
 export type Props = {
@@ -77,6 +78,7 @@ export function EvaluationsReview({
   const { hasPendingOnchainCredentials, refreshIssuableCredentials } = useProposalCredentials({
     proposalId: proposal?.id
   });
+
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
@@ -90,6 +92,11 @@ export function EvaluationsReview({
   const isCredentialsActive =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
 
+  const shareLink = `https://app.charmverse.io/${currentSpace?.domain}/${pagePath}`;
+  const shareText = `${pageTitle || 'Untitled'} from ${
+    currentSpace?.name
+  } is now open for feedback.\nView on CharmVerse:\n`;
+  const { user } = useUser();
   const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass' && !!isCredentialsComplete;
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
@@ -282,12 +289,56 @@ export function EvaluationsReview({
       {pagePath && pageTitle && proposal && expandedContainer && (
         <>
           <Divider />
-          <ProposalSocialShareLinks
+          <SocialShareLinksStep
             lensPostLink={proposal.lensPostLink}
-            proposalId={proposal.id}
-            proposalPath={pagePath}
-            proposalTitle={pageTitle}
-            proposalAuthors={proposal.authors.map((a) => a.userId)}
+            onPublish={refreshProposal}
+            text={shareText}
+            content={{
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      marks: [
+                        {
+                          type: 'bold'
+                        }
+                      ],
+                      text: `Proposal: `
+                    },
+                    {
+                      type: 'text',
+                      text: shareText
+                    }
+                  ]
+                },
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      text: `View on CharmVerse `
+                    },
+                    {
+                      type: 'text',
+                      marks: [
+                        {
+                          type: 'link',
+                          attrs: {
+                            href: `https://app.charmverse.io/${currentSpace?.domain}/${pagePath}`
+                          }
+                        }
+                      ],
+                      text: shareLink
+                    }
+                  ]
+                }
+              ]
+            }}
+            link={shareLink}
+            readOnly={!user || !proposal.authors.map((a) => a.userId).includes(user.id)}
           />
         </>
       )}

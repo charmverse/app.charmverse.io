@@ -6,54 +6,53 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import { ProposalLensSocialShare } from './ProposalLensSocialShare';
-import { ProposalSocialShareLink } from './ProposalSocialShareLink';
+import { LensSocialShare } from './LensSocialShare';
+import { SocialShareLink } from './SocialShareLink';
 
-export function ProposalSocialShareLinks({
-  proposalId,
-  proposalPath,
-  proposalTitle,
+export function SocialShareLinksStep({
+  onPublish,
   lensPostLink,
-  proposalAuthors
+  link,
+  text,
+  readOnly,
+  content
 }: {
-  proposalAuthors: string[];
-  proposalId: string;
-  proposalPath: string;
-  proposalTitle: string;
+  readOnly?: boolean;
+  onPublish: VoidFunction;
+  link: string;
+  text: string;
   lensPostLink?: string | null;
+  content: PageContent;
 }) {
   const isAdmin = useIsAdmin();
-  const { user } = useUser();
-  const isProposalAuthor = user ? proposalAuthors.includes(user.id) : false;
   const { showMessage } = useSnackbar();
-  const { space } = useCurrentSpace();
   const [, copyFn] = useCopyToClipboard();
-  const proposalLink = `https://app.charmverse.io/${space?.domain}/${proposalPath}`;
 
   function copyProposalLink() {
-    copyFn(proposalLink).then(() => {
+    copyFn(link).then(() => {
       showMessage('Copied proposal link');
     });
   }
 
-  const isDisabled = !(isAdmin || isProposalAuthor);
+  const isDisabled = !isAdmin || readOnly;
 
   return (
     <Stack gap={1} flexDirection='row' alignItems='center' p={1}>
       <Typography variant='h6' mr={1}>
         Share
       </Typography>
-      <ProposalSocialShareLink site='x' proposalTitle={proposalTitle} proposalLink={proposalLink} />
-      <ProposalSocialShareLink site='warpcast' proposalTitle={proposalTitle} proposalLink={proposalLink} />
-      <ProposalLensSocialShare
+      <SocialShareLink site='x' link={link} text={text} />
+      <SocialShareLink site='warpcast' link={link} text={text} />
+      <LensSocialShare
+        onPublish={onPublish}
         lensPostLink={lensPostLink}
-        proposalId={proposalId}
-        proposalLink={proposalLink}
-        proposalTitle={proposalTitle}
+        content={content}
+        link={link}
         canPublishToLens={!isDisabled}
       />
-      <ProposalSocialShareLink site='telegram' proposalTitle={proposalTitle} proposalLink={proposalLink} />
+      <SocialShareLink site='telegram' link={link} text={text} />
       <Tooltip title='Copy proposal link'>
         <IconButton
           sx={{
