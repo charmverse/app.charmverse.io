@@ -129,9 +129,9 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
 export const projectFieldProperties: ProjectFieldProperty[] = [
   {
     field: 'name',
-    label: 'Project',
+    label: 'Project Name',
     alwaysRequired: true,
-    columnTitle: 'Project Name',
+    columnTitle: 'Project',
     columnPropertyId: PROJECT_NAME_ID
   },
   {
