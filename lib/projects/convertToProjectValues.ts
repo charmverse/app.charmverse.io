@@ -13,6 +13,7 @@ export function convertToProjectValues(projectWithMembers: ProjectWithMembers): 
     twitter: projectWithMembers.twitter,
     walletAddress: projectWithMembers.walletAddress,
     website: projectWithMembers.website,
+    deletedAt: projectWithMembers.deletedAt,
     projectMembers: projectWithMembers.projectMembers.map((projectMember) => {
       return {
         warpcast: projectMember.warpcast,
