@@ -156,7 +156,7 @@ export function TagSelect({
         ? selectValue.map((v) => mapValueToSelectOption(v))
         : [mapValueToSelectOption(selectValue)]
       : options.map((o) => mapPropertyOptionToSelectOption(o));
-  }, [options, selectValue]);
+  }, [displayValueAsOptions, options, selectValue]);
 
   const onUpdate = useCallback(
     (selectOption: SelectOptionType) => {

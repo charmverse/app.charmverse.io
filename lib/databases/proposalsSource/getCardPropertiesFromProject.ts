@@ -11,7 +11,11 @@ export type ProjectInformation = Project & {
 };
 
 export function getCardPropertiesFromProject(project: ProjectInformation): PropertiesMap {
-  const members = project.projectMembers.sort((a, b) => (a.teamLead ? -1 : b.createdAt > a.createdAt ? 1 : -1));
+  // sort by team lead, then by createdAt
+  const members = project.projectMembers.sort((a, b) =>
+    a.teamLead ? -1 : b.teamLead ? 1 : b.createdAt > a.createdAt ? -1 : 1
+  );
+
   return {
     [constants.PROJECT_NAME_ID]: project.name,
     [constants.PROJECT_EXCERPT_ID]: project.excerpt ?? '',

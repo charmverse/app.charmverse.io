@@ -12,6 +12,9 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label'];
 
+// define properties that will apply to all source fields
+const defaultOptions = { readOnly: true, options: [], dynamicOptions: true };
+
 // apply proposal-related properties to the board
 export function getBoardProperties({
   currentCardProperties = [],
@@ -293,12 +296,11 @@ function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProper
   const existingProp = boardProperties.find((p) => p.id === fieldProperty.id);
   if (!existingProp) {
     boardProperties.push({
-      readOnly: true,
-      options: [],
+      ...defaultOptions,
       ...fieldProperty
     });
   } else {
-    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
+    Object.assign(existingProp, defaultOptions, fieldProperty);
   }
 }
 
@@ -308,9 +310,9 @@ function applyToPropertiesByType(
 ) {
   const existingProp = boardProperties.find((p) => p.type === fieldProperty.type);
   if (!existingProp) {
-    boardProperties.push({ id, readOnly: true, options: [], ...fieldProperty });
+    boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
   } else {
-    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
+    Object.assign(existingProp, defaultOptions, fieldProperty);
   }
 }
 
@@ -320,9 +322,9 @@ function applyToPropertiesByTypeAndName(
 ) {
   const existingProp = boardProperties.find((p) => p.type === fieldProperty.type && p.name === fieldProperty.name);
   if (!existingProp) {
-    boardProperties.push({ id, readOnly: true, options: [], ...fieldProperty });
+    boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
   } else {
-    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
+    Object.assign(existingProp, defaultOptions, fieldProperty);
   }
 }
 
@@ -334,12 +336,11 @@ function applyFormFieldToProperties(
   if (!existingProp) {
     boardProperties.push({
       id,
-      readOnly: true,
-      options: [],
+      ...defaultOptions,
       ...fieldProperty
     });
   } else {
-    Object.assign(existingProp, { readOnly: true, options: [] }, fieldProperty);
+    Object.assign(existingProp, defaultOptions, fieldProperty);
   }
 }
 
