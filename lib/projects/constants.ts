@@ -5,6 +5,7 @@ import type { ProjectAndMembersPayload } from './interfaces';
 export function createDefaultProjectAndMembersPayload(): ProjectAndMembersPayload {
   return {
     name: '',
+    deletedAt: null,
     excerpt: '',
     description: '',
     twitter: '',
