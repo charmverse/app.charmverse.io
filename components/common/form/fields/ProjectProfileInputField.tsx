@@ -81,7 +81,9 @@ export function ProjectProfileInputField({
             }
             // Selected project might have stale name if it was changed, so find the correct project from the list
             const selectedProjectName =
-              projectsWithMembers?.find((_project) => _project.id === selectedProject?.id)?.name || 'Untitled';
+              projectsWithMembers?.find((_project) => _project.id === selectedProject?.id)?.name ||
+              selectedProject?.name ||
+              'Untitled';
             return selectedProjectName;
           }}
         >

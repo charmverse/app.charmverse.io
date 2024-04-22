@@ -13,6 +13,7 @@ export type ProjectPayload = Pick<
   | 'communityUrl'
   | 'otherUrl'
   | 'walletAddress'
+  | 'deletedAt'
 >;
 
 export type ProjectMemberPayload = Pick<

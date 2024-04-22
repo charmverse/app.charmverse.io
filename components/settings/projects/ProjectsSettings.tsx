@@ -63,6 +63,10 @@ function ProjectRow({
     mode: 'onChange'
   });
 
+  const removeProjectPopupState = usePopupState({
+    variant: 'popover',
+    popupId: `remove-project-${projectWithMembers.id}`
+  });
   const removeProjectMemberPopupState = usePopupState({
     variant: 'popover',
     popupId: `remove-member-${projectWithMembers.id}`
@@ -86,6 +90,27 @@ function ProjectRow({
         },
         {
           revalidate: false
+        }
+      );
+    }
+  }
+
+  async function deleteProject() {
+    if (isTeamLead) {
+      await updateProjectAndMembers(
+        { ...projectWithMembers, deletedAt: new Date() },
+        {
+          async onSuccess() {
+            await mutate(
+              (projects) => {
+                if (!projects || !projectWithMembers) {
+                  return projects;
+                }
+                return projects.filter((_project) => _project.id !== projectWithMembers.id);
+              },
+              { revalidate: false }
+            );
+          }
         }
       );
     }
@@ -190,25 +215,32 @@ function ProjectRow({
             <Typography data-test={`project-title-${projectWithMembers.id}`}>
               {projectWithMembers.name || 'Untitled'}
             </Typography>
-            {!isTeamLead && (
-              <Stack
-                flexDirection='row'
-                justifyContent='space-between'
-                alignItems='center'
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <ContextMenu iconSize='small' popupId={`menu-${projectWithMembers.id}`}>
+            <Stack
+              flexDirection='row'
+              justifyContent='space-between'
+              alignItems='center'
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+            >
+              <ContextMenu iconSize='small' popupId={`menu-${projectWithMembers.id}`}>
+                {isTeamLead ? (
+                  <MenuItem onClick={removeProjectPopupState.open}>
+                    <ListItemIcon>
+                      <DeleteOutlined fontSize='small' />
+                    </ListItemIcon>
+                    <ListItemText>Delete Project</ListItemText>
+                  </MenuItem>
+                ) : (
                   <MenuItem onClick={removeProjectMemberPopupState.open}>
                     <ListItemIcon>
                       <DeleteOutlined fontSize='small' />
                     </ListItemIcon>
                     <ListItemText>Leave project</ListItemText>
                   </MenuItem>
-                </ContextMenu>
-              </Stack>
-            )}
+                )}
+              </ContextMenu>
+            </Stack>
           </Stack>
         </AccordionSummary>
         <AccordionDetails>
@@ -247,6 +279,15 @@ function ProjectRow({
         buttonText='Leave'
         question='Are you sure you want to leave this project?'
         onConfirm={removeProjectMember}
+      />
+      <ConfirmDeleteModal
+        title='Delete project'
+        onClose={removeProjectPopupState.close}
+        open={removeProjectPopupState.isOpen}
+        buttonText='Delete'
+        loading={isMutating}
+        question='Are you sure you want to delete this project?'
+        onConfirm={deleteProject}
       />
     </>
   );

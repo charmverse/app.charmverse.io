@@ -8,6 +8,7 @@ export type ConfirmationModalProps = {
   onCancel?: () => void;
   onConfirm?: () => Promise<void>;
   message: string;
+  loading?: boolean;
   title?: string;
   confirmButton?: string;
 };
@@ -18,6 +19,7 @@ export function ConfirmationModal() {
     <ModalWithButtons
       open={props.isOpen}
       title={props.title}
+      loading={props.loading}
       onClose={props.onCancel || (() => {})}
       onConfirm={props.onConfirm || (() => {})}
       buttonText={props.confirmButton || 'Confirm'}

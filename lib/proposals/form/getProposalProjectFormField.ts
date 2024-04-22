@@ -22,7 +22,11 @@ export function getProposalProjectFormField({
 
   privateProjectFields.forEach((key) => {
     if (key in projectWithMembers) {
-      projectWithMembers[key] = '';
+      if (key === 'deletedAt') {
+        projectWithMembers[key] = null;
+      } else {
+        projectWithMembers[key] = '';
+      }
     }
   });
 

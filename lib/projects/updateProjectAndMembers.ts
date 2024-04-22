@@ -119,7 +119,8 @@ export async function updateProjectAndMembers({
         otherUrl: payload.otherUrl,
         demoUrl: payload.demoUrl,
         twitter: payload.twitter,
-        website: payload.website
+        website: payload.website,
+        deletedAt: payload.deletedAt
       }
     }),
     prisma.projectMember.deleteMany({
