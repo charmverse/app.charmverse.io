@@ -483,7 +483,7 @@ function PropertyValueElement(props: Props) {
     Array.isArray(propertyValue) &&
     !card.fields.isAssigned
   ) {
-    propertyValueElement = null;
+    propertyValueElement = <Box />;
   } else if (
     propertyTemplate.type === 'person' ||
     propertyTemplate.type === 'proposalEvaluatedBy' ||
