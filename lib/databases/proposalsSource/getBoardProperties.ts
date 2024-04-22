@@ -133,7 +133,7 @@ function applyProjectProfileProperties(
   if (getFieldConfig(fieldConfig.description).show) {
     applyToPropertiesById(boardProperties, {
       id: constants.PROJECT_DESCRIPTION_ID,
-      name: 'Project Excerpt',
+      name: 'Project Description',
       type: 'text'
     });
   }
