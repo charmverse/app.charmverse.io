@@ -28,7 +28,7 @@ export function LensSocialShare({
   lensPostLink?: string | null;
   pageId: string;
 }) {
-  const { lensProfile } = useLensProfile();
+  const { hasFarcasterProfile } = useLensProfile();
   const [isPublishToLensModalOpen, setIsPublishToLensModalOpen] = useState(false);
 
   const { createLensPublication, isPublishingToLens } = useCreateLensPublication({
@@ -53,7 +53,7 @@ export function LensSocialShare({
     borderRadius: '50%',
     width: 35,
     height: 35,
-    cursor: lensPostLink || lensProfile ? 'pointer' : 'default'
+    cursor: lensPostLink || hasFarcasterProfile ? 'pointer' : 'default'
   };
 
   return (
@@ -62,7 +62,7 @@ export function LensSocialShare({
         title={
           lensPostLink
             ? 'View on lens'
-            : lensProfile
+            : hasFarcasterProfile
             ? canPublishToLens
               ? 'Publish to Lens'
               : 'You do not have permission to publish to Lens'
@@ -84,7 +84,7 @@ export function LensSocialShare({
           ) : (
             <img
               onClick={() => {
-                if (lensProfile && canPublishToLens) {
+                if (hasFarcasterProfile && canPublishToLens) {
                   setIsPublishToLensModalOpen(true);
                 }
               }}
