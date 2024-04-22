@@ -1,5 +1,5 @@
+import * as constants from 'lib/projects/formField';
 import { getFieldConfig } from 'lib/projects/formField';
-import * as constants from 'lib/proposals/blocks/constants';
 import { getFormInput, getProfectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getBoardProperties } from '../getBoardProperties';

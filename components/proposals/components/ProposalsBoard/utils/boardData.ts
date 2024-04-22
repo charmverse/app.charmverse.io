@@ -25,6 +25,9 @@ import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 
+// define properties that will apply to all source fields
+const defaultOptions = { readOnly: true, options: [] };
+
 export function getDefaultBoard({
   storedBoard,
   customOnly = false,
@@ -63,13 +66,16 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
   return [
     getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
-    proposalDbProperties.proposalAuthor({ name: 'Author' }),
-    proposalDbProperties.proposalReviewer(),
-    proposalDbProperties.proposalCreatedAt(),
     {
+      ...defaultOptions,
+      ...proposalDbProperties.proposalAuthor({ name: 'Author' })
+    },
+    { ...defaultOptions, ...proposalDbProperties.proposalReviewer() },
+    { ...defaultOptions, ...proposalDbProperties.proposalCreatedAt() },
+    {
+      ...defaultOptions,
       id: `__createdTime`, // these properties are always re-generated so use a static id
       name: 'Last updated time',
-      options: [],
       type: 'updatedTime'
     }
   ];
@@ -77,6 +83,7 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
 
 export function getDefaultStatusProperty() {
   return {
+    ...defaultOptions,
     ...proposalDbProperties.proposalStatus({ name: 'Status' }),
     options: proposalStatuses.map((s) => ({
       id: s,
@@ -88,6 +95,7 @@ export function getDefaultStatusProperty() {
 
 export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
+    ...defaultOptions,
     ...proposalDbProperties.proposalStep({
       name: 'Step',
       options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials']

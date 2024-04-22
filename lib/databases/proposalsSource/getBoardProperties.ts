@@ -4,16 +4,15 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
-import { getFieldConfig } from 'lib/projects/formField';
+import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import * as constants from 'lib/proposals/blocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label'];
 
 // define properties that will apply to all source fields
-const defaultOptions = { readOnly: true, options: [], dynamicOptions: true };
+const defaultOptions = { readOnly: true, readOnlyValues: true, options: [], dynamicOptions: true };
 
 // apply proposal-related properties to the board
 export function getBoardProperties({
@@ -108,6 +107,7 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         type: boardPropertyType,
         formFieldId: formField.id,
         readOnly: true,
+        readOnlyValues: true,
         private: formField.private
       };
 
@@ -121,153 +121,24 @@ function applyProjectProfileProperties(
   boardProperties: IPropertyTemplate[],
   fieldConfig: ProjectAndMembersFieldConfig
 ) {
-  applyToPropertiesById(boardProperties, {
-    id: constants.PROJECT_NAME_ID,
-    name: 'Project',
-    type: 'text'
+  projectFieldProperties.forEach((field) => {
+    if (getFieldConfig(fieldConfig[field.columnPropertyId]).show) {
+      applyToPropertiesById(boardProperties, {
+        id: field.columnPropertyId,
+        name: field.columnTitle,
+        type: 'text'
+      });
+    }
   });
-  if (getFieldConfig(fieldConfig.excerpt).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_EXCERPT_ID,
-      name: 'Project Excerpt',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.description).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_DESCRIPTION_ID,
-      name: 'Project Description',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.twitter).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_TWITTER_ID,
-      name: 'Project X Account',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.website).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_WEBSITE_ID,
-      name: 'Project Website',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.github).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_GITHUB_ID,
-      name: 'Project Github',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.blog).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_BLOG_ID,
-      name: 'Project Blog',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.demoUrl).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_DEMO_URL_ID,
-      name: 'Project Demo',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.communityUrl).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_COMMUNITY_URL_ID,
-      name: 'Project Community',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.otherUrl).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_OTHER_URL_ID,
-      name: 'Project Other Url',
-      type: 'text'
-    });
-  }
-  if (getFieldConfig(fieldConfig.walletAddress).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_WALLET_ID,
-      name: 'Project Wallet',
-      private: getFieldConfig(fieldConfig.walletAddress).private,
-      type: 'text'
-    });
-  }
-  // member properties
-  applyToPropertiesById(boardProperties, {
-    id: constants.PROJECT_MEMBER_NAMES_ID,
-    name: 'Project Members',
-    type: 'multiSelect'
+  projectMemberFieldProperties.forEach((field) => {
+    if (getFieldConfig(fieldConfig[field.columnPropertyId]).show) {
+      applyToPropertiesById(boardProperties, {
+        id: field.columnPropertyId,
+        name: field.columnTitle,
+        type: 'multiSelect'
+      });
+    }
   });
-  if (getFieldConfig(fieldConfig.projectMember.walletAddress).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_WALLETS_ID,
-      name: 'Project Member Wallets',
-      private: getFieldConfig(fieldConfig.projectMember.walletAddress).private,
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.email).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_EMAILS_ID,
-      name: 'Project Member Emails',
-      private: getFieldConfig(fieldConfig.projectMember.email).private,
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.twitter).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_TWITTERS_ID,
-      name: 'Project Member X Accounts',
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.warpcast).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_WARPCASTS_ID,
-      name: 'Project Member Warpcast',
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.github).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_GITHUBS_ID,
-      name: 'Project Member Github',
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.linkedin).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_LINKEDINS_ID,
-      name: 'Project Member LinkedIn',
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.telegram).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_TELEGRAMS_ID,
-      name: 'Project Member Telegram',
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.otherUrl).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_OTHER_URLS_ID,
-      name: 'Project Member URLs',
-      type: 'multiSelect'
-    });
-  }
-  if (getFieldConfig(fieldConfig.projectMember.previousProjects).show) {
-    applyToPropertiesById(boardProperties, {
-      id: constants.PROJECT_MEMBER_PREVIOUS_PROJECTS_ID,
-      name: 'Project Member Previous Projects',
-      type: 'multiSelect'
-    });
-  }
 }
 
 function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {

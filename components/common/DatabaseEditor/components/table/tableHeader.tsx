@@ -161,7 +161,6 @@ function TableHeader(props: Props): JSX.Element {
   }
 
   const isDisabled = !!template.readOnly;
-
   const popupContent = (
     <Stack>
       <MenuList>
