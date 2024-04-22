@@ -43,7 +43,7 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           color='secondary'
           size='small'
           variant='outlined'
-          label={`Status: ${personaUserKyc.status ? mapPersonaStatus[personaUserKyc.status] : 'Unknown'}`}
+          label={`Status: ${mapPersonaStatus[personaUserKyc.status] || 'Unknown'}`}
         />
       ) : (
         <Chip

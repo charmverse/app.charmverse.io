@@ -85,7 +85,7 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
           color='secondary'
           size='small'
           variant='outlined'
-          label={`Status: ${synapsUserKyc.status ? mapSynapsStatus[synapsUserKyc.status] : 'Unknown'}`}
+          label={`Status: ${mapSynapsStatus[synapsUserKyc.status] || 'Unknown'}`}
         />
       ) : (
         <Chip
