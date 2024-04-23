@@ -60,7 +60,9 @@ export function EvaluationsReview({
     };
   }, [workflow, application]);
 
-  const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);
+  const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
+    application ? currentEvaluation?.id : undefined
+  );
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
