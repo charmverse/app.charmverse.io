@@ -7,6 +7,7 @@ import type {
   Bounty,
   BountyStatus,
   Comment,
+  PageComment,
   Page,
   Post,
   PostComment,
@@ -22,6 +23,7 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { AnyIfEmpty } from 'react-redux';
 import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/databases/board';
@@ -403,41 +405,6 @@ export async function generateComment({
     }
   });
   return thread.comments?.[0];
-}
-
-export async function generateThread(props: {
-  thread: Partial<Thread> & { comments: Partial<Comment>[] };
-}): Promise<{ comments: Comment[] }> {
-  const { thread } = props;
-  const { pageId = v4(), spaceId = v4(), userId = v4(), context = '', resolved = false, comments } = thread;
-
-  const createdThread = await prisma.thread.create({
-    data: {
-      context,
-      pageId,
-      spaceId,
-      userId,
-      resolved,
-      comments: {
-        createMany: {
-          data: comments
-            .filter((item): item is Comment => !!item && !!item.content)
-            .map((item) => ({
-              ...item,
-              content: item.content ?? '',
-              userId: item.userId,
-              pageId: item.pageId,
-              spaceId: item.spaceId
-            }))
-        }
-      }
-    },
-    select: {
-      comments: true
-    }
-  });
-
-  return createdThread;
 }
 
 export function generateTransaction({
@@ -1114,22 +1081,13 @@ export async function createPost(
   return forumPost;
 }
 
-export async function generateApplicationComment({
-  userId,
-  applicationId,
-  bountyId
-}: {
-  bountyId: string;
-  applicationId: string;
-  userId: string;
-}) {
+export async function generatePageComment({ createdBy, pageId }: { createdBy: string; pageId: string }) {
   return prisma.pageComment.create({
     data: {
       content: emptyDocument,
       contentText: '',
-      createdBy: userId,
-      parentId: applicationId,
-      pageId: bountyId
+      createdBy,
+      pageId
     }
   });
 }
