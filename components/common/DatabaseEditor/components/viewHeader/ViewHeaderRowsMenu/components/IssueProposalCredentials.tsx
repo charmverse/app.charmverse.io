@@ -29,7 +29,7 @@ export function IssueProposalCredentials({
 
   const { space } = useCurrentSpace();
 
-  const proposalLabel = getFeatureTitle('Proposal');
+  const proposalLabel = getFeatureTitle('proposal');
 
   const {
     issuableProposalCredentials,
