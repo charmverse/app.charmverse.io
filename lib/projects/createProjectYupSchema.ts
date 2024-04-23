@@ -3,8 +3,8 @@ import * as yup from 'yup';
 
 import { isValidEmail } from 'lib/utils/strings';
 
-import { projectFieldProperties, projectMemberFieldProperties } from './constants';
-import type { ProjectField, ProjectMemberField, ProjectAndMembersFieldConfig } from './interfaces';
+import { projectFieldProperties, projectMemberFieldProperties } from './formField';
+import type { ProjectField, ProjectMemberField, ProjectAndMembersFieldConfig } from './formField';
 
 function addMatchersToSchema({
   fieldType,

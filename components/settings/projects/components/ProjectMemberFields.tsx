@@ -1,5 +1,5 @@
-import { projectMemberFieldProperties } from 'lib/projects/constants';
-import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
+import { projectMemberFieldProperties } from 'lib/projects/formField';
+import type { FieldConfig, ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
 import { FieldAnswers } from './FormFields/FieldAnswers';
 import { FieldsEditor } from './FormFields/FieldsEditor';

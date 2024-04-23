@@ -25,6 +25,9 @@ import type { ProposalEvaluationStatus } from 'lib/proposals/interfaces';
 
 const proposalStatuses = Object.keys(EVALUATION_STATUS_LABELS) as ProposalEvaluationStatus[];
 
+// define properties that will apply to all source fields
+const defaultOptions = { readOnly: true, options: [] };
+
 export function getDefaultBoard({
   storedBoard,
   customOnly = false,
@@ -63,13 +66,16 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
   return [
     getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
-    proposalDbProperties.proposalAuthor(AUTHORS_BLOCK_ID, 'Author'),
-    proposalDbProperties.proposalReviewer(PROPOSAL_REVIEWERS_BLOCK_ID, 'Reviewers'),
-    proposalDbProperties.proposalCreatedAt(CREATED_AT_ID),
     {
+      ...defaultOptions,
+      ...proposalDbProperties.proposalAuthor({ name: 'Author' })
+    },
+    { ...defaultOptions, ...proposalDbProperties.proposalReviewer() },
+    { ...defaultOptions, ...proposalDbProperties.proposalCreatedAt() },
+    {
+      ...defaultOptions,
       id: `__createdTime`, // these properties are always re-generated so use a static id
       name: 'Last updated time',
-      options: [],
       type: 'updatedTime'
     }
   ];
@@ -77,7 +83,8 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
 
 export function getDefaultStatusProperty() {
   return {
-    ...proposalDbProperties.proposalStatus(PROPOSAL_STATUS_BLOCK_ID, 'Status'),
+    ...defaultOptions,
+    ...proposalDbProperties.proposalStatus({ name: 'Status' }),
     options: proposalStatuses.map((s) => ({
       id: s,
       value: s,
@@ -88,12 +95,11 @@ export function getDefaultStatusProperty() {
 
 export function getDefaultStepProperty({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
   return {
-    ...proposalDbProperties.proposalStep(PROPOSAL_STEP_BLOCK_ID, 'Step'),
-    options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'].map((title) => ({
-      id: title,
-      value: title,
-      color: 'propColorGray'
-    }))
+    ...defaultOptions,
+    ...proposalDbProperties.proposalStep({
+      name: 'Step',
+      options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials']
+    })
   };
 }
 

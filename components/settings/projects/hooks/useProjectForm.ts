@@ -8,8 +8,9 @@ import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getDefaultProjectValues } from 'lib/projects/getDefaultProjectValues';
-import type { ProjectAndMembersFieldConfig, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function useProjectForm(options: {
   fieldConfig: ProjectAndMembersFieldConfig;

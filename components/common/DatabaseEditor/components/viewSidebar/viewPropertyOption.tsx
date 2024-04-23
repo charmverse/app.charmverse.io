@@ -7,17 +7,15 @@ import { Divider, MenuItem, Typography, Stack, TextField } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo, useState } from 'react';
 
-import { proposalPropertyTypesList, type Board, type IPropertyTemplate } from 'lib/databases/board';
+import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import { getPropertyName } from 'lib/databases/getPropertyName';
-import { defaultRewardPropertyIds } from 'lib/rewards/blocks/constants';
 
 import mutator from '../../mutator';
 import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
 import { RelationPropertyEditOptions } from '../properties/relation/RelationPropertyMenu/RelationPropertyOptions';
-import { DEFAULT_BLOCK_IDS } from '../table/tableHeader';
 
 const StyledMenuItem = styled(MenuItem)`
   padding-left: ${({ theme }) => theme.spacing(1)};
@@ -53,12 +51,7 @@ function ViewPropertyOption({
   const isVisible = visiblePropertyIdsWithTitle.includes(property.id);
   const showRelationPropertyDeletePopup = usePopupState({ variant: 'popover', popupId: 'delete-relation-property' });
 
-  const disabled =
-    proposalPropertyTypesList.includes(property.type as any) ||
-    DEFAULT_BLOCK_IDS.includes(property.id) ||
-    defaultRewardPropertyIds.includes(property.id) ||
-    !!property.formFieldId ||
-    !!property.proposalFieldId;
+  const disabled = !!property.readOnly;
 
   const toggleVisibility = () => {
     let newVisiblePropertyIds = [];

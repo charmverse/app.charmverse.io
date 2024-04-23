@@ -29,7 +29,7 @@ export async function createRewardFromIssue({
     };
   }
 
-  const issueState = message.issue.state;
+  const issueState = message.issue?.state;
 
   if (issueState !== 'open') {
     return {

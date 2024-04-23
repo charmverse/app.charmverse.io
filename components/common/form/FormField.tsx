@@ -23,8 +23,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/constants';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/interfaces';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utils/react';

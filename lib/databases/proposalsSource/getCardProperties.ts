@@ -24,6 +24,8 @@ import type { CardPropertyValue } from '../card';
 
 import type { FormAnswerData } from './getCardPropertiesFromForm';
 import { getCardPropertiesFromForm } from './getCardPropertiesFromForm';
+import type { ProjectInformation } from './getCardPropertiesFromProject';
+import { getCardPropertiesFromProject } from './getCardPropertiesFromProject';
 import { getCardPropertiesFromRubric } from './getCardPropertiesFromRubric';
 
 export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
@@ -54,6 +56,11 @@ const pageSelectObject = {
         select: {
           fieldId: true,
           value: true
+        }
+      },
+      project: {
+        include: {
+          projectMembers: true
         }
       },
       status: true,
@@ -139,22 +146,6 @@ export async function getCardPropertiesFromProposal({
   if (!proposal) {
     throw new Error('Proposal not found');
   }
-  const formFields = proposal.formId
-    ? await prisma.formField.findMany({
-        where: {
-          formId: proposal.formId
-        },
-        select: {
-          formId: true,
-          id: true,
-          type: true,
-          private: true
-        },
-        orderBy: {
-          index: 'asc'
-        }
-      })
-    : [];
 
   return {
     boardBlock,
@@ -180,8 +171,9 @@ type ProposalData = {
       rubricCriteria: ProposalRubricCriteria[];
     })[];
     formAnswers: FormAnswerData[];
-    rewards: { id: string }[];
     issuedCredentials: IssuedCredential[];
+    rewards: { id: string }[];
+    project: ProjectInformation | null;
   };
   cardProperties: IPropertyTemplate[];
   space: IssuableProposalCredentialSpace;
@@ -257,6 +249,10 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     cardProperties,
     formAnswers: proposal.formAnswers
   });
+
+  if (proposal.project) {
+    Object.assign(properties, getCardPropertiesFromProject(proposal.project));
+  }
 
   return {
     title: page.title,

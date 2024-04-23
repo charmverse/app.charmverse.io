@@ -17,6 +17,9 @@ import {
   REWARD_PROPOSAL_LINK
 } from 'lib/rewards/blocks/constants';
 
+// define properties that will apply to all source fields
+const defaultOptions = { readOnly: true, options: [] };
+
 const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (typeof Constants)['menuColors'] }[] = [
   { id: 'open', value: 'Open', color: 'propColorTeal' },
   { id: 'complete', value: 'Approved', color: 'propColorBlue' },
@@ -25,75 +28,77 @@ const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (type
 
 const rewardDbProperties = {
   rewardStatus: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_STATUS_BLOCK_ID,
     name: 'Status',
     options: rewardStatusOptions,
     type: 'select'
   }),
   rewardApplicants: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARDS_APPLICANTS_BLOCK_ID,
     name: 'Applicant',
-    options: [],
     type: 'person'
   }),
   rewardReviewers: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_REVIEWERS_BLOCK_ID,
     name: 'Reviewers',
-    options: [],
     type: 'person'
   }),
   rewardAvailableCount: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARDS_AVAILABLE_BLOCK_ID,
     name: 'Available',
-    options: [],
     type: 'number'
   }),
   rewardDueDate: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: DUE_DATE_ID,
     name: 'Due Date',
-    options: [],
     type: 'date'
   }),
   rewardCreatedAt: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: CREATED_AT_ID,
     name: 'Created Time',
-    options: [],
     type: 'createdTime'
   }),
   rewardAmount: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_AMOUNT,
     name: 'Token amount',
-    options: [],
     type: 'tokenAmount'
   }),
   rewardChain: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_CHAIN,
     name: 'Token chain',
     options: [], // use an external list that can be maintained separately
     type: 'tokenChain'
   }),
   rewardCustomValue: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_CUSTOM_VALUE,
     name: 'Custom reward',
-    options: [],
     type: 'text'
   }),
   rewardToken: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_TOKEN,
     name: 'Reward token',
-    options: [],
     type: 'text'
   }),
   rewardApplicantsNumber: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_APPLICANTS_COUNT,
     name: 'No. of Applicants',
-    options: [],
     type: 'number'
   }),
   rewardProposalLink: (): IPropertyTemplate => ({
+    ...defaultOptions,
     id: REWARD_PROPOSAL_LINK,
     name: 'Proposal',
-    options: [],
     type: 'proposalUrl'
   })
 };

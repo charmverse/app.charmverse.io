@@ -25,11 +25,9 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import Legend from 'components/settings/Legend';
 import { useUser } from 'hooks/useUser';
-import {
-  createDefaultProjectAndMembersFieldConfig,
-  createDefaultProjectAndMembersPayload
-} from 'lib/projects/constants';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProjectYupSchema } from 'lib/projects/createProjectYupSchema';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { UpdateProjectMemberPayload } from 'lib/projects/updateProjectMember';
 
