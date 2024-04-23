@@ -23,6 +23,7 @@ export function createMockPage(input: MockPageInput = {}): MockPageOutput {
     fontSizeSmall: null,
     galleryImage: null,
     hasContent: false,
+    lensPostLink: null,
     updatedAt: new Date(),
     sourceTemplateId: null,
     updatedBy: '',
