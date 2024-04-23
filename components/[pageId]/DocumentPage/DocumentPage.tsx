@@ -386,6 +386,7 @@ function DocumentPageComponent({
             )}
             {currentTab === 1 && (
               <ProposalEvaluations
+                pageLensPostLink={page.lensPostLink}
                 pagePath={page.path}
                 pageTitle={page.title}
                 pageId={page.id}

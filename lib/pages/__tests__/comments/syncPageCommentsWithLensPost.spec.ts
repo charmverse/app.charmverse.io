@@ -7,7 +7,6 @@ import { lensClient } from 'lib/lens/lensClient';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { syncPageCommentsWithLensPost } from 'lib/pages/comments/syncPageCommentsWithLensPost';
 import { updatePageComment } from 'lib/pages/comments/updatePageComment';
-import { updateProposalLensProperties } from 'lib/proposals/updateProposalLensProperties';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 jest.mock('lib/lens/lensClient', () => ({
@@ -171,9 +170,13 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    await updateProposalLensProperties({
-      proposalId: space1ProposalPage.id,
-      lensPostLink: lensPost1Id
+    await prisma.page.update({
+      where: {
+        id: space1ProposalPage.page.id
+      },
+      data: {
+        lensPostLink: lensPost1Id
+      }
     });
 
     // This comment already exist in charmverse so we should not create it again
@@ -238,9 +241,13 @@ describe('syncPageCommentsWithLensPost', () => {
       userId: user.id
     });
 
-    await updateProposalLensProperties({
-      proposalId: space2ProposalPage.id,
-      lensPostLink: lensPost2Id
+    await prisma.page.update({
+      where: {
+        id: space2ProposalPage.page.id
+      },
+      data: {
+        lensPostLink: lensPost2Id
+      }
     });
 
     const pageComments = await syncPageCommentsWithLensPost({

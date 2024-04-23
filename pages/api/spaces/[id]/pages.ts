@@ -74,6 +74,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       galleryImage: true,
       syncWithPageId: true,
       sourceTemplateId: true,
+      lensPostLink: true,
       parent: {
         select: {
           type: true

@@ -31,17 +31,14 @@ async function syncProposalCommentsHandler(req: NextApiRequest, res: NextApiResp
       id: pageId
     },
     select: {
+      type: true,
       spaceId: true,
-      proposal: {
-        select: {
-          lensPostLink: true
-        }
-      }
+      lensPostLink: true
     }
   });
 
-  const lensPostLink = page?.proposal?.lensPostLink;
-  if (!lensPostLink) {
+  const lensPostLink = page?.lensPostLink;
+  if (!lensPostLink || page.type !== 'proposal') {
     throw new Error("Proposal not found or it hasn't been posted in Lens yet");
   }
 

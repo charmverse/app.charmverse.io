@@ -23,6 +23,7 @@ export type ProposalEvaluationsProps = {
   isStructuredProposal: boolean;
   expanded?: boolean;
   refreshPage?: VoidFunction;
+  pageLensPostLink?: string | null;
 };
 
 // display evaluation steps or their settings, depending if a proposal is published or not
@@ -43,6 +44,7 @@ export function ProposalEvaluations({
   isProposalTemplate,
   isStructuredProposal,
   expanded = true,
+  pageLensPostLink,
   refreshPage
 }: ProposalEvaluationsProps) {
   const isAdmin = useIsAdmin();
@@ -71,6 +73,7 @@ export function ProposalEvaluations({
         pageTitle={pageTitle}
         pageId={pageId}
         proposal={proposal}
+        pageLensPostLink={pageLensPostLink}
         onChangeEvaluation={onChangeEvaluation}
         readOnlyCredentialTemplates={!isAdmin}
         onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}

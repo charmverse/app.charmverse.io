@@ -24,6 +24,7 @@ export function pageMetaSelect(): Record<keyof PageMeta, true> {
     updatedAt: true,
     updatedBy: true,
     type: true,
+    lensPostLink: true,
     sourceTemplateId: true
   };
 }

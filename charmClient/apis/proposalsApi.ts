@@ -1,11 +1,8 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
-
 import * as http from 'adapters/http';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
-import type { UpdateProposalLensPropertiesRequest } from 'lib/proposals/updateProposalLensProperties';
 
 export class ProposalsApi {
   /** @deprecated - use hooks instead */

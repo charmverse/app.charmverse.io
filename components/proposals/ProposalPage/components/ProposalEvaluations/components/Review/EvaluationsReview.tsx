@@ -43,7 +43,6 @@ export type Props = {
     | 'workflowId'
     | 'currentEvaluationId'
     | 'page'
-    | 'lensPostLink'
     | 'formId'
     | 'form'
     | 'selectedCredentialTemplates'
@@ -54,6 +53,7 @@ export type Props = {
   refreshProposal?: VoidFunction;
   templateId: string | null | undefined;
   pagePath?: string;
+  pageLensPostLink?: string | null;
   pageTitle?: string;
   expanded: boolean;
   refreshPage?: VoidFunction;
@@ -64,6 +64,7 @@ export function EvaluationsReview({
   pageTitle,
   pageId,
   proposal,
+  pageLensPostLink,
   onChangeEvaluation,
   onChangeSelectedCredentialTemplates,
   readOnlyCredentialTemplates,
@@ -294,7 +295,7 @@ export function EvaluationsReview({
           <Divider />
           <SocialShareLinksStep
             pageId={pageId}
-            lensPostLink={proposal.lensPostLink}
+            lensPostLink={pageLensPostLink}
             onPublish={refreshProposal}
             text={shareText}
             content={{

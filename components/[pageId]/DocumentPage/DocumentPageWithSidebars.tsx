@@ -172,6 +172,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('proposal_evaluation'),
             closeSidebar
           }}
+          pageLensPostLink={page.lensPostLink}
           refreshPage={refreshPage}
           pagePath={page.path}
           pageTitle={page.title}

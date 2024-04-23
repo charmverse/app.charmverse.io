@@ -8,7 +8,6 @@ import { getPage } from 'lib/pages/server';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { withSessionRoute } from 'lib/session/withSession';
 import { getSnapshotProposal } from 'lib/snapshot/getProposal';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { coerceToMilliseconds } from 'lib/utils/dates';
 import { DataNotFoundError } from 'lib/utils/errors';
 

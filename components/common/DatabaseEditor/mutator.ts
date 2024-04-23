@@ -1,5 +1,4 @@
 /* eslint-disable default-param-last */
-import type { PageMeta } from '@charmverse/core/pages';
 
 import charmClient from 'charmClient';
 import type { UIBlockWithDetails, BlockPatch } from 'lib/databases/block';
