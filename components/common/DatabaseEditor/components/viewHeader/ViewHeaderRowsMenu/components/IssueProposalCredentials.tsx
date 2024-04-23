@@ -63,7 +63,13 @@ export function IssueProposalCredentials({
       if (result === 'gnosis') {
         showMessage('Transaction submitted to Gnosis Safe. Please execute it there');
       } else {
-        showMessage(`Issued ${_issuableProposalCredentials.length} ${proposalLabel} credentials`);
+        const issuedCredentialAmount = _issuableProposalCredentials.length;
+        showMessage(
+          `Issued ${issuedCredentialAmount} ${proposalLabel} ${conditionalPlural({
+            count: issuedCredentialAmount,
+            word: 'credential'
+          })}`
+        );
       }
       onIssueCredentialsSuccess?.();
     } catch (err: any) {
