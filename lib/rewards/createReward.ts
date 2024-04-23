@@ -25,6 +25,7 @@ export type RewardCreationData = UpdateableRewardFields & {
   pageProps?: RewardPageProps;
   proposalId?: string | null;
   githubIssueUrl?: string;
+  isDraft?: boolean;
 };
 /**
  * You can create a reward suggestion using only title, spaceId and createdBy. You will see many unit tests using this limited dataset, which will then default the reward to suggestion status. Your logic should account for this.
@@ -48,7 +49,8 @@ export async function createReward({
   selectedCredentialTemplates,
   allowMultipleApplications,
   proposalId,
-  githubIssueUrl
+  githubIssueUrl,
+  isDraft
 }: RewardCreationData) {
   const errors = getRewardErrors({
     page: pageProps || null,
@@ -56,7 +58,7 @@ export async function createReward({
     reward: { assignedSubmitters, rewardAmount, rewardToken, chainId, customReward, reviewers },
     rewardType: getRewardType({ rewardAmount, rewardToken, chainId, customReward })
   });
-  if (errors.length > 0) {
+  if (!isDraft && errors.length > 0) {
     throw new InvalidInputError(errors.join(', '));
   }
 
@@ -90,6 +92,7 @@ export async function createReward({
         id: userId
       }
     },
+    status: isDraft ? 'draft' : 'open',
     githubIssueUrl,
     dueDate,
     fields: fields as any,
