@@ -1,3 +1,4 @@
+import type { IPropertyTemplate } from 'lib/databases/board';
 import * as constants from 'lib/projects/formField';
 import { getFieldConfig } from 'lib/projects/formField';
 import { getFormInput, getProfectProfileFieldConfig } from 'testing/mocks/form';
@@ -16,6 +17,63 @@ describe('getBoardProperties', () => {
     expect(properties.some((r) => r.type === 'proposalReviewerNotes')).toBeTruthy();
   });
 
+  it('Should return custom properties from proposals', () => {
+    const customProperty: IPropertyTemplate = {
+      id: 'custom-color',
+      name: 'color',
+      type: 'multiSelect',
+      options: [{ id: 'red', color: 'red', value: 'red' }]
+    };
+    const properties = getBoardProperties({
+      proposalCustomProperties: [
+        { id: 'custom-color', name: 'color', type: 'multiSelect', options: [{ id: 'red', color: 'red', value: 'red' }] }
+      ]
+    });
+    expect(properties).toEqual(
+      expect.arrayContaining([
+        {
+          ...customProperty,
+          readOnly: true,
+          readOnlyValues: true
+        }
+      ])
+    );
+  });
+
+  // in case we change our mind about defaults, since all these fields are readonly
+  it('Should override previous configuration of custom properties', () => {
+    const customProperty: IPropertyTemplate = {
+      id: 'custom-color',
+      name: 'color',
+      type: 'multiSelect' as const,
+      options: [{ id: 'red', color: 'red', value: 'red' }]
+    };
+    const specialId = 'custom-color-mirror-id';
+    const properties = getBoardProperties({
+      currentCardProperties: [
+        {
+          ...customProperty,
+          id: specialId,
+          dynamicOptions: true,
+          readOnly: false,
+          readOnlyValues: false
+        }
+      ],
+      proposalCustomProperties: [
+        { id: 'custom-color', name: 'color', type: 'multiSelect', options: [{ id: 'red', color: 'red', value: 'red' }] }
+      ]
+    });
+    expect(properties).toEqual(
+      expect.arrayContaining([
+        {
+          ...customProperty,
+          readOnly: true,
+          readOnlyValues: true
+        }
+      ])
+    );
+  });
+
   it('Should return universal properties for rubric steps', () => {
     const properties = getBoardProperties({
       rubricStepTitles: ['Rubric Evaluation']
@@ -23,6 +81,21 @@ describe('getBoardProperties', () => {
     expect(properties.some((r) => r.type === 'proposalEvaluatedBy')).toBeTruthy();
     expect(properties.some((r) => r.type === 'proposalEvaluationTotal')).toBeTruthy();
     expect(properties.some((r) => r.type === 'proposalEvaluationAverage')).toBeTruthy();
+  });
+
+  it('Should retain the id of an existing property when matching by type', () => {
+    const properties = getBoardProperties({
+      rubricStepTitles: ['Rubric Evaluation']
+    });
+    const property = properties.find((r) => r.type === 'proposalEvaluatedBy');
+    expect(property?.id).toBeTruthy();
+    const originalId = property?.id;
+    const newProperties = getBoardProperties({
+      currentCardProperties: properties,
+      rubricStepTitles: ['Rubric Evaluation']
+    });
+    const updatedProperty = newProperties.find((r) => r.type === 'proposalEvaluatedBy');
+    expect(updatedProperty?.id).toEqual(originalId);
   });
 
   it('Should return visible properties for project profile', () => {
