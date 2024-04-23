@@ -36,7 +36,7 @@ export async function updateProjectMember({
       previousProjects: projectMemberValues.previousProjects,
       telegram: projectMemberValues.telegram,
       twitter: projectMemberValues.twitter,
-      walletAddress: projectMemberValues.walletAddress,
+      walletAddress: projectMemberValues.walletAddress?.toLowerCase()?.trim(),
       warpcast: projectMemberValues.warpcast,
       userId: connectedUserId
     }
