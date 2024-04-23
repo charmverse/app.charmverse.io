@@ -24,6 +24,16 @@ export function rewardWithUsersInclude() {
         roleId: true,
         permissionLevel: true
       }
+    },
+    proposal: {
+      select: {
+        page: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
+      }
     }
   };
 }

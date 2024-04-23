@@ -1,16 +1,15 @@
 import { blockToFBBlock } from 'components/common/DatabaseEditor/utils/blockUtils';
-import { getDefaultRewardProperties } from 'components/rewards/components/RewardsBoard/utils/getDefaultRewardProperties';
 import type { UIBlockWithDetails as FBBlock, BlockWithDetails } from 'lib/databases/block';
 import { createBoard } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews } from 'lib/rewards/blocks/views';
 
+import { getDefaultRewardProperties } from './getDefaultRewardProperties';
+
 export function getDefaultBoard({
-  storedBoard,
-  hasMilestoneRewards = false
+  storedBoard
 }: {
   storedBoard: (Omit<BlockWithDetails, 'fields'> & { fields: any }) | undefined;
-  hasMilestoneRewards?: boolean;
 }) {
   const block: Partial<FBBlock> = storedBoard
     ? blockToFBBlock(storedBoard)
@@ -24,7 +23,7 @@ export function getDefaultBoard({
         }
       });
 
-  const cardProperties = [...getDefaultRewardProperties(hasMilestoneRewards), ...(block.fields?.cardProperties || [])];
+  const cardProperties = [...getDefaultRewardProperties(), ...(block.fields?.cardProperties || [])];
 
   block.fields = {
     ...(block.fields || {}),
