@@ -14,8 +14,8 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.use(requireUser).put(publishRewardController);
 
 async function publishRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
-  const { id } = req.query;
-  const reward = await getRewardOrThrow({ rewardId: id as string });
+  const rewardId = req.query.id as string;
+  const reward = await getRewardOrThrow({ rewardId });
   const userId = req.session.user.id;
   if (reward.status !== 'draft') {
     throw new InvalidInputError('Reward is not in draft state.');
@@ -27,7 +27,10 @@ async function publishRewardController(req: NextApiRequest, res: NextApiResponse
 
   const rewardPublishData = req.body as RewardPublishData;
 
-  const publishedReward = await publishReward(rewardPublishData);
+  const publishedReward = await publishReward({
+    ...rewardPublishData,
+    rewardId
+  });
 
   res.status(200).json(publishedReward);
 }

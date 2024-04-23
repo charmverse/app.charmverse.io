@@ -10,6 +10,7 @@ import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
+import type { RewardPublishData } from 'lib/rewards/publishReward';
 
 import type { MaybeString } from './helpers';
 import { useGET, usePOST, usePUT, useDELETE, useGETImmutable } from './helpers';
@@ -68,4 +69,8 @@ export function useDeleteRewardBlocks(spaceId: string) {
 
 export function useGetRewardWorkflows(spaceId: MaybeString) {
   return useGETImmutable<RewardWorkflow[]>(spaceId ? `/api/spaces/${spaceId}/rewards/workflows` : null);
+}
+
+export function usePublishReward(rewardId: string) {
+  return usePUT<Omit<RewardPublishData, 'rewardId'>, RewardWithUsers>(`/api/rewards/${rewardId}/publish`);
 }

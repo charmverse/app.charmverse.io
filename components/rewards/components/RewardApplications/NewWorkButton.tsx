@@ -1,18 +1,18 @@
 import type { ButtonProps } from '@mui/material';
 import { Box, Tooltip } from '@mui/material';
-import { useMemo } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
 import { AddIcon } from 'components/common/Icons/AddIcon';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 
 type Props = {
+  reward?: RewardWithUsers;
   rewardId?: string;
   addIcon?: boolean;
   variant?: ButtonProps['variant'];
@@ -20,15 +20,18 @@ type Props = {
   color?: ButtonProps['color'];
 };
 
-export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 'contained' }: Props) {
-  const { rewards } = useRewards();
+export function NewWorkButton({
+  color,
+  buttonSize,
+  addIcon,
+  rewardId: _rewardId,
+  reward,
+  variant = 'contained'
+}: Props) {
+  const rewardId = reward?.id ?? _rewardId;
   const { user } = useUser();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const isCharmverseSpace = useIsCharmverseSpace();
-
-  const reward = useMemo(() => {
-    return rewards?.find((r) => r.id === rewardId);
-  }, [rewardId, rewards]);
 
   const hasApplication = !!user && reward?.applications.some((app) => app.createdBy === user.id);
 

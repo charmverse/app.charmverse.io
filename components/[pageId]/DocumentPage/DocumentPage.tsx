@@ -28,6 +28,7 @@ import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/comp
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
+import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -153,7 +154,7 @@ function DocumentPageComponent({
   const _showParentChip =
     showParentChip ?? !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
 
-  const { data: reward } = useGetReward({ rewardId: page.bountyId });
+  const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
   const hideCardDetails = isRewardsPage && page.bountyId;
 
@@ -558,6 +559,9 @@ function DocumentPageComponent({
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
           <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
+        )}
+        {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
+          <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />
         )}
       </FormProvider>
     </Box>

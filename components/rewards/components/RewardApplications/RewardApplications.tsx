@@ -3,7 +3,6 @@ import { Box, Divider, Grid, IconButton, Stack, Tooltip } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useMemo } from 'react';
 
-import { useGetReward } from 'charmClient/hooks/rewards';
 import UserDisplay from 'components/common/UserDisplay';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -11,14 +10,14 @@ import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { submissionStatuses } from 'lib/rewards/constants';
-import type { ApplicationMeta } from 'lib/rewards/interfaces';
+import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { formatDate, formatDateTime } from 'lib/utils/dates';
 import type { LoggedInUser } from 'models';
 
 import { RewardApplicationStatusChip } from '../RewardApplicationStatusChip';
 
 type Props = {
-  rewardId: string;
+  reward: RewardWithUsers;
   applicationRequired: boolean;
 };
 
@@ -139,12 +138,9 @@ function ApplicationRows({
   );
 }
 
-export function RewardApplications({ rewardId, applicationRequired }: Props) {
+export function RewardApplications({ applicationRequired, reward }: Props) {
   const { updateURLQuery } = useCharmRouter();
-
   const { user } = useUser();
-
-  const { data: reward } = useGetReward({ rewardId });
 
   const { applications, submissions } = useMemo(() => {
     if (!reward) {
@@ -194,7 +190,7 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
           >
             There are no {applicationRequired ? 'applications' : 'submissions'} yet.
           </Typography>
-          <NewWorkButton rewardId={rewardId} />
+          <NewWorkButton reward={reward} />
         </Stack>
       </Stack>
     );
@@ -204,7 +200,7 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
     return (
       <>
         <Stack flex={1} direction='row' my={1}>
-          <NewWorkButton rewardId={rewardId} />
+          <NewWorkButton reward={reward} />
         </Stack>
         <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
         <Divider
@@ -220,7 +216,7 @@ export function RewardApplications({ rewardId, applicationRequired }: Props) {
   return (
     <>
       <Stack flex={1} direction='row' my={1}>
-        <NewWorkButton rewardId={rewardId} />
+        <NewWorkButton reward={reward} />
       </Stack>
       <ApplicationRows isApplication={false} openApplication={openApplication} applications={submissions} />
     </>
