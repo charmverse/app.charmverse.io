@@ -12,7 +12,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 export const excludedFieldTypes = ['project_profile', 'label'];
 
 // define properties that will apply to all source fields
-const defaultOptions = { readOnly: true, readOnlyValues: true, options: [], dynamicOptions: true };
+const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 
 // apply proposal-related properties to the board
 export function getBoardProperties({
@@ -134,12 +134,13 @@ function applyProjectProfileProperties(
   });
   projectMemberFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
-    if (config.show) {
+    if (getFieldConfig(fieldConfig[field.field]).show) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,
         private: config.private,
-        type: 'multiSelect'
+        type: 'multiSelect',
+        dynamicOptions: true
       });
     }
   });
