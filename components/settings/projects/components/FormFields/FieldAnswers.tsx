@@ -28,7 +28,9 @@ function FieldAnswer({
     name
   });
 
-  const registeredField = register(name);
+  const registeredField = register(name, {
+    setValueAs: (value) => value.trim()
+  });
 
   const isShown = fieldConfig?.[property.field]?.show ?? true;
   if (!isShown) {
@@ -50,7 +52,7 @@ function FieldAnswer({
       onChange={(e) => {
         field.onChange(e);
         if (onChange) {
-          onChange({ [property.field]: e.target.value });
+          onChange({ [property.field]: e.target.value.trim() });
         }
       }}
     />
