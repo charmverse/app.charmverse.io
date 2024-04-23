@@ -94,6 +94,16 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     if (!isValidEvaluationSteps) {
       throw new ActionNotPermittedError('Inputs do not match the template');
     }
+
+    const selectedCredentialTemplates = proposalCreateProps.selectedCredentialTemplates ?? [];
+    const proposalTemplateCredentials = proposalTemplate.proposal.selectedCredentialTemplates;
+
+    if (
+      selectedCredentialTemplates.length !== proposalTemplateCredentials.length ||
+      !selectedCredentialTemplates.every((templateId) => proposalTemplateCredentials.includes(templateId))
+    ) {
+      throw new ActionNotPermittedError('Selected credentials do not match the template');
+    }
   }
   const proposalPage = await createProposal({
     ...req.body,

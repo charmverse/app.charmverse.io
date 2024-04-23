@@ -95,10 +95,6 @@ export function IssueProposalCredentials({
         : `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
       : undefined;
 
-  const actionLabel = `Issue ${
-    issuableProposalCredentials?.length ? `${issuableProposalCredentials?.length} ` : ''
-  }Onchain ${conditionalPlural({ word: 'Credential', count: issuableProposalCredentials?.length || 0 })}`;
-
   async function _handleIssueCredentials() {
     if (!space?.credentialsChainId) {
       return;
@@ -132,7 +128,7 @@ export function IssueProposalCredentials({
                   mr: 1
                 }}
               />
-              <ListItemText primary={actionLabel} />
+              <ListItemText primary='Issue onchain' />
             </StyledMenuItem>
           </div>
         ) : (
@@ -143,7 +139,7 @@ export function IssueProposalCredentials({
             loading={publishingCredential || (isLoadingIssuableProposalCredentials && !issuableProposalCredentials)}
             disabled={disableIssueCredentials}
           >
-            {actionLabel}
+            Issue onchain
           </Button>
         )}
       </Box>
