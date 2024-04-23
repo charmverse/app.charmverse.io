@@ -4,6 +4,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
 import type { ReactNode } from 'react';
@@ -14,14 +15,16 @@ const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   complete: 'Approved',
-  paid: 'Paid'
+  paid: 'Paid',
+  draft: 'Draft'
 };
 
 const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
   complete: 'blue',
-  paid: 'green'
+  paid: 'green',
+  draft: 'gray'
 };
 
 const isRewardStatus = (status: RewardStatus): status is RewardStatus => status in REWARD_STATUS_COLORS;
@@ -69,7 +72,8 @@ export const REWARD_STATUS_ICONS: Record<RewardStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   complete: <CheckCircleOutlineIcon />,
-  paid: <PaidIcon />
+  paid: <PaidIcon />,
+  draft: <BountyIcon />
 };
 
 export function RewardStatusChip({
