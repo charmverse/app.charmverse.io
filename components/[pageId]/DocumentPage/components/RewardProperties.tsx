@@ -97,7 +97,7 @@ export function RewardProperties(props: {
 
       {!isTemplate && (
         <>
-          {!!currentReward?.id && showApplications && (
+          {!!currentReward?.id && showApplications && initialReward?.status !== 'draft' && (
             <>
               <Divider sx={{ my: 1 }} />
               <Stack>
