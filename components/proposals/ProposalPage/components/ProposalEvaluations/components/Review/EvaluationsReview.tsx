@@ -90,7 +90,8 @@ export function EvaluationsReview({
   const isCredentialsActive =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
 
-  const isRewardsActive = hasRewardsStep && currentEvaluation?.result === 'pass' && !!isCredentialsComplete;
+  const isRewardsActive =
+    hasRewardsStep && currentEvaluation?.result === 'pass' && (!hasCredentialsStep || !!isCredentialsComplete);
   // To find the previous step index. we have to calculate the position including Draft and Rewards steps
   let adjustedCurrentEvaluationIndex = 0; // "draft" step
   if (proposal && currentEvaluation) {
