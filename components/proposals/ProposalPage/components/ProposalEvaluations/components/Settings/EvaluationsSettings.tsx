@@ -1,5 +1,6 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { Box, Chip, Collapse, Stack, Switch } from '@mui/material';
+import { read } from '@popperjs/core';
 
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
@@ -50,8 +51,8 @@ export function EvaluationsSettings({
   const { mappedFeatures } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
 
-  const showCredentials = isAdmin || !!proposal?.selectedCredentialTemplates?.length;
-  const readOnlyCredentials = !isAdmin;
+  const showCredentials = isAdmin || !!proposal?.selectedCredentialTemplates?.length || !templateId;
+  const readOnlyCredentials = !isAdmin && (readOnly || !!templateId);
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
 

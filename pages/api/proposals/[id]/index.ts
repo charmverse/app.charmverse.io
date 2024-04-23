@@ -41,7 +41,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
 
   const { authors, fields, projectId } = req.body as UpdateProposalRequest;
 
-  const proposal = await prisma.proposal.findUnique({
+  const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
     },
@@ -49,15 +49,12 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
       reviewers: true,
       page: {
         select: {
+          sourceTemplateId: true,
           type: true
         }
       }
     }
   });
-
-  if (!proposal) {
-    throw new NotFoundError();
-  }
 
   const { error, isAdmin } = await hasAccessToSpace({
     spaceId: proposal.spaceId,
@@ -101,12 +98,23 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
+  const selectedCredentialTemplates: string[] = req.body.selectedCredentialTemplates ?? [];
+  const proposalCredentials: string[] = proposal.selectedCredentialTemplates ?? [];
+
+  if (
+    !isAdmin &&
+    (selectedCredentialTemplates.length !== proposalCredentials.length ||
+      !selectedCredentialTemplates.every((id) => proposalCredentials.includes(id)))
+  ) {
+    throw new ActionNotPermittedError('You cannot change the selected credential templates');
+  }
+
   await updateProposal({
     proposalId: proposal.id,
     authors,
     projectId,
     fields,
-    selectedCredentialTemplates: req.body.selectedCredentialTemplates,
+    selectedCredentialTemplates,
     actorId: userId
   });
 

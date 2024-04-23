@@ -356,7 +356,7 @@ describe('POST /api/proposals - Create a proposal', () => {
     expect(createdProposal.selectedCredentialTemplates).toEqual([credentialThreeId]);
   });
 
-  it('should only accept creating a proposal with credentials if they match the proposal template', async () => {
+  it('should only accept creating a proposal with credentials if they match the proposal template or there is no linked template', async () => {
     const credentialOneId = uuid();
     const credentialTwoId = uuid();
 
@@ -409,6 +409,17 @@ describe('POST /api/proposals - Create a proposal', () => {
         selectedCredentialTemplates: [credentialOneId, credentialTwoId]
       })
       .expect(201);
+
+    await request(baseUrl)
+      .post('/api/proposals')
+      .set('Cookie', userCookie)
+      .send({
+        ...input,
+        pageProps: { ...input.pageProps, sourceTemplateId: null },
+        selectedCredentialTemplates: [credentialOneId]
+      })
+      .expect(201);
+
     const response = (
       await request(baseUrl)
         .post('/api/proposals')

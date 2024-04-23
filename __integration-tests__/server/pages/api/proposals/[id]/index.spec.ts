@@ -1,6 +1,7 @@
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import { testUtilsCredentials, testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
+import _isEqual from 'lodash/isEqual';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
@@ -11,17 +12,16 @@ import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 
 let author: User;
+let admin: User;
 let reviewer: User;
 let space: Space;
+
 let authorCookie: string;
 
 beforeAll(async () => {
-  const generated1 = await testUtilsUser.generateUserAndSpace({ isAdmin: false });
-  space = generated1.space;
-  author = generated1.user;
-
-  const generated2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
-  reviewer = generated2;
+  ({ space, user: author } = await testUtilsUser.generateUserAndSpace({ isAdmin: false }));
+  admin = await testUtilsUser.generateSpaceUser({ isAdmin: true, spaceId: space.id });
+  reviewer = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
   authorCookie = await loginUser(author.id);
 });
@@ -163,6 +163,59 @@ describe('PUT /api/proposals/[id] - Update a proposal', () => {
       .set('Cookie', adminCookie)
       .send(updateContent)
       .expect(200);
+  });
+
+  it('should only allow admins to update credentials if the proposal uses a template', async () => {
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+
+    const secondCredentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['proposal_approved']
+    });
+
+    const template = await testUtilsProposals.generateProposalTemplate({
+      spaceId: space.id,
+      userId: author.id,
+      pageType: 'proposal_template',
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      userId: author.id,
+      spaceId: space.id,
+      sourceTemplateId: template.id,
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const adminCookie = await loginUser(admin.id);
+
+    const updateContent: Partial<UpdateProposalRequest> = {
+      selectedCredentialTemplates: [secondCredentialTemplate.id]
+    };
+
+    await request(baseUrl)
+      .put(`/api/proposals/${proposal.id}`)
+      .set('Cookie', authorCookie)
+      .send(updateContent)
+      .expect(401);
+
+    await request(baseUrl)
+      .put(`/api/proposals/${proposal.id}`)
+      .set('Cookie', adminCookie)
+      .send(updateContent)
+      .expect(200);
+
+    const proposalAfterUpdate = await prisma.proposal.findUniqueOrThrow({
+      where: { id: proposal.id },
+      select: {
+        selectedCredentialTemplates: true
+      }
+    });
+
+    expect(proposalAfterUpdate.selectedCredentialTemplates).toEqual([secondCredentialTemplate.id]);
   });
 
   it('should update a proposal templates settings if the user is a space admin', async () => {
