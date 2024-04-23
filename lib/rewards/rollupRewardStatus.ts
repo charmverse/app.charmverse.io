@@ -23,6 +23,10 @@ export async function rollupRewardStatus({ rewardId }: { rewardId: string }): Pr
     }
   });
 
+  if (reward.status === 'draft') {
+    return getRewardOrThrow({ rewardId });
+  }
+
   const remainingSlots = countRemainingSubmissionSlots({
     applications: reward.applications,
     limit: reward.maxSubmissions
