@@ -138,7 +138,7 @@ export function getProjectMemberCreateTransaction({
     data: {
       name: projectMember.name,
       email: projectMember.email,
-      walletAddress: projectMember.walletAddress?.trim(),
+      walletAddress: projectMember.walletAddress?.toLowerCase()?.trim(),
       twitter: projectMember.twitter,
       warpcast: projectMember.warpcast,
       github: projectMember.github,

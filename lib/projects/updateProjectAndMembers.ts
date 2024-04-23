@@ -67,7 +67,7 @@ export async function updateProjectAndMembers({
           data: {
             name: projectMember.name,
             email: projectMember.email,
-            walletAddress: projectMember.walletAddress?.toLowerCase(),
+            walletAddress: projectMember.walletAddress?.toLowerCase()?.trim(),
             twitter: projectMember.twitter,
             warpcast: projectMember.warpcast,
             github: projectMember.github,
