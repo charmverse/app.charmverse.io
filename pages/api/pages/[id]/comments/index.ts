@@ -22,22 +22,13 @@ async function listPageCommentsHandler(req: NextApiRequest, res: NextApiResponse
 
   const userId = req.session.user?.id;
 
-  const pagePermissions = await prisma.pagePermission.count({
-    where: {
-      pageId,
-      public: true
-    }
-  });
-
-  const isPublic = pagePermissions !== 0;
-
   const permissions = await permissionsApiClient.pages.computePagePermissions({
     resourceId: pageId,
     userId
   });
 
-  if (permissions.comment !== true && !isPublic) {
-    throw new ActionNotPermittedError('You do not have permission to view comments this page');
+  if (permissions.read !== true) {
+    throw new ActionNotPermittedError('You do not have permission to view comments');
   }
 
   const pageCommentsWithVotes = await listPageComments({ pageId, userId });
