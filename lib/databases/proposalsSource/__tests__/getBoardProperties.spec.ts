@@ -16,6 +16,30 @@ describe('getBoardProperties', () => {
     expect(properties.some((r) => r.type === 'proposalReviewerNotes')).toBeTruthy();
   });
 
+  it('Should return custom properties from proposals', () => {
+    const customProperty = {
+      id: 'custom-color',
+      name: 'color',
+      type: 'multiSelect',
+      options: [{ id: 'red', color: 'red', value: 'red' }]
+    };
+    const properties = getBoardProperties({
+      proposalCustomProperties: [
+        { id: 'custom-color', name: 'color', type: 'multiSelect', options: [{ id: 'red', color: 'red', value: 'red' }] }
+      ]
+    });
+    expect(properties).toEqual(
+      expect.arrayContaining([
+        {
+          ...customProperty,
+          proposalFieldId: customProperty.id,
+          readOnly: true,
+          readOnlyValues: true
+        }
+      ])
+    );
+  });
+
   it('Should return universal properties for rubric steps', () => {
     const properties = getBoardProperties({
       rubricStepTitles: ['Rubric Evaluation']
