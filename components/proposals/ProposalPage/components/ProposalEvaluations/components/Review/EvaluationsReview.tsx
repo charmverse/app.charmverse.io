@@ -14,6 +14,7 @@ import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
@@ -95,7 +96,7 @@ export function EvaluationsReview({
   const isCredentialsActive =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
 
-  const shareLink = `https://app.charmverse.io/${currentSpace?.domain}/${pagePath}`;
+  const shareLink = getAbsolutePath(pagePath || '', currentSpace?.domain);
   const shareText = `${pageTitle || 'Untitled'} from ${
     currentSpace?.name
   } is now open for feedback.\nView on CharmVerse:\n`;

@@ -16,6 +16,7 @@ import { getRewardWorkflowWithApplication } from 'lib/rewards/getRewardWorkflowW
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
@@ -70,7 +71,7 @@ export function EvaluationsReview({
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
-  const shareLink = `https://app.charmverse.io/${currentSpace?.domain}/${page.path}`;
+  const shareLink = getAbsolutePath(`/${page.path}`, currentSpace?.domain);
   const shareText = `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: `;
 
   useEffect(() => {
