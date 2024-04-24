@@ -46,11 +46,11 @@ export function useNodeViews(ref: RefObject<HTMLElement>) {
         if (!destroyed) {
           // make sure that updates run sequentially for prosemiror, or we get infinite recursion of node views being created and destroyed.
           // See also: https://github.com/ueberdosis/tiptap/pull/2985
-          // flushSync(() => {
-          // use callback variant of setState to
-          // always get freshest nodeViews.
-          setNodeViews((_nodeViews) => cb(_nodeViews));
-          // });
+          flushSync(() => {
+            // use callback variant of setState to
+            // always get freshest nodeViews.
+            setNodeViews((_nodeViews) => cb(_nodeViews));
+          });
         }
       })
     );
