@@ -4,7 +4,6 @@ import nc from 'next-connect';
 import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
-import type { RewardPublishData } from 'lib/rewards/publishReward';
 import { publishReward } from 'lib/rewards/publishReward';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError, UnauthorisedActionError } from 'lib/utils/errors';
@@ -25,12 +24,7 @@ async function publishRewardController(req: NextApiRequest, res: NextApiResponse
     throw new UnauthorisedActionError('You do not have permission to publish this reward.');
   }
 
-  const rewardPublishData = req.body as RewardPublishData;
-
-  const publishedReward = await publishReward({
-    ...rewardPublishData,
-    rewardId
-  });
+  const publishedReward = await publishReward(rewardId);
 
   res.status(200).json(publishedReward);
 }

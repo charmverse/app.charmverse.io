@@ -1,5 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
-
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
@@ -36,6 +34,7 @@ export type CardPageProposal = {
 export type CardPageReward = {
   id: string;
   rewardType: RewardType;
+  applications: { createdBy: string }[];
 };
 
 export type CardWithRelations<V = CardPropertyValue> = Card<V> & {

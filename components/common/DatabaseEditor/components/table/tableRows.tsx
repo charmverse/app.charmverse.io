@@ -6,7 +6,6 @@ import React, { useState } from 'react';
 import charmClient from 'charmClient';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useLocalStorage } from 'hooks/useLocalStorage';
 import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/databases/board';
@@ -51,7 +50,6 @@ function TableRows(props: Props): JSX.Element {
   } = props;
   const hasSubPages = allCards.some((card) => card.subPages?.length);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const { rewards = [] } = useRewards();
   const {
     data: cardsInView,
     hasNextPage,
@@ -96,55 +94,51 @@ function TableRows(props: Props): JSX.Element {
 
   return (
     <>
-      {cardsInView.map((card) => {
-        const reward = rewards.find((r) => r.id === card.reward?.id);
-
-        return (
-          <TableRow
-            key={card.id + card.updatedAt}
-            board={board}
-            activeView={activeView}
-            card={card}
-            hasContent={card.hasContent}
-            isSelected={props.selectedCardIds.includes(card.id)}
-            focusOnMount={props.cardIdToFocusOnRender === card.id}
-            pageIcon={card.icon}
-            pageTitle={card.title || ''}
-            pageUpdatedAt={card.updatedAt.toString()}
-            pageUpdatedBy={card.updatedBy}
-            onClick={props.onCardClicked}
-            saveTitle={saveTitle}
-            showCard={props.showCard}
-            readOnly={props.readOnly}
-            onDrop={props.onDrop}
-            onDeleteCard={onDeleteCard}
-            offset={props.offset}
-            resizingColumn={props.resizingColumn}
-            columnRefs={props.columnRefs}
-            readOnlyTitle={props.readOnlyTitle}
-            subPages={card.subPages}
-            expandSubRowsOnLoad={expandSubRowsOnLoad}
-            setIsExpanded={setIsExpanded}
-            setCheckedIds={setCheckedIds}
-            isChecked={checkedIds.includes(card.id)}
-            emptySubPagesPlaceholder={
-              reward ? (
-                <Box
-                  p={1}
-                  pl={5}
-                  display='flex'
-                  justifyContent='flex-start'
-                  style={{ backgroundColor: 'var(--input-bg)' }}
-                >
-                  <NewWorkButton color='secondary' reward={reward} addIcon variant='text' buttonSize='small' />
-                </Box>
-              ) : null
-            }
-            isExpanded={isExpanded(card.id)}
-            subRowsEmptyValueContent={subRowsEmptyValueContent}
-          />
-        );
-      })}
+      {cardsInView.map((card) => (
+        <TableRow
+          key={card.id + card.updatedAt}
+          board={board}
+          activeView={activeView}
+          card={card}
+          hasContent={card.hasContent}
+          isSelected={props.selectedCardIds.includes(card.id)}
+          focusOnMount={props.cardIdToFocusOnRender === card.id}
+          pageIcon={card.icon}
+          pageTitle={card.title || ''}
+          pageUpdatedAt={card.updatedAt.toString()}
+          pageUpdatedBy={card.updatedBy}
+          onClick={props.onCardClicked}
+          saveTitle={saveTitle}
+          showCard={props.showCard}
+          readOnly={props.readOnly}
+          onDrop={props.onDrop}
+          onDeleteCard={onDeleteCard}
+          offset={props.offset}
+          resizingColumn={props.resizingColumn}
+          columnRefs={props.columnRefs}
+          readOnlyTitle={props.readOnlyTitle}
+          subPages={card.subPages}
+          expandSubRowsOnLoad={expandSubRowsOnLoad}
+          setIsExpanded={setIsExpanded}
+          setCheckedIds={setCheckedIds}
+          isChecked={checkedIds.includes(card.id)}
+          emptySubPagesPlaceholder={
+            card.reward ? (
+              <Box
+                p={1}
+                pl={5}
+                display='flex'
+                justifyContent='flex-start'
+                style={{ backgroundColor: 'var(--input-bg)' }}
+              >
+                <NewWorkButton color='secondary' rewardId={card.reward.id} addIcon variant='text' buttonSize='small' />
+              </Box>
+            ) : null
+          }
+          isExpanded={isExpanded(card.id)}
+          subRowsEmptyValueContent={subRowsEmptyValueContent}
+        />
+      ))}
 
       {hasNextPage && (
         <div className='octo-table-footer'>

@@ -23,22 +23,7 @@ export function RewardStickyFooter({
 
   async function onClick() {
     try {
-      await publishReward({
-        allowedSubmitterRoles: reward.allowedSubmitterRoles,
-        allowMultipleApplications: reward.allowMultipleApplications,
-        approveSubmitters: reward.approveSubmitters,
-        assignedSubmitters: reward.assignedSubmitters,
-        chainId: reward.chainId,
-        customReward: reward.customReward,
-        dueDate: reward.dueDate,
-        fields: reward.fields,
-        maxSubmissions: reward.maxSubmissions,
-        reviewers: reward.reviewers,
-        rewardAmount: reward.rewardAmount,
-        rewardToken: reward.rewardToken,
-        rewardType: getRewardType(reward),
-        selectedCredentialTemplates: reward.selectedCredentialTemplates
-      });
+      await publishReward();
       refreshReward?.();
     } catch (error) {
       showMessage((error as Error).message, 'error');

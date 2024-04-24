@@ -5,22 +5,26 @@ import { InvalidInputError } from 'lib/utils/errors';
 import { getRewardOrThrow } from './getReward';
 import { getRewardErrors } from './getRewardErrors';
 import { getRewardType } from './getRewardType';
-import { updateRewardSettings, type UpdateableRewardFields } from './updateRewardSettings';
 
-export type RewardPublishData = UpdateableRewardFields & {
-  rewardId: string;
-};
+export async function publishReward(rewardId: string) {
+  const { chainId, rewardToken, rewardAmount, customReward, permissions } = await prisma.bounty.findUniqueOrThrow({
+    where: {
+      id: rewardId
+    },
+    select: {
+      rewardAmount: true,
+      rewardToken: true,
+      chainId: true,
+      customReward: true,
+      permissions: {
+        where: {
+          permissionLevel: 'reviewer'
+        }
+      }
+    }
+  });
 
-export async function publishReward(props: RewardPublishData) {
-  const {
-    rewardId,
-    chainId = 1,
-    rewardAmount,
-    rewardToken,
-    customReward = null,
-    reviewers,
-    assignedSubmitters
-  } = props;
+  const reviewers = permissions.map((permission) => permission);
 
   const rewardType = getRewardType({ rewardAmount, rewardToken, chainId, customReward });
   const page = await prisma.page.findFirstOrThrow({
@@ -35,19 +39,20 @@ export async function publishReward(props: RewardPublishData) {
 
   const errors = getRewardErrors({
     page,
-    reward: { assignedSubmitters, rewardAmount, rewardToken, chainId, customReward, reviewers },
+    reward: { rewardAmount, rewardToken, chainId, customReward, reviewers },
     rewardType
   });
+
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join(', '));
   }
 
-  await updateRewardSettings({
-    rewardId,
-    isPublished: true,
-    updateContent: {
-      ...props,
-      rewardType
+  await prisma.bounty.update({
+    where: {
+      id: rewardId
+    },
+    data: {
+      status: 'open'
     }
   });
 
