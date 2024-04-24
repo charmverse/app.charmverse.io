@@ -11,7 +11,6 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
   const id = uuid();
   return {
     issuedCredentials: [],
-    lensPostLink: null,
     publishToLens: null,
     archived: false,
     createdBy: '',
