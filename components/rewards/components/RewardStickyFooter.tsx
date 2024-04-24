@@ -30,10 +30,11 @@ export function RewardStickyFooter({
     }
   }
 
+  // Making sure that the type is bounty so that validation for reviewers works
   const disabledTooltip = getRewardErrors({
     page: {
       title: page.title,
-      type: page.type
+      type: 'bounty'
     },
     reward,
     rewardType: getRewardType(reward),
