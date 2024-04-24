@@ -7,22 +7,28 @@ import { getRewardErrors } from './getRewardErrors';
 import { getRewardType } from './getRewardType';
 
 export async function publishReward(rewardId: string) {
-  const { chainId, rewardToken, rewardAmount, customReward, permissions } = await prisma.bounty.findUniqueOrThrow({
-    where: {
-      id: rewardId
-    },
-    select: {
-      rewardAmount: true,
-      rewardToken: true,
-      chainId: true,
-      customReward: true,
-      permissions: {
-        where: {
-          permissionLevel: 'reviewer'
+  const { status, chainId, rewardToken, rewardAmount, customReward, permissions } =
+    await prisma.bounty.findUniqueOrThrow({
+      where: {
+        id: rewardId
+      },
+      select: {
+        status: true,
+        rewardAmount: true,
+        rewardToken: true,
+        chainId: true,
+        customReward: true,
+        permissions: {
+          where: {
+            permissionLevel: 'reviewer'
+          }
         }
       }
-    }
-  });
+    });
+
+  if (status !== 'draft') {
+    throw new InvalidInputError('Reward is not in draft state.');
+  }
 
   const reviewers = permissions.map((permission) => permission);
 
