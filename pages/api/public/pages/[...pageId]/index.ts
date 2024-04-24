@@ -296,7 +296,7 @@ async function getPublicPage(req: NextApiRequest, res: NextApiResponse<PublicPag
   return res.status(200).json({
     bounty: bounty
       ? {
-          ...mapDbRewardToReward({ ...bounty, applications: [] }),
+          ...mapDbRewardToReward({ ...bounty, applications: [], proposal: null }),
           page: {
             ...page
           }
