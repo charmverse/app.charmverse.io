@@ -31,7 +31,7 @@ export async function addProjectMember({
       teamLead: false,
       telegram: payload.telegram,
       twitter: payload.twitter,
-      walletAddress: payload.walletAddress?.toLowerCase(),
+      walletAddress: payload.walletAddress?.toLowerCase()?.trim(),
       warpcast: payload.warpcast,
       userId: connectedUserId
     }

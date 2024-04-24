@@ -28,6 +28,7 @@ const schema = generateSchemasForAllSupportedFieldTypes();
 board.fields.cardProperties = Object.values(schema) as IPropertyTemplate[];
 
 const boardPage: PageMeta = {
+  lensPostLink: null,
   id: board.id,
   boardId: board.id,
   bountyId: null,

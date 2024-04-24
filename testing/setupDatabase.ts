@@ -38,7 +38,7 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
-import type { ApplicationMeta } from 'lib/rewards/interfaces';
+import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
 import { createUserFromWallet } from 'lib/users/createUser';
 import { uniqueValues } from 'lib/utils/array';
@@ -297,7 +297,7 @@ export async function generateBounty({
     bountyPermissions?: Partial<BountyPermissions>;
     pagePermissions?: Omit<Prisma.PagePermissionCreateManyInput, 'pageId'>[];
     page?: Partial<Pick<Page, 'deletedAt'>>;
-  }): Promise<Bounty & { applications: ApplicationMeta[] }> {
+  }): Promise<RewardWithUsers> {
   const rewardId = id ?? v4();
   const pageId = customPageId ?? rewardId;
 

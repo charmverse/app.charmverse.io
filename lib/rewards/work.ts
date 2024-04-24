@@ -2,6 +2,7 @@ import type { Application, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
+import { InvalidStateError } from 'lib/middleware';
 import { DuplicateDataError, InvalidInputError, LimitReachedError, WrongStateError } from 'lib/utils/errors';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 import { publishBountyEvent } from 'lib/webhookPublisher/publishEvent';
@@ -34,6 +35,10 @@ export async function work({
   }
 
   const reward = await getRewardOrThrow({ rewardId });
+
+  if (reward.status === 'draft') {
+    throw new InvalidStateError(`Cannot apply to a draft reward`);
+  }
 
   const userApplications = reward.applications.filter((a) => a.createdBy === userId);
 

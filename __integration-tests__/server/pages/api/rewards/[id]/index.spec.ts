@@ -19,7 +19,7 @@ describe('GET /api/rewards/:id - get reward details', () => {
   });
 
   it('should return the reward with a status code of 200 if the user has permission to view the reward', async () => {
-    const reward = await generateBounty({
+    const { sourceProposalPage, ...reward } = await generateBounty({
       approveSubmitters: false,
       createdBy: user.id,
       spaceId: space.id,

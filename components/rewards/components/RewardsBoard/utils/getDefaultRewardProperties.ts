@@ -103,7 +103,7 @@ const rewardDbProperties = {
   })
 };
 
-export function getDefaultRewardProperties(hasMilestoneRewards?: boolean): IPropertyTemplate[] {
+export function getDefaultRewardProperties(): IPropertyTemplate[] {
   const properties = [
     rewardDbProperties.rewardCreatedAt(),
     rewardDbProperties.rewardDueDate(),
@@ -114,12 +114,9 @@ export function getDefaultRewardProperties(hasMilestoneRewards?: boolean): IProp
     rewardDbProperties.rewardAmount(),
     rewardDbProperties.rewardChain(),
     rewardDbProperties.rewardCustomValue(),
-    rewardDbProperties.rewardApplicantsNumber()
+    rewardDbProperties.rewardApplicantsNumber(),
+    rewardDbProperties.rewardProposalLink()
   ];
-
-  if (hasMilestoneRewards) {
-    properties.unshift(rewardDbProperties.rewardProposalLink());
-  }
 
   return properties;
 }

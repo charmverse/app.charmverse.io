@@ -1,19 +1,22 @@
-import { Collapse, Tooltip } from '@mui/material';
+import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
+import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { PageWithContent } from 'lib/pages';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import { getRewardWorkflowWithApplication } from 'lib/rewards/getRewardWorkflowWithApplication';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
@@ -30,6 +33,8 @@ export type Props = Omit<
   reward: RewardWithUsers;
   application?: ApplicationWithTransactions;
   refreshApplication?: VoidFunction;
+  page: PageWithContent;
+  refreshPage?: VoidFunction;
 };
 
 export function EvaluationsReview({
@@ -38,7 +43,9 @@ export function EvaluationsReview({
   onChangeReward,
   expanded: expandedContainer,
   readOnly,
-  refreshApplication
+  refreshApplication,
+  page,
+  refreshPage
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
@@ -60,10 +67,14 @@ export function EvaluationsReview({
     };
   }, [workflow, application]);
 
-  const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(currentEvaluation?.id);
+  const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
+    application ? currentEvaluation?.id : undefined
+  );
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
   const { showMessage } = useSnackbar();
+  const shareLink = getAbsolutePath(`/${page.path}`, currentSpace?.domain);
+  const shareText = `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: `;
 
   useEffect(() => {
     if (currentEvaluation && application) {
@@ -151,6 +162,54 @@ export function EvaluationsReview({
             ...tempRewardUpdates
           }}
         />
+      )}
+      {page && expandedContainer && (
+        <>
+          <Divider />
+          <SocialShareLinksStep
+            pageId={page.id}
+            lensPostLink={page.lensPostLink}
+            onPublish={refreshPage}
+            text={shareText}
+            content={{
+              type: 'doc',
+              content: [
+                {
+                  type: 'paragraph',
+                  content: [
+                    {
+                      type: 'text',
+                      marks: [
+                        {
+                          type: 'bold'
+                        }
+                      ],
+                      text: `Reward: `
+                    },
+                    {
+                      type: 'text',
+                      text: `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: `
+                    },
+                    {
+                      type: 'text',
+                      marks: [
+                        {
+                          type: 'link',
+                          attrs: {
+                            href: `https://app.charmverse.io/${currentSpace?.domain}/${page.path}`
+                          }
+                        }
+                      ],
+                      text: shareLink
+                    }
+                  ]
+                }
+              ]
+            }}
+            link={shareLink}
+            readOnly={readOnly}
+          />
+        </>
       )}
     </LoadingComponent>
   );

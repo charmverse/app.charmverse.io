@@ -97,13 +97,13 @@ export function RewardProperties(props: {
 
       {!isTemplate && (
         <>
-          {!!currentReward?.id && showApplications && (
+          {!!currentReward?.id && showApplications && initialReward && initialReward?.status !== 'draft' && (
             <>
               <Divider sx={{ my: 1 }} />
               <Stack>
                 <RewardApplications
                   applicationRequired={currentReward.approveSubmitters ?? false}
-                  rewardId={currentReward.id}
+                  reward={initialReward}
                 />
               </Stack>
             </>
