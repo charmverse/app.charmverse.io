@@ -10,14 +10,17 @@ import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/p
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
-import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import {
+  allReviewersSystemRole,
+  authorSystemRole
+} from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { Reward, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 
@@ -63,6 +66,8 @@ export function MilestonePropertiesForm({
   const { templates: rewardTemplates = [] } = useRewardTemplates();
   const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
+  const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
+
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
       const customReward = updates.customReward;
@@ -176,6 +181,33 @@ export function MilestonePropertiesForm({
                 </Box>
               </Box>
             )}
+
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
+                Reviewers
+              </PropertyLabel>
+              {isProposalTemplate ? (
+                <UserAndRoleSelect
+                  readOnly
+                  value={[{ group: 'system_role', id: ProposalSystemRole.all_reviewers }]}
+                  systemRoles={[allReviewersSystemRole]}
+                  onChange={() => {}}
+                />
+              ) : (
+                <UserAndRoleSelect
+                  readOnly={readOnlyReviewers}
+                  value={values.reviewers ?? []}
+                  onChange={async (options) => {
+                    const reviewerOptions = options.filter(
+                      (option) => option.group === 'role' || option.group === 'user'
+                    ) as RewardReviewer[];
+                    await applyUpdates({
+                      reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+                    });
+                  }}
+                />
+              )}
+            </Box>
 
             {/* Select authors */}
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
