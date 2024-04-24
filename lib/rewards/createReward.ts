@@ -162,16 +162,23 @@ export async function createReward({
           create: {
             permissions: {
               createMany: {
-                data: [
-                  {
-                    permissionLevel: 'view',
-                    spaceId
-                  },
-                  {
-                    permissionLevel: 'full_access',
-                    userId
-                  }
-                ]
+                data: isDraft
+                  ? [
+                      {
+                        permissionLevel: 'full_access',
+                        userId
+                      }
+                    ]
+                  : [
+                      {
+                        permissionLevel: 'view',
+                        spaceId
+                      },
+                      {
+                        permissionLevel: 'full_access',
+                        userId
+                      }
+                    ]
               }
             },
             id: rewardId,
