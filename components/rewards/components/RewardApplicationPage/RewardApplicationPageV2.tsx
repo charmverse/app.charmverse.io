@@ -272,6 +272,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
             closeSidebar: () => setActiveView(null),
             openSidebar: () => setActiveView('reward_evaluation')
           }}
+          page={page}
           readOnly={!page?.permissionFlags?.edit_content}
           application={application}
           reward={reward}
