@@ -26,10 +26,8 @@ import { ProposalEvaluations } from 'components/proposals/ProposalPage/component
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
-import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
@@ -40,8 +38,8 @@ import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
@@ -103,7 +101,6 @@ function DocumentPageComponent({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
@@ -472,7 +469,6 @@ function DocumentPageComponent({
                       isTemplate={page.type === 'bounty_template'}
                     />
                   )}
-                  {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                 </CardPropertiesWrapper>
                 {proposal && proposal.formId ? (
                   page.type === 'proposal_template' ? (
