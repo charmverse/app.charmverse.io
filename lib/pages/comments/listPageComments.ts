@@ -19,14 +19,6 @@ export async function listPageComments({ pageId, userId }: ListPageCommentsProps
       createdAt: 'desc'
     }
   });
-  const page = await prisma.page.findFirst({
-    where: {
-      id: pageId
-    },
-    include: {
-      comments: true
-    }
-  });
 
   return comments.map(({ votes, ...comment }) => {
     let upvoted: boolean | null = null;
