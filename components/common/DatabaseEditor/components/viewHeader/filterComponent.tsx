@@ -4,7 +4,7 @@ import { Divider, MenuItem, Select, Typography, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { capitalize } from 'lodash';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { FormattedMessage } from 'react-intl';
 import { v4 } from 'uuid';
 
@@ -38,15 +38,18 @@ const FilterComponent = React.memo((props: Props) => {
   const localViewSettings = useLocalDbViewSettings();
   const currentFilter = useViewFilter(activeView);
 
-  const changeViewFilter = (filterGroup: FilterGroup) => {
-    // update filters locally if local settings context exist
-    if (localViewSettings) {
-      localViewSettings.setLocalFilters(filterGroup);
-      return;
-    }
+  const changeViewFilter = useCallback(
+    (filterGroup: FilterGroup) => {
+      // update filters locally if local settings context exist
+      if (localViewSettings) {
+        localViewSettings.setLocalFilters(filterGroup);
+        return;
+      }
 
-    mutator.changeViewFilter(activeView.id, currentFilter, filterGroup);
-  };
+      mutator.changeViewFilter(activeView.id, currentFilter, filterGroup);
+    },
+    [localViewSettings, activeView.id, currentFilter]
+  );
 
   const conditionClicked = (condition: FilterCondition, filter: FilterClause): void => {
     const filterGroup = createFilterGroup(currentFilter);
@@ -96,7 +99,9 @@ const FilterComponent = React.memo((props: Props) => {
             <Stack
               flexDirection='row'
               gap={1}
-              key={`${filter.propertyId}-${filter.condition}-${filter.values.join(',')}`}
+              // filters do not have unique ids
+              // eslint-disable-next-line react/no-array-index-key
+              key={`${filter.propertyId}-${filter.condition}-${filterIndex}`}
               alignItems='center'
             >
               <Stack sx={{ width: 75 }} flexDirection='row' justifyContent='flex-end'>
