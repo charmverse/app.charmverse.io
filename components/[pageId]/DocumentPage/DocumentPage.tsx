@@ -153,7 +153,11 @@ function DocumentPageComponent({
   );
 
   const showPageBanner =
-    page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
+    page.type !== 'proposal' &&
+    page.type !== 'proposal_template' &&
+    page.type !== 'proposal_notes' &&
+    page.type !== 'bounty' &&
+    page.type !== 'bounty_template';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, currentPageId: threadsPageId } = useThreads();
