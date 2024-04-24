@@ -155,6 +155,7 @@ export function createBoard({
     pageType: 'board',
     ...createBlock(block),
     type: 'board',
+    isLocked: block?.isLocked,
     fields: {
       showDescription: block?.fields?.showDescription ?? false,
       description: block?.fields?.description ?? '',

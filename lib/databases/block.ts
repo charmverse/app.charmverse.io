@@ -61,7 +61,7 @@ type Block = {
 type RequiredFields = 'id' | 'spaceId' | 'rootId' | 'createdBy' | 'updatedBy' | 'createdAt' | 'updatedAt';
 
 export type BlockWithDetails = OptionalFalseyFields<
-  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | 'isLocked' | RequiredFields> & {
+  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | RequiredFields> & {
     pageId?: string;
     bountyId?: string;
     galleryImage?: string;
@@ -106,8 +106,7 @@ export function createBlock(block?: Partial<UIBlockWithDetails>): UIBlockWithDet
     rootId: block?.rootId || '',
     type: block?.type || 'unknown',
     updatedAt,
-    updatedBy: block?.updatedBy || '',
-    isLocked: block?.isLocked
+    updatedBy: block?.updatedBy || ''
   };
 }
 
@@ -118,14 +117,14 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
   const newDeletedFields = difference(Object.keys(newBlock.fields), Object.keys(oldBlock.fields));
   const newUpdatedFields: Record<string, any> = {};
   const newUpdatedData: Record<string, any> = {};
-  Object.keys(newBlock.fields).forEach((val) => {
-    if (oldBlock.fields[val] !== newBlock.fields[val]) {
-      newUpdatedFields[val] = newBlock.fields[val];
+  Object.keys(newBlock.fields).forEach((key) => {
+    if (oldBlock.fields[key] !== newBlock.fields[key]) {
+      newUpdatedFields[key] = newBlock.fields[key];
     }
   });
-  Object.keys(newBlock).forEach((val) => {
-    if (val !== 'fields' && (oldBlock as any)[val] !== (newBlock as any)[val]) {
-      newUpdatedData[val] = (newBlock as any)[val];
+  Object.keys(newBlock).forEach((key) => {
+    if (key !== 'fields' && (oldBlock as any)[key] !== (newBlock as any)[key] && key !== 'isLocked') {
+      newUpdatedData[key] = (newBlock as any)[key];
     }
   });
 
@@ -172,8 +171,7 @@ export function blockToPrisma(fbBlock: UIBlockWithDetails): PrismaBlockSortOf {
     fields: fbBlock.fields,
     deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
     createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
-    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt),
-    isLocked: !!fbBlock.isLocked
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
   };
 }
 export function blockToPrismaPartial(fbBlock: Partial<UIBlockWithDetails>): Partial<PrismaBlockSortOf> {

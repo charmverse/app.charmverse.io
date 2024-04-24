@@ -232,6 +232,8 @@ function DocumentPageComponent({
     setConnectionError(null);
   }, [page.id, threadsPageId]);
 
+  // console.log('BOARD', board);
+
   const threadIds = useMemo(
     () =>
       typeof page.type === 'string'
@@ -441,7 +443,7 @@ function DocumentPageComponent({
                         readOnly={readOnly}
                         pageUpdatedAt={page.updatedAt.toString()}
                         pageUpdatedBy={page.updatedBy}
-                        // disableEditPropertyOption={board.isLocked}
+                        disableEditPropertyOption={!!board.isLocked}
                       />
                       <AddBountyButton readOnly={readOnly} card={card} />
                     </>

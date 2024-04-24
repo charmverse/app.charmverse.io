@@ -55,6 +55,8 @@ function CardDetailProperties(props: Props) {
     disableEditPropertyOption
   } = props;
 
+  // console.log('DISABLE EDIT PROPERTY OPTION', disableEditPropertyOption);
+
   const [newTemplateId, setNewTemplateId] = useState('');
   const intl = useIntl();
   const addPropertyPopupState = usePopupState({ variant: 'popover', popupId: 'add-property' });

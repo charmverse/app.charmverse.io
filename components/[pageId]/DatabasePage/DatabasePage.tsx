@@ -102,6 +102,8 @@ export function DatabasePage({ page, setPage, readOnly = false, pagePermissions 
     }
   }, [board?.id, page.id]);
 
+  // console.log('DB PAGE', board);
+
   useHotkeys('ctrl+z,cmd+z', () => {
     Utils.log('Undo');
     if (mutator.canUndo) {

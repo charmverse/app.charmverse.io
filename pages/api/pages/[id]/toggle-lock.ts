@@ -24,7 +24,7 @@ async function togglePageLockController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError('You cannot edit the lock for this page');
   }
 
-  const { page: updatedPage, block: updatedBlock } = await togglePageLock({
+  const updatedPage = await togglePageLock({
     isLocked: req.body.isLocked,
     pageId,
     userId
@@ -38,13 +38,19 @@ async function togglePageLockController(req: NextApiRequest, res: NextApiRespons
     updatedPage.spaceId
   );
 
-  if (updatedBlock) {
+  if (updatedPage.boardId) {
     relay.broadcast(
       {
         type: 'blocks_updated',
-        payload: [updatedBlock]
+        payload: [
+          {
+            id: updatedPage.id,
+            spaceId: updatedPage.spaceId,
+            isLocked: updatedPage.isLocked
+          }
+        ]
       },
-      updatedBlock.spaceId
+      updatedPage.spaceId
     );
   }
 

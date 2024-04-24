@@ -19,6 +19,8 @@ export function blockToFBBlock(block: BlockWithDetails): UIBlockWithDetails {
       headerImage: replaceS3Domain(fields.headerImage)
     };
   }
+
+  // console.log('RAW BLOCK', block);
   return {
     ...block,
     deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,

@@ -114,17 +114,20 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     }
   }
 
-  const newBlocks = data.map((block) => ({
-    ...block,
-    fields: block.fields as any,
-    parentId: block.parentId || '',
-    schema: 1,
-    spaceId: space.id,
-    title: block.title || '',
-    createdBy: req.session.user.id,
-    updatedBy: req.session.user.id,
-    deletedAt: null
-  }));
+  const newBlocks = data.map((block) => {
+    delete block.isLocked;
+    return {
+      ...block,
+      fields: block.fields as any,
+      parentId: block.parentId || '',
+      schema: 1,
+      spaceId: space.id,
+      title: block.title || '',
+      createdBy: req.session.user.id,
+      updatedBy: req.session.user.id,
+      deletedAt: null
+    };
+  });
 
   const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
 
@@ -329,6 +332,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
 
   const updatedBlocks = await prisma.$transaction(
     blocks.map((block) => {
+      delete block.isLocked;
+
       return prisma.block.update({
         where: { id: block.id },
         data: {
