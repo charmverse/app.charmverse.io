@@ -17,7 +17,7 @@ export type Card<V = CardPropertyValue> = Omit<UIBlockWithDetails, 'type'> & {
   fields: CardFields<V>;
   customIconType?: 'applicationStatus' | 'reward';
   type: 'card';
-  isLocked?: boolean;
+  isLocked?: boolean | null;
 };
 
 export type CardPageProposal = {

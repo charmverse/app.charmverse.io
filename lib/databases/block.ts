@@ -69,7 +69,7 @@ export type BlockWithDetails = OptionalFalseyFields<
     hasContent?: boolean;
     pageType?: PageType;
     syncWithPageId?: string;
-    isLocked?: boolean;
+    isLocked?: boolean | null;
   }
 > &
   Pick<PrismaBlock, RequiredFields> & { fields: Record<string, any>; type: BlockTypes };
@@ -106,7 +106,8 @@ export function createBlock(block?: Partial<UIBlockWithDetails>): UIBlockWithDet
     rootId: block?.rootId || '',
     type: block?.type || 'unknown',
     updatedAt,
-    updatedBy: block?.updatedBy || ''
+    updatedBy: block?.updatedBy || '',
+    isLocked: block?.isLocked
   };
 }
 
