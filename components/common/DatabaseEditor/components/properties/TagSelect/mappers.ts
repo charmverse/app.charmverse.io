@@ -24,3 +24,15 @@ export function mapPropertyOptionToSelectOption(option: IPropertyOption): Select
     disabled: option.disabled
   };
 }
+
+export function mapValueToSelectOption(value: string): SelectOptionType {
+  return {
+    id: value,
+    name: value,
+    color: 'default'
+    // variant: option.variant,
+    // dropdownName: option.dropdownValue,
+    // color: convertFocalboardToMUIColor(option.color)
+    // disabled: option.disabled
+  };
+}

@@ -1,7 +1,7 @@
 import { FormControlLabel, Stack, Switch, Typography } from '@mui/material';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { FieldConfig, ProjectFieldProperty } from 'lib/projects/interfaces';
+import type { FieldConfig, ProjectFieldProperty } from 'lib/projects/formField';
 
 export function FieldsEditor({
   onChange,

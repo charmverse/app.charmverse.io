@@ -40,6 +40,7 @@ const boardPage: PageMeta = {
   galleryImage: null,
   hasContent: false,
   headerImage: null,
+  lensPostLink: null,
   icon: null,
   index: 0,
   parentId: null,

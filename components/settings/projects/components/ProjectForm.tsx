@@ -7,11 +7,10 @@ import { useGetProjects } from 'charmClient/hooks/projects';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { useUser } from 'hooks/useUser';
-import {
-  createDefaultProjectAndMembersFieldConfig,
-  createDefaultProjectAndMembersPayload
-} from 'lib/projects/constants';
-import type { ProjectAndMembersFieldConfig, ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 import { useProjectUpdates } from '../hooks/useProjectUpdates';
 

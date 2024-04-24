@@ -6,6 +6,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
 import type { Card } from './card';
+import { Constants } from './constants';
 
 export const proposalPropertyTypesList = [
   'proposalUrl',
@@ -20,6 +21,7 @@ export const proposalPropertyTypesList = [
   'proposalStep',
   'proposalReviewerNotes'
 ] as const;
+
 export type ProposalPropertyType = (typeof proposalPropertyTypesList)[number];
 
 export type PropertyType =
@@ -43,7 +45,7 @@ export type PropertyType =
   | 'relation'
   | ProposalPropertyType;
 
-interface IPropertyOption<T = string> {
+export interface IPropertyOption<T = string> {
   id: T;
   value: string;
   color: string;
@@ -68,8 +70,10 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
   formFieldId?: string;
   private?: boolean; // used for answers to form fields in proposal-as-a-source
-  proposalFieldId?: string;
   relationData?: RelationPropertyData;
+  readOnly?: boolean; // whether this property cannot be deleted or renamed by users
+  readOnlyValues?: boolean; // whether the values of this property are synced and uneditable
+  dynamicOptions?: boolean; // do not rely on a static list of options
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
@@ -96,12 +100,17 @@ export type BoardFields = {
   sourceData?: GoogleFormSourceData;
 };
 
-type Board = UIBlockWithDetails & {
+export type Board = UIBlockWithDetails & {
   pageType: Exclude<UIBlockWithDetails['pageType'], undefined>;
   fields: BoardFields;
 };
 
-function createBoard({
+export type BoardGroup = {
+  option: IPropertyOption;
+  cards: Card[];
+};
+
+export function createBoard({
   block,
   addDefaultProperty
 }: { block?: Partial<UIBlockWithDetails>; addDefaultProperty?: boolean } | undefined = {}): Board {
@@ -159,10 +168,7 @@ function createBoard({
   };
 }
 
-type BoardGroup = {
-  option: IPropertyOption;
-  cards: Card[];
-};
-
-export { createBoard };
-export type { Board, IPropertyOption, BoardGroup };
+// these properties cannot be deleted or renamed by users
+export function isReadonlyPropertyTitle({ id: templateId, readOnly }: IPropertyTemplate): boolean {
+  return (templateId.startsWith('__') && templateId !== Constants.titleColumnId) || !!readOnly;
+}

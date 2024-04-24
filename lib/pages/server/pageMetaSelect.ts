@@ -13,6 +13,7 @@ export function pageMetaSelect(): Record<keyof PageMeta, true> {
     galleryImage: true,
     hasContent: true,
     headerImage: true,
+    lensPostLink: true,
     icon: true,
     index: true,
     parentId: true,

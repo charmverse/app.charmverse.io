@@ -28,7 +28,6 @@ import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
-import { proposalPropertyTypesList } from 'lib/databases/board';
 import type { CardWithRelations } from 'lib/databases/card';
 import {
   EVALUATION_STATUS_LABELS,
@@ -156,8 +155,7 @@ function PropertyValueElement(props: Props) {
   const propertyValue = card.fields.properties[propertyTemplate.id];
   const cardProperties = board.fields.cardProperties;
   const cardProperty = cardProperties.find((_cardProperty) => _cardProperty.id === propertyTemplate.id);
-  const readOnly =
-    proposal?.archived || props.readOnly || !!cardProperty?.formFieldId || !!cardProperty?.proposalFieldId;
+  const readOnly = proposal?.archived || props.readOnly || !!cardProperty?.readOnlyValues;
 
   const displayValue = OctoUtils.propertyDisplayValue({
     block: card,
@@ -440,11 +438,12 @@ function PropertyValueElement(props: Props) {
       <TagSelect
         data-test='closed-select-input'
         dataTestActive='active-select-autocomplete'
-        canEditOptions={!readOnly && !proposalPropertyTypesList.includes(propertyTemplate.type as any)}
+        canEditOptions={!readOnly}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
-        readOnly={readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any)}
-        propertyValue={propertyValue as string}
+        displayValueAsOptions={propertyTemplate.dynamicOptions}
+        readOnly={readOnly}
+        propertyValue={propertyValue as string | string[]}
         options={propertyTemplate.options}
         onChange={async (newValue) => {
           try {
@@ -484,20 +483,12 @@ function PropertyValueElement(props: Props) {
     !card.fields.isAssigned
   ) {
     propertyValueElement = null;
-  } else if (
-    propertyTemplate.type === 'person' ||
-    propertyTemplate.type === 'proposalEvaluatedBy' ||
-    propertyTemplate.id === REWARDS_APPLICANTS_BLOCK_ID
-  ) {
+  } else if (propertyTemplate.type === 'person' || propertyTemplate.type === 'proposalEvaluatedBy') {
     propertyValueElement = (
       <UserSelect
         displayType={displayType}
         memberIds={typeof propertyValue === 'string' ? [propertyValue] : (propertyValue as string[]) ?? []}
-        readOnly={
-          readOnly ||
-          (displayType !== 'details' && displayType !== 'table') ||
-          proposalPropertyTypesList.includes(propertyTemplate.type as any)
-        }
+        readOnly={readOnly || (displayType !== 'details' && displayType !== 'table')}
         onChange={async (newValue) => {
           try {
             await mutator.changePropertyValue(card, propertyTemplate.id, newValue);
@@ -666,7 +657,7 @@ function PropertyValueElement(props: Props) {
   const commonProps = {
     className: 'octo-propertyvalue',
     placeholderText: emptyDisplayValue || showUnlimited,
-    readOnly: props.readOnly || proposalPropertyTypesList.includes(propertyTemplate.type as any),
+    readOnly,
     value: value.toString(),
     autoExpand: true,
     onChange: setValue,

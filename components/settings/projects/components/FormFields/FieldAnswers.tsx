@@ -3,7 +3,8 @@ import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
-import type { ProjectAndMembersPayload, ProjectFieldProperty, FieldConfig } from 'lib/projects/interfaces';
+import type { ProjectFieldProperty, FieldConfig } from 'lib/projects/formField';
+import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
 function FieldAnswer({
   property,
@@ -27,7 +28,9 @@ function FieldAnswer({
     name
   });
 
-  const registeredField = register(name);
+  const registeredField = register(name, {
+    setValueAs: (value) => value.trim()
+  });
 
   const isShown = fieldConfig?.[property.field]?.show ?? true;
   if (!isShown) {
@@ -49,7 +52,7 @@ function FieldAnswer({
       onChange={(e) => {
         field.onChange(e);
         if (onChange) {
-          onChange({ [property.field]: e.target.value });
+          onChange({ [property.field]: e.target.value.trim() });
         }
       }}
     />

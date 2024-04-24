@@ -42,6 +42,7 @@ const boardPage: PageMeta = {
   deletedAt: null,
   deletedBy: null,
   galleryImage: null,
+  lensPostLink: null,
   hasContent: false,
   headerImage: null,
   icon: null,

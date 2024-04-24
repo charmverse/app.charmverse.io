@@ -433,12 +433,8 @@ describe('getCardPropertiesFromProposals', () => {
 
     const boardCardProperties = databaseBoard.fields.cardProperties;
 
-    const textProperty = boardCardProperties.find(
-      (prop) => prop.id === customProperties[0].id && prop.proposalFieldId === customProperties[0].id
-    );
-    const selectProperty = boardCardProperties.find(
-      (prop) => prop.id === customProperties[1].id && prop.proposalFieldId === customProperties[1].id
-    );
+    const textProperty = boardCardProperties.find((prop) => prop.id === customProperties[0].id);
+    const selectProperty = boardCardProperties.find((prop) => prop.id === customProperties[1].id);
 
     expect(textProperty).toBeDefined();
     expect(selectProperty).toBeDefined();
