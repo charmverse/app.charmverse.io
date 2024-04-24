@@ -26,7 +26,8 @@ export function blockToFBBlock(block: BlockWithDetails): UIBlockWithDetails {
     updatedAt: new Date(block.updatedAt).getTime(),
     title: block.title || '',
     type: block.type as UIBlockWithDetails['type'],
-    fields
+    fields,
+    isLocked: block.isLocked
   };
 }
 
@@ -40,6 +41,7 @@ export function fbBlockToBlock(fbBlock: UIBlockWithDetails): Omit<BlockWithDetai
     fields: fbBlock.fields,
     deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
     createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
-    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt),
+    isLocked: fbBlock.isLocked
   };
 }

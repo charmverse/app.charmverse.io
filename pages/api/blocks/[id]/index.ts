@@ -6,7 +6,8 @@ import nc from 'next-connect';
 
 import type { BlockWithDetails } from 'lib/databases/block';
 import { applyPageToBlock } from 'lib/databases/block';
-import type { BoardFields } from 'lib/databases/board';
+import type { Board, BoardFields } from 'lib/databases/board';
+import type { Card } from 'lib/databases/card';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { applyPropertiesToCard } from 'lib/databases/proposalsSource/applyPropertiesToCards';
 import { getCardPropertiesFromProposal } from 'lib/databases/proposalsSource/getCardProperties';
@@ -79,6 +80,10 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
       canViewPrivateFields: proposalPermission.view_private_fields
     });
     Object.assign(result, updatedFields);
+  }
+
+  if (page?.isLocked) {
+    (block as Pick<Board | Card, 'isLocked'>).isLocked = true;
   }
 
   return res.status(200).json(result);

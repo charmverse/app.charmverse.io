@@ -103,6 +103,7 @@ export type BoardFields = {
 export type Board = UIBlockWithDetails & {
   pageType: Exclude<UIBlockWithDetails['pageType'], undefined>;
   fields: BoardFields;
+  isLocked?: boolean;
 };
 
 export type BoardGroup = {

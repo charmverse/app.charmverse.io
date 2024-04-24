@@ -1,11 +1,9 @@
-import type { PageType, Block as PrismaBlock, Page } from '@charmverse/core/prisma';
+import type { Page, PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
 import type { OptionalFalseyFields } from 'lib/utils/objects';
 import { replaceS3Domain } from 'lib/utils/url';
-
-import { Constants } from './constants';
 
 // export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
@@ -25,7 +23,8 @@ type PageFields = Pick<
   | 'type'
   | 'updatedBy'
   | 'updatedAt'
->;
+> &
+  Partial<Pick<Page, 'isLocked'>>;
 
 export type BlockPatch = {
   spaceId?: string;
@@ -62,7 +61,7 @@ type Block = {
 type RequiredFields = 'id' | 'spaceId' | 'rootId' | 'createdBy' | 'updatedBy' | 'createdAt' | 'updatedAt';
 
 export type BlockWithDetails = OptionalFalseyFields<
-  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | RequiredFields> & {
+  Omit<PrismaBlock, 'fields' | 'schema' | 'type' | 'isLocked' | RequiredFields> & {
     pageId?: string;
     bountyId?: string;
     galleryImage?: string;
@@ -70,6 +69,7 @@ export type BlockWithDetails = OptionalFalseyFields<
     hasContent?: boolean;
     pageType?: PageType;
     syncWithPageId?: string;
+    isLocked?: boolean;
   }
 > &
   Pick<PrismaBlock, RequiredFields> & { fields: Record<string, any>; type: BlockTypes };
@@ -81,6 +81,7 @@ export type UIBlockWithDetails = Block & {
   icon?: string;
   hasContent?: boolean;
   pageType?: PageType;
+  isLocked?: boolean | null;
 };
 
 // cant think of a better word for this.. handle some edge cases with types from the prisma client
@@ -170,7 +171,8 @@ export function blockToPrisma(fbBlock: UIBlockWithDetails): PrismaBlockSortOf {
     fields: fbBlock.fields,
     deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
     createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
-    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt),
+    isLocked: !!fbBlock.isLocked
   };
 }
 export function blockToPrismaPartial(fbBlock: Partial<UIBlockWithDetails>): Partial<PrismaBlockSortOf> {
@@ -228,7 +230,8 @@ export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
     updatedAt: new Date(block.updatedAt).getTime(),
     title: block.title || '',
     type: block.type as UIBlockWithDetails['type'],
-    fields
+    fields,
+    isLocked: block.isLocked
   };
 }
 
@@ -246,6 +249,7 @@ export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWit
   blockWithDetails.pageType = page.type;
   blockWithDetails.updatedAt = page.updatedAt;
   blockWithDetails.updatedBy = page.updatedBy;
+  blockWithDetails.isLocked = !!page.isLocked;
   // used for sorting
   // if (blockWithDetails.type === 'card') {
   //   blockWithDetails.fields ||= { properties: {} };

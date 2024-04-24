@@ -319,6 +319,7 @@ export function boardWithCardsArgs({
       schema: 1,
       type: 'view',
       title: `My entries - ${i + 1}`,
+      isLocked: false,
       fields: {
         filter: {
           filters: [],
