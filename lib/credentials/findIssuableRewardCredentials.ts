@@ -84,10 +84,6 @@ export function generateCredentialInputsForReward({
       const targetWallet = application.applicant.primaryWallet?.address ?? application.applicant.wallets[0]?.address;
 
       if (!targetWallet) {
-        log.warn(`User has no wallet to issue credentials to`, {
-          userId: application.createdBy,
-          applicationId: application.id
-        });
         return;
       }
 
