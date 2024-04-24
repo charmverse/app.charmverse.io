@@ -36,7 +36,7 @@ export function useNewReward() {
   }, []);
 
   const createReward = useCallback(
-    async (pageValues: (RewardPageProps & { linkedPageId?: string }) | null) => {
+    async (pageValues: (RewardPageProps & { isDraft?: boolean; linkedPageId?: string }) | null) => {
       pageValues ||= EMPTY_PAGE_VALUES;
       log.info('[user-journey] Create a reward');
       if (currentSpace) {
@@ -55,6 +55,7 @@ export function useNewReward() {
                 type: pageValues.type
               },
           ...rewardValues,
+          isDraft: pageValues.isDraft,
           linkedPageId: pageValues.linkedPageId,
           spaceId: currentSpace.id
         })

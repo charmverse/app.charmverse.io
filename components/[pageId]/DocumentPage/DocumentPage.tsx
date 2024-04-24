@@ -28,6 +28,7 @@ import { ProposalRewardsTable } from 'components/proposals/ProposalPage/componen
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
+import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -122,7 +123,7 @@ function DocumentPageComponent({
     proposalId
   });
 
-  const { onChangeRewardWorkflow, reward, updateReward } = useReward({
+  const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
   });
 
@@ -152,7 +153,11 @@ function DocumentPageComponent({
   );
 
   const showPageBanner =
-    page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
+    page.type !== 'proposal' &&
+    page.type !== 'proposal_template' &&
+    page.type !== 'proposal_notes' &&
+    page.type !== 'bounty' &&
+    page.type !== 'bounty_template';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, currentPageId: threadsPageId } = useThreads();
@@ -580,6 +585,9 @@ function DocumentPageComponent({
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
           <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
+        )}
+        {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
+          <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />
         )}
       </FormProvider>
     </Box>

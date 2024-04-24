@@ -34,6 +34,7 @@ export type CardPageProposal = {
 export type CardPageReward = {
   id: string;
   rewardType: RewardType;
+  applications: { createdBy: string }[];
 };
 
 export type CardWithRelations<V = CardPropertyValue> = Card<V> & {

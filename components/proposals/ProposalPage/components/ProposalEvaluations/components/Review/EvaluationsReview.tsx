@@ -97,9 +97,7 @@ export function EvaluationsReview({
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
 
   const shareLink = getAbsolutePath(pagePath || '', currentSpace?.domain);
-  const shareText = `${pageTitle || 'Untitled'} from ${
-    currentSpace?.name
-  } is now open for feedback.\nView on CharmVerse:\n`;
+  const shareText = `${pageTitle || 'Untitled'} from ${currentSpace?.name} is now open for feedback.\n`;
   const { user } = useUser();
   const isRewardsActive =
     hasRewardsStep && currentEvaluation?.result === 'pass' && (!hasCredentialsStep || !!isCredentialsComplete);
@@ -299,7 +297,7 @@ export function EvaluationsReview({
             pageId={pageId}
             lensPostLink={pageLensPostLink}
             onPublish={refreshProposal}
-            text={shareText}
+            text={`${shareText}\nView on CharmVerse:\n`}
             content={{
               type: 'doc',
               content: [

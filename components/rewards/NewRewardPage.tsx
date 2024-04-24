@@ -162,14 +162,15 @@ export function NewRewardPage({
     }
   }
 
-  const saveForm = async () => {
-    setSubmittedDraft(true);
+  const saveForm = async (isDraft?: boolean) => {
+    setSubmittedDraft(!!isDraft);
     const createdReward = await createReward({
       content: pageData.content,
       contentText: pageData.contentText,
       title: pageData.title,
       type: rewardPageType,
-      sourceTemplateId: sourceTemplate?.page.id
+      sourceTemplateId: sourceTemplate?.page.id,
+      isDraft
     });
 
     if (createdReward) {
@@ -295,10 +296,19 @@ export function NewRewardPage({
             </Box>
             <StickyFooterContainer>
               <Button
+                disabled={isSavingReward}
+                loading={isSavingReward && submittedDraft}
+                data-test='create-proposal-button'
+                variant='outlined'
+                onClick={() => saveForm(true)}
+              >
+                Save draft
+              </Button>
+              <Button
                 data-test='publish-new-reward-button'
                 disabled={Boolean(disabledTooltip) || isSavingReward}
                 disabledTooltip={disabledTooltip}
-                onClick={saveForm}
+                onClick={() => saveForm()}
                 loading={isSavingReward && !submittedDraft}
               >
                 Publish
