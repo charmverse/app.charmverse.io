@@ -27,7 +27,6 @@ export function createMockPage(input: MockPageInput = {}): MockPageOutput {
     updatedAt: new Date(),
     sourceTemplateId: null,
     updatedBy: '',
-    lensPostLink: null,
     headerImage: null,
     icon: null,
     id: uuid(),
