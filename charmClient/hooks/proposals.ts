@@ -23,7 +23,6 @@ import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCrit
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
-import type { UpdateProposalLensPropertiesRequest } from 'lib/proposals/updateProposalLensProperties';
 
 import type { MaybeString } from './helpers';
 import { useDELETE, useGET, useGETtrigger, usePOST, usePUT } from './helpers';
@@ -111,12 +110,6 @@ export function useUpsertDraftRubricCriteriaAnswers({ proposalId }: { proposalId
 
 export function useDeleteRubricCriteriaAnswers({ proposalId }: { proposalId: MaybeString }) {
   return useDELETE<{ isDraft: boolean; evaluationId: string }>(`/api/proposals/${proposalId}/rubric-answers`);
-}
-
-export function useUpdateProposalLensProperties({ proposalId }: { proposalId: string }) {
-  return usePUT<Omit<UpdateProposalLensPropertiesRequest, 'proposalId'>>(
-    `/api/proposals/${proposalId}/update-lens-properties`
-  );
 }
 
 export function useUpdateProposalBlocks(spaceId: string) {

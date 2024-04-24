@@ -22,14 +22,16 @@ import type { DocumentPageProps } from './DocumentPage';
 import { DocumentPage } from './DocumentPage';
 import { usePageSidebar } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
+import { useReward } from './hooks/useReward';
 
 type DocumentPageWithSidebarsProps = DocumentPageProps & {
   readOnly?: boolean;
   insideModal?: boolean;
+  refreshPage?: VoidFunction;
 };
 
 function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps) {
-  const { page, readOnly = false } = props;
+  const { page, readOnly = false, refreshPage } = props;
   const { router } = useCharmRouter();
   const { activeView: sidebarView, setActiveView, closeSidebar } = usePageSidebar();
   const { editMode } = useCharmEditor();
@@ -52,17 +54,9 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     proposalId
   });
 
-  const { data: reward, mutate: refreshReward } = useGetReward({ rewardId });
-
-  async function updateReward(updateContent: UpdateableRewardFields) {
-    if (rewardId) {
-      await charmClient.rewards.updateReward({
-        rewardId,
-        updateContent
-      });
-      refreshReward();
-    }
-  }
+  const { onChangeRewardWorkflow, reward, updateReward } = useReward({
+    rewardId
+  });
 
   const { threads, isLoading: isLoadingThreads, currentPageId: threadsPageId } = useThreads();
   const isSharedPage = router.pathname.startsWith('/share');
@@ -119,31 +113,12 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     setDefaultView(null);
   }, []);
 
-  async function onChangeRewardWorkflow(workflow: RewardWorkflow) {
-    if (workflow.id === 'application_required') {
-      updateReward({
-        approveSubmitters: true,
-        assignedSubmitters: null
-      });
-    } else if (workflow.id === 'direct_submission') {
-      updateReward({
-        approveSubmitters: false,
-        assignedSubmitters: null
-      });
-    } else if (workflow.id === 'assigned') {
-      updateReward({
-        approveSubmitters: false,
-        allowMultipleApplications: false,
-        assignedSubmitters: [user!.id]
-      });
-    }
-  }
-
   return (
     <DocumentColumnLayout>
       <DocumentColumn>
         <DocumentPage
           {...props}
+          refreshPage={refreshPage}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
           sidebarView={internalSidebarView}
@@ -171,6 +146,8 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('proposal_evaluation'),
             closeSidebar
           }}
+          pageLensPostLink={page.lensPostLink}
+          refreshPage={refreshPage}
           pagePath={page.path}
           pageTitle={page.title}
           pageId={page.id}
@@ -196,10 +173,12 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             closeSidebar
           }}
           isDraft={reward.status === 'draft'}
+          refreshPage={refreshPage}
+          page={page}
           expanded={false}
           onChangeWorkflow={onChangeRewardWorkflow}
-          isTemplate={page.type === 'bounty_template'}
           onChangeReward={updateReward}
+          isTemplate={page.type === 'bounty_template'}
           reward={reward}
           rewardInput={reward}
           readOnly={props.readOnly}

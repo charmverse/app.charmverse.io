@@ -12,6 +12,7 @@ import type { ReactNode } from 'react';
 import type { BrandColor } from 'theme/colors';
 
 const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
+  draft: 'Draft',
   suggestion: 'Suggestion',
   open: 'Open',
   complete: 'Approved',
@@ -20,6 +21,7 @@ const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
 };
 
 const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
+  draft: 'gray',
   suggestion: 'purple',
   open: 'teal',
   complete: 'blue',
@@ -69,6 +71,7 @@ const StyledRewardStatusChip = styled(StyledStatusChip)<{ status?: RewardStatus 
 `;
 
 export const REWARD_STATUS_ICONS: Record<RewardStatus, ReactNode> = {
+  draft: <LightbulbIcon />,
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   complete: <CheckCircleOutlineIcon />,

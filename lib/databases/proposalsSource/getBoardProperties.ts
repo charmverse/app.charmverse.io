@@ -12,7 +12,7 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 export const excludedFieldTypes = ['project_profile', 'label'];
 
 // define properties that will apply to all source fields
-const defaultOptions = { readOnly: true, readOnlyValues: true, options: [], dynamicOptions: true };
+const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 
 // apply proposal-related properties to the board
 export function getBoardProperties({
@@ -46,10 +46,7 @@ export function getBoardProperties({
 
   // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
-    applyToPropertiesById(boardProperties, {
-      ...cardProp,
-      proposalFieldId: cardProp.id
-    });
+    applyToPropertiesById(boardProperties, cardProp);
   });
 
   // properties related to form proposals
@@ -134,12 +131,13 @@ function applyProjectProfileProperties(
   });
   projectMemberFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
-    if (config.show) {
+    if (getFieldConfig(fieldConfig[field.field]).show) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,
         private: config.private,
-        type: 'multiSelect'
+        type: 'multiSelect',
+        dynamicOptions: true
       });
     }
   });
@@ -168,14 +166,14 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
 type PartialPropertyTemplate = Omit<IPropertyTemplate, 'options'>;
 
 function applyToPropertiesById(boardProperties: IPropertyTemplate[], fieldProperty: PartialPropertyTemplate) {
-  const existingProp = boardProperties.find((p) => p.id === fieldProperty.id);
-  if (!existingProp) {
+  const existingPropIndex = boardProperties.findIndex((p) => p.id === fieldProperty.id);
+  if (existingPropIndex === -1) {
     boardProperties.push({
       ...defaultOptions,
       ...fieldProperty
     });
   } else {
-    Object.assign(existingProp, defaultOptions, fieldProperty);
+    boardProperties[existingPropIndex] = { ...defaultOptions, ...fieldProperty };
   }
 }
 
@@ -183,11 +181,12 @@ function applyToPropertiesByType(
   boardProperties: IPropertyTemplate[],
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
-  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type);
-  if (!existingProp) {
+  const existingPropIndex = boardProperties.findIndex((p) => p.type === fieldProperty.type);
+  if (existingPropIndex === -1) {
     boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
   } else {
-    Object.assign(existingProp, defaultOptions, fieldProperty);
+    const existingProp = boardProperties[existingPropIndex];
+    boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
   }
 }
 
@@ -195,11 +194,14 @@ function applyToPropertiesByTypeAndName(
   boardProperties: IPropertyTemplate[],
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
-  const existingProp = boardProperties.find((p) => p.type === fieldProperty.type && p.name === fieldProperty.name);
-  if (!existingProp) {
+  const existingPropIndex = boardProperties.findIndex(
+    (p) => p.type === fieldProperty.type && p.name === fieldProperty.name
+  );
+  if (existingPropIndex === -1) {
     boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
   } else {
-    Object.assign(existingProp, defaultOptions, fieldProperty);
+    const existingProp = boardProperties[existingPropIndex];
+    boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
   }
 }
 
@@ -207,15 +209,16 @@ function applyFormFieldToProperties(
   boardProperties: IPropertyTemplate[],
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
-  const existingProp = boardProperties.find((p) => p.formFieldId === fieldProperty.formFieldId);
-  if (!existingProp) {
+  const existingPropIndex = boardProperties.findIndex((p) => p.formFieldId === fieldProperty.formFieldId);
+  if (existingPropIndex === -1) {
     boardProperties.push({
       id,
       ...defaultOptions,
       ...fieldProperty
     });
   } else {
-    Object.assign(existingProp, defaultOptions, fieldProperty);
+    const existingProp = boardProperties[existingPropIndex];
+    boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
   }
 }
 

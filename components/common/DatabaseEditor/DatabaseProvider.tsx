@@ -1,7 +1,9 @@
+import type { PageMeta } from '@charmverse/core/pages';
 import { useCallback, useEffect } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
+import type { Card } from 'lib/databases/card';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 import { publishDeletes, publishIncrementalUpdate } from './publisher';
@@ -25,9 +27,7 @@ function DatabaseWatcher({ children }: { children: JSX.Element }) {
 
   const handlePageUpdates = useCallback(
     (value: WebSocketPayload<'pages_meta_updated'>) => {
-      // pass all values in, in case some are cards
-      const cards = value;
-      dispatch(updateCards(cards.map((page) => ({ id: page.id, title: page.title }))));
+      dispatch(updateCards(value.map(pageMetaUpdateToCard)));
     },
     [dispatch]
   );
@@ -63,4 +63,20 @@ export function DatabaseProvider({ children }: { children: JSX.Element }) {
       <DatabaseWatcher>{children}</DatabaseWatcher>
     </ReduxProvider>
   );
+}
+
+function pageMetaUpdateToCard(page: WebSocketPayload<'pages_meta_updated'>[number]): Partial<Card> & { id: string } {
+  const card: Partial<Card> & { id: string } = {
+    id: page.id
+  };
+  if ('title' in page) {
+    card.title = page.title;
+  }
+  if ('hasContent' in page) {
+    card.hasContent = page.hasContent;
+  }
+  if ('icon' in page) {
+    card.icon = page.icon || undefined;
+  }
+  return card;
 }

@@ -5,7 +5,6 @@ import { SessionType, useCreateComment, useCreatePost } from '@lens-protocol/rea
 import { useState } from 'react';
 
 import { useUploadToArweave } from 'charmClient/hooks/lens';
-import { useUpdateProposalLensProperties } from 'charmClient/hooks/proposals';
 import { usePageComments } from 'components/[pageId]/DocumentPage/components/CommentsFooter/usePageComments';
 import { useHandleLensError, useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -16,6 +15,8 @@ import { LensChain } from 'lib/lens/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 
+import { usePage } from './usePage';
+
 async function switchNetwork() {
   return switchActiveNetwork(LensChain);
 }
@@ -23,8 +24,8 @@ async function switchNetwork() {
 export type CreateLensPublicationParams = {
   onError: VoidFunction;
   onSuccess: VoidFunction;
-  proposalLink: string;
-  proposalId: string;
+  link: string;
+  pageId: string;
 } & (
   | {
       publicationType: 'post';
@@ -37,13 +38,16 @@ export type CreateLensPublicationParams = {
 );
 
 export function useCreateLensPublication(params: CreateLensPublicationParams) {
-  const { onError, onSuccess, proposalId, publicationType, proposalLink } = params;
+  const { onError, onSuccess, pageId, publicationType, link } = params;
+  const { space } = useCurrentSpace();
   const { execute: createPost } = useCreatePost();
-  const { updateComment } = usePageComments(proposalId);
+  const { updateComment } = usePageComments(pageId);
   const { execute: createComment } = useCreateComment();
   const { chainId } = useWeb3Account();
-  const { trigger: updateProposalLensProperties } = useUpdateProposalLensProperties({ proposalId });
-  const { space } = useCurrentSpace();
+  const { updatePage } = usePage({
+    pageIdOrPath: pageId,
+    spaceId: space?.id
+  });
   const { handlerLensError } = useHandleLensError();
   const { showMessage } = useSnackbar();
   const [isPublishingToLens, setIsPublishingToLens] = useState(false);
@@ -73,7 +77,7 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
       });
 
       const finalMarkdownContent = `${markdownContent}${
-        publicationType === 'comment' ? `\n\nView on CharmVerse ${proposalLink}?commentId=${params.commentId}` : ''
+        publicationType === 'comment' ? `\n\nView on CharmVerse ${link}?commentId=${params.commentId}` : ''
       }`;
 
       const metadata = textOnly({ content: finalMarkdownContent });
@@ -130,7 +134,8 @@ export function useCreateLensPublication(params: CreateLensPublicationParams) {
       const createdPublication = completion.value;
 
       if (publicationType === 'post') {
-        await updateProposalLensProperties({
+        await updatePage({
+          id: pageId,
           lensPostLink: createdPublication.id
         });
       } else if (params.publicationType === 'comment') {

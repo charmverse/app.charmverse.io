@@ -1,3 +1,4 @@
+import type { PageWithContent } from 'lib/pages/interfaces';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 
 import { EvaluationsReview } from './components/Review/EvaluationsReview';
@@ -11,10 +12,13 @@ export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkf
   isTemplate?: boolean;
   refreshApplication?: VoidFunction;
   isDraft?: boolean;
+  page?: PageWithContent;
+  refreshPage?: VoidFunction;
 };
 
 export function RewardEvaluations({
   rewardInput,
+  page,
   readOnly,
   expanded = true,
   onChangeReward,
@@ -24,7 +28,8 @@ export function RewardEvaluations({
   application,
   isTemplate,
   refreshApplication,
-  isDraft
+  isDraft,
+  refreshPage
 }: RewardEvaluationsProps) {
   if (isDraft || isUnpublishedReward || isTemplate) {
     return (
@@ -37,15 +42,17 @@ export function RewardEvaluations({
         onChangeReward={onChangeReward}
       />
     );
-  } else if (reward) {
+  } else if (reward && page) {
     return (
       <EvaluationsReview
+        page={page}
         application={application}
         expanded={expanded}
         readOnly={readOnly}
         reward={reward}
         onChangeReward={onChangeReward}
         refreshApplication={refreshApplication}
+        refreshPage={refreshPage}
       />
     );
   }

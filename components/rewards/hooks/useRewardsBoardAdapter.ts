@@ -45,9 +45,8 @@ export function useRewardsBoardAdapter() {
   const { space } = useCurrentSpace();
   const { membersRecord } = useMembers();
   const { rewards, mutateRewards } = useRewards();
-  const { rewardsBoardBlock: board, rewardBlocks } = useRewardBlocks();
   const { getRewardPage } = useRewardPage();
-  const hasMilestoneRewards = useMemo(() => rewards?.some((r) => !!r.proposalId), [rewards]);
+  const { rewardsBoardBlock: board, rewardBlocks } = useRewardBlocks();
 
   const {
     router: { query }
@@ -56,27 +55,8 @@ export function useRewardsBoardAdapter() {
   const views = useMemo(() => {
     return (board?.fields.viewIds || [])
       .map((vId) => rewardBlocks?.find((b) => b.id === vId) as BoardView)
-      .filter(Boolean)
-      .map((v) => {
-        const view = { ...v, fields: { ...v.fields } };
-        if (v.fields.viewType === 'table' && v.fields?.visiblePropertyIds?.length) {
-          const visibleIds = [...v.fields.visiblePropertyIds];
-          if (hasMilestoneRewards) {
-            const proposalIndex = visibleIds.indexOf(REWARD_PROPOSAL_LINK);
-            if (proposalIndex === -1) {
-              const titleIndex = visibleIds.indexOf(Constants.titleColumnId);
-              visibleIds.splice(titleIndex === 0 ? titleIndex + 1 : 0, 0, REWARD_PROPOSAL_LINK);
-            }
-          } else {
-            visibleIds.filter((id) => id !== REWARD_PROPOSAL_LINK);
-          }
-
-          view.fields.visiblePropertyIds = Array.from(new Set(visibleIds));
-        }
-
-        return view;
-      });
-  }, [board?.fields.viewIds, hasMilestoneRewards, rewardBlocks]);
+      .filter(Boolean);
+  }, [board?.fields.viewIds, rewardBlocks]);
   const queryViewType =
     viewTypeToBlockId[query?.viewId?.toString() as IViewType] || query?.viewId?.toString() || DEFAULT_VIEW_BLOCK_ID;
 
@@ -180,6 +160,7 @@ export function mapRewardToCard({
         | 'rewardToken'
         | 'customReward'
         | 'status'
+        | 'sourceProposalPage'
       >;
   rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
@@ -193,7 +174,8 @@ export function mapRewardToCard({
         : reward.applications
       : [];
 
-  const proposalLinkValue = rewardPage ? [rewardPage.title, `/${rewardPage.path}`] : '';
+  const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
+  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
   const assignedSubmitters =
     reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
   const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;

@@ -1,10 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
-import type { LensConfig } from '@lens-protocol/react-web';
-import { development, LensProvider } from '@lens-protocol/react-web';
-import { bindings } from '@lens-protocol/wagmi';
 import { Paper } from '@mui/material';
 import type { Store } from '@reduxjs/toolkit';
-import { wagmiConfig } from 'connectors/config';
 import { useRef, type ReactNode } from 'react';
 import { Provider as ReduxProvider } from 'react-redux';
 import { spaces } from 'stories/lib/mockData';
@@ -18,11 +14,6 @@ import { SpacesContext, type IContext as ISpacesContext } from 'hooks/useSpaces'
 import { UserProvider } from 'hooks/useUser';
 
 const space = spaces[0];
-
-const lensConfig: LensConfig = {
-  bindings: bindings(wagmiConfig),
-  environment: development
-};
 
 export function GlobalContext({
   children,
@@ -70,9 +61,7 @@ export function GlobalContext({
             <MemberPropertiesProvider>
               <ReduxProvider store={reduxStore}>
                 <PagesProvider>
-                  <LensProvider config={lensConfig}>
-                    <Paper square>{children}</Paper>
-                  </LensProvider>
+                  <Paper square>{children}</Paper>
                 </PagesProvider>
               </ReduxProvider>
             </MemberPropertiesProvider>

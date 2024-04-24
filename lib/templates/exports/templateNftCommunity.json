@@ -655,7 +655,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -1756,7 +1755,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -2835,7 +2833,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -3649,7 +3646,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -4661,7 +4657,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -5870,7 +5865,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -6815,7 +6809,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
@@ -7894,7 +7887,6 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": false,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__status": "",
