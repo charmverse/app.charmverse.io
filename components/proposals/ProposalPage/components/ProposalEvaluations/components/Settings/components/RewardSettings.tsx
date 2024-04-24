@@ -16,11 +16,13 @@ export type RewardSettingsProps = {
 
 export function RewardSettings({ value, onChange }: RewardSettingsProps) {
   const { templates = [] } = useRewardTemplates();
-  const options: SelectOptionType[] = templates.map((template) => ({
-    id: template.page.id,
-    name: template.page.title,
-    color: 'default'
-  }));
+  const options: SelectOptionType[] = templates
+    .filter((template) => template.reward.status !== 'draft')
+    .map((template) => ({
+      id: template.page.id,
+      name: template.page.title,
+      color: 'default'
+    }));
   // when we are ready to offer this option with a modal inside the page
   options.push({
     id: 'add_new',
