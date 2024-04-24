@@ -14,6 +14,7 @@ import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
+import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -291,14 +292,13 @@ export function ProposalRewardsTable({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <RewardPropertiesForm
+          <MilestonePropertiesForm
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward
             readOnly={readOnly}
             isTemplate={false}
             expandedByDefault
-            forcedApplicationType='assigned'
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}

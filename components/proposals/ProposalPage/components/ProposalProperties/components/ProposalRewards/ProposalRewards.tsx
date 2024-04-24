@@ -10,6 +10,7 @@ import { SelectPreviewContainer } from 'components/common/DatabaseEditor/compone
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
+import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
@@ -314,14 +315,13 @@ export function ProposalRewards({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <RewardPropertiesForm
+          <MilestonePropertiesForm
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward
             readOnly={readOnly}
             isTemplate={false}
             expandedByDefault
-            forcedApplicationType='assigned'
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}
