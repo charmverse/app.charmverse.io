@@ -120,8 +120,8 @@ function FilterPropertyValue({
           filters
         });
       }
-    }, 1000);
-  }, []);
+    }, 100);
+  }, [changeViewFilter, currentFilter.filters, filter.filterId]);
 
   const updateTextValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
