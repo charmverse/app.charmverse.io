@@ -5046,7 +5046,10 @@
                   "title": "SPEAKERS",
                   "fields": {
                     "icon": "",
-                    "viewIds": ["b9c35257-b076-44e3-b677-ba472ffce00c", "1a45707e-abce-4902-84e7-601cd74b63c8"],
+                    "viewIds": [
+                      "b9c35257-b076-44e3-b677-ba472ffce00c",
+                      "1a45707e-abce-4902-84e7-601cd74b63c8"
+                    ],
                     "isTemplate": false,
                     "description": "",
                     "headerImage": null,
@@ -5102,7 +5105,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   },
                   {
@@ -5141,7 +5146,10 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title", "2a2f8e47-1389-406d-ba4b-22b035219f79"]
+                      "visiblePropertyIds": [
+                        "__title",
+                        "2a2f8e47-1389-406d-ba4b-22b035219f79"
+                      ]
                     }
                   }
                 ]
@@ -6130,7 +6138,9 @@
                       "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
-                      "visiblePropertyIds": ["__title"]
+                      "visiblePropertyIds": [
+                        "__title"
+                      ]
                     }
                   }
                 ]
@@ -7198,7 +7208,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "11529a7a-e533-45a0-84c9-b7f1d2afe7c9",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "contentOrder": []
                   }
@@ -7359,7 +7371,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "862a3932-b6e8-45b3-ab8b-5b5bce83cf51",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "contentOrder": []
                   }
@@ -7531,7 +7545,9 @@
                     "isTemplate": false,
                     "properties": {
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "2d9e6902-c4ab-4907-867e-8e503b8d864c",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -7672,7 +7688,9 @@
                       "203f700e-15a1-4ce7-aefe-3cea868cf26c": "74737ad4-016f-4f4f-ac45-11a66f172d72",
                       "a37645c5-84cc-4a9d-b919-52d0c7121ab1": "Team Bunny Rockets",
                       "c4073658-39b7-4a7e-a886-08c23d0f3475": "true",
-                      "cee129aa-6f0c-4347-b634-fbe699448504": ["419f57e4-aa82-49ea-9637-bbad33f19f6d"]
+                      "cee129aa-6f0c-4347-b634-fbe699448504": [
+                        "419f57e4-aa82-49ea-9637-bbad33f19f6d"
+                      ]
                     },
                     "headerImage": null,
                     "contentOrder": []
@@ -7697,7 +7715,10 @@
               "title": "",
               "fields": {
                 "icon": "",
-                "viewIds": ["3215ec40-6edc-4713-9c1a-eccb53c05a0d", "9b01aca3-8575-4db9-bddd-691e00f31f44"],
+                "viewIds": [
+                  "3215ec40-6edc-4713-9c1a-eccb53c05a0d",
+                  "9b01aca3-8575-4db9-bddd-691e00f31f44"
+                ],
                 "isTemplate": false,
                 "description": {
                   "type": "doc",
@@ -8256,7 +8277,10 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["e56af877-edfc-4a6c-878c-56a894981fb4", "083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "e56af877-edfc-4a6c-878c-56a894981fb4",
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.digtix.global"
                     },
@@ -8476,7 +8500,10 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["e56af877-edfc-4a6c-878c-56a894981fb4", "083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "e56af877-edfc-4a6c-878c-56a894981fb4",
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "c639c952-a08a-496c-ac12-b47cb9b52485",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.fractal-i.xyz"
                     },
@@ -8797,7 +8824,9 @@
                     "icon": "",
                     "isTemplate": false,
                     "properties": {
-                      "__title": ["083ae264-62d7-4de0-8170-dfefae763667"],
+                      "__title": [
+                        "083ae264-62d7-4de0-8170-dfefae763667"
+                      ],
                       "42f851d4-5db2-482a-b6df-a8f50ae5915f": "6ebd1311-7854-4d4d-bed8-fc8dd57fdfdd",
                       "a42c9a70-7e98-4dcb-84f3-6d0051cee41a": "www.convocase.xyz",
                       "f8c41428-4385-49bd-82ef-dcecf200b2c5": [
@@ -10920,7 +10949,11 @@
           "isTemplate": false,
           "parentId": "b16a9dfb-b90b-43bb-bf9f-793ff23c1665",
           "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-          "additionalPaths": ["project-review-5865383728141715", "project-r-5865383728141715", "page-5865383728141715"],
+          "additionalPaths": [
+            "project-review-5865383728141715",
+            "project-r-5865383728141715",
+            "page-5865383728141715"
+          ],
           "type": "page",
           "boardId": null,
           "autoGenerated": false,
@@ -10983,7 +11016,10 @@
               "isTemplate": false,
               "parentId": "0df721e8-44d4-4490-bd50-b47082761b15",
               "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-              "additionalPaths": ["projects-for-review-06252826552878332", "page-06252826552878332"],
+              "additionalPaths": [
+                "projects-for-review-06252826552878332",
+                "page-06252826552878332"
+              ],
               "type": "inline_board",
               "boardId": "5d99a8f4-4b04-46e6-b78f-3ee585f64321",
               "autoGenerated": false,
@@ -11484,7 +11520,10 @@
               "isTemplate": false,
               "parentId": "c30b61db-ef50-4e07-ae83-e4f2c0f2bc26",
               "spaceId": "c57663bf-7cb0-4c6a-a77f-26932fd6dce7",
-              "additionalPaths": ["final-submissions-4923071826005603", "page-4923071826005603"],
+              "additionalPaths": [
+                "final-submissions-4923071826005603",
+                "page-4923071826005603"
+              ],
               "type": "inline_board",
               "boardId": "0cf97552-2610-43d1-9743-2d04c6d14420",
               "autoGenerated": false,
@@ -16056,13 +16095,14 @@
         "reviewedBy": null,
         "reviewedAt": null,
         "publishToLens": null,
-        "lensPostLink": null,
         "fields": {
           "properties": {
             "__step": "Draft",
             "__title": "Hackathon Project",
             "__status": "in_progress",
-            "__authors": [null],
+            "__authors": [
+              null
+            ],
             "__reviewers": [],
             "__evaluationType": "draft"
           }
@@ -16840,7 +16880,11 @@
         "type": "profile_pic",
         "options": null,
         "index": 0,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16855,7 +16899,11 @@
         "type": "role",
         "options": null,
         "index": 2,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16870,7 +16918,11 @@
         "type": "bio",
         "options": null,
         "index": 3,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16885,7 +16937,11 @@
         "type": "discord",
         "options": null,
         "index": 4,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16900,7 +16956,11 @@
         "type": "linked_in",
         "options": null,
         "index": 6,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16915,7 +16975,11 @@
         "type": "github",
         "options": null,
         "index": 7,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16930,7 +16994,11 @@
         "type": "timezone",
         "options": null,
         "index": 8,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -16945,7 +17013,11 @@
         "type": "twitter",
         "options": null,
         "index": 5,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       },
@@ -17005,7 +17077,11 @@
         "type": "text",
         "options": null,
         "index": 1,
-        "enabledViews": ["gallery", "table", "profile"],
+        "enabledViews": [
+          "gallery",
+          "table",
+          "profile"
+        ],
         "required": false,
         "permissions": []
       }

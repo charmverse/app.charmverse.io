@@ -31,6 +31,10 @@ export type RewardWithUsersAndPageMeta = Bounty & {
   allowedSubmitterRoles: string[] | null;
   assignedSubmitters: string[] | null;
   page: Pick<Page, 'id' | 'title' | 'path'>;
+  sourceProposalPage?: {
+    id: string;
+    title: string;
+  };
 };
 
 export type ApplicationWithTransactions = Application & {
