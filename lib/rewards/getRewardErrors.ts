@@ -15,6 +15,8 @@ type ValidationInput = {
   linkedPageId?: string | null; // the page a bounty is attached to
   rewardType: RewardType;
   isProposalTemplate?: boolean;
+  isMilestone?: boolean;
+  templateId?: string;
 };
 
 function getRewardPrizeError({
@@ -50,7 +52,9 @@ export function getRewardErrors({
   linkedPageId,
   reward,
   rewardType,
-  isProposalTemplate
+  isProposalTemplate,
+  isMilestone,
+  templateId
 }: ValidationInput): string[] {
   const errors: string[] = getRewardPrizeError({
     ...reward,
@@ -68,6 +72,9 @@ export function getRewardErrors({
     } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0 && !isProposalTemplate) {
       errors.push('You need to assign at least one submitter');
     }
+  }
+  if (isMilestone && !templateId) {
+    errors.push('Template is required for milestone');
   }
   return errors;
 }

@@ -11,7 +11,6 @@ import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocu
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
-import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
@@ -148,7 +147,13 @@ export function ProposalRewards({
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
       const rewardType = getRewardType(template.reward);
-      setRewardValues({ rewardType, ...template.reward });
+      setRewardValues({
+        rewardType,
+        chainId: template.reward.chainId ?? rewardValues.chainId,
+        customReward: template.reward.customReward ?? rewardValues.customReward,
+        rewardAmount: template.reward.rewardAmount ?? rewardValues.rewardAmount,
+        rewardToken: template.reward.rewardToken ?? rewardValues.rewardToken
+      });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
@@ -167,7 +172,9 @@ export function ProposalRewards({
     page: newPageValues,
     reward: rewardValues,
     rewardType: rewardValues.rewardType,
-    isProposalTemplate
+    isProposalTemplate,
+    isMilestone: true,
+    templateId: newPageValues?.templateId
   }).join(', ');
 
   if (rewards.length) {
