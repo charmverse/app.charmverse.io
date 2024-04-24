@@ -16,8 +16,7 @@ const REWARD_STATUS_LABELS: Record<RewardStatus, string> = {
   suggestion: 'Suggestion',
   open: 'Open',
   complete: 'Approved',
-  paid: 'Paid',
-  draft: 'Draft'
+  paid: 'Paid'
 };
 
 const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
@@ -25,8 +24,7 @@ const REWARD_STATUS_COLORS: Record<RewardStatus, BrandColor> = {
   suggestion: 'purple',
   open: 'teal',
   complete: 'blue',
-  paid: 'green',
-  draft: 'gray'
+  paid: 'green'
 };
 
 const isRewardStatus = (status: RewardStatus): status is RewardStatus => status in REWARD_STATUS_COLORS;
@@ -75,8 +73,7 @@ export const REWARD_STATUS_ICONS: Record<RewardStatus, ReactNode> = {
   suggestion: <LightbulbIcon />,
   open: <ModeStandbyIcon />,
   complete: <CheckCircleOutlineIcon />,
-  paid: <PaidIcon />,
-  draft: <BountyIcon />
+  paid: <PaidIcon />
 };
 
 export function RewardStatusChip({
