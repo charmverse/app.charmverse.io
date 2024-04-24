@@ -12,6 +12,7 @@ import type {
 import { SessionType, useLogin, useProfiles, useSession } from '@lens-protocol/react-web';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useFarcasterUser } from 'hooks/useFarcasterUser';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { useWeb3Account } from 'hooks/useWeb3Account';
@@ -90,6 +91,7 @@ export function useHandleLensError() {
 export function useLensProfile() {
   const { user } = useUser();
   const { account } = useWeb3Account();
+  const { farcasterProfile } = useFarcasterUser();
   const { data: sessionData } = useSession();
   const authenticated = sessionData?.authenticated ?? false;
   const sessionProfile = sessionData?.type === SessionType.WithProfile ? sessionData?.profile : null;
@@ -108,17 +110,17 @@ export function useLensProfile() {
   const { space } = useCurrentSpace();
 
   const setupLensProfile = async () => {
-    if (!user || !account || !lensProfile) {
+    if (!user || !account || (!lensProfile && !farcasterProfile)) {
       return null;
     }
 
-    if (authenticated) {
+    if (authenticated && lensProfile) {
       return lensProfile;
     }
 
     const result = await execute({
       address: account,
-      profileId: lensProfile.id as ProfileId
+      profileId: (lensProfile?.id ?? farcasterProfile?.id) as ProfileId
     });
 
     if (result.isFailure()) {
@@ -133,7 +135,8 @@ export function useLensProfile() {
     isAuthenticated: authenticated,
     lensProfile: !isCyberConnect(space?.domain) ? lensProfile : null,
     setupLensProfile,
-    loading
+    loading,
+    hasFarcasterProfile: !!farcasterProfile || !!lensProfile
   };
 }
 

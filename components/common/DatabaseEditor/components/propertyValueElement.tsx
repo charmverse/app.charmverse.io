@@ -237,7 +237,6 @@ function PropertyValueElement(props: Props) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
     }
-
     propertyValueElement = (
       <Box sx={{ a: { color: 'inherit' } }}>
         <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
@@ -696,7 +695,7 @@ function PropertyValueElement(props: Props) {
         />
       );
     }
-  } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string') {
+  } else if (propertyTemplate.type === 'proposalUrl' && typeof displayValue === 'string' && !propertyValueElement) {
     const proposalUrl = getAbsolutePath(`/${propertyValue as string}`, domain);
     propertyValueElement = (
       <div data-test='property-proposal-url'>

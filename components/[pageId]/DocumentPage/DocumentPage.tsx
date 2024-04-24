@@ -8,7 +8,6 @@ import { FormProvider } from 'react-hook-form';
 import { useResizeObserver } from 'usehooks-ts';
 
 import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
-import { useGetReward } from 'charmClient/hooks/rewards';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { CardPropertiesWrapper } from 'components/common/CharmEditor/CardPropertiesWrapper';
 import { handleImageFileDrop } from 'components/common/CharmEditor/components/@bangle.dev/base-components/image';
@@ -28,6 +27,7 @@ import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/comp
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
+import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -61,6 +61,7 @@ import { ProposalProperties } from './components/ProposalProperties';
 import { SyncedPageBanner } from './components/SyncedPageBanner';
 import type { IPageSidebarContext } from './hooks/usePageSidebar';
 import { useProposal } from './hooks/useProposal';
+import { useReward } from './hooks/useReward';
 
 export const defaultPageTop = 56; // we need to add some room for the announcement banner and other banners
 
@@ -78,6 +79,7 @@ export type DocumentPageProps = {
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
   showParentChip?: boolean;
+  refreshPage?: VoidFunction;
 };
 
 function DocumentPageComponent({
@@ -89,7 +91,8 @@ function DocumentPageComponent({
   sidebarView,
   setSidebarView,
   showCard,
-  showParentChip
+  showParentChip,
+  refreshPage
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -104,6 +107,7 @@ function DocumentPageComponent({
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
+  const rewardId = page.bountyId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const isCharmverseSpace = useIsCharmverseSpace();
 
@@ -117,6 +121,11 @@ function DocumentPageComponent({
   } = useProposal({
     proposalId
   });
+
+  const { onChangeRewardWorkflow, reward, updateReward } = useReward({
+    rewardId
+  });
+
   const { data: proposalFormFieldAnswers = [] } = useGetProposalFormFieldAnswers({
     proposalId
   });
@@ -151,11 +160,10 @@ function DocumentPageComponent({
   // Check if we are on the rewards page, as parent chip is only shown on rewards page
   const isRewardsPage = router.pathname === '/[domain]/rewards';
   const _showParentChip =
-    showParentChip ?? !!(page.type === 'card' && page.bountyId && card?.parentId && insideModal && isRewardsPage);
+    showParentChip ?? !!(page.type === 'card' && rewardId && card?.parentId && insideModal && isRewardsPage);
 
-  const { data: reward } = useGetReward({ rewardId: page.bountyId });
   const fontFamilyClassName = `font-family-${page.fontFamily}${page.fontSizeSmall ? ' font-size-small' : ''}`;
-  const hideCardDetails = isRewardsPage && page.bountyId;
+  const hideCardDetails = isRewardsPage && rewardId;
 
   const enableSuggestingMode = editMode === 'suggesting' && !readOnly && !!pagePermissions.comment;
   const isPageTemplate = page.type.includes('template');
@@ -360,7 +368,7 @@ function DocumentPageComponent({
                 readOnly={readOnlyTitle}
               />
             )}
-            {proposalId && !isMdScreen && (
+            {(proposalId || rewardId) && !isMdScreen && (
               <Tabs
                 sx={{
                   mb: 1
@@ -384,24 +392,38 @@ function DocumentPageComponent({
                 />
               </Tabs>
             )}
-            {currentTab === 1 && (
-              <ProposalEvaluations
-                pagePath={page.path}
-                pageTitle={page.title}
-                pageId={page.id}
-                isUnpublishedProposal={isUnpublishedProposal}
-                readOnlyProposalPermissions={!proposal?.permissions.edit}
-                isProposalTemplate={page.type === 'proposal_template'}
-                isStructuredProposal={isStructuredProposal}
-                proposal={proposal}
-                proposalInput={proposal}
-                templateId={proposal?.page?.sourceTemplateId}
-                onChangeEvaluation={onChangeEvaluation}
-                refreshProposal={refreshProposal}
-                onChangeWorkflow={onChangeWorkflow}
-                onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
-              />
-            )}
+            {currentTab === 1 &&
+              (page.type === 'proposal_template' || page.type === 'proposal' ? (
+                <ProposalEvaluations
+                  pageLensPostLink={page.lensPostLink}
+                  pagePath={page.path}
+                  pageTitle={page.title}
+                  pageId={page.id}
+                  isUnpublishedProposal={isUnpublishedProposal}
+                  readOnlyProposalPermissions={!proposal?.permissions.edit}
+                  isProposalTemplate={page.type === 'proposal_template'}
+                  isStructuredProposal={isStructuredProposal}
+                  proposal={proposal}
+                  proposalInput={proposal}
+                  templateId={proposal?.page?.sourceTemplateId}
+                  onChangeEvaluation={onChangeEvaluation}
+                  refreshProposal={refreshProposal}
+                  onChangeWorkflow={onChangeWorkflow}
+                  onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
+                />
+              ) : page.type === 'bounty' || page.type === 'bounty_template' ? (
+                <RewardEvaluations
+                  isTemplate={page.type === 'bounty_template'}
+                  reward={reward}
+                  readOnly={readOnly}
+                  refreshPage={refreshPage}
+                  page={page}
+                  rewardInput={reward}
+                  expanded
+                  onChangeReward={updateReward}
+                  onChangeWorkflow={onChangeRewardWorkflow}
+                />
+              ) : null)}
 
             {currentTab === 0 && (
               <>

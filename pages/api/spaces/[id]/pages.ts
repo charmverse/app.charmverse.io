@@ -72,6 +72,7 @@ async function getPages(req: NextApiRequest, res: NextApiResponse<PageMeta[]>) {
       bountyId: true,
       hasContent: true,
       galleryImage: true,
+      lensPostLink: true,
       syncWithPageId: true,
       sourceTemplateId: true,
       parent: {

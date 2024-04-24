@@ -5,13 +5,20 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-  const acc = await prisma.page.findMany({
+  const bountyCards = await prisma.bounty.count({
     where: {
-      title: 'daos'
+      page: {
+        type: "card"
+      },
+      space: {
+        domain: {
+          startsWith: "cvt-"
+        }
+      }
     }
-  });
-  console.log(acc);
+  })
 
+  console.log(`Bounty cards: ${bountyCards}`);
 }
 
 

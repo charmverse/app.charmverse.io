@@ -70,7 +70,6 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   description?: string;
   formFieldId?: string;
   private?: boolean; // used for answers to form fields in proposal-as-a-source
-  proposalFieldId?: string;
   relationData?: RelationPropertyData;
   readOnly?: boolean; // whether this property cannot be deleted or renamed by users
   readOnlyValues?: boolean; // whether the values of this property are synced and uneditable

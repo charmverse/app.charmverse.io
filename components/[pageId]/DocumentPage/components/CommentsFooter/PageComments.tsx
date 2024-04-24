@@ -50,10 +50,10 @@ export function PageComments({ page, enableComments }: Props) {
   }
 
   useEffect(() => {
-    if (page.type === 'proposal' && proposal?.lensPostLink) {
+    if (page.type === 'proposal' && page?.lensPostLink) {
       syncPageCommentsWithLensPost();
     }
-  }, [page.id, proposal?.lensPostLink, page.type]);
+  }, [page.id, page?.lensPostLink, page.type]);
 
   useEffect(() => {
     const commentId = router.query.commentId;
@@ -101,7 +101,7 @@ export function PageComments({ page, enableComments }: Props) {
                   handleUpdateComment={updateComment}
                   handleDeleteComment={deleteComment}
                   handleVoteComment={isProposal ? voteComment : undefined}
-                  lensPostLink={proposal?.lensPostLink}
+                  lensPostLink={page?.lensPostLink}
                 />
               ))}
             </Stack>
