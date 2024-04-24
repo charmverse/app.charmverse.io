@@ -1,5 +1,3 @@
-import type { PageMeta } from '@charmverse/core/pages';
-
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';

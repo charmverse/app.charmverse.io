@@ -31,6 +31,7 @@ const schema = generateSchemasForAllSupportedFieldTypes();
 board.fields.cardProperties = Object.values(schema) as IPropertyTemplate[];
 
 const boardPage: PageMeta = {
+  lensPostLink: null,
   id: board.id,
   boardId: board.id,
   bountyId: null,
@@ -41,7 +42,6 @@ const boardPage: PageMeta = {
   deletedBy: null,
   galleryImage: null,
   hasContent: false,
-  lensPostLink: null,
   headerImage: null,
   icon: null,
   index: 0,

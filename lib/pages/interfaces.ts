@@ -62,6 +62,7 @@ export type PageWithContent = PageMeta &
     | 'sourceTemplateId'
     | 'isLocked'
     | 'lockedBy'
+    | 'lensPostLink'
   > & { permissionFlags: PagePermissionFlags };
 
 export type PageDetails = {

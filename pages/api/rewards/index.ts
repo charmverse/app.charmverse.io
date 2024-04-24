@@ -73,7 +73,7 @@ async function getRewards(req: NextApiRequest, res: NextApiResponse<RewardWithUs
 }
 
 async function createRewardController(req: NextApiRequest, res: NextApiResponse<RewardWithUsers>) {
-  const { spaceId, linkedPageId } = req.body as RewardCreationData;
+  const { spaceId } = req.body as RewardCreationData;
 
   const { id: userId } = req.session.user;
 
@@ -90,15 +90,7 @@ async function createRewardController(req: NextApiRequest, res: NextApiResponse<
     userId: req.session.user.id
   });
 
-  if (linkedPageId) {
-    relay.broadcast(
-      {
-        type: 'pages_meta_updated',
-        payload: [{ bountyId: createdReward.id, spaceId: createdReward.spaceId, id: linkedPageId }]
-      },
-      createdReward.spaceId
-    );
-  } else if (createdPageId) {
+  if (createdPageId) {
     const pages = await getPageMetaList([createdPageId]);
     relay.broadcast(
       {
