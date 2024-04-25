@@ -97,7 +97,11 @@ function PaymentStepReviewAction({
       )}
 
       {application.status === 'complete' && rewardType === 'custom' && reviewPermission && (
-        <Button onClick={open}>Mark as paid</Button>
+        <Stack justifyContent='flex-end' flexDirection='row'>
+          <Box width='fit-content'>
+            <Button onClick={open}>Mark as paid</Button>
+          </Box>
+        </Stack>
       )}
 
       {application.status === 'paid' && !!application.transactions.length && (
