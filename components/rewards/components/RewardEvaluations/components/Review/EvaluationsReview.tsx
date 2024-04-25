@@ -7,6 +7,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { useRewardCredentials } from 'components/rewards/hooks/useRewardCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
@@ -51,12 +52,21 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
+  const { issuableRewardCredentials: issuableCredentials = [] } = useRewardCredentials();
+  const issuableRewardCredentials = issuableCredentials.filter((issuable) => issuable.rewardId === reward.id);
+  const hasIssuableOnchainCredentials = !!(
+    currentSpace?.useOnchainCredentials &&
+    currentSpace?.credentialsWallet &&
+    issuableRewardCredentials.length > 0
+  );
+
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
       ? getRewardWorkflowWithApplication({
           application,
           workflow,
-          hasCredentials: reward.selectedCredentialTemplates.length > 0
+          hasCredentials: reward.selectedCredentialTemplates.length > 0,
+          hasIssuableOnchainCredentials
         })
       : workflow;
 
@@ -66,7 +76,7 @@ export function EvaluationsReview({
       updatedWorkflow: _updatedWorkflow,
       currentEvaluation: _currentEvaluation
     };
-  }, [workflow, application, reward.selectedCredentialTemplates.length]);
+  }, [workflow, application, hasIssuableOnchainCredentials, reward.selectedCredentialTemplates.length]);
 
   const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
     application ? currentEvaluation?.id : undefined

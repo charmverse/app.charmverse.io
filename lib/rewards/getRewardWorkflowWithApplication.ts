@@ -4,11 +4,13 @@ import type { ApplicationWithTransactions } from './interfaces';
 export function getRewardWorkflowWithApplication({
   application,
   workflow,
-  hasCredentials
+  hasCredentials,
+  hasIssuableOnchainCredentials
 }: {
   workflow: RewardWorkflow;
   application?: ApplicationWithTransactions;
   hasCredentials: boolean;
+  hasIssuableOnchainCredentials?: boolean;
 }): RewardWorkflow {
   const evaluations: RewardEvaluation[] = workflow.evaluations.filter((evaluation) => {
     if (evaluation.type === 'credential' && !hasCredentials) {
@@ -135,6 +137,25 @@ export function getRewardWorkflowWithApplication({
 
     case 'complete':
     case 'processing': {
+      if (hasIssuableOnchainCredentials) {
+        const credentialStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'credential');
+        return {
+          ...workflow,
+          evaluations: evaluations.map((evaluation, index) => {
+            if (evaluation.type === 'credential') {
+              return {
+                ...evaluation,
+                result: null
+              };
+            }
+
+            return {
+              ...evaluation,
+              result: index < credentialStepIndex ? 'pass' : null
+            };
+          })
+        };
+      }
       const paymentStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'payment');
       return {
         ...workflow,
