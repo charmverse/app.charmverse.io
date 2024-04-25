@@ -137,7 +137,7 @@ export function getRewardWorkflowWithApplication({
 
     case 'complete':
     case 'processing': {
-      if (hasIssuableOnchainCredentials) {
+      if (hasIssuableOnchainCredentials && applicationStatus !== 'processing') {
         const credentialStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'credential');
         return {
           ...workflow,

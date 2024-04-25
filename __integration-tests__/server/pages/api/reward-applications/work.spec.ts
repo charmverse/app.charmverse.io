@@ -155,7 +155,7 @@ describe('GET /api/reward-applications/work - retrieve an application', () => {
       spaceId: space.id
     });
 
-    application = await prisma.application.create({
+    application = (await prisma.application.create({
       data: {
         spaceId: space.id,
         bounty: { connect: { id: reward.id } },
@@ -172,7 +172,7 @@ describe('GET /api/reward-applications/work - retrieve an application', () => {
       include: {
         transactions: true
       }
-    });
+    })) as any;
   });
 
   it('should return the application with a status code 200 if user has permission', async () => {

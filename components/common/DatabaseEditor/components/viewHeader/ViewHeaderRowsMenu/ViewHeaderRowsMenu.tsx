@@ -346,7 +346,7 @@ export function ViewHeaderRowsMenu({
           onIssueCredentialsSuccess={onIssueCredentialsSuccess}
         />
       )}
-      {showIssueRewardCredentials && <IssueRewardCredentials selectedPageIds={checkedIds} />}
+      {showIssueRewardCredentials && <IssueRewardCredentials selectedPageIds={checkedIds} asMenuItem />}
       {showRewardsPaymentButton && <BatchPaymentRewards checkedIds={checkedIds} />}
       {showTrashIcon && (
         <StyledMenuItem lastChild onClick={deleteCheckedCards} disabled={isDeleting}>
