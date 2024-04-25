@@ -2,12 +2,14 @@ import { ProposalSystemRole } from '@charmverse/core/prisma';
 import { type BountyStatus } from '@charmverse/core/prisma-client';
 import { Box, Collapse, Divider, Stack } from '@mui/material';
 import clsx from 'clsx';
+import { DateTime } from 'luxon';
 import { useCallback, useState } from 'react';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
+import { DateTimePicker } from 'components/common/DateTimePicker';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import {
@@ -68,6 +70,7 @@ export function MilestonePropertiesForm({
   const template = nonDraftRewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
+  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -115,6 +118,12 @@ export function MilestonePropertiesForm({
   const updateRewardCustomReward = useCallback((e: any) => {
     applyUpdates({
       customReward: e.target.value
+    });
+  }, []);
+
+  const updateRewardDueDate = useCallback((date: DateTime | null) => {
+    applyUpdates({
+      dueDate: date?.toJSDate() || undefined
     });
   }, []);
 
@@ -210,6 +219,26 @@ export function MilestonePropertiesForm({
                   }}
                 />
               )}
+            </Box>
+
+            <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
+              <PropertyLabel readOnly highlighted>
+                Due date
+              </PropertyLabel>
+
+              <DateTimePicker
+                variant='card_property'
+                minDate={DateTime.fromMillis(Date.now())}
+                value={values?.dueDate ? DateTime.fromISO(values.dueDate.toString()) : null}
+                disabled={readOnlyDueDate}
+                disablePast
+                onAccept={async (value) => {
+                  updateRewardDueDate(value);
+                }}
+                onChange={(value) => {
+                  updateRewardDueDate(value);
+                }}
+              />
             </Box>
 
             {/* Select authors */}
