@@ -26,7 +26,6 @@ type Props = {
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
   onSubmit: (props: { isDraft: boolean }) => Promise<void>;
-  refreshProposal?: VoidFunction;
   archived?: boolean;
 };
 
@@ -113,7 +112,6 @@ export function RubricAnswersForm({
   disabled,
   draftAnswers,
   archived,
-  refreshProposal,
   onSubmit
 }: Props) {
   const hasDraft = !!draftAnswers?.length;
@@ -202,7 +200,6 @@ export function RubricAnswersForm({
     // switch to draft before updating the parent context, or else the two Alerts will flicker one after the other
     setShowDraftAnswers(true);
     await onSubmit({ isDraft: true });
-    refreshProposal?.();
   }
 
   async function deleteDraftAnswers() {

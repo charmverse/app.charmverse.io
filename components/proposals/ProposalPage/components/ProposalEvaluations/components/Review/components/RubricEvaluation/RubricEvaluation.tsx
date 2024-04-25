@@ -37,8 +37,10 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
   const canViewRubricAnswers = isAdmin || canAnswerRubric;
 
   async function onSubmitEvaluation({ isDraft }: { isDraft: boolean }) {
-    if (!isDraft) {
+    if (proposal) {
       await refreshProposal?.();
+    }
+    if (!isDraft) {
       // Set view to "Results tab", assuming Results is the 2nd tab, ie value: 1
       setRubricView(1);
     }
@@ -74,7 +76,6 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
                     draftAnswers={myDraftRubricAnswers}
                     criteriaList={rubricCriteria!}
                     onSubmit={onSubmitEvaluation}
-                    refreshProposal={refreshProposal}
                     archived={proposal?.archived ?? false}
                     disabled={!canAnswerRubric || !isCurrent || !!proposal?.archived}
                   />
