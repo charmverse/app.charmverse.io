@@ -103,11 +103,16 @@ export function ProposalRewards({
             .filter(isTruthy) as RewardReviewer[],
           'id'
         );
-    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
-      ? template.reward.allowedSubmitterRoles
-      : assignedSubmitters;
 
-    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    const newReward = {
+      ...template?.reward,
+      reviewers: rewardReviewers,
+      assignedSubmitters: template?.reward.assignedSubmitters ?? assignedSubmitters,
+      // Converting reward values to be of assigned workflow
+      approveSubmitters: false,
+      allowMultipleApplications: false,
+      allowedSubmitterRoles: []
+    };
     if (template?.reward) {
       (newReward as any).rewardType = getRewardType(template.reward);
     }
@@ -148,11 +153,13 @@ export function ProposalRewards({
     if (template) {
       const rewardType = getRewardType(template.reward);
       setRewardValues({
-        rewardType,
-        chainId: template.reward.chainId ?? rewardValues.chainId,
-        customReward: template.reward.customReward ?? rewardValues.customReward,
-        rewardAmount: template.reward.rewardAmount ?? rewardValues.rewardAmount,
-        rewardToken: template.reward.rewardToken ?? rewardValues.rewardToken
+        ...template?.reward,
+        assignedSubmitters: template.reward.assignedSubmitters ?? assignedSubmitters,
+        // Converting reward values to be of assigned workflow
+        approveSubmitters: false,
+        allowMultipleApplications: false,
+        allowedSubmitterRoles: [],
+        rewardType
       });
       updateNewPageValues({
         ...template.page,
