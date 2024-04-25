@@ -10,16 +10,16 @@ import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainC
 import { CredentialRow } from './CredentialRow';
 
 export function CredentialReviewStep({
-  pendingCredentials,
+  selectedCredentials,
   issuedCredentials,
-  canIssueCredentials,
+  hasPendingOnchainCredentials,
   pageId,
   type,
   onIssueCredentialsSuccess
 }: {
-  pendingCredentials: CredentialTemplate[];
+  selectedCredentials: CredentialTemplate[];
   issuedCredentials: EASAttestationFromApi[];
-  canIssueCredentials: boolean;
+  hasPendingOnchainCredentials: boolean;
   pageId: string;
   type: 'reward' | 'proposal';
   onIssueCredentialsSuccess?: VoidFunction;
@@ -31,7 +31,7 @@ export function CredentialReviewStep({
     <>
       <Stack gap={1.5}>
         {issuedCredentials.length === 0 &&
-          pendingCredentials.map((cred) => (
+          selectedCredentials.map((cred) => (
             <CredentialRow
               credential={{ title: cred.name, subtitle: cred.organization }}
               isSmallScreen={isSmallScreen}
@@ -51,7 +51,7 @@ export function CredentialReviewStep({
         })}
       </Stack>
 
-      {space?.useOnchainCredentials && space.credentialsWallet && canIssueCredentials ? (
+      {space?.useOnchainCredentials && space.credentialsWallet && hasPendingOnchainCredentials ? (
         <Box display='flex' justifyContent='flex-end'>
           <Box width='fit-content'>
             {type === 'reward' ? (

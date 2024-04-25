@@ -30,7 +30,7 @@ export function ProposalCredentials({
   const { credentialTemplates } = useGetCredentialTemplates();
   const { getFeatureTitle } = useSpaceFeatures();
 
-  const pendingCredentials = selectedCredentialTemplates
+  const selectedCredentials = selectedCredentialTemplates
     .map((templateId) => credentialTemplates?.find((ct) => ct.id === templateId))
     .filter(Boolean) as CredentialTemplate[];
 
@@ -41,10 +41,10 @@ export function ProposalCredentials({
       </Typography>
 
       <CredentialReviewStep
-        canIssueCredentials={!!(issuableProposalCredentials && issuableProposalCredentials.length > 0)}
+        hasPendingOnchainCredentials={!!(issuableProposalCredentials && issuableProposalCredentials.length > 0)}
         issuedCredentials={proposal?.issuedCredentials ?? []}
         pageId={proposalId}
-        pendingCredentials={pendingCredentials}
+        selectedCredentials={selectedCredentials}
         type='proposal'
         onIssueCredentialsSuccess={refreshProposal}
       />

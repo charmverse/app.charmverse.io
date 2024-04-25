@@ -28,7 +28,7 @@ export function RewardCredentials({
   const issuableRewardCredentials = issuableCredentials.filter((issuable) => issuable.rewardId === rewardId);
   const { credentialTemplates } = useGetCredentialTemplates();
 
-  const pendingCredentials = selectedCredentialTemplates
+  const selectedCredentials = selectedCredentialTemplates
     .map((templateId) => credentialTemplates?.find((ct) => ct.id === templateId))
     .filter(Boolean) as CredentialTemplate[];
 
@@ -37,10 +37,10 @@ export function RewardCredentials({
       <Typography variant='body2'>Submitters receive credentials when their submission is approved</Typography>
 
       <CredentialReviewStep
-        canIssueCredentials={issuableRewardCredentials.length > 0}
+        hasPendingOnchainCredentials={issuableRewardCredentials.length > 0}
         issuedCredentials={application?.issuedCredentials ?? []}
         pageId={rewardId}
-        pendingCredentials={pendingCredentials}
+        selectedCredentials={selectedCredentials}
         type='reward'
       />
     </Box>
