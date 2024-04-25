@@ -1,4 +1,3 @@
-import type { RewardBlock } from '@charmverse/core/prisma';
 import { useEffect } from 'react';
 
 import type { BlockUpdater } from 'components/common/DatabaseEditor/charmClient.interface';
@@ -10,6 +9,7 @@ import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoa
 import { usePages } from 'hooks/usePages';
 import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { IPropertyTemplate } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
 import type { RewardBlockInput, RewardBlockUpdateInput } from 'lib/rewards/blocks/interfaces';
 
 export function useRewardsBoardMutator() {
@@ -59,7 +59,7 @@ export function useRewardsBoardMutator() {
 
     if (fbBlockInput.fields.cardProperties) {
       fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-        (p: IPropertyTemplate) => !p.id.startsWith('__')
+        (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
       );
     }
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
@@ -81,12 +81,13 @@ export function useRewardsBoardMutator() {
 
       if (fbBlockInput.fields.cardProperties) {
         fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-          (p: IPropertyTemplate) => !p.id.startsWith('__')
+          (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
         );
       }
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
       return fbBlockToBlock(fbBlockInput);
     });
+
     const updatedBlocks = await updateBlocks(updatedBlockInput as unknown as RewardBlockUpdateInput[]);
     if (!updatedBlocks) return;
 

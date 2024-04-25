@@ -8,6 +8,7 @@ import { useProposalsBoard } from 'components/proposals/hooks/useProposalsBoard'
 import { useProposalBlocks } from 'hooks/useProposalBlocks';
 import type { BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
 import type { IPropertyTemplate } from 'lib/databases/board';
+import { Constants } from 'lib/databases/constants';
 import type { ProposalBlockWithTypedFields, ProposalPropertyValues } from 'lib/proposals/blocks/interfaces';
 
 export function useProposalsBoardMutator() {
@@ -48,7 +49,7 @@ export function useProposalsBoardMutator() {
 
     if (fbBlockInput.fields.cardProperties) {
       fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-        (p: IPropertyTemplate) => !p.id.startsWith('__')
+        (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
       );
     }
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
@@ -70,7 +71,7 @@ export function useProposalsBoardMutator() {
 
       if (fbBlockInput.fields.cardProperties) {
         fbBlockInput.fields.cardProperties = fbBlockInput.fields.cardProperties.filter(
-          (p: IPropertyTemplate) => !p.id.startsWith('__')
+          (p: IPropertyTemplate) => !p.id.startsWith('__') || p.id === Constants.titleColumnId
         );
       }
       deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
