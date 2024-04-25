@@ -65,7 +65,7 @@ export function getRewardErrors({
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
-  if (!isTemplate && !isProposalTemplate) {
+  if (!isTemplate && !isProposalTemplate && !isMilestone) {
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');

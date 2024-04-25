@@ -8,7 +8,6 @@ import { useCallback, useState } from 'react';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
-import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
@@ -21,8 +20,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
-import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { Reward, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 
@@ -69,7 +67,6 @@ export function MilestonePropertiesForm({
   const nonDraftRewardTemplates = rewardTemplates.filter((tpl) => tpl.reward.status !== 'draft');
   const template = nonDraftRewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
-  const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
@@ -124,14 +121,6 @@ export function MilestonePropertiesForm({
   const updateRewardDueDate = useCallback((date: DateTime | null) => {
     applyUpdates({
       dueDate: date?.toJSDate() || undefined
-    });
-  }, []);
-
-  const updateAssignedSubmitters = useCallback((submitters: string[]) => {
-    applyUpdates({
-      assignedSubmitters: submitters,
-      approveSubmitters: false,
-      allowMultipleApplications: false
     });
   }, []);
 
@@ -197,27 +186,12 @@ export function MilestonePropertiesForm({
               <PropertyLabel readOnly highlighted required={isNewReward && !isTemplate}>
                 Reviewers
               </PropertyLabel>
-              {isProposalTemplate ? (
-                <UserAndRoleSelect
-                  readOnly
-                  value={[{ group: 'system_role', id: ProposalSystemRole.all_reviewers }]}
-                  systemRoles={[allReviewersSystemRole]}
-                  onChange={() => {}}
-                />
-              ) : (
-                <UserAndRoleSelect
-                  readOnly={readOnlyReviewers}
-                  value={values.reviewers ?? []}
-                  onChange={async (options) => {
-                    const reviewerOptions = options.filter(
-                      (option) => option.group === 'role' || option.group === 'user'
-                    ) as RewardReviewer[];
-                    await applyUpdates({
-                      reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
-                    });
-                  }}
-                />
-              )}
+              <UserAndRoleSelect
+                readOnly
+                value={[{ group: 'system_role', id: ProposalSystemRole.all_reviewers }]}
+                systemRoles={[allReviewersSystemRole]}
+                onChange={() => {}}
+              />
             </Box>
 
             <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
@@ -246,28 +220,13 @@ export function MilestonePropertiesForm({
                 Assigned applicants
               </PropertyLabel>
               <Box display='flex' flex={1}>
-                {isProposalTemplate ? (
-                  <UserAndRoleSelect
-                    readOnly
-                    wrapColumn
-                    value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
-                    systemRoles={[authorSystemRole]}
-                    onChange={() => {}}
-                  />
-                ) : (
-                  <UserSelect
-                    memberIds={values.assignedSubmitters ?? []}
-                    readOnly={readOnly}
-                    onChange={updateAssignedSubmitters}
-                    wrapColumn
-                    showEmptyPlaceholder
-                    error={
-                      !isNewReward && !values.assignedSubmitters?.length && !readOnly
-                        ? 'Requires at least one assignee'
-                        : undefined
-                    }
-                  />
-                )}
+                <UserAndRoleSelect
+                  readOnly
+                  wrapColumn
+                  value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+                  systemRoles={[authorSystemRole]}
+                  onChange={() => {}}
+                />
               </Box>
             </Box>
 
