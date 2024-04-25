@@ -1,7 +1,7 @@
 import type { ProposalRubricCriteria, ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Alert, Box, FormGroup, FormLabel, Stack, TextField, Rating, Typography } from '@mui/material';
-import { useEffect, useMemo, useState, forwardRef } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FieldArrayWithId, UseFormRegister } from 'react-hook-form';
 import { useForm, useFieldArray, Controller } from 'react-hook-form';
 
@@ -11,7 +11,6 @@ import {
   useDeleteRubricCriteriaAnswers
 } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { getNumberFromString } from 'lib/utils/numbers';
@@ -26,7 +25,8 @@ type Props = {
   answers?: ProposalRubricCriteriaAnswer[];
   draftAnswers?: ProposalRubricCriteriaAnswer[];
   criteriaList: ProposalRubricCriteria[];
-  onSubmit: (props: { isDraft: boolean }) => void;
+  onSubmit: (props: { isDraft: boolean }) => Promise<void>;
+  refreshProposal?: VoidFunction;
   archived?: boolean;
 };
 
@@ -113,6 +113,7 @@ export function RubricAnswersForm({
   disabled,
   draftAnswers,
   archived,
+  refreshProposal,
   onSubmit
 }: Props) {
   const hasDraft = !!draftAnswers?.length;
@@ -201,6 +202,7 @@ export function RubricAnswersForm({
     // switch to draft before updating the parent context, or else the two Alerts will flicker one after the other
     setShowDraftAnswers(true);
     await onSubmit({ isDraft: true });
+    refreshProposal?.();
   }
 
   async function deleteDraftAnswers() {

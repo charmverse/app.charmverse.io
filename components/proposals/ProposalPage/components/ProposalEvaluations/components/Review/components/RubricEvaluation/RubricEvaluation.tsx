@@ -74,6 +74,7 @@ export function RubricEvaluation({ proposal, isCurrent, evaluation, refreshPropo
                     draftAnswers={myDraftRubricAnswers}
                     criteriaList={rubricCriteria!}
                     onSubmit={onSubmitEvaluation}
+                    refreshProposal={refreshProposal}
                     archived={proposal?.archived ?? false}
                     disabled={!canAnswerRubric || !isCurrent || !!proposal?.archived}
                   />
