@@ -65,11 +65,11 @@ export function getRewardErrors({
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
-  if (!isTemplate && !isProposalTemplate && !isMilestone) {
+  if (!isTemplate && !isMilestone) {
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');
-    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
+    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0 && !isProposalTemplate) {
       errors.push('You need to assign at least one submitter');
     }
   }
