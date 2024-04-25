@@ -51,12 +51,12 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
-
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
       ? getRewardWorkflowWithApplication({
           application,
-          workflow
+          workflow,
+          hasCredentials: reward.selectedCredentialTemplates.length > 0
         })
       : workflow;
 
@@ -66,7 +66,7 @@ export function EvaluationsReview({
       updatedWorkflow: _updatedWorkflow,
       currentEvaluation: _currentEvaluation
     };
-  }, [workflow, application]);
+  }, [workflow, application, reward.selectedCredentialTemplates.length]);
 
   const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
     application ? currentEvaluation?.id : undefined
