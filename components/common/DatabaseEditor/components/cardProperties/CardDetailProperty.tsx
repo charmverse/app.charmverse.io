@@ -122,6 +122,7 @@ export function CardDetailProperty({
         showEmptyPlaceholder
         displayType='details'
         mutator={mutator}
+        disableEditPropertyOption={disableEditPropertyOption}
       />
     </Stack>
   );

@@ -93,6 +93,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   showCard?: (cardId: string | null) => void;
+  disableEditPropertyOption?: boolean;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -144,7 +145,8 @@ function PropertyValueElement(props: Props) {
     updatedAt,
     displayType,
     mutator = defaultMutator,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    disableEditPropertyOption
   } = props;
   const { proposal, reward } = card;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
@@ -437,7 +439,7 @@ function PropertyValueElement(props: Props) {
       <TagSelect
         data-test='closed-select-input'
         dataTestActive='active-select-autocomplete'
-        canEditOptions={!readOnly}
+        canEditOptions={!readOnly && !disableEditPropertyOption}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
         displayValueAsOptions={propertyTemplate.dynamicOptions}
