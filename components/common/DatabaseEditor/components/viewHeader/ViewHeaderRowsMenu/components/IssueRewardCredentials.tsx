@@ -5,6 +5,7 @@ import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
 
+import { useGetIssuableRewardCredentials } from 'charmClient/hooks/credentials';
 import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
 import Link from 'components/common/Link';
@@ -53,13 +54,14 @@ export function IssueRewardCredentials({
 
   const { space } = useCurrentSpace();
 
-  const {
-    issuableRewardCredentials,
-    issueAndSaveRewardCredentials,
-    isLoadingIssuableRewardCredentials,
-    userWalletCanIssueCredentialsForSpace,
-    gnosisSafeForCredentials
-  } = useRewardCredentials();
+  const { data: issuableRewardCredentials, isLoading: isLoadingIssuableRewardCredentials } =
+    useGetIssuableRewardCredentials({
+      spaceId: space?.id as string,
+      rewardIds: selectedPageIds
+    });
+
+  const { issueAndSaveRewardCredentials, userWalletCanIssueCredentialsForSpace, gnosisSafeForCredentials } =
+    useRewardCredentials();
   const { showMessage } = useSnackbar();
 
   const filteredCredentials = (issuableRewardCredentials ?? []).filter((issuable) =>

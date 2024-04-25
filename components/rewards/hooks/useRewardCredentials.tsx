@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { stringUtils } from '@charmverse/core/utilities';
 import { useCallback } from 'react';
-import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -19,14 +18,6 @@ import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 
 export function useRewardCredentials() {
   const { space } = useCurrentSpace();
-  const {
-    data: issuableRewardCredentials,
-    error,
-    isLoading: isLoadingIssuableRewardCredentials,
-    mutate: refreshIssuableCredentials
-  } = useSWR(space ? `/api/credentials/rewards?spaceId=${space.id}` : null, () =>
-    charmClient.credentials.getIssuableRewardCredentials({ spaceId: space?.id as string })
-  );
 
   const { account } = useWeb3Account();
 
@@ -86,7 +77,6 @@ export function useRewardCredentials() {
           ),
           type: 'reward'
         });
-        await refreshIssuableCredentials();
         return 'gnosis';
       } else {
         const txOutput = await multiAttestOnchain({
@@ -102,24 +92,13 @@ export function useRewardCredentials() {
           chainId: space.credentialsChainId as EasSchemaChain,
           txHash: txOutput.tx.hash
         });
-        await refreshIssuableCredentials();
         return 'wallet';
       }
     },
-    [
-      signer,
-      userWalletCanIssueCredentialsForSpace,
-      gnosisSafeForCredentials,
-      refreshIssuableCredentials,
-      proposeTransaction
-    ]
+    [signer, userWalletCanIssueCredentialsForSpace, gnosisSafeForCredentials, proposeTransaction]
   );
 
   return {
-    issuableRewardCredentials,
-    isLoadingIssuableRewardCredentials,
-    error,
-    refreshIssuableCredentials,
     issueAndSaveRewardCredentials,
     userWalletCanIssueCredentialsForSpace,
     gnosisSafeForCredentials

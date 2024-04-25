@@ -1,8 +1,11 @@
 import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 
-import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { EASAttestationWithFavorite } from 'lib/credentials/external/getOnchainCredentials';
+import type {
+  FindIssuableRewardCredentialsInput,
+  IssuableRewardApplicationCredentialContent
+} from 'lib/credentials/findIssuableRewardCredentials';
 import type { UserCredentialsRequest } from 'lib/credentials/getAllUserCredentials';
 import type { AddFavoriteCredentialPayload, ReorderFavoriteCredentialsPayload } from 'pages/api/credentials/favorites';
 
@@ -40,4 +43,11 @@ export function useAddFavoriteCredential() {
 
 export function useRemoveFavoriteCredential() {
   return useDELETE<{ favoriteCredentialId: string }>(`/api/credentials/favorites`);
+}
+
+export function useGetIssuableRewardCredentials(data: FindIssuableRewardCredentialsInput) {
+  return useGET<IssuableRewardApplicationCredentialContent[]>(
+    data.spaceId ? `/api/credentials/reward-credentials` : null,
+    data
+  );
 }

@@ -2,12 +2,12 @@ import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 
+import { useGetIssuableRewardCredentials } from 'charmClient/hooks/credentials';
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
-import { useRewardCredentials } from 'components/rewards/hooks/useRewardCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
@@ -52,7 +52,10 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
-  const { issuableRewardCredentials: issuableCredentials = [] } = useRewardCredentials();
+  const { data: issuableCredentials = [] } = useGetIssuableRewardCredentials({
+    spaceId: currentSpace?.id as string,
+    applicationId: application?.id
+  });
   const issuableRewardCredentials = issuableCredentials.filter((issuable) => issuable.rewardId === reward.id);
   const hasIssuableOnchainCredentials = !!(
     currentSpace?.useOnchainCredentials &&
