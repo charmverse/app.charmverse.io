@@ -2,6 +2,7 @@ import { prisma, type Application } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { findSpaceIssuableRewardCredentials } from 'lib/credentials/findIssuableRewardCredentials';
 import { getProposalOrApplicationCredentials } from 'lib/credentials/getProposalOrApplicationCredentials';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -76,9 +77,15 @@ async function getApplicationController(req: NextApiRequest, res: NextApiRespons
     applicationId: application.id
   });
 
+  const pendingOnchainApplicationCredentials = await findSpaceIssuableRewardCredentials({
+    applicationId: application.id,
+    spaceId: application.spaceId
+  });
+
   return res.status(200).json({
     ...application,
-    issuedCredentials: applicationCredentials
+    issuedCredentials: applicationCredentials,
+    issuableOnchainCredentials: pendingOnchainApplicationCredentials
   });
 }
 

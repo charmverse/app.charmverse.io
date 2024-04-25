@@ -55,7 +55,10 @@ export function CredentialReviewStep({
         <Box display='flex' justifyContent='flex-end'>
           <Box width='fit-content'>
             {type === 'reward' ? (
-              <IssueRewardCredentials selectedPageIds={[pageId]} />
+              <IssueRewardCredentials
+                selectedPageIds={[pageId]}
+                onIssueCredentialsSuccess={onIssueCredentialsSuccess}
+              />
             ) : (
               <IssueProposalCredentials
                 selectedPageIds={[pageId]}

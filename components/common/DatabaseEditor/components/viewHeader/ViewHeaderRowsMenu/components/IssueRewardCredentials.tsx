@@ -45,10 +45,12 @@ function IssueCredentialRow({
 
 export function IssueRewardCredentials({
   selectedPageIds,
-  asMenuItem
+  asMenuItem,
+  onIssueCredentialsSuccess
 }: {
   selectedPageIds: string[];
   asMenuItem?: boolean;
+  onIssueCredentialsSuccess?: VoidFunction;
 }) {
   const { getFeatureTitle } = useSpaceFeatures();
 
@@ -100,6 +102,7 @@ export function IssueRewardCredentials({
           })}`
         );
       }
+      onIssueCredentialsSuccess?.();
     } catch (err: any) {
       if (err.code === 'ACTION_REJECTED') {
         showMessage('Transaction rejected', 'warning');

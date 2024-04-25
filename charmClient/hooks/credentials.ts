@@ -47,7 +47,7 @@ export function useRemoveFavoriteCredential() {
 
 export function useGetIssuableRewardCredentials(data: FindIssuableRewardCredentialsInput) {
   return useGET<IssuableRewardApplicationCredentialContent[]>(
-    data.spaceId ? `/api/credentials/reward-credentials` : null,
+    data.spaceId ? `/api/credentials/rewards/issuable` : null,
     data
   );
 }

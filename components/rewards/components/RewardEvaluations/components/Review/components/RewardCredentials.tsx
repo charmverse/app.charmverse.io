@@ -2,11 +2,8 @@ import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-import { useGetCredentialTemplates, useGetIssuableRewardCredentials } from 'charmClient/hooks/credentials';
-import { useGetRewardApplications } from 'charmClient/hooks/rewards';
+import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { CredentialReviewStep } from 'components/common/workflows/Credentials/CredentialReviewStep';
-import { useRewardCredentials } from 'components/rewards/hooks/useRewardCredentials';
-import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
 
 export type UserCredentialRowProps = {
@@ -20,18 +17,16 @@ const preventAccordionToggle = (e: any) => e.stopPropagation();
 export function RewardCredentials({
   selectedCredentialTemplates,
   rewardId,
-  application
+  application,
+  refreshApplication
 }: {
   selectedCredentialTemplates: string[];
   rewardId: string;
   application?: ApplicationWithTransactions;
+  refreshApplication?: VoidFunction;
 }) {
-  const { space: currentSpace } = useCurrentSpace();
-  const { data: issuableCredentials = [] } = useGetIssuableRewardCredentials({
-    spaceId: currentSpace?.id as string,
-    applicationId: application?.id,
-    rewardIds: [rewardId]
-  });
+  const issuableCredentials = application?.issuableOnchainCredentials ?? [];
+
   const issuableRewardCredentials = issuableCredentials.filter((issuable) => issuable.rewardId === rewardId);
   const { credentialTemplates } = useGetCredentialTemplates();
 
@@ -49,6 +44,7 @@ export function RewardCredentials({
         pageId={rewardId}
         selectedCredentials={selectedCredentials}
         type='reward'
+        onIssueCredentialsSuccess={refreshApplication}
       />
     </Box>
   );
