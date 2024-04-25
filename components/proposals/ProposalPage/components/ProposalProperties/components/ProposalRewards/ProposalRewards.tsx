@@ -3,7 +3,7 @@ import { Delete, Edit } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
 
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
@@ -85,38 +85,40 @@ export function ProposalRewards({
     }
   }
 
-  function createNewReward() {
-    clearRewardValues();
-    const template = templates?.find((t) => t.page.id === requiredTemplateId);
-    // use reviewers from the proposal if not set in the template
-    const rewardReviewers = template?.reward.reviewers?.length
-      ? template.reward.reviewers
-      : uniqBy(
-          reviewers
-            .map((reviewer) =>
-              reviewer.roleId
-                ? { group: 'role', id: reviewer.roleId }
-                : reviewer.userId
-                ? { group: 'user', id: reviewer.userId }
-                : null
-            )
-            .filter(isTruthy) as RewardReviewer[],
-          'id'
-        );
+  const rewardReviewers = useMemo(() => {
+    return uniqBy(
+      reviewers
+        .map((reviewer) =>
+          reviewer.roleId
+            ? { group: 'role', id: reviewer.roleId }
+            : reviewer.userId
+            ? { group: 'user', id: reviewer.userId }
+            : null
+        )
+        .filter(isTruthy) as RewardReviewer[],
+      'id'
+    );
+  }, [reviewers]);
 
-    const newReward = {
+  function getTemplateAppliedReward(template?: RewardTemplate) {
+    const rewardType = template ? getRewardType(template.reward) : 'none';
+    return {
       ...template?.reward,
       reviewers: rewardReviewers,
-      assignedSubmitters: template?.reward.assignedSubmitters ?? assignedSubmitters,
+      assignedSubmitters,
       // Converting reward values to be of assigned workflow
       approveSubmitters: false,
       allowMultipleApplications: false,
-      allowedSubmitterRoles: []
+      allowedSubmitterRoles: [],
+      maxSubmissions: null,
+      rewardType
     };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
-    setRewardValues(newReward, { skipDirty: true });
+  }
+
+  function createNewReward() {
+    clearRewardValues();
+    const template = templates?.find((t) => t.page.id === requiredTemplateId);
+    setRewardValues(getTemplateAppliedReward(template), { skipDirty: true });
 
     openNewPage({
       ...template?.page,
@@ -151,16 +153,7 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      const rewardType = getRewardType(template.reward);
-      setRewardValues({
-        ...template?.reward,
-        assignedSubmitters: template.reward.assignedSubmitters ?? assignedSubmitters,
-        // Converting reward values to be of assigned workflow
-        approveSubmitters: false,
-        allowMultipleApplications: false,
-        allowedSubmitterRoles: [],
-        rewardType
-      });
+      setRewardValues(getTemplateAppliedReward(template));
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
