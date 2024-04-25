@@ -34,8 +34,6 @@ export function useRewardCredentials() {
 
   const {
     gnosisSafe: gnosisSafeForCredentials,
-    safeApiClient,
-    isLoadingSafe,
     currentWalletIsSafeOwner,
     proposeTransaction
   } = useGetGnosisSafe({

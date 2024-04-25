@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 import { Button } from 'components/common/Button';
-import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export type UserCredentialRowProps = {

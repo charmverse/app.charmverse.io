@@ -3,10 +3,9 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
-import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
 import { CredentialReviewStep } from 'components/common/workflows/Credentials/CredentialReviewStep';
-import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import { useRewardCredentials } from 'components/rewards/hooks/useRewardCredentials';
+import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
 
 export type UserCredentialRowProps = {
   credential: { title: string; subtitle: string; iconUrl: string };
@@ -16,19 +15,18 @@ export type UserCredentialRowProps = {
 
 const preventAccordionToggle = (e: any) => e.stopPropagation();
 
-export function ProposalCredentials({
+export function RewardCredentials({
   selectedCredentialTemplates,
-  proposalId
+  rewardId,
+  application
 }: {
   selectedCredentialTemplates: string[];
-  proposalId: string;
+  rewardId: string;
+  application?: ApplicationWithTransactions;
 }) {
-  const { issuableProposalCredentials } = useProposalCredentials({
-    proposalId
-  });
-  const { proposal, refreshProposal } = useProposal({ proposalId });
+  const { issuableRewardCredentials: issuableCredentials = [] } = useRewardCredentials();
+  const issuableRewardCredentials = issuableCredentials.filter((issuable) => issuable.rewardId === rewardId);
   const { credentialTemplates } = useGetCredentialTemplates();
-  const { getFeatureTitle } = useSpaceFeatures();
 
   const pendingCredentials = selectedCredentialTemplates
     .map((templateId) => credentialTemplates?.find((ct) => ct.id === templateId))
@@ -36,17 +34,14 @@ export function ProposalCredentials({
 
   return (
     <Box display='flex' flexDirection='column' gap={2} onClick={preventAccordionToggle}>
-      <Typography variant='body2'>
-        Authors receive credentials when the {getFeatureTitle('proposal')} is approved
-      </Typography>
+      <Typography variant='body2'>Submitters receive credentials when their submission is approved</Typography>
 
       <CredentialReviewStep
-        canIssueCredentials={!!(issuableProposalCredentials && issuableProposalCredentials.length > 0)}
-        issuedCredentials={proposal?.issuedCredentials ?? []}
-        pageId={proposalId}
+        canIssueCredentials={issuableRewardCredentials.length > 0}
+        issuedCredentials={application?.issuedCredentials ?? []}
+        pageId={rewardId}
         pendingCredentials={pendingCredentials}
-        type='proposal'
-        onIssueCredentialsSuccess={refreshProposal}
+        type='reward'
       />
     </Box>
   );

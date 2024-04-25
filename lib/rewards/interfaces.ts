@@ -1,6 +1,8 @@
 import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Application, Bounty, BountyStatus, Page, Transaction } from '@charmverse/core/prisma-client';
 
+import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
+
 export type RewardReviewer = TargetPermissionGroup<'role' | 'user'>;
 
 export type ApplicationMeta = Pick<
@@ -39,6 +41,7 @@ export type RewardWithUsersAndPageMeta = Bounty & {
 
 export type ApplicationWithTransactions = Application & {
   transactions: Transaction[];
+  issuedCredentials: EASAttestationFromApi[];
 };
 
 export type RewardTokenDetails = {
