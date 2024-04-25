@@ -136,6 +136,8 @@ export function useProposalRewards({
     isSavingReward,
     openNewPage,
     showReward,
-    rewardValues
+    rewardValues,
+    setCurrentPendingId,
+    currentPendingId
   };
 }

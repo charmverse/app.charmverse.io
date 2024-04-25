@@ -62,7 +62,6 @@ export function ProposalRewardsTable({
   const { boardBlock, isLoading } = useRewardsBoard();
   const { showPage } = usePageDialog();
 
-  const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { rewards: allRewards, mutateRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
 
@@ -80,7 +79,9 @@ export function ProposalRewardsTable({
     openNewPage,
     setRewardValues,
     updateNewPageValues,
-    rewardValues
+    rewardValues,
+    currentPendingId,
+    setCurrentPendingId
   } = useProposalRewards({
     assignedSubmitters,
     isProposalTemplate,
