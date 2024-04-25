@@ -122,12 +122,6 @@ describe('loadAndGenerateCsv()', () => {
     const { user: admin, space } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true
     });
-    // set up proposal-as-a-source db
-
-    const proposalsDatabase = await generateProposalSourceDb({
-      createdBy: admin.id,
-      spaceId: space.id
-    });
 
     const visibleProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'published',
@@ -143,6 +137,62 @@ describe('loadAndGenerateCsv()', () => {
       ]
     });
 
+    // create and attach a form
+    const form = await prisma.form.create({
+      data: {
+        formFields: {
+          createMany: {
+            data: [
+              {
+                name: 'first field',
+                type: 'project_profile',
+                fieldConfig: { projectMember: {} }
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    // create and attach a test project
+    const project = await prisma.project.create({
+      data: {
+        createdBy: admin.id,
+        updatedBy: admin.id,
+        name: 'Test project',
+        projectMembers: {
+          createMany: {
+            data: [
+              {
+                name: 'first guy',
+                updatedBy: admin.id
+              },
+              {
+                name: 'second guy',
+                updatedBy: admin.id
+              }
+            ]
+          }
+        }
+      }
+    });
+
+    await prisma.proposal.update({
+      where: {
+        id: visibleProposal.id
+      },
+      data: {
+        formId: form.id,
+        projectId: project.id
+      }
+    });
+
+    // set up proposal-as-a-source db
+    const proposalsDatabase = await generateProposalSourceDb({
+      createdBy: admin.id,
+      spaceId: space.id
+    });
+
     // generate cards
     await createMissingCards({ boardId: proposalsDatabase.id });
 
@@ -151,5 +201,7 @@ describe('loadAndGenerateCsv()', () => {
     expect(firstRow).toContain(visibleProposal.page.title);
     expect(firstRow).toContain('In Progress');
     expect(firstRow).toContain('Feedback');
+    expect(firstRow).toContain('Test project');
+    expect(firstRow).toContain('first guy|second guy');
   });
 });
