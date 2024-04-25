@@ -29,7 +29,7 @@ export function IssueProposalCredentials({
 
   const { space } = useCurrentSpace();
 
-  const proposalLabel = getFeatureTitle('Proposal');
+  const proposalLabel = getFeatureTitle('proposal');
 
   const {
     issuableProposalCredentials,
@@ -63,7 +63,13 @@ export function IssueProposalCredentials({
       if (result === 'gnosis') {
         showMessage('Transaction submitted to Gnosis Safe. Please execute it there');
       } else {
-        showMessage(`Issued ${_issuableProposalCredentials.length} ${proposalLabel} credentials`);
+        const issuedCredentialAmount = _issuableProposalCredentials.length;
+        showMessage(
+          `Issued ${issuedCredentialAmount} ${proposalLabel} ${conditionalPlural({
+            count: issuedCredentialAmount,
+            word: 'credential'
+          })}`
+        );
       }
       onIssueCredentialsSuccess?.();
     } catch (err: any) {
@@ -94,10 +100,6 @@ export function IssueProposalCredentials({
           }`
         : `You must be connected with wallet ${space?.credentialsWallet} to issue credentials`
       : undefined;
-
-  const actionLabel = `Issue ${
-    issuableProposalCredentials?.length ? `${issuableProposalCredentials?.length} ` : ''
-  }Onchain ${conditionalPlural({ word: 'Credential', count: issuableProposalCredentials?.length || 0 })}`;
 
   async function _handleIssueCredentials() {
     if (!space?.credentialsChainId) {
@@ -132,7 +134,7 @@ export function IssueProposalCredentials({
                   mr: 1
                 }}
               />
-              <ListItemText primary={actionLabel} />
+              <ListItemText primary='Issue onchain' />
             </StyledMenuItem>
           </div>
         ) : (
@@ -143,7 +145,7 @@ export function IssueProposalCredentials({
             loading={publishingCredential || (isLoadingIssuableProposalCredentials && !issuableProposalCredentials)}
             disabled={disableIssueCredentials}
           >
-            {actionLabel}
+            Issue onchain
           </Button>
         )}
       </Box>

@@ -101,12 +101,6 @@ export function generateCredentialInputsForProposal({
   proposal.authors.forEach(({ author }) => {
     const targetWallet = author.primaryWallet?.address ?? author.wallets[0]?.address;
     if (!targetWallet) {
-      log.warn(`User has no wallet to issue credentials to`, {
-        pageId: proposal.page.id,
-        userId: author.id,
-        proposalId: proposal.id,
-        credentialsToIssue
-      });
       return;
     }
 
