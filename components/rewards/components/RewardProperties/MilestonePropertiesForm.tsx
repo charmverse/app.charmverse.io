@@ -64,7 +64,8 @@ export function MilestonePropertiesForm({
   const isAdmin = useIsAdmin();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const { templates: rewardTemplates = [] } = useRewardTemplates();
-  const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
+  const nonDraftRewardTemplates = rewardTemplates.filter((tpl) => tpl.reward.status !== 'draft');
+  const template = nonDraftRewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
 
@@ -163,14 +164,16 @@ export function MilestonePropertiesForm({
                   </PropertyLabel>
                   <Box display='flex' flex={1}>
                     <TemplateSelect
-                      options={rewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
+                      options={nonDraftRewardTemplates.map((rewardTemplate) => rewardTemplate.page)}
                       disabled={readOnlyTemplate || readOnly}
                       value={templateId}
                       onChange={(templatePage) => {
                         if (!templatePage) {
                           selectTemplate(null);
                         }
-                        const selected = rewardTemplates.find((_template) => _template.page.id === templatePage?.id);
+                        const selected = nonDraftRewardTemplates.find(
+                          (_template) => _template.page.id === templatePage?.id
+                        );
                         if (selected && selectTemplate) {
                           selectTemplate(selected);
                         }
