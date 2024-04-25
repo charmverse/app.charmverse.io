@@ -119,6 +119,7 @@ export function NewRewardPage({
       contentText: template.page.contentText,
       title: pageData.title
     });
+    const rewardType = getRewardType(template.reward);
     setRewardValues({
       assignedSubmitters: template.reward.assignedSubmitters,
       allowedSubmitterRoles: template.reward.allowedSubmitterRoles,
@@ -131,7 +132,7 @@ export function NewRewardPage({
       reviewers: template.reward.reviewers,
       rewardAmount: template.reward.rewardAmount,
       rewardToken: template.reward.rewardToken,
-      rewardType: getRewardType(template.reward),
+      rewardType,
       selectedCredentialTemplates: template.reward.selectedCredentialTemplates,
       fields: template.reward.fields
     });
