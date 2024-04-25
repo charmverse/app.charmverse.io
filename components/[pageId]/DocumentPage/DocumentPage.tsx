@@ -232,8 +232,6 @@ function DocumentPageComponent({
     setConnectionError(null);
   }, [page.id, threadsPageId]);
 
-  // console.log('BOARD', board);
-
   const threadIds = useMemo(
     () =>
       typeof page.type === 'string'
