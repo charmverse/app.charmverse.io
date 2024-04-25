@@ -1,27 +1,21 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
-import { Box, ListItemIcon, MenuItem, ListItemText, Stack, Typography } from '@mui/material';
-import { uniqBy } from 'lodash';
+import { Box, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { v4 } from 'uuid';
 
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
 import { ContextMenu } from 'components/common/ContextMenu';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
-import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
-import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
-import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
-import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -29,11 +23,11 @@ import type { CardWithRelations } from 'lib/databases/card';
 import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
-import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardWithUsers, RewardType, RewardReviewer } from 'lib/rewards/interfaces';
+import type { RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
+
+import { useProposalRewards } from '../../hooks/useProposalRewards';
 
 import { AttachRewardButton } from './AttachRewardButton';
 
@@ -68,14 +62,32 @@ export function ProposalRewardsTable({
   const { boardBlock, isLoading } = useRewardsBoard();
   const { showPage } = usePageDialog();
 
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
-  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { rewards: allRewards, mutateRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
-  const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
   const { getFeatureTitle } = useSpaceFeatures();
+  const {
+    createNewReward,
+    closeDialog,
+    newRewardErrors,
+    saveForm,
+    selectTemplate,
+    contentUpdated,
+    isDirty,
+    isSavingReward,
+    newPageValues,
+    openNewPage,
+    setRewardValues,
+    updateNewPageValues,
+    rewardValues
+  } = useProposalRewards({
+    assignedSubmitters,
+    isProposalTemplate,
+    onSave,
+    reviewers,
+    requiredTemplateId
+  });
 
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
@@ -106,66 +118,8 @@ export function ProposalRewardsTable({
   );
 
   const canCreatePendingRewards = !readOnly && !publishedRewards.length;
-  const newRewardErrors = getRewardErrors({
-    page: newPageValues,
-    reward: rewardValues,
-    rewardType: rewardValues.rewardType,
-    isProposalTemplate
-  }).join(', ');
 
   const loadingData = isLoading || isLoadingRewards || loadingPages;
-
-  function closeDialog() {
-    clearRewardValues();
-    clearNewPage();
-    setCurrentPendingId(null);
-  }
-
-  async function saveForm() {
-    if (newPageValues) {
-      onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
-      closeDialog();
-    }
-  }
-
-  function createNewReward() {
-    clearRewardValues();
-    const template = templates?.find((t) => t.page.id === requiredTemplateId);
-    // use reviewers from the proposal if not set in the template
-    const rewardReviewers = template?.reward.reviewers?.length
-      ? template.reward.reviewers
-      : uniqBy(
-          reviewers
-            .map((reviewer) =>
-              reviewer.roleId
-                ? { group: 'role', id: reviewer.roleId }
-                : reviewer.userId
-                ? { group: 'user', id: reviewer.userId }
-                : null
-            )
-            .filter(isTruthy) as RewardReviewer[],
-          'id'
-        );
-    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
-      ? template.reward.allowedSubmitterRoles
-      : assignedSubmitters;
-
-    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
-    setRewardValues(newReward, { skipDirty: true });
-
-    openNewPage({
-      ...template?.page,
-      content: template?.page.content as any,
-      templateId: requiredTemplateId || undefined,
-      title: undefined,
-      type: 'bounty'
-    });
-    // set a new draftId
-    setCurrentPendingId(v4());
-  }
 
   function showRewardCard(id: string | null) {
     const isPublished = publishedRewards.some((r) => r.id === id);
@@ -189,23 +143,6 @@ export function ProposalRewardsTable({
         mutateRewards();
       }
     });
-  }
-
-  function selectTemplate(template: RewardTemplate | null) {
-    if (template) {
-      setRewardValues(template.reward);
-      updateNewPageValues({
-        ...template.page,
-        content: template.page.content as any,
-        title: undefined,
-        type: 'bounty',
-        templateId: template.page.id
-      });
-    } else {
-      updateNewPageValues({
-        templateId: undefined
-      });
-    }
   }
 
   function deleteReward() {
