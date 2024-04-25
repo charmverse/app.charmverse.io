@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import FieldLabel from 'components/common/form/FieldLabel';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import PopperPopup from 'components/common/PopperPopup';
+import { isReturnKey } from 'lib/utils/react';
 import type { BrandColor } from 'theme/colors';
 
 import { ColorSelectMenu } from '../../ColorSelectMenu';
@@ -51,7 +52,7 @@ export function SelectOptionEdit({ option, onChange, onDelete, onToggleOptionEdi
               autoFocus
               onKeyDown={(e) => {
                 e.stopPropagation();
-                if (e.code === 'Enter') {
+                if (isReturnKey(e)) {
                   onSave();
                 }
               }}

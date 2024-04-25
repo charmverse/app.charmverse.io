@@ -9,7 +9,6 @@ import { DocumentPageIcon } from 'components/common/Icons/DocumentPageIcon';
 import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 const StyledPageTemplateBanner = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'card'

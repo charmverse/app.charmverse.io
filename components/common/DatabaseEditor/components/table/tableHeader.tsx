@@ -35,6 +35,7 @@ import type { BoardView, ISortOption } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import { getPropertyName } from 'lib/databases/getPropertyName';
+import { isReturnKey } from 'lib/utils/react';
 
 import { useSortable } from '../../hooks/sortable';
 import mutator from '../../mutator';
@@ -178,7 +179,7 @@ function TableHeader(props: Props): JSX.Element {
             autoFocus
             onKeyDown={(e) => {
               e.stopPropagation();
-              if (e.code === 'Enter' && tempName.length !== 0 && tempName !== name) {
+              if (isReturnKey(e) && tempName.length !== 0 && tempName !== name) {
                 renameColumn();
               }
             }}

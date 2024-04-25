@@ -10,3 +10,7 @@ export function mergeRefs(refs: any) {
     });
   };
 }
+
+export function isReturnKey(event: React.KeyboardEvent) {
+  return event.key === 'Enter' || event.key === 'NumpadEnter';
+}

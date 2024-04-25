@@ -14,7 +14,7 @@ interface StateType {
   nodeViewProps: NodeViewProps;
 }
 
-export class NodeViewWrapper extends React.Component<PropsType, StateType> {
+class NodeViewWrapperClass extends React.Component<PropsType, StateType> {
   update: () => void;
 
   attachToContentDOM: (reactElement: HTMLDivElement) => void;
@@ -85,3 +85,5 @@ export class NodeViewWrapper extends React.Component<PropsType, StateType> {
     return element;
   }
 }
+
+export const NodeViewWrapper = React.memo(NodeViewWrapperClass);
