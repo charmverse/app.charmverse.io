@@ -152,7 +152,12 @@ export function EvaluationsReview({
                 hideReviewResult={!isCurrent && evaluation.result === null}
               />
             ) : evaluation.type === 'payment' ? (
-              <PaymentStepReview application={application} reward={reward} refreshApplication={refreshApplication} />
+              <PaymentStepReview
+                application={application}
+                hidePaymentButton={!isCurrent}
+                reward={reward}
+                refreshApplication={refreshApplication}
+              />
             ) : evaluation.type === 'submit' ? (
               <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
             ) : evaluation.type === 'credential' ? (
