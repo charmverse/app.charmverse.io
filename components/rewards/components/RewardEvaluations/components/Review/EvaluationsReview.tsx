@@ -25,6 +25,7 @@ import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
+import { RewardCredentials } from './components/RewardCredentials';
 
 export type Props = Omit<
   EvaluationSettingsProps,
@@ -50,12 +51,19 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
+  const hasIssuableOnchainCredentials = !!(
+    currentSpace?.useOnchainCredentials &&
+    currentSpace?.credentialsWallet &&
+    (application?.issuableOnchainCredentials ?? []).length > 0
+  );
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
       ? getRewardWorkflowWithApplication({
           application,
-          workflow
+          workflow,
+          hasCredentials: reward.selectedCredentialTemplates.length > 0,
+          hasIssuableOnchainCredentials
         })
       : workflow;
 
@@ -65,7 +73,7 @@ export function EvaluationsReview({
       updatedWorkflow: _updatedWorkflow,
       currentEvaluation: _currentEvaluation
     };
-  }, [workflow, application]);
+  }, [workflow, application, hasIssuableOnchainCredentials, reward.selectedCredentialTemplates.length]);
 
   const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
     application ? currentEvaluation?.id : undefined
@@ -147,6 +155,13 @@ export function EvaluationsReview({
               <PaymentStepReview application={application} reward={reward} refreshApplication={refreshApplication} />
             ) : evaluation.type === 'submit' ? (
               <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
+            ) : evaluation.type === 'credential' ? (
+              <RewardCredentials
+                selectedCredentialTemplates={reward.selectedCredentialTemplates}
+                rewardId={reward.id}
+                application={application}
+                refreshApplication={refreshApplication}
+              />
             ) : null}
           </EvaluationStepRow>
         );

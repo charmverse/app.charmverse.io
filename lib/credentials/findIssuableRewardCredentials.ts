@@ -1,12 +1,12 @@
-import { log } from '@charmverse/core/log';
-import {
-  prisma,
-  type ApplicationStatus,
-  type CredentialEventType,
-  type CredentialTemplate,
-  type IssuedCredential,
-  type Space
+import type {
+  ApplicationStatus,
+  CredentialTemplate,
+  IssuedCredential,
+  Prisma,
+  Space,
+  CredentialEventType
 } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getSubmissionPagePermalink } from 'lib/pages/getPagePermalink';
@@ -135,11 +135,17 @@ export function generateCredentialInputsForReward({
   return credentialsToIssue;
 }
 
-export async function findSpaceIssuableRewardCredentials({
-  spaceId
-}: {
+export type FindIssuableRewardCredentialsInput = {
   spaceId: string;
-}): Promise<IssuableRewardApplicationCredentialContent[]> {
+  applicationId?: string;
+  rewardIds?: string[];
+};
+
+export async function findSpaceIssuableRewardCredentials({
+  spaceId,
+  applicationId,
+  rewardIds
+}: FindIssuableRewardCredentialsInput): Promise<IssuableRewardApplicationCredentialContent[]> {
   const space = await prisma.space.findUniqueOrThrow({
     where: { id: spaceId },
     select: {
@@ -155,8 +161,17 @@ export async function findSpaceIssuableRewardCredentials({
     }
   });
 
+  const rewardIdsList = !rewardIds ? undefined : typeof rewardIds === 'string' ? [rewardIds] : rewardIds;
+
+  // Search by application ID, or reward IDs or rewards which have a page
+  const query: Prisma.BountyWhereInput = applicationId
+    ? { applications: { some: { id: applicationId } } }
+    : rewardIdsList?.length
+    ? { OR: [{ id: { in: rewardIdsList } }, { page: { id: { in: rewardIdsList } } }] }
+    : {};
+
   const rewards = await prisma.bounty.findMany({
-    where: { spaceId, page: {} },
+    where: query,
     select: {
       id: true,
       selectedCredentialTemplates: true,
@@ -166,7 +181,7 @@ export async function findSpaceIssuableRewardCredentials({
         }
       },
       applications: {
-        where: { status: { in: ['complete', 'processing', 'paid'] } },
+        where: { id: applicationId, status: { in: ['complete', 'processing', 'paid'] } },
         select: {
           id: true,
           createdBy: true,

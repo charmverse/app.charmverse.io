@@ -5,6 +5,7 @@ import { getChainById } from 'connectors/chains';
 import { useMemo, useState } from 'react';
 import { useSwitchChain } from 'wagmi';
 
+import { useGetIssuableRewardCredentials } from 'charmClient/hooks/credentials';
 import { Button } from 'components/common/Button';
 import { Chain } from 'components/common/form/InputSearchBlockchain';
 import Link from 'components/common/Link';
@@ -42,18 +43,30 @@ function IssueCredentialRow({
   );
 }
 
-export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: string[] }) {
+export function IssueRewardCredentials({
+  selectedPageIds,
+  asMenuItem,
+  onIssueCredentialsSuccess,
+  applicationId
+}: {
+  selectedPageIds: string[];
+  asMenuItem?: boolean;
+  onIssueCredentialsSuccess?: VoidFunction;
+  applicationId?: string;
+}) {
   const { getFeatureTitle } = useSpaceFeatures();
 
   const { space } = useCurrentSpace();
 
-  const {
-    issuableRewardCredentials,
-    issueAndSaveRewardCredentials,
-    isLoadingIssuableRewardCredentials,
-    userWalletCanIssueCredentialsForSpace,
-    gnosisSafeForCredentials
-  } = useRewardCredentials();
+  const { data: issuableRewardCredentials, isLoading: isLoadingIssuableRewardCredentials } =
+    useGetIssuableRewardCredentials({
+      spaceId: space?.id as string,
+      rewardIds: selectedPageIds,
+      applicationId
+    });
+
+  const { issueAndSaveRewardCredentials, userWalletCanIssueCredentialsForSpace, gnosisSafeForCredentials } =
+    useRewardCredentials();
   const { showMessage } = useSnackbar();
 
   const filteredCredentials = (issuableRewardCredentials ?? []).filter((issuable) =>
@@ -92,6 +105,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
           })}`
         );
       }
+      onIssueCredentialsSuccess?.();
     } catch (err: any) {
       if (err.code === 'ACTION_REJECTED') {
         showMessage('Transaction rejected', 'warning');
@@ -176,28 +190,43 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
     return null;
   }
 
-  return (
-    <PropertyMenu
-      lastChild={false}
-      disabledTooltip={disableIssueCredentialsMenu}
-      // add fontSize to icon to override MUI styles
-      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue Onchain Credentials' }}
-    >
-      {chainComponent}
-      <Divider />
+  if (asMenuItem) {
+    return (
+      <PropertyMenu
+        lastChild={false}
+        disabledTooltip={disableIssueCredentialsMenu}
+        // add fontSize to icon to override MUI styles
+        propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue onchain' }}
+      >
+        {chainComponent}
+        <Divider />
 
-      <IssueCredentialRow
-        disabled={disableIssueCredentialRows}
-        issuableCredentials={filteredCredentials ?? []}
-        handleIssueCredentials={handleIssueCredentials}
-        label='Submission approved'
-      />
-      {publishingCredential && (
-        <MenuItem sx={{ gap: 2 }}>
-          <LoadingComponent size={20} />
-          <ListItemText primary='Publishing credentials' />
-        </MenuItem>
-      )}
-    </PropertyMenu>
+        <IssueCredentialRow
+          disabled={disableIssueCredentialRows}
+          issuableCredentials={filteredCredentials ?? []}
+          handleIssueCredentials={handleIssueCredentials}
+          label='Submission approved'
+        />
+        {publishingCredential && (
+          <MenuItem sx={{ gap: 2 }}>
+            <LoadingComponent size={20} />
+            <ListItemText primary='Publishing credentials' />
+          </MenuItem>
+        )}
+      </PropertyMenu>
+    );
+  }
+
+  return (
+    <Button
+      variant='contained'
+      color='primary'
+      loading={publishingCredential || (isLoadingIssuableRewardCredentials && !issuableRewardCredentials)}
+      disabledTooltip={disableIssueCredentialsMenu}
+      disabled={disableIssueCredentialsMenu}
+      onClick={() => handleIssueCredentials(filteredCredentials)}
+    >
+      Issue onchain
+    </Button>
   );
 }
