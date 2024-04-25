@@ -46,11 +46,13 @@ function IssueCredentialRow({
 export function IssueRewardCredentials({
   selectedPageIds,
   asMenuItem,
-  onIssueCredentialsSuccess
+  onIssueCredentialsSuccess,
+  applicationId
 }: {
   selectedPageIds: string[];
   asMenuItem?: boolean;
   onIssueCredentialsSuccess?: VoidFunction;
+  applicationId?: string;
 }) {
   const { getFeatureTitle } = useSpaceFeatures();
 
@@ -59,7 +61,8 @@ export function IssueRewardCredentials({
   const { data: issuableRewardCredentials, isLoading: isLoadingIssuableRewardCredentials } =
     useGetIssuableRewardCredentials({
       spaceId: space?.id as string,
-      rewardIds: selectedPageIds
+      rewardIds: selectedPageIds,
+      applicationId
     });
 
   const { issueAndSaveRewardCredentials, userWalletCanIssueCredentialsForSpace, gnosisSafeForCredentials } =

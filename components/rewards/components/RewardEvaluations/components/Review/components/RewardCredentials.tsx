@@ -45,6 +45,7 @@ export function RewardCredentials({
         selectedCredentials={selectedCredentials}
         type='reward'
         onIssueCredentialsSuccess={refreshApplication}
+        applicationId={application?.id}
       />
     </Box>
   );

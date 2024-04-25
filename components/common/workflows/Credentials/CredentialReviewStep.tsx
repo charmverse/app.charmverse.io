@@ -15,7 +15,8 @@ export function CredentialReviewStep({
   hasPendingOnchainCredentials,
   pageId,
   type,
-  onIssueCredentialsSuccess
+  onIssueCredentialsSuccess,
+  applicationId
 }: {
   selectedCredentials: CredentialTemplate[];
   issuedCredentials: EASAttestationFromApi[];
@@ -23,6 +24,7 @@ export function CredentialReviewStep({
   pageId: string;
   type: 'reward' | 'proposal';
   onIssueCredentialsSuccess?: VoidFunction;
+  applicationId?: string;
 }) {
   const { space } = useCurrentSpace();
   const isSmallScreen = useSmallScreen();
@@ -58,6 +60,7 @@ export function CredentialReviewStep({
               <IssueRewardCredentials
                 selectedPageIds={[pageId]}
                 onIssueCredentialsSuccess={onIssueCredentialsSuccess}
+                applicationId={applicationId}
               />
             ) : (
               <IssueProposalCredentials
