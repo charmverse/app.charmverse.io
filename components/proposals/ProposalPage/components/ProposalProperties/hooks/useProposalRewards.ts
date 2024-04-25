@@ -71,15 +71,19 @@ export function useProposalRewards({
   function getTemplateAppliedReward(template?: RewardTemplate) {
     const rewardType = template ? getRewardType(template.reward) : 'none';
     return {
-      ...template?.reward,
+      rewardType,
+      chainId: rewardType === 'token' ? template?.reward.chainId : null,
+      customReward: rewardType === 'custom' ? template?.reward.customReward : null,
+      rewardAmount: rewardType === 'token' ? template?.reward.rewardAmount : null,
+      rewardToken: rewardType === 'token' ? template?.reward.rewardToken : null,
+      dueDate: template?.reward.dueDate,
       reviewers: rewardReviewers,
       assignedSubmitters,
       // Converting reward values to be of assigned workflow
       approveSubmitters: false,
       allowMultipleApplications: false,
       allowedSubmitterRoles: [],
-      maxSubmissions: null,
-      rewardType
+      maxSubmissions: null
     };
   }
 

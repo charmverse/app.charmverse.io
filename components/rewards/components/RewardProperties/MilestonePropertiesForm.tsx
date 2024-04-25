@@ -186,7 +186,6 @@ export function MilestonePropertiesForm({
                         if (selected && selectTemplate) {
                           selectTemplate(selected);
                         }
-                        setRewardType(getRewardType(selected?.reward || values, isNewReward, !!templatePage));
                       }}
                     />
                   </Box>
