@@ -72,6 +72,8 @@ export function useProposalRewards({
     const rewardType = template ? getRewardType(template.reward) : 'none';
     return {
       rewardType,
+      fields: template?.reward.fields,
+      selectedCredentialTemplates: template?.reward.selectedCredentialTemplates,
       chainId: rewardType === 'token' ? template?.reward.chainId : null,
       customReward: rewardType === 'custom' ? template?.reward.customReward : null,
       rewardAmount: rewardType === 'token' ? template?.reward.rewardAmount : null,
