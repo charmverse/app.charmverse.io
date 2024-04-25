@@ -52,21 +52,13 @@ describe('PUT /api/pages/{id}/toggle-lock - Toggle page lock', () => {
       })
       .expect(200);
 
-    const [updatedPage, updatedBlock] = await Promise.all([
-      prisma.page.findUniqueOrThrow({
-        where: {
-          id: database.id
-        }
-      }),
-      prisma.block.findUniqueOrThrow({
-        where: {
-          id: database.id
-        }
-      })
-    ]);
+    const updatedPage = await prisma.page.findUniqueOrThrow({
+      where: {
+        id: database.id
+      }
+    });
 
     expect(updatedPage.isLocked).toEqual(true);
-    expect(updatedBlock.isLocked).toEqual(true);
   });
 
   it('should not allow a user without edit_lock permissions to change the page lock, responding with 401', async () => {

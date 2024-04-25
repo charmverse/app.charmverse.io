@@ -29,7 +29,7 @@ const boardsSlice = createSlice({
                     delete state.boards[board.id]
                     delete state.templates[board.id]
                 } else */
-        if (board.fields.isTemplate) {
+        if (board.fields?.isTemplate) {
           state.templates[board.id] = board;
         } else {
           const updated = Object.assign(state.boards[board.id] || {}, board);
@@ -51,7 +51,8 @@ const boardsSlice = createSlice({
         if (block.type === 'board' && block.fields.isTemplate) {
           state.templates[block.id] = block as Board;
         } else if (block.type === 'board' && !block.fields.isTemplate) {
-          state.boards[block.id] = block as Board;
+          const currentBoard = state.boards[block.id] ?? {};
+          state.boards[block.id] = { ...currentBoard, block } as Board;
         }
       }
     });
@@ -60,7 +61,8 @@ const boardsSlice = createSlice({
       state.boards = state.boards ?? {};
       const block = action.payload;
       if (block.type === 'board') {
-        state.boards[block.id] = block as Board;
+        const currentBlock = state.boards[block.id] ?? {};
+        state.boards[block.id] = { ...currentBlock, ...block } as Board;
       }
     });
   }

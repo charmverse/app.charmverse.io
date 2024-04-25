@@ -9,7 +9,7 @@ export type PageLockToggle = {
   isLocked: boolean;
 };
 
-export type PageLockToggleResult = Pick<Page, 'id' | 'lockedBy' | 'isLocked' | 'spaceId' | 'boardId'>;
+export type PageLockToggleResult = Pick<Page, 'id' | 'lockedBy' | 'isLocked' | 'spaceId' | 'boardId' | 'type'>;
 
 export async function togglePageLock({
   pageId,
@@ -42,7 +42,8 @@ export async function togglePageLock({
       lockedBy: true,
       isLocked: true,
       spaceId: true,
-      boardId: true
+      boardId: true,
+      type: true
     }
   });
 

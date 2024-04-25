@@ -46,7 +46,9 @@ async function togglePageLockController(req: NextApiRequest, res: NextApiRespons
           {
             id: updatedPage.id,
             spaceId: updatedPage.spaceId,
-            isLocked: updatedPage.isLocked
+            type: 'board',
+            isLocked: updatedPage.isLocked,
+            pageType: updatedPage.type
           }
         ]
       },
