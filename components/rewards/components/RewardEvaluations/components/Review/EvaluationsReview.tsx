@@ -2,7 +2,6 @@ import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
 import { useEffect, useMemo, useState } from 'react';
 
-import { useGetIssuableRewardCredentials } from 'charmClient/hooks/credentials';
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
@@ -52,15 +51,10 @@ export function EvaluationsReview({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
-  const { data: issuableCredentials = [] } = useGetIssuableRewardCredentials({
-    spaceId: currentSpace?.id as string,
-    applicationId: application?.id
-  });
-  const issuableRewardCredentials = issuableCredentials.filter((issuable) => issuable.rewardId === reward.id);
   const hasIssuableOnchainCredentials = !!(
     currentSpace?.useOnchainCredentials &&
     currentSpace?.credentialsWallet &&
-    issuableRewardCredentials.length > 0
+    (application?.issuableOnchainCredentials ?? []).length > 0
   );
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
@@ -166,6 +160,7 @@ export function EvaluationsReview({
                 selectedCredentialTemplates={reward.selectedCredentialTemplates}
                 rewardId={reward.id}
                 application={application}
+                refreshApplication={refreshApplication}
               />
             ) : null}
           </EvaluationStepRow>
