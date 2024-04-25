@@ -42,7 +42,13 @@ function IssueCredentialRow({
   );
 }
 
-export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: string[] }) {
+export function IssueRewardCredentials({
+  selectedPageIds,
+  asMenuItem
+}: {
+  selectedPageIds: string[];
+  asMenuItem?: boolean;
+}) {
   const { getFeatureTitle } = useSpaceFeatures();
 
   const { space } = useCurrentSpace();
@@ -176,28 +182,43 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
     return null;
   }
 
-  return (
-    <PropertyMenu
-      lastChild={false}
-      disabledTooltip={disableIssueCredentialsMenu}
-      // add fontSize to icon to override MUI styles
-      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue onchain' }}
-    >
-      {chainComponent}
-      <Divider />
+  if (asMenuItem) {
+    return (
+      <PropertyMenu
+        lastChild={false}
+        disabledTooltip={disableIssueCredentialsMenu}
+        // add fontSize to icon to override MUI styles
+        propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue onchain' }}
+      >
+        {chainComponent}
+        <Divider />
 
-      <IssueCredentialRow
-        disabled={disableIssueCredentialRows}
-        issuableCredentials={filteredCredentials ?? []}
-        handleIssueCredentials={handleIssueCredentials}
-        label='Submission approved'
-      />
-      {publishingCredential && (
-        <MenuItem sx={{ gap: 2 }}>
-          <LoadingComponent size={20} />
-          <ListItemText primary='Publishing credentials' />
-        </MenuItem>
-      )}
-    </PropertyMenu>
+        <IssueCredentialRow
+          disabled={disableIssueCredentialRows}
+          issuableCredentials={filteredCredentials ?? []}
+          handleIssueCredentials={handleIssueCredentials}
+          label='Submission approved'
+        />
+        {publishingCredential && (
+          <MenuItem sx={{ gap: 2 }}>
+            <LoadingComponent size={20} />
+            <ListItemText primary='Publishing credentials' />
+          </MenuItem>
+        )}
+      </PropertyMenu>
+    );
+  }
+
+  return (
+    <Button
+      variant='contained'
+      color='primary'
+      loading={publishingCredential || (isLoadingIssuableRewardCredentials && !issuableRewardCredentials)}
+      disabledTooltip={disableIssueCredentialsMenu}
+      disabled={disableIssueCredentialsMenu}
+      onClick={() => handleIssueCredentials(filteredCredentials)}
+    >
+      Issue onchain
+    </Button>
   );
 }
