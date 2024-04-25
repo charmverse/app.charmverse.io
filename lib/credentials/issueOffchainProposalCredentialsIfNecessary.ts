@@ -165,14 +165,7 @@ export async function issueOffchainProposalCredentialsIfNecessary({
 
     const targetWallet = author.primaryWallet ?? author.wallets[0];
 
-    if (!targetWallet) {
-      log.debug(`User has no wallet to issue credentials to`, {
-        pageId: proposalWithSpaceConfig.page.id,
-        userId: authorUserId,
-        proposalId,
-        credentialsToIssue
-      });
-    } else {
+    if (targetWallet) {
       try {
         for (const credentialTemplate of credentialsToGiveUser) {
           const getEventLabel = credentialEventLabels[event];

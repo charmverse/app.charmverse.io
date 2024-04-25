@@ -19,6 +19,7 @@ import type { EasSchemaChain } from 'lib/credentials/connectors';
 import { getOnChainSchemaUrl } from 'lib/credentials/connectors';
 import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
+import { conditionalPlural } from 'lib/utils/strings';
 
 import { PropertyMenu } from './PropertyMenu';
 
@@ -82,7 +83,14 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
       if (result === 'gnosis') {
         showMessage('Transaction submitted to Gnosis Safe. Please execute it there');
       } else {
-        showMessage(`Issued ${_issuableRewardCredentials.length} reward credentials`);
+        const issuedCredentialAmount = _issuableRewardCredentials.length;
+        const label = getFeatureTitle('reward');
+        showMessage(
+          `Issued ${issuedCredentialAmount} ${label} ${conditionalPlural({
+            count: issuedCredentialAmount,
+            word: 'credential'
+          })}`
+        );
       }
     } catch (err: any) {
       if (err.code === 'ACTION_REJECTED') {
@@ -173,7 +181,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
       lastChild={false}
       disabledTooltip={disableIssueCredentialsMenu}
       // add fontSize to icon to override MUI styles
-      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue Onchain Credentials' }}
+      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue onchain' }}
     >
       {chainComponent}
       <Divider />

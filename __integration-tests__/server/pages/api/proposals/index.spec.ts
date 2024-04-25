@@ -1,4 +1,4 @@
-import type { Space, User, ProposalWorkflow, Role } from '@charmverse/core/prisma';
+import type { Space, User, ProposalWorkflow, Role, Proposal } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
@@ -6,6 +6,7 @@ import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { CreateProposalInput } from 'lib/proposals/createProposal';
+import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
@@ -14,6 +15,7 @@ import { createRole } from 'testing/utils/roles';
 let space: Space;
 let proposalCreator: User;
 let spaceMember: User;
+let admin: User;
 let proposalCreatorRole: Role;
 let workflow: ProposalWorkflowTyped;
 
@@ -23,6 +25,10 @@ beforeAll(async () => {
   proposalCreator = generated.user;
   spaceMember = await testUtilsUser.generateSpaceUser({
     spaceId: space.id
+  });
+  admin = await testUtilsUser.generateSpaceUser({
+    spaceId: space.id,
+    isAdmin: true
   });
   proposalCreatorRole = await createRole({
     spaceId: space.id,
@@ -201,6 +207,7 @@ describe('POST /api/proposals - Create a proposal', () => {
       userId: proposalCreator.id,
       authors: [proposalCreator.id],
       proposalStatus: 'draft',
+      pageType: 'proposal_template',
       evaluationInputs: [
         {
           evaluationType: 'pass_fail',
@@ -237,16 +244,13 @@ describe('POST /api/proposals - Create a proposal', () => {
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(401);
   });
 
-  it('should pass if the proposal does not match the template and respond with 201', async () => {
-    const admin = await testUtilsUser.generateSpaceUser({
-      spaceId: space.id,
-      isAdmin: true
-    });
+  it('should pass if the proposal does not match the template, but the user is an admin and respond with 201', async () => {
     const template = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: proposalCreator.id,
       authors: [proposalCreator.id],
       proposalStatus: 'draft',
+      pageType: 'proposal_template',
       evaluationInputs: [
         {
           evaluationType: 'pass_fail',
@@ -281,5 +285,178 @@ describe('POST /api/proposals - Create a proposal', () => {
       workflowId: workflow.id
     };
     await request(baseUrl).post('/api/proposals').set('Cookie', userCookie).send(input).expect(201);
+  });
+
+  it('should succeed if the proposal credentials do not match the template credentials, but the user is an admin and respond with 201', async () => {
+    const credentialOneId = uuid();
+    const credentialTwoId = uuid();
+    const credentialThreeId = uuid();
+
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      pageType: 'proposal_template',
+      selectedCredentialTemplateIds: [credentialOneId, credentialTwoId],
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          permissions: [],
+          reviewers: [{ group: 'user', id: spaceMember.id }],
+          title: 'Feedback'
+        }
+      ]
+    });
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          type: 'pass_fail',
+          reviewers: [{ userId: spaceMember.id }],
+          title: 'Feedback',
+          index: 0,
+          rubricCriteria: [],
+          id: template.evaluations[0].id
+        }
+      ],
+      workflowId: workflow.id
+    };
+    const userCookie = await loginUser(admin.id);
+
+    const response = (
+      await request(baseUrl)
+        .post('/api/proposals')
+        .set('Cookie', userCookie)
+        .send({
+          ...input,
+          selectedCredentialTemplates: [credentialThreeId]
+        })
+        .expect(201)
+    ).body as { id: string };
+
+    const createdProposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: response.id
+      },
+      select: {
+        selectedCredentialTemplates: true
+      }
+    });
+
+    expect(createdProposal.selectedCredentialTemplates).toEqual([credentialThreeId]);
+  });
+
+  it('should only accept creating a proposal with credentials if they match the proposal template or there is no linked template', async () => {
+    const credentialOneId = uuid();
+    const credentialTwoId = uuid();
+
+    const template = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: proposalCreator.id,
+      authors: [proposalCreator.id],
+      proposalStatus: 'draft',
+      pageType: 'proposal_template',
+      selectedCredentialTemplateIds: [credentialOneId, credentialTwoId],
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          permissions: [],
+          reviewers: [{ group: 'user', id: spaceMember.id }],
+          title: 'Feedback'
+        }
+      ]
+    });
+
+    const input: CreateProposalInput = {
+      spaceId: space.id,
+      userId: spaceMember.id,
+      authors: [spaceMember.id],
+      pageProps: {
+        sourceTemplateId: template.id,
+        title: 'Proposal title',
+        content: { ...emptyDocument },
+        contentText: 'Empty proposal'
+      },
+      evaluations: [
+        {
+          type: 'pass_fail',
+          reviewers: [{ userId: spaceMember.id }],
+          title: 'Feedback',
+          index: 0,
+          rubricCriteria: [],
+          id: template.evaluations[0].id
+        }
+      ],
+      workflowId: workflow.id
+    };
+    const userCookie = await loginUser(proposalCreator.id);
+
+    await request(baseUrl)
+      .post('/api/proposals')
+      .set('Cookie', userCookie)
+      .send({
+        ...input,
+        selectedCredentialTemplates: [credentialOneId, credentialTwoId]
+      })
+      .expect(201);
+
+    await request(baseUrl)
+      .post('/api/proposals')
+      .set('Cookie', userCookie)
+      .send({
+        ...input,
+        pageProps: { ...input.pageProps, sourceTemplateId: null },
+        selectedCredentialTemplates: [credentialOneId]
+      })
+      .expect(201);
+
+    const response = (
+      await request(baseUrl)
+        .post('/api/proposals')
+        .set('Cookie', userCookie)
+        .send({
+          ...input,
+          selectedCredentialTemplates: [credentialTwoId, credentialOneId]
+        })
+        .expect(201)
+    ).body as { id: string };
+
+    const createdProposal = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: response.id
+      },
+      select: {
+        selectedCredentialTemplates: true
+      }
+    });
+
+    expect(createdProposal.selectedCredentialTemplates).toEqual([credentialTwoId, credentialOneId]);
+
+    await request(baseUrl)
+      .post('/api/proposals')
+      .set('Cookie', userCookie)
+      .send({
+        ...input,
+        selectedCredentialTemplates: [credentialTwoId]
+      })
+      .expect(401);
+    await request(baseUrl)
+      .post('/api/proposals')
+      .set('Cookie', userCookie)
+      .send({
+        ...input,
+        selectedCredentialTemplates: null
+      })
+      .expect(401);
   });
 });

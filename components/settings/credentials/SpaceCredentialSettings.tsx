@@ -50,6 +50,10 @@ export function SpaceCredentialSettings() {
       (!spaceCredentialConfigChanged || !spaceCredentialConfigValid));
 
   function handleCredentialSettingsChange(data: Partial<UpdateableCredentialProps>) {
+    if (data.credentialsWallet) {
+      data.credentialsWallet = data.credentialsWallet.toLowerCase();
+    }
+
     setSpaceOnChainCredentialSettings((prev) => ({
       ...prev,
       ...data
