@@ -7,11 +7,13 @@ import { SelectPreviewContainer } from 'components/common/DatabaseEditor/compone
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
+import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -95,6 +97,7 @@ export function ProposalRewards({
 
     updateURLQuery({ [rewardQueryKey]: pageIdToOpen });
   }
+  const isCharmverseSpace = useIsCharmverseSpace();
 
   if (rewards.length) {
     return (
@@ -241,18 +244,34 @@ export function ProposalRewards({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <MilestonePropertiesForm
-            onChange={setRewardValues}
-            values={rewardValues}
-            isNewReward
-            readOnly={readOnly}
-            isTemplate={false}
-            expandedByDefault
-            templateId={newPageValues?.templateId}
-            readOnlyTemplate={!!requiredTemplateId}
-            selectTemplate={selectTemplate}
-            isProposalTemplate={isProposalTemplate}
-          />
+          {isCharmverseSpace ? (
+            <MilestonePropertiesForm
+              onChange={setRewardValues}
+              values={rewardValues}
+              isNewReward
+              readOnly={readOnly}
+              isTemplate={false}
+              expandedByDefault
+              templateId={newPageValues?.templateId}
+              readOnlyTemplate={!!requiredTemplateId}
+              selectTemplate={selectTemplate}
+              isProposalTemplate={isProposalTemplate}
+            />
+          ) : (
+            <RewardPropertiesForm
+              onChange={setRewardValues}
+              values={rewardValues}
+              isNewReward
+              readOnly={readOnly}
+              isTemplate={false}
+              expandedByDefault
+              forcedApplicationType='assigned'
+              templateId={newPageValues?.templateId}
+              readOnlyTemplate={!!requiredTemplateId}
+              selectTemplate={selectTemplate}
+              isProposalTemplate={isProposalTemplate}
+            />
+          )}
         </NewDocumentPage>
       </NewPageDialog>
     </>

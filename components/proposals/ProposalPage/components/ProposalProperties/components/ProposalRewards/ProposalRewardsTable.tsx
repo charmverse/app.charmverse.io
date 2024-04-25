@@ -1,7 +1,7 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
 import { Box, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
 import { ContextMenu } from 'components/common/ContextMenu';
@@ -12,11 +12,13 @@ import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog'
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
+import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { CardWithRelations } from 'lib/databases/card';
@@ -61,7 +63,7 @@ export function ProposalRewardsTable({
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
   const { showPage } = usePageDialog();
-
+  const isCharmverseSpace = useIsCharmverseSpace();
   const { rewards: allRewards, mutateRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
 
@@ -230,18 +232,34 @@ export function ProposalRewardsTable({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <MilestonePropertiesForm
-            onChange={setRewardValues}
-            values={rewardValues}
-            isNewReward
-            readOnly={readOnly}
-            isTemplate={false}
-            expandedByDefault
-            templateId={newPageValues?.templateId}
-            readOnlyTemplate={!!requiredTemplateId}
-            selectTemplate={selectTemplate}
-            isProposalTemplate={isProposalTemplate}
-          />
+          {isCharmverseSpace ? (
+            <MilestonePropertiesForm
+              onChange={setRewardValues}
+              values={rewardValues}
+              isNewReward
+              readOnly={readOnly}
+              isTemplate={false}
+              expandedByDefault
+              templateId={newPageValues?.templateId}
+              readOnlyTemplate={!!requiredTemplateId}
+              selectTemplate={selectTemplate}
+              isProposalTemplate={isProposalTemplate}
+            />
+          ) : (
+            <RewardPropertiesForm
+              onChange={setRewardValues}
+              values={rewardValues}
+              isNewReward
+              readOnly={readOnly}
+              isTemplate={false}
+              expandedByDefault
+              forcedApplicationType='assigned'
+              templateId={newPageValues?.templateId}
+              readOnlyTemplate={!!requiredTemplateId}
+              selectTemplate={selectTemplate}
+              isProposalTemplate={isProposalTemplate}
+            />
+          )}
         </NewDocumentPage>
       </NewPageDialog>
     </>
