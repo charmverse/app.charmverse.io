@@ -173,7 +173,7 @@ export function IssueRewardCredentials({ selectedPageIds }: { selectedPageIds: s
       lastChild={false}
       disabledTooltip={disableIssueCredentialsMenu}
       // add fontSize to icon to override MUI styles
-      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue Onchain Credentials' }}
+      propertyTemplate={{ icon: <MedalIcon sx={{ fontSize: '16px !important' }} />, name: 'Issue onchain' }}
     >
       {chainComponent}
       <Divider />
