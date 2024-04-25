@@ -217,7 +217,7 @@ function generateTableArray(
   return { rows, rowIds: filteredCards.map(({ id }) => id) };
 }
 
-export function getCSVColumns({
+function getCSVColumns({
   card,
   context,
   formatters,
@@ -267,7 +267,8 @@ export function getCSVColumns({
       const multiSelectValue = (((displayValue as unknown) || []) as string[]).join('|');
       columns.push(multiSelectValue);
     } else if (propertyTemplate.type === 'proposalUrl') {
-      columns.push(`${baseUrl}${encodeText(displayValue as string)}`);
+      // proposalUrl is an array on the Rewards database of [title, url], and only a string on database-as-a-source
+      columns.push(`${baseUrl}${encodeText(Array.isArray(displayValue) ? displayValue[0] : displayValue.toString())}`);
     } else {
       // Export as string
       columns.push(`"${encodeText(displayValue as string)}"`);

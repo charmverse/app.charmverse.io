@@ -92,7 +92,8 @@ export function EvaluationsReview({
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
-  const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
+  const isCredentialsComplete =
+    hasCredentialsStep && currentEvaluation?.result === 'pass' && !hasPendingOnchainCredentials;
   const isCredentialsActive =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
 
