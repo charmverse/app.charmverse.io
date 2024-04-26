@@ -33,13 +33,13 @@ const graphQlClients: Record<ExternalCredentialChain | EasSchemaChain, ApolloCli
     skipRedisCache
   }),
   [sepolia.id]: new ApolloClientWithRedisCache({
-    cacheKeyPrefix: 'optimism-easscan',
+    cacheKeyPrefix: 'sepolia-easscan',
     uri: 'https://sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
     skipRedisCache
   }),
   [optimismSepolia.id]: new ApolloClientWithRedisCache({
-    cacheKeyPrefix: 'optimism-easscan',
+    cacheKeyPrefix: 'optimism-sepolia-easscan',
     uri: 'https://optimism-sepolia.easscan.org/graphql',
     persistForSeconds: defaultEASCacheDuration,
     skipRedisCache
