@@ -20,7 +20,7 @@ export function SubmitStepSettings({
   rewardInput,
   readOnly,
   onChange
-}: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
   const isAssignedReward = !!rewardInput?.assignedSubmitters;
 
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {

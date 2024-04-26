@@ -14,6 +14,7 @@ import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 export type EvaluationSettingsProps = {
   rewardInput?: UpdateableRewardFields;
   readOnly?: boolean;
+  requireTokenAmount: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded?: boolean;
   onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
@@ -22,6 +23,7 @@ export type EvaluationSettingsProps = {
 
 export function EvaluationsSettings({
   rewardInput,
+  requireTokenAmount,
   readOnly,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
@@ -59,6 +61,7 @@ export function EvaluationsSettings({
               {evaluation.type === 'apply' ? null : (
                 <EvaluationStepSettings
                   evaluation={evaluation}
+                  requireTokenAmount={requireTokenAmount}
                   readOnly={readOnly}
                   onChange={(updated) => {
                     onChangeReward?.(updated);

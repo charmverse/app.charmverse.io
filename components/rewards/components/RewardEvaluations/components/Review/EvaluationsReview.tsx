@@ -28,10 +28,7 @@ import { ReviewStepReview } from './components/ReviewStepReview';
 import { RewardCredentials } from './components/RewardCredentials';
 import { SubmitStepReview } from './components/SubmitStepReview';
 
-export type Props = Omit<
-  EvaluationSettingsProps,
-  'onChangeWorkflow' | 'requireWorkflowChangeConfirmation' | 'rewardInput'
-> & {
+export type Props = Pick<EvaluationSettingsProps, 'requireTokenAmount' | 'onChangeReward' | 'expanded' | 'readOnly'> & {
   reward: RewardWithUsers;
   application?: ApplicationWithTransactions;
   refreshApplication?: VoidFunction;
@@ -43,6 +40,7 @@ export type Props = Omit<
 export function EvaluationsReview({
   application,
   reward,
+  requireTokenAmount,
   onChangeReward,
   expanded: expandedContainer,
   readOnly,
@@ -178,6 +176,7 @@ export function EvaluationsReview({
         <EvaluationStepSettingsModal
           close={closeSettings}
           evaluationInput={evaluationInput}
+          requireTokenAmount={requireTokenAmount}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
           reward={{

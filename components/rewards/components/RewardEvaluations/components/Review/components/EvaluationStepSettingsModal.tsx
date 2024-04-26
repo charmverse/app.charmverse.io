@@ -12,6 +12,7 @@ import { EvaluationStepSettings } from '../../Settings/components/EvaluationStep
 export function EvaluationStepSettingsModal({
   close,
   reward,
+  requireTokenAmount,
   saveEvaluation,
   updateEvaluation,
   evaluationInput
@@ -19,6 +20,7 @@ export function EvaluationStepSettingsModal({
   evaluationInput: RewardEvaluation;
   close: VoidFunction;
   reward: RewardWithUsers;
+  requireTokenAmount: boolean;
   saveEvaluation: () => void;
   updateEvaluation: (updates: UpdateableRewardFields) => void;
 }) {
@@ -28,6 +30,7 @@ export function EvaluationStepSettingsModal({
       <Box mb={2}>
         <EvaluationStepSettings
           evaluation={evaluationInput}
+          requireTokenAmount={requireTokenAmount}
           readOnly={false}
           rewardInput={reward}
           rewardStatus={reward.status}

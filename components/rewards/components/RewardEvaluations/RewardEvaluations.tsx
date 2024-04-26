@@ -5,7 +5,10 @@ import { EvaluationsReview } from './components/Review/EvaluationsReview';
 import type { EvaluationSettingsProps } from './components/Settings/EvaluationsSettings';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
-export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkflowChangeConfirmation'> & {
+export type RewardEvaluationsProps = Pick<
+  EvaluationSettingsProps,
+  'expanded' | 'rewardInput' | 'readOnly' | 'onChangeReward' | 'onChangeWorkflow'
+> & {
   isUnpublishedReward?: boolean;
   reward?: RewardWithUsers;
   application?: ApplicationWithTransactions;
@@ -33,10 +36,13 @@ export function RewardEvaluations({
   refreshReward,
   isNewApplication
 }: RewardEvaluationsProps) {
+  const requireTokenAmount = !isTemplate; // always require token amount unless it is a template
+
   if (isDraft || isUnpublishedReward || isTemplate) {
     return (
       <EvaluationsSettings
         rewardInput={rewardInput}
+        requireTokenAmount={requireTokenAmount}
         readOnly={readOnly}
         requireWorkflowChangeConfirmation
         expanded={expanded}
@@ -50,6 +56,7 @@ export function RewardEvaluations({
         page={page}
         application={application}
         expanded={expanded}
+        requireTokenAmount={requireTokenAmount}
         readOnly={readOnly}
         reward={reward}
         onChangeReward={onChangeReward}

@@ -22,8 +22,9 @@ export function PaymentStepSettings({
   rewardInput,
   readOnly,
   onChange,
-  rewardStatus
-}: Omit<EvaluationStepSettingsProps, 'evaluation'>) {
+  rewardStatus,
+  requireTokenAmount
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'requireTokenAmount'>) {
   const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
@@ -54,7 +55,7 @@ export function PaymentStepSettings({
       onChange({
         chainId: rewardToken.chainId,
         rewardToken: rewardToken.rewardToken,
-        rewardAmount: Number(rewardToken.rewardAmount),
+        rewardAmount: rewardToken.rewardAmount ? Number(rewardToken.rewardAmount) : null,
         customReward: null
       });
     }

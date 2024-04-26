@@ -10,6 +10,7 @@ import { SubmitStepSettings } from './SubmitSettings';
 
 export type EvaluationStepSettingsProps = {
   evaluation: RewardEvaluation;
+  requireTokenAmount: boolean;
   onChange: (updatedReward: UpdateableRewardFields) => void;
   readOnly?: boolean;
   rewardInput?: UpdateableRewardFields;
