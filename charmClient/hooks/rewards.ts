@@ -69,3 +69,7 @@ export function useDeleteRewardBlocks(spaceId: string) {
 export function useGetRewardWorkflows(spaceId: MaybeString) {
   return useGETImmutable<RewardWorkflow[]>(spaceId ? `/api/spaces/${spaceId}/rewards/workflows` : null);
 }
+
+export function usePublishReward(rewardId: string) {
+  return usePUT<undefined, RewardWithUsers>(`/api/rewards/${rewardId}/publish`);
+}

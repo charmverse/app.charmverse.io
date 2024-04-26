@@ -122,7 +122,6 @@ export function ApplicationComments({ applicationId }: { applicationId: string }
             {commentTree.map((comment) => (
               <Comment
                 deletingDisabled={false}
-                replyingDisabled={false}
                 inlineCharmEditor
                 permissions={{
                   add_comment: true,

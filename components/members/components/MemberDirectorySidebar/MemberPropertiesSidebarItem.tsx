@@ -20,7 +20,7 @@ import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { MEMBER_PROPERTY_CONFIG, PREMIUM_MEMBER_PROPERTIES } from 'lib/members/constants';
 import type { MemberPropertyWithPermissions } from 'lib/members/interfaces';
-import { mergeRefs } from 'lib/utils/react';
+import { isReturnKey, mergeRefs } from 'lib/utils/react';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
 
@@ -63,7 +63,7 @@ function MemberPropertyItemForm({ property, close }: { property: MemberProperty;
             setPropertyName(e.target.value);
           }}
           onKeyDown={(e) => {
-            if (e.code === 'Enter') {
+            if (isReturnKey(e)) {
               onSubmit();
             }
           }}

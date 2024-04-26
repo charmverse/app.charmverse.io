@@ -5,10 +5,20 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
-export function useRewardTemplates({ load } = { load: true }) {
+export function useRewardTemplates(
+  {
+    load = true,
+    skipDraft = true
+  }: {
+    load?: boolean;
+    skipDraft?: boolean;
+  } = { load: true, skipDraft: true }
+) {
   const { space } = useCurrentSpace();
   const { subscribe } = useWebSocketClient();
   const { data: templates, mutate, isLoading } = useGetRewardTemplatesBySpace(load ? space?.id : null);
+
+  const filteredTemplates = skipDraft ? templates?.filter((template) => template.reward.status !== 'draft') : templates;
 
   useEffect(() => {
     function handleDeleteEvent(deletedPages: WebSocketPayload<'pages_deleted'>) {
@@ -37,7 +47,7 @@ export function useRewardTemplates({ load } = { load: true }) {
   }, [mutate, subscribe]);
 
   return {
-    templates,
+    templates: filteredTemplates,
     isLoading
   };
 }

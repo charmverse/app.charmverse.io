@@ -162,7 +162,7 @@ export function CredentialSelect({
           return (
             <TextField
               {...params}
-              variant={templateType === 'proposal' ? 'outlined' : 'standard'}
+              variant='outlined'
               InputProps={{
                 ...params.InputProps,
                 disableUnderline: true,

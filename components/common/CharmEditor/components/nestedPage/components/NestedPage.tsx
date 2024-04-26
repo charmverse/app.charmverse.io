@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { Typography } from '@mui/material';
 import type { EditorView } from 'prosemirror-view';
+import { memo } from 'react';
 
 import Link from 'components/common/Link';
 import { NoAccessPageIcon, PageIcon } from 'components/common/PageIcon';
@@ -56,7 +57,7 @@ function resetPageNodeDropPluginState(view: EditorView) {
   }
 }
 
-export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
+function NestedPageComponent({ isLinkedPage = false, node, getPos }: NodeViewProps & { isLinkedPage?: boolean }) {
   const view = useEditorViewContext();
   const { getFeatureTitle, mappedFeatures } = useSpaceFeatures();
   const { categories } = useForumCategories();
@@ -135,6 +136,8 @@ export function NestedPage({ isLinkedPage = false, node, getPos }: NodeViewProps
     </StyledLink>
   );
 }
+
+export const NestedPage = memo(NestedPageComponent);
 
 function LinkIcon({
   isLinkedPage,

@@ -12,6 +12,7 @@ import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import { getPropertyName } from 'lib/databases/getPropertyName';
+import { isReturnKey } from 'lib/utils/react';
 
 import mutator from '../../mutator';
 import { DeleteRelationPropertyModal } from '../properties/relation/DeleteRelationPropertyModal';
@@ -93,7 +94,7 @@ function ViewPropertyOption({
         autoFocus
         onKeyDown={(e) => {
           e.stopPropagation();
-          if (e.code === 'Enter' && tempName.length !== 0 && tempName !== name) {
+          if (isReturnKey(e) && tempName.length !== 0 && tempName !== name) {
             mutator.changePropertyTypeAndName(board, cards, property, property.type, tempName, views);
           }
         }}

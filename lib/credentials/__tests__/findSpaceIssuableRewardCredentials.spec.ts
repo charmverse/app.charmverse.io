@@ -9,10 +9,141 @@ import { pseudoRandomHexString } from 'lib/utils/random';
 import { randomETHWalletAddress } from 'testing/generateStubs';
 import { generateBounty, generateBountyApplication, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
+import { rewardSubmissionApprovedVerb } from '../constants';
 import type { IssuableRewardApplicationCredentialContent } from '../findIssuableRewardCredentials';
 import { findSpaceIssuableRewardCredentials } from '../findIssuableRewardCredentials';
 
 describe('findSpaceIssuableRewardCredentials', () => {
+  it('should only return issuable credentials for a specific reward or application if this is provided', async () => {
+    const authorWalletAddress = randomETHWallet().address;
+    const { space, user: author } = await testUtilsUser.generateUserAndSpace({ wallet: authorWalletAddress });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: space.id,
+      credentialEvents: ['reward_submission_approved'],
+      schemaType: 'reward',
+      schemaAddress: '0x1234',
+      description: 'Description 1',
+      name: 'Template 1',
+      organization: 'Org 1'
+    });
+
+    const rewardWithApplication = await generateBountyWithSingleApplication({
+      applicationStatus: 'complete',
+      bountyCap: null,
+      spaceId: space.id,
+      userId: author.id,
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const firstApplication = rewardWithApplication.applications[0];
+
+    const secondApplication = await generateBountyApplication({
+      applicationStatus: 'complete',
+      bountyId: rewardWithApplication.id,
+      spaceId: space.id,
+      userId: author.id
+    });
+
+    const secondRewardWithApplication = await generateBountyWithSingleApplication({
+      applicationStatus: 'complete',
+      bountyCap: null,
+      spaceId: space.id,
+      userId: author.id,
+      selectedCredentialTemplateIds: [credentialTemplate.id]
+    });
+
+    const result = await findSpaceIssuableRewardCredentials({ spaceId: space.id });
+
+    // 1 author * 1 credential template * (2 applications + 1 application) = 3 credentials
+    expect(result).toHaveLength(3);
+
+    const expectedFirstRewardApplicationCredential: IssuableRewardApplicationCredentialContent = {
+      recipientUserId: author.id,
+      recipientAddress: authorWalletAddress,
+      credentialTemplateId: credentialTemplate.id,
+      event: 'reward_submission_approved',
+      rewardApplicationId: firstApplication.id,
+      rewardId: rewardWithApplication.id,
+      rewardPageId: rewardWithApplication.page.id,
+      credential: {
+        Description: credentialTemplate.description,
+        Name: credentialTemplate.name,
+        Organization: credentialTemplate.organization,
+        Event: `Reward submission ${rewardSubmissionApprovedVerb}`,
+        rewardURL: getSubmissionPagePermalink({ submissionId: firstApplication.id })
+      }
+    } as IssuableRewardApplicationCredentialContent;
+
+    const expectedFirstRewardSecondApplicationCredential: IssuableRewardApplicationCredentialContent = {
+      recipientUserId: author.id,
+      recipientAddress: authorWalletAddress,
+      credentialTemplateId: credentialTemplate.id,
+      event: 'reward_submission_approved',
+      rewardApplicationId: secondApplication.id,
+      rewardId: rewardWithApplication.id,
+      rewardPageId: rewardWithApplication.page.id,
+      credential: {
+        Description: credentialTemplate.description,
+        Name: credentialTemplate.name,
+        Organization: credentialTemplate.organization,
+        Event: `Reward submission ${rewardSubmissionApprovedVerb}`,
+        rewardURL: getSubmissionPagePermalink({ submissionId: secondApplication.id })
+      }
+    } as IssuableRewardApplicationCredentialContent;
+
+    const expectedSecondRewardApplicationCredential: IssuableRewardApplicationCredentialContent = {
+      recipientUserId: author.id,
+      recipientAddress: authorWalletAddress,
+      credentialTemplateId: credentialTemplate.id,
+      event: 'reward_submission_approved',
+      rewardApplicationId: secondRewardWithApplication.applications[0].id,
+      rewardId: secondRewardWithApplication.id,
+      rewardPageId: secondRewardWithApplication.page.id,
+      credential: {
+        Description: credentialTemplate.description,
+        Name: credentialTemplate.name,
+        Organization: credentialTemplate.organization,
+        Event: `Reward submission ${rewardSubmissionApprovedVerb}`,
+        rewardURL: getSubmissionPagePermalink({ submissionId: secondRewardWithApplication.applications[0].id })
+      }
+    } as IssuableRewardApplicationCredentialContent;
+
+    expect(result).toMatchObject(
+      expect.arrayContaining<IssuableRewardApplicationCredentialContent>([
+        expectedFirstRewardApplicationCredential,
+        expectedFirstRewardSecondApplicationCredential,
+        expectedSecondRewardApplicationCredential
+      ])
+    );
+
+    const resultWithSelectedRewardId = await findSpaceIssuableRewardCredentials({
+      spaceId: space.id,
+      rewardIds: [rewardWithApplication.id]
+    });
+
+    expect(resultWithSelectedRewardId).toHaveLength(2);
+
+    expect(resultWithSelectedRewardId).toMatchObject(
+      expect.arrayContaining<IssuableRewardApplicationCredentialContent>([
+        expectedFirstRewardApplicationCredential,
+        expectedFirstRewardSecondApplicationCredential
+      ])
+    );
+
+    const resultWithSelectedApplicationId = await findSpaceIssuableRewardCredentials({
+      spaceId: space.id,
+      applicationId: secondApplication.id
+    });
+
+    expect(resultWithSelectedApplicationId).toHaveLength(1);
+
+    expect(resultWithSelectedApplicationId).toMatchObject(
+      expect.arrayContaining<IssuableRewardApplicationCredentialContent>([
+        expectedFirstRewardSecondApplicationCredential
+      ])
+    );
+  });
   it('should not return credentials  for rewards without selected credential templates', async () => {
     const { space, user } = await testUtilsUser.generateUserAndSpace();
     await generateBountyWithSingleApplication({

@@ -122,6 +122,11 @@ export function getDefaultTableView({ board }: { board: Board }) {
 
   // Hide createdAt by default
   view.fields.visiblePropertyIds = view.fields.visiblePropertyIds.filter((id) => id !== CREATED_AT_ID);
+  // make sure title is first. otherwise when it is renmed, it will appear after the other default proposal card properties
+  view.fields.visiblePropertyIds = [
+    Constants.titleColumnId,
+    ...view.fields.visiblePropertyIds.filter((prop) => prop !== Constants.titleColumnId)
+  ];
 
   view.fields.openPageIn = 'full_page';
 

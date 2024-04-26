@@ -11,10 +11,13 @@ import { generateBounty } from 'testing/setupDatabase';
 
 describe('GET /api/rewards - getRewards', () => {
   let user: User;
+  let user2: User;
   let admin: User;
   let space: Space;
   let userCookie: string;
+  let user2Cookie: string;
   let reward: RewardWithUsers;
+  let draftReward: RewardWithUsers;
   let hiddenReward: RewardWithUsers;
   let publicReward: RewardWithUsers;
 
@@ -23,8 +26,10 @@ describe('GET /api/rewards - getRewards', () => {
     admin = generated.user;
     space = generated.space;
     user = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    user2 = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     userCookie = await loginUser(user.id);
+    user2Cookie = await loginUser(user2.id);
 
     const { id: hiddenRewardId } = await generateBounty({
       createdBy: admin.id,
@@ -37,6 +42,18 @@ describe('GET /api/rewards - getRewards', () => {
       pagePermissions: [{ permissionLevel: 'view_comment', spaceId: space.id }]
     });
 
+    const { id: draftRewardId } = await generateBounty({
+      createdBy: user.id,
+      spaceId: space.id,
+      status: 'draft',
+      pagePermissions: [
+        {
+          permissionLevel: 'full_access',
+          userId: user.id
+        }
+      ]
+    });
+
     const { id: publicRewardId } = await generateBounty({
       createdBy: admin.id,
       spaceId: space.id,
@@ -45,12 +62,30 @@ describe('GET /api/rewards - getRewards', () => {
 
     // Make a public reward
     reward = await getRewardOrThrow({ rewardId });
+    draftReward = await getRewardOrThrow({ rewardId: draftRewardId });
     hiddenReward = await getRewardOrThrow({ rewardId: hiddenRewardId });
     publicReward = await getRewardOrThrow({ rewardId: publicRewardId });
   });
+
   it('should provide space members with a list of rewards they can view and respond with a status code 200', async () => {
     const response = (
       await request(baseUrl).get(`/api/rewards?spaceId=${space.id}`).set('Cookie', userCookie).expect(200)
+    ).body as RewardWithUsers[];
+
+    expect(response).toHaveLength(3);
+
+    expect(response).toEqual(
+      expect.arrayContaining([
+        { ...reward, createdAt: expect.any(String), updatedAt: expect.any(String) },
+        { ...draftReward, createdAt: expect.any(String), updatedAt: expect.any(String) },
+        { ...publicReward, createdAt: expect.any(String), updatedAt: expect.any(String) }
+      ])
+    );
+  });
+
+  it('should return accessible rewards for space member without draft rewards from other space members and respond with a status code 200', async () => {
+    const response = (
+      await request(baseUrl).get(`/api/rewards?spaceId=${space.id}`).set('Cookie', user2Cookie).expect(200)
     ).body as RewardWithUsers[];
 
     expect(response).toHaveLength(2);
@@ -71,6 +106,7 @@ describe('GET /api/rewards - getRewards', () => {
 
     expect(response).toEqual([{ ...publicReward, createdAt: expect.any(String), updatedAt: expect.any(String) }]);
   });
+
   it('should return a status code 401 if a person outside the space requests rewards and the space has turned off public rewards board setting', async () => {
     const { space: spaceWithoutPublicRewards } = await testUtilsUser.generateUserAndSpace({
       isAdmin: true,

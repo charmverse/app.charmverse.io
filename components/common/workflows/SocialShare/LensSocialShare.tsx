@@ -1,6 +1,7 @@
 import { Box, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
+import { OpenWalletSelectorButton } from 'components/_app/Web3ConnectionManager/components/WalletSelectorModal/OpenWalletSelectorButton';
 import { Button } from 'components/common/Button';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/InlineCharmEditor';
 import InlineCharmEditor from 'components/common/CharmEditor/InlineCharmEditor';
@@ -9,6 +10,7 @@ import Modal from 'components/common/Modal';
 import { useLensProfile } from 'components/settings/account/hooks/useLensProfile';
 import { isProdEnv } from 'config/constants';
 import { useCreateLensPublication } from 'hooks/useCreateLensPublication';
+import { useWeb3Account } from 'hooks/useWeb3Account';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -30,6 +32,7 @@ export function LensSocialShare({
 }) {
   const { hasFarcasterProfile } = useLensProfile();
   const [isPublishToLensModalOpen, setIsPublishToLensModalOpen] = useState(false);
+  const { account, chainId, signer } = useWeb3Account();
 
   const { createLensPublication, isPublishingToLens } = useCreateLensPublication({
     publicationType: 'post',
@@ -118,18 +121,24 @@ export function LensSocialShare({
             justifyContent: 'flex-end'
           }}
         >
-          <Button
-            onClick={() => {
-              createLensPublication({
-                content: lensContent.doc
-              });
-            }}
-            loading={isPublishingToLens}
-            disabled={checkIsContentEmpty(lensContent.doc)}
-            primary
-          >
-            Share
-          </Button>
+          {!account || !chainId || !signer ? (
+            <Tooltip title='Your wallet must be unlocked to pay for this reward'>
+              <OpenWalletSelectorButton label='Unlock Wallet' />
+            </Tooltip>
+          ) : (
+            <Button
+              onClick={() => {
+                createLensPublication({
+                  content: lensContent.doc
+                });
+              }}
+              loading={isPublishingToLens}
+              disabled={checkIsContentEmpty(lensContent.doc)}
+              primary
+            >
+              Share
+            </Button>
+          )}
         </Box>
       </Modal>
     </>

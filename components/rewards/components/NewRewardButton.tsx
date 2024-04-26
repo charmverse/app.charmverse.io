@@ -16,19 +16,15 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
-export function NewRewardButton({ showPage }: { showPage: (pageId: string) => void }) {
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
+export function NewRewardButton() {
+  const { isDirty, clearNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const router = useRouter();
-  const isCharmverseSpace = useIsCharmverseSpace();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const overrideContentModalPopupState = usePopupState({ variant: 'popover', popupId: 'override-content' });
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
@@ -36,7 +32,9 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const isAdmin = useIsAdmin();
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-  const { templates, isLoading } = useRewardTemplates();
+  const { templates, isLoading } = useRewardTemplates({
+    skipDraft: false
+  });
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
   const { trigger: trashPages } = useTrashPages();
@@ -52,14 +50,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
 
   function createNewReward() {
-    if (isCharmverseSpace) {
-      navigateToSpacePath('/rewards/new');
-    } else {
-      clearRewardValues();
-      openNewPage({
-        type: 'bounty'
-      });
-    }
+    navigateToSpacePath('/rewards/new');
   }
 
   async function saveForm() {
@@ -70,31 +61,11 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
 
   function createRewardFromTemplate(template: RewardTemplate) {
-    if (isCharmverseSpace) {
-      navigateToSpacePath(`/rewards/new`, { template: template.page.id });
-    } else {
-      openNewPage({
-        ...template.page,
-        content: template.page.content as PageContent,
-        title: undefined,
-        type: 'bounty',
-        templateId: template.page.id
-      });
-      setRewardValues({
-        rewardType: getRewardType(template.reward),
-        ...template.reward
-      });
-    }
+    navigateToSpacePath(`/rewards/new`, { template: template.page.id });
   }
 
   function createTemplate() {
-    if (isCharmverseSpace) {
-      navigateToSpacePath('/rewards/new', { type: 'bounty_template' });
-    } else {
-      openNewPage({
-        type: 'bounty_template'
-      });
-    }
+    navigateToSpacePath('/rewards/new', { type: 'template' });
   }
 
   function editTemplate(templateId: string) {
@@ -140,12 +111,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   return (
     <>
       <ButtonGroup variant='contained' ref={buttonRef}>
-        <Button
-          disabled={isDisabled}
-          data-test='create-suggest-bounty'
-          href={isCharmverseSpace ? '/rewards/new' : undefined}
-          onClick={isCharmverseSpace ? undefined : createNewReward}
-        >
+        <Button disabled={isDisabled} data-test='create-suggest-bounty' href='/rewards/new'>
           Create
         </Button>
         <Button disabled={isDisabled} data-test='reward-template-select' size='small' onClick={popupState.open}>
@@ -154,7 +120,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       </ButtonGroup>
       <TemplatesMenu
         isLoading={isLoading}
-        templates={templates?.map((tpl) => tpl.page) ?? []}
+        templates={templates?.map((tpl) => ({ ...tpl.page, draft: tpl.reward.status === 'draft' })) ?? []}
         addPageFromTemplate={(page) => {
           const template = templates?.find((tpl) => tpl.page.id === page.id);
           if (template) {

@@ -1,24 +1,43 @@
-import type { RewardWorkflow } from './getRewardWorkflows';
+import type { RewardEvaluation, RewardWorkflow } from './getRewardWorkflows';
 import type { ApplicationWithTransactions } from './interfaces';
 
 export function getRewardWorkflowWithApplication({
-  application,
-  workflow
+  applicationStatus,
+  workflow,
+  hasCredentials,
+  hasIssuableOnchainCredentials
 }: {
   workflow: RewardWorkflow;
-  application?: ApplicationWithTransactions;
+  applicationStatus?: ApplicationWithTransactions['status'];
+  hasCredentials: boolean;
+  hasIssuableOnchainCredentials?: boolean;
 }): RewardWorkflow {
-  if (!application) {
-    return workflow;
+  const evaluations: RewardEvaluation[] = workflow.evaluations.filter((evaluation) => {
+    if (evaluation.type === 'credential' && !hasCredentials) {
+      return false;
+    }
+
+    return true;
+  });
+
+  if (!applicationStatus) {
+    return {
+      ...workflow,
+      evaluations: evaluations.map((evaluation) => {
+        return {
+          ...evaluation,
+          result: null
+        };
+      })
+    };
   }
 
-  const applicationStatus = application.status;
   switch (applicationStatus) {
     case 'applied': {
-      const applyStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'apply');
+      const applyStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'apply');
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation, index) => {
+        evaluations: evaluations.map((evaluation, index) => {
           if (evaluation.type === 'apply') {
             return {
               ...evaluation,
@@ -34,12 +53,12 @@ export function getRewardWorkflowWithApplication({
       };
     }
     case 'rejected': {
-      const applicationReviewStepIndex = workflow.evaluations.findIndex(
+      const applicationReviewStepIndex = evaluations.findIndex(
         (evaluation) => evaluation.type === 'application_review'
       );
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation, index) => {
+        evaluations: evaluations.map((evaluation, index) => {
           if (evaluation.type === 'application_review') {
             return {
               ...evaluation,
@@ -56,10 +75,10 @@ export function getRewardWorkflowWithApplication({
     }
 
     case 'submission_rejected': {
-      const submissionReviewStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'review');
+      const submissionReviewStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'review');
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation, index) => {
+        evaluations: evaluations.map((evaluation, index) => {
           if (evaluation.type === 'review') {
             return {
               ...evaluation,
@@ -76,10 +95,10 @@ export function getRewardWorkflowWithApplication({
     }
 
     case 'inProgress': {
-      const submitStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'submit');
+      const submitStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'submit');
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation, index) => {
+        evaluations: evaluations.map((evaluation, index) => {
           if (evaluation.type === 'submit') {
             return {
               ...evaluation,
@@ -96,10 +115,10 @@ export function getRewardWorkflowWithApplication({
     }
 
     case 'review': {
-      const reviewStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'review');
+      const reviewStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'review');
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation, index) => {
+        evaluations: evaluations.map((evaluation, index) => {
           if (evaluation.type === 'review') {
             return {
               ...evaluation,
@@ -117,10 +136,29 @@ export function getRewardWorkflowWithApplication({
 
     case 'complete':
     case 'processing': {
-      const paymentStepIndex = workflow.evaluations.findIndex((evaluation) => evaluation.type === 'payment');
+      if (hasIssuableOnchainCredentials && applicationStatus !== 'processing') {
+        const credentialStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'credential');
+        return {
+          ...workflow,
+          evaluations: evaluations.map((evaluation, index) => {
+            if (evaluation.type === 'credential') {
+              return {
+                ...evaluation,
+                result: null
+              };
+            }
+
+            return {
+              ...evaluation,
+              result: index < credentialStepIndex ? 'pass' : null
+            };
+          })
+        };
+      }
+      const paymentStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'payment');
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation, index) => {
+        evaluations: evaluations.map((evaluation, index) => {
           if (evaluation.type === 'payment') {
             return {
               ...evaluation,
@@ -139,7 +177,7 @@ export function getRewardWorkflowWithApplication({
     case 'paid': {
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation) => {
+        evaluations: evaluations.map((evaluation) => {
           return {
             ...evaluation,
             result: 'pass'
@@ -151,7 +189,7 @@ export function getRewardWorkflowWithApplication({
     case 'cancelled': {
       return {
         ...workflow,
-        evaluations: workflow.evaluations.map((evaluation) => {
+        evaluations: evaluations.map((evaluation) => {
           return {
             ...evaluation,
             result: evaluation.type === 'payment' ? 'fail' : 'pass'

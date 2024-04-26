@@ -1,7 +1,6 @@
 import type { Application } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormLabel } from '@mui/material';
-import Alert from '@mui/material/Alert';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import Stack from '@mui/material/Stack';
@@ -19,7 +18,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardType } from 'lib/rewards/interfaces';
 import type { WorkUpsertData } from 'lib/rewards/work';
 import { isValidChainAddress } from 'lib/tokens/validation';
-import type { SystemError } from 'lib/utils/errors';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
@@ -95,15 +93,12 @@ export function RewardSubmissionInput({
 
   const formValues = getValues();
 
-  const [formError, setFormError] = useState<SystemError | null>(null);
-
   async function onSubmit(values: FormValues) {
     const hasSaved = await onSubmitProp({
       applicationId: submission?.id,
       ...values
     });
     if (hasSaved) {
-      setFormError(null);
       setIsEditorTouched(false);
     }
   }
@@ -122,7 +117,7 @@ export function RewardSubmissionInput({
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
-          <Grid item>
+          <Grid item data-test='submission-input'>
             <CharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={(content) => {
@@ -193,17 +188,12 @@ export function RewardSubmissionInput({
                   !isEditorTouched ||
                   checkIsContentEmpty(formValues.submissionNodes as unknown as PageContent)
                 }
+                data-test='submit-submission-button'
                 type='submit'
                 loading={isSaving}
               >
                 {submission?.id ? 'Update' : 'Submit'}
               </Button>
-            </Grid>
-          )}
-
-          {formError && (
-            <Grid item>
-              <Alert severity={formError.severity}>{formError.message}</Alert>
             </Grid>
           )}
         </Grid>
