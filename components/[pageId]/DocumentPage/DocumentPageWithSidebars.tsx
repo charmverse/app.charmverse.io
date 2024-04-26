@@ -48,7 +48,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     proposalId
   });
 
-  const { onChangeRewardWorkflow, reward, updateReward } = useReward({
+  const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
   });
 
@@ -112,7 +112,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       <DocumentColumn>
         <DocumentPage
           {...props}
-          refreshPage={refreshPage}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
           sidebarView={internalSidebarView}
@@ -167,7 +166,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             closeSidebar
           }}
           isDraft={reward.status === 'draft'}
-          refreshPage={refreshPage}
+          refreshReward={refreshReward}
           page={page}
           expanded={false}
           onChangeWorkflow={onChangeRewardWorkflow}

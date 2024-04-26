@@ -52,8 +52,8 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
         ]
       },
       include: {
-        page: true,
-        ...rewardWithUsersInclude()
+        ...rewardWithUsersInclude(),
+        page: true
       }
     })
     .then((bounties) =>

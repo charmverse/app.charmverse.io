@@ -80,7 +80,6 @@ export type DocumentPageProps = {
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
   showParentChip?: boolean;
-  refreshPage?: VoidFunction;
 };
 
 function DocumentPageComponent({
@@ -92,8 +91,7 @@ function DocumentPageComponent({
   sidebarView,
   setSidebarView,
   showCard,
-  showParentChip,
-  refreshPage
+  showParentChip
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -422,7 +420,7 @@ function DocumentPageComponent({
                   isDraft={reward?.status === 'draft'}
                   reward={reward}
                   readOnly={readOnly}
-                  refreshPage={refreshPage}
+                  refreshReward={refreshReward}
                   page={page}
                   rewardInput={reward}
                   expanded

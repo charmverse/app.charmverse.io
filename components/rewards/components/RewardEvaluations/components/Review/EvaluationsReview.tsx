@@ -36,7 +36,7 @@ export type Props = Omit<
   application?: ApplicationWithTransactions;
   refreshApplication?: VoidFunction;
   page: PageWithContent;
-  refreshPage?: VoidFunction;
+  refreshReward?: VoidFunction;
 };
 
 export function EvaluationsReview({
@@ -47,7 +47,7 @@ export function EvaluationsReview({
   readOnly,
   refreshApplication,
   page,
-  refreshPage
+  refreshReward
 }: Props) {
   const router = useRouter();
 
@@ -193,8 +193,8 @@ export function EvaluationsReview({
           <Divider />
           <SocialShareLinksStep
             pageId={page.id}
-            lensPostLink={page.lensPostLink}
-            onPublish={refreshPage}
+            lensPostLink={reward.lensPostLink}
+            onPublish={refreshReward}
             text={shareText}
             content={{
               type: 'doc',

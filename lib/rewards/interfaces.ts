@@ -22,6 +22,7 @@ export type RewardWithUsers = Bounty & {
   applications: ApplicationMeta[];
   allowedSubmitterRoles: string[] | null;
   assignedSubmitters: string[] | null;
+  lensPostLink?: string | null;
   sourceProposalPage?: {
     id: string;
     title: string;
