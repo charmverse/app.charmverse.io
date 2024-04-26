@@ -1,7 +1,7 @@
 import type { ApplicationStatus } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ArrowBack } from '@mui/icons-material';
-import { Box, Divider, FormLabel, Grid } from '@mui/material';
+import { Box, Divider, FormLabel, Grid, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
 
 import charmClient from 'charmClient';
@@ -21,6 +21,7 @@ import type { WorkInput } from 'components/rewards/hooks/useApplication';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import { useNewWork } from 'components/rewards/hooks/useNewApplication';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { useMembers } from 'hooks/useMembers';
 import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -28,6 +29,8 @@ import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
+
+import { RewardEvaluations } from '../RewardEvaluations/RewardEvaluations';
 
 import { ApplicationComments } from './components/ApplicationComments';
 import { ApplicationInput } from './components/RewardApplicationInput';
@@ -54,6 +57,8 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId: application?.bountyId || rewardId || '' });
   const currentRewardId = rewardId || reward?.id || application?.bountyId;
   const { page } = usePage({ pageIdOrPath: reward?.page.id });
+  const [currentTab, setCurrentTab] = useState<number>(0);
+  const isMdScreen = useMdScreen();
 
   const { data: rewardPageContent } = useGetPage(currentRewardId);
 
@@ -176,89 +181,128 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
                       </Button>
                     )}
 
-                    <div className='focalboard-body'>
-                      <RewardProperties
-                        reward={reward}
-                        pageId={reward.page.id}
-                        pagePath={reward.page.path}
-                        readOnly
-                        rewardChanged={refreshReward}
-                      />
-                      {rewardPageContent?.content && (
-                        <>
-                          <CharmEditor
-                            readOnly
-                            content={rewardPageContent.content as PageContent}
-                            isContentControlled
-                          />
-                          <Divider sx={{ my: 2 }} />
-                        </>
-                      )}
-                    </div>
-                    {isApplicationLoaded && (
+                    {!isMdScreen && (
+                      <Tabs
+                        sx={{
+                          mb: 1
+                        }}
+                        indicatorColor='primary'
+                        value={currentTab}
+                      >
+                        <Tab label='Document' value={0} onClick={() => setCurrentTab(0)} />
+                        <Tab
+                          sx={{
+                            px: 1.5,
+                            fontSize: 14,
+                            minHeight: 0
+                          }}
+                          label='Evaluation'
+                          value={1}
+                          onClick={() => setCurrentTab(1)}
+                        />
+                      </Tabs>
+                    )}
+
+                    {currentTab === 0 && (
                       <>
-                        {application && (
-                          <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
-                            <Grid item display='flex' alignItems='center' gap={2}>
-                              <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
-                                {application.status === 'rejected' || application.status === 'applied'
-                                  ? 'Applicant'
-                                  : 'Submitter'}
-                              </FormLabel>
-                              <UserDisplay userId={submitter?.id} avatarSize='small' showMiniProfile />
-                            </Grid>
-                          </Box>
-                        )}
-
-                        {applicationStepRequired && (
-                          <ApplicationInput
-                            onCancel={application ? undefined : onCancelNewSubmission}
-                            application={application}
-                            disableCollapse={!showSubmissionInput}
-                            expandedOnLoad={isNewApplication || isApplicationStage}
-                            readOnly={(application?.createdBy !== user?.id && !isNewApplication) || !isApplicationStage}
-                            onSubmit={(updatedApplication) =>
-                              saveApplication(
-                                {
-                                  applicationId: application?.id,
-                                  message: updatedApplication.message,
-                                  messageNodes: updatedApplication.messageNodes,
-                                  rewardId: reward.id
-                                },
-                                'application'
-                              )
-                            }
-                            isSaving={isSaving}
+                        <div className='focalboard-body'>
+                          <RewardProperties
+                            reward={reward}
+                            pageId={reward.page.id}
+                            pagePath={reward.page.path}
+                            readOnly
+                            rewardChanged={refreshReward}
                           />
-                        )}
+                          {rewardPageContent?.content && (
+                            <>
+                              <CharmEditor
+                                readOnly
+                                content={rewardPageContent.content as PageContent}
+                                isContentControlled
+                              />
+                              <Divider sx={{ my: 2 }} />
+                            </>
+                          )}
+                        </div>
+                        {isApplicationLoaded && (
+                          <>
+                            {application && (
+                              <Box mb={2} display='flex' justifyContent='space-between' alignItems='center'>
+                                <Grid item display='flex' alignItems='center' gap={2}>
+                                  <FormLabel sx={{ fontWeight: 'bold', cursor: 'pointer', lineHeight: '1.5' }}>
+                                    {application.status === 'rejected' || application.status === 'applied'
+                                      ? 'Applicant'
+                                      : 'Submitter'}
+                                  </FormLabel>
+                                  <UserDisplay userId={submitter?.id} avatarSize='small' showMiniProfile />
+                                </Grid>
+                              </Box>
+                            )}
 
-                        {showSubmissionInput && (
-                          <RewardSubmissionInput
-                            onCancel={application ? undefined : onCancelNewSubmission}
-                            currentUserIsAuthor={(!!user && user.id === application?.createdBy) || isNewApplication}
-                            submission={application}
-                            readOnly={readonlySubmission}
-                            refreshSubmission={refreshApplication}
-                            onSubmit={(submission) =>
-                              saveApplication(
-                                {
-                                  rewardId: reward.id,
-                                  submissionNodes: submission.submissionNodes,
-                                  applicationId: application?.id,
-                                  submission: submission.submission,
-                                  walletAddress: submission.walletAddress
-                                },
-                                'submission'
-                              )
-                            }
-                            bountyId={currentRewardId}
-                            permissions={applicationRewardPermissions}
-                            rewardType={rewardType}
-                            isSaving={isSaving}
-                          />
+                            {applicationStepRequired && (
+                              <ApplicationInput
+                                onCancel={application ? undefined : onCancelNewSubmission}
+                                application={application}
+                                disableCollapse={!showSubmissionInput}
+                                expandedOnLoad={isNewApplication || isApplicationStage}
+                                readOnly={
+                                  (application?.createdBy !== user?.id && !isNewApplication) || !isApplicationStage
+                                }
+                                onSubmit={(updatedApplication) =>
+                                  saveApplication(
+                                    {
+                                      applicationId: application?.id,
+                                      message: updatedApplication.message,
+                                      messageNodes: updatedApplication.messageNodes,
+                                      rewardId: reward.id
+                                    },
+                                    'application'
+                                  )
+                                }
+                                isSaving={isSaving}
+                              />
+                            )}
+
+                            {showSubmissionInput && (
+                              <RewardSubmissionInput
+                                onCancel={application ? undefined : onCancelNewSubmission}
+                                currentUserIsAuthor={(!!user && user.id === application?.createdBy) || isNewApplication}
+                                submission={application}
+                                readOnly={readonlySubmission}
+                                refreshSubmission={refreshApplication}
+                                onSubmit={(submission) =>
+                                  saveApplication(
+                                    {
+                                      rewardId: reward.id,
+                                      submissionNodes: submission.submissionNodes,
+                                      applicationId: application?.id,
+                                      submission: submission.submission,
+                                      walletAddress: submission.walletAddress
+                                    },
+                                    'submission'
+                                  )
+                                }
+                                bountyId={currentRewardId}
+                                permissions={applicationRewardPermissions}
+                                rewardType={rewardType}
+                                isSaving={isSaving}
+                              />
+                            )}
+                            {application && <ApplicationComments applicationId={application.id} />}
+                          </>
                         )}
-                        {application && <ApplicationComments applicationId={application.id} />}
                       </>
+                    )}
+                    {currentTab === 1 && (
+                      <RewardEvaluations
+                        page={page}
+                        readOnly={!page?.permissionFlags?.edit_content}
+                        application={application}
+                        reward={reward}
+                        refreshApplication={refreshApplication}
+                        onChangeReward={updateReward}
+                        refreshReward={refreshReward}
+                      />
                     )}
                   </Box>
                 </StyledContainer>
@@ -278,6 +322,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
           reward={reward}
           refreshApplication={refreshApplication}
           onChangeReward={updateReward}
+          refreshReward={refreshReward}
         />
       </DocumentColumnLayout>
     </Box>
