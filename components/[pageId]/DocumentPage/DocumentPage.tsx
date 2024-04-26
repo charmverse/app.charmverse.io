@@ -28,6 +28,7 @@ import { ProposalRewardsTable } from 'components/proposals/ProposalPage/componen
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
+import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
@@ -79,7 +80,6 @@ export type DocumentPageProps = {
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
   showParentChip?: boolean;
-  refreshPage?: VoidFunction;
 };
 
 function DocumentPageComponent({
@@ -91,8 +91,7 @@ function DocumentPageComponent({
   sidebarView,
   setSidebarView,
   showCard,
-  showParentChip,
-  refreshPage
+  showParentChip
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -122,7 +121,7 @@ function DocumentPageComponent({
     proposalId
   });
 
-  const { onChangeRewardWorkflow, reward, updateReward } = useReward({
+  const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
   });
 
@@ -152,7 +151,11 @@ function DocumentPageComponent({
   );
 
   const showPageBanner =
-    page.type !== 'proposal' && page.type !== 'proposal_template' && page.type !== 'proposal_notes';
+    page.type !== 'proposal' &&
+    page.type !== 'proposal_template' &&
+    page.type !== 'proposal_notes' &&
+    page.type !== 'bounty' &&
+    page.type !== 'bounty_template';
   const pageTop = showPageBanner ? getPageTop(page) : defaultPageTop;
 
   const { threads, currentPageId: threadsPageId } = useThreads();
@@ -414,9 +417,10 @@ function DocumentPageComponent({
               ) : page.type === 'bounty' || page.type === 'bounty_template' ? (
                 <RewardEvaluations
                   isTemplate={page.type === 'bounty_template'}
+                  isDraft={reward?.status === 'draft'}
                   reward={reward}
                   readOnly={readOnly}
-                  refreshPage={refreshPage}
+                  refreshReward={refreshReward}
                   page={page}
                   rewardInput={reward}
                   expanded
@@ -571,7 +575,7 @@ function DocumentPageComponent({
                 {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                   <Box>
                     {/* add negative margin to offset height of .charm-empty-footer */}
-                    <PageComments page={page} enableComments={pagePermissions.comment} />
+                    <PageComments page={page} canComment={pagePermissions.comment} />
                   </Box>
                 )}
               </>
@@ -580,6 +584,9 @@ function DocumentPageComponent({
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
           <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
+        )}
+        {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
+          <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />
         )}
       </FormProvider>
     </Box>

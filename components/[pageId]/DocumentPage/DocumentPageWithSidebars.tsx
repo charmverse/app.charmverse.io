@@ -1,20 +1,15 @@
 import type { EditorState } from 'prosemirror-state';
 import { memo, useEffect, useState } from 'react';
 
-import charmClient from 'charmClient';
-import { useGetReward } from 'charmClient/hooks/rewards';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
-import { useUser } from 'hooks/useUser';
-import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
-import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 
-import { DocumentColumnLayout, DocumentColumn } from './components/DocumentColumnLayout';
+import { DocumentColumn, DocumentColumnLayout } from './components/DocumentColumnLayout';
 import { PageSidebar } from './components/Sidebar/PageSidebar';
 import { ProposalSidebar } from './components/Sidebar/ProposalSidebar';
 import { RewardSidebar } from './components/Sidebar/RewardSidebar';
@@ -41,7 +36,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
   const isCharmverseSpace = useIsCharmverseSpace();
-  const { user } = useUser();
 
   const {
     proposal,
@@ -54,7 +48,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     proposalId
   });
 
-  const { onChangeRewardWorkflow, reward, updateReward } = useReward({
+  const { onChangeRewardWorkflow, reward, updateReward, refreshReward } = useReward({
     rewardId
   });
 
@@ -118,7 +112,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
       <DocumentColumn>
         <DocumentPage
           {...props}
-          refreshPage={refreshPage}
           setEditorState={setEditorState}
           setSidebarView={setActiveView}
           sidebarView={internalSidebarView}
@@ -172,7 +165,8 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
             openSidebar: () => setActiveView('reward_evaluation'),
             closeSidebar
           }}
-          refreshPage={refreshPage}
+          isDraft={reward.status === 'draft'}
+          refreshReward={refreshReward}
           page={page}
           expanded={false}
           onChangeWorkflow={onChangeRewardWorkflow}

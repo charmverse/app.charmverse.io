@@ -1,5 +1,5 @@
 import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
-import type { Page, Bounty } from '@charmverse/core/prisma-client';
+import type { Page, Bounty, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { rewardWithUsersInclude } from 'lib/rewards/getReward';
@@ -17,7 +17,7 @@ export type RewardTemplate = {
 };
 
 export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<RewardTemplate[]> {
-  const { spaceRole } = await hasAccessToSpace({
+  const { spaceRole, isAdmin } = await hasAccessToSpace({
     spaceId,
     userId
   });
@@ -26,18 +26,34 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
     return [];
   }
 
+  const bountyWhereInput: Prisma.BountyWhereInput = {
+    spaceId,
+    page: {
+      type: 'bounty_template',
+      deletedAt: null
+    }
+  };
+
   return prisma.bounty
     .findMany({
       where: {
-        spaceId,
-        page: {
-          type: 'bounty_template',
-          deletedAt: null
-        }
+        OR: [
+          {
+            ...bountyWhereInput,
+            status: 'draft',
+            createdBy: isAdmin ? undefined : userId
+          },
+          {
+            ...bountyWhereInput,
+            status: {
+              notIn: ['draft']
+            }
+          }
+        ]
       },
       include: {
-        page: true,
-        ...rewardWithUsersInclude()
+        ...rewardWithUsersInclude(),
+        page: true
       }
     })
     .then((bounties) =>

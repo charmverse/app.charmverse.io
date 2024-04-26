@@ -187,7 +187,6 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                   {applicationStepRequired && (
                     <ApplicationInput
                       application={application}
-                      rewardId={reward.id}
                       disableCollapse={!showSubmissionInput}
                       expandedOnLoad={isNewApplication || isApplicationStage}
                       readOnly={(application?.createdBy !== user?.id && !isNewApplication) || !isApplicationStage}
@@ -195,7 +194,8 @@ export function RewardApplicationPage({ applicationId, rewardId, closeDialog }: 
                         saveApplication(
                           {
                             applicationId: application?.id,
-                            message: updatedApplication,
+                            message: updatedApplication.message,
+                            messageNodes: updatedApplication.messageNodes,
                             rewardId: reward.id
                           },
                           'application'

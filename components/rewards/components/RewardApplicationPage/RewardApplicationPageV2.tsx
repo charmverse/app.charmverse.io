@@ -214,7 +214,6 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
                           <ApplicationInput
                             onCancel={application ? undefined : onCancelNewSubmission}
                             application={application}
-                            rewardId={reward.id}
                             disableCollapse={!showSubmissionInput}
                             expandedOnLoad={isNewApplication || isApplicationStage}
                             readOnly={(application?.createdBy !== user?.id && !isNewApplication) || !isApplicationStage}
@@ -222,7 +221,8 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
                               saveApplication(
                                 {
                                   applicationId: application?.id,
-                                  message: updatedApplication,
+                                  message: updatedApplication.message,
+                                  messageNodes: updatedApplication.messageNodes,
                                   rewardId: reward.id
                                 },
                                 'application'
@@ -272,6 +272,7 @@ export function RewardApplicationPageV2({ applicationId: _applicationId, rewardI
             closeSidebar: () => setActiveView(null),
             openSidebar: () => setActiveView('reward_evaluation')
           }}
+          page={page}
           readOnly={!page?.permissionFlags?.edit_content}
           application={application}
           reward={reward}

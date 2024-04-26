@@ -4,6 +4,7 @@ import { useGetRewardBlocks, useUpdateRewardBlocks } from 'charmClient/hooks/rew
 import { getDefaultBoard } from 'components/rewards/components/RewardsBoard/utils/boardData';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
@@ -18,9 +19,11 @@ import type { WebSocketPayload } from 'lib/websockets/interfaces';
 
 export function useRewardsBoard() {
   const { space } = useCurrentSpace();
+  const { getFeatureTitle } = useSpaceFeatures();
   const { data: blocksFromDB, isLoading, mutate } = useGetRewardBlocks({ spaceId: space?.id, type: 'board' });
   const { trigger: updateRewardBlocks } = useUpdateRewardBlocks(space?.id || '');
   const { showError } = useSnackbar();
+
   const dbBlock = blocksFromDB?.find((b): b is RewardsBoardBlock => b.type === 'board');
 
   const boardBlock = useMemo(() => {
@@ -28,10 +31,11 @@ export function useRewardsBoard() {
       dbBlock.fields.cardProperties = [];
     }
     const board = getDefaultBoard({
-      storedBoard: dbBlock
+      storedBoard: dbBlock,
+      getFeatureTitle
     }) as RewardsBoardFFBlock;
     return board;
-  }, [dbBlock]);
+  }, [dbBlock, getFeatureTitle]);
 
   const { subscribe } = useWebSocketClient();
 

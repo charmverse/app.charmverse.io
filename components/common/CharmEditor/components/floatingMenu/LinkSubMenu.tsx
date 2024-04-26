@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 
 import { useEditorViewContext } from 'components/common/CharmEditor/components/@bangle.dev/react/hooks';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { isReturnKey } from 'lib/utils/react';
 
 import * as link from '../link/link';
 
@@ -14,7 +15,7 @@ export function LinkSubMenu() {
   const isSavedDisabled = href === originalHref || !/^(ipfs|http(s?)):\/\//i.test(href);
   const handleSubmit = (e: React.KeyboardEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    if (!isSavedDisabled && e.code === 'Enter') {
+    if (!isSavedDisabled && isReturnKey(e)) {
       e.preventDefault();
       link.updateLink(href)(view.state, view.dispatch);
       view.focus();

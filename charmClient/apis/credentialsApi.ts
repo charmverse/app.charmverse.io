@@ -5,7 +5,10 @@ import type {
   FindIssuableProposalCredentialsInput,
   IssuableProposalCredentialContent
 } from 'lib/credentials/findIssuableProposalCredentials';
-import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
+import type {
+  FindIssuableRewardCredentialsInput,
+  IssuableRewardApplicationCredentialContent
+} from 'lib/credentials/findIssuableRewardCredentials';
 import type { GnosisSafeTransactionToIndex } from 'lib/credentials/indexGnosisSafeCredentialTransaction';
 import type { ProposalCredentialsToIndex } from 'lib/credentials/indexOnChainProposalCredential';
 import type { RewardCredentialsToIndex } from 'lib/credentials/indexOnChainRewardCredential';
@@ -42,10 +45,6 @@ export class CredentialsApi {
 
   requestPendingCredentialGnosisSafeIndexing(data: GnosisSafeTransactionToIndex) {
     return http.POST(`/api/credentials/request-gnosis-safe-indexing`, data);
-  }
-
-  getIssuableRewardCredentials({ spaceId }: { spaceId: string }) {
-    return http.GET<IssuableRewardApplicationCredentialContent[]>(`/api/credentials/rewards/issuable`, { spaceId });
   }
 
   requestRewardCredentialIndexing(data: RewardCredentialsToIndex) {

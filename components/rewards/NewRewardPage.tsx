@@ -26,6 +26,7 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
@@ -78,7 +79,7 @@ export function NewRewardPage({
     contentText: ''
   });
   const canCreateReward = !spacePermissions || !!spacePermissions[0]?.createBounty;
-
+  const isAdmin = useIsAdmin();
   const rewardPageType = isTemplate ? 'bounty_template' : 'bounty';
 
   const disabledTooltip = useMemo(() => {
@@ -119,6 +120,7 @@ export function NewRewardPage({
       contentText: template.page.contentText,
       title: pageData.title
     });
+    const rewardType = getRewardType(template.reward);
     setRewardValues({
       assignedSubmitters: template.reward.assignedSubmitters,
       allowedSubmitterRoles: template.reward.allowedSubmitterRoles,
@@ -131,7 +133,7 @@ export function NewRewardPage({
       reviewers: template.reward.reviewers,
       rewardAmount: template.reward.rewardAmount,
       rewardToken: template.reward.rewardToken,
-      rewardType: getRewardType(template.reward),
+      rewardType,
       selectedCredentialTemplates: template.reward.selectedCredentialTemplates,
       fields: template.reward.fields
     });
@@ -162,14 +164,15 @@ export function NewRewardPage({
     }
   }
 
-  const saveForm = async () => {
-    setSubmittedDraft(true);
+  const saveForm = async (isDraft?: boolean) => {
+    setSubmittedDraft(!!isDraft);
     const createdReward = await createReward({
       content: pageData.content,
       contentText: pageData.contentText,
       title: pageData.title,
       type: rewardPageType,
-      sourceTemplateId: sourceTemplate?.page.id
+      sourceTemplateId: sourceTemplate?.page.id,
+      isDraft
     });
 
     if (createdReward) {
@@ -295,10 +298,19 @@ export function NewRewardPage({
             </Box>
             <StickyFooterContainer>
               <Button
+                disabled={isSavingReward}
+                loading={isSavingReward && submittedDraft}
+                data-test='create-proposal-button'
+                variant='outlined'
+                onClick={() => saveForm(true)}
+              >
+                Save draft
+              </Button>
+              <Button
                 data-test='publish-new-reward-button'
                 disabled={Boolean(disabledTooltip) || isSavingReward}
                 disabledTooltip={disabledTooltip}
-                onClick={saveForm}
+                onClick={() => saveForm()}
                 loading={isSavingReward && !submittedDraft}
               >
                 Publish
@@ -313,6 +325,8 @@ export function NewRewardPage({
             closeSidebar: () => setActiveView(null),
             openSidebar: () => setActiveView('reward_evaluation')
           }}
+          // if creating a reward from template then disable the reward properties
+          readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
           isUnpublishedReward
           rewardInput={rewardValues}
           onChangeReward={(updates) => {

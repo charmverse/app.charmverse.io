@@ -92,14 +92,13 @@ export function EvaluationsReview({
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
-  const isCredentialsComplete = hasCredentialsStep && !hasPendingOnchainCredentials;
+  const isCredentialsComplete =
+    hasCredentialsStep && currentEvaluation?.result === 'pass' && !hasPendingOnchainCredentials;
   const isCredentialsActive =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && (!isCredentialsComplete || !hasRewardsStep);
 
   const shareLink = getAbsolutePath(pagePath || '', currentSpace?.domain);
-  const shareText = `${pageTitle || 'Untitled'} from ${
-    currentSpace?.name
-  } is now open for feedback.\nView on CharmVerse:\n`;
+  const shareText = `${pageTitle || 'Untitled'} from ${currentSpace?.name} is now open for feedback.\n`;
   const { user } = useUser();
   const isRewardsActive =
     hasRewardsStep && currentEvaluation?.result === 'pass' && (!hasCredentialsStep || !!isCredentialsComplete);
@@ -299,7 +298,7 @@ export function EvaluationsReview({
             pageId={pageId}
             lensPostLink={pageLensPostLink}
             onPublish={refreshProposal}
-            text={shareText}
+            text={`${shareText}\nView on CharmVerse:\n`}
             content={{
               type: 'doc',
               content: [

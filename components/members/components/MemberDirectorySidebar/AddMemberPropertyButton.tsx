@@ -12,6 +12,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMemberProperties } from 'hooks/useMemberProperties';
 import { useMembers } from 'hooks/useMembers';
 import { MEMBER_PROPERTY_CONFIG } from 'lib/members/constants';
+import { isReturnKey } from 'lib/utils/react';
 
 import { MemberPropertyItem } from './MemberPropertyItem';
 
@@ -119,7 +120,7 @@ export function AddMemberPropertyButton() {
               flexGrow: 1
             }}
             onKeyDown={(e) => {
-              if (e.code === 'Enter') {
+              if (isReturnKey(e)) {
                 onSubmit();
               }
             }}

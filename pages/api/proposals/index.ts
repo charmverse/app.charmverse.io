@@ -2,7 +2,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { updateTrackPageProfile } from 'lib/metrics/mixpanel/updateTrackPageProfile';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
@@ -93,6 +92,16 @@ async function createProposalController(req: NextApiRequest, res: NextApiRespons
     });
     if (!isValidEvaluationSteps) {
       throw new ActionNotPermittedError('Inputs do not match the template');
+    }
+
+    const selectedCredentialTemplates = proposalCreateProps.selectedCredentialTemplates ?? [];
+    const proposalTemplateCredentials = proposalTemplate.proposal.selectedCredentialTemplates;
+
+    if (
+      selectedCredentialTemplates.length !== proposalTemplateCredentials.length ||
+      !selectedCredentialTemplates.every((templateId) => proposalTemplateCredentials.includes(templateId))
+    ) {
+      throw new ActionNotPermittedError('Selected credentials do not match the template');
     }
   }
   const proposalPage = await createProposal({

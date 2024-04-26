@@ -2,6 +2,8 @@ import { prisma, type Application } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import { findSpaceIssuableRewardCredentials } from 'lib/credentials/findIssuableRewardCredentials';
+import { getProposalOrApplicationCredentials } from 'lib/credentials/getProposalOrApplicationCredentials';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { providePermissionClients } from 'lib/permissions/api/permissionsClientMiddleware';
@@ -71,7 +73,20 @@ async function getApplicationController(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You cannot access this application`);
   }
 
-  return res.status(200).json(application);
+  const applicationCredentials = await getProposalOrApplicationCredentials({
+    applicationId: application.id
+  });
+
+  const pendingOnchainApplicationCredentials = await findSpaceIssuableRewardCredentials({
+    applicationId: application.id,
+    spaceId: application.spaceId
+  });
+
+  return res.status(200).json({
+    ...application,
+    issuedCredentials: applicationCredentials,
+    issuableOnchainCredentials: pendingOnchainApplicationCredentials
+  });
 }
 
 export default withSessionRoute(handler);

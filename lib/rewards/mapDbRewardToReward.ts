@@ -6,6 +6,9 @@ export function mapDbRewardToReward(
   reward: Reward & {
     applications: ApplicationMeta[];
     permissions: Pick<BountyPermission, 'roleId' | 'userId' | 'permissionLevel'>[];
+    page?: {
+      lensPostLink?: string | null;
+    } | null;
     proposal: {
       page: {
         id: string;
@@ -29,6 +32,7 @@ export function mapDbRewardToReward(
 
   const rewardWithUsers: RewardWithUsers = {
     ...reward,
+    lensPostLink: reward.page?.lensPostLink,
     applications: reward.applications,
     reviewers,
     allowedSubmitterRoles:

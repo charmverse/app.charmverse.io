@@ -18,6 +18,7 @@ import { createCard } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
 import type { FilterClause } from 'lib/databases/filterClause';
 import type { FilterGroup } from 'lib/databases/filterGroup';
+import { computeGroupSpacePermissions } from 'lib/permissions/spaces/computeGroupSpacePermissions';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { OctoUtils } from './octoUtils';
@@ -674,6 +675,7 @@ export class Mutator {
     views: BoardView[],
     relationData?: RelationPropertyData
   ) {
+    // console.log('changePropertyTypeAndName', board, propertyTemplate, newType, newName);
     const titleProperty: IPropertyTemplate = { id: Constants.titleColumnId, name: 'Title', type: 'text', options: [] };
     if (propertyTemplate.type === newType && propertyTemplate.name === newName) {
       return;
@@ -684,7 +686,6 @@ export class Mutator {
     if (!newTemplate) {
       return;
     }
-
     if (!cardProperty && propertyTemplate.id === Constants.titleColumnId) {
       newBoard.fields.cardProperties = [newTemplate, ...newBoard.fields.cardProperties];
     }

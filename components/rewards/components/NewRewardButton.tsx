@@ -36,7 +36,9 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   const isAdmin = useIsAdmin();
   const buttonRef = useRef<HTMLDivElement>(null);
   const popupState = usePopupState({ variant: 'popover', popupId: 'templates-menu' });
-  const { templates, isLoading } = useRewardTemplates();
+  const { templates, isLoading } = useRewardTemplates({
+    skipDraft: false
+  });
   const [currentSpacePermissions] = useCurrentSpacePermissions();
   const { getFeatureTitle } = useSpaceFeatures();
   const { trigger: trashPages } = useTrashPages();
@@ -154,7 +156,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
       </ButtonGroup>
       <TemplatesMenu
         isLoading={isLoading}
-        templates={templates?.map((tpl) => tpl.page) ?? []}
+        templates={templates?.map((tpl) => ({ ...tpl.page, draft: tpl.reward.status === 'draft' })) ?? []}
         addPageFromTemplate={(page) => {
           const template = templates?.find((tpl) => tpl.page.id === page.id);
           if (template) {

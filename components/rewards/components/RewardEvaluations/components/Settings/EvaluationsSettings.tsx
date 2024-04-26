@@ -6,14 +6,13 @@ import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
-import type { RewardInput } from 'lib/rewards/inferRewardWorkflow';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type EvaluationSettingsProps = {
-  rewardInput?: RewardInput;
+  rewardInput?: UpdateableRewardFields;
   readOnly?: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded?: boolean;

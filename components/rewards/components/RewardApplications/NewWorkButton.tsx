@@ -10,25 +10,35 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { statusesAcceptingNewWork } from 'lib/rewards/shared';
 
 type Props = {
   rewardId?: string;
+  reward?: Pick<RewardWithUsers, 'id' | 'applications' | 'status' | 'allowMultipleApplications' | 'approveSubmitters'>;
   addIcon?: boolean;
   variant?: ButtonProps['variant'];
   buttonSize?: ButtonProps['size'];
   color?: ButtonProps['color'];
 };
 
-export function NewWorkButton({ color, buttonSize, addIcon, rewardId, variant = 'contained' }: Props) {
-  const { rewards } = useRewards();
+export function NewWorkButton({
+  color,
+  buttonSize,
+  addIcon,
+  rewardId: _rewardId,
+  reward: _reward,
+  variant = 'contained'
+}: Props) {
+  const rewardId = _rewardId ?? _reward?.id;
   const { user } = useUser();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const isCharmverseSpace = useIsCharmverseSpace();
+  const { rewards } = useRewards();
 
   const reward = useMemo(() => {
-    return rewards?.find((r) => r.id === rewardId);
-  }, [rewardId, rewards]);
+    return _reward ?? rewards?.find((r) => r.id === rewardId);
+  }, [_reward, rewards, rewardId]);
 
   const hasApplication = !!user && reward?.applications.some((app) => app.createdBy === user.id);
 

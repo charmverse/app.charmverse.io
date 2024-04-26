@@ -56,11 +56,12 @@ const StyledButton = styled(Button)`
 
 type Props = {
   redirectUrl?: string;
-  showSignup: boolean;
+  showSignup?: boolean;
+  signInLabel?: string;
   emailOnly?: boolean;
 };
 
-export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
+export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
   const { resetSigning } = useWeb3Account();
 
@@ -100,7 +101,7 @@ export function LoginButton({ redirectUrl, showSignup, emailOnly }: Props) {
         variant={showSignup ? 'outlined' : undefined}
         data-test='signin-button'
       >
-        Sign in
+        {signInLabel}
       </StyledButton>
       <LoginHandler emailOnly={emailOnly} redirectUrl={redirectUrl} isOpen={loginDialog.isOpen} onClose={handleClose} />
     </Box>

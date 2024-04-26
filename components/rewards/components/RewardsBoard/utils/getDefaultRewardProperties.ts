@@ -2,6 +2,7 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
+import type { FeatureTitleVariation } from 'lib/features/getFeatureTitle';
 import {
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -95,15 +96,19 @@ const rewardDbProperties = {
     name: 'No. of Applicants',
     type: 'number'
   }),
-  rewardProposalLink: (): IPropertyTemplate => ({
+  rewardProposalLink: ({ name }: { name: string }): IPropertyTemplate => ({
     ...defaultOptions,
     id: REWARD_PROPOSAL_LINK,
-    name: 'Proposal',
+    name,
     type: 'proposalUrl'
   })
 };
 
-export function getDefaultRewardProperties(): IPropertyTemplate[] {
+export function getDefaultRewardProperties({
+  getFeatureTitle = (b) => b
+}: {
+  getFeatureTitle?: (featureName: FeatureTitleVariation) => string;
+} = {}): IPropertyTemplate[] {
   const properties = [
     rewardDbProperties.rewardCreatedAt(),
     rewardDbProperties.rewardDueDate(),
@@ -115,7 +120,7 @@ export function getDefaultRewardProperties(): IPropertyTemplate[] {
     rewardDbProperties.rewardChain(),
     rewardDbProperties.rewardCustomValue(),
     rewardDbProperties.rewardApplicantsNumber(),
-    rewardDbProperties.rewardProposalLink()
+    rewardDbProperties.rewardProposalLink({ name: getFeatureTitle('Proposal') })
   ];
 
   return properties;

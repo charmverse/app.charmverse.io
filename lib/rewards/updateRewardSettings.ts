@@ -34,7 +34,11 @@ export type RewardUpdate = {
   updateContent: UpdateableRewardFields;
 };
 
-export async function updateRewardSettings({ rewardId, updateContent }: RewardUpdate): Promise<RewardWithUsers> {
+export async function updateRewardSettings({
+  rewardId,
+  updateContent,
+  isPublished
+}: RewardUpdate & { isPublished?: boolean }): Promise<RewardWithUsers> {
   if (!stringUtils.isUUID(rewardId)) {
     throw new InvalidInputError(`Valid reward id is required`);
   }
@@ -48,6 +52,7 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
       id: rewardId
     },
     select: {
+      status: true,
       maxSubmissions: true,
       applications: {
         select: {
@@ -73,6 +78,7 @@ export async function updateRewardSettings({ rewardId, updateContent }: RewardUp
         id: rewardId
       },
       data: {
+        status: isPublished ? 'open' : reward.status,
         customReward: updateContent.customReward,
         updatedAt: new Date(),
         dueDate: updateContent.dueDate,
