@@ -35,13 +35,12 @@ import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
@@ -108,7 +107,6 @@ function DocumentPageComponent({
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-  const isCharmverseSpace = useIsCharmverseSpace();
 
   const {
     proposal,
@@ -466,7 +464,7 @@ function DocumentPageComponent({
                       pagePath={page.path}
                       readOnly={readOnly}
                       showApplications
-                      expandedRewardProperties={!isCharmverseSpace}
+                      expandedRewardProperties={false}
                       templateId={page.sourceTemplateId || undefined}
                       isTemplate={page.type === 'bounty_template'}
                     />

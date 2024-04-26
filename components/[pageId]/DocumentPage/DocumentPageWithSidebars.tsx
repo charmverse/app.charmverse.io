@@ -4,7 +4,6 @@ import { memo, useEffect, useState } from 'react';
 import type { PageSidebarView } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { isTruthy } from 'lib/utils/types';
@@ -35,7 +34,6 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
-  const isCharmverseSpace = useIsCharmverseSpace();
 
   const {
     proposal,
@@ -158,7 +156,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
         />
       )}
-      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && isCharmverseSpace && (
+      {(page.type === 'bounty' || page.type === 'bounty_template') && reward && (
         <RewardSidebar
           sidebarProps={{
             isOpen: internalSidebarView === 'reward_evaluation',

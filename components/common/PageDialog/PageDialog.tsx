@@ -4,7 +4,6 @@ import type { Page } from '@charmverse/core/prisma';
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import { Box } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useRef } from 'react';
 
@@ -23,14 +22,6 @@ import debouncePromise from 'lib/utils/debouncePromise';
 
 import { FullPageActionsMenuButton } from '../PageActions/FullPageActionsMenuButton';
 import { DocumentHeaderElements } from '../PageLayout/components/Header/components/DocumentHeaderElements';
-
-const RewardApplicationPage = dynamic(
-  () =>
-    import('../../rewards/components/RewardApplicationPage/RewardApplicationPage').then(
-      (mod) => mod.RewardApplicationPage
-    ),
-  { ssr: false }
-);
 
 interface Props {
   pageId?: string;
@@ -190,13 +181,6 @@ function PageDialogBase(props: Props) {
           page={page}
           savePage={savePage}
           readOnly={readOnlyPage}
-        />
-      )}
-      {contentType === 'application' && applicationContext && (
-        <RewardApplicationPage
-          applicationId={applicationContext.applicationId || null}
-          rewardId={applicationContext.pageId || null}
-          closeDialog={close}
         />
       )}
     </Dialog>
