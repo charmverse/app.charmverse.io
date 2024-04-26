@@ -82,10 +82,6 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
     Object.assign(result, updatedFields);
   }
 
-  if (page?.isLocked) {
-    (block as Pick<Board | Card, 'isLocked'>).isLocked = true;
-  }
-
   return res.status(200).json(result);
 }
 

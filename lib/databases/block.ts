@@ -123,7 +123,7 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
     }
   });
   Object.keys(newBlock).forEach((key) => {
-    if (key !== 'fields' && (oldBlock as any)[key] !== (newBlock as any)[key] && key !== 'isLocked') {
+    if (key !== 'fields' && (oldBlock as any)[key] !== (newBlock as any)[key]) {
       newUpdatedData[key] = (newBlock as any)[key];
     }
   });
@@ -229,8 +229,7 @@ export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
     updatedAt: new Date(block.updatedAt).getTime(),
     title: block.title || '',
     type: block.type as UIBlockWithDetails['type'],
-    fields,
-    isLocked: block.isLocked
+    fields
   };
 }
 

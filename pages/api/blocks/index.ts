@@ -115,7 +115,6 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
   }
 
   const newBlocks = data.map((block) => {
-    delete block.isLocked;
     return {
       ...block,
       fields: block.fields as any,
@@ -297,7 +296,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     },
     select: {
       id: true,
-      isLocked: true
+      isLocked: true,
+      type: true
     }
   });
 
@@ -331,10 +331,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
   );
 
   const updatedBlocks = await prisma.$transaction(
-    blocks.map((block) => {
-      delete block.isLocked;
-
-      return prisma.block.update({
+    blocks.map((block) =>
+      prisma.block.update({
         where: { id: block.id },
         data: {
           ...block,
@@ -342,9 +340,23 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
           updatedAt: new Date(),
           updatedBy: req.session.user.id
         }
-      });
-    })
+      })
+    )
   );
+
+  const mappedBoardPages = pages.reduce((acc, page) => {
+    if (page.type === 'board') {
+      acc[page.id] = !!page.isLocked;
+    }
+    return acc;
+  }, {} as Record<string, boolean>);
+
+  const blocksWithLocked = updatedBlocks.map((block) => {
+    if (block.type === 'board') {
+      (block as BlockWithDetails).isLocked = mappedBoardPages[block.id];
+    }
+    return block;
+  });
 
   relay.broadcast(
     {
@@ -354,7 +366,7 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     updatedBlocks[0].spaceId
   );
 
-  return res.status(200).json(updatedBlocks as BlockWithDetails[]);
+  return res.status(200).json(blocksWithLocked as BlockWithDetails[]);
 }
 
 async function deleteBlocks(req: NextApiRequest, res: NextApiResponse) {

@@ -19,8 +19,6 @@ export function blockToFBBlock(block: BlockWithDetails): UIBlockWithDetails {
       headerImage: replaceS3Domain(fields.headerImage)
     };
   }
-
-  // console.log('RAW BLOCK', block);
   return {
     ...block,
     deletedAt: block.deletedAt ? new Date(block.deletedAt).getTime() : 0,
@@ -28,8 +26,7 @@ export function blockToFBBlock(block: BlockWithDetails): UIBlockWithDetails {
     updatedAt: new Date(block.updatedAt).getTime(),
     title: block.title || '',
     type: block.type as UIBlockWithDetails['type'],
-    fields,
-    isLocked: block.isLocked
+    fields
   };
 }
 
@@ -43,7 +40,6 @@ export function fbBlockToBlock(fbBlock: UIBlockWithDetails): Omit<BlockWithDetai
     fields: fbBlock.fields,
     deletedAt: fbBlock.deletedAt === 0 ? null : fbBlock.deletedAt ? new Date(fbBlock.deletedAt) : null,
     createdAt: !fbBlock.createdAt || fbBlock.createdAt === 0 ? new Date() : new Date(fbBlock.createdAt),
-    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt),
-    isLocked: fbBlock.isLocked
+    updatedAt: !fbBlock.updatedAt || fbBlock.updatedAt === 0 ? new Date() : new Date(fbBlock.updatedAt)
   };
 }
