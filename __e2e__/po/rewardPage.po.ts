@@ -85,16 +85,8 @@ export class RewardPage extends GlobalPage {
     this.saveTokenPaymentMethod = this.customTokenFormContainer.locator('data-test=create-token-payment-method');
   }
 
-  async openApplication({
-    rewardPagePath,
-    spaceDomain,
-    applicationId
-  }: {
-    rewardPagePath: string;
-    spaceDomain: string;
-    applicationId: string;
-  }) {
-    await this.page.goto(`${baseUrl}/${spaceDomain}/${rewardPagePath}?applicationId=${applicationId}`);
+  async openApplication({ spaceDomain, applicationId }: { spaceDomain: string; applicationId: string }) {
+    await this.page.goto(`${baseUrl}/${spaceDomain}/rewards/applications/${applicationId}`);
   }
 
   async selectRewardChain(chainId: number) {

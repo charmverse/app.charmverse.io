@@ -72,7 +72,6 @@ test.describe('Review reward', () => {
 
     await rewardPage.openApplication({
       applicationId: application.id,
-      rewardPagePath: rewardDocument.path,
       spaceDomain: space.domain
     });
 
@@ -101,7 +100,6 @@ test.describe('Review reward', () => {
 
     await rewardPage.openApplication({
       applicationId: applicationFromMember.id,
-      rewardPagePath: rewardDocument.path,
       spaceDomain: space.domain
     });
 
