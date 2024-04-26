@@ -300,14 +300,14 @@ export function NewRewardPage({
               <Button
                 disabled={isSavingReward}
                 loading={isSavingReward && submittedDraft}
-                data-test='create-proposal-button'
+                data-test='draft-reward-button'
                 variant='outlined'
                 onClick={() => saveForm(true)}
               >
                 Save draft
               </Button>
               <Button
-                data-test='publish-new-reward-button'
+                data-test='publish-reward-button'
                 disabled={Boolean(disabledTooltip) || isSavingReward}
                 disabledTooltip={disabledTooltip}
                 onClick={() => saveForm()}

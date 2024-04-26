@@ -69,6 +69,7 @@ export function NewWorkButton({
           variant={variant}
           disabled={!permissions?.work}
           onClick={newApplication}
+          data-test='new-work-button'
         >
           {addIcon ? (
             <AddIcon

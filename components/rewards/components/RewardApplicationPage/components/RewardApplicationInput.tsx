@@ -105,7 +105,7 @@ export function ApplicationInput({
           style={{ margin: 'auto', width: '100%' }}
         >
           <Grid container direction='column' spacing={1}>
-            <Grid item>
+            <Grid item data-test='application-input'>
               <CharmEditor
                 content={application?.messageNodes as PageContent}
                 onContentChange={(content) => {
@@ -145,6 +145,7 @@ export function ApplicationInput({
                     !isValid || (!!currentApplicationMessage && currentApplicationMessage === application?.message)
                   }
                   type='submit'
+                  data-test='submit-application-button'
                   loading={isSaving}
                 >
                   {!application ? ' Apply' : 'Update'}

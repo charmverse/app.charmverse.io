@@ -8,8 +8,10 @@ import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
+import { getAbsolutePath } from 'lib/utils/browser';
 
 type RewardOptions = Pick<ProposalFields, 'rewardsTemplateId' | 'enableRewards'>;
 
@@ -25,7 +27,7 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
     name: template.page.title,
     color: 'default'
   }));
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
+  const { isDirty, clearNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, createReward, isSavingReward } =
     useNewReward();
   // when we are ready to offer this option with a modal inside the page
@@ -35,7 +37,7 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
     color: 'gray',
     variant: 'plain'
   });
-
+  const { space } = useCurrentSpace();
   function onChangeSettings(updates: Partial<RewardOptions>) {
     onChange({ ...value, ...updates });
   }
@@ -82,9 +84,8 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
           options={options}
           onChange={async (rewardsTemplateId: string | string[]) => {
             if (rewardsTemplateId === 'add_new') {
-              openNewPage({
-                type: 'bounty_template'
-              });
+              const absolutePath = space ? getAbsolutePath('/rewards/new?type=bounty_template', space.domain) : '';
+              window.open(absolutePath, '_blank');
             } else if (typeof rewardsTemplateId === 'string') {
               onChangeSettings({ rewardsTemplateId: rewardsTemplateId ?? null });
             }

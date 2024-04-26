@@ -47,7 +47,7 @@ export function RewardStickyFooter({
         <Button
           disabledTooltip={disabledTooltip}
           disabled={!!disabledTooltip}
-          data-test='complete-draft-button'
+          data-test='publish-reward-button'
           loading={isMutating}
           onClick={onClick}
         >

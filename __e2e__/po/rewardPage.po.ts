@@ -50,6 +50,34 @@ export class RewardPage extends GlobalPage {
 
   readonly customTokenName: Locator;
 
+  readonly rewardTemplateSelect: Locator;
+
+  readonly addNewTemplate: Locator;
+
+  readonly documentTitleInput: Locator;
+
+  readonly draftRewardButton: Locator;
+
+  readonly workflowSelect: Locator;
+
+  readonly rewardReviewerSelect: Locator;
+
+  readonly publishRewardButton: Locator;
+
+  readonly newWorkButton: Locator;
+
+  readonly applicationInput: Locator;
+
+  readonly submissionInput: Locator;
+
+  readonly submitApplicationButton: Locator;
+
+  readonly submitSubmissionButton: Locator;
+
+  readonly markPaidButton: Locator;
+
+  readonly confirmMarkPaidButton: Locator;
+
   rootSelector: { locator: Locator['locator'] };
 
   constructor(page: Page, rootSelector?: string) {
@@ -83,6 +111,20 @@ export class RewardPage extends GlobalPage {
     this.customTokenSymbol = this.customTokenFormContainer.locator('data-test=custom-token-symbol >> input');
     this.customTokenName = this.customTokenFormContainer.locator('data-test=custom-token-name >> input');
     this.saveTokenPaymentMethod = this.customTokenFormContainer.locator('data-test=create-token-payment-method');
+    this.rewardTemplateSelect = this.page.locator('data-test=reward-template-select');
+    this.addNewTemplate = this.page.locator('data-test=new-template-button');
+    this.documentTitleInput = this.rootSelector.locator(`data-test=editor-page-title >> textarea`).first();
+    this.draftRewardButton = this.rootSelector.locator('data-test=draft-reward-button');
+    this.workflowSelect = this.rootSelector.locator('data-test=workflow-select');
+    this.rewardReviewerSelect = this.rootSelector.locator('data-test=reward-reviewer-select');
+    this.publishRewardButton = this.rootSelector.locator('data-test=publish-reward-button');
+    this.newWorkButton = this.rootSelector.locator('data-test=new-work-button');
+    this.applicationInput = this.rootSelector.locator('data-test=application-input >> div[contenteditable]').first();
+    this.submissionInput = this.rootSelector.locator('data-test=submission-input >> div[contenteditable]').first();
+    this.submitApplicationButton = this.rootSelector.locator('data-test=submit-application-button');
+    this.submitSubmissionButton = this.rootSelector.locator('data-test=submit-submission-button');
+    this.markPaidButton = this.rootSelector.locator('data-test=mark-paid-button');
+    this.confirmMarkPaidButton = this.rootSelector.locator('data-test=confirm-mark-paid-button');
   }
 
   async openApplication({ spaceDomain, applicationId }: { spaceDomain: string; applicationId: string }) {
@@ -94,7 +136,21 @@ export class RewardPage extends GlobalPage {
     await this.page.keyboard.press('Enter');
   }
 
-  // async selectRewardToken(chainId: number) {
-  //   await this.rewardPropertyToken.locator(`data-test=select-crypto-${token}`).click();
-  // }
+  async selectRewardReviewer(optionId: string) {
+    await this.rewardReviewerSelect.click();
+    await this.page.locator(`data-test=select-option-${optionId}`).click();
+  }
+
+  async selectRewardTemplate(optionId: string) {
+    await this.rewardTemplateSelect.click();
+    await this.page.locator(`data-test=select-option-${optionId}`).click();
+  }
+
+  async writeApplicationInput(text: string) {
+    await this.applicationInput.fill(text);
+  }
+
+  async writeSubmissionInput(text: string) {
+    await this.submissionInput.fill(text);
+  }
 }
