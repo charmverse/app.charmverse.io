@@ -60,11 +60,7 @@ export function ProposalRewards({
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
   const { getFeatureTitle } = useSpaceFeatures();
-  const {
-    updateURLQuery,
-    navigateToSpacePath,
-    router: { query }
-  } = useCharmRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 

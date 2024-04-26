@@ -57,15 +57,15 @@ export function getRewardErrors({
     rewardType
   });
 
-  const isTemplate = page?.type === 'bounty_template';
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
-  if (!isTemplate) {
+  // In proposal template, reviewers are all the reviewers and assignedSubmitters are the authors
+  if (!isProposalTemplate) {
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');
-    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0 && !isProposalTemplate) {
+    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
       errors.push('You need to assign at least one submitter');
     }
   }
