@@ -8,7 +8,6 @@ import { Button } from 'components/common/Button';
 import { AddIcon } from 'components/common/Icons/AddIcon';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useUser } from 'hooks/useUser';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { statusesAcceptingNewWork } from 'lib/rewards/shared';
@@ -32,8 +31,7 @@ export function NewWorkButton({
 }: Props) {
   const rewardId = _rewardId ?? _reward?.id;
   const { user } = useUser();
-  const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-  const isCharmverseSpace = useIsCharmverseSpace();
+  const { navigateToSpacePath } = useCharmRouter();
   const { rewards } = useRewards();
 
   const reward = useMemo(() => {
@@ -50,13 +48,7 @@ export function NewWorkButton({
 
   async function newApplication() {
     if (!reward) return;
-
-    if (isCharmverseSpace) {
-      navigateToSpacePath(`/rewards/applications/new`, { rewardId });
-    } else {
-      // open modal with empty submission
-      updateURLQuery({ id: rewardId, applicationId: 'new' });
-    }
+    navigateToSpacePath(`/rewards/applications/new`, { rewardId });
   }
 
   if (
@@ -77,6 +69,7 @@ export function NewWorkButton({
           variant={variant}
           disabled={!permissions?.work}
           onClick={newApplication}
+          data-test='new-work-button'
         >
           {addIcon ? (
             <AddIcon

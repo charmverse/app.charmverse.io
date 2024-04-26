@@ -1,40 +1,40 @@
-const rewardSubmitEvaluation = {
+export const rewardSubmitEvaluation = {
   id: 'submit',
   title: 'Submit',
   type: 'submit'
 } as const;
 
-const rewardReviewEvaluation = {
+export const rewardReviewEvaluation = {
   id: 'review',
   title: 'Review',
   type: 'review'
 } as const;
 
-const rewardPaymentEvaluation = {
+export const rewardPaymentEvaluation = {
   id: 'payment',
   title: 'Payment',
   type: 'payment'
 } as const;
 
-const rewardApplyEvaluation = {
+export const rewardApplyEvaluation = {
   id: 'apply',
   title: 'Apply',
   type: 'apply'
 } as const;
 
-const rewardApplicationReviewEvaluation = {
+export const rewardApplicationReviewEvaluation = {
   id: 'application_review',
   title: 'Application Review',
   type: 'application_review'
 } as const;
 
-const rewardKycEvaluation = {
+export const rewardKycEvaluation = {
   id: 'kyc',
   title: 'KYC',
   type: 'kyc'
 };
 
-const rewardCredentialEvaluation = {
+export const rewardCredentialEvaluation = {
   id: 'credential',
   title: 'Credentials',
   type: 'credential'
@@ -58,41 +58,49 @@ export type RewardWorkflow = {
   evaluations: RewardEvaluation[];
 };
 
+export const directSubmissionWorkflow = {
+  id: 'direct_submission',
+  title: 'Direct Submission',
+  evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardCredentialEvaluation, rewardPaymentEvaluation]
+} as RewardWorkflow;
+
+export const applicationRequiredWorkflow = {
+  id: 'application_required',
+  title: 'Application Required',
+  evaluations: [
+    rewardApplyEvaluation,
+    rewardApplicationReviewEvaluation,
+    rewardSubmitEvaluation,
+    rewardReviewEvaluation,
+    rewardCredentialEvaluation,
+    rewardPaymentEvaluation
+  ]
+} as RewardWorkflow;
+
+export const assignedWorkflow = {
+  id: 'assigned',
+  title: 'Assigned',
+  evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardCredentialEvaluation, rewardPaymentEvaluation]
+} as RewardWorkflow;
+
+export const assignedKycFlow = {
+  id: 'assigned_kyc',
+  title: 'Assigned & KYC',
+  evaluations: [
+    rewardSubmitEvaluation,
+    rewardReviewEvaluation,
+    rewardCredentialEvaluation,
+    rewardKycEvaluation,
+    rewardPaymentEvaluation
+  ]
+} as RewardWorkflow;
+
 export function getRewardWorkflows(spaceId: string): RewardWorkflow[] {
   const rewardWorkflows = [
-    {
-      id: 'direct_submission',
-      title: 'Direct Submission',
-      evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardCredentialEvaluation, rewardPaymentEvaluation]
-    },
-    {
-      id: 'application_required',
-      title: 'Application Required',
-      evaluations: [
-        rewardApplyEvaluation,
-        rewardApplicationReviewEvaluation,
-        rewardSubmitEvaluation,
-        rewardReviewEvaluation,
-        rewardCredentialEvaluation,
-        rewardPaymentEvaluation
-      ]
-    },
-    {
-      id: 'assigned',
-      title: 'Assigned',
-      evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardCredentialEvaluation, rewardPaymentEvaluation]
-    },
-    {
-      id: 'assigned_kyc',
-      title: 'Assigned & KYC',
-      evaluations: [
-        rewardSubmitEvaluation,
-        rewardReviewEvaluation,
-        rewardCredentialEvaluation,
-        rewardKycEvaluation,
-        rewardPaymentEvaluation
-      ]
-    }
+    directSubmissionWorkflow,
+    applicationRequiredWorkflow,
+    assignedWorkflow,
+    assignedKycFlow
   ] as RewardWorkflow[];
 
   return rewardWorkflows;

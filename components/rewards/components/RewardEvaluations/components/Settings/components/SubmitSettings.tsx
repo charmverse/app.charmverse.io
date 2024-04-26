@@ -50,12 +50,14 @@ export function SubmitStepSettings({
           placeholder='Select due date'
           onAccept={(date) => {
             onChange({
-              dueDate: date?.toJSDate() || undefined
+              dueDate: date?.toJSDate() || undefined,
+              allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
             });
           }}
           onChange={(value) => {
             onChange({
-              dueDate: value?.toJSDate() || undefined
+              dueDate: value?.toJSDate() || undefined,
+              allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
             });
           }}
         />
@@ -77,7 +79,8 @@ export function SubmitStepSettings({
               checked={Boolean(rewardInput?.allowMultipleApplications)}
               onChange={(e) => {
                 onChange({
-                  allowMultipleApplications: e.target.checked
+                  allowMultipleApplications: e.target.checked,
+                  allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
                 });
               }}
               disabled={readOnly}
@@ -115,7 +118,8 @@ export function SubmitStepSettings({
               onChange={(e) => {
                 const value = Number(e.target.value);
                 onChange({
-                  maxSubmissions: value <= 0 ? null : value
+                  maxSubmissions: value <= 0 ? null : value,
+                  allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
                 });
               }}
               variant='outlined'

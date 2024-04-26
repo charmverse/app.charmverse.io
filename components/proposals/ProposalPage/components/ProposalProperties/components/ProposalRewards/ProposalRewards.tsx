@@ -15,7 +15,6 @@ import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -41,8 +40,6 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-const rewardQueryKey = 'rewardId';
-
 export function ProposalRewards({
   pendingRewards,
   readOnly,
@@ -55,7 +52,6 @@ export function ProposalRewards({
   variant,
   isProposalTemplate
 }: Props) {
-  useRewardsNavigation(rewardQueryKey);
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
@@ -132,16 +128,7 @@ export function ProposalRewards({
 
   function openReward(rewardId: string | null) {
     if (!rewardId) return;
-
-    const modalView = !!query.id;
-
-    if (!modalView) {
-      navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
-      return;
-    }
-    const pageIdToOpen = getRewardPage(rewardId)?.id;
-
-    updateURLQuery({ [rewardQueryKey]: pageIdToOpen });
+    navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
   }
 
   function selectTemplate(template: RewardTemplate | null) {

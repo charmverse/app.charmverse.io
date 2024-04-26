@@ -4,11 +4,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardSignupButton } from 'components/rewards/components/RewardProperties/components/RewardSignupButton';
-import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardPropertiesFormV2 } from 'components/rewards/components/RewardProperties/RewardPropertiesFormV2';
 import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
@@ -39,7 +37,6 @@ export function RewardProperties(props: {
     templateId,
     readOnlyTemplate
   } = props;
-  const isCharmverseSpace = useIsCharmverseSpace();
   const { updateReward } = useRewards();
   const [currentReward, setCurrentReward] = useState<RewardsValue | undefined>();
   useEffect(() => {
@@ -89,12 +86,7 @@ export function RewardProperties(props: {
 
   return (
     <Stack flex={1}>
-      {isCharmverseSpace ? (
-        <RewardPropertiesFormV2 {...rewardPropertiesFormProps} />
-      ) : (
-        <RewardPropertiesForm {...rewardPropertiesFormProps} />
-      )}
-
+      <RewardPropertiesFormV2 {...rewardPropertiesFormProps} />
       {!isTemplate && (
         <>
           {!!currentReward?.id && showApplications && initialReward && initialReward?.status !== 'draft' && (

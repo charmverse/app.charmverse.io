@@ -99,7 +99,9 @@ function PaymentStepReviewAction({
       {application.status === 'complete' && rewardType === 'custom' && reviewPermission && (
         <Stack justifyContent='flex-end' flexDirection='row'>
           <Box width='fit-content'>
-            <Button onClick={open}>Mark as paid</Button>
+            <Button data-test='mark-paid-button' onClick={open}>
+              Mark as paid
+            </Button>
           </Box>
         </Stack>
       )}
@@ -129,7 +131,7 @@ function PaymentStepReviewAction({
             Please confirm you want to mark this reward as paid
           </Typography>
           <Box display='flex' gap={2} mt={3}>
-            <Button color='success' onClick={markAsPaid}>
+            <Button color='success' onClick={markAsPaid} data-test='confirm-mark-paid-button'>
               Confirm
             </Button>
 

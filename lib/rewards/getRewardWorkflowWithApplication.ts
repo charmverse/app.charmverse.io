@@ -2,14 +2,14 @@ import type { RewardEvaluation, RewardWorkflow } from './getRewardWorkflows';
 import type { ApplicationWithTransactions } from './interfaces';
 
 export function getRewardWorkflowWithApplication({
-  application,
+  applicationStatus,
   workflow,
   hasCredentials,
   hasIssuableOnchainCredentials,
   kycStatus
 }: {
   workflow: RewardWorkflow;
-  application?: ApplicationWithTransactions;
+  applicationStatus?: ApplicationWithTransactions['status'];
   hasCredentials: boolean;
   hasIssuableOnchainCredentials?: boolean;
   kycStatus?: boolean | null;
@@ -22,7 +22,7 @@ export function getRewardWorkflowWithApplication({
     return true;
   });
 
-  if (!application) {
+  if (!applicationStatus) {
     return {
       ...workflow,
       evaluations: evaluations.map((evaluation) => {
@@ -34,7 +34,6 @@ export function getRewardWorkflowWithApplication({
     };
   }
 
-  const applicationStatus = application.status;
   switch (applicationStatus) {
     case 'applied': {
       const applyStepIndex = evaluations.findIndex((evaluation) => evaluation.type === 'apply');

@@ -30,6 +30,7 @@ import { EvaluationStepSettingsModal } from './components/EvaluationStepSettings
 import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
 import { RewardCredentials } from './components/RewardCredentials';
+import { SubmitStepReview } from './components/SubmitStepReview';
 
 export type Props = Omit<
   EvaluationSettingsProps,
@@ -40,6 +41,7 @@ export type Props = Omit<
   refreshApplication?: VoidFunction;
   page: PageWithContent;
   refreshReward?: VoidFunction;
+  isNewApplication?: boolean;
 };
 
 export function EvaluationsReview({
@@ -50,12 +52,9 @@ export function EvaluationsReview({
   readOnly,
   refreshApplication,
   page,
-  refreshReward
+  refreshReward,
+  isNewApplication
 }: Props) {
-  const router = useRouter();
-
-  const isNewApplication =
-    router.pathname === '/[domain]/rewards/applications/[applicationId]' && router.query.applicationId === 'new';
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
@@ -83,7 +82,7 @@ export function EvaluationsReview({
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
       ? getRewardWorkflowWithApplication({
-          application,
+          applicationStatus: application?.status,
           workflow,
           hasCredentials: reward.selectedCredentialTemplates.length > 0,
           hasIssuableOnchainCredentials,
@@ -191,7 +190,7 @@ export function EvaluationsReview({
                 userId={application?.createdBy}
               />
             ) : evaluation.type === 'submit' ? (
-              <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
+              <SubmitStepReview reward={reward} />
             ) : evaluation.type === 'credential' ? (
               <RewardCredentials
                 selectedCredentialTemplates={reward.selectedCredentialTemplates}
