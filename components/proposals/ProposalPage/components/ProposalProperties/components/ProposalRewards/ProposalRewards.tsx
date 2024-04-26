@@ -177,12 +177,7 @@ export function ProposalRewards({
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
                       <RewardAmount
-                        reward={{
-                          chainId: reward.chainId || null,
-                          customReward: reward.customReward || null,
-                          rewardAmount: reward.rewardAmount || null,
-                          rewardToken: reward.rewardToken || null
-                        }}
+                        reward={reward}
                         truncate={true}
                         truncatePrecision={2}
                         typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
@@ -228,12 +223,7 @@ export function ProposalRewards({
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
                             <RewardAmount
-                              reward={{
-                                chainId: reward.chainId || null,
-                                customReward: reward.customReward || null,
-                                rewardAmount: reward.rewardAmount || null,
-                                rewardToken: reward.rewardToken || null
-                              }}
+                              reward={reward}
                               truncate={true}
                               truncatePrecision={2}
                               typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}

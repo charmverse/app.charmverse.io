@@ -84,13 +84,15 @@ export function PaymentStepSettings({
           <Box width='fit-content'>
             <RewardTokenProperty
               onChange={onRewardTokenUpdate}
+              requireTokenAmount={!isTemplate}
               currentReward={
                 rewardInput
                   ? {
                       chainId: rewardInput.chainId ?? null,
                       customReward: rewardInput.customReward ?? null,
                       rewardAmount: rewardInput.rewardAmount ?? null,
-                      rewardToken: rewardInput.rewardToken ?? null
+                      rewardToken: rewardInput.rewardToken ?? null,
+                      rewardType
                     }
                   : null
               }

@@ -66,7 +66,7 @@ export function RewardAmount({
 }: {
   noRewardText?: string;
   fullForm?: boolean;
-  reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'>>;
+  reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'rewardType'>>;
   truncate?: boolean;
   truncatePrecision?: number;
   typographyProps?: TypographyProps;
@@ -84,11 +84,11 @@ export function RewardAmount({
     );
   }
 
-  if (!isTruthy(reward.rewardAmount) || !isTruthy(reward.rewardToken) || !isTruthy(reward.chainId)) {
+  if (reward.rewardType === 'none' || !isTruthy(reward.rewardToken) || !isTruthy(reward.chainId)) {
     return noRewardText ? <Typography>{noRewardText}</Typography> : null;
   }
 
-  const rewardAmount = reward.rewardAmount;
+  const rewardAmount = reward.rewardAmount; // amount is optional for reward templates
   const rewardToken = reward.rewardToken;
   const chainId = reward.chainId;
 
@@ -98,9 +98,12 @@ export function RewardAmount({
     symbolOrAddress: rewardToken
   });
 
-  const formattedAmount = Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(rewardAmount);
+  const formattedAmount = rewardAmount
+    ? Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(rewardAmount)
+    : '';
 
   const truncatedAmount = () => {
+    if (!rewardAmount && typeof rewardAmount !== 'number') return '';
     try {
       return millify(rewardAmount, { precision: truncatePrecision });
     } catch (error) {

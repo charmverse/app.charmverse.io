@@ -262,6 +262,7 @@ function PropertyValueElement(props: Props) {
             rewardToken: symbolOrAddress
           }) !== 'token'
         }
+        requireTokenAmount
         currentReward={{
           chainId: Number(chainId),
           rewardAmount,
