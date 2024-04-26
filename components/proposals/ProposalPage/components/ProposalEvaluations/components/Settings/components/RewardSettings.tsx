@@ -84,7 +84,7 @@ export function RewardSettings({ value, onChange }: RewardSettingsProps) {
           options={options}
           onChange={async (rewardsTemplateId: string | string[]) => {
             if (rewardsTemplateId === 'add_new') {
-              const absolutePath = space ? getAbsolutePath('/rewards/new?type=bounty_template', space.domain) : '';
+              const absolutePath = space ? getAbsolutePath('/rewards/new?type=template', space.domain) : '';
               window.open(absolutePath, '_blank');
             } else if (typeof rewardsTemplateId === 'string') {
               onChangeSettings({ rewardsTemplateId: rewardsTemplateId ?? null });

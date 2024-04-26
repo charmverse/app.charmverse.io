@@ -65,7 +65,7 @@ export function NewRewardButton({ showPage }: { showPage: (pageId: string) => vo
   }
 
   function createTemplate() {
-    navigateToSpacePath('/rewards/new', { type: 'bounty_template' });
+    navigateToSpacePath('/rewards/new', { type: 'template' });
   }
 
   function editTemplate(templateId: string) {
