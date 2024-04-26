@@ -19,7 +19,6 @@ import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/i
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { getAbsolutePath } from 'lib/utils/browser';
 
-import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
@@ -27,6 +26,7 @@ import { EvaluationStepSettingsModal } from './components/EvaluationStepSettings
 import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
 import { RewardCredentials } from './components/RewardCredentials';
+import { SubmitStepReview } from './components/SubmitStepReview';
 
 export type Props = Omit<
   EvaluationSettingsProps,
@@ -164,7 +164,7 @@ export function EvaluationsReview({
                 refreshApplication={refreshApplication}
               />
             ) : evaluation.type === 'submit' ? (
-              <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
+              <SubmitStepReview reward={reward} />
             ) : evaluation.type === 'credential' ? (
               <RewardCredentials
                 selectedCredentialTemplates={reward.selectedCredentialTemplates}
