@@ -38,7 +38,7 @@ export function RewardEvaluations({
       <EvaluationsSettings
         rewardInput={rewardInput}
         readOnly={readOnly}
-        requireWorkflowChangeConfirmation
+        requireWorkflowChangeConfirmation={!!reward}
         expanded={expanded}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
