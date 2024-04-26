@@ -13,7 +13,7 @@ export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkf
   refreshApplication?: VoidFunction;
   isDraft?: boolean;
   page?: PageWithContent;
-  refreshPage?: VoidFunction;
+  refreshReward?: VoidFunction;
 };
 
 export function RewardEvaluations({
@@ -29,7 +29,7 @@ export function RewardEvaluations({
   isTemplate,
   refreshApplication,
   isDraft,
-  refreshPage
+  refreshReward
 }: RewardEvaluationsProps) {
   if (isDraft || isUnpublishedReward || isTemplate) {
     return (
@@ -52,7 +52,7 @@ export function RewardEvaluations({
         reward={reward}
         onChangeReward={onChangeReward}
         refreshApplication={refreshApplication}
-        refreshPage={refreshPage}
+        refreshReward={refreshReward}
       />
     );
   }
