@@ -65,7 +65,7 @@ export function EvaluationsReview({
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
       ? getRewardWorkflowWithApplication({
-          application,
+          applicationStatus: application?.status,
           workflow,
           hasCredentials: reward.selectedCredentialTemplates.length > 0,
           hasIssuableOnchainCredentials
