@@ -21,7 +21,6 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -104,9 +103,7 @@ export function ProposalRewards({
       : assignedSubmitters;
 
     const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
+
     setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
@@ -133,8 +130,7 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      const rewardType = getRewardType(template.reward);
-      setRewardValues({ ...template.reward, rewardType });
+      setRewardValues({ ...template.reward });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,

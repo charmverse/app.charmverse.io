@@ -81,10 +81,7 @@ export function getEvaluationFormError(evaluation: RewardEvaluation, reward: Rew
     case 'review':
       return reward.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'payment':
-      return getRewardPrizeError({
-        ...reward,
-        rewardType: getRewardType(reward)
-      }).join(', ');
+      return getRewardPrizeError(reward).join(', ');
     default:
       return false;
   }

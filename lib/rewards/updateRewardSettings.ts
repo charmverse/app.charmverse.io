@@ -14,6 +14,7 @@ export type UpdateableRewardFields = Partial<
     | 'chainId'
     | 'rewardAmount'
     | 'rewardToken'
+    | 'rewardType'
     | 'approveSubmitters'
     | 'allowMultipleApplications'
     | 'maxSubmissions'
@@ -26,7 +27,6 @@ export type UpdateableRewardFields = Partial<
   reviewers?: RewardReviewer[];
   allowedSubmitterRoles?: string[] | null;
   assignedSubmitters?: string[] | null;
-  rewardType?: RewardType;
 };
 
 export type RewardUpdate = {

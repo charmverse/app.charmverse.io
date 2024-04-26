@@ -42,8 +42,7 @@ export function RewardProperties(props: {
   useEffect(() => {
     if (initialReward) {
       setCurrentReward({
-        ...initialReward,
-        rewardType: getRewardType(initialReward)
+        ...initialReward
       });
     }
   }, [initialReward]);
