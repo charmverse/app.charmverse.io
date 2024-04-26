@@ -37,6 +37,7 @@ export type Props = Omit<
   refreshApplication?: VoidFunction;
   page: PageWithContent;
   refreshReward?: VoidFunction;
+  isNewApplication?: boolean;
 };
 
 export function EvaluationsReview({
@@ -47,12 +48,9 @@ export function EvaluationsReview({
   readOnly,
   refreshApplication,
   page,
-  refreshReward
+  refreshReward,
+  isNewApplication
 }: Props) {
-  const router = useRouter();
-
-  const isNewApplication =
-    router.pathname === '/[domain]/rewards/applications/[applicationId]' && router.query.applicationId === 'new';
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);

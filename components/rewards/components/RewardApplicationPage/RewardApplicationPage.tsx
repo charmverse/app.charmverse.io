@@ -153,7 +153,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
             overflow: 'hidden'
           }}
         >
-          <Box mt={10} display='flex' flexDirection='column' height='100%'>
+          <Box mt={6} display='flex' flexDirection='column' height='100%'>
             <Box
               className='document-print-container'
               display='flex'
@@ -295,6 +295,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
                     )}
                     {currentTab === 1 && (
                       <RewardEvaluations
+                        isNewApplication={isNewApplication}
                         page={page}
                         readOnly={!page?.permissionFlags?.edit_content}
                         application={application}
@@ -311,6 +312,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
           </Box>
         </DocumentColumn>
         <RewardSidebar
+          isNewApplication={isNewApplication}
           sidebarProps={{
             isOpen: internalSidebarView === 'reward_evaluation',
             closeSidebar: () => setActiveView(null),

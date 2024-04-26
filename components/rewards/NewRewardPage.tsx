@@ -1,7 +1,7 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import type { Theme } from '@mui/material';
-import { Box, Divider, useMediaQuery } from '@mui/material';
+import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
@@ -27,6 +27,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
+import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
@@ -39,6 +40,7 @@ import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import { fontClassName } from 'theme/fonts';
 
+import { RewardEvaluations } from './components/RewardEvaluations/RewardEvaluations';
 import { CustomPropertiesAdapter } from './components/RewardProperties/CustomPropertiesAdapter';
 import { useNewReward } from './hooks/useNewReward';
 
@@ -81,6 +83,8 @@ export function NewRewardPage({
   const canCreateReward = !spacePermissions || !!spacePermissions[0]?.createBounty;
   const isAdmin = useIsAdmin();
   const rewardPageType = isTemplate ? 'bounty_template' : 'bounty';
+  const [currentTab, setCurrentTab] = useState<number>(0);
+  const isMdScreen = useMdScreen();
 
   const disabledTooltip = useMemo(() => {
     const errors = getRewardErrors({
@@ -240,59 +244,95 @@ export function NewRewardPage({
                     focusDocumentEditor={focusDocumentEditor}
                     placeholder='Title (required)'
                   />
-                  <div className='focalboard-body font-family-default'>
-                    <div className='CardDetail content'>
-                      {!isTemplate && (
-                        <>
-                          <Box className='octo-propertyrow'>
-                            <PropertyLabel readOnly highlighted>
-                              Template
-                            </PropertyLabel>
-                            <Box display='flex' flex={1}>
-                              <TemplateSelect
-                                options={templatePageOptions}
-                                value={rewardTemplateId}
-                                onChange={(page) => {
-                                  if (page === null) {
-                                    setRewardTemplateId(null);
-                                    // if user has not updated the content, then just overwrite everything
-                                  } else if (pageData.contentText?.length === 0) {
-                                    setRewardTemplateId(page.id);
-                                  } else {
-                                    setSelectedRewardTemplateId(page.id);
-                                  }
-                                }}
-                              />
-                            </Box>
-                          </Box>
-                          <Divider />
-                        </>
-                      )}
-                      <CustomPropertiesAdapter
-                        reward={{
-                          fields: rewardValues.fields as RewardFields
+                  {!isMdScreen && (
+                    <Tabs
+                      sx={{
+                        mb: 1
+                      }}
+                      indicatorColor='primary'
+                      value={currentTab}
+                    >
+                      <Tab label='Document' value={0} onClick={() => setCurrentTab(0)} />
+                      <Tab
+                        sx={{
+                          px: 1.5,
+                          fontSize: 14,
+                          minHeight: 0
                         }}
-                        onChange={(properties: RewardPropertiesField) => {
-                          setRewardValues({
-                            fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
-                          });
-                        }}
+                        label='Evaluation'
+                        value={1}
+                        onClick={() => setCurrentTab(1)}
                       />
-                    </div>
-                  </div>
-                  <CharmEditor
-                    placeholderText={`Describe the reward. Type '/' to see the list of available commands`}
-                    content={pageData.content as PageContent}
-                    autoFocus={false}
-                    enableVoting={false}
-                    containerWidth={containerWidth}
-                    pageType={rewardPageType}
-                    disableNestedPages
-                    onContentChange={applyRewardContent}
-                    focusOnInit
-                    isContentControlled
-                    key={rewardTemplateId}
-                  />
+                    </Tabs>
+                  )}
+                  {currentTab === 0 && (
+                    <>
+                      <div className='focalboard-body font-family-default'>
+                        <div className='CardDetail content'>
+                          {!isTemplate && (
+                            <>
+                              <Box className='octo-propertyrow'>
+                                <PropertyLabel readOnly highlighted>
+                                  Template
+                                </PropertyLabel>
+                                <Box display='flex' flex={1}>
+                                  <TemplateSelect
+                                    options={templatePageOptions}
+                                    value={rewardTemplateId}
+                                    onChange={(page) => {
+                                      if (page === null) {
+                                        setRewardTemplateId(null);
+                                        // if user has not updated the content, then just overwrite everything
+                                      } else if (pageData.contentText?.length === 0) {
+                                        setRewardTemplateId(page.id);
+                                      } else {
+                                        setSelectedRewardTemplateId(page.id);
+                                      }
+                                    }}
+                                  />
+                                </Box>
+                              </Box>
+                              <Divider />
+                            </>
+                          )}
+                          <CustomPropertiesAdapter
+                            reward={{
+                              fields: rewardValues.fields as RewardFields
+                            }}
+                            onChange={(properties: RewardPropertiesField) => {
+                              setRewardValues({
+                                fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
+                      <CharmEditor
+                        placeholderText={`Describe the reward. Type '/' to see the list of available commands`}
+                        content={pageData.content as PageContent}
+                        autoFocus={false}
+                        enableVoting={false}
+                        containerWidth={containerWidth}
+                        pageType={rewardPageType}
+                        disableNestedPages
+                        onContentChange={applyRewardContent}
+                        focusOnInit
+                        isContentControlled
+                        key={rewardTemplateId}
+                      />
+                    </>
+                  )}
+                  {currentTab === 1 && (
+                    <RewardEvaluations
+                      onChangeWorkflow={applyWorkflow}
+                      readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+                      isUnpublishedReward
+                      rewardInput={rewardValues}
+                      onChangeReward={(updates) => {
+                        setRewardValues(updates);
+                      }}
+                    />
+                  )}
                 </Box>
               </StyledContainer>
             </Box>
