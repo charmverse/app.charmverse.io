@@ -5,12 +5,14 @@ export function getRewardWorkflowWithApplication({
   application,
   workflow,
   hasCredentials,
-  hasIssuableOnchainCredentials
+  hasIssuableOnchainCredentials,
+  kycStatus
 }: {
   workflow: RewardWorkflow;
   application?: ApplicationWithTransactions;
   hasCredentials: boolean;
   hasIssuableOnchainCredentials?: boolean;
+  kycStatus?: boolean | null;
 }): RewardWorkflow {
   const evaluations: RewardEvaluation[] = workflow.evaluations.filter((evaluation) => {
     if (evaluation.type === 'credential' && !hasCredentials) {
@@ -160,6 +162,19 @@ export function getRewardWorkflowWithApplication({
       return {
         ...workflow,
         evaluations: evaluations.map((evaluation, index) => {
+          if (evaluation.type === 'kyc') {
+            if (kycStatus === null) {
+              return {
+                ...evaluation,
+                result: null
+              };
+            }
+
+            return {
+              ...evaluation,
+              result: kycStatus ? 'pass' : 'fail'
+            };
+          }
           if (evaluation.type === 'payment') {
             return {
               ...evaluation,

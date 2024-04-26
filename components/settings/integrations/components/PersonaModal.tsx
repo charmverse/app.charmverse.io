@@ -2,7 +2,8 @@ import Chip from '@mui/material/Chip';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 
-import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/spaces';
+import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/kyc';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
 
@@ -19,9 +20,9 @@ const mapPersonaStatus = {
   declined: 'Declined'
 };
 
-export function PersonaModal({ spaceId }: { spaceId: string }) {
+export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; userId?: string; isAdmin?: boolean }) {
   const { user } = useUser();
-  const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId);
+  const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId, userId);
   const {
     data: personaInquiry,
     trigger: initPersonaInquiry,
@@ -45,7 +46,7 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           variant='outlined'
           label={`Status: ${mapPersonaStatus[personaUserKyc.status] || 'Unknown'}`}
         />
-      ) : (
+      ) : isAdmin ? (
         <Chip
           onClick={onConfirm}
           clickable={true}
@@ -56,6 +57,14 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           label='Test KYC'
           data-test='start-persona-kyc'
         />
+      ) : (
+        <Button
+          onClick={onConfirm}
+          disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
+          data-test='start-persona-kyc'
+        >
+          Start KYC
+        </Button>
       )}
       {personaInquiry?.inquiryId && (
         <Modal

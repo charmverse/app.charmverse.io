@@ -28,6 +28,12 @@ const rewardApplicationReviewEvaluation = {
   type: 'application_review'
 } as const;
 
+const rewardKycEvaluation = {
+  id: 'kyc',
+  title: 'KYC',
+  type: 'kyc'
+};
+
 const rewardCredentialEvaluation = {
   id: 'credential',
   title: 'Credentials',
@@ -41,12 +47,13 @@ export type RewardEvaluation = (
   | typeof rewardApplyEvaluation
   | typeof rewardApplicationReviewEvaluation
   | typeof rewardCredentialEvaluation
+  | typeof rewardKycEvaluation
 ) & {
   result?: 'pass' | 'fail' | null;
 };
 
 export type RewardWorkflow = {
-  id: 'direct_submission' | 'application_required' | 'assigned';
+  id: 'direct_submission' | 'application_required' | 'assigned' | 'assigned_kyc';
   title: string;
   evaluations: RewardEvaluation[];
 };
@@ -74,6 +81,17 @@ export function getRewardWorkflows(spaceId: string): RewardWorkflow[] {
       id: 'assigned',
       title: 'Assigned',
       evaluations: [rewardSubmitEvaluation, rewardReviewEvaluation, rewardCredentialEvaluation, rewardPaymentEvaluation]
+    },
+    {
+      id: 'assigned_kyc',
+      title: 'Assigned & KYC',
+      evaluations: [
+        rewardSubmitEvaluation,
+        rewardReviewEvaluation,
+        rewardCredentialEvaluation,
+        rewardKycEvaluation,
+        rewardPaymentEvaluation
+      ]
     }
   ] as RewardWorkflow[];
 

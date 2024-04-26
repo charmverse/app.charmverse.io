@@ -1,11 +1,13 @@
 import type { Space, KycOption } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { useGetKycCredentials, useUpdateSpace, useUpdateKycCredentials } from 'charmClient/hooks/spaces';
+import { useGetKycCredentials, useUpdateKycCredentials } from 'charmClient/hooks/kyc';
+import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { KycCredentials } from 'lib/kyc/getKycCredentials';
@@ -111,6 +113,9 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+      <Typography variant='body2' mb={2}>
+        {isAdmin ? 'Choose your provider' : 'Only admins can configure KYC'}
+      </Typography>
       <Grid container spacing={3} direction='column'>
         {kycCredentials && (
           <Grid item>
@@ -119,7 +124,7 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
         )}
         {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
           <Grid item>
-            <SynapsModal spaceId={space.id} />
+            <SynapsModal spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
         )}
         {isAdmin &&
