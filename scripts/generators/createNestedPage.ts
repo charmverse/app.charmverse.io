@@ -24,7 +24,7 @@ async function search() {
   // console.log(JSON.stringify(page.content!.content, null, 2));
   // return;
   const existingPages = await prisma.page.findMany({ select: { id: true } });
-  const childPageIds = (page.content!.content as any[])
+  const childPageIds = ((page.content as any)!.content as any[])
     .map((node) => (node.type === 'page' ? node.attrs.id : getNodeIds(node)))
     .flat()
     .filter((id) => !!id);
