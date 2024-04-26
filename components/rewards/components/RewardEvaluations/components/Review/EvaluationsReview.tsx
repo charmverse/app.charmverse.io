@@ -1,5 +1,6 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
+import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
@@ -48,6 +49,10 @@ export function EvaluationsReview({
   page,
   refreshPage
 }: Props) {
+  const router = useRouter();
+
+  const isNewApplication =
+    router.pathname === '/[domain]/rewards/applications/[applicationId]' && router.query.applicationId === 'new';
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
@@ -76,7 +81,7 @@ export function EvaluationsReview({
   }, [workflow, application, hasIssuableOnchainCredentials, reward.selectedCredentialTemplates.length]);
 
   const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
-    application ? currentEvaluation?.id : undefined
+    application || isNewApplication ? currentEvaluation?.id : undefined
   );
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
@@ -85,10 +90,10 @@ export function EvaluationsReview({
   const shareText = `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: `;
 
   useEffect(() => {
-    if (currentEvaluation && application) {
+    if (currentEvaluation && (application || isNewApplication)) {
       setExpandedEvaluationId(currentEvaluation.id);
     }
-  }, [currentEvaluation, application]);
+  }, [currentEvaluation, application, isNewApplication]);
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));
@@ -126,7 +131,7 @@ export function EvaluationsReview({
         </Tooltip>
       </Collapse>
       {updatedWorkflow?.evaluations.map((evaluation, index) => {
-        const isCurrent = application ? currentEvaluation?.id === evaluation.id : false;
+        const isCurrent = application || isNewApplication ? currentEvaluation?.id === evaluation.id : false;
         return (
           <EvaluationStepRow
             key={evaluation.id}
