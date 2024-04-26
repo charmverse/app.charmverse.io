@@ -12,6 +12,7 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { CharmEditor } from 'components/common/CharmEditor';
 import { useUser } from 'hooks/useUser';
+import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { RewardApplicationStatusChip, applicationStatuses } from '../../RewardApplicationStatusChip';
 
@@ -106,12 +107,12 @@ export function ApplicationInput({
           <Grid container direction='column' spacing={1}>
             <Grid item>
               <CharmEditor
-                content={application?.messageNodes ? JSON.parse(application?.messageNodes) : null}
+                content={application?.messageNodes as PageContent}
                 onContentChange={(content) => {
                   setValue('message', content.rawText, {
                     shouldValidate: true
                   });
-                  setValue('messageNodes', JSON.stringify(content.doc) as any as string, {
+                  setValue('messageNodes', content.doc as any, {
                     shouldValidate: true
                   });
                 }}

@@ -25,7 +25,7 @@ async function convertCharmEditorApplicationInput() {
             id: application.id
           },
           data: {
-            messageNodes: JSON.stringify({
+            messageNodes: {
               type: 'doc',
               content: [
                 {
@@ -38,7 +38,7 @@ async function convertCharmEditorApplicationInput() {
                   ]
                 }
               ]
-            })
+            }
           }
         })
       }

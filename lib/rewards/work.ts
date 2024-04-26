@@ -85,7 +85,7 @@ export async function work({
     submissionNodes: submissionNodesAsString,
     rewardInfo,
     message,
-    messageNodes,
+    messageNodes: messageNodes as Prisma.JsonObject,
     walletAddress
   };
 
