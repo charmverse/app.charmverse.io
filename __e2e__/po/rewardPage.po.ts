@@ -80,7 +80,12 @@ export class RewardPage extends GlobalPage {
 
   rootSelector: { locator: Locator['locator'] };
 
-  constructor(page: Page, rootSelector?: string) {
+  constructor(
+    page: Page,
+    rootSelector?: string,
+    public rewardTypeSelect = page.locator('data-test=reward-type-select'),
+    public customRewardInput = page.locator('data-test=custom-reward-input >> input')
+  ) {
     super(page);
     this.rootSelector = rootSelector ? this.page.locator(rootSelector) : this.page;
     this.rewardApplicationApproveButton = this.rootSelector.locator('data-test=approve-reward-button');
@@ -136,14 +141,19 @@ export class RewardPage extends GlobalPage {
     await this.page.keyboard.press('Enter');
   }
 
+  async selectRewardType(rewardType: string) {
+    await this.rewardTypeSelect.click();
+    await this.getSelectOption(rewardType).click();
+  }
+
   async selectRewardReviewer(optionId: string) {
     await this.rewardReviewerSelect.click();
-    await this.page.locator(`data-test=select-option-${optionId}`).click();
+    await this.getSelectOption(optionId).click();
   }
 
   async selectRewardTemplate(optionId: string) {
     await this.rewardTemplateSelect.click();
-    await this.page.locator(`data-test=select-option-${optionId}`).click();
+    await this.getSelectOption(optionId).click();
   }
 
   async writeApplicationInput(text: string) {
@@ -152,5 +162,13 @@ export class RewardPage extends GlobalPage {
 
   async writeSubmissionInput(text: string) {
     await this.submissionInput.fill(text);
+  }
+
+  async writeCustomRewardInput(text: string) {
+    await this.customRewardInput.fill(text);
+  }
+
+  getSelectOption(optionId: string) {
+    return this.page.locator(`data-test=select-option-${optionId}`);
   }
 }

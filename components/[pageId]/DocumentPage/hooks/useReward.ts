@@ -7,6 +7,7 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export function useReward({ rewardId }: { rewardId: MaybeString }) {
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId });
+
   const { user } = useUser();
 
   async function updateReward(updateContent: UpdateableRewardFields) {

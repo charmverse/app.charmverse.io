@@ -23,8 +23,8 @@ export function PaymentStepSettings({
   readOnly,
   onChange,
   rewardStatus,
-  requireTokenAmount
-}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'requireTokenAmount'>) {
+  isTemplate
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate'>) {
   const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
@@ -109,6 +109,7 @@ export function PaymentStepSettings({
           </FormLabel>
           <Box width='fit-content'>
             <StyledPropertyTextInput
+              data-test='custom-reward-input'
               onChange={(e) => {
                 onChange({
                   customReward: e.target.value.trim()

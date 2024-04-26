@@ -36,13 +36,11 @@ export function RewardEvaluations({
   refreshReward,
   isNewApplication
 }: RewardEvaluationsProps) {
-  const requireTokenAmount = !isTemplate; // always require token amount unless it is a template
-
   if (isDraft || isUnpublishedReward || isTemplate) {
     return (
       <EvaluationsSettings
         rewardInput={rewardInput}
-        requireTokenAmount={requireTokenAmount}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
         requireWorkflowChangeConfirmation
         expanded={expanded}
@@ -56,7 +54,7 @@ export function RewardEvaluations({
         page={page}
         application={application}
         expanded={expanded}
-        requireTokenAmount={requireTokenAmount}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
         reward={reward}
         onChangeReward={onChangeReward}

@@ -147,7 +147,7 @@ export function PaymentStepReview({
   application,
   refreshApplication,
   hidePaymentButton
-}: Omit<PaymentStepReviewActionProps, 'application'> & {
+}: Pick<PaymentStepReviewActionProps, 'reward' | 'refreshApplication'> & {
   application?: ApplicationWithTransactions;
   hidePaymentButton?: boolean;
 }) {
