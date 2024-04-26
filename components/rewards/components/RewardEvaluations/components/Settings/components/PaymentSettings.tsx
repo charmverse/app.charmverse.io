@@ -108,6 +108,7 @@ export function PaymentStepSettings({
           </FormLabel>
           <Box width='fit-content'>
             <StyledPropertyTextInput
+              data-test='custom-reward-input'
               onChange={(e) => {
                 onChange({
                   customReward: e.target.value.trim()

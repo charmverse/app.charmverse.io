@@ -102,6 +102,7 @@ export async function createReward({
     maxSubmissions: isAssignedReward ? 1 : maxSubmissions,
     rewardAmount,
     rewardToken,
+    rewardType,
     customReward,
     selectedCredentialTemplates,
     allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications,
