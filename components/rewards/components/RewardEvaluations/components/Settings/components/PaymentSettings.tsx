@@ -24,7 +24,7 @@ export function PaymentStepSettings({
   onChange,
   rewardStatus
 }: Omit<EvaluationStepSettingsProps, 'evaluation'>) {
-  const rewardType = rewardInput ? rewardInput?.rewardType ?? getRewardType(rewardInput) : 'token';
+  const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
 

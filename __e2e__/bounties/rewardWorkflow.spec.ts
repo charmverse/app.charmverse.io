@@ -61,12 +61,14 @@ test.describe.serial('Review reward applications', () => {
       page: Page;
     };
 
+    // set reward type (Maybe todo: set it in the UI?)
     await prisma.bounty.update({
       where: {
         id: reward.id
       },
       data: {
-        customReward: 'Custom Reward'
+        customReward: 'Custom Reward',
+        rewardType: 'custom'
       }
     });
   });
