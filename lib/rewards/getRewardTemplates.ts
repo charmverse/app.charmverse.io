@@ -17,14 +17,13 @@ export type RewardTemplate = {
 };
 
 export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<RewardTemplate[]> {
-  const { spaceRole, isAdmin } = await hasAccessToSpace({
-    spaceId,
-    userId
+  const isAdmin = await prisma.spaceRole.findFirst({
+    where: {
+      userId,
+      spaceId,
+      isAdmin: true
+    }
   });
-
-  if (!spaceRole) {
-    return [];
-  }
 
   const bountyWhereInput: Prisma.BountyWhereInput = {
     spaceId,

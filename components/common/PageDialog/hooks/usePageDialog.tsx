@@ -8,7 +8,6 @@ export interface PageDialogContext {
   hideToolsMenu?: boolean;
   onClose?: () => void;
   applicationId?: string;
-  isNewApplication?: boolean;
 }
 
 interface Context {

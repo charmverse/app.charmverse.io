@@ -117,7 +117,7 @@ export function RewardSubmissionInput({
       </Box>
       <form onSubmit={handleSubmit(onSubmit)} style={{ margin: 'auto', width: '100%' }}>
         <Grid container direction='column' spacing={2}>
-          <Grid item>
+          <Grid item data-test='submission-input'>
             <CharmEditor
               content={submission?.submissionNodes ? JSON.parse(submission?.submissionNodes) : null}
               onContentChange={(content) => {
@@ -188,6 +188,7 @@ export function RewardSubmissionInput({
                   !isEditorTouched ||
                   checkIsContentEmpty(formValues.submissionNodes as unknown as PageContent)
                 }
+                data-test='submit-submission-button'
                 type='submit'
                 loading={isSaving}
               >

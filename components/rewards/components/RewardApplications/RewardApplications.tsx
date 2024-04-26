@@ -6,7 +6,6 @@ import { useMemo } from 'react';
 import UserDisplay from 'components/common/UserDisplay';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
 import { submissionStatuses } from 'lib/rewards/constants';
@@ -52,7 +51,6 @@ function ApplicationRows({
   applications: ApplicationMeta[];
 }) {
   const { navigateToSpacePath } = useCharmRouter();
-  const isCharmverseSpace = useIsCharmverseSpace();
 
   const { getMemberById } = useMembers();
 
@@ -105,11 +103,7 @@ function ApplicationRows({
                   <IconButton
                     size='small'
                     onClick={() => {
-                      if (isCharmverseSpace) {
-                        navigateToSpacePath(`/rewards/applications/${application.id}`);
-                      } else {
-                        openApplication(application.id);
-                      }
+                      navigateToSpacePath(`/rewards/applications/${application.id}`);
                     }}
                   >
                     <ArrowForwardIosIcon fontSize='small' color='secondary' />
