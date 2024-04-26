@@ -6,11 +6,11 @@ import type { RewardType } from './interfaces';
 // If it is a new reward and not using a template, use Token
 // If neither rewardToken nor customReward is set, use None
 export function getRewardType(
-  reward: Partial<Pick<Bounty, 'chainId' | 'customReward' | 'rewardToken' | 'rewardAmount'>>,
+  reward: Partial<Pick<Bounty, 'chainId' | 'customReward' | 'rewardToken' | 'rewardAmount' | 'rewardType'>>,
   isNewReward?: boolean,
   isFromTemplate?: boolean
 ): RewardType {
-  return reward.customReward
+  return reward.rewardType || reward.customReward
     ? 'custom'
     : reward.rewardToken
     ? 'token'
