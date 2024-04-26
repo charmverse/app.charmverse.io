@@ -22,8 +22,8 @@ import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
-export function NewRewardButton({ showPage }: { showPage: (pageId: string) => void }) {
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
+export function NewRewardButton() {
+  const { isDirty, clearNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const router = useRouter();
   const [selectedTemplate, setSelectedTemplate] = useState<RewardTemplate | null>(null);
   const overrideContentModalPopupState = usePopupState({ variant: 'popover', popupId: 'override-content' });

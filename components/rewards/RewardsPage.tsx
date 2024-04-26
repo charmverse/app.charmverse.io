@@ -35,7 +35,6 @@ import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
@@ -67,8 +66,6 @@ const StyledButton = styled(Button)`
 `;
 
 export function RewardsPage({ title }: { title: string }) {
-  useRewardsNavigation();
-
   const { space: currentSpace } = useCurrentSpace();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { isFreeSpace } = useIsFreeSpace();
@@ -244,7 +241,7 @@ export function RewardsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewRewardButton showPage={openPage} />
+                <NewRewardButton />
               </Box>
             </Box>
           </Box>

@@ -14,7 +14,6 @@ import { handleImageFileDrop } from 'components/common/CharmEditor/components/@b
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import { AddBountyButton } from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { makeSelectBoard } from 'components/common/DatabaseEditor/store/boards';
 import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
@@ -26,10 +25,8 @@ import { ProposalEvaluations } from 'components/proposals/ProposalPage/component
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
-import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
@@ -100,7 +97,6 @@ function DocumentPageComponent({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
@@ -432,20 +428,17 @@ function DocumentPageComponent({
                 <CardPropertiesWrapper>
                   {/* Property list */}
                   {card && board && !hideCardDetails && (
-                    <>
-                      <CardDetailProperties
-                        syncWithPageId={page.syncWithPageId}
-                        board={board}
-                        card={card}
-                        showCard={_showCard}
-                        cards={cards}
-                        views={boardViews}
-                        readOnly={readOnly}
-                        pageUpdatedAt={page.updatedAt.toString()}
-                        pageUpdatedBy={page.updatedBy}
-                      />
-                      <AddBountyButton readOnly={readOnly} card={card} />
-                    </>
+                    <CardDetailProperties
+                      syncWithPageId={page.syncWithPageId}
+                      board={board}
+                      card={card}
+                      showCard={_showCard}
+                      cards={cards}
+                      views={boardViews}
+                      readOnly={readOnly}
+                      pageUpdatedAt={page.updatedAt.toString()}
+                      pageUpdatedBy={page.updatedBy}
+                    />
                   )}
                   {proposalId && (
                     <ProposalProperties
@@ -469,7 +462,6 @@ function DocumentPageComponent({
                       isTemplate={page.type === 'bounty_template'}
                     />
                   )}
-                  {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                 </CardPropertiesWrapper>
                 {proposal && proposal.formId ? (
                   page.type === 'proposal_template' ? (

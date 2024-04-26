@@ -5,7 +5,6 @@ import { useCallback, useEffect } from 'react';
 
 import { trackPageView } from 'charmClient/hooks/track';
 import ErrorPage from 'components/common/errors/ErrorPage';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCurrentPage } from 'hooks/useCurrentPage';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -21,7 +20,6 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
   const { editMode, resetPageProps, setPageProps } = useCharmEditor();
   const [, setTitleState] = usePageTitle();
   const { space: currentSpace } = useCurrentSpace();
-  useRewardsNavigation();
   const {
     error: pageWithContentError,
     page,
