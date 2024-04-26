@@ -42,6 +42,7 @@ export function RewardEvaluations({
         expanded={expanded}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
+        isUnpublishedReward={isUnpublishedReward}
       />
     );
   } else if (reward && page) {
