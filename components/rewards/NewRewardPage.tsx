@@ -169,7 +169,11 @@ export function NewRewardPage({
       setRewardValues({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: [user!.id]
+        assignedSubmitters: [user!.id],
+        fields: {
+          ...(rewardValues.fields as object | undefined | null),
+          hasKyc: true
+        }
       });
     }
   }

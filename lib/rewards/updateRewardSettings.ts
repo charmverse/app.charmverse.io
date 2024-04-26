@@ -21,6 +21,7 @@ export type UpdateableRewardFields = Partial<
     | 'customReward'
     | 'fields'
     | 'selectedCredentialTemplates'
+    | 'fields'
   >
 > & {
   reviewers?: RewardReviewer[];

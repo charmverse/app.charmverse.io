@@ -14,8 +14,8 @@ export function inferRewardWorkflow(workflows: RewardWorkflow[], reward: Updatea
   if (reward.assignedSubmitters === null || reward.assignedSubmitters?.length === 0) {
     return reward.approveSubmitters ? applicationRequiredWorkflow : directSubmissionWorkflow;
   }
-  // @TODO how can I make this separate from
-  if (assignedKycWorkflow) {
+
+  if (assignedKycWorkflow && (reward.fields as { hasKyc?: boolean } | undefined | null)?.hasKyc) {
     return assignedKycWorkflow;
   }
 
