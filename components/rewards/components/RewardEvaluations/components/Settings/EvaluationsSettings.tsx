@@ -65,7 +65,7 @@ export function EvaluationsSettings({
                 <EvaluationStepSettings
                   evaluation={evaluation}
                   isTemplate={isTemplate}
-                  rewardTemplateInput={rewardTemplate?.reward}
+                  rewardTemplateInput={rewardTemplate}
                   readOnly={readOnly}
                   onChange={(updated) => {
                     onChangeReward?.(updated);

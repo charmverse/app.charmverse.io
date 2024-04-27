@@ -89,6 +89,6 @@ describe('getRewardTemplates', () => {
     });
 
     expect(rewardTemplates.length).toBe(1);
-    expect(rewardTemplates[0].reward.id).toBe(reward1.reward.id);
+    expect(rewardTemplates[0].id).toBe(reward1.reward.id);
   });
 });

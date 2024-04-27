@@ -7,7 +7,7 @@ import type {
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 

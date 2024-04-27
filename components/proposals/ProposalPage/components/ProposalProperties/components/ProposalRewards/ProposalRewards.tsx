@@ -20,7 +20,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -84,8 +84,8 @@ export function ProposalRewards({
     clearRewardValues();
     const template = templates?.find((t) => t.page.id === requiredTemplateId);
     // use reviewers from the proposal if not set in the template
-    const rewardReviewers = template?.reward.reviewers?.length
-      ? template.reward.reviewers
+    const rewardReviewers = template?.reviewers?.length
+      ? template.reviewers
       : uniqBy(
           reviewers
             .map((reviewer) =>
@@ -98,11 +98,11 @@ export function ProposalRewards({
             .filter(isTruthy) as RewardReviewer[],
           'id'
         );
-    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
-      ? template.reward.allowedSubmitterRoles
+    const rewardAssignedSubmitters = template?.allowedSubmitterRoles?.length
+      ? template.allowedSubmitterRoles
       : assignedSubmitters;
 
-    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+    const newReward = { ...template, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
 
     setRewardValues(newReward, { skipDirty: true });
 
@@ -130,7 +130,7 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      setRewardValues({ ...template.reward });
+      setRewardValues({ ...template });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,

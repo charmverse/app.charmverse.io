@@ -2,34 +2,30 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { onError, onNoMatch } from 'lib/middleware';
+import { onError, onNoMatch, NotFoundError } from 'lib/middleware';
+import { getRewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
-import { getRewardTemplates } from 'lib/rewards/getRewardTemplates';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getRewardTemplatesController);
 
-async function getRewardTemplatesController(req: NextApiRequest, res: NextApiResponse<RewardTemplate[]>) {
+async function getRewardTemplatesController(req: NextApiRequest, res: NextApiResponse<RewardTemplate>) {
   const userId = req.session.user?.id;
-  const spaceId = req.query.id as string;
+  const pageId = req.query.id as string;
+  const template = await getRewardTemplate({ pageId });
 
-  const { spaceRole } = await hasAccessToSpace({
-    spaceId,
+  const { isAdmin } = await hasAccessToSpace({
+    spaceId: template.spaceId,
     userId
   });
 
-  if (!spaceRole) {
-    return [];
+  if (!isAdmin) {
+    throw new NotFoundError();
   }
 
-  const templates = await getRewardTemplates({
-    spaceId,
-    userId
-  });
-
-  return res.status(200).json(templates);
+  return res.status(200).json(template);
 }
 
 export default withSessionRoute(handler);

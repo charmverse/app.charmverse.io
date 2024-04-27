@@ -34,7 +34,7 @@ export function EvaluationStepSettingsModal({
       <Box mb={2}>
         <EvaluationStepSettings
           evaluation={evaluationInput}
-          rewardTemplateInput={rewardTemplate?.reward}
+          rewardTemplateInput={rewardTemplate}
           isTemplate={isTemplate}
           readOnly={false}
           rewardInput={reward}

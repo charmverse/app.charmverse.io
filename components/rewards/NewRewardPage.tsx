@@ -34,7 +34,7 @@ import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import { fontClassName } from 'theme/fonts';
@@ -124,23 +124,23 @@ export function NewRewardPage({
       title: pageData.title
     });
     setRewardValues({
-      assignedSubmitters: template.reward.assignedSubmitters,
-      allowedSubmitterRoles: template.reward.allowedSubmitterRoles,
-      allowMultipleApplications: template.reward.allowMultipleApplications,
-      approveSubmitters: template.reward.approveSubmitters,
-      chainId: template.reward.chainId,
-      customReward: template.reward.customReward,
-      dueDate: template.reward.dueDate,
-      maxSubmissions: template.reward.maxSubmissions,
-      reviewers: template.reward.reviewers,
-      rewardAmount: template.reward.rewardAmount,
-      rewardToken: template.reward.rewardToken,
-      rewardType: template.reward.rewardType,
-      selectedCredentialTemplates: template.reward.selectedCredentialTemplates,
-      fields: template.reward.fields
+      assignedSubmitters: template.assignedSubmitters,
+      allowedSubmitterRoles: template.allowedSubmitterRoles,
+      allowMultipleApplications: template.allowMultipleApplications,
+      approveSubmitters: template.approveSubmitters,
+      chainId: template.chainId,
+      customReward: template.customReward,
+      dueDate: template.dueDate,
+      maxSubmissions: template.maxSubmissions,
+      reviewers: template.reviewers,
+      rewardAmount: template.rewardAmount,
+      rewardToken: template.rewardToken,
+      rewardType: template.rewardType,
+      selectedCredentialTemplates: template.selectedCredentialTemplates,
+      fields: template.fields
     });
     setRewardTemplateId(template.page.id);
-    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template.reward);
+    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template);
     if (workflow) {
       applyWorkflow(workflow);
     }
