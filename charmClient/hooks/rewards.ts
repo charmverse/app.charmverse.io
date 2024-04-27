@@ -56,6 +56,10 @@ export function useGetRewardTemplatesBySpace(spaceId?: string | null) {
   return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);
 }
 
+export function useGetRewardTemplate(pageId: MaybeString) {
+  return useGET<RewardTemplate>(pageId ? `/api/rewards/templates/${pageId}` : null);
+}
+
 export function useUpdateRewardBlocks(spaceId: string) {
   return usePUT<(RewardBlockUpdateInput | RewardBlockInput)[], RewardBlockWithTypedFields[]>(
     `/api/spaces/${spaceId}/rewards/blocks`

@@ -29,11 +29,13 @@ export function RewardTokenDialog({
   currentReward,
   requireTokenAmount,
   readOnly,
+  readOnlyToken,
   children,
   onChange
 }: {
   displayType?: PropertyValueDisplayType;
-  readOnly?: boolean;
+  readOnly: boolean;
+  readOnlyToken: boolean;
   requireTokenAmount: boolean;
   currentReward: Pick<RewardCreationData & RewardWithUsers, 'rewardAmount' | 'rewardToken' | 'chainId'>;
   children: ReactNode;

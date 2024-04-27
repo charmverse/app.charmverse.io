@@ -14,6 +14,7 @@ export type EvaluationStepSettingsProps = {
   onChange: (updatedReward: UpdateableRewardFields) => void;
   readOnly?: boolean;
   rewardInput?: UpdateableRewardFields;
+  rewardTemplateInput?: UpdateableRewardFields;
   rewardStatus?: BountyStatus | null;
 };
 

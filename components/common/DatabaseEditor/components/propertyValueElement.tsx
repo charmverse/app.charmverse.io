@@ -250,18 +250,20 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+    const _rewardOnly =
+      readOnly ||
+      !isAdmin ||
+      !reward ||
+      getRewardType({
+        chainId: Number(chainId),
+        rewardAmount,
+        rewardToken: symbolOrAddress
+      }) !== 'token';
+
     propertyValueElement = (
       <RewardTokenDialog
-        readOnly={
-          readOnly ||
-          !isAdmin ||
-          !reward ||
-          getRewardType({
-            chainId: Number(chainId),
-            rewardAmount,
-            rewardToken: symbolOrAddress
-          }) !== 'token'
-        }
+        readOnly={_rewardOnly}
+        readOnlyToken={_rewardOnly}
         requireTokenAmount
         currentReward={{
           chainId: Number(chainId),

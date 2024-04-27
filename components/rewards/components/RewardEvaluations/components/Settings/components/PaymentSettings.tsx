@@ -20,11 +20,15 @@ const RowStack = styled(Stack)`
 
 export function PaymentStepSettings({
   rewardInput,
+  rewardTemplateInput,
   readOnly,
   onChange,
   rewardStatus,
   isTemplate
-}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate'>) {
+}: Pick<
+  EvaluationStepSettingsProps,
+  'rewardInput' | 'rewardTemplateInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate'
+>) {
   const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
@@ -96,7 +100,8 @@ export function PaymentStepSettings({
                     }
                   : null
               }
-              readOnly={readOnly}
+              readOnly={!!readOnly}
+              readOnlyToken={!!rewardTemplateInput?.rewardToken}
             />
           </Box>
         </RowStack>

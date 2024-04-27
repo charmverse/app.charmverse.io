@@ -454,6 +454,7 @@ export function RewardPropertiesForm({
                   requireTokenAmount
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}
+                  readOnlyToken={false} // not sure RewardPropertiesForm component is used
                 />
               </Box>
             )}

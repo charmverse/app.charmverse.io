@@ -1,6 +1,6 @@
 import { Collapse } from '@mui/material';
 
-import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
+import { useGetRewardWorkflows, useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
@@ -15,6 +15,7 @@ export type EvaluationSettingsProps = {
   rewardInput?: UpdateableRewardFields;
   readOnly?: boolean;
   isTemplate: boolean;
+  templateId: string | null | undefined;
   requireWorkflowChangeConfirmation?: boolean;
   expanded?: boolean;
   onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
@@ -25,6 +26,7 @@ export function EvaluationsSettings({
   rewardInput,
   isTemplate,
   readOnly,
+  templateId,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
   onChangeReward,
@@ -32,7 +34,8 @@ export function EvaluationsSettings({
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = inferRewardWorkflow(workflowOptions, rewardInput);
+  const { data: rewardTemplate } = useGetRewardTemplate(templateId);
+  const workflow = rewardInput && inferRewardWorkflow(workflowOptions, rewardInput);
   return (
     <LoadingComponent isLoading={!rewardInput} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
@@ -62,6 +65,7 @@ export function EvaluationsSettings({
                 <EvaluationStepSettings
                   evaluation={evaluation}
                   isTemplate={isTemplate}
+                  rewardTemplateInput={rewardTemplate?.reward}
                   readOnly={readOnly}
                   onChange={(updated) => {
                     onChangeReward?.(updated);

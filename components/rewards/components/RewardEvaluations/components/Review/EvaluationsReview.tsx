@@ -35,12 +35,14 @@ export type Props = Pick<EvaluationSettingsProps, 'isTemplate' | 'onChangeReward
   page: PageWithContent;
   refreshReward?: VoidFunction;
   isNewApplication?: boolean;
+  templateId: string | null | undefined;
 };
 
 export function EvaluationsReview({
   application,
   reward,
   isTemplate,
+  templateId,
   onChangeReward,
   expanded: expandedContainer,
   readOnly,
@@ -179,6 +181,7 @@ export function EvaluationsReview({
           isTemplate={isTemplate}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
+          templateId={templateId}
           reward={{
             ...reward,
             ...tempRewardUpdates

@@ -140,7 +140,7 @@ export function NewRewardPage({
       fields: template.reward.fields
     });
     setRewardTemplateId(template.page.id);
-    const workflow = inferRewardWorkflow(workflowOptions ?? [], template.reward);
+    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template.reward);
     if (workflow) {
       applyWorkflow(workflow);
     }
@@ -323,7 +323,7 @@ export function NewRewardPage({
                   {currentTab === 1 && (
                     <RewardEvaluations
                       onChangeWorkflow={applyWorkflow}
-                      readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+                      templateId={rewardTemplateId}
                       isTemplate={!!isTemplate}
                       isUnpublishedReward
                       rewardInput={rewardValues}
