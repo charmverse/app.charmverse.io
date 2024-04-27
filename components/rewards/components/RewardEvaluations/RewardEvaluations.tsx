@@ -46,10 +46,11 @@ export function RewardEvaluations({
         isTemplate={!!isTemplate}
         templateId={templateId}
         readOnly={readOnly}
-        requireWorkflowChangeConfirmation
+        requireWorkflowChangeConfirmation={!!reward}
         expanded={expanded}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
+        isUnpublishedReward={isUnpublishedReward}
       />
     );
   } else if (reward && page) {

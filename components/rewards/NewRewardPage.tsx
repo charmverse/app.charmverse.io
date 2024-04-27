@@ -59,7 +59,9 @@ export function NewRewardPage({
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
-  const { templates: rewardTemplates } = useRewardTemplates();
+  const { templates: rewardTemplates } = useRewardTemplates({
+    skipDraft: false
+  });
   const [selectedRewardTemplateId, setSelectedRewardTemplateId] = useState<null | string>();
   const [rewardTemplateId, setRewardTemplateId] = useState<null | string>();
   const [, setPageTitle] = usePageTitle();
