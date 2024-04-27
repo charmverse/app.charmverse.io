@@ -324,6 +324,7 @@ export function NewRewardPage({
                     <RewardEvaluations
                       onChangeWorkflow={applyWorkflow}
                       readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+                      isTemplate={!!isTemplate}
                       isUnpublishedReward
                       rewardInput={rewardValues}
                       onChangeReward={(updates) => {
@@ -365,6 +366,7 @@ export function NewRewardPage({
           }}
           // if creating a reward from template then disable the reward properties
           readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+          isTemplate={!!isTemplate}
           isUnpublishedReward
           rewardInput={rewardValues}
           onChangeReward={(updates) => {

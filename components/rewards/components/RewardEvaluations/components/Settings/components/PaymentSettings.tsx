@@ -22,8 +22,9 @@ export function PaymentStepSettings({
   rewardInput,
   readOnly,
   onChange,
-  rewardStatus
-}: Omit<EvaluationStepSettingsProps, 'evaluation'>) {
+  rewardStatus,
+  isTemplate
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate'>) {
   const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
   const { getFeatureTitle } = useSpaceFeatures();
@@ -54,7 +55,7 @@ export function PaymentStepSettings({
       onChange({
         chainId: rewardToken.chainId,
         rewardToken: rewardToken.rewardToken,
-        rewardAmount: Number(rewardToken.rewardAmount),
+        rewardAmount: rewardToken.rewardAmount ? Number(rewardToken.rewardAmount) : null,
         customReward: null
       });
     }
@@ -83,13 +84,15 @@ export function PaymentStepSettings({
           <Box width='fit-content'>
             <RewardTokenProperty
               onChange={onRewardTokenUpdate}
+              requireTokenAmount={!isTemplate}
               currentReward={
                 rewardInput
                   ? {
                       chainId: rewardInput.chainId ?? null,
                       customReward: rewardInput.customReward ?? null,
                       rewardAmount: rewardInput.rewardAmount ?? null,
-                      rewardToken: rewardInput.rewardToken ?? null
+                      rewardToken: rewardInput.rewardToken ?? null,
+                      rewardType
                     }
                   : null
               }

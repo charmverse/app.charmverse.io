@@ -10,7 +10,7 @@ export function ReviewStepSettings({
   rewardInput,
   readOnly,
   onChange
-}: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers as UpdateableRewardFields['reviewers']

@@ -5,7 +5,10 @@ import { EvaluationsReview } from './components/Review/EvaluationsReview';
 import type { EvaluationSettingsProps } from './components/Settings/EvaluationsSettings';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
-export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkflowChangeConfirmation'> & {
+export type RewardEvaluationsProps = Pick<
+  EvaluationSettingsProps,
+  'expanded' | 'rewardInput' | 'readOnly' | 'onChangeReward' | 'onChangeWorkflow'
+> & {
   isUnpublishedReward?: boolean;
   reward?: RewardWithUsers;
   application?: ApplicationWithTransactions;
@@ -37,6 +40,7 @@ export function RewardEvaluations({
     return (
       <EvaluationsSettings
         rewardInput={rewardInput}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
         requireWorkflowChangeConfirmation
         expanded={expanded}
@@ -50,6 +54,7 @@ export function RewardEvaluations({
         page={page}
         application={application}
         expanded={expanded}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
         reward={reward}
         onChangeReward={onChangeReward}

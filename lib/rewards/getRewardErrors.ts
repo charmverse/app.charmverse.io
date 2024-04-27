@@ -1,6 +1,5 @@
 import type { Bounty, Page } from '@charmverse/core/prisma';
 
-import { getRewardType } from './getRewardType';
 import type { RewardEvaluation } from './getRewardWorkflows';
 import type { RewardType, RewardWithUsers } from './interfaces';
 
@@ -17,19 +16,22 @@ type ValidationInput = {
   isProposalTemplate?: boolean;
 };
 
-function getRewardPrizeError({
-  chainId,
-  customReward,
-  rewardAmount,
-  rewardToken,
-  rewardType
-}: {
-  rewardType: RewardType;
-  chainId?: number | null;
-  rewardToken?: string | null;
-  rewardAmount?: number | null;
-  customReward?: string | null;
-}) {
+function getRewardPrizeError(
+  {
+    chainId,
+    customReward,
+    rewardAmount,
+    rewardToken,
+    rewardType
+  }: {
+    rewardType: RewardType;
+    chainId?: number | null;
+    rewardToken?: string | null;
+    rewardAmount?: number | null;
+    customReward?: string | null;
+  },
+  isTemplate: boolean
+) {
   const errors: string[] = [];
 
   if (typeof rewardAmount === 'number' && rewardAmount < 0) {
@@ -38,7 +40,7 @@ function getRewardPrizeError({
     errors.push(`Reward amount must also have chainId and token`);
   } else if (rewardType === 'custom' && !customReward) {
     errors.push('Custom reward is required');
-  } else if (rewardType === 'token' && !(chainId && rewardToken && rewardAmount)) {
+  } else if (rewardType === 'token' && !(chainId && rewardToken && (rewardAmount || isTemplate))) {
     errors.push('Token information is required');
   }
 
@@ -52,12 +54,15 @@ export function getRewardErrors({
   rewardType,
   isProposalTemplate
 }: ValidationInput): string[] {
-  const errors: string[] = getRewardPrizeError({
-    ...reward,
-    rewardType
-  });
-
   const isTemplate = page?.type === 'bounty_template';
+  const errors: string[] = getRewardPrizeError(
+    {
+      ...reward,
+      rewardType
+    },
+    isTemplate
+  );
+
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
@@ -72,7 +77,11 @@ export function getRewardErrors({
   return errors;
 }
 
-export function getEvaluationFormError(evaluation: RewardEvaluation, reward: RewardWithUsers): string | false {
+export function getEvaluationFormError(
+  evaluation: RewardEvaluation,
+  reward: RewardWithUsers,
+  isTemplate: boolean
+): string | false {
   switch (evaluation.type) {
     case 'apply':
     case 'submit':
@@ -81,7 +90,7 @@ export function getEvaluationFormError(evaluation: RewardEvaluation, reward: Rew
     case 'review':
       return reward.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'payment':
-      return getRewardPrizeError(reward).join(', ');
+      return getRewardPrizeError(reward, isTemplate).join(', ');
     default:
       return false;
   }
