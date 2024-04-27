@@ -1,4 +1,5 @@
 import { Collapse } from '@mui/material';
+import { useMemo } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -19,12 +20,14 @@ export type EvaluationSettingsProps = {
   expanded?: boolean;
   onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
   onChangeWorkflow?: (workflow: RewardWorkflow) => void;
+  isUnpublishedReward?: boolean;
 };
 
 export function EvaluationsSettings({
   rewardInput,
   isTemplate,
   readOnly,
+  isUnpublishedReward,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
   onChangeReward,
@@ -33,12 +36,28 @@ export function EvaluationsSettings({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, rewardInput);
+  const transformedWorkflow = useMemo(() => {
+    // Make sure to remove credential step if a new reward is created without any credential templates
+    if (!workflow) {
+      return undefined;
+    }
+
+    if (isUnpublishedReward && (rewardInput?.selectedCredentialTemplates ?? []).length === 0) {
+      return {
+        ...workflow,
+        evaluations: workflow.evaluations.filter((evaluation) => evaluation.type !== 'credential')
+      };
+    }
+
+    return workflow;
+  }, [workflow, rewardInput, isUnpublishedReward]);
+
   return (
     <LoadingComponent isLoading={!rewardInput} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
         <WorkflowSelect
           options={workflowOptions}
-          value={workflow?.id}
+          value={transformedWorkflow?.id}
           readOnly={readOnly}
           required
           disableAddNew
@@ -46,8 +65,8 @@ export function EvaluationsSettings({
           requireConfirmation={requireWorkflowChangeConfirmation}
         />
       </Collapse>
-      {workflow &&
-        workflow.evaluations.map((evaluation, index) => {
+      {transformedWorkflow &&
+        transformedWorkflow.evaluations.map((evaluation, index) => {
           return (
             <EvaluationStepRow
               key={evaluation.id}

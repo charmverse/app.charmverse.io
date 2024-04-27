@@ -485,7 +485,7 @@ function DocumentPageComponent({
                 ) : (
                   <CharmEditor
                     placeholderText={
-                      page.type === 'bounty' || page.type === 'bounty_template'
+                      (page.type === 'bounty' || page.type === 'bounty_template') && !readOnly
                         ? `Describe the reward. Type '/' to see the list of available commands`
                         : undefined
                     }

@@ -1,6 +1,8 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { testUtilsBounties, testUtilsUser } from '@charmverse/core/test';
 
+import { permissionsApiClient } from 'lib/permissions/api/client';
+
 import { publishReward } from '../publishReward';
 
 describe('publishReward', () => {
@@ -32,6 +34,9 @@ describe('publishReward', () => {
 
   it(`Should update reward status and return reward`, async () => {
     const { user, space } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    const spaceMember = await testUtilsUser.generateSpaceUser({
+      spaceId: space.id
+    });
 
     const bounty = await testUtilsBounties.generateBounty({
       createdBy: user.id,
@@ -49,6 +54,19 @@ describe('publishReward', () => {
     });
 
     const reward = await publishReward(bounty.id);
+    const authorPermission = await permissionsApiClient.pages.computePagePermissions({
+      resourceId: bounty.page.id,
+      userId: user.id
+    });
+    const spaceMemberPermission = await permissionsApiClient.pages.computePagePermissions({
+      resourceId: bounty.page.id,
+      userId: spaceMember.id
+    });
+
+    expect(authorPermission.edit_content).toBeTruthy();
+    expect(spaceMemberPermission.edit_content).toBeFalsy();
+    expect(spaceMemberPermission.read).toBeTruthy();
+
     expect(reward.status).toBe('open');
   });
 });
