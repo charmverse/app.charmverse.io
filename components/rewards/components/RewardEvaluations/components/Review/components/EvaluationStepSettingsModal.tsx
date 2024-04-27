@@ -24,7 +24,7 @@ export function EvaluationStepSettingsModal({
   saveEvaluation: () => void;
   updateEvaluation: (updates: UpdateableRewardFields) => void;
 }) {
-  const evaluationInputError = getEvaluationFormError(evaluationInput, reward);
+  const evaluationInputError = getEvaluationFormError(evaluationInput, reward, isTemplate);
   return (
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
       <Box mb={2}>
