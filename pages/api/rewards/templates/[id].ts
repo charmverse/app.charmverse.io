@@ -21,7 +21,7 @@ async function getRewardTemplatesController(req: NextApiRequest, res: NextApiRes
     userId
   });
 
-  if (!isAdmin) {
+  if (template.status === 'draft' && !isAdmin) {
     throw new NotFoundError();
   }
 
