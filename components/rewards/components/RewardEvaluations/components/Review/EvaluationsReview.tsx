@@ -21,11 +21,11 @@ import { getAbsolutePath } from 'lib/utils/browser';
 
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
+import { CredentialsStepReview } from './components/CredentialsStepReview';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
-import { RewardCredentials } from './components/RewardCredentials';
 import { SubmitStepReview } from './components/SubmitStepReview';
 
 export type Props = Pick<EvaluationSettingsProps, 'isTemplate' | 'onChangeReward' | 'expanded' | 'readOnly'> & {
@@ -164,7 +164,7 @@ export function EvaluationsReview({
             ) : evaluation.type === 'submit' ? (
               <SubmitStepReview reward={reward} />
             ) : evaluation.type === 'credential' ? (
-              <RewardCredentials
+              <CredentialsStepReview
                 selectedCredentialTemplates={reward.selectedCredentialTemplates}
                 rewardId={reward.id}
                 application={application}

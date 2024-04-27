@@ -14,7 +14,7 @@ export type UserCredentialRowProps = {
 
 const preventAccordionToggle = (e: any) => e.stopPropagation();
 
-export function RewardCredentials({
+export function CredentialsStepReview({
   selectedCredentialTemplates,
   rewardId,
   application,

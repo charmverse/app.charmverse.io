@@ -3,13 +3,15 @@ import { Box, FormLabel, Stack, Typography } from '@mui/material';
 import clsx from 'clsx';
 
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
-import { RewardTokenProperty } from 'components/rewards/components/RewardProperties/components/RewardTokenProperty';
-import { RewardTypeSelect } from 'components/rewards/components/RewardProperties/components/RewardTypeSelect';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardTokenDetails, RewardType } from 'lib/rewards/interfaces';
 
-import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
+import type { EvaluationStepSettingsProps } from '../EvaluationStepSettings';
+
+import type { FormInput } from './components/RewardTokenForm';
+import { RewardTokenForm } from './components/RewardTokenForm';
+import { RewardTypeSelect } from './components/RewardTypeSelect';
 
 const RowStack = styled(Stack)`
   flex-direction: row;
@@ -54,7 +56,7 @@ export function PaymentStepSettings({
     });
   }
 
-  async function onRewardTokenUpdate(rewardToken: RewardTokenDetails | null) {
+  async function onRewardTokenUpdate(rewardToken: FormInput | null) {
     if (rewardToken) {
       onChange({
         chainId: rewardToken.chainId,
@@ -68,43 +70,33 @@ export function PaymentStepSettings({
   return (
     <Stack gap={1.5}>
       <RowStack>
-        <FormLabel required>
+        <FormLabel required style={{ width: '150px' }}>
           <Typography component='span' variant='subtitle1'>
             Type
           </Typography>
         </FormLabel>
-        <Box width='fit-content'>
+        <Box flexGrow={1}>
           <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
         </Box>
       </RowStack>
 
       {rewardType === 'token' && (
-        <RowStack>
-          <FormLabel required>
+        <>
+          {/* <FormLabel required>
             <Typography component='span' variant='subtitle1'>
               Token
             </Typography>
-          </FormLabel>
+          </FormLabel> */}
           <Box width='fit-content'>
-            <RewardTokenProperty
+            <RewardTokenForm
               onChange={onRewardTokenUpdate}
-              requireTokenAmount={!isTemplate}
-              currentReward={
-                rewardInput
-                  ? {
-                      chainId: rewardInput.chainId ?? null,
-                      customReward: rewardInput.customReward ?? null,
-                      rewardAmount: rewardInput.rewardAmount ?? null,
-                      rewardToken: rewardInput.rewardToken ?? null,
-                      rewardType
-                    }
-                  : null
-              }
+              defaultValues={rewardInput}
               readOnly={!!readOnly}
               readOnlyToken={!!rewardTemplateInput?.rewardToken}
+              requireTokenAmount={!isTemplate}
             />
           </Box>
-        </RowStack>
+        </>
       )}
 
       {rewardType === 'custom' && (

@@ -35,11 +35,11 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
+import { RewardTypeSelect } from '../RewardEvaluations/components/Settings/components/PaymentStepSettings/components/RewardTypeSelect';
 
 import { RewardApplicationTypeSelect } from './components/RewardApplicationTypeSelect';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardTokenProperty } from './components/RewardTokenProperty';
-import { RewardTypeSelect } from './components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
 
 type Props = {
