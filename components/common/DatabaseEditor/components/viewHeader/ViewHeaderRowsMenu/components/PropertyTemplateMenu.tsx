@@ -325,6 +325,7 @@ export function PropertyTemplateMenu({
                   rewardToken: symbolOrAddress
                 }) !== 'token'
               }
+              requireTokenAmount
               currentReward={{
                 chainId: Number(chainId),
                 rewardAmount,

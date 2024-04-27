@@ -451,6 +451,7 @@ export function RewardPropertiesForm({
                 </PropertyLabel>
                 <RewardTokenProperty
                   onChange={onRewardTokenUpdate}
+                  requireTokenAmount
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}
                 />

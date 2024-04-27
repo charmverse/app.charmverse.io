@@ -43,6 +43,8 @@ test.describe.serial('Review reward applications', () => {
     await rewardPage.page.locator(`data-test=select-option-application_required`).click();
     await rewardPage.page.locator('[data-test="modal-confirm-button"]').click();
     await rewardPage.selectRewardReviewer(adminUser.id);
+    await rewardPage.selectRewardType('custom');
+    await rewardPage.customRewardInput.fill('Custom Reward');
     await rewardPage.publishRewardButton.click();
     await rewardPage.page.waitForResponse('**/publish');
 
@@ -60,15 +62,6 @@ test.describe.serial('Review reward applications', () => {
     })) as Bounty & {
       page: Page;
     };
-
-    await prisma.bounty.update({
-      where: {
-        id: reward.id
-      },
-      data: {
-        customReward: 'Custom Reward'
-      }
-    });
   });
 
   test('Create a reward from template, submit and review application', async ({ page, rewardPage }) => {

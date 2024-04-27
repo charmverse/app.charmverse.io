@@ -6,7 +6,7 @@ export function CredentialsSettings({
   rewardInput,
   readOnly,
   onChange
-}: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
   return (
     <CredentialSelect
       templateType='reward'

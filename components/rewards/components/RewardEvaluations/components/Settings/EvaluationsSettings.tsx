@@ -15,6 +15,7 @@ import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 export type EvaluationSettingsProps = {
   rewardInput?: UpdateableRewardFields;
   readOnly?: boolean;
+  isTemplate: boolean;
   requireWorkflowChangeConfirmation?: boolean;
   expanded?: boolean;
   onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
@@ -24,6 +25,7 @@ export type EvaluationSettingsProps = {
 
 export function EvaluationsSettings({
   rewardInput,
+  isTemplate,
   readOnly,
   isUnpublishedReward,
   requireWorkflowChangeConfirmation,
@@ -78,6 +80,7 @@ export function EvaluationsSettings({
               {evaluation.type === 'apply' ? null : (
                 <EvaluationStepSettings
                   evaluation={evaluation}
+                  isTemplate={isTemplate}
                   readOnly={readOnly}
                   onChange={(updated) => {
                     onChangeReward?.(updated);

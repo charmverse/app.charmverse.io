@@ -39,6 +39,7 @@ export async function createReward({
   maxSubmissions,
   rewardAmount,
   rewardToken,
+  rewardType,
   customReward = null,
   allowedSubmitterRoles,
   assignedSubmitters,
@@ -56,7 +57,7 @@ export async function createReward({
     page: pageProps || null,
     linkedPageId,
     reward: { assignedSubmitters, rewardAmount, rewardToken, chainId, customReward, reviewers },
-    rewardType: getRewardType({ rewardAmount, rewardToken, chainId, customReward })
+    rewardType: rewardType || getRewardType({ rewardAmount, rewardToken, chainId, customReward })
   });
   if (!isDraft && errors.length > 0) {
     throw new InvalidInputError(errors.join(', '));
@@ -101,6 +102,7 @@ export async function createReward({
     maxSubmissions: isAssignedReward ? 1 : maxSubmissions,
     rewardAmount,
     rewardToken,
+    rewardType,
     customReward,
     selectedCredentialTemplates,
     allowMultipleApplications: isAssignedReward ? false : allowMultipleApplications,

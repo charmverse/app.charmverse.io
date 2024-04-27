@@ -12,7 +12,6 @@ import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useGnosisSafes } from 'hooks/useGnosisSafes';
 import { usePages } from 'hooks/usePages';
 import { useWeb3Account } from 'hooks/useWeb3Account';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -58,10 +57,7 @@ export function BatchPaymentRewards({ checkedIds }: { checkedIds: string[] }) {
       })
       .filter(
         (reward) =>
-          isTruthy(reward) &&
-          getRewardType(reward) === 'token' &&
-          reward.chainId === chainId &&
-          reward.submissions.length
+          isTruthy(reward) && reward.rewardType === 'token' && reward.chainId === chainId && reward.submissions.length
       ) ?? []) as (RewardWithUsers & {
       submissions: ApplicationLite[];
     })[];

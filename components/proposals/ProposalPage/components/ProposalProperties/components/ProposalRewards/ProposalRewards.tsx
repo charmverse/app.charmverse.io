@@ -21,7 +21,6 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -100,9 +99,7 @@ export function ProposalRewards({
       : assignedSubmitters;
 
     const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
+
     setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
@@ -129,8 +126,7 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      const rewardType = getRewardType(template.reward);
-      setRewardValues({ rewardType, ...template.reward });
+      setRewardValues({ ...template.reward });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
@@ -177,12 +173,7 @@ export function ProposalRewards({
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
                       <RewardAmount
-                        reward={{
-                          chainId: reward.chainId || null,
-                          customReward: reward.customReward || null,
-                          rewardAmount: reward.rewardAmount || null,
-                          rewardToken: reward.rewardToken || null
-                        }}
+                        reward={reward}
                         truncate={true}
                         truncatePrecision={2}
                         typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
@@ -228,12 +219,7 @@ export function ProposalRewards({
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
                             <RewardAmount
-                              reward={{
-                                chainId: reward.chainId || null,
-                                customReward: reward.customReward || null,
-                                rewardAmount: reward.rewardAmount || null,
-                                rewardToken: reward.rewardToken || null
-                              }}
+                              reward={reward}
                               truncate={true}
                               truncatePrecision={2}
                               typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}

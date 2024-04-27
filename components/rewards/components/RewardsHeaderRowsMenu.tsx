@@ -170,7 +170,7 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
       for (const pageId of checkedIds) {
         const page = pages[pageId];
         const reward = page?.bountyId ? rewards?.find((r) => r.id === page.bountyId) : null;
-        if (reward && getRewardType(reward) === 'token') {
+        if (reward && reward.rewardType === 'token') {
           await updateReward({
             rewardId: reward.id,
             updateContent: {
@@ -196,7 +196,7 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
         return rewardId ? rewards?.find((r) => r.id === rewardId) : null;
       })
       .filter(isTruthy)
-      .filter((reward) => getRewardType(reward) === 'custom');
+      .filter((reward) => reward.rewardType === 'custom');
 
     try {
       for (const reward of checkedRewards) {

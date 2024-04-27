@@ -37,6 +37,7 @@ export function RewardTypeSelect({ readOnly, readOnlyMessage, value, onChange }:
 
   return (
     <TagSelect
+      data-test='reward-type-select'
       wrapColumn
       readOnly={readOnly}
       readOnlyMessage={readOnlyMessage}

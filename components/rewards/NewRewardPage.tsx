@@ -35,7 +35,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import { fontClassName } from 'theme/fonts';
@@ -126,7 +125,6 @@ export function NewRewardPage({
       contentText: template.page.contentText,
       title: pageData.title
     });
-    const rewardType = getRewardType(template.reward);
     setRewardValues({
       assignedSubmitters: template.reward.assignedSubmitters,
       allowedSubmitterRoles: template.reward.allowedSubmitterRoles,
@@ -139,7 +137,7 @@ export function NewRewardPage({
       reviewers: template.reward.reviewers,
       rewardAmount: template.reward.rewardAmount,
       rewardToken: template.reward.rewardToken,
-      rewardType,
+      rewardType: template.reward.rewardType,
       selectedCredentialTemplates: template.reward.selectedCredentialTemplates,
       fields: template.reward.fields
     });
@@ -328,6 +326,7 @@ export function NewRewardPage({
                     <RewardEvaluations
                       onChangeWorkflow={applyWorkflow}
                       readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+                      isTemplate={!!isTemplate}
                       isUnpublishedReward
                       rewardInput={rewardValues}
                       onChangeReward={(updates) => {
@@ -369,6 +368,7 @@ export function NewRewardPage({
           }}
           // if creating a reward from template then disable the reward properties
           readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+          isTemplate={!!isTemplate}
           isUnpublishedReward
           rewardInput={rewardValues}
           onChangeReward={(updates) => {

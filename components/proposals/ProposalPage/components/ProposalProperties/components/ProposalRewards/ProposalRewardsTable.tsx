@@ -77,9 +77,8 @@ export function ProposalRewardsTable({
 
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
-      const rewardType = getRewardType(page.reward);
-      if (rewardType) {
-        acc.add(rewardType);
+      if (page.reward.rewardType) {
+        acc.add(page.reward.rewardType);
       }
       return acc;
     }, new Set());
@@ -149,9 +148,7 @@ export function ProposalRewardsTable({
       : assignedSubmitters;
 
     const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
+
     setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({

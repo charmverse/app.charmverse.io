@@ -262,6 +262,7 @@ function PropertyValueElement(props: Props) {
             rewardToken: symbolOrAddress
           }) !== 'token'
         }
+        requireTokenAmount
         currentReward={{
           chainId: Number(chainId),
           rewardAmount,
@@ -705,7 +706,7 @@ function PropertyValueElement(props: Props) {
   } else if (propertyValueElement === null) {
     const displayValueStr =
       typeof displayValue === 'string' || typeof displayValue === 'number' ? displayValue.toString() : '';
-    if (typeof displayValue !== 'string' && typeof displayValue !== 'undefined') {
+    if (typeof displayValue !== 'string' && typeof displayValue !== 'undefined' && !Array.isArray(displayValue)) {
       log.error('displayValue for card property is not a string', { displayValue, template: props.propertyTemplate });
     }
     propertyValueElement = (
