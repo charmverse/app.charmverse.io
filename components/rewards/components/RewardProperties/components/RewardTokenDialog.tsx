@@ -70,9 +70,6 @@ export function RewardTokenDialog({
   };
 
   function openTokenSettings() {
-    if (readOnly) {
-      return;
-    }
     setIsOpen(true);
     reset({
       rewardToken: currentReward?.rewardToken || '',
@@ -129,7 +126,7 @@ export function RewardTokenDialog({
     <>
       <SelectPreviewContainer
         data-test='open-reward-value-dialog'
-        readOnly={readOnly}
+        readOnly={readOnly && readOnlyToken}
         displayType={displayType}
         onClick={openTokenSettings}
       >
@@ -241,7 +238,7 @@ export function RewardTokenDialog({
                     width: '100%'
                   }}
                   required={requireTokenAmount}
-                  disabled={readOnly}
+                  disabled={readOnly && readOnlyToken}
                   placeholder='Number greater than 0'
                   error={!!errors.rewardAmount}
                 />
