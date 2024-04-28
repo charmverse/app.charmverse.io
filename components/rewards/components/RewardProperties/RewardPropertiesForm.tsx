@@ -7,6 +7,7 @@ import type { ChangeEvent } from 'react';
 import { useCallback, useState } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
+import { useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import type { RoleOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -86,13 +87,14 @@ export function RewardPropertiesForm({
     group: 'role'
   }));
   const isAssignedReward = rewardApplicationType === 'assigned';
+  const { data: template } = useGetRewardTemplate(templateId);
   const { templates: rewardTemplates = [] } = useRewardTemplates();
-  const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
   const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reviewers?.length);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.dueDate);
   const readOnlyApplicationType =
     !!forcedApplicationType || (!isAdmin && (readOnly || !!template)) || !!isProposalTemplate;
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
+  const readOnlyToken = !isAdmin && (readOnly || !!template?.rewardToken);
   const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.maxSubmissions === 'number');
   const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.allowedSubmitterRoles?.length);
   const readOnlySelectedCredentials = !isAdmin && (readOnly || !!template?.selectedCredentialTemplates?.length);
@@ -451,10 +453,10 @@ export function RewardPropertiesForm({
                 </PropertyLabel>
                 <RewardTokenProperty
                   onChange={onRewardTokenUpdate}
-                  requireTokenAmount
+                  requireTokenAmount={!isProposalTemplate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}
-                  readOnlyToken={false} // not sure RewardPropertiesForm component is used
+                  readOnlyToken={readOnlyToken}
                 />
               </Box>
             )}
