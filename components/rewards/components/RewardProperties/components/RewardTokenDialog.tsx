@@ -114,6 +114,7 @@ export function RewardTokenDialog({
           readOnly={readOnly}
           readOnlyToken={readOnlyToken}
           requireTokenAmount={requireTokenAmount}
+          readOnlyTokenAmount={false} // TODO: probably needs to be based on some prop?
           setIsValid={setIsValid}
         />
       </Dialog>

@@ -81,6 +81,7 @@ export function PaymentStepSettings({
             defaultValues={rewardInput}
             readOnly={!!readOnly}
             readOnlyToken={!!rewardTemplateInput?.rewardToken}
+            readOnlyTokenAmount={!!rewardTemplateInput?.rewardAmount}
             requireTokenAmount={!isTemplate}
           />
         </Box>

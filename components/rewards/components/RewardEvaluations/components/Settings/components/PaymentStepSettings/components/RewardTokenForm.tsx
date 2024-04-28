@@ -21,12 +21,13 @@ export type FormInput = {
 /**
  *
  * When a user is creating a reward from a template and the token is set but not the amount, props should be:
- *  readOnly: false, readOnlyToken: true, requireTokenAmount: true
+ *  readOnly: true, readOnlyToken: true, requireTokenAmount: true, readOnlyTokenAmount: true|false
  */
 type Props = {
   defaultValues?: FormInput;
   readOnly: boolean;
   readOnlyToken: boolean;
+  readOnlyTokenAmount: boolean;
   requireTokenAmount: boolean;
   onChange: (value: FormInput) => void;
   setIsValid?: (value: boolean) => void;
@@ -38,6 +39,7 @@ export function RewardTokenForm({
   setIsValid,
   readOnly,
   readOnlyToken,
+  readOnlyTokenAmount,
   requireTokenAmount
 }: Props) {
   const [paymentMethods] = usePaymentMethods();
@@ -100,7 +102,7 @@ export function RewardTokenForm({
   useEffect(() => {
     setIsValid?.(isValid);
     onChange(values);
-  }, [isValid, values]);
+  }, [isValid, values.chainId, values.rewardAmount, values.rewardToken]);
 
   return (
     <Stack gap={1}>
@@ -155,7 +157,7 @@ export function RewardTokenForm({
       </Box>
 
       <Box display='flex' alignItems='center'>
-        <FieldLabel required={requireTokenAmount} style={{ width: 150 }}>
+        <FieldLabel required={requireTokenAmount && !readOnlyTokenAmount} style={{ width: 150 }}>
           Amount
         </FieldLabel>
         <Controller
@@ -168,7 +170,7 @@ export function RewardTokenForm({
           render={({ field: { onChange: _onChange, value } }) => (
             <TextField
               onChange={_onChange}
-              value={value ?? undefined}
+              value={value}
               data-test='reward-property-amount'
               type='number'
               inputProps={{
@@ -179,7 +181,7 @@ export function RewardTokenForm({
                 flexGrow: 1
               }}
               required={requireTokenAmount}
-              disabled={readOnly && readOnlyToken}
+              disabled={readOnly && readOnlyTokenAmount}
               placeholder='Number greater than 0'
               error={!!errors.rewardAmount}
             />

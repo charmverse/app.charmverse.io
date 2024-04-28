@@ -1,4 +1,3 @@
-import type { SxProps } from '@mui/material';
 import { FormLabel, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 

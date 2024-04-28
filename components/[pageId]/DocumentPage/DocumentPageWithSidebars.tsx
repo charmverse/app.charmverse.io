@@ -170,6 +170,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           onChangeWorkflow={onChangeRewardWorkflow}
           onChangeReward={updateReward}
           isTemplate={page.type === 'bounty_template'}
+          templateId={page.sourceTemplateId}
           reward={reward}
           rewardInput={reward}
           readOnly={props.readOnly}
