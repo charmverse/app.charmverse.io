@@ -67,10 +67,10 @@ export function ProposalRewards({
     rewardValues
   } = useProposalRewards({
     assignedSubmitters,
-    isProposalTemplate,
     onSave,
     reviewers,
-    requiredTemplateId
+    requiredTemplateId,
+    isProposalTemplate
   });
 
   function openReward(rewardId: string | null) {

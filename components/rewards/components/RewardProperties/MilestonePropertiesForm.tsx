@@ -157,7 +157,7 @@ export function MilestonePropertiesForm({
             {!isTemplate && isNewReward && (
               <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
                 <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-                  <PropertyLabel readOnly highlighted required>
+                  <PropertyLabel readOnly highlighted>
                     Template
                   </PropertyLabel>
                   <Box display='flex' flex={1}>
@@ -243,7 +243,7 @@ export function MilestonePropertiesForm({
                   Token
                 </PropertyLabel>
                 <RewardTokenProperty
-                  requireTokenAmount={false}
+                  requireTokenAmount={!isProposalTemplate}
                   onChange={onRewardTokenUpdate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}

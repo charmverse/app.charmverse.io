@@ -17,7 +17,7 @@ export function getProposalErrors({
   };
   proposal: Pick<
     CreateProposalInput,
-    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers'
+    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'
   > & {
     workflowId?: string | null;
   };

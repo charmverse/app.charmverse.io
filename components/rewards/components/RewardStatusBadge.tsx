@@ -62,7 +62,8 @@ export function RewardAmount({
   truncatePrecision = 4,
   typographyProps,
   fullForm,
-  noRewardText
+  noRewardText,
+  requireTokenAmount
 }: {
   noRewardText?: string;
   fullForm?: boolean;
@@ -70,6 +71,7 @@ export function RewardAmount({
   truncate?: boolean;
   truncatePrecision?: number;
   typographyProps?: TypographyProps;
+  requireTokenAmount?: boolean;
 }) {
   const [paymentMethods] = usePaymentMethods();
 
@@ -102,12 +104,16 @@ export function RewardAmount({
     ? Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(rewardAmount)
     : '';
 
-  const truncatedAmount = () => {
+  const truncateAmount = () => {
     if (!rewardAmount && typeof rewardAmount !== 'number') return '';
     try {
-      return millify(rewardAmount, { precision: truncatePrecision });
+      const truncatedAmount = millify(rewardAmount, { precision: truncatePrecision });
+      if (truncatedAmount === '0') {
+        return requireTokenAmount ? '0' : '';
+      }
+      return truncatedAmount;
     } catch (error) {
-      return 'Invalid number';
+      return requireTokenAmount ? 'Invalid number' : '';
     }
   };
   const chain = reward.chainId ? getChainById(reward.chainId) : undefined;
@@ -116,7 +122,7 @@ export function RewardAmount({
   return (
     <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>
       <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
-        {rewardAmount === 0 ? (
+        {rewardAmount === 0 && requireTokenAmount ? (
           <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
             <Typography
               component='span'
@@ -153,7 +159,7 @@ export function RewardAmount({
               textTransform='uppercase'
               {...typographyProps}
             >
-              {truncate ? truncatedAmount() : rewardAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}
+              {truncate ? truncateAmount() : rewardAmount || ''} {tokenInfo.isContract && tokenInfo.tokenSymbol}
             </Typography>
           </>
         )}

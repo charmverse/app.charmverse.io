@@ -81,10 +81,10 @@ export function ProposalRewardsTable({
     setCurrentPendingId
   } = useProposalRewards({
     assignedSubmitters,
-    isProposalTemplate,
     onSave,
     reviewers,
-    requiredTemplateId
+    requiredTemplateId,
+    isProposalTemplate
   });
 
   const tableView = useMemo(() => {

@@ -6,7 +6,6 @@ import { v4 } from 'uuid';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
@@ -31,7 +30,6 @@ export function useProposalRewards({
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
-  const isCharmVerseSpace = useIsCharmverseSpace();
 
   function closeDialog() {
     clearRewardValues();
@@ -65,13 +63,12 @@ export function useProposalRewards({
     page: newPageValues,
     reward: rewardValues,
     rewardType: rewardValues.rewardType,
-    isProposalTemplate,
-    isMilestone: isCharmVerseSpace,
-    templateId: newPageValues?.templateId
+    isMilestone: true,
+    isProposalTemplate
   }).join(', ');
 
   function getTemplateAppliedReward(template?: RewardTemplate) {
-    const rewardType = template ? getRewardType(template.reward) : 'none';
+    const rewardType = template ? getRewardType(template.reward) : 'token';
     return {
       rewardType,
       fields: template?.reward.fields,
