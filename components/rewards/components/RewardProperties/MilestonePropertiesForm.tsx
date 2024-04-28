@@ -243,6 +243,7 @@ export function MilestonePropertiesForm({
                   Token
                 </PropertyLabel>
                 <RewardTokenProperty
+                  requireTokenAmount={false}
                   onChange={onRewardTokenUpdate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}
