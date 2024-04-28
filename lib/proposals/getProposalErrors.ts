@@ -17,7 +17,7 @@ export function getProposalErrors({
   };
   proposal: Pick<
     CreateProposalInput,
-    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers'
+    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'
   > & {
     workflowId?: string | null;
   };
@@ -37,11 +37,17 @@ export function getProposalErrors({
     errors.push('Workflow is required');
   }
 
-  if (requireTemplates && page.type === 'proposal' && !proposal.proposalTemplateId && !page.sourceTemplateId) {
-    errors.push('Template is required');
-  }
-  if (page.type === 'proposal' && proposal.authors.length === 0) {
-    errors.push('At least one author is required');
+  // non-templates
+  if (page.type === 'proposal') {
+    if (requireTemplates && !proposal.proposalTemplateId && !page.sourceTemplateId) {
+      errors.push('Template is required');
+    }
+    if (proposal.authors.length === 0) {
+      errors.push('At least one author is required');
+    }
+    if (proposal.fields?.pendingRewards?.some((r) => r.reward.rewardType === 'token' && !r.reward.rewardAmount)) {
+      errors.push('Token amount is required for milestones');
+    }
   }
 
   if (proposalType === 'structured') {
@@ -58,7 +64,7 @@ export function getProposalErrors({
   } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }
-  // get the first validation error from the evaluations
+  // check evaluation configurations
   errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
 
   return errors;

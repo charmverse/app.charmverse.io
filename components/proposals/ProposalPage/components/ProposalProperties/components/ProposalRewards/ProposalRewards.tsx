@@ -266,7 +266,9 @@ export function ProposalRewards({
           )}
         </Stack>
       )}
-      {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
+      {canCreatePendingRewards && !pendingRewards?.length && (
+        <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+      )}
 
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}

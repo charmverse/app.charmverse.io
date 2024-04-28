@@ -3,20 +3,22 @@ import { v4 as uuid } from 'uuid';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { OptionalNullable } from 'lib/utils/types';
 
-type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations'>> & {
+type ProposalInput = Partial<Omit<ProposalWithUsersAndRubric, 'evaluations' | 'fields'>> & {
   evaluations?: Partial<ProposalWithUsersAndRubric['evaluations'][number]>[];
+  fields?: Partial<ProposalWithUsersAndRubric['fields']>;
 };
 
 export function createMockProposal(input: ProposalInput = {}): OptionalNullable<ProposalWithUsersAndRubric> {
   const id = uuid();
   return {
+    workflowId: 'test',
     issuedCredentials: [],
     publishToLens: null,
     archived: false,
     createdBy: '',
     selectedCredentialTemplates: [],
     id,
-    authors: [],
+    authors: [{ proposalId: 'id', userId: 'someone' }],
     reviewedAt: null,
     reviewedBy: null,
     spaceId: '',
