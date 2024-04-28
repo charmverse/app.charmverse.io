@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -70,7 +70,7 @@ export const StyledUserPropertyContainer = styled(Box, {
   overflow: ${(props) => (props.displayType === 'table' ? 'hidden' : 'initial')};
 `;
 
-function SelectedOptions({
+export function UserAndRoleSelectedOptions({
   value,
   isRequiredValue = () => false,
   readOnly,
@@ -82,14 +82,14 @@ function SelectedOptions({
   readOnly: boolean;
   value: SelectOptionPopulated[];
   isRequiredValue?: (option: SelectOptionPopulated) => boolean;
-  onRemove: (reviewerId: string) => void;
+  onRemove?: (reviewerId: string) => void;
   errorValues?: string[];
 }) {
   return (
     <>
       {value.map((option) => {
         return (
-          <>
+          <Fragment key={option.id}>
             {option.group === 'user' && (
               <Stack
                 mr={1}
@@ -106,7 +106,7 @@ function SelectedOptions({
               >
                 <UserDisplay fontSize={14} avatarSize='xSmall' userId={option.id} wrapName={wrapColumn} />
                 {!readOnly && !isRequiredValue(option) && (
-                  <IconButton size='small' onClick={() => onRemove(option.id)}>
+                  <IconButton size='small' onClick={() => onRemove?.(option.id)}>
                     <CloseIcon
                       sx={{
                         fontSize: 14
@@ -127,7 +127,7 @@ function SelectedOptions({
                 // color={option.color}
                 key={option.id}
                 size='small'
-                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
+                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove?.(option.id)}
                 deleteIcon={
                   <CloseIcon
                     sx={{
@@ -148,7 +148,7 @@ function SelectedOptions({
                 icon={option.icon}
                 variant='outlined'
                 size='small'
-                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove(option.id)}
+                onDelete={readOnly || isRequiredValue(option) ? undefined : () => onRemove?.(option.id)}
                 deleteIcon={
                   <CloseIcon
                     sx={{
@@ -159,7 +159,7 @@ function SelectedOptions({
                 }
               />
             )}
-          </>
+          </Fragment>
         );
       })}
     </>
@@ -288,7 +288,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
           ) : (
-            <SelectedOptions
+            <UserAndRoleSelectedOptions
               wrapColumn={wrapColumn}
               readOnly
               value={populatedValue}
@@ -385,7 +385,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
             );
           }}
           renderTags={() => (
-            <SelectedOptions
+            <UserAndRoleSelectedOptions
               wrapColumn={wrapColumn}
               readOnly={!!readOnly}
               value={populatedValue}

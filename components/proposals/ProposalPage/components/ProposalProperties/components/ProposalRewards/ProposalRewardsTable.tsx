@@ -8,24 +8,21 @@ import { ContextMenu } from 'components/common/ContextMenu';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
-import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { CardWithRelations } from 'lib/databases/card';
 import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -62,11 +59,9 @@ export function ProposalRewardsTable({
 }: Props) {
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
-  const { showPage } = usePageDialog();
-  const isCharmverseSpace = useIsCharmverseSpace();
-  const { rewards: allRewards, mutateRewards, isLoading: isLoadingRewards } = useRewards();
+  const { rewards: allRewards, isLoading: isLoadingRewards } = useRewards();
   const { pages, loadingPages } = usePages();
-
+  const { navigateToSpacePath } = useCharmRouter();
   const { getFeatureTitle } = useSpaceFeatures();
   const {
     createNewReward,
@@ -94,9 +89,8 @@ export function ProposalRewardsTable({
 
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
-      const rewardType = getRewardType(page.reward);
-      if (rewardType) {
-        acc.add(rewardType);
+      if (page.reward.rewardType) {
+        acc.add(page.reward.rewardType);
       }
       return acc;
     }, new Set());
@@ -139,13 +133,7 @@ export function ProposalRewardsTable({
   }
 
   function openPublishedReward(pageId: string) {
-    showPage({
-      pageId,
-      onClose: () => {
-        // refresh rewards in case a property was updated
-        mutateRewards();
-      }
-    });
+    navigateToSpacePath(`/${pageId}`);
   }
 
   function deleteReward() {
@@ -232,34 +220,18 @@ export function ProposalRewardsTable({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          {isCharmverseSpace ? (
-            <MilestonePropertiesForm
-              onChange={setRewardValues}
-              values={rewardValues}
-              isNewReward
-              readOnly={readOnly}
-              isTemplate={false}
-              expandedByDefault
-              templateId={newPageValues?.templateId}
-              readOnlyTemplate={!!requiredTemplateId}
-              selectTemplate={selectTemplate}
-              isProposalTemplate={isProposalTemplate}
-            />
-          ) : (
-            <RewardPropertiesForm
-              onChange={setRewardValues}
-              values={rewardValues}
-              isNewReward
-              readOnly={readOnly}
-              isTemplate={false}
-              expandedByDefault
-              forcedApplicationType='assigned'
-              templateId={newPageValues?.templateId}
-              readOnlyTemplate={!!requiredTemplateId}
-              selectTemplate={selectTemplate}
-              isProposalTemplate={isProposalTemplate}
-            />
-          )}
+          <MilestonePropertiesForm
+            onChange={setRewardValues}
+            values={rewardValues}
+            isNewReward
+            readOnly={readOnly}
+            isTemplate={false}
+            expandedByDefault
+            templateId={newPageValues?.templateId}
+            readOnlyTemplate={!!requiredTemplateId}
+            selectTemplate={selectTemplate}
+            isProposalTemplate={isProposalTemplate}
+          />
         </NewDocumentPage>
       </NewPageDialog>
     </>

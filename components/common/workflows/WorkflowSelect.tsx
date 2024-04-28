@@ -93,7 +93,7 @@ export function WorkflowSelect<Option extends { id: string; title: string }>({
           Workflow
         </PropertyLabel>
         <TagSelect
-          data-test='proposal-workflow-select'
+          data-test='workflow-select'
           disableClearable
           wrapColumn
           options={propertyOptions}

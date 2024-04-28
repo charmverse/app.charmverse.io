@@ -12,7 +12,7 @@ import { getRewardOrThrow } from './getReward';
 import { statusesAcceptingNewWork } from './shared';
 
 export type WorkUpsertData = { userId: string; rewardId: string; applicationId?: string } & Partial<
-  Pick<Application, 'message' | 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>
+  Pick<Application, 'message' | 'messageNodes' | 'submission' | 'submissionNodes' | 'walletAddress' | 'rewardInfo'>
 >;
 
 /**
@@ -23,6 +23,7 @@ export type WorkUpsertData = { userId: string; rewardId: string; applicationId?:
 export async function work({
   rewardId,
   message,
+  messageNodes,
   userId,
   submission,
   submissionNodes,
@@ -84,6 +85,7 @@ export async function work({
     submissionNodes: submissionNodesAsString,
     rewardInfo,
     message,
+    messageNodes: messageNodes as Prisma.JsonObject,
     walletAddress
   };
 

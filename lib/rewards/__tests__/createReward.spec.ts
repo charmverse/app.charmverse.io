@@ -230,6 +230,51 @@ describe('createReward', () => {
     );
   });
 
+  it('should add a full access page permission for the creator, and a no view permission for the space for a draft reward', async () => {
+    const rewardData: RewardCreationData = {
+      spaceId: space.id,
+      userId: user.id,
+      chainId: 2,
+      rewardAmount: 100,
+      rewardToken: 'BTC',
+      approveSubmitters: true,
+      maxSubmissions: 10,
+      dueDate: new Date(),
+      isDraft: true,
+      customReward: 'Special Badge',
+      fields: { fieldName: 'sampleField', type: 'text' },
+      pageProps: {
+        title: 'Reward Page'
+      },
+      reviewers: [{ id: user.id, group: 'user' }]
+    };
+
+    const { reward } = await createReward(rewardData);
+
+    const permissions = await prisma.pagePermission.findMany({
+      where: {
+        pageId: reward.id
+      }
+    });
+
+    expect(permissions).toEqual(
+      expect.arrayContaining<PagePermission>([
+        {
+          allowDiscovery: false,
+          id: expect.any(String),
+          inheritedFromPermission: null,
+          pageId: reward.id,
+          permissionLevel: 'full_access',
+          permissions: [],
+          userId: user.id,
+          public: null,
+          roleId: null,
+          spaceId: null
+        }
+      ])
+    );
+  });
+
   it('should throw a InvalidInputError if rewardAmount is negative', async () => {
     const rewardData = {
       spaceId: space.id,

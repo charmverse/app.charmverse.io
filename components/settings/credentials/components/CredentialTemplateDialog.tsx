@@ -143,13 +143,13 @@ function CredentialTemplateForm({ credentialTemplate, refreshTemplates, newCrede
             />
           </Box>
           <Divider />
-          <Box>
+          {/* <Box>
             <CredentialEventsSelector
               selectedCredentialEvents={selectedCredentialEvents as CredentialEventType[]}
               onChange={(events) => setValue('credentialEvents', events)}
               credentialTemplateType={templateType}
             />
-          </Box>
+          </Box> */}
           <ProposalCredentialPreview
             credentialTemplateType={templateType}
             credential={getValues() as ProposalCredentialToPreview}

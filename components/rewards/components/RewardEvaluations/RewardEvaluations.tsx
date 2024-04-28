@@ -5,7 +5,10 @@ import { EvaluationsReview } from './components/Review/EvaluationsReview';
 import type { EvaluationSettingsProps } from './components/Settings/EvaluationsSettings';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
-export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkflowChangeConfirmation'> & {
+export type RewardEvaluationsProps = Pick<
+  EvaluationSettingsProps,
+  'expanded' | 'rewardInput' | 'readOnly' | 'onChangeReward' | 'onChangeWorkflow'
+> & {
   isUnpublishedReward?: boolean;
   reward?: RewardWithUsers;
   application?: ApplicationWithTransactions;
@@ -13,7 +16,8 @@ export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkf
   refreshApplication?: VoidFunction;
   isDraft?: boolean;
   page?: PageWithContent;
-  refreshPage?: VoidFunction;
+  refreshReward?: VoidFunction;
+  isNewApplication?: boolean;
 };
 
 export function RewardEvaluations({
@@ -29,17 +33,20 @@ export function RewardEvaluations({
   isTemplate,
   refreshApplication,
   isDraft,
-  refreshPage
+  refreshReward,
+  isNewApplication
 }: RewardEvaluationsProps) {
   if (isDraft || isUnpublishedReward || isTemplate) {
     return (
       <EvaluationsSettings
         rewardInput={rewardInput}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
-        requireWorkflowChangeConfirmation
+        requireWorkflowChangeConfirmation={!!reward}
         expanded={expanded}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
+        isUnpublishedReward={isUnpublishedReward}
       />
     );
   } else if (reward && page) {
@@ -48,11 +55,13 @@ export function RewardEvaluations({
         page={page}
         application={application}
         expanded={expanded}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
         reward={reward}
         onChangeReward={onChangeReward}
         refreshApplication={refreshApplication}
-        refreshPage={refreshPage}
+        refreshReward={refreshReward}
+        isNewApplication={isNewApplication}
       />
     );
   }

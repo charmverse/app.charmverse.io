@@ -1,6 +1,5 @@
 import type { Bounty, Page } from '@charmverse/core/prisma';
 
-import { getRewardType } from './getRewardType';
 import type { RewardEvaluation } from './getRewardWorkflows';
 import type { RewardType, RewardWithUsers } from './interfaces';
 
@@ -19,19 +18,22 @@ type ValidationInput = {
   templateId?: string;
 };
 
-function getRewardPrizeError({
-  chainId,
-  customReward,
-  rewardAmount,
-  rewardToken,
-  rewardType
-}: {
-  rewardType: RewardType;
-  chainId?: number | null;
-  rewardToken?: string | null;
-  rewardAmount?: number | null;
-  customReward?: string | null;
-}) {
+function getRewardPrizeError(
+  {
+    chainId,
+    customReward,
+    rewardAmount,
+    rewardToken,
+    rewardType
+  }: {
+    rewardType: RewardType;
+    chainId?: number | null;
+    rewardToken?: string | null;
+    rewardAmount?: number | null;
+    customReward?: string | null;
+  },
+  isTemplate: boolean
+) {
   const errors: string[] = [];
 
   if (typeof rewardAmount === 'number' && rewardAmount < 0) {
@@ -40,7 +42,7 @@ function getRewardPrizeError({
     errors.push(`Reward amount must also have chainId and token`);
   } else if (rewardType === 'custom' && !customReward) {
     errors.push('Custom reward is required');
-  } else if (rewardType === 'token' && !(chainId && rewardToken && rewardAmount)) {
+  } else if (rewardType === 'token' && !(chainId && rewardToken && (rewardAmount || isTemplate))) {
     errors.push('Token information is required');
   }
 
@@ -56,30 +58,35 @@ export function getRewardErrors({
   isMilestone,
   templateId
 }: ValidationInput): string[] {
-  const errors: string[] = getRewardPrizeError({
-    ...reward,
-    rewardType
-  });
-
   const isTemplate = page?.type === 'bounty_template';
+  const errors: string[] = getRewardPrizeError(
+    {
+      ...reward,
+      rewardType
+    },
+    isTemplate
+  );
+
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
-  if (!isTemplate && !isMilestone) {
+  // In proposal template, reviewers are all the reviewers and assignedSubmitters are the authors
+  if (!isProposalTemplate) {
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');
-    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0 && !isProposalTemplate) {
+    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
       errors.push('You need to assign at least one submitter');
     }
-  }
-  if (isMilestone && !templateId) {
-    errors.push('Template is required for milestone');
   }
   return errors;
 }
 
-export function getEvaluationFormError(evaluation: RewardEvaluation, reward: RewardWithUsers): string | false {
+export function getEvaluationFormError(
+  evaluation: RewardEvaluation,
+  reward: RewardWithUsers,
+  isTemplate: boolean
+): string | false {
   switch (evaluation.type) {
     case 'apply':
     case 'submit':
@@ -88,10 +95,7 @@ export function getEvaluationFormError(evaluation: RewardEvaluation, reward: Rew
     case 'review':
       return reward.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'payment':
-      return getRewardPrizeError({
-        ...reward,
-        rewardType: getRewardType(reward)
-      }).join(', ');
+      return getRewardPrizeError(reward, isTemplate).join(', ');
     default:
       return false;
   }

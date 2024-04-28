@@ -7,14 +7,27 @@ import type { EasSchemaChain } from './connectors';
 import { getOnchainCredentialsById, type EASAttestationFromApi } from './external/getOnchainCredentials';
 import { getCharmverseOffchainCredentialsByIds, getParsedCredential } from './queriesAndMutations';
 
-export async function getProposalCredentials({ proposalId }: { proposalId: string }): Promise<EASAttestationFromApi[]> {
-  if (!proposalId) {
-    throw new InvalidInputError('proposaliD is required');
+export async function getProposalOrApplicationCredentials({
+  proposalId,
+  applicationId
+}: {
+  proposalId?: string;
+  applicationId?: string;
+}): Promise<EASAttestationFromApi[]> {
+  if (!proposalId && !applicationId) {
+    throw new InvalidInputError('proposalId or applicationId is required');
   }
   const issuedCredentials = await prisma.issuedCredential
     .findMany({
       where: {
-        proposalId
+        OR: [
+          {
+            proposalId
+          },
+          {
+            rewardApplicationId: applicationId
+          }
+        ]
       }
     })
     .then((data) =>

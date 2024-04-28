@@ -1,5 +1,6 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
+import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
@@ -18,44 +19,52 @@ import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/i
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { getAbsolutePath } from 'lib/utils/browser';
 
-import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
+import { RewardCredentials } from './components/RewardCredentials';
+import { SubmitStepReview } from './components/SubmitStepReview';
 
-export type Props = Omit<
-  EvaluationSettingsProps,
-  'onChangeWorkflow' | 'requireWorkflowChangeConfirmation' | 'rewardInput'
-> & {
+export type Props = Pick<EvaluationSettingsProps, 'isTemplate' | 'onChangeReward' | 'expanded' | 'readOnly'> & {
   reward: RewardWithUsers;
   application?: ApplicationWithTransactions;
   refreshApplication?: VoidFunction;
   page: PageWithContent;
-  refreshPage?: VoidFunction;
+  refreshReward?: VoidFunction;
+  isNewApplication?: boolean;
 };
 
 export function EvaluationsReview({
   application,
   reward,
+  isTemplate,
   onChangeReward,
   expanded: expandedContainer,
   readOnly,
   refreshApplication,
   page,
-  refreshPage
+  refreshReward,
+  isNewApplication
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const workflow = inferRewardWorkflow(workflowOptions, reward);
+  const hasIssuableOnchainCredentials = !!(
+    currentSpace?.useOnchainCredentials &&
+    currentSpace?.credentialsWallet &&
+    (application?.issuableOnchainCredentials ?? []).length > 0
+  );
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
       ? getRewardWorkflowWithApplication({
-          application,
-          workflow
+          applicationStatus: application?.status,
+          workflow,
+          hasCredentials: reward.selectedCredentialTemplates.length > 0,
+          hasIssuableOnchainCredentials
         })
       : workflow;
 
@@ -65,10 +74,10 @@ export function EvaluationsReview({
       updatedWorkflow: _updatedWorkflow,
       currentEvaluation: _currentEvaluation
     };
-  }, [workflow, application]);
+  }, [workflow, application, hasIssuableOnchainCredentials, reward.selectedCredentialTemplates.length]);
 
   const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
-    application ? currentEvaluation?.id : undefined
+    application || isNewApplication ? currentEvaluation?.id : undefined
   );
   const [evaluationInput, setEvaluationInput] = useState<RewardEvaluation | null>(null);
   const [tempRewardUpdates, setTempRewardUpdates] = useState<UpdateableRewardFields | null>(null);
@@ -77,10 +86,10 @@ export function EvaluationsReview({
   const shareText = `Check out ${page.title} from ${currentSpace?.domain} on CharmVerse: `;
 
   useEffect(() => {
-    if (currentEvaluation && application) {
+    if (currentEvaluation && (application || isNewApplication)) {
       setExpandedEvaluationId(currentEvaluation.id);
     }
-  }, [currentEvaluation, application]);
+  }, [currentEvaluation, application, isNewApplication]);
 
   function openSettings(evaluation: RewardEvaluation) {
     setEvaluationInput(cloneDeep(evaluation));
@@ -118,7 +127,7 @@ export function EvaluationsReview({
         </Tooltip>
       </Collapse>
       {updatedWorkflow?.evaluations.map((evaluation, index) => {
-        const isCurrent = application ? currentEvaluation?.id === evaluation.id : false;
+        const isCurrent = application || isNewApplication ? currentEvaluation?.id === evaluation.id : false;
         return (
           <EvaluationStepRow
             key={evaluation.id}
@@ -144,9 +153,21 @@ export function EvaluationsReview({
                 hideReviewResult={!isCurrent && evaluation.result === null}
               />
             ) : evaluation.type === 'payment' ? (
-              <PaymentStepReview application={application} reward={reward} refreshApplication={refreshApplication} />
+              <PaymentStepReview
+                application={application}
+                hidePaymentButton={!isCurrent}
+                reward={reward}
+                refreshApplication={refreshApplication}
+              />
             ) : evaluation.type === 'submit' ? (
-              <SubmitStepSettings readOnly onChange={() => {}} rewardInput={reward} />
+              <SubmitStepReview reward={reward} />
+            ) : evaluation.type === 'credential' ? (
+              <RewardCredentials
+                selectedCredentialTemplates={reward.selectedCredentialTemplates}
+                rewardId={reward.id}
+                application={application}
+                refreshApplication={refreshApplication}
+              />
             ) : null}
           </EvaluationStepRow>
         );
@@ -155,6 +176,7 @@ export function EvaluationsReview({
         <EvaluationStepSettingsModal
           close={closeSettings}
           evaluationInput={evaluationInput}
+          isTemplate={isTemplate}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
           reward={{
@@ -168,8 +190,8 @@ export function EvaluationsReview({
           <Divider />
           <SocialShareLinksStep
             pageId={page.id}
-            lensPostLink={page.lensPostLink}
-            onPublish={refreshPage}
+            lensPostLink={reward.lensPostLink}
+            onPublish={refreshReward}
             text={shareText}
             content={{
               type: 'doc',

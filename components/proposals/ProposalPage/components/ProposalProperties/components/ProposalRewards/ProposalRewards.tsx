@@ -7,13 +7,10 @@ import { SelectPreviewContainer } from 'components/common/DatabaseEditor/compone
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
-import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -35,8 +32,6 @@ type Props = {
   isProposalTemplate?: boolean;
 };
 
-const rewardQueryKey = 'rewardId';
-
 export function ProposalRewards({
   pendingRewards,
   readOnly,
@@ -49,16 +44,10 @@ export function ProposalRewards({
   variant,
   isProposalTemplate
 }: Props) {
-  useRewardsNavigation(rewardQueryKey);
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
-
   const { getFeatureTitle } = useSpaceFeatures();
-  const {
-    updateURLQuery,
-    navigateToSpacePath,
-    router: { query }
-  } = useCharmRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
@@ -86,18 +75,8 @@ export function ProposalRewards({
 
   function openReward(rewardId: string | null) {
     if (!rewardId) return;
-
-    const modalView = !!query.id;
-
-    if (!modalView) {
-      navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
-      return;
-    }
-    const pageIdToOpen = getRewardPage(rewardId)?.id;
-
-    updateURLQuery({ [rewardQueryKey]: pageIdToOpen });
+    navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
   }
-  const isCharmverseSpace = useIsCharmverseSpace();
 
   if (rewards.length) {
     return (
@@ -124,12 +103,7 @@ export function ProposalRewards({
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
                       <RewardAmount
-                        reward={{
-                          chainId: reward.chainId || null,
-                          customReward: reward.customReward || null,
-                          rewardAmount: reward.rewardAmount || null,
-                          rewardToken: reward.rewardToken || null
-                        }}
+                        reward={reward}
                         truncate={true}
                         truncatePrecision={2}
                         typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
@@ -175,12 +149,7 @@ export function ProposalRewards({
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
                             <RewardAmount
-                              reward={{
-                                chainId: reward.chainId || null,
-                                customReward: reward.customReward || null,
-                                rewardAmount: reward.rewardAmount || null,
-                                rewardToken: reward.rewardToken || null
-                              }}
+                              reward={reward}
                               truncate={true}
                               truncatePrecision={2}
                               typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
@@ -244,34 +213,18 @@ export function ProposalRewards({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          {isCharmverseSpace ? (
-            <MilestonePropertiesForm
-              onChange={setRewardValues}
-              values={rewardValues}
-              isNewReward
-              readOnly={readOnly}
-              isTemplate={false}
-              expandedByDefault
-              templateId={newPageValues?.templateId}
-              readOnlyTemplate={!!requiredTemplateId}
-              selectTemplate={selectTemplate}
-              isProposalTemplate={isProposalTemplate}
-            />
-          ) : (
-            <RewardPropertiesForm
-              onChange={setRewardValues}
-              values={rewardValues}
-              isNewReward
-              readOnly={readOnly}
-              isTemplate={false}
-              expandedByDefault
-              forcedApplicationType='assigned'
-              templateId={newPageValues?.templateId}
-              readOnlyTemplate={!!requiredTemplateId}
-              selectTemplate={selectTemplate}
-              isProposalTemplate={isProposalTemplate}
-            />
-          )}
+          <MilestonePropertiesForm
+            onChange={setRewardValues}
+            values={rewardValues}
+            isNewReward
+            readOnly={readOnly}
+            isTemplate={false}
+            expandedByDefault
+            templateId={newPageValues?.templateId}
+            readOnlyTemplate={!!requiredTemplateId}
+            selectTemplate={selectTemplate}
+            isProposalTemplate={isProposalTemplate}
+          />
         </NewDocumentPage>
       </NewPageDialog>
     </>

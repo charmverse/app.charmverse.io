@@ -25,9 +25,9 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
   const userId = req.session.user.id;
   const spaceId = req.body.spaceId;
 
-  const { numberOfConditions, chainType, accesType } = processTokenGateConditions(req.body);
+  const { numberOfConditions, chainType, accesType, gateType } = processTokenGateConditions(req.body);
 
-  const result = await prisma.tokenGate.create({
+  await prisma.tokenGate.create({
     data: {
       createdBy: req.session.user.id,
       resourceId: {},
@@ -40,7 +40,7 @@ async function saveTokenGate(req: NextApiRequest, res: NextApiResponse<void>) {
     spaceId,
     accesType,
     chainType,
-    gateType: result.type,
+    gateType,
     numberOfConditions
   });
 

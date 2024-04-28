@@ -13,20 +13,23 @@ import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBad
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { getGnosisTransactionUrl } from 'lib/gnosis/utils';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 
 type PaymentStepReviewActionProps = {
   reward: RewardWithUsers;
   application: ApplicationWithTransactions;
   refreshApplication?: () => void;
+  hidePaymentButton?: boolean;
 };
 
-function PaymentStepReviewAction({ application, refreshApplication, reward }: PaymentStepReviewActionProps) {
+function PaymentStepReviewAction({
+  hidePaymentButton,
+  application,
+  refreshApplication,
+  reward
+}: PaymentStepReviewActionProps) {
   const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: reward.id });
   const reviewPermission = rewardPermissions?.review;
-
-  const rewardType = getRewardType(reward);
 
   const { open, isOpen, close } = usePopupState({ variant: 'dialog', popupId: 'confirm-mark-submission-paid' });
   const { showMessage } = useSnackbar();
@@ -71,24 +74,33 @@ function PaymentStepReviewAction({ application, refreshApplication, reward }: Pa
 
   return (
     <>
-      {application.status === 'complete' && rewardType === 'token' && reviewPermission && (
-        <Box width='fit-content'>
-          <RewardPaymentButton
-            amount={String(reward.rewardAmount)}
-            chainIdToUse={reward.chainId as number}
-            receiver={application.walletAddress as string}
-            reward={reward}
-            tokenSymbolOrAddress={reward.rewardToken as string}
-            onSuccess={recordTransaction}
-            onError={(message) => showMessage(message, 'warning')}
-            submission={application}
-            refreshSubmission={refreshApplication ?? (() => {})}
-          />
-        </Box>
+      {application.status === 'complete' && reward.rewardType === 'token' && reviewPermission && !hidePaymentButton && (
+        <Stack justifyContent='flex-end' flexDirection='row'>
+          <Box width='fit-content'>
+            <RewardPaymentButton
+              buttonSize='medium'
+              amount={String(reward.rewardAmount)}
+              chainIdToUse={reward.chainId as number}
+              receiver={application.walletAddress as string}
+              reward={reward}
+              tokenSymbolOrAddress={reward.rewardToken as string}
+              onSuccess={recordTransaction}
+              onError={(message) => showMessage(message, 'warning')}
+              submission={application}
+              refreshSubmission={refreshApplication ?? (() => {})}
+            />
+          </Box>
+        </Stack>
       )}
 
-      {application.status === 'complete' && rewardType === 'custom' && reviewPermission && (
-        <Button onClick={open}>Mark as paid</Button>
+      {application.status === 'complete' && reward.rewardType === 'custom' && reviewPermission && (
+        <Stack justifyContent='flex-end' flexDirection='row'>
+          <Box width='fit-content'>
+            <Button data-test='mark-paid-button' onClick={open}>
+              Mark as paid
+            </Button>
+          </Box>
+        </Stack>
       )}
 
       {application.status === 'paid' && !!application.transactions.length && (
@@ -116,7 +128,7 @@ function PaymentStepReviewAction({ application, refreshApplication, reward }: Pa
             Please confirm you want to mark this reward as paid
           </Typography>
           <Box display='flex' gap={2} mt={3}>
-            <Button color='success' onClick={markAsPaid}>
+            <Button color='success' onClick={markAsPaid} data-test='confirm-mark-paid-button'>
               Confirm
             </Button>
 
@@ -133,15 +145,22 @@ function PaymentStepReviewAction({ application, refreshApplication, reward }: Pa
 export function PaymentStepReview({
   reward,
   application,
-  refreshApplication
-}: Omit<PaymentStepReviewActionProps, 'application'> & {
+  refreshApplication,
+  hidePaymentButton
+}: Pick<PaymentStepReviewActionProps, 'reward' | 'refreshApplication'> & {
   application?: ApplicationWithTransactions;
+  hidePaymentButton?: boolean;
 }) {
   return (
     <Stack gap={2}>
       <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
       {application && (
-        <PaymentStepReviewAction reward={reward} application={application} refreshApplication={refreshApplication} />
+        <PaymentStepReviewAction
+          hidePaymentButton={hidePaymentButton}
+          reward={reward}
+          application={application}
+          refreshApplication={refreshApplication}
+        />
       )}
     </Stack>
   );

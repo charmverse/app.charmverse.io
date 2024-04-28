@@ -6,7 +6,7 @@ import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 
 export default function PageView() {
   const router = useRouter();
-  const isTemplate = router.query.type === 'bounty_template';
+  const isTemplate = router.query.type === 'template';
   const selectedTemplate = router.query.template as string | undefined;
 
   const { isSpaceMember } = useIsSpaceMember();
