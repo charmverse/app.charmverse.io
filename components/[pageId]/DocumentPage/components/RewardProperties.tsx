@@ -4,11 +4,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { RewardApplications } from 'components/rewards/components/RewardApplications/RewardApplications';
 import { RewardSignupButton } from 'components/rewards/components/RewardProperties/components/RewardSignupButton';
-import { RewardPropertiesFormV2 } from 'components/rewards/components/RewardProperties/RewardPropertiesFormV2';
+import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
 import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 import debouncePromise from 'lib/utils/debouncePromise';
 
@@ -85,7 +84,7 @@ export function RewardProperties(props: {
 
   return (
     <Stack flex={1}>
-      <RewardPropertiesFormV2 {...rewardPropertiesFormProps} />
+      <RewardPropertiesForm {...rewardPropertiesFormProps} />
       {!isTemplate && (
         <>
           {!!currentReward?.id && showApplications && initialReward && initialReward?.status !== 'draft' && (
