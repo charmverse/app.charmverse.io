@@ -9,8 +9,8 @@ import { FormattedMessage } from 'react-intl';
 
 import { useTrashPages } from 'charmClient/hooks/pages';
 import { Button } from 'components/common/Button';
-import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEditor';
+import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
 import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
 import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
@@ -35,12 +35,10 @@ import { NewRewardButton } from 'components/rewards/components/NewRewardButton';
 import { useRewardsBoardMutator } from 'components/rewards/components/RewardsBoard/hooks/useRewardsBoardMutator';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewardsBoardAndBlocks } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
-import { useRewardsNavigation } from 'components/rewards/hooks/useRewardsNavigation';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useHasMemberLevel } from 'hooks/useHasMemberLevel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { createBoard } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
@@ -68,8 +66,6 @@ const StyledButton = styled(Button)`
 `;
 
 export function RewardsPage({ title }: { title: string }) {
-  useRewardsNavigation();
-
   const { space: currentSpace } = useCurrentSpace();
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
   const { isFreeSpace } = useIsFreeSpace();
@@ -79,7 +75,6 @@ export function RewardsPage({ title }: { title: string }) {
   const { getRewardPage } = useRewardPage();
   const [selectedPropertyId, setSelectedPropertyId] = useState<null | string>(null);
   const [checkedIds, setCheckedIds] = useState<string[]>([]);
-  const isCharmverseSpace = useIsCharmverseSpace();
   const isAdmin = useIsAdmin();
 
   const { board: activeBoard, views, cards, activeView } = useRewardsBoardAndBlocks();
@@ -127,11 +122,7 @@ export function RewardsPage({ title }: { title: string }) {
   function openPage(rewardId: string | null) {
     if (!rewardId) return;
     const pageId = getRewardPage(rewardId)?.id || rewardId;
-    if (isCharmverseSpace) {
-      navigateToSpacePath(`/${pageId}`);
-    } else if (openPageIn === 'center_peek') {
-      updateURLQuery({ id: pageId });
-    }
+    navigateToSpacePath(`/${pageId}`);
   }
 
   const onDelete = useCallback(async (rewardId: string) => {
@@ -142,11 +133,7 @@ export function RewardsPage({ title }: { title: string }) {
     if (id && (!rewardId || id === rewardId)) {
       openPage(id);
     } else if (id) {
-      if (isCharmverseSpace) {
-        navigateToSpacePath(`/rewards/applications/${id}`);
-      } else if (openPageIn === 'center_peek') {
-        updateURLQuery({ applicationId: id });
-      }
+      navigateToSpacePath(`/rewards/applications/${id}`);
     }
   };
 
@@ -254,7 +241,7 @@ export function RewardsPage({ title }: { title: string }) {
                   flexDirection: 'row-reverse'
                 }}
               >
-                <NewRewardButton showPage={openPage} />
+                <NewRewardButton />
               </Box>
             </Box>
           </Box>
@@ -440,10 +427,8 @@ export function RewardsPage({ title }: { title: string }) {
                 view={activeView}
                 isOpen={!!showSidebar}
                 closeSidebar={() => setShowSidebar(false)}
-                hideLayoutOptions={isCharmverseSpace ? true : undefined}
-                hideLayoutSelectOptions={
-                  isCharmverseSpace ? undefined : defaultRewardViews.includes(activeView?.id || '')
-                }
+                hideLayoutOptions
+                hideLayoutSelectOptions={undefined}
                 hideSourceOptions
                 hideGroupOptions
                 groupByProperty={groupByProperty}

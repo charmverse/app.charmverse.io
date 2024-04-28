@@ -1,6 +1,6 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
-import { Box, ListItemIcon, MenuItem, ListItemText, Stack, Typography } from '@mui/material';
+import { Box, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { uniqBy } from 'lodash';
 import { useMemo, useState } from 'react';
 import { v4 } from 'uuid';
@@ -11,7 +11,6 @@ import Table from 'components/common/DatabaseEditor/components/table/table';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
-import { usePageDialog } from 'components/common/PageDialog/hooks/usePageDialog';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
@@ -21,6 +20,7 @@ import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { mapRewardToCard } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { usePages } from 'hooks/usePages';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -31,7 +31,7 @@ import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardWithUsers, RewardType, RewardReviewer } from 'lib/rewards/interfaces';
+import type { RewardReviewer, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
 import { AttachRewardButton } from './AttachRewardButton';
@@ -65,8 +65,7 @@ export function ProposalRewardsTable({
 }: Props) {
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
-  const { showPage } = usePageDialog();
-
+  const { navigateToSpacePath } = useCharmRouter();
   const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
   const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
   const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
@@ -78,9 +77,8 @@ export function ProposalRewardsTable({
 
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
-      const rewardType = getRewardType(page.reward);
-      if (rewardType) {
-        acc.add(rewardType);
+      if (page.reward.rewardType) {
+        acc.add(page.reward.rewardType);
       }
       return acc;
     }, new Set());
@@ -150,9 +148,7 @@ export function ProposalRewardsTable({
       : assignedSubmitters;
 
     const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
+
     setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
@@ -181,13 +177,7 @@ export function ProposalRewardsTable({
   }
 
   function openPublishedReward(pageId: string) {
-    showPage({
-      pageId,
-      onClose: () => {
-        // refresh rewards in case a property was updated
-        mutateRewards();
-      }
-    });
+    navigateToSpacePath(`/${pageId}`);
   }
 
   function selectTemplate(template: RewardTemplate | null) {

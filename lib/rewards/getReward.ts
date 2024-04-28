@@ -25,6 +25,11 @@ export function rewardWithUsersInclude() {
         permissionLevel: true
       }
     },
+    page: {
+      select: {
+        lensPostLink: true
+      }
+    },
     proposal: {
       select: {
         page: {

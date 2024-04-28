@@ -14,7 +14,6 @@ import { handleImageFileDrop } from 'components/common/CharmEditor/components/@b
 import type { FrontendParticipant } from 'components/common/CharmEditor/components/fiduswriter/collab';
 import type { ConnectionEvent } from 'components/common/CharmEditor/components/fiduswriter/ws';
 import { focusEventName } from 'components/common/CharmEditor/constants';
-import { AddBountyButton } from 'components/common/DatabaseEditor/components/cardDetail/AddBountyButton';
 import CardDetailProperties from 'components/common/DatabaseEditor/components/cardDetail/cardDetailProperties';
 import { makeSelectBoard } from 'components/common/DatabaseEditor/store/boards';
 import { makeSelectViewCardsSortedFilteredAndGrouped } from 'components/common/DatabaseEditor/store/cards';
@@ -26,22 +25,19 @@ import { ProposalEvaluations } from 'components/proposals/ProposalPage/component
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
-import { NewInlineReward } from 'components/rewards/components/NewInlineReward';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
-import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCharmEditor } from 'hooks/useCharmEditor';
 import { useCharmEditorView } from 'hooks/useCharmEditorView';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { useThreads } from 'hooks/useThreads';
 import { useUser } from 'hooks/useUser';
 import type { PageWithContent } from 'lib/pages/interfaces';
-import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isTruthy } from 'lib/utils/types';
 import { fontClassName } from 'theme/fonts';
@@ -80,7 +76,6 @@ export type DocumentPageProps = {
   setSidebarView?: IPageSidebarContext['setActiveView'];
   showCard?: (cardId: string | null) => void;
   showParentChip?: boolean;
-  refreshPage?: VoidFunction;
 };
 
 function DocumentPageComponent({
@@ -92,8 +87,7 @@ function DocumentPageComponent({
   sidebarView,
   setSidebarView,
   showCard,
-  showParentChip,
-  refreshPage
+  showParentChip
 }: DocumentPageProps) {
   const { user } = useUser();
   const { router } = useCharmRouter();
@@ -103,14 +97,12 @@ function DocumentPageComponent({
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
   const dispatch = useAppDispatch();
   const [currentTab, setCurrentTab] = useState<number>(0);
-  const { creatingInlineReward } = useRewards();
   const isMdScreen = useMdScreen();
   const isAdmin = useIsAdmin();
   const pagePermissions = page.permissionFlags;
   const proposalId = page.proposalId;
   const rewardId = page.bountyId;
   const { updateURLQuery, navigateToSpacePath } = useCharmRouter();
-  const isCharmverseSpace = useIsCharmverseSpace();
 
   const {
     proposal,
@@ -419,9 +411,10 @@ function DocumentPageComponent({
               ) : page.type === 'bounty' || page.type === 'bounty_template' ? (
                 <RewardEvaluations
                   isTemplate={page.type === 'bounty_template'}
+                  isDraft={reward?.status === 'draft'}
                   reward={reward}
                   readOnly={readOnly}
-                  refreshPage={refreshPage}
+                  refreshReward={refreshReward}
                   page={page}
                   rewardInput={reward}
                   expanded
@@ -435,20 +428,17 @@ function DocumentPageComponent({
                 <CardPropertiesWrapper>
                   {/* Property list */}
                   {card && board && !hideCardDetails && (
-                    <>
-                      <CardDetailProperties
-                        syncWithPageId={page.syncWithPageId}
-                        board={board}
-                        card={card}
-                        showCard={_showCard}
-                        cards={cards}
-                        views={boardViews}
-                        readOnly={readOnly}
-                        pageUpdatedAt={page.updatedAt.toString()}
-                        pageUpdatedBy={page.updatedBy}
-                      />
-                      <AddBountyButton readOnly={readOnly} card={card} />
-                    </>
+                    <CardDetailProperties
+                      syncWithPageId={page.syncWithPageId}
+                      board={board}
+                      card={card}
+                      showCard={_showCard}
+                      cards={cards}
+                      views={boardViews}
+                      readOnly={readOnly}
+                      pageUpdatedAt={page.updatedAt.toString()}
+                      pageUpdatedBy={page.updatedBy}
+                    />
                   )}
                   {proposalId && (
                     <ProposalProperties
@@ -467,12 +457,11 @@ function DocumentPageComponent({
                       pagePath={page.path}
                       readOnly={readOnly}
                       showApplications
-                      expandedRewardProperties={!isCharmverseSpace}
+                      expandedRewardProperties={false}
                       templateId={page.sourceTemplateId || undefined}
                       isTemplate={page.type === 'bounty_template'}
                     />
                   )}
-                  {creatingInlineReward && !readOnly && <NewInlineReward pageId={page.id} />}
                 </CardPropertiesWrapper>
                 {proposal && proposal.formId ? (
                   page.type === 'proposal_template' ? (
@@ -496,7 +485,7 @@ function DocumentPageComponent({
                 ) : (
                   <CharmEditor
                     placeholderText={
-                      page.type === 'bounty' || page.type === 'bounty_template'
+                      (page.type === 'bounty' || page.type === 'bounty_template') && !readOnly
                         ? `Describe the reward. Type '/' to see the list of available commands`
                         : undefined
                     }

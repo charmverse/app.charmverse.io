@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
 import { Button } from 'components/common/Button';
-import Link from 'components/common/Link';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 
 export type UserCredentialRowProps = {
@@ -25,14 +24,14 @@ export function CredentialRow({ credential, isSmallScreen, verificationUrl }: Us
 
   return (
     <Stack gap={1} alignItems='center' justifyContent='space-between' flexDirection='row'>
-      <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='50%'>
+      <Box gap={1} display='flex' alignItems='center' justifyItems='flex-start' flexBasis='100%' sx={{ pr: 1 }}>
         <Image
           src={credentialInfo.iconUrl}
           alt='charmverse-logo'
           height={isSmallScreen ? 40 : 30}
           width={isSmallScreen ? 40 : 30}
         />
-        <Box display='flex' flexDirection='column' flexGrow={1}>
+        <Box display='flex' flexDirection='column' flexGrow={2}>
           <Typography variant='body1' fontWeight='bold'>
             {credentialInfo.title}
           </Typography>

@@ -1,25 +1,7 @@
-import type { RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
-
 import type { RewardWorkflow } from './getRewardWorkflows';
+import type { UpdateableRewardFields } from './updateRewardSettings';
 
-export type RewardInput = Partial<
-  Pick<
-    RewardWithUsers,
-    | 'assignedSubmitters'
-    | 'approveSubmitters'
-    | 'reviewers'
-    | 'dueDate'
-    | 'allowMultipleApplications'
-    | 'allowedSubmitterRoles'
-    | 'maxSubmissions'
-    | 'chainId'
-    | 'customReward'
-    | 'rewardToken'
-    | 'rewardAmount'
-  > & { rewardType?: RewardType }
->;
-
-export function inferRewardWorkflow(workflows: RewardWorkflow[], reward: RewardInput | undefined) {
+export function inferRewardWorkflow(workflows: RewardWorkflow[], reward: UpdateableRewardFields | undefined) {
   if (!reward) {
     return null;
   }

@@ -21,8 +21,6 @@ import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { rewardCredentialSchemaId } from 'lib/credentials/schemas/reward';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
-import { UserCredentialHideAndPublish } from './UserCredentialHideAndPublish';
-
 export type UserCredentialRowProps = {
   credential: EASAttestationFromApi & Partial<Pick<EASAttestationWithFavorite, 'favoriteCredentialId' | 'index'>>;
   readOnly?: boolean;

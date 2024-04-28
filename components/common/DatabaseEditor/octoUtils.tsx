@@ -56,8 +56,12 @@ class OctoUtils {
       }
       case 'multiSelect': {
         if (Array.isArray(propertyValue)) {
-          const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
-          displayValue = options.map((o) => o.value);
+          if (propertyTemplate.dynamicOptions) {
+            displayValue = propertyValue;
+          } else {
+            const options = propertyTemplate.options.filter((o) => propertyValue.includes(o.id));
+            displayValue = options.map((o) => o.value);
+          }
         }
         break;
       }

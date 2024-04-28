@@ -12,6 +12,7 @@ import { EvaluationStepSettings } from '../../Settings/components/EvaluationStep
 export function EvaluationStepSettingsModal({
   close,
   reward,
+  isTemplate,
   saveEvaluation,
   updateEvaluation,
   evaluationInput
@@ -19,15 +20,17 @@ export function EvaluationStepSettingsModal({
   evaluationInput: RewardEvaluation;
   close: VoidFunction;
   reward: RewardWithUsers;
+  isTemplate: boolean;
   saveEvaluation: () => void;
   updateEvaluation: (updates: UpdateableRewardFields) => void;
 }) {
-  const evaluationInputError = getEvaluationFormError(evaluationInput, reward);
+  const evaluationInputError = getEvaluationFormError(evaluationInput, reward, isTemplate);
   return (
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
       <Box mb={2}>
         <EvaluationStepSettings
           evaluation={evaluationInput}
+          isTemplate={isTemplate}
           readOnly={false}
           rewardInput={reward}
           rewardStatus={reward.status}

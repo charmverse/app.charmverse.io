@@ -27,12 +27,14 @@ type FormInput = {
 export function RewardTokenDialog({
   displayType,
   currentReward,
+  requireTokenAmount,
   readOnly,
   children,
   onChange
 }: {
   displayType?: PropertyValueDisplayType;
   readOnly?: boolean;
+  requireTokenAmount: boolean;
   currentReward: Pick<RewardCreationData & RewardWithUsers, 'rewardAmount' | 'rewardToken' | 'chainId'>;
   children: ReactNode;
   onChange: (value: RewardTokenDetails | null) => void;
@@ -164,7 +166,9 @@ export function RewardTokenDialog({
       >
         <Stack flex={1} className='CardDetail content'>
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Chain</PropertyLabel>
+            <PropertyLabel required readOnly>
+              Chain
+            </PropertyLabel>
             <Controller
               name='chainId'
               control={control}
@@ -184,7 +188,9 @@ export function RewardTokenDialog({
           </Box>
 
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Token</PropertyLabel>
+            <PropertyLabel required readOnly>
+              Token
+            </PropertyLabel>
             <Controller
               name='rewardToken'
               control={control}
@@ -209,11 +215,16 @@ export function RewardTokenDialog({
           </Box>
 
           <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-            <PropertyLabel readOnly>Amount</PropertyLabel>
+            <PropertyLabel required={requireTokenAmount} readOnly>
+              Amount
+            </PropertyLabel>
             <Controller
               name='rewardAmount'
               control={control}
-              rules={{ required: true, validate: (value) => Number(value) > 0 }}
+              rules={{
+                required: requireTokenAmount,
+                validate: (value) => (requireTokenAmount ? Number(value) > 0 : true)
+              }}
               render={({ field: { onChange: _onChange, value } }) => (
                 <TextField
                   onChange={_onChange}
@@ -227,7 +238,7 @@ export function RewardTokenDialog({
                   sx={{
                     width: '100%'
                   }}
-                  required
+                  required={requireTokenAmount}
                   disabled={readOnly}
                   placeholder='Number greater than 0'
                   error={!!errors.rewardAmount}

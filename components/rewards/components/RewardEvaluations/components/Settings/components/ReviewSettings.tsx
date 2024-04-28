@@ -10,7 +10,7 @@ export function ReviewStepSettings({
   rewardInput,
   readOnly,
   onChange
-}: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers as UpdateableRewardFields['reviewers']
@@ -26,7 +26,7 @@ export function ReviewStepSettings({
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
         <UserAndRoleSelect
-          data-test='reward-review-select'
+          data-test='reward-reviewer-select'
           emptyPlaceholderContent='Select user or role'
           value={(rewardInput?.reviewers ?? []) as SelectOption[]}
           readOnly={readOnly}

@@ -37,6 +37,7 @@ interface Props {
   onError?: (err: string, severity?: AlertColor) => void;
   reward: RewardWithUsers;
   refreshSubmission: () => void;
+  buttonSize?: ButtonProps['size'];
 }
 
 export function RewardPaymentButton({
@@ -48,7 +49,8 @@ export function RewardPaymentButton({
   onError = () => {},
   onSuccess = () => {},
   chainIdToUse,
-  tokenSymbolOrAddress
+  tokenSymbolOrAddress,
+  buttonSize = 'small'
 }: Props) {
   const { account, chainId, signer } = useWeb3Account();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -156,7 +158,7 @@ export function RewardPaymentButton({
     return (
       <div>
         <Tooltip title='Your wallet must be unlocked to pay for this reward'>
-          <OpenWalletSelectorButton size='small' label='Unlock Wallet' />
+          <OpenWalletSelectorButton size={buttonSize} label='Unlock Wallet' />
         </Tooltip>
       </div>
     );
@@ -168,7 +170,7 @@ export function RewardPaymentButton({
         loading={sendingTx}
         color='primary'
         endIcon={hasSafes && !sendingTx ? <KeyboardArrowDownIcon /> : null}
-        size='small'
+        size={buttonSize}
         onClick={(e: MouseEvent<HTMLButtonElement>) => {
           if (!hasSafes) {
             makePayment();

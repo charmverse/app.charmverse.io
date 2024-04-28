@@ -69,12 +69,7 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
           </Typography>
           <Stack alignItems='center' direction='row' height='100%'>
             <RewardAmount
-              reward={{
-                chainId: reward.chainId || null,
-                customReward: reward.customReward || null,
-                rewardAmount: reward.rewardAmount || null,
-                rewardToken: reward.rewardToken || null
-              }}
+              reward={reward}
               truncate={true}
               truncatePrecision={2}
               typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
