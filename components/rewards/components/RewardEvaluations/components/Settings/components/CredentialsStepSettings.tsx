@@ -2,7 +2,7 @@ import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
 
-export function CredentialsSettings({
+export function CredentialsStepSettings({
   rewardInput,
   readOnly,
   onChange

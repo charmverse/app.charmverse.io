@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
-import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
-import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
+import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -16,7 +16,7 @@ import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 
-import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
+import { EvaluationStepRow } from '../../../../../../common/WorkflowSidebar/components/EvaluationStepRow';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EditStepButton } from './components/EditStepButton';

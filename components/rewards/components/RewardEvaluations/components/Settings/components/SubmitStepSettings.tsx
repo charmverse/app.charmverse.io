@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
-import { Box, Checkbox, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { Box, Checkbox, Stack, TextField } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
+import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
 
@@ -34,11 +35,7 @@ export function SubmitStepSettings({
   return (
     <Stack gap={2}>
       <Box>
-        <FormLabel>
-          <Typography sx={{ mb: 1 }} variant='subtitle1'>
-            Due date
-          </Typography>
-        </FormLabel>
+        <FieldLabel>Due date</FieldLabel>
         <DateTimePicker
           sx={{
             width: '100%'
@@ -66,11 +63,7 @@ export function SubmitStepSettings({
       {!isAssignedReward ? (
         <>
           <RowStack>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Allow multiple entries
-              </Typography>
-            </FormLabel>
+            <FieldLabel>Allow multiple entries</FieldLabel>
             <Checkbox
               sx={{
                 p: 0
@@ -88,11 +81,7 @@ export function SubmitStepSettings({
             />
           </RowStack>
           <Box>
-            <FormLabel>
-              <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                Applicant Roles
-              </Typography>
-            </FormLabel>
+            <FieldLabel>Applicant Roles</FieldLabel>
             <UserAndRoleSelect
               type='role'
               readOnly={readOnly}
@@ -109,11 +98,7 @@ export function SubmitStepSettings({
           </Box>
 
           <Box>
-            <FormLabel>
-              <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                # Available
-              </Typography>
-            </FormLabel>
+            <FieldLabel># Available</FieldLabel>
             <TextField
               onChange={(e) => {
                 const value = Number(e.target.value);
@@ -140,11 +125,7 @@ export function SubmitStepSettings({
         </>
       ) : (
         <Box>
-          <FormLabel>
-            <Typography sx={{ mb: 1 }} variant='subtitle1'>
-              Assigned applicants
-            </Typography>
-          </FormLabel>
+          <FieldLabel>Assigned applicants</FieldLabel>
           <UserSelect
             memberIds={rewardInput.assignedSubmitters ?? []}
             readOnly={readOnly}

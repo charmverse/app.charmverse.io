@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 
+import { useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { getEvaluationFormError } from 'lib/rewards/getRewardErrors';
@@ -15,6 +16,7 @@ export function EvaluationStepSettingsModal({
   isTemplate,
   saveEvaluation,
   updateEvaluation,
+  templateId,
   evaluationInput
 }: {
   evaluationInput: RewardEvaluation;
@@ -22,14 +24,17 @@ export function EvaluationStepSettingsModal({
   reward: RewardWithUsers;
   isTemplate: boolean;
   saveEvaluation: () => void;
+  templateId?: string | null;
   updateEvaluation: (updates: UpdateableRewardFields) => void;
 }) {
   const evaluationInputError = getEvaluationFormError(evaluationInput, reward, isTemplate);
+  const { data: rewardTemplate } = useGetRewardTemplate(templateId);
   return (
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
       <Box mb={2}>
         <EvaluationStepSettings
           evaluation={evaluationInput}
+          rewardTemplateInput={rewardTemplate}
           isTemplate={isTemplate}
           readOnly={false}
           rewardInput={reward}
