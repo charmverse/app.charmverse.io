@@ -92,6 +92,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
         voteSettings: e.voteSettings as any,
         rubricCriteria: e.rubricCriteria as any[]
       })),
+      fields: proposalPage.proposal!.fields as any,
       authors: proposalPage.proposal!.authors.map((a) => a.userId),
       formAnswers: proposalPage.proposal!.formAnswers as unknown as FieldAnswerInput[],
       formFields: proposalPage.proposal!.form?.formFields as unknown as FormFieldInput[]
