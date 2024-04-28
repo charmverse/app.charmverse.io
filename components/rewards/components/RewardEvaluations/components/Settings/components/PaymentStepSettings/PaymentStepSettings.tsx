@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
-import { Box, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Stack, TextField } from '@mui/material';
 import clsx from 'clsx';
 
-import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
+import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardTokenDetails, RewardType } from 'lib/rewards/interfaces';
+import type { RewardType } from 'lib/rewards/interfaces';
 
 import type { EvaluationStepSettingsProps } from '../EvaluationStepSettings';
 
@@ -16,8 +16,6 @@ import { RewardTypeSelect } from './components/RewardTypeSelect';
 const RowStack = styled(Stack)`
   flex-direction: row;
   align-items: center;
-  gap: ${({ theme }) => theme.spacing(2)};
-  justify-content: space-between;
 `;
 
 export function PaymentStepSettings({
@@ -70,67 +68,48 @@ export function PaymentStepSettings({
   return (
     <Stack gap={1.5}>
       <RowStack>
-        <FormLabel required style={{ width: '150px' }}>
-          <Typography component='span' variant='subtitle1'>
-            Type
-          </Typography>
-        </FormLabel>
+        <FieldLabel style={{ width: 150 }}>Type</FieldLabel>
         <Box flexGrow={1}>
           <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
         </Box>
       </RowStack>
 
       {rewardType === 'token' && (
-        <>
-          {/* <FormLabel required>
-            <Typography component='span' variant='subtitle1'>
-              Token
-            </Typography>
-          </FormLabel> */}
-          <Box width='fit-content'>
-            <RewardTokenForm
-              onChange={onRewardTokenUpdate}
-              defaultValues={rewardInput}
-              readOnly={!!readOnly}
-              readOnlyToken={!!rewardTemplateInput?.rewardToken}
-              requireTokenAmount={!isTemplate}
-            />
-          </Box>
-        </>
+        <Box width='fit-content'>
+          <RewardTokenForm
+            onChange={onRewardTokenUpdate}
+            defaultValues={rewardInput}
+            readOnly={!!readOnly}
+            readOnlyToken={!!rewardTemplateInput?.rewardToken}
+            requireTokenAmount={!isTemplate}
+          />
+        </Box>
       )}
 
       {rewardType === 'custom' && (
         <RowStack>
-          <FormLabel required>
-            <Typography component='span' variant='subtitle1'>
-              Custom {getFeatureTitle('Reward')}
-            </Typography>
-          </FormLabel>
-          <Box width='fit-content'>
-            <StyledPropertyTextInput
-              data-test='custom-reward-input'
-              onChange={(e) => {
-                onChange({
-                  customReward: e.target.value.trim()
-                });
-              }}
-              value={rewardInput?.customReward ?? ''}
-              required
-              size='small'
-              inputProps={{
-                style: { height: 'auto' },
-                className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
-              }}
-              sx={{
-                width: '100%'
-              }}
-              disabled={readOnly}
-              placeholder='T-shirt'
-              autoFocus
-              rows={1}
-              type='text'
-            />
-          </Box>
+          <FieldLabel required={!readOnly} style={{ width: 150 }}>
+            Custom {getFeatureTitle('Reward')}
+          </FieldLabel>
+          <TextField
+            data-test='custom-reward-input'
+            onChange={(e) => {
+              onChange({
+                customReward: e.target.value.trim()
+              });
+            }}
+            value={rewardInput?.customReward ?? ''}
+            required
+            size='small'
+            inputProps={{
+              style: { height: 'auto' },
+              className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+            }}
+            disabled={readOnly}
+            placeholder='T-shirt'
+            autoFocus
+            sx={{ flexGrow: 1 }}
+          />
         </RowStack>
       )}
     </Stack>

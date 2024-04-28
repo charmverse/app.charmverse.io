@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { WorkflowSidebar, type SidebarProps } from 'components/common/workflows/WorkflowSidebar';
+import { WorkflowSidebar, type SidebarProps } from 'components/common/WorkflowSidebar/WorkflowSidebar';
 import { ProposalNotesLink } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/ProposalNotesLink';
 import type { ProposalEvaluationsProps } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';

@@ -3,8 +3,8 @@ import { useMemo } from 'react';
 
 import { useGetRewardWorkflows, useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
-import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
+import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';

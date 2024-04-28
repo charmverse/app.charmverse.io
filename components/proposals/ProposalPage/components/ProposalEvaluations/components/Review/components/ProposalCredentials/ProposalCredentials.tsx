@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
 import { useProposal } from 'components/[pageId]/DocumentPage/hooks/useProposal';
-import { CredentialReviewStep } from 'components/common/workflows/Credentials/CredentialReviewStep';
+import { CredentialReviewStep } from 'components/common/WorkflowSidebar/components/CredentialReviewStep/CredentialReviewStep';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 

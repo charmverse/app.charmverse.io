@@ -3,12 +3,12 @@ import { Box, Stack, TextField } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
 import { getChainById } from 'connectors/chains';
 import { useEffect, useState } from 'react';
-import type { Control } from 'react-hook-form';
 import { Controller, useForm } from 'react-hook-form';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
+import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { isTruthy } from 'lib/utils/types';
 
@@ -18,8 +18,6 @@ export type FormInput = {
   rewardToken?: string | null;
 };
 
-type FormField = keyof FormInput;
-
 /**
  *
  * When a user is creating a reward from a template and the token is set but not the amount, props should be:
@@ -27,40 +25,25 @@ type FormField = keyof FormInput;
  */
 type Props = {
   defaultValues?: FormInput;
-  // defaultChainId?: number | null;
-  // defaultTokenId?: string | null;
   readOnly: boolean;
   readOnlyToken: boolean;
   requireTokenAmount: boolean;
   onChange: (value: FormInput) => void;
   setIsValid?: (value: boolean) => void;
-  // the following props are from useForm()
-  // onChange: Control;
-  // watch: <T = any>(name: string) => T;
-  // setValue: (name: FormField, value: any) => void;
-  // errors: FieldErrors;
 };
 
 export function RewardTokenForm({
   defaultValues,
   onChange,
   setIsValid,
-  // defaultChainId,
-  // defaultTokenId,
-  // control,
   readOnly,
   readOnlyToken,
   requireTokenAmount
-}: // watch,
-// errors,
-// setValue
-Props) {
+}: Props) {
   const [paymentMethods] = usePaymentMethods();
   const [availableCryptos, setAvailableCryptos] = useState<(string | CryptoCurrency)[]>(['ETH']);
   const {
     control,
-    // handleSubmit,
-    // reset,
     setValue,
     watch,
     formState: { errors, isValid }
@@ -120,11 +103,11 @@ Props) {
   }, [isValid, values]);
 
   return (
-    <Stack flex={1} className='CardDetail content'>
-      <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-        <PropertyLabel required readOnly>
+    <Stack gap={1}>
+      <Box display='flex' alignItems='center'>
+        <FieldLabel required={!readOnly} style={{ width: 150 }}>
           Chain
-        </PropertyLabel>
+        </FieldLabel>
         <Controller
           name='chainId'
           control={control}
@@ -135,7 +118,7 @@ Props) {
               readOnly={readOnly}
               chainId={value || undefined}
               sx={{
-                width: '100%'
+                flexGrow: 1
               }}
               onChange={_onChange}
             />
@@ -143,10 +126,10 @@ Props) {
         />
       </Box>
 
-      <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-        <PropertyLabel required readOnly>
+      <Box display='flex' alignItems='center'>
+        <FieldLabel required={!readOnly} style={{ width: 150 }}>
           Token
-        </PropertyLabel>
+        </FieldLabel>
         <Controller
           name='rewardToken'
           control={control}
@@ -164,17 +147,17 @@ Props) {
               onChange={_onChange}
               onNewPaymentMethod={onNewPaymentMethod}
               sx={{
-                width: '100%'
+                flexGrow: 1
               }}
             />
           )}
         />
       </Box>
 
-      <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
-        <PropertyLabel required={requireTokenAmount} readOnly>
+      <Box display='flex' alignItems='center'>
+        <FieldLabel required={requireTokenAmount} style={{ width: 150 }}>
           Amount
-        </PropertyLabel>
+        </FieldLabel>
         <Controller
           name='rewardAmount'
           control={control}
@@ -193,7 +176,7 @@ Props) {
                 style: { height: 'auto' }
               }}
               sx={{
-                width: '100%'
+                flexGrow: 1
               }}
               required={requireTokenAmount}
               disabled={readOnly && readOnlyToken}

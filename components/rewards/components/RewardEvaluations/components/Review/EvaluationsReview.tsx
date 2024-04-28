@@ -5,9 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
-import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
-import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
+import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
+import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
