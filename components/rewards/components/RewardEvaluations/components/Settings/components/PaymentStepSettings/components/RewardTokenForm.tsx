@@ -157,7 +157,7 @@ export function RewardTokenForm({
       </Box>
 
       <Box display='flex' alignItems='center'>
-        <FieldLabel required={requireTokenAmount && !readOnlyTokenAmount} style={{ width: 150 }}>
+        <FieldLabel required={requireTokenAmount && !readOnlyTokenAmount} style={{ flexShrink: 0, width: 150 }}>
           Amount
         </FieldLabel>
         <Controller
@@ -174,8 +174,7 @@ export function RewardTokenForm({
               data-test='reward-property-amount'
               type='number'
               inputProps={{
-                step: 0.01,
-                style: { height: 'auto' }
+                step: 0.01
               }}
               sx={{
                 flexGrow: 1

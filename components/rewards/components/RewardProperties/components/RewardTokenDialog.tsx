@@ -1,12 +1,11 @@
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 
 import { Button } from 'components/common/Button';
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
-import { Dialog } from 'components/common/Dialog/Dialog';
+import { Modal } from 'components/common/Modal';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
 
@@ -34,21 +33,6 @@ export function RewardTokenDialog({
   const [tokenInput, setTokenInput] = useState<FormInput>(currentReward);
   const [isValid, setIsValid] = useState(false);
 
-  // const {
-  //   control,
-  //   handleSubmit,
-  //   reset,
-  //   setValue,
-  //   watch,
-  //   formState: { errors, isValid }
-  // } = useForm<FormInput>({
-  //   defaultValues: {
-  //     rewardToken: currentReward.rewardToken || '',
-  //     chainId: currentReward.chainId || undefined,
-  //     rewardAmount: currentReward.rewardAmount || undefined
-  //   }
-  // });
-
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -60,11 +44,6 @@ export function RewardTokenDialog({
 
   function openTokenSettings() {
     setIsOpen(true);
-    // reset({
-    //   rewardToken: currentReward?.rewardToken || '',
-    //   chainId: currentReward?.chainId || undefined,
-    //   rewardAmount: currentReward?.rewardAmount || undefined
-    // });
   }
 
   return (
@@ -77,47 +56,35 @@ export function RewardTokenDialog({
       >
         {children}
       </SelectPreviewContainer>
-      <Dialog
-        open={isOpen}
-        data-test='reward-value-configuration'
-        onClose={handleClose}
-        title='Reward token details'
-        footerActions={
-          <Stack gap={2} flexDirection='row' alignItems='center'>
-            <Button
-              sx={{
-                alignSelf: 'flex-start'
-              }}
-              onClick={handleClose}
-              variant='outlined'
-              color='secondary'
-            >
-              Cancel
-            </Button>
 
-            <Button
-              disabled={!isValid}
-              data-test='save-reward-value'
-              onClick={onSubmit}
-              sx={{
-                alignSelf: 'flex-start'
-              }}
-            >
-              Save
-            </Button>
-          </Stack>
-        }
+      <Modal
+        data-test='reward-value-configuration'
+        open={isOpen}
+        onClose={handleClose}
+        size='500px'
+        title='Edit token details'
       >
-        <RewardTokenForm
-          onChange={setTokenInput}
-          defaultValues={tokenInput}
-          readOnly={readOnly}
-          readOnlyToken={readOnlyToken}
-          requireTokenAmount={requireTokenAmount}
-          readOnlyTokenAmount={false} // TODO: probably needs to be based on some prop?
-          setIsValid={setIsValid}
-        />
-      </Dialog>
+        <Box mb={2}>
+          <RewardTokenForm
+            onChange={setTokenInput}
+            defaultValues={tokenInput}
+            readOnly={readOnly}
+            readOnlyToken={readOnlyToken}
+            requireTokenAmount={requireTokenAmount}
+            readOnlyTokenAmount={false} // TODO: probably needs to be based on some prop?
+            setIsValid={setIsValid}
+          />
+        </Box>
+        <Stack gap={1} flexDirection='row' alignItems='center' justifyContent='flex-end'>
+          <Button onClick={handleClose} variant='outlined' color='secondary'>
+            Cancel
+          </Button>
+
+          <Button disabled={!isValid} data-test='save-reward-value' onClick={onSubmit}>
+            Save
+          </Button>
+        </Stack>
+      </Modal>
     </>
   );
 }
