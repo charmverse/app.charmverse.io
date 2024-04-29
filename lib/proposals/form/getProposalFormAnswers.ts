@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
 
 export async function getProposalFormAnswers({
@@ -31,7 +32,10 @@ export async function getProposalFormAnswers({
     return [];
   }
 
-  const accessibleFields = getProposalFormFields(proposal.form?.formFields, canViewPrivateFields);
+  const accessibleFields = getProposalFormFields(
+    proposal.form?.formFields as unknown as FormFieldInput[],
+    canViewPrivateFields
+  );
   const accessibleFieldIds = accessibleFields?.map((field) => field.id);
 
   return allAnswers.filter((answer) => !!accessibleFieldIds?.includes(answer.fieldId));

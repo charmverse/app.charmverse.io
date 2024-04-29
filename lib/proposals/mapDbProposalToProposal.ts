@@ -11,12 +11,13 @@ import type {
 import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
 
-import { getProposalProjectFormField } from './form/getProposalProjectFormField';
+import { getProposalProjectFormAnswers } from './form/getProposalProjectFormAnswers';
 import type { PopulatedEvaluation, ProposalFields, ProposalWithUsersAndRubric, TypedFormField } from './interfaces';
 
 type FormFieldsIncludeType = {
@@ -51,11 +52,14 @@ export function mapDbProposalToProposal({
 }): ProposalWithUsersAndRubric {
   const { rewards, form, evaluations, fields, page, issuedCredentials, ...rest } = proposal;
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const formFields = getProposalFormFields(form?.formFields, !!permissions.view_private_fields);
+  const formFields = getProposalFormFields(
+    form?.formFields as unknown as FormFieldInput[],
+    !!permissions.view_private_fields
+  );
   const projectFormFieldConfig = proposal.form?.formFields?.find((field) => field.type === 'project_profile')
     ?.fieldConfig as ProjectAndMembersFieldConfig;
   const project = proposal.project
-    ? getProposalProjectFormField({
+    ? getProposalProjectFormAnswers({
         canViewPrivateFields: !!permissions.view_private_fields,
         projectWithMembers: proposal.project,
         fieldConfig: projectFormFieldConfig

@@ -1,8 +1,7 @@
-import type { FormField } from '@charmverse/core/prisma-client';
-
+import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
-export function getProposalFormFields(fields: FormField[] | null | undefined, canViewPrivateFields: boolean) {
+export function getProposalFormFields(fields: FormFieldInput[] | null | undefined, canViewPrivateFields: boolean) {
   if (!fields) {
     return null;
   }
