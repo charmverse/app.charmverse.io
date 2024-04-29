@@ -40,7 +40,8 @@ export function FormFieldsEditor({
     try {
       await debouncedUpdate({ formFields: _formFields });
     } catch (error) {
-      showError(error, 'Error saving form fields');
+      // dont show error modal, the UI should show red borders now instead
+      // showError(error, 'Error saving form fields');
     }
   }
 
