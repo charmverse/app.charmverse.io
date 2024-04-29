@@ -5,7 +5,6 @@ import dynamic from 'next/dynamic';
 import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/kyc';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
-import { useUser } from 'hooks/useUser';
 
 const PersonaInquiry = dynamic(() => import('persona').then((module) => module.Inquiry), { ssr: false });
 
@@ -21,7 +20,6 @@ const mapPersonaStatus = {
 };
 
 export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; userId?: string; isAdmin?: boolean }) {
-  const { user } = useUser();
   const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId, userId);
   const {
     data: personaInquiry,
@@ -75,11 +73,8 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
         >
           <PersonaInquiry
             inquiryId={personaInquiry?.inquiryId}
-            referenceId={user?.id}
-            onComplete={() => {
-              // Inquiry completed. Close the modal
-              popupPersonaState.close();
-            }}
+            referenceId={userId}
+            onComplete={() => popupPersonaState.close()}
           />
         </Modal>
       )}

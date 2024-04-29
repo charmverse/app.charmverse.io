@@ -57,12 +57,14 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { isDirty, dirtyFields }
   } = useForm<FormValues>({
     defaultValues: getDefaultValues({ kycCredentials, space }),
     resolver: yupResolver(schema),
     mode: 'onSubmit'
   });
+  const kycOption = watch('kycOption');
   const isLoading = updateSpaceLoading || kycUpdateCredentialsLoading;
   const resetValues = () => reset(getDefaultValues({ kycCredentials, space }));
 
@@ -122,19 +124,16 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
             <KycIntegrationFields control={control} isAdmin={isAdmin} />
           </Grid>
         )}
-        {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
+        {isAdmin && space.kycOption === 'synaps' && kycOption === 'synaps' && (
           <Grid item>
             <SynapsModal spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
         )}
-        {isAdmin &&
-          space.kycOption === 'persona' &&
-          kycCredentials?.persona?.apiKey &&
-          kycCredentials.persona.templateId && (
-            <Grid item>
-              <PersonaModal spaceId={space.id} />
-            </Grid>
-          )}
+        {isAdmin && space.kycOption === 'persona' && kycOption === 'persona' && (
+          <Grid item>
+            <PersonaModal spaceId={space.id} isAdmin={isAdmin} />
+          </Grid>
+        )}
         {isAdmin && kycCredentials && isDirty && (
           <Grid item alignSelf='end'>
             {isDirty && (

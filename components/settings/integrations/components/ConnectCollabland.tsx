@@ -37,10 +37,10 @@ export function ConnectCollabland() {
 
   if (space?.discordServerId) {
     return (
-      <Stack>
+      <Stack gap={2}>
         <FieldWrapper label='Connected discord server id'>
           <Stack direction='row' alignItems='center' gap={1} flex={1}>
-            <TextField disabled value={space.discordServerId} sx={{ flex: 1 }} />
+            <TextField disabled value={space?.discordServerId || ''} sx={{ flex: 1 }} />
             <Chip size='small' label='Connected' color='success' icon={<CheckCircleOutlineOutlined />} />
           </Stack>
         </FieldWrapper>
@@ -94,12 +94,9 @@ export function ConnectCollabland() {
         <Typography variant='body2'>
           To connect your space with Collab.Land, you will need to install our mini-app in their marketplace
         </Typography>
-
-        <Stack>
-          <Button onClick={connectCollablandModalState.open} loading={isConnecting}>
-            Connect
-          </Button>
-        </Stack>
+        <Button onClick={connectCollablandModalState.open} loading={isConnecting}>
+          Connect
+        </Button>
       </Stack>
       <ConfirmDeleteModal
         title='Connect CollabLand'
