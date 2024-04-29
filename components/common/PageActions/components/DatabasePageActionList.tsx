@@ -1,6 +1,6 @@
-import type { PageType } from '@charmverse/core/dist/cjs/prisma-client';
 import { log } from '@charmverse/core/log';
 import type { PagePermissionFlags } from '@charmverse/core/permissions';
+import type { PageType } from '@charmverse/core/prisma-client';
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined';
 import UndoIcon from '@mui/icons-material/Undo';
 import UploadFileIcon from '@mui/icons-material/UploadFile';

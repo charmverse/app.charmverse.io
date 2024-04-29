@@ -1,9 +1,10 @@
 import type { KycOption } from '@charmverse/core/prisma-client';
-import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import FormHelperText from '@mui/material/FormHelperText';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
@@ -54,7 +55,10 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
     control
   });
 
-  const { field: kycOption } = useController({
+  const {
+    field: kycOption,
+    fieldState: { error: kycOptionError }
+  } = useController({
     name: 'kycOption',
     control
   });
@@ -68,11 +72,15 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
           value={kycOption.value || ''}
           disabled={!isAdmin}
           renderValue={(val) => (val ? capitalize(val) : 'None')}
+          error={!!kycOptionError?.message}
         >
           <MenuItem value=''>None</MenuItem>
           <MenuItem value='synaps'>Synaps</MenuItem>
           <MenuItem value='persona'>Persona</MenuItem>
         </Select>
+        {kycOptionError?.message && (
+          <FormHelperText error={!!kycOptionError.message}>{kycOptionError.message}</FormHelperText>
+        )}
       </Box>
       {kycOption.value === 'synaps' && (
         <>

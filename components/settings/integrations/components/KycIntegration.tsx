@@ -43,7 +43,7 @@ const schema = yup.object({
       then: () => yup.string().required('Field is required'),
       otherwise: () => yup.string()
     }),
-  kycOption: yup.string().oneOf<KycOption>(['synaps', 'persona']).nullable()
+  kycOption: yup.string().oneOf<KycOption | ''>(['synaps', 'persona', '']).nullable()
 });
 
 export type FormValues = yup.InferType<typeof schema>;
@@ -58,7 +58,7 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
     control,
     reset,
     watch,
-    formState: { isDirty, dirtyFields }
+    formState: { isDirty, dirtyFields, errors }
   } = useForm<FormValues>({
     defaultValues: getDefaultValues({ kycCredentials, space }),
     resolver: yupResolver(schema),
@@ -124,12 +124,12 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
             <KycIntegrationFields control={control} isAdmin={isAdmin} />
           </Grid>
         )}
-        {isAdmin && space.kycOption === 'synaps' && kycOption === 'synaps' && (
+        {isAdmin && space.kycOption === 'synaps' && kycOption === 'synaps' && kycCredentials && (
           <Grid item>
             <SynapsModal spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
         )}
-        {isAdmin && space.kycOption === 'persona' && kycOption === 'persona' && (
+        {isAdmin && space.kycOption === 'persona' && kycOption === 'persona' && kycCredentials && (
           <Grid item>
             <PersonaModal spaceId={space.id} isAdmin={isAdmin} />
           </Grid>
