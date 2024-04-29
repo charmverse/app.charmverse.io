@@ -4,8 +4,9 @@ import { forwardRef } from 'react';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
-import type { ControlFieldProps, FieldProps, FieldType } from 'lib/forms/interfaces';
+import type { FieldType } from 'lib/forms/interfaces';
 
 import { InputSearchBlockchain } from '../InputSearchBlockchain';
 

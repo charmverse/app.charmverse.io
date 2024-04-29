@@ -3,7 +3,7 @@ import TextField from '@mui/material/TextField';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import type { ControlFieldProps, FieldProps } from 'lib/forms/interfaces';
+import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
 type Props = ControlFieldProps & FieldProps & { multiline?: boolean; rows?: number; maxRows?: number };
 

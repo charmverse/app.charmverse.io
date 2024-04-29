@@ -7,9 +7,9 @@ import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
-import type { FormFieldInput } from '../../../lib/forms/interfaces';
 import { Button } from '../Button';
 
 import type { SelectOptionType } from './fields/Select/interfaces';

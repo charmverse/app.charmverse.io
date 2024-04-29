@@ -7,12 +7,11 @@ import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
 import { useUpdateProposal } from 'charmClient/hooks/proposals';
 import { ProposalProjectFormAnswers } from 'components/settings/projects/components/ProjectForm';
 import { useUser } from 'hooks/useUser';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
-
-import type { FormFieldValue } from '../../../../lib/forms/interfaces';
 
 export function ProjectProfileInputField({
   onChange,

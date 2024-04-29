@@ -1,20 +1,16 @@
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Image from 'next/image';
 
-import { Button } from 'components/common/Button';
 import { FileUploadForm } from 'components/common/CharmEditor/components/file/FileUploadForm';
-import ImageSelector from 'components/common/ImageSelector/ImageSelector';
+import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import Link from 'components/common/Link';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
-import type { ControlFieldProps, FieldProps } from '../../../../lib/forms/interfaces';
-
 import type { FieldWrapperProps } from './FieldWrapper';
-import { FieldWrapper, FieldWrapperContainer, ReadonlyCharmContent } from './FieldWrapper';
+import { FieldWrapper } from './FieldWrapper';
 
 type Props = ControlFieldProps<UploadedFileInfo> &
   FieldProps &

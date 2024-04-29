@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { SelectOptionItem } from 'components/common/form/fields/Select/SelectOptionItem';
-import type { ControlFieldProps, FieldProps } from 'lib/forms/interfaces';
+import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import { getRandomThemeColor } from 'theme/utils/getRandomThemeColor';
 
 const filter = createFilterOptions<SelectOptionType>();
