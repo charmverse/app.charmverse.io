@@ -20,8 +20,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
@@ -60,11 +59,7 @@ export function ProposalRewards({
   const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
 
   const { getFeatureTitle } = useSpaceFeatures();
-  const {
-    updateURLQuery,
-    navigateToSpacePath,
-    router: { query }
-  } = useCharmRouter();
+  const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
@@ -85,8 +80,8 @@ export function ProposalRewards({
     clearRewardValues();
     const template = templates?.find((t) => t.page.id === requiredTemplateId);
     // use reviewers from the proposal if not set in the template
-    const rewardReviewers = template?.reward.reviewers?.length
-      ? template.reward.reviewers
+    const rewardReviewers = template?.reviewers?.length
+      ? template.reviewers
       : uniqBy(
           reviewers
             .map((reviewer) =>
@@ -99,14 +94,12 @@ export function ProposalRewards({
             .filter(isTruthy) as RewardReviewer[],
           'id'
         );
-    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
-      ? template.reward.allowedSubmitterRoles
+    const rewardAssignedSubmitters = template?.allowedSubmitterRoles?.length
+      ? template.allowedSubmitterRoles
       : assignedSubmitters;
 
-    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
+    const newReward = { ...template, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+
     setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
@@ -133,8 +126,7 @@ export function ProposalRewards({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      const rewardType = getRewardType(template.reward);
-      setRewardValues({ rewardType, ...template.reward });
+      setRewardValues({ ...template });
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,
@@ -181,12 +173,7 @@ export function ProposalRewards({
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
                       <RewardAmount
-                        reward={{
-                          chainId: reward.chainId || null,
-                          customReward: reward.customReward || null,
-                          rewardAmount: reward.rewardAmount || null,
-                          rewardToken: reward.rewardToken || null
-                        }}
+                        reward={reward}
                         truncate={true}
                         truncatePrecision={2}
                         typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
@@ -232,12 +219,7 @@ export function ProposalRewards({
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
                             <RewardAmount
-                              reward={{
-                                chainId: reward.chainId || null,
-                                customReward: reward.customReward || null,
-                                rewardAmount: reward.rewardAmount || null,
-                                rewardToken: reward.rewardToken || null
-                              }}
+                              reward={reward}
                               truncate={true}
                               truncatePrecision={2}
                               typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
@@ -284,7 +266,9 @@ export function ProposalRewards({
           )}
         </Stack>
       )}
-      {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
+      {canCreatePendingRewards && !pendingRewards?.length && (
+        <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+      )}
 
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}

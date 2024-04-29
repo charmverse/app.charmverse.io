@@ -7,9 +7,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useGetPersonaInquiry, useGetSynapsSession } from 'charmClient/hooks/kyc';
 import { useGetRewardPermissions, useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
-import { SocialShareLinksStep } from 'components/common/workflows/SocialShare/SocialShareLinksStep';
-import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
+import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
+import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
@@ -25,28 +25,28 @@ import { KycSettings } from '../Settings/components/KycSettings';
 import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
+import { CredentialsStepReview } from './components/CredentialsStepReview';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { PaymentStepReview } from './components/PaymentStepReview';
 import { ReviewStepReview } from './components/ReviewStepReview';
-import { RewardCredentials } from './components/RewardCredentials';
 import { SubmitStepReview } from './components/SubmitStepReview';
 
-export type Props = Omit<
-  EvaluationSettingsProps,
-  'onChangeWorkflow' | 'requireWorkflowChangeConfirmation' | 'rewardInput'
-> & {
+export type Props = Pick<EvaluationSettingsProps, 'isTemplate' | 'onChangeReward' | 'expanded' | 'readOnly'> & {
   reward: RewardWithUsers;
   application?: ApplicationWithTransactions;
   refreshApplication?: VoidFunction;
   page: PageWithContent;
   refreshReward?: VoidFunction;
   isNewApplication?: boolean;
+  templateId: string | null | undefined;
 };
 
 export function EvaluationsReview({
   application,
   reward,
+  isTemplate,
+  templateId,
   onChangeReward,
   expanded: expandedContainer,
   readOnly,
@@ -192,7 +192,7 @@ export function EvaluationsReview({
             ) : evaluation.type === 'submit' ? (
               <SubmitStepReview reward={reward} />
             ) : evaluation.type === 'credential' ? (
-              <RewardCredentials
+              <CredentialsStepReview
                 selectedCredentialTemplates={reward.selectedCredentialTemplates}
                 rewardId={reward.id}
                 application={application}
@@ -206,8 +206,10 @@ export function EvaluationsReview({
         <EvaluationStepSettingsModal
           close={closeSettings}
           evaluationInput={evaluationInput}
+          isTemplate={isTemplate}
           saveEvaluation={saveEvaluation}
           updateEvaluation={updateEvaluation}
+          templateId={templateId}
           reward={{
             ...reward,
             ...tempRewardUpdates

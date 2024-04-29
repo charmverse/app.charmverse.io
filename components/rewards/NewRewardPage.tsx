@@ -5,7 +5,7 @@ import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
-import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
+import { useGetRewardWorkflows, useGetRewardTemplate, useGetRewardTemplatesBySpace } from 'charmClient/hooks/rewards';
 import { DocumentColumn, DocumentColumnLayout } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
@@ -22,7 +22,6 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegis
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
-import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -34,8 +33,7 @@ import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import { getRewardType } from 'lib/rewards/getRewardType';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import { fontClassName } from 'theme/fonts';
@@ -56,17 +54,18 @@ export function NewRewardPage({
   templateId?: string;
 }) {
   const { user } = useUser();
+
   const spacePermissions = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
-  const { templates: rewardTemplates } = useRewardTemplates();
   const [selectedRewardTemplateId, setSelectedRewardTemplateId] = useState<null | string>();
-  const [rewardTemplateId, setRewardTemplateId] = useState<null | string>();
+  const [rewardTemplateId, setRewardTemplateId] = useState<null | undefined | string>(templateIdFromUrl);
   const [, setPageTitle] = usePageTitle();
+  const { data: sourceTemplate } = useGetRewardTemplate(rewardTemplateId);
+  const { data: rewardTemplates } = useGetRewardTemplatesBySpace(currentSpace?.id);
   const { data: workflowOptions, isLoading: isLoadingWorkflows } = useGetRewardWorkflows(currentSpace?.id);
   const { contentUpdated, createReward, rewardValues, setRewardValues, isSavingReward } = useNewReward();
-  const sourceTemplate = rewardTemplates?.find((template) => template.page.id === rewardTemplateId);
   const [submittedDraft, setSubmittedDraft] = useState<boolean>(false);
   const containerWidthRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
@@ -124,25 +123,24 @@ export function NewRewardPage({
       contentText: template.page.contentText,
       title: pageData.title
     });
-    const rewardType = getRewardType(template.reward);
     setRewardValues({
-      assignedSubmitters: template.reward.assignedSubmitters,
-      allowedSubmitterRoles: template.reward.allowedSubmitterRoles,
-      allowMultipleApplications: template.reward.allowMultipleApplications,
-      approveSubmitters: template.reward.approveSubmitters,
-      chainId: template.reward.chainId,
-      customReward: template.reward.customReward,
-      dueDate: template.reward.dueDate,
-      maxSubmissions: template.reward.maxSubmissions,
-      reviewers: template.reward.reviewers,
-      rewardAmount: template.reward.rewardAmount,
-      rewardToken: template.reward.rewardToken,
-      rewardType,
-      selectedCredentialTemplates: template.reward.selectedCredentialTemplates,
-      fields: template.reward.fields
+      assignedSubmitters: template.assignedSubmitters,
+      allowedSubmitterRoles: template.allowedSubmitterRoles,
+      allowMultipleApplications: template.allowMultipleApplications,
+      approveSubmitters: template.approveSubmitters,
+      chainId: template.chainId,
+      customReward: template.customReward,
+      dueDate: template.dueDate,
+      maxSubmissions: template.maxSubmissions,
+      reviewers: template.reviewers,
+      rewardAmount: template.rewardAmount,
+      rewardToken: template.rewardToken,
+      rewardType: template.rewardType,
+      selectedCredentialTemplates: template.selectedCredentialTemplates,
+      fields: template.fields
     });
     setRewardTemplateId(template.page.id);
-    const workflow = inferRewardWorkflow(workflowOptions ?? [], template.reward);
+    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template);
     if (workflow) {
       applyWorkflow(workflow);
     }
@@ -335,7 +333,8 @@ export function NewRewardPage({
                   {currentTab === 1 && (
                     <RewardEvaluations
                       onChangeWorkflow={applyWorkflow}
-                      readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+                      templateId={rewardTemplateId}
+                      isTemplate={!!isTemplate}
                       isUnpublishedReward
                       rewardInput={rewardValues}
                       onChangeReward={(updates) => {
@@ -377,6 +376,8 @@ export function NewRewardPage({
           }}
           // if creating a reward from template then disable the reward properties
           readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
+          isTemplate={!!isTemplate}
+          templateId={rewardTemplateId}
           isUnpublishedReward
           rewardInput={rewardValues}
           onChangeReward={(updates) => {

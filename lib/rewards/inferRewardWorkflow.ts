@@ -1,11 +1,10 @@
 import type { RewardWorkflow } from './getRewardWorkflows';
 import type { UpdateableRewardFields } from './updateRewardSettings';
 
-export function inferRewardWorkflow(workflows: RewardWorkflow[], reward: UpdateableRewardFields | undefined) {
-  if (!reward) {
-    return null;
-  }
-
+export function inferRewardWorkflow(
+  workflows: RewardWorkflow[],
+  reward: Pick<UpdateableRewardFields, 'assignedSubmitters' | 'approveSubmitters'>
+) {
   const applicationRequiredWorkflow = workflows.find((workflow) => workflow.id === 'application_required');
   const directSubmissionWorkflow = workflows.find((workflow) => workflow.id === 'direct_submission');
   const assignedWorkflow = workflows.find((workflow) => workflow.id === 'assigned');

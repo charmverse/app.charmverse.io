@@ -1,37 +1,98 @@
-import type { AccessControlCondition, TokenGateAccessType } from 'lib/tokenGates/interfaces';
+import type { AccessControlCondition } from 'lib/tokenGates/interfaces';
+import { isTruthy } from 'lib/utils/types';
+
+type GateType = 'Wallet' | 'Collectibles' | 'Tokens' | 'Community' | 'Credential';
+
+type AccessType =
+  | 'ERC721'
+  | 'ERC1155'
+  | 'POAP'
+  | 'Unlock'
+  | 'Hypersub'
+  | 'ERC20'
+  | 'Wallet'
+  | 'Hats'
+  | 'Guild'
+  | 'Builder'
+  | 'Moloch'
+  | 'Gitcoin holder'
+  | 'Gitcoin score';
 
 /**
  * Used for creating analytics events
  * @param condition AccessControlCondition
- * @returns TokenGateAccessType
  */
-export function getAccessType(condition: AccessControlCondition): TokenGateAccessType {
+export function getAccessType(condition: AccessControlCondition): AccessType | null {
+  const { type, quantity } = condition;
+
+  switch (type) {
+    case 'Wallet':
+      return 'Wallet';
+    case 'ERC721':
+      return 'ERC721';
+    case 'POAP':
+      return 'POAP';
+    case 'MolochDAOv2.1':
+      return 'Moloch';
+    case 'Builder':
+      return 'Builder';
+    case 'Hypersub':
+      return 'Hypersub';
+    case 'Unlock':
+      return 'Unlock';
+    case 'GitcoinPassport':
+      if (quantity === '0') {
+        return 'Gitcoin holder';
+      } else {
+        return 'Gitcoin score';
+      }
+    case 'Guildxyz':
+      return 'Guild';
+    case 'ERC1155':
+      return 'ERC1155';
+    case 'ERC20':
+      return 'ERC20';
+    case 'Hats':
+      return 'Hats';
+    default:
+      return null;
+  }
+}
+
+/**
+ * Used for creating analytics events
+ * @param condition AccessControlCondition
+ */
+export function getGateType(condition: AccessControlCondition): GateType | null {
   const { type } = condition;
 
   switch (type) {
     case 'Wallet':
-      return 'individual_wallet';
-    case 'ERC721':
-      return 'individual_nft';
-    case 'POAP':
-      return 'poap_collectors';
+      return 'Wallet';
+    case 'ERC20':
+      return 'Tokens';
+    case 'GitcoinPassport':
+      return 'Credential';
     case 'MolochDAOv2.1':
     case 'Builder':
-      return 'dao_members';
+    case 'Guildxyz':
+    case 'Hats':
+      return 'Community';
+    case 'ERC721':
+    case 'ERC1155':
+    case 'POAP':
     case 'Hypersub':
     case 'Unlock':
-      return 'nft_subscriber';
-    case 'GitcoinPassport':
-      return 'gitcoin_passport';
-    case 'Guildxyz':
-      return 'guild';
-    case 'ERC1155':
-    case 'ERC20':
+      return 'Collectibles';
     default:
-      return 'group_token_or_nft';
+      return null;
   }
 }
 
-export function getAccessTypes(conditions: AccessControlCondition[]): TokenGateAccessType[] {
-  return conditions.map((c) => getAccessType(c));
+export function getAccessTypes(conditions: AccessControlCondition[]): AccessType[] {
+  return conditions.map((c) => getAccessType(c)).filter(isTruthy);
+}
+
+export function getGateTypes(conditions: AccessControlCondition[]): GateType[] {
+  return conditions.map((c) => getGateType(c)).filter(isTruthy);
 }

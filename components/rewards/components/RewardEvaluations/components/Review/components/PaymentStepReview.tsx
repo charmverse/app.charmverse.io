@@ -13,7 +13,6 @@ import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBad
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { getGnosisTransactionUrl } from 'lib/gnosis/utils';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/interfaces';
 
 type PaymentStepReviewActionProps = {
@@ -31,8 +30,6 @@ function PaymentStepReviewAction({
 }: PaymentStepReviewActionProps) {
   const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: reward.id });
   const reviewPermission = rewardPermissions?.review;
-
-  const rewardType = getRewardType(reward);
 
   const { open, isOpen, close } = usePopupState({ variant: 'dialog', popupId: 'confirm-mark-submission-paid' });
   const { showMessage } = useSnackbar();
@@ -77,7 +74,7 @@ function PaymentStepReviewAction({
 
   return (
     <>
-      {application.status === 'complete' && rewardType === 'token' && reviewPermission && !hidePaymentButton && (
+      {application.status === 'complete' && reward.rewardType === 'token' && reviewPermission && !hidePaymentButton && (
         <Stack justifyContent='flex-end' flexDirection='row'>
           <Box width='fit-content'>
             <RewardPaymentButton
@@ -96,7 +93,7 @@ function PaymentStepReviewAction({
         </Stack>
       )}
 
-      {application.status === 'complete' && rewardType === 'custom' && reviewPermission && (
+      {application.status === 'complete' && reward.rewardType === 'custom' && reviewPermission && (
         <Stack justifyContent='flex-end' flexDirection='row'>
           <Box width='fit-content'>
             <Button data-test='mark-paid-button' onClick={open}>
@@ -150,7 +147,7 @@ export function PaymentStepReview({
   application,
   refreshApplication,
   hidePaymentButton
-}: Omit<PaymentStepReviewActionProps, 'application'> & {
+}: Pick<PaymentStepReviewActionProps, 'reward' | 'refreshApplication'> & {
   application?: ApplicationWithTransactions;
   hidePaymentButton?: boolean;
 }) {

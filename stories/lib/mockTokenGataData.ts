@@ -14,7 +14,7 @@ export const ownsWalletCondition: AccessControlCondition[] = [
     contractAddress: '',
     quantity: '1',
     condition: 'evm',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    image: '/images/cryptoLogos/ethereum-icon-purple.svg'
   }
 ];
 
@@ -54,7 +54,7 @@ export const ownedEth: AccessControlCondition[] = [
     contractAddress: '',
     quantity: '100000000000',
     type: 'ERC20',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    image: '/images/cryptoLogos/ethereum-icon-purple.svg'
   }
 ];
 
@@ -104,7 +104,7 @@ export const ownsAnyPoap: AccessControlCondition[] = [
     contractAddress: '0x22C1f6050E56d2876009903609a2cC3fEf83B415',
     quantity: '1',
     type: 'ERC721',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    image: '/images/cryptoLogos/ethereum-icon-purple.svg'
   }
 ];
 
@@ -117,7 +117,7 @@ export const daoMember: AccessControlCondition[] = [
     contractAddress: '0x38064F40B20347d58b326E767791A6f79cdEddCe',
     quantity: '1',
     type: 'MolochDAOv2.1',
-    image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+    image: '/images/cryptoLogos/ethereum-icon-purple.svg'
   }
 ];
 

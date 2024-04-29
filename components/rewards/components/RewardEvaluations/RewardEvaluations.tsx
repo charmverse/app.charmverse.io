@@ -5,12 +5,17 @@ import { EvaluationsReview } from './components/Review/EvaluationsReview';
 import type { EvaluationSettingsProps } from './components/Settings/EvaluationsSettings';
 import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
-export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkflowChangeConfirmation'> & {
+export type RewardEvaluationsProps = Pick<
+  EvaluationSettingsProps,
+  'expanded' | 'rewardInput' | 'onChangeReward' | 'onChangeWorkflow'
+> & {
   isUnpublishedReward?: boolean;
+  templateId?: string | null;
   reward?: RewardWithUsers;
   application?: ApplicationWithTransactions;
   isTemplate?: boolean;
   refreshApplication?: VoidFunction;
+  readOnly?: boolean;
   isDraft?: boolean;
   page?: PageWithContent;
   refreshReward?: VoidFunction;
@@ -20,11 +25,12 @@ export type RewardEvaluationsProps = Omit<EvaluationSettingsProps, 'requireWorkf
 export function RewardEvaluations({
   rewardInput,
   page,
-  readOnly,
+  templateId,
   expanded = true,
   onChangeReward,
   onChangeWorkflow,
   isUnpublishedReward,
+  readOnly,
   reward,
   application,
   isTemplate,
@@ -37,11 +43,14 @@ export function RewardEvaluations({
     return (
       <EvaluationsSettings
         rewardInput={rewardInput}
+        isTemplate={!!isTemplate}
+        templateId={templateId}
         readOnly={readOnly}
-        requireWorkflowChangeConfirmation
+        requireWorkflowChangeConfirmation={!!reward}
         expanded={expanded}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
+        isUnpublishedReward={isUnpublishedReward}
       />
     );
   } else if (reward && page) {
@@ -50,7 +59,9 @@ export function RewardEvaluations({
         page={page}
         application={application}
         expanded={expanded}
+        isTemplate={!!isTemplate}
         readOnly={readOnly}
+        templateId={templateId}
         reward={reward}
         onChangeReward={onChangeReward}
         refreshApplication={refreshApplication}

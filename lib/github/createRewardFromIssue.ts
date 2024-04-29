@@ -6,7 +6,6 @@ import { baseUrl } from 'config/constants';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import { createReward } from 'lib/rewards/createReward';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { relay } from 'lib/websockets/relay';
 
@@ -159,7 +158,7 @@ export async function createRewardFromIssue({
     maxSubmissions: rewardTemplate?.maxSubmissions,
     rewardAmount: rewardTemplate?.rewardAmount,
     rewardToken: rewardTemplate?.rewardToken,
-    rewardType: rewardTemplate ? getRewardType(rewardTemplate) : undefined,
+    rewardType: rewardTemplate ? rewardTemplate.rewardType : undefined,
     allowedSubmitterRoles: allowedSubmitterRoles.length > 0 ? allowedSubmitterRoles : undefined,
     assignedSubmitters: assignedSubmitters.length > 0 ? assignedSubmitters : undefined,
     reviewers:

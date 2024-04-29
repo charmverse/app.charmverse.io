@@ -29,7 +29,7 @@ import type { PagesMap } from 'lib/pages';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getProposalRewardsView } from 'lib/rewards/blocks/views';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -77,9 +77,8 @@ export function ProposalRewardsTable({
 
   const tableView = useMemo(() => {
     const rewardTypesUsed = (pendingRewards || []).reduce<Set<RewardType>>((acc, page) => {
-      const rewardType = getRewardType(page.reward);
-      if (rewardType) {
-        acc.add(rewardType);
+      if (page.reward.rewardType) {
+        acc.add(page.reward.rewardType);
       }
       return acc;
     }, new Set());
@@ -130,8 +129,8 @@ export function ProposalRewardsTable({
     clearRewardValues();
     const template = templates?.find((t) => t.page.id === requiredTemplateId);
     // use reviewers from the proposal if not set in the template
-    const rewardReviewers = template?.reward.reviewers?.length
-      ? template.reward.reviewers
+    const rewardReviewers = template?.reviewers?.length
+      ? template.reviewers
       : uniqBy(
           reviewers
             .map((reviewer) =>
@@ -144,14 +143,12 @@ export function ProposalRewardsTable({
             .filter(isTruthy) as RewardReviewer[],
           'id'
         );
-    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
-      ? template.reward.allowedSubmitterRoles
+    const rewardAssignedSubmitters = template?.allowedSubmitterRoles?.length
+      ? template.allowedSubmitterRoles
       : assignedSubmitters;
 
-    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-    if (template?.reward) {
-      (newReward as any).rewardType = getRewardType(template.reward);
-    }
+    const newReward = { ...template, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
+
     setRewardValues(newReward, { skipDirty: true });
 
     openNewPage({
@@ -185,7 +182,7 @@ export function ProposalRewardsTable({
 
   function selectTemplate(template: RewardTemplate | null) {
     if (template) {
-      setRewardValues(template.reward);
+      setRewardValues(template);
       updateNewPageValues({
         ...template.page,
         content: template.page.content as any,

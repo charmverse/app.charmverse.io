@@ -11,26 +11,30 @@ type Props = {
   onChange: (value: RewardTokenDetails | null) => void;
   currentReward: Pick<
     RewardCreationData & RewardWithUsers,
-    'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward'
+    'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'rewardType'
   > | null;
-  readOnly?: boolean;
+  requireTokenAmount: boolean;
+  readOnly: boolean;
+  readOnlyToken: boolean;
 };
 
-export function RewardTokenProperty({ onChange, currentReward, readOnly }: Props) {
+export function RewardTokenProperty({ onChange, currentReward, requireTokenAmount, readOnlyToken, readOnly }: Props) {
   if (!currentReward) {
     return null;
   }
 
   return (
-    <RewardTokenDialog displayType='details' onChange={onChange} readOnly={readOnly} currentReward={currentReward}>
+    <RewardTokenDialog
+      requireTokenAmount={requireTokenAmount}
+      displayType='details'
+      onChange={onChange}
+      readOnly={readOnly}
+      readOnlyToken={readOnlyToken}
+      currentReward={currentReward}
+    >
       <Box>
         <RewardAmount
-          reward={{
-            chainId: currentReward.chainId,
-            customReward: currentReward.customReward,
-            rewardAmount: currentReward.rewardAmount,
-            rewardToken: currentReward.rewardToken
-          }}
+          reward={currentReward}
           truncate={true}
           truncatePrecision={2}
           typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}

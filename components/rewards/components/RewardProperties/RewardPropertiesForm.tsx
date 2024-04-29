@@ -7,6 +7,7 @@ import type { ChangeEvent } from 'react';
 import { useCallback, useState } from 'react';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
+import { useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import type { RoleOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -27,7 +28,7 @@ import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardApplicationType } from 'lib/rewards/getApplicationType';
 import { getApplicationType } from 'lib/rewards/getApplicationType';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { Reward, RewardReviewer, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
@@ -35,11 +36,11 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
+import { RewardTypeSelect } from '../RewardEvaluations/components/Settings/components/PaymentStepSettings/components/RewardTypeSelect';
 
 import { RewardApplicationTypeSelect } from './components/RewardApplicationTypeSelect';
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardTokenProperty } from './components/RewardTokenProperty';
-import { RewardTypeSelect } from './components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
 
 type Props = {
@@ -86,16 +87,17 @@ export function RewardPropertiesForm({
     group: 'role'
   }));
   const isAssignedReward = rewardApplicationType === 'assigned';
+  const { data: template } = useGetRewardTemplate(templateId);
   const { templates: rewardTemplates = [] } = useRewardTemplates();
-  const template = rewardTemplates?.find((tpl) => tpl.page.id === templateId);
-  const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reward.reviewers?.length);
-  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
+  const readOnlyReviewers = !isAdmin && (readOnly || !!template?.reviewers?.length);
+  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.dueDate);
   const readOnlyApplicationType =
     !!forcedApplicationType || (!isAdmin && (readOnly || !!template)) || !!isProposalTemplate;
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
-  const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.reward.maxSubmissions === 'number');
-  const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.reward.allowedSubmitterRoles?.length);
-  const readOnlySelectedCredentials = !isAdmin && (readOnly || !!template?.reward.selectedCredentialTemplates?.length);
+  const readOnlyToken = !isAdmin && (readOnly || !!template?.rewardToken);
+  const readOnlyNumberAvailable = !isAdmin && (readOnly || typeof template?.maxSubmissions === 'number');
+  const readOnlyApplicantRoles = !isAdmin && (readOnly || !!template?.allowedSubmitterRoles?.length);
+  const readOnlySelectedCredentials = !isAdmin && (readOnly || !!template?.selectedCredentialTemplates?.length);
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -241,7 +243,7 @@ export function RewardPropertiesForm({
                         if (selected && selectTemplate) {
                           selectTemplate(selected);
                         }
-                        setRewardType(getRewardType(selected?.reward || values, isNewReward, !!templatePage));
+                        setRewardType(getRewardType(selected || values, isNewReward, !!templatePage));
                       }}
                     />
                   </Box>
@@ -451,8 +453,10 @@ export function RewardPropertiesForm({
                 </PropertyLabel>
                 <RewardTokenProperty
                   onChange={onRewardTokenUpdate}
+                  requireTokenAmount={!isProposalTemplate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}
+                  readOnlyToken={readOnlyToken}
                 />
               </Box>
             )}

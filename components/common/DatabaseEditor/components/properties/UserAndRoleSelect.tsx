@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import UserDisplay from 'components/common/UserDisplay';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
@@ -89,7 +89,7 @@ export function UserAndRoleSelectedOptions({
     <>
       {value.map((option) => {
         return (
-          <>
+          <Fragment key={option.id}>
             {option.group === 'user' && (
               <Stack
                 mr={1}
@@ -159,7 +159,7 @@ export function UserAndRoleSelectedOptions({
                 }
               />
             )}
-          </>
+          </Fragment>
         );
       })}
     </>
