@@ -1,7 +1,6 @@
 import type { KycOption, PersonaUserKycStatus, SynapsUserKycStatus } from '@charmverse/core/prisma-client';
 import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
-import { useRouter } from 'next/router';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPersonaInquiry, useGetSynapsSession } from 'charmClient/hooks/kyc';
