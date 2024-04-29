@@ -116,6 +116,7 @@ export function NewRewardPage({
   }
 
   function applyTemplate(template: RewardTemplate) {
+    setRewardTemplateId(template.page.id);
     setPageData({
       content: template.page.content as PageContent,
       contentText: template.page.contentText,
@@ -138,8 +139,6 @@ export function NewRewardPage({
       selectedCredentialTemplates: template.selectedCredentialTemplates,
       fields: template.fields
     });
-
-    setRewardTemplateId(template.page.id);
     const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template);
     if (workflow) {
       applyWorkflow(workflow);
@@ -328,7 +327,7 @@ export function NewRewardPage({
                   {currentTab === 1 && (
                     <RewardEvaluations
                       onChangeWorkflow={applyWorkflow}
-                      templateId={rewardTemplateId}
+                      templateId={pageData.sourceTemplateId}
                       isTemplate={!!isTemplate}
                       isUnpublishedReward
                       rewardInput={rewardValues}
@@ -372,7 +371,7 @@ export function NewRewardPage({
           // if creating a reward from template then disable the reward properties
           readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
           isTemplate={!!isTemplate}
-          templateId={rewardTemplateId}
+          templateId={pageData.sourceTemplateId}
           isUnpublishedReward
           rewardInput={rewardValues}
           onChangeReward={(updates) => {

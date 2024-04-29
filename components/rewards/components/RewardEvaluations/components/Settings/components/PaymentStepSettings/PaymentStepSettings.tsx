@@ -77,6 +77,7 @@ export function PaymentStepSettings({
       {rewardType === 'token' && (
         <Box width='fit-content'>
           <RewardTokenForm
+            key={rewardTemplateInput?.id}
             onChange={onRewardTokenUpdate}
             defaultValues={rewardInput}
             readOnly={!!readOnly}

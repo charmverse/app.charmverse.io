@@ -1,5 +1,6 @@
 import type { BountyStatus } from '@charmverse/core/prisma-client';
 
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
@@ -14,7 +15,7 @@ export type EvaluationStepSettingsProps = {
   onChange: (updatedReward: UpdateableRewardFields) => void;
   readOnly?: boolean;
   rewardInput?: UpdateableRewardFields;
-  rewardTemplateInput?: UpdateableRewardFields;
+  rewardTemplateInput?: RewardTemplate;
   rewardStatus?: BountyStatus | null;
 };
 

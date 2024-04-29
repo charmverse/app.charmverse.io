@@ -95,9 +95,8 @@ export function RewardTokenForm({
   useEffect(() => {
     if (values.chainId) {
       refreshCryptoList(values.chainId, values.rewardToken);
-      // setValue('rewardToken', newNativeCurrency);
     }
-  }, [values.chainId, values.rewardToken, setValue]);
+  }, [values.chainId, values.rewardToken]);
 
   useEffect(() => {
     setIsValid?.(isValid);
