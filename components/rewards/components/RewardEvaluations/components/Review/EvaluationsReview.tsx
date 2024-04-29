@@ -21,8 +21,7 @@ import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/i
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { getAbsolutePath } from 'lib/utils/browser';
 
-import { KycSettings } from '../Settings/components/KycSettings';
-import { SubmitStepSettings } from '../Settings/components/SubmitSettings';
+import { KycStepSettings } from '../Settings/components/KycStepSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { CredentialsStepReview } from './components/CredentialsStepReview';
@@ -182,7 +181,7 @@ export function EvaluationsReview({
                 refreshApplication={refreshApplication}
               />
             ) : evaluation.type === 'kyc' ? (
-              <KycSettings
+              <KycStepSettings
                 readOnly={
                   // It will be readonly if there is no application or is current application
                   !application || (!isCurrent && evaluation.result === null) || (reviewPermission && kycStatus === null)

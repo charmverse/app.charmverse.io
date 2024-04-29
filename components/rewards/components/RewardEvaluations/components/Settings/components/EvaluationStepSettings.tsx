@@ -3,10 +3,9 @@ import type { BountyStatus } from '@charmverse/core/prisma-client';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
-import { CredentialsSettings } from './CredentialsSettings';
 import { CredentialsStepSettings } from './CredentialsStepSettings';
-import { KycSettings } from './KycSettings';
-import { PaymentStepSettings } from './PaymentSettings';
+import { KycStepSettings } from './KycStepSettings';
+import { PaymentStepSettings } from './PaymentStepSettings/PaymentStepSettings';
 import { ReviewStepSettings } from './ReviewStepSettings';
 import { SubmitStepSettings } from './SubmitStepSettings';
 
@@ -32,7 +31,7 @@ export function EvaluationStepSettings(props: EvaluationStepSettingsProps) {
   } else if (evaluationType === 'payment') {
     return <PaymentStepSettings {...props} />;
   } else if (evaluationType === 'kyc') {
-    return <KycSettings {...props} readOnly />;
+    return <KycStepSettings {...props} readOnly />;
   }
 
   return null;

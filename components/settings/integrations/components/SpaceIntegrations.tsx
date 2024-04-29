@@ -32,7 +32,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
         <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
       </Grid>
       <Grid item>
-        <FieldLabel>Kyc</FieldLabel>
+        <FieldLabel>KYC (Know Your Customer)</FieldLabel>
         <KycIntegration space={space} isAdmin={isAdmin} />
       </Grid>
     </Grid>

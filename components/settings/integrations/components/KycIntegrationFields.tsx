@@ -99,6 +99,9 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               helperText={synapsSecretError?.message}
             />
             <Typography variant='caption'>{'Select a secret from: Synaps Manager > Integration > Webhook'}</Typography>
+            <Typography variant='caption'>
+              Add https://webhooks.charmverse.co/synaps-events as the webhook url
+            </Typography>
           </Box>
         </>
       )}
@@ -134,6 +137,9 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
               <Link color='inherit' href='https://app.withpersona.com/dashboard/webhooks' external>
                 https://app.withpersona.com/dashboard/webhooks
               </Link>
+            </Typography>
+            <Typography variant='caption'>
+              Add https://webhooks.charmverse.co/synaps-events as the webhook url
             </Typography>
           </Box>
           <Box>

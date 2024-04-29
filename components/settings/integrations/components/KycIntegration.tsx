@@ -93,7 +93,7 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
       dirtyFields.personaSecret ||
       dirtyFields.personaTemplateId
     ) {
-      const synapsPayload: KycCredentials = {
+      const payload: KycCredentials = {
         synaps: {
           spaceId: space.id,
           apiKey: values.synapsApiKey ?? '',
@@ -107,7 +107,7 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
         }
       };
 
-      await updateKycCredential({ ...synapsPayload }, { onSuccess: (data) => mutateKycCredentials(data) });
+      await updateKycCredential({ ...payload }, { onSuccess: (data) => mutateKycCredentials(data) });
     }
   };
 
