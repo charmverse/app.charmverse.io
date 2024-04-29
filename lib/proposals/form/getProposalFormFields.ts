@@ -1,4 +1,4 @@
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
 export function getProposalFormFields(fields: FormFieldInput[] | null | undefined, canViewPrivateFields: boolean) {

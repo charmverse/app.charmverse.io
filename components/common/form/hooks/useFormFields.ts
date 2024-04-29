@@ -11,7 +11,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isUUID, isUrl, isValidEmail } from 'lib/utils/strings';
 
-import type { FieldType, FormFieldValue } from '../interfaces';
+import type { FieldType, FormFieldValue } from '../../../../lib/forms/interfaces';
 
 type FormFieldInput = {
   value?: any;

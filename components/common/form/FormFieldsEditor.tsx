@@ -9,11 +9,11 @@ import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
+import type { FormFieldInput } from '../../../lib/forms/interfaces';
 import { Button } from '../Button';
 
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
-import type { FormFieldInput } from './interfaces';
 
 export function FormFieldsEditor({
   proposalId,

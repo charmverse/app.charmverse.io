@@ -11,7 +11,7 @@ import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { replaceS3Domain } from 'lib/utils/url';
 
-import type { ControlFieldProps, FieldProps } from '../interfaces';
+import type { ControlFieldProps, FieldProps } from '../../../../lib/forms/interfaces';
 
 import type { FieldWrapperProps } from './FieldWrapper';
 import { FieldWrapper, FieldWrapperContainer, ReadonlyCharmContent } from './FieldWrapper';

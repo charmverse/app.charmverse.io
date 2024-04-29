@@ -1,4 +1,4 @@
-import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import type { FieldAnswerInput } from 'lib/forms/interfaces';
 
 export function validateAnswers(answers: FieldAnswerInput[], formFields: { required: boolean; id: string }[]) {
   return formFields.every(

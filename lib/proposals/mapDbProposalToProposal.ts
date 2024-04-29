@@ -11,8 +11,8 @@ import type {
 import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';

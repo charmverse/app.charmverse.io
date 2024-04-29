@@ -3,7 +3,7 @@ import type { FormField } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { upsertProposalFormFields } from 'lib/proposals/form/upsertProposalFormFields';

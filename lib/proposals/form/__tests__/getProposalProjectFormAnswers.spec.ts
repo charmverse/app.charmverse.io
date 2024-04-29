@@ -2,7 +2,7 @@ import type { User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';

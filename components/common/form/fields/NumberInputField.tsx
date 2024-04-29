@@ -4,7 +4,7 @@ import { TextField } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
+import type { ControlFieldProps, FieldProps } from 'lib/forms/interfaces';
 import type { NestedDataTest } from 'testing/e2eType';
 
 type Props = ControlFieldProps &

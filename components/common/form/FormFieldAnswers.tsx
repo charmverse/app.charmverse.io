@@ -14,6 +14,7 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
+import type { FormFieldValue } from '../../../lib/forms/interfaces';
 import { hoverIconsStyle } from '../Icons/hoverIconsStyle';
 
 import { fieldTypePlaceholderRecord } from './constants';
@@ -24,7 +25,6 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
-import type { FormFieldValue } from './interfaces';
 
 const FormFieldAnswersContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};

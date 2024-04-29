@@ -4,8 +4,8 @@ import { useMemo } from 'react';
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { FormFieldAnswers } from 'components/common/form/FormFieldAnswers';
-import type { FormFieldValue } from 'components/common/form/interfaces';
 import LoadingComponent from 'components/common/LoadingComponent';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 

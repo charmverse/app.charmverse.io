@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 import { isTruthy } from 'lib/utils/types';
-import type { FormFieldValue } from 'components/common/form/interfaces';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 
 // Import rows from a CSV that answer questions on a proposal template
 const templateId = '23630cb0-8a55-4bea-acf5-0f65579302e4';
@@ -347,7 +347,12 @@ async function importTemplate() {
       data: rubricCriteria.map((c) => ({ ...c, parameters: c.parameters as any }))
     }),
     prisma.formField.createMany({
-      data: formFields.map((f) => ({ ...f, fieldConfig: f.fieldConfig as Prisma.InputJsonValue, description: f.description as any, options: f.options as any }))
+      data: formFields.map((f) => ({
+        ...f,
+        fieldConfig: f.fieldConfig as Prisma.InputJsonValue,
+        description: f.description as any,
+        options: f.options as any
+      }))
     })
   ]);
 }

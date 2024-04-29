@@ -2,7 +2,7 @@ import { Button } from 'components/common/Button';
 import ImageSelector from 'components/common/ImageSelector/ImageSelector';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
-import type { ControlFieldProps, FieldProps } from '../interfaces';
+import type { ControlFieldProps, FieldProps } from '../../../../lib/forms/interfaces';
 
 import type { FieldWrapperProps } from './FieldWrapper';
 import { FieldWrapper } from './FieldWrapper';

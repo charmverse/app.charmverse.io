@@ -29,6 +29,7 @@ import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { mergeRefs } from 'lib/utils/react';
 
+import type { FormFieldInput } from '../../../lib/forms/interfaces';
 import { CharmEditor } from '../CharmEditor';
 import PopperPopup from '../PopperPopup';
 
@@ -42,7 +43,6 @@ import {
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
-import type { FormFieldInput } from './interfaces';
 
 export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {

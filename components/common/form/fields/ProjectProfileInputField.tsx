@@ -12,7 +12,7 @@ import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 
-import type { FormFieldValue } from '../interfaces';
+import type { FormFieldValue } from '../../../../lib/forms/interfaces';
 
 export function ProjectProfileInputField({
   onChange,

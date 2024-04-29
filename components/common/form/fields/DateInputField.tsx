@@ -3,7 +3,7 @@ import { forwardRef } from 'react';
 
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
-import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
+import type { ControlFieldProps, FieldProps } from 'lib/forms/interfaces';
 
 type Props = ControlFieldProps & FieldProps;
 
