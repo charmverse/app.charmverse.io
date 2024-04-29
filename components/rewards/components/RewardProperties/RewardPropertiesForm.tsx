@@ -31,7 +31,7 @@ type Props = {
   readOnlyTemplate?: boolean;
   rewardStatus?: BountyStatus | null;
 };
-export function RewardPropertiesFormV2({
+export function RewardPropertiesForm({
   onChange,
   values,
   readOnly,
