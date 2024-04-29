@@ -14,11 +14,13 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import charmClient from 'charmClient';
+import { useGetPageMarkdown } from 'charmClient/hooks/pages';
 import { usePageSidebar } from 'components/[pageId]/DocumentPage/hooks/usePageSidebar';
 import { Button } from 'components/common/Button';
 import { SetAsHomePageAction } from 'components/common/PageActions/components/SetAsHomePageAction';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useMembers } from 'hooks/useMembers';
 import { usePages } from 'hooks/usePages';
@@ -27,7 +29,7 @@ import type { PageUpdates, PageWithContent } from 'lib/pages';
 import { lockablePageTypes } from 'lib/pages/constants';
 import { fontClassName } from 'theme/fonts';
 
-import { exportMarkdown } from '../utils/exportMarkdown';
+import { downloadMarkdownFile } from '../utils/downloadMarkdownFile';
 
 import { AddToFavoritesAction } from './AddToFavoritesAction';
 import { ArchiveProposalAction } from './ArchiveProposalAction';
@@ -129,7 +131,9 @@ export function DocumentPageActionList({
   const { members } = useMembers();
   const { setActiveView } = usePageSidebar();
   const pageType = page.type;
+  const { trigger: getPageMarkdown } = useGetPageMarkdown(pageId);
   const isExportablePage = documentTypes.includes(pageType as PageType);
+  const { space } = useCurrentSpace();
   const basePageBounty = rewards?.find((r) => r.id === pageId);
 
   const canCreateProposal = spacePermissions?.createProposals;
@@ -176,13 +180,12 @@ export function DocumentPageActionList({
   }
 
   async function exportMarkdownPage() {
-    const _page = await charmClient.pages.getPage(pageId);
-    exportMarkdown({
-      content: _page.content,
-      id: _page.id,
-      members,
-      spaceId: _page.spaceId,
-      title: _page.title
+    const markdownContent = await getPageMarkdown();
+    downloadMarkdownFile({
+      markdownContent,
+      pageId,
+      spaceId: space!.id,
+      title: page.title
     }).catch((error) => {
       log.error('Error exporting markdown', { error });
       showMessage('Error exporting markdown', 'error');
