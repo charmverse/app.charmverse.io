@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { DateTime } from 'luxon';
 import { useCallback, useState } from 'react';
 
+import { useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -19,17 +20,17 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { Reward, RewardTokenDetails, RewardType, RewardWithUsers } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { isTruthy } from 'lib/utils/types';
 
 import type { UpdateableRewardFieldsWithType } from '../../hooks/useNewReward';
 import type { BoardReward } from '../../hooks/useRewardsBoardAdapter';
+import { RewardTypeSelect } from '../RewardEvaluations/components/Settings/components/PaymentStepSettings/components/RewardTypeSelect';
 
 import { RewardPropertiesHeader } from './components/RewardPropertiesHeader';
 import { RewardTokenProperty } from './components/RewardTokenProperty';
-import { RewardTypeSelect } from './components/RewardTypeSelect';
 import { CustomPropertiesAdapter } from './CustomPropertiesAdapter';
 
 type Props = {
@@ -63,11 +64,11 @@ export function MilestonePropertiesForm({
   const { getFeatureTitle } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
-  const { templates: rewardTemplates = [] } = useRewardTemplates();
-  const nonDraftRewardTemplates = rewardTemplates.filter((tpl) => tpl.reward.status !== 'draft');
-  const template = nonDraftRewardTemplates?.find((tpl) => tpl.page.id === templateId);
+  const { data: template } = useGetRewardTemplate(templateId);
   const readOnlyProperties = !isAdmin && (readOnly || !!template);
-  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.reward.dueDate);
+  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.dueDate);
+  const readOnlyToken = !isAdmin && (readOnly || !!template?.rewardToken);
+  const { templates: nonDraftRewardTemplates = [] } = useRewardTemplates();
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
     if ('customReward' in updates) {
@@ -247,6 +248,7 @@ export function MilestonePropertiesForm({
                   onChange={onRewardTokenUpdate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
                   readOnly={readOnlyProperties}
+                  readOnlyToken={readOnlyToken}
                 />
               </Box>
             )}

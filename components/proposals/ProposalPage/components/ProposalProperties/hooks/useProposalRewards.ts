@@ -8,7 +8,7 @@ import { useNewReward } from 'components/rewards/hooks/useNewReward';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
@@ -68,16 +68,16 @@ export function useProposalRewards({
   }).join(', ');
 
   function getTemplateAppliedReward(template?: RewardTemplate) {
-    const rewardType = template ? getRewardType(template.reward) : 'token';
+    const rewardType = template ? getRewardType(template) : 'token';
     return {
       rewardType,
-      fields: template?.reward.fields,
-      selectedCredentialTemplates: template?.reward.selectedCredentialTemplates,
-      chainId: rewardType === 'token' ? template?.reward.chainId : null,
-      customReward: rewardType === 'custom' ? template?.reward.customReward : null,
-      rewardAmount: rewardType === 'token' ? template?.reward.rewardAmount : null,
-      rewardToken: rewardType === 'token' ? template?.reward.rewardToken : null,
-      dueDate: template?.reward.dueDate,
+      fields: template?.fields,
+      selectedCredentialTemplates: template?.selectedCredentialTemplates,
+      chainId: rewardType === 'token' ? template?.chainId : null,
+      customReward: rewardType === 'custom' ? template?.customReward : null,
+      rewardAmount: rewardType === 'token' ? template?.rewardAmount : null,
+      rewardToken: rewardType === 'token' ? template?.rewardToken : null,
+      dueDate: template?.dueDate,
       reviewers: rewardReviewers,
       assignedSubmitters,
       // Converting reward values to be of assigned workflow

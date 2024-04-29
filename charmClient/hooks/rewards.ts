@@ -7,7 +7,7 @@ import type {
   RewardBlockWithTypedFields
 } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { ApplicationWithTransactions, RewardWithUsers, RewardWithUsersAndPageMeta } from 'lib/rewards/interfaces';
 
@@ -54,6 +54,10 @@ export function useCreateReward() {
 
 export function useGetRewardTemplatesBySpace(spaceId?: string | null) {
   return useGET<RewardTemplate[]>(spaceId ? `/api/spaces/${spaceId}/reward-templates` : null);
+}
+
+export function useGetRewardTemplate(pageId: MaybeString) {
+  return useGET<RewardTemplate>(pageId ? `/api/rewards/templates/${pageId}` : null);
 }
 
 export function useUpdateRewardBlocks(spaceId: string) {

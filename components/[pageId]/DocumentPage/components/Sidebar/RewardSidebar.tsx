@@ -1,6 +1,6 @@
 import { memo } from 'react';
 
-import { WorkflowSidebar, type SidebarProps } from 'components/common/workflows/WorkflowSidebar';
+import { WorkflowSidebar, type SidebarProps } from 'components/common/WorkflowSidebar/WorkflowSidebar';
 import type { RewardEvaluationsProps } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 

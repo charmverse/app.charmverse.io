@@ -6,7 +6,7 @@ import { PropertyLabel } from 'components/common/DatabaseEditor/components/prope
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardType } from 'lib/rewards/interfaces';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
@@ -31,7 +31,7 @@ type Props = {
   readOnlyTemplate?: boolean;
   rewardStatus?: BountyStatus | null;
 };
-export function RewardPropertiesForm({
+export function RewardPropertiesFormV2({
   onChange,
   values,
   readOnly,
@@ -128,7 +128,7 @@ export function RewardPropertiesForm({
                         if (selected && selectTemplate) {
                           selectTemplate(selected);
                         }
-                        setRewardType(getRewardType(selected?.reward || values, isNewReward, !!templatePage));
+                        setRewardType(getRewardType(selected || values, isNewReward, !!templatePage));
                       }}
                     />
                   </Box>

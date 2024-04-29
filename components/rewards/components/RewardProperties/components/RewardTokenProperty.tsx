@@ -14,10 +14,11 @@ type Props = {
     'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'rewardType'
   > | null;
   requireTokenAmount: boolean;
-  readOnly?: boolean;
+  readOnly: boolean;
+  readOnlyToken: boolean;
 };
 
-export function RewardTokenProperty({ onChange, currentReward, requireTokenAmount, readOnly }: Props) {
+export function RewardTokenProperty({ onChange, currentReward, requireTokenAmount, readOnlyToken, readOnly }: Props) {
   if (!currentReward) {
     return null;
   }
@@ -28,6 +29,7 @@ export function RewardTokenProperty({ onChange, currentReward, requireTokenAmoun
       displayType='details'
       onChange={onChange}
       readOnly={readOnly}
+      readOnlyToken={readOnlyToken}
       currentReward={currentReward}
     >
       <Box>

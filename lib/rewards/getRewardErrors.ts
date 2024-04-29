@@ -61,15 +61,7 @@ export function getRewardErrors({
   isProposalTemplate
 }: ValidationInput): string[] {
   const isTemplate = page?.type === 'bounty_template';
-  const errors: string[] = getRewardPrizeError(
-    {
-      ...reward,
-      rewardType
-    },
-    isTemplate,
-    isProposalTemplate
-  );
-
+  const errors: string[] = [];
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
@@ -82,6 +74,16 @@ export function getRewardErrors({
       errors.push('You need to assign at least one submitter');
     }
   }
+  errors.push(
+    ...getRewardPrizeError(
+      {
+        ...reward,
+        rewardType
+      },
+      isTemplate,
+      isProposalTemplate
+    )
+  );
   return errors;
 }
 

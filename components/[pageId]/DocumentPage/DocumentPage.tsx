@@ -411,6 +411,7 @@ function DocumentPageComponent({
               ) : page.type === 'bounty' || page.type === 'bounty_template' ? (
                 <RewardEvaluations
                   isTemplate={page.type === 'bounty_template'}
+                  templateId={page.sourceTemplateId}
                   isDraft={reward?.status === 'draft'}
                   reward={reward}
                   readOnly={readOnly}

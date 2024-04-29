@@ -1,8 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { permissionsApiClient } from 'lib/permissions/api/client';
-
 import type { ProposalWithUsersAndRubric } from './interfaces';
 import { mapDbProposalToProposal } from './mapDbProposalToProposal';
 

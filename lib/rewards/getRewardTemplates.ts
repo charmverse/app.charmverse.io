@@ -1,22 +1,18 @@
-import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
-import type { Page, Bounty, Prisma } from '@charmverse/core/prisma-client';
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { rewardWithUsersInclude } from 'lib/rewards/getReward';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { mapDbRewardToReward } from 'lib/rewards/mapDbRewardToReward';
-import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
-export type RewardTemplate = {
-  reward: Bounty & {
-    assignedSubmitters: string[] | null;
-    reviewers: RewardReviewer[];
-    allowedSubmitterRoles: string[] | null;
-  };
-  page: Page;
-};
+import type { RewardTemplate } from './getRewardTemplate';
 
-export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequest): Promise<RewardTemplate[]> {
+export async function getRewardTemplates({
+  spaceId,
+  userId
+}: {
+  spaceId: string;
+  userId: string;
+}): Promise<RewardTemplate[]> {
   const isAdmin = await prisma.spaceRole.findFirst({
     where: {
       userId,
@@ -65,10 +61,7 @@ export async function getRewardTemplates({ spaceId, userId }: SpaceResourcesRequ
         .map(({ reward, page }) => {
           const { applications, ...mappedReward } = mapDbRewardToReward(reward);
 
-          return {
-            reward: mappedReward,
-            page
-          };
+          return { ...mappedReward, page };
         })
     );
 }

@@ -2,14 +2,13 @@ import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { memo } from 'react';
 
-import { useMdScreen } from 'hooks/useMediaScreens';
-
-import { SidebarColumn } from '../../[pageId]/DocumentPage/components/DocumentColumnLayout';
+import { SidebarColumn } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import {
   SidebarContentLayout,
   SidebarHeader
-} from '../../[pageId]/DocumentPage/components/Sidebar/components/SidebarContentLayout';
-import { ToggleProposalSidebarButton } from '../../[pageId]/DocumentPage/components/Sidebar/components/ToggleProposalButton';
+} from 'components/[pageId]/DocumentPage/components/Sidebar/components/SidebarContentLayout';
+import { ToggleProposalSidebarButton } from 'components/[pageId]/DocumentPage/components/Sidebar/components/ToggleProposalButton';
+import { useMdScreen } from 'hooks/useMediaScreens';
 
 const sidebarWidth = 430;
 const sidebarMinWidth = 54;

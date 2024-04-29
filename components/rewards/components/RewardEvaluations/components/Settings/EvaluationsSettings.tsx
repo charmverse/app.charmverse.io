@@ -1,10 +1,10 @@
 import { Collapse } from '@mui/material';
 import { useMemo } from 'react';
 
-import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
+import { useGetRewardWorkflows, useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { EvaluationStepRow } from 'components/common/workflows/EvaluationStepRow';
-import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
+import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
+import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
@@ -16,6 +16,7 @@ export type EvaluationSettingsProps = {
   rewardInput?: UpdateableRewardFields;
   readOnly?: boolean;
   isTemplate: boolean;
+  templateId: string | null | undefined;
   requireWorkflowChangeConfirmation?: boolean;
   expanded?: boolean;
   onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
@@ -27,6 +28,7 @@ export function EvaluationsSettings({
   rewardInput,
   isTemplate,
   readOnly,
+  templateId,
   isUnpublishedReward,
   requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
@@ -35,7 +37,9 @@ export function EvaluationsSettings({
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = inferRewardWorkflow(workflowOptions, rewardInput);
+  const { data: rewardTemplate } = useGetRewardTemplate(templateId);
+
+  const workflow = rewardInput && inferRewardWorkflow(workflowOptions, rewardInput);
   const transformedWorkflow = useMemo(() => {
     // Make sure to remove credential step if a new reward is created without any credential templates
     if (!workflow) {
@@ -81,6 +85,7 @@ export function EvaluationsSettings({
                 <EvaluationStepSettings
                   evaluation={evaluation}
                   isTemplate={isTemplate}
+                  rewardTemplateInput={rewardTemplate}
                   readOnly={readOnly}
                   onChange={(updated) => {
                     onChangeReward?.(updated);

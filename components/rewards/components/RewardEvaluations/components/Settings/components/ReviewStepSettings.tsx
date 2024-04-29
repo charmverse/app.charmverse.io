@@ -1,7 +1,8 @@
-import { Box, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
@@ -19,11 +20,7 @@ export function ReviewStepSettings({
 
   return (
     <Stack gap={1.5}>
-      <FormLabel required>
-        <Typography component='span' variant='subtitle1'>
-          Reviewers
-        </Typography>
-      </FormLabel>
+      <FieldLabel required>Reviewers</FieldLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
         <UserAndRoleSelect
           data-test='reward-reviewer-select'
