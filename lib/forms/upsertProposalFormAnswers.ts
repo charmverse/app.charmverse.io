@@ -3,7 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import { v4 } from 'uuid';
 
-import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import type { FieldAnswerInput } from 'lib/forms/interfaces';
 import { validateAnswers } from 'lib/forms/validateAnswers';
 import { isTruthy } from 'lib/utils/types';
 

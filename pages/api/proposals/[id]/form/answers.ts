@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FieldAnswerInput } from 'components/common/form/interfaces';
+import type { FieldAnswerInput } from 'lib/forms/interfaces';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';

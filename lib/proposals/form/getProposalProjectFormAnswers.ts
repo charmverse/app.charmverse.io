@@ -1,7 +1,7 @@
 import type { ProjectField, ProjectAndMembersFieldConfig, ProjectMemberField } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
-export function getProposalProjectFormField({
+export function getProposalProjectFormAnswers({
   canViewPrivateFields,
   projectWithMembers,
   fieldConfig
@@ -9,7 +9,7 @@ export function getProposalProjectFormField({
   fieldConfig: ProjectAndMembersFieldConfig;
   projectWithMembers: ProjectWithMembers;
   canViewPrivateFields: boolean;
-}) {
+}): ProjectWithMembers {
   if (canViewPrivateFields) return projectWithMembers;
 
   const privateProjectFields = Object.entries(fieldConfig)

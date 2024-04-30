@@ -480,12 +480,10 @@ test.describe.serial('Structured proposal template with project', () => {
         .inputValue()) !== ''
     ).toBeTruthy();
 
-    expect(
-      (await projectSettings
-        .getProjectField({
-          fieldName: 'projectMembers[0].email'
-        })
-        .inputValue()) === ''
-    ).toBeTruthy();
+    await expect(
+      projectSettings.getProjectField({
+        fieldName: 'projectMembers[0].email'
+      })
+    ).toBeHidden();
   });
 });

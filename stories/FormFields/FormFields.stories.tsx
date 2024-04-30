@@ -10,7 +10,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import { FormFieldAnswers as CustomFormFieldAnswers } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
-import type { FormFieldInput, FormFieldValue } from 'components/common/form/interfaces';
+import type { FormFieldInput, FormFieldValue } from 'lib/forms/interfaces';
 import { createDocumentWithText } from 'lib/prosemirror/constants';
 
 const options: SelectOptionType[] = [

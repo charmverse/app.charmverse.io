@@ -21,7 +21,6 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
   const userId = req.session.user?.id as string | undefined;
 
   const permissionsByStep = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
-    // Proposal id is the same as page
     resourceId: proposalId,
     userId
   });
