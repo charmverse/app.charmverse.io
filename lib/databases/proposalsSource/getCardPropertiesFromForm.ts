@@ -1,6 +1,6 @@
 import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
 
-import type { FormFieldValue, LongTextValue } from 'components/common/form/interfaces';
+import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 

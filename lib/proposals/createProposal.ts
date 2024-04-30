@@ -7,9 +7,9 @@ import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import { rewardCharmsForProposal } from 'lib/charms/triggers/rewardCharmsForProposal';
 import { createForm } from 'lib/forms/createForm';
+import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';

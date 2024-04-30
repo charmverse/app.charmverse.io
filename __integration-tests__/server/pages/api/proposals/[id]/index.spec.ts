@@ -5,8 +5,8 @@ import _isEqual from 'lodash/isEqual';
 import request from 'supertest';
 import { v4 } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/forms/createForm';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import { baseUrl, loginUser } from 'testing/mockApiCall';

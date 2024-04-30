@@ -3,8 +3,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { expect, test as base } from '@playwright/test';
 
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
+import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { randomETHWalletAddress } from 'testing/generateStubs';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 import { generateForumPost, generatePostCategory } from 'testing/utils/forums';
 
 import { ForumHomePage } from '../po/forumHome.po';

@@ -4,11 +4,11 @@ import { v4 as uuid } from 'uuid';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import { useProjectForm } from 'components/settings/projects/hooks/useProjectForm';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';

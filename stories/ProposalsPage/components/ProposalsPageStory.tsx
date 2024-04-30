@@ -7,9 +7,9 @@ import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
+import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../../lib/mockData';
 

@@ -3,8 +3,8 @@ import type { FormFieldAnswer, Space, User } from '@charmverse/core/prisma-clien
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/forms/createForm';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 import { generateProposal } from 'testing/utils/proposals';
