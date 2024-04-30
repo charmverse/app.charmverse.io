@@ -1,7 +1,6 @@
 import type { Bounty as Reward } from '@charmverse/core/prisma';
 import RewardIcon from '@mui/icons-material/RequestPageOutlined';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography, { type TypographyProps } from '@mui/material/Typography';
@@ -16,60 +15,23 @@ import { getTokenInfo } from 'lib/tokens/tokenData';
 import { fancyTrim } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 
-import { RewardStatusChip } from './RewardChip';
-
 export interface IRewardBadgeProps {
   reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'status'>>;
-  truncate?: boolean;
-  hideStatus?: boolean;
-  showEmptyStatus?: boolean;
-  fullForm?: boolean;
-  noRewardText?: string;
-}
-export function RewardStatusBadge({
-  fullForm,
-  truncate = false,
-  showEmptyStatus,
-  hideStatus,
-  reward,
-  noRewardText
-}: IRewardBadgeProps) {
-  return (
-    <Grid container direction='column' alignItems='center'>
-      <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            width: '100%',
-            justifyContent: 'space-between',
-            gap: 1,
-            alignItems: 'center',
-            minHeight: '30px'
-          }}
-        >
-          <RewardAmount noRewardText={noRewardText} fullForm={fullForm} reward={reward} truncate={truncate} />
-          {!hideStatus && <RewardStatusChip status={reward.status} showEmptyStatus={showEmptyStatus} />}
-        </Box>
-      </Grid>
-    </Grid>
-  );
 }
 
 export function RewardAmount({
   reward,
-  truncate = false,
-  truncatePrecision = 4,
+  truncatePrecision = 2,
   typographyProps,
   fullForm,
   noRewardText,
+  noAmountText,
   requireTokenAmount
 }: {
   noRewardText?: string;
+  noAmountText?: string;
   fullForm?: boolean;
   reward: Partial<Pick<Reward, 'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'rewardType'>>;
-  truncate?: boolean;
   truncatePrecision?: number;
   typographyProps?: TypographyProps;
   requireTokenAmount?: boolean;
@@ -94,6 +56,11 @@ export function RewardAmount({
   const rewardAmount = reward.rewardAmount; // amount is optional for reward templates
   const rewardToken = reward.rewardToken;
   const chainId = reward.chainId;
+  const truncatedAmount = truncateAmount({
+    amount: rewardAmount,
+    precision: truncatePrecision,
+    requireAmount: !!requireTokenAmount
+  });
 
   const tokenInfo = getTokenInfo({
     chainId,
@@ -104,68 +71,60 @@ export function RewardAmount({
   const formattedAmount = rewardAmount
     ? Intl.NumberFormat(undefined, { maximumSignificantDigits: 3 }).format(rewardAmount)
     : '';
-
-  const truncateAmount = () => {
-    if (!rewardAmount && typeof rewardAmount !== 'number') return '';
-    try {
-      const truncatedAmount = millify(rewardAmount, { precision: truncatePrecision });
-      if (truncatedAmount === '0') {
-        return requireTokenAmount ? '0' : '';
-      }
-      return truncatedAmount;
-    } catch (error) {
-      return requireTokenAmount ? 'Invalid number' : '';
-    }
-  };
   const chain = reward.chainId ? getChainById(reward.chainId) : undefined;
   const tooltip = `${formattedAmount} ${tokenInfo.tokenSymbol} ${chain ? `on ${chain.chainName}` : ''}`;
 
   return (
     <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>
-      <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
+      <Box display='flex' alignItems='center' gap={1} flexGrow={1}>
         {!rewardAmount && requireTokenAmount ? (
           <EmptyPlaceholder>Enter amount</EmptyPlaceholder>
-        ) : // <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
-        //   <Typography
-        //     component='span'
-        //     sx={{
-        //       fontWeight: 600
-        //     }}
-        //     mr={0.5}
-        //     variant='caption'
-        //     {...typographyProps}
-        //   >
-        //     Reward not set
-        //   </Typography>
-        // </Box>
-        fullForm ? (
+        ) : fullForm ? (
           <TokenBadge tokenAmount={rewardAmount} chainId={chainId} tokenAddress={rewardToken} />
         ) : (
           <>
-            <Box
-              component='span'
-              sx={{
-                width: 25,
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-            </Box>
-            <Typography
-              component='span'
-              fontWeight='600'
-              variant='h6'
-              fontSize={18}
-              data-test='reward-amount'
-              textTransform='uppercase'
-              {...typographyProps}
-            >
-              {truncate ? truncateAmount() : rewardAmount || ''} {tokenInfo.isContract && tokenInfo.tokenSymbol}
-            </Typography>
+            <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+            {truncatedAmount && (
+              <Typography component='span' variant='body2' data-test='reward-amount' {...typographyProps}>
+                {truncatedAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}
+              </Typography>
+            )}
+            {tokenInfo.isContract && tokenInfo.tokenSymbol && (
+              <Typography
+                component='span'
+                variant='body2'
+                data-test='reward-amount'
+                textTransform='uppercase'
+                {...typographyProps}
+              >
+                {tokenInfo.isContract && tokenInfo.tokenSymbol}
+              </Typography>
+            )}
+            {!truncatedAmount && noAmountText && <EmptyPlaceholder>{noAmountText}</EmptyPlaceholder>}
           </>
         )}
       </Box>
     </Tooltip>
   );
+}
+
+function truncateAmount({
+  precision,
+  amount,
+  requireAmount
+}: {
+  precision: number;
+  amount: number | null | undefined;
+  requireAmount: boolean;
+}) {
+  if (!amount && typeof amount !== 'number') return '';
+  try {
+    const truncatedAmount = millify(amount, { precision });
+    if (truncatedAmount === '0') {
+      return requireAmount ? '0' : '';
+    }
+    return truncatedAmount;
+  } catch (error) {
+    return requireAmount ? 'Invalid number' : '';
+  }
 }

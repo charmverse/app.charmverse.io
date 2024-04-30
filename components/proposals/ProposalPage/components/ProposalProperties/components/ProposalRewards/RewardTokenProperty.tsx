@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 
+import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
-import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
 
@@ -30,15 +30,11 @@ export function RewardTokenProperty({ onChange, currentReward, requireTokenAmoun
       readOnlyToken={readOnlyToken}
       currentReward={currentReward}
     >
-      <Box>
-        <RewardAmount
-          reward={currentReward}
-          truncate={true}
-          truncatePrecision={2}
-          requireTokenAmount={requireTokenAmount}
-          typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-        />
-      </Box>
+      <RewardAmount
+        reward={currentReward}
+        requireTokenAmount={requireTokenAmount}
+        noAmountText='Submitter defines amount'
+      />
     </RewardTokenDialog>
   );
 }
