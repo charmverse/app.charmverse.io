@@ -15,7 +15,9 @@ let guild2Role1: Role;
 let guild2Role2: Role;
 
 beforeAll(async () => {
-  const { space: createdSpace, user } = await generateUserAndSpace();
+  const { space: createdSpace, user } = await generateUserAndSpace({
+    walletAddress: randomETHWalletAddress()
+  });
   user1 = user;
   user2 = await createUserWithWallet({
     address: randomETHWalletAddress()

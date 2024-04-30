@@ -36,14 +36,6 @@ jest.mock('lib/blockchain/getNFTs', () => {
   };
 });
 
-jest.mock('lib/profile/getUserNFTs', () => {
-  return {
-    getUserNFTs: (userId: string) => {
-      return [];
-    }
-  };
-});
-
 jest.mock('lib/metrics/mixpanel/trackUserAction', () => ({
   trackUserAction: jest.fn()
 }));
