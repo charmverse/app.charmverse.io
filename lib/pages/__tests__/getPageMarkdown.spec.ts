@@ -3,10 +3,8 @@ import { testUtilsPages, testUtilsProposals } from '@charmverse/core/test';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { getPageMarkdown } from 'lib/pages/getPageMarkdown';
-import type { FieldConfig } from 'lib/projects/formField';
-import { projectFieldProperties } from 'lib/projects/formField';
-import { jsonDoc, _ } from 'lib/prosemirror/builders';
-import { getProfectProfileFieldConfigDefaultHidden } from 'testing/mocks/form';
+import { _, jsonDoc } from 'lib/prosemirror/builders';
+import { getProjectProfileFieldConfigDefaultHidden } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('getPageMarkdown', () => {
@@ -100,7 +98,7 @@ describe('getPageMarkdown', () => {
                 index: 4,
                 name: 'Project Profile',
                 type: 'project_profile',
-                fieldConfig: getProfectProfileFieldConfigDefaultHidden({
+                fieldConfig: getProjectProfileFieldConfigDefaultHidden({
                   github: {
                     show: true
                   },
@@ -140,7 +138,18 @@ describe('getPageMarkdown', () => {
           createMany: {
             data: [
               {
+                teamLead: true,
                 name: 'First guy',
+                updatedBy: user.id,
+                walletAddress: '0x1234567890'
+              },
+              {
+                name: 'Second guy',
+                updatedBy: user.id,
+                walletAddress: '0x1234567890'
+              },
+              {
+                name: 'Third guy',
                 updatedBy: user.id,
                 walletAddress: '0x1234567890'
               }
@@ -182,6 +191,15 @@ describe('getPageMarkdown', () => {
           type: 'long_text'
         },
         {
+          fieldId: form.formFields[4].id,
+          value: {
+            projectId: project.id,
+            selectedMemberIds: [project.projectMembers[1].id]
+          },
+          proposalId: proposal.id,
+          type: 'project_profile'
+        },
+        {
           fieldId: form.formFields[5].id,
           value: 'select-option-1',
           proposalId: proposal.id,
@@ -219,6 +237,12 @@ long text
   - First guy
 
     - Wallet address: ${project.projectMembers[0].walletAddress}
+
+    - Email: N/A
+
+  - Second guy
+
+    - Wallet address: ${project.projectMembers[1].walletAddress}
 
     - Email: N/A
 

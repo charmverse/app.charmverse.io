@@ -25,7 +25,7 @@ export function getFormInput(input: Partial<FormFieldInput>): FormFieldInput {
   };
 }
 
-export function getProfectProfileFieldConfig(
+export function getProjectProfileFieldConfig(
   fieldConfig: ProjectAndMembersFieldConfig = {}
 ): ProjectAndMembersFieldConfig {
   const defaults = createDefaultProjectAndMembersFieldConfig();
@@ -40,7 +40,7 @@ export function getProfectProfileFieldConfig(
 }
 
 // get project profile field config with all fields hidden
-export function getProfectProfileFieldConfigDefaultHidden(
+export function getProjectProfileFieldConfigDefaultHidden(
   fieldConfig: ProjectAndMembersFieldConfig = {}
 ): ProjectAndMembersFieldConfig {
   const defaults = createDefaultProjectAndMembersFieldConfig();

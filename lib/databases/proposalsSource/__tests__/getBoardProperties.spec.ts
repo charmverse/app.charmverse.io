@@ -1,7 +1,7 @@
 import type { IPropertyTemplate } from 'lib/databases/board';
 import * as constants from 'lib/projects/formField';
 import { getFieldConfig } from 'lib/projects/formField';
-import { getFormInput, getProfectProfileFieldConfig } from 'testing/mocks/form';
+import { getFormInput, getProjectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getBoardProperties } from '../getBoardProperties';
 
@@ -104,7 +104,7 @@ describe('getBoardProperties', () => {
         getFormInput({
           id: 'project-profile-id',
           type: 'project_profile',
-          fieldConfig: getProfectProfileFieldConfig()
+          fieldConfig: getProjectProfileFieldConfig()
         })
       ]
     });
@@ -138,7 +138,7 @@ describe('getBoardProperties', () => {
         getFormInput({
           id: 'project-profile-id',
           type: 'project_profile',
-          fieldConfig: getProfectProfileFieldConfig({
+          fieldConfig: getProjectProfileFieldConfig({
             walletAddress: { private: true },
             projectMember: {
               walletAddress: getFieldConfig({ private: true })
@@ -161,7 +161,7 @@ describe('getBoardProperties', () => {
         getFormInput({
           id: 'project-profile-id',
           type: 'project_profile',
-          fieldConfig: getProfectProfileFieldConfig({
+          fieldConfig: getProjectProfileFieldConfig({
             website: { show: false }
           })
         })
