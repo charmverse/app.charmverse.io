@@ -31,7 +31,31 @@ describe('getPageMarkdown', () => {
     const { space, user } = await generateUserAndSpace();
     const proposal = await testUtilsProposals.generateProposal({
       spaceId: space.id,
-      userId: user.id
+      userId: user.id,
+      fields: {
+        pendingRewards: [
+          {
+            page: {
+              title: 'Cheez wizard'
+            },
+            reward: {
+              rewardType: 'custom',
+              customReward: 'All the cheese'
+            }
+          },
+          {
+            page: {
+              title: 'Payout'
+            },
+            reward: {
+              chainId: 1,
+              rewardType: 'token',
+              rewardAmount: 100,
+              rewardToken: 'ETH'
+            }
+          }
+        ]
+      }
     });
     const page = await testUtilsPages.generatePage({
       content: jsonDoc(_.p(markdownContent)),
@@ -201,6 +225,14 @@ long text
 ### Select Field
 
 Option 1
+
+### Milestones
+
+- Cheez wizard${'  '}
+ Reward: All the cheese
+
+- Payout${'  '}
+ Token reward: 100 ETH on Ethereum
 `.trim()
     );
   });
