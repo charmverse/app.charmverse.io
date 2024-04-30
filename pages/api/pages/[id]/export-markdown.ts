@@ -3,25 +3,20 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { onError, onNoMatch, ActionNotPermittedError } from 'lib/middleware';
+import { getPageMarkdown } from 'lib/pages/getPageMarkdown';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.get(getPageMarkdown);
+handler.get(getPageMarkdownEndpoint);
 
-async function getPageMarkdown(req: NextApiRequest, res: NextApiResponse) {
+async function getPageMarkdownEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session?.user?.id;
 
-  const page = await prisma.page.findFirstOrThrow({
-    where: { id: pageId }
-  });
-
-  // Page ID might be a path now, so first we fetch the page and if found, can pass the id from the found page to check if we should actually send it to the requester
   const permissions = await permissionsApiClient.pages.computePagePermissions({
-    resourceId: page.id,
+    resourceId: pageId,
     userId
   });
 
@@ -29,21 +24,25 @@ async function getPageMarkdown(req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You do not have permissions to view this page');
   }
 
-  const spaceRoles = await prisma.spaceRole.findMany({
+  const page = await prisma.page.findUniqueOrThrow({
     where: {
-      spaceId: page.spaceId
+      id: pageId
     },
-    include: {
-      user: true
+    select: {
+      proposalId: true
     }
   });
-  const spaceMembers = spaceRoles.map((role) => role.user);
+  // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
+  const proposalPermissions = page.proposalId
+    ? await permissionsApiClient.proposals.computeProposalPermissions({
+        resourceId: page.proposalId,
+        userId
+      })
+    : null;
 
-  const markdownContent = await generateMarkdown({
-    content: page.content,
-    generatorOptions: {
-      members: spaceMembers
-    }
+  const markdownContent = await getPageMarkdown({
+    pageId,
+    includePrivateFields: proposalPermissions?.view_private_fields
   });
 
   res.status(200).json(markdownContent);
