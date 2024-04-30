@@ -1,16 +1,14 @@
-import type { Role, Space, TokenGate, TokenGateToRole } from '@charmverse/core/prisma';
+import type { Role, Space, User, TokenGate, TokenGateToRole } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
-import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import type { LoggedInUser } from 'models';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 
 // User 1 is admin
-let user1: LoggedInUser;
-let user2: LoggedInUser;
+let user1: User;
+let user2: User;
 let space: Space;
 let cookie1: string;
 let cookie2: string;
@@ -20,10 +18,10 @@ let role2: Role;
 let tokenGateToRole: TokenGateToRole;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpaceWithApiToken();
+  const generated = await generateUserAndSpace();
 
   user1 = generated.user;
-  user2 = await createUserFromWallet({
+  user2 = await createUserWithWallet({
     address: randomETHWalletAddress()
   });
   space = generated.space;

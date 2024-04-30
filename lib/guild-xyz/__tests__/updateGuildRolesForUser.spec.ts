@@ -2,8 +2,8 @@ import type { Role, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
-import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
+import { createUserWithWallet } from 'testing/setupDatabase';
 
 let user: User;
 let space1: Space;
@@ -16,7 +16,7 @@ let space2guildRole1: Role;
 let space2guildRole2: Role;
 
 beforeAll(async () => {
-  user = await createUserFromWallet({
+  user = await createUserWithWallet({
     address: randomETHWalletAddress()
   });
   space1 = await prisma.space.create({
