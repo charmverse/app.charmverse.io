@@ -2,8 +2,8 @@ import { testUtilsPages } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { saveDocumentNotification } from 'lib/notifications/saveNotification';
+import { builders } from 'lib/prosemirror/builders';
 import { updateUserProfile } from 'lib/users/updateUserProfile';
-import { builders } from 'testing/prosemirror/builders';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { sendNotificationEmail } from '../sendNotificationEmail';

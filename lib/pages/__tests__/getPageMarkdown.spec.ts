@@ -4,8 +4,8 @@ import { testUtilsPages, testUtilsProposals } from '@charmverse/core/test';
 import { getPageMarkdown } from 'lib/pages/getPageMarkdown';
 import type { FieldConfig } from 'lib/projects/formField';
 import { projectFieldProperties } from 'lib/projects/formField';
+import { jsonDoc, _ } from 'lib/prosemirror/builders';
 import { getProfectProfileFieldConfigDefaultHidden } from 'testing/mocks/form';
-import { jsonDoc, _ } from 'testing/prosemirror/builders';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 describe('getPageMarkdown', () => {

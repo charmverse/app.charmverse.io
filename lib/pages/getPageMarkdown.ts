@@ -3,11 +3,11 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
 import type { ProjectField, ProjectMemberField, ProjectMemberFieldConfig, FieldConfig } from 'lib/projects/formField';
 import { getFieldConfig, projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
+import { _ } from 'lib/prosemirror/builders';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { generateMarkdown } from 'lib/prosemirror/markdown/generateMarkdown';
 import { isTruthy } from 'lib/utils/types';
-import { _ } from 'testing/prosemirror/builders';
 
 export async function getPageMarkdown({
   pageId,

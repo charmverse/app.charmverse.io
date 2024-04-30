@@ -1,4 +1,4 @@
-import { _, jsonDoc } from 'testing/prosemirror/builders';
+import { _, jsonDoc } from 'lib/prosemirror/builders';
 
 import { convertDocument } from '../convertOldListNodes';
 
