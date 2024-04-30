@@ -120,7 +120,7 @@ function getFunctionInput({
         ...evaluation,
         voteSettings: evaluation.voteSettings as any
       }))
-    },
+    } as any,
     page
   };
 }

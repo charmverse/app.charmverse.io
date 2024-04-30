@@ -13,6 +13,7 @@ type ValidationInput = {
   >;
   linkedPageId?: string | null; // the page a bounty is attached to
   rewardType: RewardType;
+  isMilestone?: boolean;
   isProposalTemplate?: boolean;
 };
 
@@ -30,7 +31,8 @@ function getRewardPrizeError(
     rewardAmount?: number | null;
     customReward?: string | null;
   },
-  isTemplate: boolean
+  isTemplate: boolean,
+  isProposalTemplate?: boolean
 ) {
   const errors: string[] = [];
 
@@ -40,7 +42,10 @@ function getRewardPrizeError(
     errors.push(`Reward amount must also have chainId and token`);
   } else if (rewardType === 'custom' && !customReward) {
     errors.push('Custom reward is required');
-  } else if (rewardType === 'token' && !(chainId && rewardToken && (rewardAmount || isTemplate))) {
+  } else if (
+    rewardType === 'token' &&
+    !(chainId && rewardToken && (rewardAmount || isTemplate || isProposalTemplate))
+  ) {
     errors.push('Token information is required');
   }
 
@@ -52,6 +57,7 @@ export function getRewardErrors({
   linkedPageId,
   reward,
   rewardType,
+  isMilestone,
   isProposalTemplate
 }: ValidationInput): string[] {
   const isTemplate = page?.type === 'bounty_template';
@@ -59,22 +65,28 @@ export function getRewardErrors({
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
-  // In proposal template, reviewers are all the reviewers and assignedSubmitters are the authors
-  if (!isProposalTemplate) {
+
+  if (!isMilestone) {
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');
     } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
       errors.push('You need to assign at least one submitter');
     }
+  } else if (!isProposalTemplate) {
+    if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
+      errors.push('You need to assign at least one submitter');
+    }
   }
+
   errors.push(
     ...getRewardPrizeError(
       {
         ...reward,
         rewardType
       },
-      isTemplate
+      isTemplate,
+      isProposalTemplate
     )
   );
   return errors;

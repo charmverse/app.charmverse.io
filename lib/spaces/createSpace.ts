@@ -17,7 +17,7 @@ import { memberProfileNames } from 'lib/profile/memberProfiles';
 import { createDefaultProposal } from 'lib/proposals/createDefaultProposal';
 import { getDefaultWorkflows } from 'lib/proposals/workflows/defaultWorkflows';
 import { upsertDefaultRewardsBoard } from 'lib/rewards/blocks/upsertDefaultRewardsBoard';
-import { createDefaultReward } from 'lib/rewards/createDefaultReward';
+import { createDefaultReward, createDefaultRewardTemplate } from 'lib/rewards/createDefaultReward';
 import { defaultFreeBlockQuota } from 'lib/subscription/constants';
 import { importSpaceData } from 'lib/templates/importSpaceData';
 import { createSigningSecret, subscribeToAllEvents } from 'lib/webhookPublisher/subscribeToEvents';
@@ -213,6 +213,11 @@ export async function createWorkspace({
 
   // Create a test reward, and the default rewards views
   await createDefaultReward({
+    spaceId: space.id,
+    userId: space.createdBy
+  });
+
+  await createDefaultRewardTemplate({
     spaceId: space.id,
     userId: space.createdBy
   });

@@ -36,8 +36,7 @@ export function RewardStickyFooter({
       type: 'bounty'
     },
     reward,
-    rewardType: reward.rewardType,
-    isProposalTemplate: false
+    rewardType: reward.rewardType
   }).join('\n');
 
   return (

@@ -531,6 +531,7 @@ function DocumentPageComponent({
                         variant='solid_button'
                         readOnly={!proposal.permissions.edit}
                         rewardIds={proposal.rewardIds || []}
+                        isProposalTemplate={page.type === 'proposal_template'}
                         onSave={(pendingReward) => {
                           const isExisting = proposal.fields?.pendingRewards?.find(
                             (r) => r.draftId === pendingReward.draftId

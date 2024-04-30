@@ -161,7 +161,8 @@ export function NewRewardPage({
       setRewardValues({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: [user!.id]
+        assignedSubmitters: [user!.id],
+        allowedSubmitterRoles: []
       });
     }
   }

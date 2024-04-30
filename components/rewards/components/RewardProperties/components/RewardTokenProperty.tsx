@@ -37,6 +37,7 @@ export function RewardTokenProperty({ onChange, currentReward, requireTokenAmoun
           reward={currentReward}
           truncate={true}
           truncatePrecision={2}
+          requireTokenAmount={requireTokenAmount}
           typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
         />
       </Box>
