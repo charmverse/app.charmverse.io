@@ -31,7 +31,6 @@ import { PropertyLabel } from 'components/common/DatabaseEditor/components/prope
 import { FormFieldAnswersControlled } from 'components/common/form/FormFieldAnswers';
 import { ControlledFormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { getInitialFormFieldValue } from 'components/common/form/hooks/useFormFields';
-import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { authorSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
@@ -42,6 +41,7 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
+import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';

@@ -1,6 +1,6 @@
 import { v4 as uuid } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { FieldConfig, ProjectFieldConfig } from 'lib/projects/formField';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 
