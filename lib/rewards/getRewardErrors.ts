@@ -65,7 +65,7 @@ export function getRewardErrors({
   if (!page?.title && !linkedPageId) {
     errors.push('Page title is required');
   }
-  // In proposal template, reviewers are all the reviewers and assignedSubmitters are the authors
+
   if (!isMilestone) {
     // these values are not required for templates
     if (!reward.reviewers?.length) {
@@ -73,7 +73,12 @@ export function getRewardErrors({
     } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
       errors.push('You need to assign at least one submitter');
     }
+  } else if (!isProposalTemplate) {
+    if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
+      errors.push('You need to assign at least one submitter');
+    }
   }
+
   errors.push(
     ...getRewardPrizeError(
       {

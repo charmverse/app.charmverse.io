@@ -81,7 +81,6 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
         'id'
       ),
       allowedSubmitterRoles: [],
-      assignedSubmitters: proposal.authors.map((a) => a.userId),
       pageProps: page || {},
       spaceId: proposal.spaceId,
       userId,

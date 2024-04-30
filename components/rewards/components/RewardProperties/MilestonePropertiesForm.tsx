@@ -9,6 +9,7 @@ import { useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { StyledPropertyTextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
@@ -101,6 +102,14 @@ export function MilestonePropertiesForm({
       chainId: rewardType === 'token' ? values.chainId : undefined
     });
   }
+
+  const updateAssignedSubmitters = useCallback((submitters: string[]) => {
+    applyUpdates({
+      assignedSubmitters: submitters,
+      approveSubmitters: false,
+      allowMultipleApplications: false
+    });
+  }, []);
 
   async function onRewardTokenUpdate(rewardToken: RewardTokenDetails | null) {
     if (rewardToken) {
@@ -221,13 +230,28 @@ export function MilestonePropertiesForm({
                 Assigned applicants
               </PropertyLabel>
               <Box display='flex' flex={1}>
-                <UserAndRoleSelect
-                  readOnly
-                  wrapColumn
-                  value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
-                  systemRoles={[authorSystemRole]}
-                  onChange={() => {}}
-                />
+                {isProposalTemplate ? (
+                  <UserAndRoleSelect
+                    readOnly
+                    wrapColumn
+                    value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
+                    systemRoles={[authorSystemRole]}
+                    onChange={() => {}}
+                  />
+                ) : (
+                  <UserSelect
+                    memberIds={values.assignedSubmitters ?? []}
+                    readOnly={readOnly}
+                    onChange={updateAssignedSubmitters}
+                    wrapColumn
+                    showEmptyPlaceholder
+                    error={
+                      !isNewReward && !values.assignedSubmitters?.length && !readOnly
+                        ? 'Requires at least one assignee'
+                        : undefined
+                    }
+                  />
+                )}
               </Box>
             </Box>
 
