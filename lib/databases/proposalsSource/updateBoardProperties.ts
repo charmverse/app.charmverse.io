@@ -1,8 +1,8 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 

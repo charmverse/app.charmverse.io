@@ -27,8 +27,8 @@ export type ProjectFieldConfig = {
 // TODO: use type enums instead of string for the keys
 // export type FieldConfig = Partial<Record<ProjectField, ProjectFieldConfig>>;
 // export type ProjectMemberFieldConfig = Partial<Record<ProjectMemberField, ProjectFieldConfig>>;
-export type FieldConfig = Partial<Record<string, ProjectFieldConfig>>;
-export type ProjectMemberFieldConfig = Partial<Record<string, ProjectFieldConfig>>;
+export type FieldConfig = Record<string, ProjectFieldConfig>;
+export type ProjectMemberFieldConfig = Record<string, ProjectFieldConfig>;
 
 export type ProjectAndMembersFieldConfig = FieldConfig & {
   projectMember: ProjectMemberFieldConfig;
