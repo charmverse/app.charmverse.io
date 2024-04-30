@@ -14,7 +14,10 @@ import { getRelativeTimeInThePast } from 'lib/utils/dates';
 export type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer'>;
+  evaluation: Pick<
+    PopulatedEvaluation,
+    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionButtonLabels'
+  >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
   isCurrent: boolean;
@@ -50,11 +53,21 @@ export function PassFailEvaluation({
     ? 'You cannot move an archived proposal'
     : null;
 
+  const actionButtonLabels = evaluation?.actionButtonLabels as
+    | undefined
+    | {
+        approve: string;
+        decline: string;
+      };
+
+  const approveLabel = actionButtonLabels?.approve || 'Pass';
+  const declineLabel = actionButtonLabels?.decline || 'Decline';
+
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (confirmationMessage) {
       const { confirmed } = await showConfirmation({
         message: confirmationMessage,
-        confirmButton: result === 'pass' ? 'Approve' : 'Decline'
+        confirmButton: result === 'pass' ? approveLabel : declineLabel
       });
       if (!confirmed) {
         return;
@@ -110,7 +123,7 @@ export function PassFailEvaluation({
                 disabledTooltip={disabledTooltip}
                 color='errorPale'
               >
-                Decline
+                {declineLabel}
               </Button>
               <Button
                 data-test='evaluation-pass-button'
@@ -119,7 +132,7 @@ export function PassFailEvaluation({
                 disabledTooltip={disabledTooltip}
                 color='successPale'
               >
-                Pass
+                {approveLabel}
               </Button>
             </Box>
           </Box>

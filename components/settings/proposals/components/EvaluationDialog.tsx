@@ -2,7 +2,7 @@ import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
-import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
+import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
@@ -33,6 +33,12 @@ export const schema = yup.object({
   id: yup.string().required(),
   title: yup.string().required(),
   type: yup.mixed<ProposalEvaluationType>().oneOf(evaluationTypes).required(),
+  actionButtonLabels: yup
+    .object({
+      approve: yup.string().optional(),
+      decline: yup.string().optional()
+    })
+    .nullable(),
   permissions: yup
     .array()
     .of(
@@ -65,7 +71,7 @@ export function EvaluationDialog({
     reset,
     setValue,
     watch,
-    formState: { errors, isValid }
+    formState: { isValid }
   } = useForm<FormValues>({});
 
   const dialogTitle = evaluation?.id ? 'Rename evaluation' : evaluation ? 'New evaluation step' : '';
@@ -93,6 +99,13 @@ export function EvaluationDialog({
     });
     onClose();
   }
+
+  const actionButtonLabels = formValues?.actionButtonLabels as
+    | undefined
+    | {
+        approve: string;
+        decline: string;
+      };
 
   return (
     <Dialog
@@ -180,6 +193,39 @@ export function EvaluationDialog({
                 )}
               />
             </div>
+            {formValues.type === 'pass_fail' || formValues.type === 'rubric' ? (
+              <div>
+                <FieldLabel>Action button labels</FieldLabel>
+                <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
+                  <Typography width='50%'>Pass</Typography>
+                  <TextField
+                    placeholder='Pass'
+                    onChange={(e) => {
+                      setValue('actionButtonLabels', {
+                        ...actionButtonLabels,
+                        approve: e.target.value
+                      });
+                    }}
+                    fullWidth
+                    value={actionButtonLabels?.approve}
+                  />
+                </Stack>
+                <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+                  <Typography width='50%'>Decline</Typography>
+                  <TextField
+                    placeholder='Decline'
+                    onChange={(e) => {
+                      setValue('actionButtonLabels', {
+                        ...actionButtonLabels,
+                        decline: e.target.value
+                      });
+                    }}
+                    fullWidth
+                    value={actionButtonLabels?.decline}
+                  />
+                </Stack>
+              </div>
+            ) : null}
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (
