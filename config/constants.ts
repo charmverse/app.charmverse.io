@@ -59,6 +59,7 @@ export const githubAppId = Number(process.env.GITHUB_APP_ID);
 
 // Docusign
 export const docusignClientId = env('DOCUSIGN_CLIENT_ID') ?? (process.env.REACT_APP_DOCUSIGN_CLIENT_ID as string);
+export const docusignClientSecret = process.env.DOCUSIGN_CLIENT_SECRET as string;
 export const docusignOauthBaseUri =
   env('DOCUSIGN_OAUTH_BASE_URI') ?? (process.env.REACT_APP_DOCUSIGN_OAUTH_BASE_URI as string);
 
