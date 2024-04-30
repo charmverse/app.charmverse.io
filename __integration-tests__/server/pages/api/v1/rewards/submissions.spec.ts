@@ -1,10 +1,10 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import request from 'supertest';
 
+import { _ } from 'lib/prosemirror/builders';
 import { getUserProfile } from 'lib/public-api/searchUserProfile';
 import type { PublicApiSubmission } from 'pages/api/v1/rewards/submissions';
 import { baseUrl } from 'testing/mockApiCall';
-import { _ } from 'testing/prosemirror/builders';
 import {
   generateBountyWithSingleApplication,
   generateSpaceUser,

@@ -8,7 +8,7 @@ import { createProject } from 'lib/projects/createProject';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
-import { getProfectProfileFieldConfig } from 'testing/mocks/form';
+import { getProjectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getProposalProjectFormAnswers } from '../getProposalProjectFormAnswers';
 
@@ -22,7 +22,7 @@ const fieldsInput: FormFieldInput[] = [
     options: [],
     private: false,
     required: true,
-    fieldConfig: getProfectProfileFieldConfig({
+    fieldConfig: getProjectProfileFieldConfig({
       walletAddress: {
         private: true
       },

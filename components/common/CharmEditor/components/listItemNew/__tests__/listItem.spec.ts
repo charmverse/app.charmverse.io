@@ -1,6 +1,6 @@
 import { charmEditorPlugins } from 'components/common/CharmEditor/plugins';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import { builders as _ } from 'testing/prosemirror/builders';
+import { builders as _ } from 'lib/prosemirror/builders';
 import { setSelectionNear, expectNodesAreEqual } from 'testing/prosemirror/helpers';
 import { sendKeyToPm } from 'testing/prosemirror/keyboard';
 import { renderTestEditor } from 'testing/prosemirror/renderTestEditor';
