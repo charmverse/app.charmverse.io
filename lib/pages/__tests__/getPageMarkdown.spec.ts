@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsPages, testUtilsProposals } from '@charmverse/core/test';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { getPageMarkdown } from 'lib/pages/getPageMarkdown';
 import type { FieldConfig } from 'lib/projects/formField';
 import { projectFieldProperties } from 'lib/projects/formField';
@@ -52,21 +53,27 @@ describe('getPageMarkdown', () => {
             data: [
               {
                 index: 0,
+                name: 'First label',
+                description: jsonDoc(_.p('First label description')),
+                type: 'label'
+              },
+              {
+                index: 1,
                 name: 'Email',
                 type: 'email'
               },
               {
-                index: 1,
+                index: 2,
                 name: 'Short Text',
                 type: 'short_text'
               },
               {
-                index: 2,
+                index: 3,
                 name: 'Long Text',
                 type: 'long_text'
               },
               {
-                index: 3,
+                index: 4,
                 name: 'Project Profile',
                 type: 'project_profile',
                 fieldConfig: getProfectProfileFieldConfigDefaultHidden({
@@ -82,6 +89,12 @@ describe('getPageMarkdown', () => {
                     }
                   }
                 })
+              },
+              {
+                index: 5,
+                name: 'Select Field',
+                type: 'select',
+                options: [{ id: 'select-option-1', name: 'Option 1' } as SelectOptionType]
               }
             ]
           }
@@ -127,22 +140,28 @@ describe('getPageMarkdown', () => {
     await prisma.formFieldAnswer.createMany({
       data: [
         {
-          fieldId: form.formFields[0].id,
+          fieldId: form.formFields[1].id,
           value: 'safwan@gmail.com',
           proposalId: proposal.id,
           type: 'email'
         },
         {
-          fieldId: form.formFields[1].id,
+          fieldId: form.formFields[2].id,
           value: 'short text',
           proposalId: proposal.id,
           type: 'short_text'
         },
         {
-          fieldId: form.formFields[2].id,
+          fieldId: form.formFields[3].id,
           value: { contentText: '', content: jsonDoc(_.p('long text')) },
           proposalId: proposal.id,
           type: 'long_text'
+        },
+        {
+          fieldId: form.formFields[5].id,
+          value: 'select-option-1',
+          proposalId: proposal.id,
+          type: 'select'
         }
       ]
     });
@@ -151,6 +170,10 @@ describe('getPageMarkdown', () => {
 
     expect(result).toEqual(
       `
+## First label
+
+First label description
+
 ### Email
 
 safwan@gmail.com
@@ -174,6 +197,10 @@ long text
     - Wallet address: ${project.projectMembers[0].walletAddress}
 
     - Email: N/A
+
+### Select Field
+
+Option 1
 `.trim()
     );
   });

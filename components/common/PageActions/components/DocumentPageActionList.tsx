@@ -180,16 +180,19 @@ export function DocumentPageActionList({
   }
 
   async function exportMarkdownPage() {
-    const markdownContent = await getPageMarkdown();
-    downloadMarkdownFile({
-      markdownContent,
-      pageId,
-      spaceId: space!.id,
-      title: page.title
-    }).catch((error) => {
+    try {
+      const markdownContent = await getPageMarkdown();
+      await downloadMarkdownFile({
+        markdownContent,
+        pageId,
+        spaceId: space!.id,
+        title: page.title
+      });
+    } catch (error) {
       log.error('Error exporting markdown', { error });
       showMessage('Error exporting markdown', 'error');
-    });
+      return;
+    }
     onComplete();
   }
 

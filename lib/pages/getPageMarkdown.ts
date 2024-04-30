@@ -1,5 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
 import type { ProjectField, ProjectMemberField, ProjectMemberFieldConfig, FieldConfig } from 'lib/projects/formField';
 import { getFieldConfig, projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
@@ -25,7 +26,11 @@ export async function getPageMarkdown({
         include: {
           form: {
             include: {
-              formFields: true
+              formFields: {
+                orderBy: {
+                  index: 'asc'
+                }
+              }
             }
           },
           formAnswers: true,
@@ -62,7 +67,10 @@ export async function getPageMarkdown({
             return [];
           }
           if (field.type === 'label') {
-            return [_.heading({ level: 2 }, field.name), ...(getNodeFromJson(field.description as any).content as any)];
+            return [
+              _.heading({ level: 2 }, field.name),
+              ...(field.description ? (getNodeFromJson(field.description).content as any).content : [])
+            ];
           } else if (field.type === 'project_profile') {
             const fieldConfig = field.fieldConfig as FieldConfig;
             const memberConfig = fieldConfig.projectMember as ProjectMemberFieldConfig;
@@ -90,17 +98,32 @@ export async function getPageMarkdown({
             return fields;
           }
           const answer = formAnswersMap.get(field.id) as FormFieldValue;
-          if (typeof answer === 'string' || typeof answer === 'number') {
-            return [_.heading({ level: 3 }, field.name), _.paragraph(answer.toString() || 'N/A')];
-          } else if ((answer as LongTextValue)?.content) {
+          if ((answer as LongTextValue)?.content) {
             const contentNode = getNodeFromJson((answer as LongTextValue).content);
             return [_.heading({ level: 3 }, field.name), ...((contentNode.content as any).content || [])];
+          }
+          const answerArray = answer && typeof answer === 'string' ? [answer] : Array.isArray(answer) ? answer : [];
+          if (answerArray.length > 0) {
+            return [
+              _.heading({ level: 3 }, field.name),
+              _.p(
+                ...answerArray
+                  .map((value) => {
+                    // handle select/multiselect type values
+                    const mappedValue = (field.options as SelectOptionType[])?.find(
+                      (option) => option.id === value
+                    )?.name;
+                    return mappedValue || value;
+                  })
+                  .join(', ')
+              )
+            ];
           }
           return [];
         })
         .flat()
     );
-    // console.log(JSON.stringify(content.toJSON(), null, 2));
+
     return generateMarkdown({
       content: content.toJSON(),
       generatorOptions: {
