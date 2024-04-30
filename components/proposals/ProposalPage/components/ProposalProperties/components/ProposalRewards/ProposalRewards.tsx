@@ -6,7 +6,7 @@ import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
+import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -102,12 +102,7 @@ export function ProposalRewards({
                   </Typography>
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
-                      <RewardAmount
-                        reward={reward}
-                        truncate={true}
-                        truncatePrecision={2}
-                        typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                      />
+                      <RewardAmount reward={reward} />
                     </Stack>
                   </Hidden>
                 </Stack>
@@ -148,12 +143,7 @@ export function ProposalRewards({
                       <Hidden lgDown>
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
-                            <RewardAmount
-                              reward={reward}
-                              truncate={true}
-                              truncatePrecision={2}
-                              typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                            />
+                            <RewardAmount reward={reward} />
                           </Stack>
                         </Grid>
                       </Hidden>

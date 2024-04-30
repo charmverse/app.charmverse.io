@@ -1,5 +1,7 @@
+import { truncate } from 'fs';
+
 import LaunchIcon from '@mui/icons-material/Launch';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Grid, Stack, Typography } from '@mui/material';
 import { getChainExplorerLink } from 'connectors/chains';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -8,8 +10,8 @@ import charmClient from 'charmClient';
 import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { RewardPaymentButton } from 'components/rewards/components/RewardApplicationPage/components/RewardPaymentButton';
-import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getSafeApiClient } from 'lib/gnosis/safe/getSafeApiClient';
 import { getGnosisTransactionUrl } from 'lib/gnosis/utils';
@@ -153,7 +155,24 @@ export function PaymentStepReview({
 }) {
   return (
     <Stack gap={2}>
-      <RewardStatusBadge noRewardText='No reward available' fullForm reward={reward} hideStatus truncate />
+      <Grid container direction='column' alignItems='center'>
+        <Grid item xs width='100%' display='flex' flexDirection='column' sx={{ alignItems: 'center' }}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              width: '100%',
+              justifyContent: 'space-between',
+              gap: 1,
+              alignItems: 'center',
+              minHeight: '30px'
+            }}
+          >
+            <RewardAmount truncatePrecision={4} noRewardText='No reward available' fullForm reward={reward} />
+          </Box>
+        </Grid>
+      </Grid>
       {application && (
         <PaymentStepReviewAction
           hidePaymentButton={hidePaymentButton}
