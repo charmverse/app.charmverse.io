@@ -43,12 +43,17 @@ export function ProfileWidgets({
   );
   const { isLoading: isLoadingUserCredentials, data: userCredentials } = useGetUserCredentials({ userId });
   const {
-    data: ensProfileData,
+    data: ensProfile,
     isLoading: isLoadingEnsProfile,
-    error: ensProfileError
-  } = useSWR(`public/profile/${userId}/ens`, () => charmClient.publicProfile.getEnsProfile(userId));
-  const defaultEnsProfile = ensname ? { ensname } : null;
-  const ensProfile = ensProfileError && defaultEnsProfile ? defaultEnsProfile : ensProfileData;
+    mutate: mutateEnsProfile
+  } = useSWR(`public/profile/${userId}/ens`, () => charmClient.publicProfile.getEnsProfile(userId), {
+    onError: (error) => {
+      if (error.status === 504 && ensname) {
+        mutateEnsProfile({ ensname }, { revalidate: false });
+      }
+    },
+    shouldRetryOnError: false
+  });
 
   const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(
     space && `public/profile/${userId}/summon`,
