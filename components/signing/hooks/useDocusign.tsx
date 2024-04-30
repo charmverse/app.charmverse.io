@@ -1,3 +1,11 @@
+import {
+  useGetDocusignProfile,
+  useGetDocusignTemplates,
+  useGetSpaceDocusignEnvelopes,
+  usePostCreateEnvelope,
+  usePostRequestDocusignLink
+} from 'charmClient/hooks/docusign';
+import { useGET } from 'charmClient/hooks/helpers';
 import { docusignClientId, docusignOauthBaseUri } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
@@ -21,7 +29,31 @@ export function useDocusign() {
     return oauthUri;
   }
 
+  const { data: docusignProfile, mutate: refreshDocusignProfile } = useGetDocusignProfile({ spaceId: space?.id });
+
+  const { trigger: triggerCreateEnvelope, data: createdEnvelope } = usePostCreateEnvelope();
+
+  const { trigger: requestSigningLink } = usePostRequestDocusignLink();
+
+  const { data: envelopes, mutate: refreshEnvelopes } = useGetSpaceDocusignEnvelopes({ spaceId: space?.id });
+
+  const {
+    data: docusignTemplates,
+    mutate: refreshDocusignTemplates,
+    error: templateLoadingError
+  } = useGetDocusignTemplates({ spaceId: space?.id });
+
   return {
-    docusignOauthUrl
+    docusignOauthUrl,
+    docusignProfile,
+    refreshDocusignProfile,
+    docusignTemplates: docusignTemplates?.envelopeTemplates,
+    refreshDocusignTemplates,
+    templateLoadingError,
+    triggerCreateEnvelope,
+    createdEnvelope,
+    envelopes,
+    refreshEnvelopes,
+    requestSigningLink
   };
 }
