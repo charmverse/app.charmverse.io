@@ -10,15 +10,12 @@ export type LongTextValue = {
   contentText: string;
 };
 
-export type FormFieldValue =
-  | string
-  | string[]
-  | LongTextValue
-  | UploadedFileInfo
-  | {
-      projectId: string;
-      selectedMemberIds: string[];
-    };
+export type ProjectFieldValue = {
+  projectId: string;
+  selectedMemberIds: string[];
+};
+
+export type FormFieldValue = string | string[] | LongTextValue | UploadedFileInfo | ProjectFieldValue;
 
 export type FieldType = MemberPropertyType | FormFieldType;
 

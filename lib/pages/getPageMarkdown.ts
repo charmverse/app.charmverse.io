@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getChainById } from 'connectors/chains';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
+import type { FormFieldValue, LongTextValue, ProjectFieldValue } from 'lib/forms/interfaces';
 import type { ProjectField, ProjectMemberField, ProjectMemberFieldConfig, FieldConfig } from 'lib/projects/formField';
 import { getFieldConfig, projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
 import type { ProposalFields } from 'lib/proposals/interfaces';
@@ -22,6 +22,7 @@ export async function getPageMarkdown({
     select: {
       content: true,
       spaceId: true,
+      title: true,
       proposal: {
         include: {
           form: {
@@ -65,6 +66,7 @@ export async function getPageMarkdown({
         if (field.private && !includePrivateFields) {
           return [];
         }
+        const answer = formAnswersMap.get(field.id) as FormFieldValue;
         if (field.type === 'label') {
           return [
             _.heading({ level: 2 }, field.name),
@@ -77,31 +79,53 @@ export async function getPageMarkdown({
           projectFieldProperties.forEach((property) => {
             const config = getFieldConfig(fieldConfig[property.field]);
             if (config.show && (!config.private || includePrivateFields)) {
-              const answer = page.proposal?.project?.[property.field as ProjectField];
-              fields.push(_.bullet_list({ indent: 0 }, _.list_item(_.p(`${property.label}: ${answer || 'N/A'}`))));
+              fields.push(
+                _.bullet_list(
+                  { indent: 0 },
+                  _.list_item(
+                    _.p(`${property.label}: ${page.proposal?.project?.[property.field as ProjectField] || 'N/A'}`)
+                  )
+                )
+              );
             }
           });
 
           fields.push(_.bullet_list({ indent: 0 }, _.list_item(_.p('Project Members'))));
-          page.proposal?.project?.projectMembers.forEach((member) => {
+          const selectedProjectMemberIds = (answer as ProjectFieldValue)?.selectedMemberIds ?? [];
+          const selectedProjectMembers =
+            page.proposal?.project?.projectMembers.filter(
+              (member) => member.teamLead || selectedProjectMemberIds.includes(member.id)
+            ) ?? [];
+          selectedProjectMembers.forEach((member) => {
             fields.push(_.bullet_list({ indent: 1 }, _.list_item(_.p(member.name))));
             projectMemberFieldProperties.forEach((property) => {
               const config = getFieldConfig(memberConfig[property.field]);
               if (config.show && (!config.private || includePrivateFields)) {
-                const answer = member[property.field as ProjectMemberField];
-                fields.push(_.bullet_list({ indent: 2 }, _.list_item(_.p(`${property.label}: ${answer || 'N/A'}`))));
+                fields.push(
+                  _.bullet_list(
+                    { indent: 2 },
+                    _.list_item(_.p(`${property.label}: ${member[property.field as ProjectMemberField] || 'N/A'}`))
+                  )
+                );
               }
             });
           });
 
           return fields;
         }
-        const answer = formAnswersMap.get(field.id) as FormFieldValue;
         if ((answer as LongTextValue)?.content) {
           const contentNode = getNodeFromJson((answer as LongTextValue).content);
           return [_.heading({ level: 3 }, field.name), ...((contentNode.content as any).content || [])];
         }
         const answerArray = answer && typeof answer === 'string' ? [answer] : Array.isArray(answer) ? answer : [];
+        if (field.type === 'person') {
+          answerArray.forEach((value, index) => {
+            const member = spaceMembers.find((sm) => sm.id === value);
+            if (member) {
+              answerArray[index] = member.username;
+            }
+          });
+        }
         if (answerArray.length > 0) {
           return [
             _.heading({ level: 3 }, field.name),
