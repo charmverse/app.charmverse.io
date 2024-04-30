@@ -18,7 +18,7 @@ let role2: Role;
 let tokenGateToRole: TokenGateToRole;
 
 beforeAll(async () => {
-  const generated = await generateUserAndSpace();
+  const generated = await generateUserAndSpace({ isAdmin: true });
 
   user1 = generated.user;
   user2 = await createUserWithWallet({
