@@ -4,6 +4,7 @@ import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { useEffect } from 'react';
+import type { UseFormSetValue } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
@@ -36,7 +37,7 @@ export const schema = yup.object({
   actionButtonLabels: yup
     .object({
       approve: yup.string().optional(),
-      decline: yup.string().optional()
+      reject: yup.string().optional()
     })
     .nullable(),
   permissions: yup
@@ -53,6 +54,50 @@ export const schema = yup.object({
 });
 
 type FormValues = yup.InferType<typeof schema>;
+
+function StepActionButtonLabel({
+  type,
+  setValue,
+  actionButtonLabels
+}: {
+  type: ProposalEvaluationType;
+  actionButtonLabels: WorkflowEvaluationJson['actionButtonLabels'];
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  return type === 'pass_fail' || type === 'rubric' ? (
+    <div>
+      <FieldLabel>Action button labels</FieldLabel>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
+        <Typography width='50%'>Pass</Typography>
+        <TextField
+          placeholder='Pass'
+          onChange={(e) => {
+            setValue('actionButtonLabels', {
+              ...actionButtonLabels,
+              approve: e.target.value
+            });
+          }}
+          fullWidth
+          value={actionButtonLabels?.approve}
+        />
+      </Stack>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Typography width='50%'>Decline</Typography>
+        <TextField
+          placeholder='Decline'
+          onChange={(e) => {
+            setValue('actionButtonLabels', {
+              ...actionButtonLabels,
+              reject: e.target.value
+            });
+          }}
+          fullWidth
+          value={actionButtonLabels?.reject}
+        />
+      </Stack>
+    </div>
+  ) : null;
+}
 
 export function EvaluationDialog({
   evaluation,
@@ -101,12 +146,7 @@ export function EvaluationDialog({
     onClose();
   }
 
-  const actionButtonLabels = formValues?.actionButtonLabels as
-    | undefined
-    | {
-        approve: string;
-        decline: string;
-      };
+  const actionButtonLabels = formValues?.actionButtonLabels as WorkflowEvaluationJson['actionButtonLabels'];
 
   return (
     <Dialog
@@ -156,6 +196,9 @@ export function EvaluationDialog({
             )}
           />
         </div>
+        {evaluation && (
+          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionButtonLabels={actionButtonLabels} />
+        )}
         {!evaluation?.id && (
           <>
             <div>
@@ -194,39 +237,7 @@ export function EvaluationDialog({
                 )}
               />
             </div>
-            {formValues.type === 'pass_fail' || formValues.type === 'rubric' ? (
-              <div>
-                <FieldLabel>Action button labels</FieldLabel>
-                <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
-                  <Typography width='50%'>Pass</Typography>
-                  <TextField
-                    placeholder='Pass'
-                    onChange={(e) => {
-                      setValue('actionButtonLabels', {
-                        ...actionButtonLabels,
-                        approve: e.target.value
-                      });
-                    }}
-                    fullWidth
-                    value={actionButtonLabels?.approve}
-                  />
-                </Stack>
-                <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-                  <Typography width='50%'>Decline</Typography>
-                  <TextField
-                    placeholder='Decline'
-                    onChange={(e) => {
-                      setValue('actionButtonLabels', {
-                        ...actionButtonLabels,
-                        decline: e.target.value
-                      });
-                    }}
-                    fullWidth
-                    value={actionButtonLabels?.decline}
-                  />
-                </Stack>
-              </div>
-            ) : null}
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionButtonLabels={actionButtonLabels} />
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (
