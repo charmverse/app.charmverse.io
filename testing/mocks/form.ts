@@ -44,9 +44,11 @@ export function getProfectProfileFieldConfigDefaultHidden(
 ): ProjectAndMembersFieldConfig {
   const defaults = createDefaultProjectAndMembersFieldConfig();
   projectFieldProperties.forEach((property) => {
+    defaults[property.field] = defaults[property.field] || {};
     defaults[property.field]!.show = false;
   });
   projectMemberFieldProperties.forEach((property) => {
+    defaults.projectMember[property.field] = defaults.projectMember[property.field] || {};
     defaults.projectMember[property.field]!.show = false;
   });
   return {

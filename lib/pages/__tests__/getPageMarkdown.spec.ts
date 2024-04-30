@@ -1,5 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
-import { testUtilsPages } from '@charmverse/core/test';
+import { testUtilsPages, testUtilsProposals } from '@charmverse/core/test';
 
 import { getPageMarkdown } from 'lib/pages/getPageMarkdown';
 import type { FieldConfig } from 'lib/projects/formField';
@@ -28,38 +28,45 @@ describe('getPageMarkdown', () => {
     const markdownContent = 'markdownContent';
 
     const { space, user } = await generateUserAndSpace();
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id
+    });
     const page = await testUtilsPages.generatePage({
       content: jsonDoc(_.p(markdownContent)),
       spaceId: space.id,
-      createdBy: user.id
-    });
-    // create config where properties are hidden by default
-    const fieldConfig: FieldConfig = { projectMember: {} };
-    projectFieldProperties.forEach((property) => {
-      fieldConfig[property.field]!.show = false;
-    });
-    projectFieldProperties.forEach((property) => {
-      fieldConfig[property.field]!.show = false;
+      createdBy: user.id,
+      type: 'proposal',
+      proposalId: proposal.id
     });
 
     const form = await prisma.form.create({
       data: {
+        proposal: {
+          connect: {
+            id: proposal.id
+          }
+        },
         formFields: {
           createMany: {
             data: [
               {
+                index: 0,
                 name: 'Email',
                 type: 'email'
               },
               {
+                index: 1,
                 name: 'Short Text',
                 type: 'short_text'
               },
               {
+                index: 2,
                 name: 'Long Text',
                 type: 'long_text'
               },
               {
+                index: 3,
                 name: 'Project Profile',
                 type: 'project_profile',
                 fieldConfig: getProfectProfileFieldConfigDefaultHidden()
@@ -73,8 +80,56 @@ describe('getPageMarkdown', () => {
       }
     });
 
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        formId: form.id
+      }
+    });
+
+    await prisma.formFieldAnswer.createMany({
+      data: [
+        {
+          fieldId: form.formFields[0].id,
+          value: 'safwan@gmail.com',
+          proposalId: proposal.id,
+          type: 'email'
+        },
+        {
+          fieldId: form.formFields[1].id,
+          value: 'short text',
+          proposalId: proposal.id,
+          type: 'short_text'
+        },
+        {
+          fieldId: form.formFields[2].id,
+          value: { contentText: '', content: jsonDoc(_.p('long text')) },
+          proposalId: proposal.id,
+          type: 'long_text'
+        }
+      ]
+    });
+
     const result = await getPageMarkdown({ pageId: page.id });
 
-    expect(result).toEqual(markdownContent);
+    expect(result).toEqual(
+      `
+### Email
+
+safwan@gmail.com
+
+### Short Text
+
+short text
+
+### Long Text
+
+long text
+
+### Project Profile
+`.trim()
+    );
   });
 });

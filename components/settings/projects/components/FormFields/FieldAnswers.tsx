@@ -3,6 +3,7 @@ import type { Path } from 'react-hook-form';
 import { useController, useFormContext } from 'react-hook-form';
 
 import { TextInputField } from 'components/common/form/fields/TextInputField';
+import { getFieldConfig } from 'lib/projects/formField';
 import type { ProjectFieldProperty, FieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
 
@@ -32,7 +33,7 @@ function FieldAnswer({
     setValueAs: (value) => value.trim()
   });
 
-  const isShown = fieldConfig?.[property.field]?.show ?? true;
+  const isShown = getFieldConfig(fieldConfig?.[property.field]).show;
   if (!isShown) {
     return null;
   }
