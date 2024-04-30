@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { FormFieldValue, LongTextValue } from 'components/common/form/interfaces';
+import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
 import type { ProjectField, ProjectMemberField, ProjectMemberFieldConfig, FieldConfig } from 'lib/projects/formField';
 import { getFieldConfig, projectMemberFieldProperties, projectFieldProperties } from 'lib/projects/formField';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
