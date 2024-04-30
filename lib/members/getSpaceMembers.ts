@@ -124,6 +124,8 @@ export async function getSpaceMembers({
         });
 
         const roles = spaceRole.spaceRoleToRole.map((sr) => sr.role);
+        const ensname = wallets.filter((w) => !!w.ensname)[0]?.ensname;
+
         return {
           id: userData.id,
           createdAt: userData.createdAt,
@@ -142,7 +144,8 @@ export async function getSpaceMembers({
           properties,
           searchValue: getMemberSearchValue(spaceRole.user, visiblePropertiesMap, memberUsernameRecord[spaceRole.id]),
           roles,
-          isBot: userData.isBot ?? undefined
+          isBot: userData.isBot ?? undefined,
+          ensname: ensname ?? undefined
         };
       })
       // filter out deleted members

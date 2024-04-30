@@ -1,4 +1,4 @@
-import { Grid } from '@mui/material';
+import Grid from '@mui/material/Grid';
 import type { Dispatch, SetStateAction } from 'react';
 import useSWR from 'swr';
 
@@ -22,12 +22,14 @@ export function ProfileWidgets({
   userId,
   readOnly,
   setActiveTab,
-  showAllProfileTypes = false
+  showAllProfileTypes = false,
+  ensname
 }: {
   setActiveTab?: Dispatch<SetStateAction<number>>;
   userId: string;
   readOnly?: boolean;
   showAllProfileTypes?: boolean;
+  ensname?: string;
 }) {
   const { space } = useCurrentSpace();
   const {
@@ -40,9 +42,13 @@ export function ProfileWidgets({
     charmClient.publicProfile.getLensProfile(userId)
   );
   const { isLoading: isLoadingUserCredentials, data: userCredentials } = useGetUserCredentials({ userId });
-  const { data: ensProfile, isLoading: isLoadingEnsProfile } = useSWR(`public/profile/${userId}/ens`, () =>
-    charmClient.publicProfile.getEnsProfile(userId)
-  );
+  const {
+    data: ensProfileData,
+    isLoading: isLoadingEnsProfile,
+    error: ensProfileError
+  } = useSWR(`public/profile/${userId}/ens`, () => charmClient.publicProfile.getEnsProfile(userId));
+  const defaultEnsProfile = ensname ? { ensname } : null;
+  const ensProfile = ensProfileError && defaultEnsProfile ? defaultEnsProfile : ensProfileData;
 
   const { data: summonProfile, isLoading: isLoadingSummonProfile } = useSWR(
     space && `public/profile/${userId}/summon`,

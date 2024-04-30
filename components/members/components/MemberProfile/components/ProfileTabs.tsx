@@ -30,6 +30,7 @@ export function ProfileTabs(props: {
           key='profile'
           readOnly={readOnly}
           userId={props.user.id}
+          ensname={'ensname' in props.user && props.user.ensname ? props.user.ensname : undefined}
         />,
         { sx: { px: 0 } }
       ],
