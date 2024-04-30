@@ -196,7 +196,7 @@ export function EvaluationDialog({
             )}
           />
         </div>
-        {evaluation && (
+        {evaluation?.id && (
           <StepActionButtonLabel type={formValues.type} setValue={setValue} actionButtonLabels={actionButtonLabels} />
         )}
         {!evaluation?.id && (

@@ -1,3 +1,4 @@
+import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
@@ -53,15 +54,10 @@ export function PassFailEvaluation({
     ? 'You cannot move an archived proposal'
     : null;
 
-  const actionButtonLabels = evaluation?.actionButtonLabels as
-    | undefined
-    | {
-        approve: string;
-        decline: string;
-      };
+  const actionButtonLabels = evaluation?.actionButtonLabels as WorkflowEvaluationJson['actionButtonLabels'];
 
   const approveLabel = actionButtonLabels?.approve || 'Pass';
-  const declineLabel = actionButtonLabels?.decline || 'Decline';
+  const declineLabel = actionButtonLabels?.reject || 'Decline';
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (confirmationMessage) {
