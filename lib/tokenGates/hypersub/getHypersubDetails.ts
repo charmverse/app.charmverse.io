@@ -1,4 +1,5 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { getAddress } from 'viem';
 
 import { isNumber } from 'lib/utils/numbers';
@@ -40,6 +41,7 @@ export async function getHypersubDetails(props: GetHypersubPayload) {
 
     return hypersubMetadata;
   } catch (error: any) {
+    log.error('Error fetching hypersub details. Check the contract address and chain', { error });
     throw new DataNotFoundError('Error fetching hypersub details. Check the contract address and chain.');
   }
 }
