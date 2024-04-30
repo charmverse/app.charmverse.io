@@ -66,6 +66,8 @@ export class RewardPage extends GlobalPage {
 
   readonly newWorkButton: Locator;
 
+  readonly createBountyButton: Locator;
+
   readonly applicationInput: Locator;
 
   readonly submissionInput: Locator;
@@ -130,6 +132,7 @@ export class RewardPage extends GlobalPage {
     this.submitSubmissionButton = this.rootSelector.locator('data-test=submit-submission-button');
     this.markPaidButton = this.rootSelector.locator('data-test=mark-paid-button');
     this.confirmMarkPaidButton = this.rootSelector.locator('data-test=confirm-mark-paid-button');
+    this.createBountyButton = page.locator('data-test=create-suggest-bounty');
   }
 
   async openApplication({ spaceDomain, applicationId }: { spaceDomain: string; applicationId: string }) {
