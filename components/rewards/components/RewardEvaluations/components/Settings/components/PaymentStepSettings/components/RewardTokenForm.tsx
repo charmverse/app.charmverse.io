@@ -180,7 +180,7 @@ export function RewardTokenForm({
               }}
               required={requireTokenAmount}
               disabled={readOnly && readOnlyTokenAmount}
-              placeholder='Number greater than 0'
+              placeholder='Enter amount'
               error={!!errors.rewardAmount}
             />
           )}

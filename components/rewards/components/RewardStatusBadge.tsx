@@ -8,6 +8,7 @@ import Typography, { type TypographyProps } from '@mui/material/Typography';
 import { getChainById } from 'connectors/chains';
 import millify from 'millify';
 
+import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
 import { TokenBadge } from 'components/common/TokenBadge';
 import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
@@ -122,21 +123,22 @@ export function RewardAmount({
   return (
     <Tooltip arrow placement='top' title={rewardAmount === 0 ? '' : tooltip}>
       <Box sx={{ display: 'inline-flex', alignItems: 'center', verticalAlign: 'middle' }}>
-        {rewardAmount === 0 && requireTokenAmount ? (
-          <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
-            <Typography
-              component='span'
-              sx={{
-                fontWeight: 600
-              }}
-              mr={0.5}
-              variant='caption'
-              {...typographyProps}
-            >
-              Reward not set
-            </Typography>
-          </Box>
-        ) : fullForm ? (
+        {!rewardAmount && requireTokenAmount ? (
+          <EmptyPlaceholder>Enter amount</EmptyPlaceholder>
+        ) : // <Box sx={{ display: 'flex', verticalAlign: 'middle' }}>
+        //   <Typography
+        //     component='span'
+        //     sx={{
+        //       fontWeight: 600
+        //     }}
+        //     mr={0.5}
+        //     variant='caption'
+        //     {...typographyProps}
+        //   >
+        //     Reward not set
+        //   </Typography>
+        // </Box>
+        fullForm ? (
           <TokenBadge tokenAmount={rewardAmount} chainId={chainId} tokenAddress={rewardToken} />
         ) : (
           <>

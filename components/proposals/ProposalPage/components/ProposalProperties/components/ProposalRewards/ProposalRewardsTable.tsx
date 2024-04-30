@@ -10,7 +10,6 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
 import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
-import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
@@ -29,6 +28,7 @@ import { isTruthy } from 'lib/utils/types';
 import { useProposalRewards } from '../../hooks/useProposalRewards';
 
 import { AttachRewardButton } from './AttachRewardButton';
+import { ProposalRewardsForm } from './ProposalRewardsForm';
 
 type Props = {
   containerWidth: number;
@@ -220,7 +220,7 @@ export function ProposalRewardsTable({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <MilestonePropertiesForm
+          <ProposalRewardsForm
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward

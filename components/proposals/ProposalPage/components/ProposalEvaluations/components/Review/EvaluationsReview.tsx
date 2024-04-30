@@ -25,7 +25,7 @@ import { EvaluationStepSettingsModal } from './components/EvaluationStepSettings
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
-import { PublishRewardsButton } from './components/PublishRewardsButton';
+import { RewardReviewStep } from './components/RewardReviewStep';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
 import { VoteEvaluation } from './components/VoteEvaluation/VoteEvaluation';
 
@@ -90,6 +90,7 @@ export function EvaluationsReview({
 
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
+
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
   const isCredentialsComplete =
@@ -282,7 +283,7 @@ export function EvaluationsReview({
           result={isRewardsComplete ? 'pass' : null}
           title={rewardsTitle}
         >
-          <PublishRewardsButton
+          <RewardReviewStep
             disabled={!(proposal?.permissions.evaluate && isRewardsActive && !isRewardsComplete) || !!proposal.archived}
             proposalId={proposal?.id}
             pendingRewards={pendingRewards}
