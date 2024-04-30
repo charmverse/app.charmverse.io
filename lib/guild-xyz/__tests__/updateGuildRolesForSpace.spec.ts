@@ -1,14 +1,11 @@
-import type { Role, Space, SpaceRole } from '@charmverse/core/prisma';
+import type { Role, Space, SpaceRole, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 } from 'uuid';
 
-import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import type { LoggedInUser } from 'models';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 
-let user1: LoggedInUser;
-let user2: LoggedInUser;
+let user1: User;
+let user2: User;
 let space: Space;
 let user1SpaceRole: SpaceRole;
 let user2SpaceRole: SpaceRole;
@@ -18,9 +15,11 @@ let guild2Role1: Role;
 let guild2Role2: Role;
 
 beforeAll(async () => {
-  const { space: createdSpace, user } = await generateUserAndSpaceWithApiToken();
+  const { space: createdSpace, user } = await generateUserAndSpace({
+    walletAddress: randomETHWalletAddress()
+  });
   user1 = user;
-  user2 = await createUserFromWallet({
+  user2 = await createUserWithWallet({
     address: randomETHWalletAddress()
   });
   space = createdSpace;
@@ -121,10 +120,15 @@ beforeAll(async () => {
 });
 
 it('Should correctly update guild roles for space', async () => {
+  const wallet = await prisma.userWallet.findFirstOrThrow({
+    where: {
+      userId: user1.id
+    }
+  });
   jest.mock('lib/guild-xyz/client', () => ({
     user: {
       getMemberships: (address: string) => {
-        if (address === user1.wallets[0].address) {
+        if (address === wallet.address) {
           return [
             {
               roleIds: ['G1R1']

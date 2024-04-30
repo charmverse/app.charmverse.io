@@ -1,6 +1,5 @@
-import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { generateForumPost } from 'testing/utils/forums';
 
 import { canView, canCreate } from '../permissions';
@@ -10,13 +9,13 @@ let pageId: string;
 let spaceId: string;
 
 beforeAll(async () => {
-  const { user, space } = await generateUserAndSpaceWithApiToken(undefined, true);
+  const { user, space } = await generateUserAndSpace({ isAdmin: true });
   const page = await generateForumPost({ spaceId: space.id, userId: user.id });
   pageId = page.id;
   spaceId = space.id;
   users.member = user.id;
   users.nonMember = (
-    await createUserFromWallet({
+    await createUserWithWallet({
       address: randomETHWalletAddress()
     })
   ).id;

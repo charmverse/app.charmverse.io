@@ -20,7 +20,7 @@ describe('disconnectWallet', () => {
           create: {
             id: walletId,
             address: walletAddress,
-            ensname: 'test.eth'
+            ensname: `${Math.random()}test.eth`
           }
         },
         profileItems: {

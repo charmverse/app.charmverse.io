@@ -1,4 +1,3 @@
-import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Space, SpaceOperation } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { Wallet } from '@ethersproject/wallet';
@@ -9,9 +8,8 @@ import { baseUrl } from 'config/constants';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { memberProfileNames } from 'lib/profile/memberProfiles';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { createUserFromWallet } from 'lib/users/createUser';
 import type { LoggedInUser } from 'models';
-import { createPage } from 'testing/setupDatabase';
+import { createPage, createUserWithWallet } from 'testing/setupDatabase';
 
 export async function loginBrowserUser({
   browserPage,
@@ -298,7 +296,7 @@ export async function generateUserAndSpace({
   const wallet = Wallet.createRandom();
   const address = wallet.address;
 
-  const user = await createUserFromWallet({ address, email });
+  const user = await createUserWithWallet({ address, email });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 
