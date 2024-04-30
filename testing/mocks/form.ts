@@ -39,6 +39,7 @@ export function getProfectProfileFieldConfig(
   };
 }
 
+// get project profile field config with all fields hidden
 export function getProfectProfileFieldConfigDefaultHidden(
   fieldConfig: ProjectAndMembersFieldConfig = {}
 ): ProjectAndMembersFieldConfig {

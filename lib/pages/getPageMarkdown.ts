@@ -66,24 +66,23 @@ export async function getPageMarkdown({
           } else if (field.type === 'project_profile') {
             const fieldConfig = field.fieldConfig as FieldConfig;
             const memberConfig = fieldConfig.projectMember as ProjectMemberFieldConfig;
-
             const fields: any[] = [_.heading({ level: 3 }, 'Project Profile')];
             projectFieldProperties.forEach((property) => {
               const config = getFieldConfig(fieldConfig[property.field]);
               if (config.show && (!config.private || includePrivateFields)) {
                 const answer = page.proposal?.project?.[property.field as ProjectField];
-                fields.push(_.bullet_list({ indent: 0 }, _.list_item(_.p(`${property.label}:  ${answer || 'N/A'}`))));
+                fields.push(_.bullet_list({ indent: 0 }, _.list_item(_.p(`${property.label}: ${answer || 'N/A'}`))));
               }
             });
 
             fields.push(_.bullet_list({ indent: 0 }, _.list_item(_.p('Project Members'))));
             page.proposal?.project?.projectMembers.forEach((member) => {
-              fields.push(_.bullet_list({ indent: 1 }, _.list_item(_.p(`Name:  ${member.name}`))));
+              fields.push(_.bullet_list({ indent: 1 }, _.list_item(_.p(member.name))));
               projectMemberFieldProperties.forEach((property) => {
                 const config = getFieldConfig(memberConfig[property.field]);
                 if (config.show && (!config.private || includePrivateFields)) {
                   const answer = member[property.field as ProjectMemberField];
-                  fields.push(_.bullet_list({ indent: 2 }, _.list_item(_.p(`${property.label}:  ${answer || 'N/A'}`))));
+                  fields.push(_.bullet_list({ indent: 2 }, _.list_item(_.p(`${property.label}: ${answer || 'N/A'}`))));
                 }
               });
             });

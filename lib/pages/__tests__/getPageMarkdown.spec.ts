@@ -69,7 +69,19 @@ describe('getPageMarkdown', () => {
                 index: 3,
                 name: 'Project Profile',
                 type: 'project_profile',
-                fieldConfig: getProfectProfileFieldConfigDefaultHidden()
+                fieldConfig: getProfectProfileFieldConfigDefaultHidden({
+                  github: {
+                    show: true
+                  },
+                  projectMember: {
+                    email: {
+                      show: true
+                    },
+                    walletAddress: {
+                      show: true
+                    }
+                  }
+                })
               }
             ]
           }
@@ -80,12 +92,35 @@ describe('getPageMarkdown', () => {
       }
     });
 
+    // create and attach a test project
+    const project = await prisma.project.create({
+      data: {
+        createdBy: user.id,
+        updatedBy: user.id,
+        name: 'Test project',
+        github: 'https://github.com/charmverse/app.charmverse.io',
+        projectMembers: {
+          createMany: {
+            data: [
+              {
+                name: 'First guy',
+                updatedBy: user.id,
+                walletAddress: '0x1234567890'
+              }
+            ]
+          }
+        }
+      },
+      include: { projectMembers: true }
+    });
+
     await prisma.proposal.update({
       where: {
         id: proposal.id
       },
       data: {
-        formId: form.id
+        formId: form.id,
+        projectId: project.id
       }
     });
 
@@ -129,6 +164,16 @@ short text
 long text
 
 ### Project Profile
+
+- GitHub: ${project.github}
+
+- Project Members
+
+  - First guy
+
+    - Wallet address: ${project.projectMembers[0].walletAddress}
+
+    - Email: N/A
 `.trim()
     );
   });
