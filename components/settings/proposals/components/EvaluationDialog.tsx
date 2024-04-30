@@ -87,7 +87,8 @@ export function EvaluationDialog({
       id: evaluation?.id || undefined,
       title: evaluation?.title,
       type: evaluation?.type,
-      permissions: evaluation?.permissions ?? []
+      permissions: evaluation?.permissions ?? [],
+      actionButtonLabels: evaluation?.actionButtonLabels
     });
   }, [evaluation?.id]);
 
