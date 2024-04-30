@@ -1,11 +1,9 @@
 import { Box } from '@mui/material';
 
+import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
+import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import type { RewardCreationData } from 'lib/rewards/createReward';
 import type { RewardTokenDetails, RewardWithUsers } from 'lib/rewards/interfaces';
-
-import { RewardAmount } from '../../RewardStatusBadge';
-
-import { RewardTokenDialog } from './RewardTokenDialog';
 
 type Props = {
   onChange: (value: RewardTokenDetails | null) => void;

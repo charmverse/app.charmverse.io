@@ -6,7 +6,6 @@ import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
 import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
@@ -18,6 +17,7 @@ import { isTruthy } from 'lib/utils/types';
 import { useProposalRewards } from '../../hooks/useProposalRewards';
 
 import { AttachRewardButton } from './AttachRewardButton';
+import { ProposalRewardsForm } from './ProposalRewardsForm';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -215,7 +215,7 @@ export function ProposalRewards({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <MilestonePropertiesForm
+          <ProposalRewardsForm
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward

@@ -20,7 +20,7 @@ export type Props = {
   onSubmit?: VoidFunction;
 };
 
-export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
+export function RewardReviewStep({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
   const { trigger, isMutating } = useCreateProposalRewards(proposalId);
   const { showMessage } = useSnackbar();
   const { mappedFeatures } = useSpaceFeatures();
