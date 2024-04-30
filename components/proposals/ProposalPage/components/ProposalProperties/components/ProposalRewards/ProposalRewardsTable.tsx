@@ -152,7 +152,7 @@ export function ProposalRewardsTable({
               <Box my={1}>
                 <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
               </Box>
-              <Box my={1}>
+              <Box my={1} className='dont-print-me'>
                 {canCreatePendingRewards && !loadingData && (
                   <AttachRewardButton createNewReward={createNewReward} variant={variant} />
                 )}

@@ -180,7 +180,7 @@ export function ProposalRewards({
           })}
 
           {canCreatePendingRewards && (
-            <Box>
+            <Box className='dont-print-me'>
               <AttachRewardButton createNewReward={createNewReward} variant={variant} />
             </Box>
           )}
