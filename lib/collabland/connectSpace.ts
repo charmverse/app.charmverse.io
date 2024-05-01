@@ -41,7 +41,6 @@ export async function connectSpace({ state, discordServerId }: { state: string; 
   if (!spaceRole || !spaceRole.space) {
     throw new InvalidInputError('Cannot find space to connect');
   }
-
   await upsertSpaceRolesFromDiscord({
     spaceId: spaceRole.space.id,
     discordServerId,
@@ -88,7 +87,7 @@ export async function connectSpace({ state, discordServerId }: { state: string; 
     }
   }
 
-  updateMemberRolesFromDiscord({
+  await updateMemberRolesFromDiscord({
     spaceId,
     discordServerId
   });

@@ -222,33 +222,33 @@ img.ProseMirror-separator {
 }
 
 // nested list styles
-ul li {
-  ul li {
-    list-style-type: circle;
+// ul li {
+//   ul li {
+//     list-style-type: circle;
 
-    ul li {
-      list-style-type: square;
+//     ul li {
+//       list-style-type: square;
 
-      ul li {
-        list-style-type: disc;
-      }
-    }
-  }
-}
+//       ul li {
+//         list-style-type: disc;
+//       }
+//     }
+//   }
+// }
 
-ol li {
-  ol li {
-    list-style-type: lower-alpha;
+// ol li {
+//   ol li {
+//     list-style-type: lower-alpha;
 
-    ol li {
-      list-style-type: lower-roman;
+//     ol li {
+//       list-style-type: lower-roman;
 
-      ol li {
-        list-style-type: circle;
-      }
-    }
-  }
-}
+//       ol li {
+//         list-style-type: circle;
+//       }
+//     }
+//   }
+// }
 
 .bangle-editor li > span {
   display: block;

@@ -2,7 +2,6 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import ERC721_ABI from 'abis/ERC721.json';
 import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
-import type { PublicClient } from 'viem';
 import { zkSync, zkSyncTestnet } from 'viem/chains';
 import { Provider } from 'zksync-web3';
 
@@ -40,8 +39,6 @@ class ZkSyncApiClient {
 
   chainId: SupportedChainId;
 
-  client: PublicClient;
-
   constructor({ chainId }: { chainId: SupportedChainId }) {
     if (!supportedNetworks.includes(chainId)) {
       throw new Error(`Unsupported chain id: ${chainId}`);
@@ -50,7 +47,6 @@ class ZkSyncApiClient {
     this.chainId = chainId;
     this.provider = new Provider(this.rpcUrl, chainId);
     this.blockExplorerUrl = chainId === zkSync.id ? ZK_MAINNET_BLOCK_EXPLORER : ZK_TESTNET_BLOCK_EXPLORER;
-    this.client = getPublicClient(chainId);
   }
 
   async getNFTInfo({
@@ -62,7 +58,8 @@ class ZkSyncApiClient {
     tokenId: number | string;
     walletId?: string | null;
   }): Promise<NFTData> {
-    const result = (await this.client.readContract({
+    const client = getPublicClient(this.chainId);
+    const result = (await client.readContract({
       abi: ERC721_ABI,
       address: contractAddress as `0x${string}`,
       functionName: 'tokenURI',
