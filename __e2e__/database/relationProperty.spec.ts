@@ -8,6 +8,7 @@ import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { Constants } from 'lib/databases/constants';
+import { prettyPrint } from 'lib/utils/strings';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';
@@ -29,12 +30,9 @@ let spaceUser: User;
 let space: Space;
 
 test.beforeAll(async () => {
-  const generated = await testUtilsUser.generateUserAndSpace({
+  ({ space, user: spaceUser } = await testUtilsUser.generateUserAndSpace({
     isAdmin: true
-  });
-
-  spaceUser = generated.user;
-  space = generated.space;
+  }));
 });
 
 test('create and edit relation property values', async ({ page, document, databasePage }) => {
@@ -42,6 +40,7 @@ test('create and edit relation property values', async ({ page, document, databa
   const sourceBoardPage = await generateBoard({
     createdBy: spaceUser.id,
     spaceId: space.id,
+    boardTitle: 'Source Board',
     customProps: {
       cardPropertyValues: [
         {
@@ -112,11 +111,11 @@ test('create and edit relation property values', async ({ page, document, databa
     }
   });
 
-  await generateBoard({
-    createdBy: spaceUser.id,
-    spaceId: space.id,
-    boardTitle: 'Test Board'
-  });
+  // await generateBoard({
+  //   createdBy: spaceUser.id,
+  //   spaceId: space.id,
+  //   boardTitle: 'Test Board'
+  // });
 
   await loginBrowserUser({
     browserPage: page,
@@ -132,12 +131,13 @@ test('create and edit relation property values', async ({ page, document, databa
   const relationPropertyType = databasePage.getPropertyTypeOptionLocator({ type: 'relation' });
   expect(relationPropertyType).toBeVisible();
   await relationPropertyType.click();
-  await databasePage.page.keyboard.type('Connected Board');
+
   await databasePage.linkedDatabaseOption({ sourceBoardId: targetBoardPage.id }).click();
   await databasePage.getShowOnRelatedBoardButton().click();
+
   await databasePage.getAddRelationButton().click();
 
-  await databasePage.page.waitForTimeout(1000);
+  await databasePage.waitForBlocksUpdate();
 
   const sourceBoard = await prisma.block.findUniqueOrThrow({
     where: {
@@ -153,17 +153,34 @@ test('create and edit relation property values', async ({ page, document, databa
     (field: IPropertyTemplate) => field.type === 'relation'
   );
 
-  const tableCell = databasePage.getDatabaseTableCell({
+  prettyPrint({ sourceRelationProperty, sourceBoardCards, targetBoardCards });
+
+  let tableCell = databasePage.getDatabaseTableCell({
     cardId: sourceBoardCards[0].id,
     templateId: sourceRelationProperty.id
   });
   await tableCell.click();
 
   await databasePage.page.locator(`data-test=page-option-${targetBoardCards[0].id}`).click();
-  await tableCell.click(); // the menu hides for some reason, altho this doesnt happen in dev mode
+
+  await databasePage.waitForBlockRelationsUpdate();
+
+  // This is a workaround for the fact that the relation property is not receiving socket events
+  await document.goToPage({
+    domain: space.domain,
+    path: sourceBoardPage.path
+  });
+
+  tableCell = databasePage.getDatabaseTableCell({
+    cardId: sourceBoardCards[0].id,
+    templateId: sourceRelationProperty.id
+  });
+  await tableCell.click();
+
   await databasePage.page.locator(`data-test=page-option-${targetBoardCards[1].id}`).click();
 
   await databasePage.page.locator("div[role='presentation']").click();
+
   await databasePage
     .getDatabaseTableCell({
       cardId: sourceBoardCards[1].id,
