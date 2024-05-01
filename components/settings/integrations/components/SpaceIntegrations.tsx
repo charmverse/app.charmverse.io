@@ -1,5 +1,5 @@
 import type { Space } from '@charmverse/core/prisma-client';
-import Grid from '@mui/material/Grid';
+import { Stack } from '@mui/material';
 import Typography from '@mui/material/Typography';
 
 import FieldLabel from 'components/common/form/FieldLabel';
@@ -15,30 +15,18 @@ export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
 
   return (
-    <Grid container spacing={3} direction='column'>
-      <Grid item>
-        <FieldLabel>Snapshot.org domain</FieldLabel>
-        <SnapshotIntegration isAdmin={isAdmin} space={space} />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Collab.Land</FieldLabel>
-        <ConnectCollabland />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Send events to Discord/Telegram</FieldLabel>
-        <ConnectBoto />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Sync with Github Repo</FieldLabel>
-        <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Kyc</FieldLabel>
-        <Typography variant='body2' mb={2}>
-          Choose your provider
-        </Typography>
-        <KycIntegration space={space} isAdmin={isAdmin} />
-      </Grid>
-    </Grid>
+    <Stack gap={2} mt={2}>
+      <SnapshotIntegration isAdmin={isAdmin} space={space} />
+      <ConnectCollabland />
+      <FieldLabel>Send events to Discord/Telegram</FieldLabel>
+      <ConnectBoto />
+      <FieldLabel>Sync with Github Repo</FieldLabel>
+      <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
+      <FieldLabel>Kyc</FieldLabel>
+      <Typography variant='body2' mb={2}>
+        Choose your provider
+      </Typography>
+      <KycIntegration space={space} isAdmin={isAdmin} />
+    </Stack>
   );
 }

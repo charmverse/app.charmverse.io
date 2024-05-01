@@ -1,19 +1,18 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
+import { Box, TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
-import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { isTruthy } from 'lib/utils/types';
+
+import { IntegrationContainer } from './IntegrationContainer';
 
 const schema = yup.object({
   snapshotDomain: yup
@@ -34,6 +33,7 @@ type FormValues = yup.InferType<typeof schema>;
 export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; space: Space }) {
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
   const { refreshCurrentSpace } = useCurrentSpace();
+  const [expanded, setExpanded] = useState(false);
   const {
     getValues,
     register,
@@ -53,24 +53,33 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
     }
   };
 
+  const isConnected = !!space.snapshotDomain;
+
   return (
-    <Box>
-      <Stack flexDirection='row' alignItems='center' gap={1}>
-        {!space.snapshotDomain && !isAdmin ? (
-          <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
-        ) : (
-          <TextField
-            {...register('snapshotDomain')}
-            InputProps={{
-              startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
-            }}
-            disabled={!isAdmin}
-            fullWidth
-            error={!!errors.snapshotDomain?.message}
-            helperText={errors.snapshotDomain?.message}
-          />
-        )}
-        {isAdmin && (
+    <IntegrationContainer
+      expanded={expanded}
+      setExpanded={setExpanded}
+      isConnected={isConnected}
+      disableConnectTooltip={!isAdmin ? 'Only an admin can change Snapshot domain' : undefined}
+      connectedSummary={
+        <>
+          Connected to <strong>{space.snapshotDomain}</strong>
+        </>
+      }
+      title='Snapshot.org domain'
+    >
+      <Box display='flex' gap={2} flexDirection='column'>
+        <TextField
+          {...register('snapshotDomain')}
+          InputProps={{
+            startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
+          }}
+          disabled={!isAdmin}
+          fullWidth
+          error={!!errors.snapshotDomain?.message}
+          helperText={errors.snapshotDomain?.message}
+        />
+        <Box display='flex' justifyContent='flex-end'>
           <Button
             disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
             disableElevation
@@ -80,8 +89,8 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
           >
             Save
           </Button>
-        )}
-      </Stack>
-    </Box>
+        </Box>
+      </Box>
+    </IntegrationContainer>
   );
 }

@@ -12,9 +12,12 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 
+import { IntegrationContainer } from './IntegrationContainer';
+
 const collablandStoreUrl = isProdEnv ? 'https://cc.collab.land/dashboard' : 'https://cc-qa.collab.land/dashboard';
 
 export function ConnectCollabland() {
+  const [expanded, setExpanded] = useState(false);
   const { space } = useCurrentSpace();
   const isAdmin = useIsAdmin();
   const [isConnecting, setIsConnecting] = useState(false);
@@ -34,6 +37,39 @@ export function ConnectCollabland() {
       setIsConnecting(false);
     }
   };
+
+  return (
+    <IntegrationContainer
+      isConnected={!!space?.discordServerId}
+      expanded={expanded}
+      setExpanded={setExpanded}
+      title='Collab.Land'
+      disableConnectTooltip={
+        !isAdmin ? 'Collab.Land is not connected yet. Only space admins can configure this' : undefined
+      }
+    >
+      <Stack gap={2}>
+        <Typography variant='body2'>
+          To connect your space with Collab.Land, you will need to install our mini-app in their marketplace
+        </Typography>
+        <List dense sx={{ mt: -1, mx: 2, listStyleType: 'disc', listStylePosition: 'outside' }}>
+          {[
+            'You will visit CollabLand Command Center',
+            'Connect your Discord Account',
+            'Install one of the CharmVerse plugin',
+            'Return to your CharmVerse space and your roles will be synced'
+          ].map((step) => (
+            <ListItem key={step} sx={{ px: 0, display: 'list-item' }}>
+              <Typography variant='body2'>{step}</Typography>
+            </ListItem>
+          ))}
+        </List>
+        <div>
+          <Button onClick={redirectToCollablandStore}>Go to Collab.Land</Button>
+        </div>
+      </Stack>
+    </IntegrationContainer>
+  );
 
   if (space?.discordServerId) {
     return (
@@ -79,12 +115,6 @@ export function ConnectCollabland() {
           </Stack>
         )}
       </Stack>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <Typography variant='body2'>Collab.Land is not connected yet. Only space admins can configure this.</Typography>
     );
   }
 
