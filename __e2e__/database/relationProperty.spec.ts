@@ -153,8 +153,6 @@ test('create and edit relation property values', async ({ page, document, databa
     (field: IPropertyTemplate) => field.type === 'relation'
   );
 
-  prettyPrint({ sourceRelationProperty, sourceBoardCards, targetBoardCards });
-
   let tableCell = databasePage.getDatabaseTableCell({
     cardId: sourceBoardCards[0].id,
     templateId: sourceRelationProperty.id
