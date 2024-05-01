@@ -64,7 +64,7 @@ const card1 = createMockCard(board);
 card1.fields.properties = {
   [schema.text.id]: 'First',
   [schema.checkbox.id]: 'true',
-  [schema.date.id]: '{"from":"1695067400713"}',
+  [schema.date.id]: '{"from":1695067400713}',
   [schema.email.id]: 'test1@example.com',
   [schema.multiSelect.id]: [schema.multiSelect.options[0].id, schema.multiSelect.options[1].id],
   [schema.number.id]: 7223,

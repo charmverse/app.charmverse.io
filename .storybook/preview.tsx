@@ -73,7 +73,7 @@ const preview: Preview = {
       ]
     },
     layout: 'fullscreen', // removes padding around the views
-    actions: { argTypesRegex: '^on[A-Z].*' },
+    // actions: { argTypesRegex: '^on[A-Z].*' }, config from storybook 7
     controls: {
       matchers: {
         color: /(background|color)$/i,
