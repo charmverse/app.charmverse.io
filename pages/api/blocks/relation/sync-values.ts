@@ -40,10 +40,6 @@ async function syncRelatedCardsValuesHandler(req: NextApiRequest, res: NextApiRe
     userId: req.session.user.id
   });
 
-  prettyPrint({
-    updatedBlocks
-  });
-
   if (updatedBlocks.length) {
     relay.broadcast(
       {
