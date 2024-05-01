@@ -135,9 +135,11 @@ test('create and edit relation property values', async ({ page, document, databa
   await databasePage.linkedDatabaseOption({ sourceBoardId: targetBoardPage.id }).click();
   await databasePage.getShowOnRelatedBoardButton().click();
 
+  const blocksUpdate = databasePage.waitForBlocksUpdate();
+
   await databasePage.getAddRelationButton().click();
 
-  await databasePage.waitForBlocksUpdate();
+  await blocksUpdate;
 
   const sourceBoard = await prisma.block.findUniqueOrThrow({
     where: {
