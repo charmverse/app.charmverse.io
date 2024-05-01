@@ -268,7 +268,7 @@
     "react-intl": "^6.5.1",
     "react-pdf": "^5.7.2",
     "react-resizable": "^3.0.5",
-    "react-to-print": "^2.14.12",
+    "react-to-print": "^2.15.1",
     "react-window": "^1.8.7",
     "redis": "^4.3.1",
     "rfc6902": "^5.0.1",
