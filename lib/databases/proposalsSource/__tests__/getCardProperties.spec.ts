@@ -657,7 +657,7 @@ describe('getCardPropertiesFromProposals', () => {
         credentialEvent: 'proposal_approved',
         credentialTemplateId: credentialTemplate.id,
         userId: proposalAuthor.id,
-        onchainAttestationId: '0xabc',
+        onchainAttestationId: randomETHWalletAddress(),
         proposalId: proposal.id
       }
     });
@@ -790,7 +790,7 @@ describe('getCardPropertiesFromProposals', () => {
         credentialEvent: 'proposal_approved',
         credentialTemplateId: credentialTemplate.id,
         userId: proposalAuthor.id,
-        onchainAttestationId: '0xabc',
+        onchainAttestationId: randomETHWalletAddress(),
         proposalId: proposal.id
       }
     });
