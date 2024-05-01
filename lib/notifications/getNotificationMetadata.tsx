@@ -2,8 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
-import type { FeatureJson } from 'lib/features/constants';
-import { constructFeaturesRecord } from 'lib/features/constructFeaturesRecord';
+import { STATIC_PAGES, type FeatureJson } from 'lib/features/constants';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import type {
   ApplicationCommentNotificationType,
@@ -188,8 +187,19 @@ function getRewardContent({
   }
 }
 
-function getProposalContent(n: ProposalNotification, actorUsername?: string): string | ReactNode {
-  const { type, createdBy } = n;
+function getProposalContent({
+  notification,
+  actorUsername,
+  spaceFeatures
+}: {
+  notification: ProposalNotification;
+  actorUsername?: string;
+  spaceFeatures: FeatureJson[];
+}): string | ReactNode {
+  const proposalFeature = spaceFeatures.find((spaceFeature) => spaceFeature.id === 'proposals')!;
+  const defaultProposalFeature = STATIC_PAGES.find((page) => page.path === 'proposals')!;
+  const proposalFeatureTitle = (proposalFeature.title || defaultProposalFeature.title).toLowerCase();
+  const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
     case 'start_discussion': {
@@ -198,29 +208,35 @@ function getProposalContent(n: ProposalNotification, actorUsername?: string): st
           <strong>{username}</strong> requested feedback for a proposal
         </span>
       ) : (
-        `Feedback requested for a proposal`
+        `Feedback requested for a ${proposalFeatureTitle}`
       );
     }
     case 'vote_passed': {
-      return `The vote on ${n.pageTitle} has passed. View results.`;
+      return `The vote on ${notification.pageTitle} has passed. View results.`;
     }
     case 'reward_published': {
-      return `Your proposal reward has been created`;
+      return `Your ${proposalFeatureTitle} reward has been created`;
     }
-    case 'proposal_passed': {
-      return `Your proposal has passed`;
-    }
+    case 'step_passed':
+    case 'proposal_passed':
     case 'proposal_failed': {
-      return `Your proposal has failed in ${n.evaluation?.title ?? 'current step'}`;
-    }
-    case 'step_passed': {
-      return `Your proposal has been moved to ${n.evaluation?.title ?? 'the next step'}`;
+      const isFailed = type === 'proposal_failed';
+      const evaluation = isFailed ? notification.evaluation : notification.previousEvaluation;
+      const evaluationTitle = evaluation?.title;
+      const actionButtonLabels = evaluation?.actionButtonLabels;
+      const passActionLabel = actionButtonLabels?.approve ?? 'Pass';
+      const declineActionLabel = actionButtonLabels?.reject ?? 'Decline';
+      if (isFailed) {
+        return `Your ${proposalFeatureTitle} failed at ${evaluationTitle} with the status: ${declineActionLabel}`;
+      } else {
+        return `Your ${proposalFeatureTitle} moved from ${evaluationTitle} with the status: ${passActionLabel}`;
+      }
     }
     case 'vote': {
-      return `Voting started for a proposal`;
+      return `Voting started for a ${proposalFeatureTitle}`;
     }
     case 'review_required': {
-      return `Review required for a proposal`;
+      return `Review required for a ${proposalFeatureTitle}`;
     }
     default: {
       return '';
@@ -283,7 +299,11 @@ export function getNotificationMetadata({
 
       case 'proposal': {
         return {
-          content: getProposalContent(notification as ProposalNotification, actorUsername),
+          content: getProposalContent({
+            notification: notification as ProposalNotification,
+            actorUsername,
+            spaceFeatures
+          }),
           href,
           pageTitle: notification.pageTitle
         };
