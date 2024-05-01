@@ -2,11 +2,11 @@ import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
 
-export function CredentialsSettings({
+export function CredentialsStepSettings({
   rewardInput,
   readOnly,
   onChange
-}: Omit<EvaluationStepSettingsProps, 'evaluation' | 'rewardStatus'>) {
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
   return (
     <CredentialSelect
       templateType='reward'

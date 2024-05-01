@@ -27,7 +27,6 @@ import { usePage } from 'hooks/usePage';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { RewardEvaluations } from '../RewardEvaluations/RewardEvaluations';
@@ -130,7 +129,6 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
     return null;
   }
 
-  const rewardType = getRewardType(reward);
   const submitter = members.find((m) => m.id === application?.createdBy);
 
   const readonlySubmission =
@@ -284,7 +282,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
                                 }
                                 bountyId={currentRewardId}
                                 permissions={applicationRewardPermissions}
-                                rewardType={rewardType}
+                                rewardType={reward.rewardType}
                                 isSaving={isSaving}
                               />
                             )}
@@ -300,6 +298,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
                         readOnly={!page?.permissionFlags?.edit_content}
                         application={application}
                         reward={reward}
+                        templateId={page?.sourceTemplateId}
                         refreshApplication={refreshApplication}
                         onChangeReward={updateReward}
                         refreshReward={refreshReward}
@@ -319,6 +318,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
             openSidebar: () => setActiveView('reward_evaluation')
           }}
           page={page}
+          templateId={page?.sourceTemplateId}
           readOnly={!page?.permissionFlags?.edit_content}
           application={application}
           reward={reward}

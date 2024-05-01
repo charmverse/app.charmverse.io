@@ -1,9 +1,9 @@
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';

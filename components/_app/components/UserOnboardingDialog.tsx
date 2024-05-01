@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 
 import { ConnectedAccounts } from 'components/_app/components/ConnectedAccounts';
 import { Button } from 'components/common/Button';
-import type { FormFieldValue } from 'components/common/form/interfaces';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { MemberPropertiesForm } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesForm';
 import { DialogContainer } from 'components/members/components/MemberProfile/components/ProfileWidgets/components/MemberPropertiesWidget/MemberPropertiesFormDialog';
@@ -24,6 +23,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useMembers } from 'hooks/useMembers';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { LoggedInUser } from 'models';
 
 import type { OnboardingStep } from '../hooks/useOnboarding';

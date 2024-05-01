@@ -1,10 +1,10 @@
 import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
-import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { IssuableProposalCredentialContent } from 'lib/credentials/findIssuableProposalCredentials';
+import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import type {
   ProposalBlockInput,
   ProposalBlockUpdateInput,

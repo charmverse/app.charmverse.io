@@ -6,12 +6,11 @@ import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
 import * as yup from 'yup';
 
+import type { FieldType, FormFieldValue } from 'lib/forms/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { isUUID, isUrl, isValidEmail } from 'lib/utils/strings';
-
-import type { FieldType, FormFieldValue } from '../interfaces';
 
 type FormFieldInput = {
   value?: any;

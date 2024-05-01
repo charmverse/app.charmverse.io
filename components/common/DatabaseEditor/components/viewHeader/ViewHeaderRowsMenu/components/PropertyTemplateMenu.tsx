@@ -313,18 +313,20 @@ export function PropertyTemplateMenu({
       const symbolOrAddress = firstTokenRewardCard.fields.properties[REWARD_TOKEN] as string;
       const chainId = firstTokenRewardCard.fields.properties[REWARD_CHAIN] as string;
       const rewardAmount = firstTokenRewardCard.fields.properties[REWARD_AMOUNT] as number;
+      const _rewardOnly =
+        getRewardType({
+          chainId: Number(chainId),
+          rewardAmount,
+          rewardToken: symbolOrAddress
+        }) !== 'token';
 
       return (
         <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
           <Box display='flex' px='4px'>
             <RewardTokenDialog
-              readOnly={
-                getRewardType({
-                  chainId: Number(chainId),
-                  rewardAmount,
-                  rewardToken: symbolOrAddress
-                }) !== 'token'
-              }
+              readOnly={_rewardOnly}
+              readOnlyToken={_rewardOnly}
+              requireTokenAmount
               currentReward={{
                 chainId: Number(chainId),
                 rewardAmount,

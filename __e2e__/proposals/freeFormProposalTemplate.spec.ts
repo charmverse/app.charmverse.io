@@ -302,30 +302,6 @@ test.describe.serial('Create and use Proposal Template', async () => {
                   headerImage: null
                 },
                 reward: {
-                  fields: {
-                    isAssigned: false,
-                    properties: {
-                      __limit: '',
-                      __title: '',
-                      __rewarder: '',
-                      __available: '',
-                      __createdAt: '',
-                      __reviewers: [
-                        {
-                          id: role.id,
-                          group: 'role'
-                        }
-                      ],
-                      __applicants: [],
-                      __rewardChain: rewardConfig.chain.toString(),
-                      __rewardToken: rewardConfig.token,
-                      __rewardAmount: rewardConfig.amount,
-                      __rewardStatus: '',
-                      __rewardCustomValue: '',
-                      __rewardProposalLink: '',
-                      __rewardApplicantsCount: '0'
-                    }
-                  },
                   chainId: rewardConfig.chain,
                   reviewers: [
                     {
@@ -338,7 +314,11 @@ test.describe.serial('Create and use Proposal Template', async () => {
                   customReward: null,
                   rewardAmount: rewardConfig.amount,
                   assignedSubmitters: [],
-                  rewardType: 'token'
+                  rewardType: 'token',
+                  allowMultipleApplications: false,
+                  allowedSubmitterRoles: [],
+                  approveSubmitters: false,
+                  maxSubmissions: null
                 },
                 draftId: pendingReward.draftId
               }
@@ -518,30 +498,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
                   headerImage: null
                 },
                 reward: {
-                  fields: {
-                    isAssigned: false,
-                    properties: {
-                      __limit: '',
-                      __title: '',
-                      __rewarder: '',
-                      __available: '',
-                      __createdAt: '',
-                      __reviewers: [
-                        {
-                          id: role.id,
-                          group: 'role'
-                        }
-                      ],
-                      __applicants: [],
-                      __rewardChain: rewardConfig.chain.toString(),
-                      __rewardToken: rewardConfig.token,
-                      __rewardAmount: rewardConfig.amount,
-                      __rewardStatus: '',
-                      __rewardCustomValue: '',
-                      __rewardProposalLink: '',
-                      __rewardApplicantsCount: '0'
-                    }
-                  },
+                  allowMultipleApplications: false,
+                  allowedSubmitterRoles: [],
+                  approveSubmitters: false,
+                  maxSubmissions: null,
                   chainId: rewardConfig.chain,
                   reviewers: [
                     {

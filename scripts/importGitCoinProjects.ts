@@ -4,10 +4,9 @@ import { getProjectRegistryContract } from 'lib/gitcoin/getProjectRegistryContra
 import { getProjectDetails, GitcoinProjectDetails } from 'lib/gitcoin/getProjectDetails';
 import { prisma } from '@charmverse/core/prisma-client';
 import { uid } from 'lib/utils/strings';
-import { createUserFromWallet } from 'lib/users/createUser';
+import { createOrGetUserFromWallet } from 'lib/users/createUser';
 import { createWorkspace, SpaceCreateInput } from 'lib/spaces/createSpace';
 import { updateTrackGroupProfile } from 'lib/metrics/mixpanel/updateTrackGroupProfile';
-import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getIpfsFileUrl } from 'lib/ipfs/fetchFileByHash';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
@@ -184,7 +183,7 @@ async function createSpaceUsers(owners: string[]) {
   });
 
   const userPromises = owners.map(async (owner) =>
-    createUserFromWallet(
+    createOrGetUserFromWallet(
       { address: owner, skipTracking: true },
       {
         signupSource: 'gitcoin-project',
@@ -193,7 +192,7 @@ async function createSpaceUsers(owners: string[]) {
     )
   );
 
-  const userIds = (await Promise.all(userPromises)).map((user) => user.id);
+  const userIds = (await Promise.all(userPromises)).map(({ user }) => user.id);
   const [author, ...users] = userIds;
 
   return { adminUserId: author, extraAdmins: [...users], botUser };

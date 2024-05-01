@@ -411,6 +411,7 @@ function DocumentPageComponent({
               ) : page.type === 'bounty' || page.type === 'bounty_template' ? (
                 <RewardEvaluations
                   isTemplate={page.type === 'bounty_template'}
+                  templateId={page.sourceTemplateId}
                   isDraft={reward?.status === 'draft'}
                   reward={reward}
                   readOnly={readOnly}
@@ -486,7 +487,7 @@ function DocumentPageComponent({
                 ) : (
                   <CharmEditor
                     placeholderText={
-                      page.type === 'bounty' || page.type === 'bounty_template'
+                      (page.type === 'bounty' || page.type === 'bounty_template') && !readOnly
                         ? `Describe the reward. Type '/' to see the list of available commands`
                         : undefined
                     }
@@ -531,6 +532,7 @@ function DocumentPageComponent({
                         variant='solid_button'
                         readOnly={!proposal.permissions.edit}
                         rewardIds={proposal.rewardIds || []}
+                        isProposalTemplate={page.type === 'proposal_template'}
                         onSave={(pendingReward) => {
                           const isExisting = proposal.fields?.pendingRewards?.find(
                             (r) => r.draftId === pendingReward.draftId
@@ -564,7 +566,7 @@ function DocumentPageComponent({
                   )}
 
                 {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
-                  <Box>
+                  <Box className='dont-print-me'>
                     {/* add negative margin to offset height of .charm-empty-footer */}
                     <PageComments page={page} canComment={pagePermissions.comment} />
                   </Box>

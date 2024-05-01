@@ -10,10 +10,15 @@ import { createDiscordUser } from 'testing/utils/discord';
 import { createRole } from 'testing/utils/roles';
 import { addUserToSpace } from 'testing/utils/spaces';
 
-import { COLLABLAND_API_URL } from '../config';
+const collablandApiUrl = 'https://fakedomain.com';
 
 jest.mock('config/constants', () => ({
   authSecret: 'testsecret1234567890'
+}));
+
+jest.mock('lib/collabland/config', () => ({
+  COLLAB_API_KEY: 'testsecret1234567890',
+  COLLABLAND_API_URL: 'https://fakedomain.com'
 }));
 
 const mockSandbox = fetchMock.sandbox();
@@ -82,7 +87,7 @@ describe('connectSpace', () => {
       userId: discordUser.id
     });
 
-    mockSandbox.get(`${COLLABLAND_API_URL}/discord/${discordServerId}/roles`, [
+    mockSandbox.get(`${collablandApiUrl}/discord/${discordServerId}/roles`, [
       {
         name: 'Existing Role',
         id: externalRoleIds[0]
@@ -93,22 +98,17 @@ describe('connectSpace', () => {
       }
     ]);
 
-    mockSandbox.get(`${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserIds[0]}`, {
+    mockSandbox.get(`${collablandApiUrl}/discord/${discordServerId}/member/${discordUserIds[0]}`, {
       roles: [externalRoleIds[0]]
     });
 
-    mockSandbox.get(`${COLLABLAND_API_URL}/discord/${discordServerId}/member/${discordUserIds[1]}`, {
+    mockSandbox.get(`${collablandApiUrl}/discord/${discordServerId}/member/${discordUserIds[1]}`, {
       roles: [externalRoleIds[1]]
     });
 
     const state = encryptData({ userId: adminUser.id, spaceId: space.id });
 
     await connectSpace({ state, discordServerId });
-
-    // wait for 1 sec since there are some async operations in connectSpace fn
-    await new Promise((resolve) => {
-      setTimeout(resolve, 500);
-    });
 
     const existingRole = await prisma.role.findFirstOrThrow({
       where: {

@@ -1,18 +1,14 @@
 import Alert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 import Tooltip from '@mui/material/Tooltip';
 import { useState } from 'react';
 import useSWR from 'swr';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
-import { ExpandableSectionTitle } from 'components/common/ExpandableSectionTitle';
 import { useIsFreeSpace } from 'hooks/useIsFreeSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { Reward } from 'lib/rewards/interfaces';
 
-import { RewardStatusBadge } from '../../RewardStatusBadge';
 /**
  * Permissions left optional so this component can initialise without them
  */
@@ -50,28 +46,6 @@ export function RewardPropertiesHeader({ readOnly = false, reward, isExpanded, p
 
   return (
     <>
-      {/* Reward price and status  */}
-      <Grid container mb={1}>
-        <Grid item xs={6}>
-          <ExpandableSectionTitle title='Details' isExpanded={isExpanded} toggleExpanded={toggleExpanded} />
-        </Grid>
-        <Grid item xs={6}>
-          <Box
-            sx={{
-              justifyContent: 'flex-end',
-              gap: 1,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            {/* Provide the reward menu options */}
-            <Box data-test='bounty-header-amount' display='flex'>
-              <RewardStatusBadge reward={reward} truncate showEmptyStatus />
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-
       {/* Warning for reward creator */}
       {!!editableCheck?.editable && !isFreeSpace && !readOnly && (
         <Alert

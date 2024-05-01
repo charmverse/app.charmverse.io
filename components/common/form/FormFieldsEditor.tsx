@@ -7,13 +7,13 @@ import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
 import { Button } from '../Button';
 
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { FormField } from './FormField';
-import type { FormFieldInput } from './interfaces';
 
 export function FormFieldsEditor({
   proposalId,
@@ -40,7 +40,8 @@ export function FormFieldsEditor({
     try {
       await debouncedUpdate({ formFields: _formFields });
     } catch (error) {
-      showError(error, 'Error saving form fields');
+      // dont show error modal, the UI should show red borders now instead
+      // showError(error, 'Error saving form fields');
     }
   }
 

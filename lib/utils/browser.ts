@@ -320,7 +320,7 @@ export function getSpaceUrl(config: { domain: string; customDomain?: string | nu
   return `/${domain}`;
 }
 
-export function getAbsolutePath(path: string, spaceDomain: string | undefined) {
+export function getAbsolutePath(path: string, spaceDomain?: string) {
   const absolutePath = spaceDomain ? `/${spaceDomain}${path}` : path;
   const subdomain = getSpaceDomainFromHost();
 

@@ -62,13 +62,3 @@ type WithRoles = {
 };
 
 export type TokenGateWithRoles = TokenGate & WithRoles;
-
-export type TokenGateAccessType =
-  | 'individual_wallet'
-  | 'individual_nft'
-  | 'group_token_or_nft'
-  | 'dao_members'
-  | 'poap_collectors'
-  | 'nft_subscriber'
-  | 'gitcoin_passport'
-  | 'guild';

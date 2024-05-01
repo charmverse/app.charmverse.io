@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
 import { useGetCredentialTemplates } from 'charmClient/hooks/credentials';
-import { CredentialReviewStep } from 'components/common/workflows/Credentials/CredentialReviewStep';
+import { CredentialReviewStep } from 'components/common/WorkflowSidebar/components/CredentialReviewStep/CredentialReviewStep';
 import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
 
 export type UserCredentialRowProps = {
@@ -14,7 +14,7 @@ export type UserCredentialRowProps = {
 
 const preventAccordionToggle = (e: any) => e.stopPropagation();
 
-export function RewardCredentials({
+export function CredentialsStepReview({
   selectedCredentialTemplates,
   rewardId,
   application,

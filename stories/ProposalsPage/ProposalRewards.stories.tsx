@@ -9,9 +9,9 @@ import { ProposalRewardsTable } from 'components/proposals/ProposalPage/componen
 import { RewardBlocksProvider } from 'components/rewards/hooks/useRewardBlocks';
 import { RewardsBoardProvider } from 'components/rewards/hooks/useRewardsBoardAndBlocks';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
+import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members } from '../lib/mockData';
 

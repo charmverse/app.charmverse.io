@@ -34,6 +34,7 @@ export function AddBountyButton({ readOnly, card }: Props) {
     !hasReward &&
     !creatingInlineReward &&
     !readOnly &&
+    !card.pageType?.startsWith('card') &&
     card.pageType?.match('template') === null &&
     spacePermissions?.createBounty &&
     space &&

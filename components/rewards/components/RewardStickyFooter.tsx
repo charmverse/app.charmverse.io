@@ -6,7 +6,6 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
 
 export function RewardStickyFooter({
@@ -37,8 +36,7 @@ export function RewardStickyFooter({
       type: 'bounty'
     },
     reward,
-    rewardType: getRewardType(reward),
-    isProposalTemplate: false
+    rewardType: reward.rewardType
   }).join('\n');
 
   return (

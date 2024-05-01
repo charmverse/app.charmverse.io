@@ -3,9 +3,8 @@ import { v4 } from 'uuid';
 
 import * as summonProfile from 'lib/profile/getSummonProfile';
 import { TENANT_URLS } from 'lib/summon/constants';
-import { createUserFromWallet } from 'lib/users/createUser';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
-import { generateUserAndSpace } from 'testing/setupDatabase';
+import { createUserWithWallet, generateUserAndSpace } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
 
 import { syncSummonSpaceRoles } from '../syncSummonSpaceRoles';
@@ -42,7 +41,7 @@ describe('syncSummonSpaceRoles', () => {
     const { space, user } = await generateUserAndSpace();
     const userXpsEngineId = v4();
     const user2XpsEngineId = v4();
-    const user2 = await createUserFromWallet({
+    const user2 = await createUserWithWallet({
       address: randomETHWalletAddress()
     });
 
@@ -133,7 +132,7 @@ describe('syncSummonSpaceRoles', () => {
 
   it(`Should create new role for a single user if userId is also passed`, async () => {
     const { space, user } = await generateUserAndSpace();
-    const user2 = await createUserFromWallet({
+    const user2 = await createUserWithWallet({
       address: randomETHWalletAddress()
     });
 

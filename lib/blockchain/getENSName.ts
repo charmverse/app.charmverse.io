@@ -2,9 +2,14 @@ import { log } from '@charmverse/core/log';
 import { getAddress } from 'viem';
 import { normalize } from 'viem/ens';
 
+import { isTestEnv } from 'config/constants';
+
 import { getPublicClient } from './publicClient';
 
 export async function getENSName(_address: string) {
+  if (isTestEnv) {
+    return null;
+  }
   const publicClient = getPublicClient(1);
   const address = getAddress(_address);
 
@@ -18,7 +23,7 @@ export function resolveENSName(ensName: string) {
 }
 
 export async function getENSDetails(ensName?: string | null) {
-  if (!ensName) {
+  if (!ensName || isTestEnv) {
     return null;
   }
 

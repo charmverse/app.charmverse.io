@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 
 import { MobileDialog } from 'components/common/MobileDialog/MobileDialog';
 import { useMdScreen } from 'hooks/useMediaScreens';
-import type { NestedDataTest } from 'testing/e2eType';
 
 export type DialogProps = {
   onClose: () => void;

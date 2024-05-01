@@ -6,10 +6,10 @@ import type { ReactNode } from 'react';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { Button } from 'components/common/Button';
 import Dialog from 'components/common/DatabaseEditor/components/dialog';
-import type { FormFieldValue } from 'components/common/form/interfaces';
 import ScrollableWindow from 'components/common/PageLayout/components/ScrollableWindow';
 import { useRequiredMemberPropertiesForm } from 'components/members/hooks/useRequiredMemberProperties';
 import Legend from 'components/settings/Legend';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { UpdateMemberPropertyValuePayload } from 'lib/members/interfaces';
 
 import { useMemberPropertyValues } from '../../../../../../hooks/useMemberPropertyValues';

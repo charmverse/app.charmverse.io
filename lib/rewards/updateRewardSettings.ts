@@ -14,6 +14,7 @@ export type UpdateableRewardFields = Partial<
     | 'chainId'
     | 'rewardAmount'
     | 'rewardToken'
+    | 'rewardType'
     | 'approveSubmitters'
     | 'allowMultipleApplications'
     | 'maxSubmissions'
@@ -26,7 +27,6 @@ export type UpdateableRewardFields = Partial<
   reviewers?: RewardReviewer[];
   allowedSubmitterRoles?: string[] | null;
   assignedSubmitters?: string[] | null;
-  rewardType?: RewardType;
 };
 
 export type RewardUpdate = {
@@ -85,6 +85,7 @@ export async function updateRewardSettings({
         chainId: updateContent.chainId,
         rewardAmount: updateContent.rewardAmount,
         rewardToken: updateContent.rewardToken,
+        rewardType: updateContent.rewardType,
         allowMultipleApplications: isAssignedReward ? false : updateContent.allowMultipleApplications,
         approveSubmitters: isAssignedReward ? false : updateContent.approveSubmitters,
         maxSubmissions: isAssignedReward ? 1 : updateContent.maxSubmissions,

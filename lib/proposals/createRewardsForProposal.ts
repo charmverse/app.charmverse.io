@@ -1,11 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { uniqBy } from 'lodash';
 
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { createReward } from 'lib/rewards/createReward';
+import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { InvalidInputError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -26,7 +28,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
         select: {
           index: true,
           result: true,
-          id: true
+          id: true,
+          reviewers: true
         },
         orderBy: {
           index: 'asc'
@@ -42,6 +45,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
       id: true
     }
   });
+
+  const reviewers = proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat();
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
 
@@ -63,8 +68,19 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     // create reward
     const { createdPageId, reward: createdReward } = await createReward({
       ...reward,
+      reviewers: uniqBy(
+        reviewers
+          .map((reviewer) =>
+            reviewer.roleId
+              ? { group: 'role', id: reviewer.roleId }
+              : reviewer.userId
+              ? { group: 'user', id: reviewer.userId }
+              : null
+          )
+          .filter(isTruthy) as RewardReviewer[],
+        'id'
+      ),
       allowedSubmitterRoles: [],
-      assignedSubmitters: proposal.authors.map((a) => a.userId),
       pageProps: page || {},
       spaceId: proposal.spaceId,
       userId,
