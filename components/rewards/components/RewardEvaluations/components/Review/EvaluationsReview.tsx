@@ -75,7 +75,7 @@ export function EvaluationsReview({
     currentSpace?.kycOption,
     currentSpace?.kycOption === 'synaps' ? userSynapsSession?.status : userPersonaSession?.status
   );
-  const reviewPermission = rewardPermissions?.review;
+  const workPermission = rewardPermissions?.work;
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
@@ -183,7 +183,7 @@ export function EvaluationsReview({
               <KycStepSettings
                 readOnly={
                   // It will be readonly if there is no application or is current application
-                  !application || (!isCurrent && evaluation.result === null) || (reviewPermission && kycStatus === null)
+                  !application || (!isCurrent && evaluation.result === null) || !workPermission
                 }
                 userId={application?.createdBy}
               />

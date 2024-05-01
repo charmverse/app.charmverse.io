@@ -32,7 +32,7 @@ export const rewardKycEvaluation = {
   id: 'kyc',
   title: 'KYC',
   type: 'kyc'
-};
+} as const;
 
 export const rewardCredentialEvaluation = {
   id: 'credential',
