@@ -1,10 +1,9 @@
-import type { FormField, Space, User, Prisma } from '@charmverse/core/prisma';
+import type { FormField, Prisma, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsCredentials, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { getDefaultBoard } from 'components/proposals/components/ProposalsBoard/utils/boardData';
-import { proposalCredentialSchemaId } from 'lib/credentials/schemas/proposal';
 import { prismaToBlock } from 'lib/databases/block';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { ProposalFields } from 'lib/proposals/interfaces';
@@ -69,7 +68,8 @@ describe('getCardPropertiesFromProposals', () => {
       space: {
         features: space.features,
         credentialTemplates: [],
-        id: space.id
+        id: space.id,
+        useOnchainCredentials: false
       },
       cardProperties: board.fields.cardProperties
     });
@@ -243,7 +243,8 @@ describe('getCardPropertiesFromProposals', () => {
       space: {
         features: generated.space.features,
         credentialTemplates: [],
-        id: generated.space.id
+        id: generated.space.id,
+        useOnchainCredentials: false
       },
       cardProperties: database.fields.cardProperties
     });
@@ -423,7 +424,8 @@ describe('getCardPropertiesFromProposals', () => {
       space: {
         features: testSpace.features,
         credentialTemplates: [],
-        id: testSpace.id
+        id: testSpace.id,
+        useOnchainCredentials: false
       },
       cardProperties: databaseBoard.fields.cardProperties
     });
@@ -524,7 +526,8 @@ describe('getCardPropertiesFromProposals', () => {
       space: {
         features: testSpace.features,
         credentialTemplates: [],
-        id: testSpace.id
+        id: testSpace.id,
+        useOnchainCredentials: false
       },
       cardProperties: database1.fields.cardProperties
     });
@@ -542,7 +545,7 @@ describe('getCardPropertiesFromProposals', () => {
     expect(cardProperties[email1Prop.id]).toBe('john.doe@gmail.com');
   });
 
-  it('should return the proposal with a step of credentials when the evaluation is complete', async () => {
+  it('should return the proposal with a step of credentials, and status of passed or in_progress depending on offchain credentials when the evaluation is complete', async () => {
     const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace({
       isAdmin: true,
       walletAddress: randomETHWalletAddress()
@@ -626,7 +629,8 @@ describe('getCardPropertiesFromProposals', () => {
       space: {
         features: testSpace.features,
         credentialTemplates: [credentialTemplate],
-        id: testSpace.id
+        id: testSpace.id,
+        useOnchainCredentials: false
       },
       cardProperties: databaseBoard.fields.cardProperties
     });
@@ -662,7 +666,141 @@ describe('getCardPropertiesFromProposals', () => {
       space: {
         features: testSpace.features,
         credentialTemplates: [credentialTemplate],
+        id: testSpace.id,
+        useOnchainCredentials: false
+      },
+      cardProperties: databaseBoard.fields.cardProperties
+    });
+    const cardBlockAfterUpdate = Object.values(cardsAfterUpdate)[0];
+
+    expect(cardBlockAfterUpdate.fields.properties[statusProp.id]).toEqual('pass');
+    expect(cardBlockAfterUpdate.fields.properties[stepProp.id]).toEqual('Credentials');
+    expect(cardBlockAfterUpdate.fields.properties[evaluationTypeProp.id]).toEqual('credentials');
+  });
+
+  it('should return the proposal with a step of credentials, and status of passed or in_progress depending on onchain credentials when the evaluation is complete', async () => {
+    const { user: proposalAuthor, space: testSpace } = await generateUserAndSpace({
+      isAdmin: true,
+      walletAddress: randomETHWalletAddress()
+    });
+
+    await prisma.space.update({
+      where: {
         id: testSpace.id
+      },
+      data: {
+        useOnchainCredentials: true,
+        credentialsChainId: 10
+      }
+    });
+
+    const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
+      spaceId: testSpace.id,
+      credentialEvents: ['proposal_approved']
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      authors: [proposalAuthor.id],
+      proposalStatus: 'published',
+      selectedCredentialTemplateIds: [credentialTemplate.id],
+      evaluationInputs: [
+        { evaluationType: 'feedback', title: 'Feedback', result: 'pass', reviewers: [], permissions: [] }
+      ],
+      spaceId: testSpace.id,
+      userId: proposalAuthor.id
+    });
+
+    const defaultBoard = getDefaultBoard({
+      evaluationStepTitles: []
+    });
+
+    await prisma.proposalBlock.create({
+      data: {
+        fields: {
+          ...defaultBoard.fields,
+          cardProperties: [...defaultBoard.fields.cardProperties] as unknown as Prisma.InputJsonArray
+        },
+        id: defaultBoard.id,
+        spaceId: testSpace.id,
+        createdBy: proposalAuthor.id,
+        rootId: testSpace.id,
+        updatedBy: proposalAuthor.id,
+        type: 'board',
+        title: 'Proposals',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        deletedAt: null,
+        parentId: testSpace.id,
+        schema: 1
+      }
+    });
+
+    const proposalFields = (proposal.fields as ProposalFields) ?? {};
+
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: {
+        fields: {
+          ...proposalFields,
+          properties: {
+            ...proposalFields.properties
+          }
+        }
+      }
+    });
+
+    const databaseBoard = await generateProposalSourceDb({
+      createdBy: proposalAuthor.id,
+      spaceId: testSpace.id
+    });
+
+    prettyPrint({ databaseBoard });
+
+    const cards = await getCardPropertiesFromProposals({
+      space: {
+        features: testSpace.features,
+        credentialTemplates: [credentialTemplate],
+        id: testSpace.id,
+        useOnchainCredentials: true
+      },
+      cardProperties: databaseBoard.fields.cardProperties
+    });
+    const cardBlock = Object.values(cards)[0];
+
+    const statusProp = databaseBoard.fields.cardProperties.find(
+      (prop) => prop.type === 'proposalStatus'
+    ) as IPropertyTemplate;
+
+    const stepProp = databaseBoard.fields.cardProperties.find(
+      (prop) => prop.type === 'proposalStep'
+    ) as IPropertyTemplate;
+
+    const evaluationTypeProp = databaseBoard.fields.cardProperties.find(
+      (prop) => prop.type === 'proposalEvaluationType'
+    ) as IPropertyTemplate;
+
+    expect(cardBlock.fields.properties[statusProp.id]).toEqual('in_progress');
+    expect(cardBlock.fields.properties[stepProp.id]).toEqual('Credentials');
+    expect(cardBlock.fields.properties[evaluationTypeProp.id]).toEqual('credentials');
+
+    await prisma.issuedCredential.create({
+      data: {
+        credentialEvent: 'proposal_approved',
+        credentialTemplateId: credentialTemplate.id,
+        userId: proposalAuthor.id,
+        onchainAttestationId: '0xabc',
+        proposalId: proposal.id
+      }
+    });
+
+    const cardsAfterUpdate = await getCardPropertiesFromProposals({
+      space: {
+        features: testSpace.features,
+        credentialTemplates: [credentialTemplate],
+        id: testSpace.id,
+        useOnchainCredentials: true
       },
       cardProperties: databaseBoard.fields.cardProperties
     });
