@@ -8,7 +8,7 @@ export async function updateSnapshotDomain(spaceId: string, snapshotDomain: stri
     const snapshotSpace = await getSnapshotSpace(snapshotDomain);
 
     if (!snapshotSpace) {
-      throw new DataNotFoundError(`No snapshot domain ${snapshotDomain} was found`);
+      throw new DataNotFoundError(`Snapshot domain "${snapshotDomain}" was not found`);
     }
   }
 
