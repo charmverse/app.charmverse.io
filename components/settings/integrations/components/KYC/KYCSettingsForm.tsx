@@ -11,7 +11,7 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import { capitalize } from 'lib/utils/strings';
 
-import type { FormValues } from './KycIntegration';
+import type { FormValues } from './KYCSettings';
 
 export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
   const {

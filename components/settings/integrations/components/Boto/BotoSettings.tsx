@@ -8,7 +8,7 @@ import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
-export function ConnectBoto({ isAdmin }: { isAdmin: boolean }) {
+export function BotoSettings({ isAdmin }: { isAdmin: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const { getFeatureTitle } = useSpaceFeatures();
   return (

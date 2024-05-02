@@ -33,7 +33,7 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; space: Space }) {
+export function SnapshotSettings({ isAdmin, space }: { isAdmin: boolean; space: Space }) {
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
   const { refreshCurrentSpace } = useCurrentSpace();
   const [expanded, setExpanded] = useState(false);
@@ -76,7 +76,7 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
     reset({
       snapshotDomain: space.snapshotDomain || ''
     });
-  }, [space?.snapshotDomain]);
+  }, [space?.snapshotDomain, reset]);
 
   return (
     <IntegrationContainer

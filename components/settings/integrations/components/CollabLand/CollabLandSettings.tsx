@@ -15,7 +15,7 @@ import { IntegrationContainer } from '../IntegrationContainer';
 
 const collablandStoreUrl = isProdEnv ? 'https://cc.collab.land/dashboard' : 'https://cc-qa.collab.land/dashboard';
 
-export function ConnectCollabland({ isAdmin }: { isAdmin: boolean }) {
+export function CollabLandSettings({ isAdmin }: { isAdmin: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const { space } = useCurrentSpace();
   const [isConnecting, setIsConnecting] = useState(false);

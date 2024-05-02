@@ -12,7 +12,7 @@ import type { KycCredentials } from 'lib/kyc/getKycCredentials';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
-import { KycIntegrationFields } from './KycIntegrationFields';
+import { KycIntegrationFields } from './KYCSettingsForm';
 import { PersonaModal } from './PersonaModal';
 import { SynapsModal } from './SynapsModal';
 
@@ -47,7 +47,7 @@ const schema = yup.object({
 });
 export type FormValues = yup.InferType<typeof schema>;
 
-export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: boolean }) {
+export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const { refreshCurrentSpace } = useCurrentSpace();
   const { data: kycCredentials, mutate: mutateKycCredentials } = useGetKycCredentials(space.id);

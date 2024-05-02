@@ -1,6 +1,5 @@
-import { Grid, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { useState } from 'react';
-import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
 import LoadingComponent from 'components/common/LoadingComponent';
@@ -10,17 +9,9 @@ import { GITHUB_APP_NAME } from 'lib/github/constants';
 
 import { IntegrationContainer } from '../IntegrationContainer';
 
-import { ConnectGithubRepoForm } from './ConnectGithubRepoForm';
+import { GithubSettingsForm } from './GithubSettingsForm';
 
-export const schema = yup.object({
-  repositoryId: yup.string().required(),
-  rewardTemplateId: yup.string().uuid().nullable(),
-  repositoryName: yup.string().required(),
-  rewardAuthorId: yup.string().uuid().required(),
-  repositoryLabels: yup.array(yup.string())
-});
-
-export function ConnectGithubApp({
+export function GithubSettings({
   isAdmin,
   spaceId,
   spaceDomain
@@ -44,34 +35,36 @@ export function ConnectGithubApp({
       subheader={`Link issues to ${getFeatureTitle('rewards')}`}
     >
       <Stack gap={2}>
-        <Typography variant='body2'>
-          Connect your space to GitHub to create {getFeatureTitle('rewards')} from GitHub issues.
-        </Typography>
         {isLoadingGithubApplicationData || isConnectingWithGithubApp ? (
           <LoadingComponent />
         ) : !githubApplicationData ? (
-          <div>
-            <Button
-              disabledTooltip={
-                isConnectingWithGithubApp
-                  ? 'Connecting with CharmVerse Github App'
-                  : !isAdmin
-                  ? 'Only admins can connect to Github'
-                  : undefined
-              }
-              disabled={!isAdmin}
-              external
-              href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
-                JSON.stringify({
-                  redirect: `${window?.location.origin}/${spaceDomain}/rewards?settingTab=integrations`
-                })
-              )}`}
-            >
-              Authorize
-            </Button>
-          </div>
+          <>
+            <Typography variant='body2'>
+              Connect a Git repository to CharmVerse to create {getFeatureTitle('rewards')} from GitHub issues.
+            </Typography>
+            <div>
+              <Button
+                disabledTooltip={
+                  isConnectingWithGithubApp
+                    ? 'Connecting with CharmVerse Github App'
+                    : !isAdmin
+                    ? 'Only admins can connect to Github'
+                    : undefined
+                }
+                disabled={!isAdmin}
+                external
+                href={`https://github.com/apps/${GITHUB_APP_NAME}/installations/new?state=${encodeURIComponent(
+                  JSON.stringify({
+                    redirect: `${window?.location.origin}/${spaceDomain}/rewards?settingTab=integrations`
+                  })
+                )}`}
+              >
+                Authorize
+              </Button>
+            </div>
+          </>
         ) : (
-          <ConnectGithubRepoForm
+          <GithubSettingsForm
             installationId={githubApplicationData.spaceGithubConnection.installationId}
             spaceId={spaceId}
             repositories={githubApplicationData.repositories}

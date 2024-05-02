@@ -39,7 +39,7 @@ const formFieldOptions = {
   shouldValidate: true
 };
 
-export function ConnectGithubRepoForm({
+export function GithubSettingsForm({
   installationId,
   spaceId,
   repositories,
