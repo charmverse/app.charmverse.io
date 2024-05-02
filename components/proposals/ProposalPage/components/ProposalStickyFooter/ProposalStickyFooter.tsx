@@ -34,6 +34,7 @@ export function ProposalStickyFooter({
       showMessage((error as Error).message, 'error');
     }
   }
+  const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
 
   const disabledTooltip = getProposalErrors({
     page: {
@@ -42,6 +43,7 @@ export function ProposalStickyFooter({
       title: page.title,
       type: page.type
     },
+    requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
     proposalType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {

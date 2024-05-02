@@ -6,7 +6,6 @@ import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
@@ -27,7 +26,6 @@ export function FormFieldsEditor({
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
   const { trigger } = useUpdateProposalFormFields({ proposalId });
-  const { showError } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
     return debounce(trigger, 200);
   }, [trigger]);
@@ -41,7 +39,6 @@ export function FormFieldsEditor({
       await debouncedUpdate({ formFields: _formFields });
     } catch (error) {
       // dont show error modal, the UI should show red borders now instead
-      // showError(error, 'Error saving form fields');
     }
   }
 
