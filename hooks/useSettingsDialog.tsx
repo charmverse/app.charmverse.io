@@ -49,7 +49,6 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   function onClose() {
     settingsModalState.close();
     setActivePath(undefined);
-    setUrlWithoutRerender(router.pathname, { settingTab: null });
   }
 
   function openUpgradeSubscription() {
@@ -65,6 +64,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
     if (router.query.settingTab && SPACE_SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
       openSettings(router.query.settingTab as SettingsPath);
+      setUrlWithoutRerender(router.pathname, { settingTab: null });
     }
     // If the user clicks a link inside the modal, close the modal only
     router.events.on('routeChangeStart', close);
