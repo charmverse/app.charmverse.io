@@ -13,7 +13,7 @@ type IContext = {
   isOpen: boolean;
   activePath?: SettingsPath;
   onClose: () => void;
-  openSettings: (path?: SettingsPath, section?: string) => void;
+  openSettings: (path?: SettingsPath) => void;
   openUpgradeSubscription: () => void;
 };
 
@@ -29,20 +29,27 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
   const [activePath, setActivePath] = useState<SettingsPath | undefined>();
   const router = useRouter();
 
-  function openSettings(_path?: SettingsPath, _section?: string) {
+  function openSettings(_path?: SettingsPath) {
     setActivePath(_path);
     settingsModalState.open();
-    setTimeout(() => {
-      if (_section) {
-        const domSection = document.getElementById(_section);
-        domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 200);
   }
+
+  // commenting out unused logic to scroll to section for now - May 2024
+  // function openSettings(_path?: SettingsPath, _section?: SettingsSection) {
+  //   setActivePath(_path);
+  //   settingsModalState.open();
+  //   setTimeout(() => {
+  //     if (_section) {
+  //       const domSection = document.getElementById(_section);
+  //       domSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  //     }
+  //   }, 200);
+  // }
 
   function onClose() {
     settingsModalState.close();
     setActivePath(undefined);
+    setUrlWithoutRerender(router.pathname, { settingTab: null });
   }
 
   function openUpgradeSubscription() {
@@ -58,7 +65,6 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
 
     if (router.query.settingTab && SPACE_SETTINGS_TABS.some((tab) => tab.path === router.query.settingTab)) {
       openSettings(router.query.settingTab as SettingsPath);
-      setUrlWithoutRerender(router.pathname, { settingTab: null });
     }
     // If the user clicks a link inside the modal, close the modal only
     router.events.on('routeChangeStart', close);
@@ -66,7 +72,7 @@ export function SettingsDialogProvider({ children }: { children: ReactNode }) {
     return () => {
       router.events.off('routeChangeStart', close);
     };
-  }, [router]);
+  }, [router.isReady]);
 
   const value = useMemo<IContext>(
     () => ({
