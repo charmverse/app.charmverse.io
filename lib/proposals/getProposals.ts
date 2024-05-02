@@ -188,7 +188,12 @@ function mapDbProposalToProposalLite({
       proposalStatus: proposal.status,
       hasPublishedRewards: rewards.length > 0,
       credentialsEnabled: !!validSelectedCredentials.length,
-      hasPendingOnchainCredentials: !!pendingCredentials.length
+      hasPendingCredentials:
+        !!pendingCredentials.length ||
+        (!space.useOnchainCredentials &&
+          validSelectedCredentials.some(
+            (cred) => !proposal.issuedCredentials.some((issuedCred) => issuedCred.credentialTemplateId === cred)
+          ))
     }),
     currentEvaluationId: proposal.status !== 'draft' && proposal.evaluations.length ? currentEvaluation?.id : undefined,
     // status: proposal.status,
