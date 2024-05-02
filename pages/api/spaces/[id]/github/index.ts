@@ -53,7 +53,6 @@ async function getGithubApplicationData(req: NextApiRequest, res: NextApiRespons
       page,
       per_page: perPage
     });
-
     const repoPromises = repos.repositories.map(async (repo) => {
       const { data: labels } = await appOctokit.request('GET /repos/{owner}/{repo}/labels', {
         owner: repo.owner.login,

@@ -278,7 +278,7 @@ export function GithubSettingsForm({
             </Select>
           </FieldWrapper>
 
-          <Stack flexDirection='row' gap={1}>
+          <Stack flexDirection='row' gap={2}>
             <Button
               variant='contained'
               color='primary'
