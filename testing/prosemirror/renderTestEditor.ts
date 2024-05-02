@@ -47,7 +47,20 @@ export function renderTestEditor(
       attributes: { class: 'bangle-editor content bangle-editor-core' }
     };
     const editor: BangleEditor = new BangleEditor(container, {
-      state: new BangleEditorState({ specRegistry, plugins, editorProps })
+      state: new BangleEditorState({
+        specRegistry,
+        plugins,
+        editorProps
+      }),
+      pmViewOpts: {
+        // editable: () => !readOnly,
+        plugins: [],
+        attributes: () => ({
+          // translate: readOnly ? 'yes' : 'no',
+          class: 'bangle-editor',
+          'data-test': 'charm-editor-input'
+        })
+      }
     });
 
     const view = editor.view;
