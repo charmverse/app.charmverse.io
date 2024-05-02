@@ -1,4 +1,4 @@
-import { ProposalWorkflowTyped } from '@charmverse/core/dist/cjs/proposals';
+import { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import { FormField, prisma } from '@charmverse/core/prisma-client';
 import { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';

@@ -15,6 +15,15 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       proposal: {
         select: {
           status: true,
+          evaluations: {
+            select: {
+              actionLabels: true,
+              title: true
+            },
+            orderBy: {
+              index: 'asc'
+            }
+          },
           page: {
             select: {
               id: true,
@@ -26,7 +35,9 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       },
       evaluation: {
         select: {
-          title: true
+          title: true,
+          index: true,
+          actionLabels: true
         }
       },
       notificationMetadata: {
@@ -37,6 +48,9 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
 
   return proposalNotifications.map((notification) => {
     const page = notification.proposal.page as Page;
+    const previousEvaluation = notification.evaluation
+      ? notification.proposal.evaluations[notification.evaluation.index - 1]
+      : null;
     const proposalNotification = {
       createdAt: notification.notificationMetadata.createdAt.toISOString(),
       id: notification.id,
@@ -53,6 +67,17 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       read: !!notification.notificationMetadata.seenAt,
       group: 'proposal',
       evaluation: notification.evaluation
+        ? {
+            actionLabels: notification.evaluation.actionLabels,
+            title: notification.evaluation.title
+          }
+        : null,
+      previousEvaluation: previousEvaluation
+        ? {
+            title: previousEvaluation.title,
+            actionLabels: previousEvaluation.actionLabels
+          }
+        : null
     } as ProposalNotification;
 
     return proposalNotification;

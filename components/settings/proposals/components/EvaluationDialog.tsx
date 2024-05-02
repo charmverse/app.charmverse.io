@@ -2,15 +2,18 @@ import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
-import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField } from '@mui/material';
+import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { useEffect } from 'react';
+import type { UseFormSetValue } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels';
 
 import { evaluationIcons } from '../constants';
 
@@ -33,6 +36,12 @@ export const schema = yup.object({
   id: yup.string().required(),
   title: yup.string().required(),
   type: yup.mixed<ProposalEvaluationType>().oneOf(evaluationTypes).required(),
+  actionLabels: yup
+    .object({
+      approve: yup.string().optional(),
+      reject: yup.string().optional()
+    })
+    .nullable(),
   permissions: yup
     .array()
     .of(
@@ -47,6 +56,54 @@ export const schema = yup.object({
 });
 
 type FormValues = yup.InferType<typeof schema>;
+
+function StepActionButtonLabel({
+  type,
+  setValue,
+  actionLabels
+}: {
+  type: ProposalEvaluationType;
+  actionLabels: WorkflowEvaluationJson['actionLabels'];
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  return customLabelEvaluationTypes.includes(type) ? (
+    <Box className='octo-propertyrow'>
+      <FieldLabel>Action labels</FieldLabel>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
+        <Box width={150}>
+          <PropertyLabel readOnly>Pass</PropertyLabel>
+        </Box>
+        <TextField
+          placeholder='Pass'
+          onChange={(e) => {
+            setValue('actionLabels', {
+              ...actionLabels,
+              approve: e.target.value
+            });
+          }}
+          fullWidth
+          value={actionLabels?.approve}
+        />
+      </Stack>
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Box width={150}>
+          <PropertyLabel readOnly>Decline</PropertyLabel>
+        </Box>
+        <TextField
+          placeholder='Decline'
+          onChange={(e) => {
+            setValue('actionLabels', {
+              ...actionLabels,
+              reject: e.target.value
+            });
+          }}
+          fullWidth
+          value={actionLabels?.reject}
+        />
+      </Stack>
+    </Box>
+  ) : null;
+}
 
 export function EvaluationDialog({
   evaluation,
@@ -65,7 +122,7 @@ export function EvaluationDialog({
     reset,
     setValue,
     watch,
-    formState: { errors, isValid }
+    formState: { isValid }
   } = useForm<FormValues>({});
 
   const dialogTitle = evaluation?.id ? 'Rename evaluation' : evaluation ? 'New evaluation step' : '';
@@ -81,7 +138,8 @@ export function EvaluationDialog({
       id: evaluation?.id || undefined,
       title: evaluation?.title,
       type: evaluation?.type,
-      permissions: evaluation?.permissions ?? []
+      permissions: evaluation?.permissions ?? [],
+      actionLabels: evaluation?.actionLabels
     });
   }, [evaluation?.id]);
 
@@ -93,6 +151,8 @@ export function EvaluationDialog({
     });
     onClose();
   }
+
+  const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
 
   return (
     <Dialog
@@ -142,6 +202,9 @@ export function EvaluationDialog({
             )}
           />
         </div>
+        {evaluation?.id && (
+          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+        )}
         {!evaluation?.id && (
           <>
             <div>
@@ -180,6 +243,7 @@ export function EvaluationDialog({
                 )}
               />
             </div>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (

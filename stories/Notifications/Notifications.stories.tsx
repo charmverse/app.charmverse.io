@@ -144,6 +144,9 @@ const proposals: ProposalNotification[] = proposalNotificationTypes
     status: 'published' as const,
     evaluation: {
       title: 'Review'
+    },
+    previousEvaluation: {
+      title: 'Feedback'
     }
   }))
   .map((notification) => ({ ...baseFields, ...notification, id: uuid() }));
