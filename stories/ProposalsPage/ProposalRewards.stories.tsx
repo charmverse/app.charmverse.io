@@ -1,5 +1,5 @@
 import { Box, Paper } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { useRef, useState } from 'react';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
@@ -76,21 +76,21 @@ export function ProposalRewards() {
 ProposalRewards.parameters = {
   msw: {
     handlers: {
-      proposals: rest.get('/api/spaces/:spaceId/proposals', (req, res, ctx) => {
-        return res(ctx.json([]));
+      proposals: http.get('/api/spaces/:spaceId/proposals', () => {
+        return HttpResponse.json([]);
       }),
-      proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
+      proposal: http.get('/api/proposals/:proposalId', () => {
         const proposal = createMockProposal({
           authors: [{ proposalId: '', userId: members[0].id }],
           status: 'published'
         });
-        return res(ctx.json(proposal));
+        return HttpResponse.json(proposal);
       }),
-      getProposalBlocks: rest.get('/api/spaces/:spaceId/proposals/blocks', (req, res, ctx) => {
-        return res(ctx.json([]));
+      getProposalBlocks: http.get('/api/spaces/:spaceId/proposals/blocks', () => {
+        return HttpResponse.json([]);
       }),
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([]);
       })
     }
   }

@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
@@ -64,7 +64,7 @@ const card1 = createMockCard(board);
 card1.fields.properties = {
   [schema.text.id]: 'First',
   [schema.checkbox.id]: 'true',
-  [schema.date.id]: '{"from":"1695067400713"}',
+  [schema.date.id]: '{"from":1695067400713}',
   [schema.email.id]: 'test1@example.com',
   [schema.multiSelect.id]: [schema.multiSelect.options[0].id, schema.multiSelect.options[1].id],
   [schema.number.id]: 7223,
@@ -125,8 +125,8 @@ export function CardPropsView() {
 CardPropsView.parameters = {
   msw: {
     handlers: {
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([boardPage, page1]);
       })
     }
   }
