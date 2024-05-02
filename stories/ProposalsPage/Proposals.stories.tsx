@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
@@ -7,9 +7,9 @@ import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/Docum
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
 import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../lib/mockData';
 
@@ -60,7 +60,7 @@ export function ProposalInEvaluation() {
 ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
-      proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
+      proposal: http.get('/api/proposals/:proposalId', () => {
         const rubricCriteria: PopulatedEvaluation['rubricCriteria'] = [
           {
             id: '1',
@@ -205,7 +205,7 @@ ProposalInEvaluation.parameters = {
             }
           ]
         });
-        return res(ctx.json(proposal));
+        return HttpResponse.json(proposal);
       })
     }
   }

@@ -2,7 +2,7 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 
 import { useCreateProposalRewards } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
-import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
+import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
@@ -20,7 +20,7 @@ export type Props = {
   onSubmit?: VoidFunction;
 };
 
-export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
+export function RewardReviewStep({ proposalId, pendingRewards, rewardIds, disabled, onSubmit }: Props) {
   const { trigger, isMutating } = useCreateProposalRewards(proposalId);
   const { showMessage } = useSnackbar();
   const { mappedFeatures } = useSpaceFeatures();
@@ -68,12 +68,7 @@ export function PublishRewardsButton({ proposalId, pendingRewards, rewardIds, di
             {page?.title || 'Untitled'}
           </Typography>
           <Stack alignItems='center' direction='row' height='100%'>
-            <RewardAmount
-              reward={reward}
-              truncate={true}
-              truncatePrecision={2}
-              typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-            />
+            <RewardAmount reward={reward} />
           </Stack>
         </Box>
       ))}

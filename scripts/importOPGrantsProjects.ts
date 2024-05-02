@@ -7,12 +7,11 @@ import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
-import { createUserFromWallet } from 'lib/users/createUser';
+import { createOrGetUserFromWallet } from 'lib/users/createUser';
 import { getProjectsImportData } from 'scripts/optimisms/getRound3Projects';
 import { DateTime } from 'luxon';
 import { isTruthy } from 'lib/utils/types';
 import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
-
 
 /*****
  * NOTE: This script creates new users and spaces for Optimism grants proposal projects.
@@ -52,16 +51,16 @@ export type ProjectInputRow = {
 };
 
 type CsvOutputRow = {
-  'proposal_title': string;
-  'space_id': string
-  'space_name': string;
-  'project_twitter': string;
-  'author_twitter': string;
-  'owner': string;
-  'space_url': string;
-  'join_url': string;
-  'space_image_url': string;
-  'created_date': string;
+  proposal_title: string;
+  space_id: string;
+  space_name: string;
+  project_twitter: string;
+  author_twitter: string;
+  owner: string;
+  space_url: string;
+  join_url: string;
+  space_image_url: string;
+  created_date: string;
 };
 
 async function importProjects() {
@@ -70,7 +69,16 @@ async function importProjects() {
   const projectsData = await getProjectsSeedData(IMPORT_TYPE);
 
   for (const projectDetails of projectsData) {
-    const { Title: projectName, SpaceName: spaceName, createdBy: adminId, avatarUrl: logo, twitterUsername: twitter, 'Author Twitter': authorTwitter, adminAddress, website } = projectDetails;
+    const {
+      Title: projectName,
+      SpaceName: spaceName,
+      createdBy: adminId,
+      avatarUrl: logo,
+      twitterUsername: twitter,
+      'Author Twitter': authorTwitter,
+      adminAddress,
+      website
+    } = projectDetails;
     const owners = [adminAddress].filter(isTruthy);
 
     const proposalTitle = projectName.replace(/(^"|"$)/g, '');
@@ -88,7 +96,7 @@ async function importProjects() {
 
     if (projectDetails !== null) {
       // temp id for local tests
-      const users = await createSpaceUsers({ projectTitle: proposalTitle, adminId, owners } );
+      const users = await createSpaceUsers({ projectTitle: proposalTitle, adminId, owners });
 
       if (users !== null) {
         const { botUser, adminUserId, owners } = users;
@@ -126,14 +134,22 @@ async function importProjects() {
         await updateTrackGroupProfile(space, 'optimism-grants');
 
         await prisma.additionalBlockQuota.create({
-          data:{
+          data: {
             spaceId: space.id,
             blockCount: EXTRA_BLOCK_QUOTA,
             expiresAt: DateTime.local().plus({ years: 1 }).endOf('day').toJSDate()
           }
-        })
+        });
 
-        const projectInfo = { proposalTitle, twitter, authorTwitter, space, spaceImageUrl: spaceImage, owner: adminUserId, website };
+        const projectInfo = {
+          proposalTitle,
+          twitter,
+          authorTwitter,
+          space,
+          spaceImageUrl: spaceImage,
+          owner: adminUserId,
+          website
+        };
 
         exportDataToCSV([projectInfo]);
         console.log('🟢 Finished Importing project', spaceName);
@@ -148,7 +164,15 @@ async function importProjects() {
   console.log('🔥 imported projects count:', projectsData.length);
 }
 
-async function createSpaceUsers({projectTitle, adminId, owners }: { projectTitle: string, adminId?: string, owners?: string[] }) {
+async function createSpaceUsers({
+  projectTitle,
+  adminId,
+  owners
+}: {
+  projectTitle: string;
+  adminId?: string;
+  owners?: string[];
+}) {
   if (!projectTitle && !owners?.length) {
     return null;
   }
@@ -167,7 +191,7 @@ async function createSpaceUsers({projectTitle, adminId, owners }: { projectTitle
   let extraOwners: string[] = [];
   if (!adminUserId && owners?.length) {
     const userPromises = owners.map(async (owner) =>
-      createUserFromWallet(
+      createOrGetUserFromWallet(
         { address: owner, skipTracking: true },
         {
           signupSource: 'optimism-project',
@@ -176,7 +200,7 @@ async function createSpaceUsers({projectTitle, adminId, owners }: { projectTitle
       )
     );
 
-    const userIds = (await Promise.all(userPromises)).map((user) => user.id);
+    const userIds = (await Promise.all(userPromises)).map(({ user }) => user.id);
     const [author, ...users] = userIds;
     adminUserId = author;
     extraOwners = users;
@@ -223,7 +247,7 @@ async function getProjectsSeedData(type: 'api' | 'csv') {
   if (type === 'api') {
     return getProjectsImportData();
   }
-  
+
   return getCsvData<ProjectInputRow>(FILE_INPUT_PATH);
 }
 
@@ -234,10 +258,9 @@ function getImportedProjectsData() {
 function getImportedProjectNames() {
   const data = getImportedProjectsData();
 
-  const names = data
-    .map((row) => {
-      return row.proposal_title || '';
-    })
+  const names = data.map((row) => {
+    return row.proposal_title || '';
+  });
 
   console.log('🔥 imported projects count', names.length);
 
@@ -246,10 +269,9 @@ function getImportedProjectNames() {
 
 function getImportedProjectSpaceNames() {
   const data = getImportedProjectsData();
-  const names = data
-    .map((row) => {
-      return row.space_name || '';
-    })
+  const names = data.map((row) => {
+    return row.space_name || '';
+  });
 
   return names;
 }
@@ -266,8 +288,8 @@ function getCsvHeader() {
     'join_url',
     'space_image_url',
     'created_date',
-    'website',
-  ]
+    'website'
+  ];
 }
 
 function exportDataToCSV(data: ProjectData[]) {
@@ -297,11 +319,10 @@ function exportDataToCSV(data: ProjectData[]) {
       website
     ];
 
-    return infoRow
+    return infoRow;
   });
 
-
-  const csvString = stringify(csvData, {  header: isEmpty, columns: getCsvHeader()  });
+  const csvString = stringify(csvData, { header: isEmpty, columns: getCsvHeader() });
 
   if (csvData.length) {
     appendFileSync(FILE_OUTPUT_PATH, csvString);

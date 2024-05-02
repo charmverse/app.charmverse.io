@@ -120,11 +120,3 @@ export async function createOrGetUserFromWallet(
     };
   }
 }
-
-export async function createUserFromWallet(
-  { id = v4(), address, email, avatar, skipTracking }: UserProps,
-  signupAnalytics: Partial<SignupAnalytics> = {}
-): Promise<LoggedInUser> {
-  const { user } = await createOrGetUserFromWallet({ id, address, email, avatar, skipTracking }, signupAnalytics);
-  return user;
-}

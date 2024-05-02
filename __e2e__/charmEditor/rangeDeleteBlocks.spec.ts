@@ -4,7 +4,7 @@ import { test as base, expect } from '@playwright/test';
 import { DocumentPage } from '__e2e__/po/document.po';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 
-import { _ } from 'testing/prosemirror/builders';
+import { _ } from 'lib/prosemirror/builders';
 
 type Fixtures = {
   documentPage: DocumentPage;

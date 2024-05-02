@@ -21,7 +21,7 @@ async function getRewardTemplatesController(req: NextApiRequest, res: NextApiRes
   });
 
   if (!spaceRole) {
-    return [];
+    return res.status(200).json([]);
   }
 
   const templates = await getRewardTemplates({

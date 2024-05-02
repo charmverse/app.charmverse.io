@@ -95,9 +95,8 @@ export function RewardTokenForm({
   useEffect(() => {
     if (values.chainId) {
       refreshCryptoList(values.chainId, values.rewardToken);
-      // setValue('rewardToken', newNativeCurrency);
     }
-  }, [values.chainId, values.rewardToken, setValue]);
+  }, [values.chainId, values.rewardToken]);
 
   useEffect(() => {
     setIsValid?.(isValid);
@@ -181,7 +180,7 @@ export function RewardTokenForm({
               }}
               required={requireTokenAmount}
               disabled={readOnly && readOnlyTokenAmount}
-              placeholder='Number greater than 0'
+              placeholder='Enter amount'
               error={!!errors.rewardAmount}
             />
           )}

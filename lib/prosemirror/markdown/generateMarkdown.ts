@@ -1,13 +1,13 @@
+import type { User } from '@charmverse/core/prisma';
 import { Node } from 'prosemirror-model';
 
 import { replaceNestedPages } from 'components/common/CharmEditor/components/nestedPage/nestedPage.utils';
 import { specRegistry } from 'components/common/CharmEditor/specRegistry';
-import type { Member } from 'lib/members/interfaces';
 
 import { markdownSerializer } from './markdownSerializer';
 
 export type CharmMarkdownGeneratorOptions = {
-  members?: Member[];
+  members?: Pick<User, 'id' | 'username'>[];
 };
 
 export async function generateMarkdown({

@@ -8,6 +8,7 @@ import { createForumPost } from 'lib/forums/posts/createForumPost';
 import { createNotificationsFromEvent } from 'lib/notifications/createNotificationsFromEvent';
 import { createPageComment } from 'lib/pages/comments/createPageComment';
 import { upsertPostCategoryPermission } from 'lib/permissions/forum/upsertPostCategoryPermission';
+import { builders as _ } from 'lib/prosemirror/builders';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 import { work } from 'lib/rewards/work';
@@ -24,7 +25,6 @@ import {
   getUserEntity
 } from 'lib/webhookPublisher/entities';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { builders as _ } from 'testing/prosemirror/builders';
 import { createPage, generateUserAndSpace } from 'testing/setupDatabase';
 import { generatePostCategory } from 'testing/utils/forums';
 import { createRole } from 'testing/utils/roles';

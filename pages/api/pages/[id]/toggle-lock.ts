@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -37,6 +38,30 @@ async function togglePageLockController(req: NextApiRequest, res: NextApiRespons
     },
     updatedPage.spaceId
   );
+
+  if (updatedPage.boardId) {
+    relay.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: [
+          {
+            id: updatedPage.id,
+            spaceId: updatedPage.spaceId,
+            type: 'board',
+            isLocked: updatedPage.isLocked,
+            pageType: updatedPage.type
+          }
+        ]
+      },
+      updatedPage.spaceId
+    );
+  }
+
+  log.info('User toggled the lock state of a page', {
+    pageId,
+    isLocked: req.body.isLocked,
+    userId
+  });
 
   res.status(200).json(updatedPage);
 }

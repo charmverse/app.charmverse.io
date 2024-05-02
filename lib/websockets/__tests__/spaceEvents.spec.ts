@@ -5,9 +5,9 @@ import { testUtilsPages, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
 import { getPagePath } from 'lib/pages';
+import { builders as _ } from 'lib/prosemirror/builders';
 import { getNodeFromJson } from 'lib/prosemirror/getNodeFromJson';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { builders as _ } from 'testing/prosemirror/builders';
 
 import { WebsocketBroadcaster } from '../broadcaster';
 import type { DocumentRoom } from '../documentEvents/docRooms';

@@ -5,6 +5,8 @@ import { SettingsModal } from './settings.po';
 export class IntegrationsSettings extends SettingsModal {
   constructor(
     page: Page,
+    public container = page.locator('data-test=integration-KYC'),
+    public connectButton = container.locator('data-test=connect-button'),
     public kycOption = page.locator('input[name=kycOption]'),
     public saveButton = page.locator('data-test=save-kyc-form'),
     public synapsApiKey = page.locator('input[name=synapsApiKey]'),

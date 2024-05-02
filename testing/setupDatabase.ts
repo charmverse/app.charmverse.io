@@ -7,7 +7,6 @@ import type {
   Bounty,
   BountyStatus,
   Comment,
-  PageComment,
   Page,
   Post,
   PostComment,
@@ -23,12 +22,10 @@ import type {
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { AnyIfEmpty } from 'react-redux';
 import { v4 } from 'uuid';
 
 import type { DataSourceType } from 'lib/databases/board';
 import type { IViewType } from 'lib/databases/boardView';
-import { generateDefaultPropertiesInput } from 'lib/members/generateDefaultPropertiesInput';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -38,9 +35,9 @@ import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
-import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { RewardWithUsers } from 'lib/rewards/interfaces';
 import { sessionUserRelations } from 'lib/session/config';
-import { createUserFromWallet } from 'lib/users/createUser';
+import { getUserProfile } from 'lib/users/getUser';
 import { uniqueValues } from 'lib/utils/array';
 import { randomETHWalletAddress } from 'lib/utils/blockchain';
 import { InvalidInputError } from 'lib/utils/errors';
@@ -50,6 +47,45 @@ import type { LoggedInUser } from 'models';
 
 import type { CustomBoardProps } from './generateBoardStub';
 import { boardWithCardsArgs } from './generateBoardStub';
+
+export async function createUserWithWallet({
+  address = randomETHWalletAddress(),
+  avatar,
+  email,
+  id = v4()
+}: {
+  address?: string;
+  email?: string;
+  id?: string;
+  avatar?: string;
+  skipTracking?: boolean;
+}) {
+  const lowercaseAddress = address.toLowerCase();
+
+  try {
+    // throws if user does not exist
+    const user = await getUserProfile('addresses', lowercaseAddress);
+    return user;
+  } catch (_) {
+    const newUser = await prisma.user.create({
+      data: {
+        avatar,
+        email,
+        id,
+        identityType: 'Wallet',
+        username: `dummy-user-${Math.random()}`,
+        path: uid(),
+        wallets: {
+          create: {
+            address: lowercaseAddress
+          }
+        }
+      },
+      include: sessionUserRelations
+    });
+    return newUser;
+  }
+}
 
 export async function generateSpaceUser({
   spaceId,
@@ -92,7 +128,7 @@ export async function generateSpaceUser({
 /**
  * Simple utility to provide a user and space object inside test code
  * @param walletAddress
- * @deprecated - this calls createUserFromWallet() which should not be called during tests. Please use generateUserAndSpace() instead
+ * @deprecated - Please use generateUserAndSpace() instead
  * @returns
  */
 export async function generateUserAndSpaceWithApiToken(
@@ -100,7 +136,7 @@ export async function generateUserAndSpaceWithApiToken(
   isAdmin = true,
   spaceName = 'Example space'
 ) {
-  const user = await createUserFromWallet({ email, address: walletAddress ?? randomETHWalletAddress() });
+  const user = await createUserWithWallet({ email, address: walletAddress ?? randomETHWalletAddress() });
 
   const existingSpaceId = user.spaceRoles?.[0]?.spaceId;
 

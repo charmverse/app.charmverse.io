@@ -1,5 +1,5 @@
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import { getFormInput, getProfectProfileFieldConfig } from 'testing/mocks/form';
+import { getFormInput, getProjectProfileFieldConfig } from 'testing/mocks/form';
 
 import { getProposalFormFields } from '../getProposalFormFields';
 
@@ -19,7 +19,7 @@ describe('getProposalFormFields', () => {
   it('Should filter out project fields', () => {
     const formField = getFormInput({
       type: 'project_profile',
-      fieldConfig: getProfectProfileFieldConfig({
+      fieldConfig: getProjectProfileFieldConfig({
         walletAddress: {
           show: true,
           private: true

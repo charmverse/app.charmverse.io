@@ -21,7 +21,7 @@ export function WalletSelector() {
   const { connector: activeConnector, isConnected } = useAccount();
   const [isLoadingConnectorId, setLoadingConnectorId] = useState<string | null>(null);
 
-  const coinbaseWalletConnector = connectors.find((c) => c.id === 'coinbaseWallet');
+  const coinbaseWalletConnector = connectors.find((c) => c.type === 'coinbaseWallet');
   const injectedConnector = connectors.find((c) => c.id === 'injected');
   const walletConnectConnector = connectors.find((c) => c.id === 'walletConnect');
 

@@ -68,7 +68,7 @@ export const projectMemberFieldProperties: ProjectFieldProperty[] = [
   },
   {
     field: 'walletAddress',
-    label: 'Wallet Address',
+    label: 'Wallet address',
     allowPrivate: true,
     columnTitle: 'Project Member Wallets',
     columnPropertyId: PROJECT_MEMBER_WALLETS_ID

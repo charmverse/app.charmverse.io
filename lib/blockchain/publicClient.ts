@@ -2,6 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { getChainById } from 'connectors/chains';
 import { createPublicClient, http } from 'viem';
 
+import { isTestEnv } from 'config/constants';
 import { getAlchemyBaseUrl } from 'lib/blockchain/provider/alchemy/client';
 
 import { getAnkrBaseUrl } from './provider/ankr/client';
@@ -21,6 +22,10 @@ export const getPublicClient = (chainId: number) => {
 
   if (!chainDetails) {
     throw new InvalidInputError(`Chain id ${chainId} not supported`);
+  }
+
+  if (isTestEnv) {
+    throw new Error('Cannot create a public client in test environment. Please mock the client instead');
   }
 
   let providerUrl: string | null = null;
@@ -43,6 +48,9 @@ export const getPublicClient = (chainId: number) => {
 
   return createPublicClient({
     chain,
-    transport: http(providerUrl)
+    transport: http(providerUrl, {
+      retryCount: 1,
+      timeout: 5000
+    })
   });
 };

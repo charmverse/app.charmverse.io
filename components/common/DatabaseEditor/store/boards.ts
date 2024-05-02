@@ -29,7 +29,7 @@ const boardsSlice = createSlice({
                     delete state.boards[board.id]
                     delete state.templates[board.id]
                 } else */
-        if (board.fields.isTemplate) {
+        if (board.fields?.isTemplate) {
           state.templates[board.id] = board;
         } else {
           const updated = Object.assign(state.boards[board.id] || {}, board);

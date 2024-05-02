@@ -20,9 +20,9 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
-import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useCharmRouter } from 'hooks/useCharmRouter';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
@@ -32,6 +32,7 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardPageProps } from 'lib/rewards/createReward';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
@@ -55,11 +56,11 @@ export function NewRewardPage({
 }) {
   const { user } = useUser();
 
+  const { showConfirmation } = useConfirmationModal();
   const spacePermissions = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
   const { space: currentSpace } = useCurrentSpace();
   const { activeView: sidebarView, setActiveView } = usePageSidebar();
-  const [selectedRewardTemplateId, setSelectedRewardTemplateId] = useState<null | string>();
   const [rewardTemplateId, setRewardTemplateId] = useState<null | undefined | string>(templateIdFromUrl);
   const [, setPageTitle] = usePageTitle();
   const { data: sourceTemplate } = useGetRewardTemplate(rewardTemplateId);
@@ -70,11 +71,8 @@ export function NewRewardPage({
   const containerWidthRef = useRef<HTMLDivElement>(null);
   const { width: containerWidth = 0 } = useResizeObserver({ ref: containerWidthRef });
   const isSmallScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
-  const [pageData, setPageData] = useState<{
-    title: string;
-    content: PageContent | null;
-    contentText: string;
-  }>({
+
+  const [pageData, setPageData] = useState<RewardPageProps>({
     title: '',
     content: null,
     contentText: ''
@@ -118,10 +116,12 @@ export function NewRewardPage({
   }
 
   function applyTemplate(template: RewardTemplate) {
+    setRewardTemplateId(template.page.id);
     setPageData({
       content: template.page.content as PageContent,
       contentText: template.page.contentText,
-      title: pageData.title
+      title: pageData.title,
+      sourceTemplateId: template.page.id
     });
     setRewardValues({
       assignedSubmitters: template.assignedSubmitters,
@@ -139,7 +139,6 @@ export function NewRewardPage({
       selectedCredentialTemplates: template.selectedCredentialTemplates,
       fields: template.fields
     });
-    setRewardTemplateId(template.page.id);
     const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template);
     if (workflow) {
       applyWorkflow(workflow);
@@ -170,11 +169,8 @@ export function NewRewardPage({
   const saveForm = async (isDraft?: boolean) => {
     setSubmittedDraft(!!isDraft);
     const createdReward = await createReward({
-      content: pageData.content,
-      contentText: pageData.contentText,
-      title: pageData.title,
+      ...pageData,
       type: rewardPageType,
-      sourceTemplateId: sourceTemplate?.page.id,
       isDraft
     });
 
@@ -285,7 +281,15 @@ export function NewRewardPage({
                                       } else if (pageData.contentText?.length === 0) {
                                         setRewardTemplateId(page.id);
                                       } else {
-                                        setSelectedRewardTemplateId(page.id);
+                                        showConfirmation({
+                                          message:
+                                            'Are you sure you want to overwrite your current content with the template?',
+                                          title: 'Overwriting your content',
+                                          confirmButton: 'Overwrite',
+                                          onConfirm: () => {
+                                            setRewardTemplateId(page.id);
+                                          }
+                                        });
                                       }
                                     }}
                                   />
@@ -317,14 +321,14 @@ export function NewRewardPage({
                         onContentChange={applyRewardContent}
                         focusOnInit
                         isContentControlled
-                        key={rewardTemplateId}
+                        key={pageData.sourceTemplateId}
                       />
                     </>
                   )}
                   {currentTab === 1 && (
                     <RewardEvaluations
                       onChangeWorkflow={applyWorkflow}
-                      templateId={rewardTemplateId}
+                      templateId={pageData.sourceTemplateId}
                       isTemplate={!!isTemplate}
                       isUnpublishedReward
                       rewardInput={rewardValues}
@@ -368,25 +372,11 @@ export function NewRewardPage({
           // if creating a reward from template then disable the reward properties
           readOnly={!isAdmin && !!rewardTemplateId && !isTemplate}
           isTemplate={!!isTemplate}
-          templateId={rewardTemplateId}
+          templateId={pageData.sourceTemplateId}
           isUnpublishedReward
           rewardInput={rewardValues}
           onChangeReward={(updates) => {
             setRewardValues(updates);
-          }}
-        />
-        <ConfirmDeleteModal
-          onClose={() => {
-            setSelectedRewardTemplateId(null);
-          }}
-          open={!!selectedRewardTemplateId}
-          title='Overwriting your content'
-          buttonText='Overwrite'
-          secondaryButtonText='Go back'
-          question='Are you sure you want to overwrite your current content with the reward template content?'
-          onConfirm={() => {
-            setRewardTemplateId(selectedRewardTemplateId!);
-            setSelectedRewardTemplateId(null);
           }}
         />
       </DocumentColumnLayout>

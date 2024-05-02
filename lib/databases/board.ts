@@ -103,6 +103,7 @@ export type BoardFields = {
 export type Board = UIBlockWithDetails & {
   pageType: Exclude<UIBlockWithDetails['pageType'], undefined>;
   fields: BoardFields;
+  isLocked?: boolean | null;
 };
 
 export type BoardGroup = {
@@ -154,6 +155,7 @@ export function createBoard({
     pageType: 'board',
     ...createBlock(block),
     type: 'board',
+    isLocked: block?.isLocked,
     fields: {
       showDescription: block?.fields?.showDescription ?? false,
       description: block?.fields?.description ?? '',

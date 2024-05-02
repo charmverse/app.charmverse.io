@@ -138,4 +138,12 @@ export class DatabasePage extends GlobalPage {
   getCardDetailsTextInput() {
     return this.page.locator('data-test=card-detail-properties').locator('textarea.octo-propertyvalue').first();
   }
+
+  async waitForBlocksUpdate() {
+    await this.page.waitForResponse('**/api/blocks');
+  }
+
+  async waitForBlockRelationsUpdate() {
+    await this.page.waitForResponse('**/api/blocks/relation/sync-values');
+  }
 }

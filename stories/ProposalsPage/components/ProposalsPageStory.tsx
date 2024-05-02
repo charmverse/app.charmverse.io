@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { v4 } from 'uuid';
 
@@ -7,9 +7,9 @@ import { ProposalsProvider } from 'components/proposals/hooks/useProposals';
 import { ProposalsBoardProvider } from 'components/proposals/hooks/useProposalsBoard';
 import { ProposalsPage } from 'components/proposals/ProposalsPage';
 import { ProposalBlocksProvider } from 'hooks/useProposalBlocks';
+import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
-import { builders as _, jsonDoc } from 'testing/prosemirror/builders';
 
 import { members, userProfile } from '../../lib/mockData';
 
@@ -101,17 +101,18 @@ export const pages = proposals.map((p, i) =>
 ProposalsPageStory.parameters = {
   msw: {
     handlers: {
-      proposals: rest.get('/api/spaces/:spaceId/proposals', (req, res, ctx) => {
-        return res(ctx.json(proposals));
+      proposals: http.get('/api/spaces/:spaceId/proposals', () => {
+        return HttpResponse.json(proposals);
       }),
-      getProposalBlocks: rest.get('/api/spaces/:spaceId/proposals/blocks', (req, res, ctx) => {
-        return res(ctx.json([]));
+      getProposalBlocks: http.get('/api/spaces/:spaceId/proposals/blocks', () => {
+        return HttpResponse.json([]);
       }),
-      createProposalBlocks: rest.post('/api/spaces/:spaceId/proposals/blocks', (req, res, ctx) => {
-        return res(ctx.json(req.body));
+      createProposalBlocks: http.post('/api/spaces/:spaceId/proposals/blocks', async ({ request }) => {
+        const body = await request.json();
+        return HttpResponse.json(body);
       }),
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json(pages));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json(pages);
       })
     }
   }

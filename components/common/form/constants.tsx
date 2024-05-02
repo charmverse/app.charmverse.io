@@ -12,6 +12,7 @@ import NotesIcon from '@mui/icons-material/Notes';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
+import BountyIcon from '@mui/icons-material/RequestPageOutlined';
 import ShortTextIcon from '@mui/icons-material/ShortText';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
 import type { ReactNode } from 'react';
@@ -31,10 +32,12 @@ export const formFieldTypes = [
   'person',
   'label',
   'image',
-  'file'
+  'file',
+  'milestone'
 ] as FormFieldType[];
 
-export const nonDuplicateFieldTypes = ['project_profile'] as FormFieldType[];
+export const nonDuplicateFieldTypes = ['project_profile', 'milestone'] as FormFieldType[];
+export const nonPrivateFieldTypes = ['label', 'project_profile', 'milestone'] as FormFieldType[];
 
 export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   date: 'Date',
@@ -51,7 +54,8 @@ export const fieldTypeLabelRecord: Record<FormFieldType, string> = {
   wallet: 'Wallet Address',
   image: 'Image',
   file: 'File',
-  project_profile: 'Project Profile'
+  project_profile: 'Project Profile',
+  milestone: 'Milestone'
 };
 
 export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
@@ -69,7 +73,8 @@ export const fieldTypeIconRecord: Record<FormFieldType, ReactNode> = {
   person: <PersonIcon fontSize='small' />,
   image: <ImageIcon fontSize='small' />,
   file: <AttachFileIcon fontSize='small' />,
-  project_profile: <AccountBoxIcon fontSize='small' />
+  project_profile: <AccountBoxIcon fontSize='small' />,
+  milestone: <BountyIcon fontSize='small' />
 };
 
 export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
@@ -87,5 +92,6 @@ export const fieldTypePlaceholderRecord: Record<FormFieldType, string> = {
   person: 'Select one or more people',
   image: 'Upload an image',
   file: 'Upload a file',
-  project_profile: 'Fill up project profile'
+  project_profile: 'Fill up project profile',
+  milestone: 'Add up milestone'
 };

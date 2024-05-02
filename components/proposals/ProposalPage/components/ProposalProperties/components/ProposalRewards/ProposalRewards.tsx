@@ -6,8 +6,7 @@ import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { MilestonePropertiesForm } from 'components/rewards/components/RewardProperties/MilestonePropertiesForm';
-import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
+import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useCharmRouter } from 'hooks/useCharmRouter';
@@ -18,6 +17,7 @@ import { isTruthy } from 'lib/utils/types';
 import { useProposalRewards } from '../../hooks/useProposalRewards';
 
 import { AttachRewardButton } from './AttachRewardButton';
+import { ProposalRewardsForm } from './ProposalRewardsForm';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -49,7 +49,7 @@ export function ProposalRewards({
   const { getFeatureTitle } = useSpaceFeatures();
   const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
-  const canCreatePendingRewards = !readOnly && !rewardIds?.length;
+  const canCreatePendingRewards = !readOnly && !rewardIds?.length && !isProposalTemplate;
 
   const {
     createNewReward,
@@ -102,12 +102,7 @@ export function ProposalRewards({
                   </Typography>
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
-                      <RewardAmount
-                        reward={reward}
-                        truncate={true}
-                        truncatePrecision={2}
-                        typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                      />
+                      <RewardAmount reward={reward} />
                     </Stack>
                   </Hidden>
                 </Stack>
@@ -148,12 +143,7 @@ export function ProposalRewards({
                       <Hidden lgDown>
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
-                            <RewardAmount
-                              reward={reward}
-                              truncate={true}
-                              truncatePrecision={2}
-                              typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                            />
+                            <RewardAmount reward={reward} />
                           </Stack>
                         </Grid>
                       </Hidden>
@@ -190,7 +180,7 @@ export function ProposalRewards({
           })}
 
           {canCreatePendingRewards && (
-            <Box>
+            <Box className='dont-print-me'>
               <AttachRewardButton createNewReward={createNewReward} variant={variant} />
             </Box>
           )}
@@ -215,7 +205,7 @@ export function ProposalRewards({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <MilestonePropertiesForm
+          <ProposalRewardsForm
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward

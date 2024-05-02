@@ -46,7 +46,8 @@ const testValues: Record<TestedFormFieldTypes, string> = {
   wallet: '0x888888CfAebbEd5554c3F36BfBD233f822e9455f',
   date: '2022-12-31',
   label: 'Label',
-  project_profile: 'Project profile'
+  project_profile: 'Project profile',
+  milestone: 'Milestone'
 };
 
 test.beforeAll(async () => {
