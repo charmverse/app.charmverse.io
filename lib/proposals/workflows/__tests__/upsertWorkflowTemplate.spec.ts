@@ -179,6 +179,65 @@ describe('Saving space workflows', () => {
     expect(template?.evaluations[0].id).toBe(proposalTemplate.evaluations[0].id);
     expect(template?.evaluations[0].title).toBe('Updated Feedback title');
   });
+
+  it(`Should update existing proposal and templates action button labels if evaluation is updated`, async () => {
+    const originalEvaluationId = uuid();
+    const workflow = await generateWorkflow({
+      spaceId: space.id,
+      evaluations: [
+        {
+          id: originalEvaluationId,
+          title: 'Review',
+          type: 'pass_fail',
+          permissions: []
+        }
+      ]
+    });
+
+    const proposalTemplate = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      pageType: 'proposal_template',
+      workflowId: workflow.id,
+      evaluationInputs: [
+        {
+          title: 'Review',
+          evaluationType: 'pass_fail',
+          reviewers: [],
+          permissions: []
+        }
+      ]
+    });
+
+    await upsertWorkflowTemplate({
+      ...workflow,
+      evaluations: [
+        {
+          id: originalEvaluationId,
+          title: 'Review title',
+          type: 'pass_fail',
+          actionButtonLabels: {
+            approve: 'Approve',
+            reject: 'Reject'
+          },
+          permissions: []
+        }
+      ]
+    });
+    const template = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposalTemplate.id
+      },
+      include: {
+        evaluations: true
+      }
+    });
+    expect(template?.evaluations[0].id).toBe(proposalTemplate.evaluations[0].id);
+    expect(template?.evaluations[0].actionButtonLabels).toStrictEqual({
+      approve: 'Approve',
+      reject: 'Reject'
+    });
+  });
 });
 
 function generateWorkflow({ spaceId, evaluations }: { spaceId: string; evaluations?: WorkflowEvaluationJson[] }) {
