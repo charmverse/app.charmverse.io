@@ -1,7 +1,7 @@
 import type { Space, KycOption } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Grid from '@mui/material/Grid';
-import { useEffect } from 'react';
+import { Typography, Grid } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -9,6 +9,8 @@ import { useGetKycCredentials, useUpdateSpace, useUpdateKycCredentials } from 'c
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { KycCredentials } from 'lib/kyc/getKycCredentials';
+
+import { IntegrationContainer } from '../IntegrationContainer';
 
 import { KycIntegrationFields } from './KycIntegrationFields';
 import { PersonaModal } from './PersonaModal';
@@ -43,10 +45,10 @@ const schema = yup.object({
     }),
   kycOption: yup.string().oneOf<KycOption>(['synaps', 'persona']).nullable()
 });
-
 export type FormValues = yup.InferType<typeof schema>;
 
 export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: boolean }) {
+  const [expanded, setExpanded] = useState(false);
   const { refreshCurrentSpace } = useCurrentSpace();
   const { data: kycCredentials, mutate: mutateKycCredentials } = useGetKycCredentials(space.id);
   const { trigger: updateKycCredential, isMutating: kycUpdateCredentialsLoading } = useUpdateKycCredentials(space.id);
@@ -110,52 +112,63 @@ export function KycIntegration({ space, isAdmin }: { space: Space; isAdmin: bool
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Grid container spacing={3} direction='column'>
-        {kycCredentials && (
-          <Grid item>
-            <KycIntegrationFields control={control} isAdmin={isAdmin} />
-          </Grid>
-        )}
-        {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
-          <Grid item>
-            <SynapsModal spaceId={space.id} />
-          </Grid>
-        )}
-        {isAdmin &&
-          space.kycOption === 'persona' &&
-          kycCredentials?.persona?.apiKey &&
-          kycCredentials.persona.templateId && (
+    <IntegrationContainer
+      isConnected={!!space.kycOption}
+      expanded={expanded}
+      setExpanded={setExpanded}
+      title='KYC'
+      subheader='Verify the identity of your members'
+    >
+      <Typography variant='body2' mb={2}>
+        Choose your provider
+      </Typography>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <Grid container spacing={3} direction='column'>
+          {kycCredentials && (
             <Grid item>
-              <PersonaModal spaceId={space.id} />
+              <KycIntegrationFields control={control} isAdmin={isAdmin} />
             </Grid>
           )}
-        {isAdmin && kycCredentials && isDirty && (
-          <Grid item alignSelf='end'>
-            {isDirty && (
+          {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
+            <Grid item>
+              <SynapsModal spaceId={space.id} />
+            </Grid>
+          )}
+          {isAdmin &&
+            space.kycOption === 'persona' &&
+            kycCredentials?.persona?.apiKey &&
+            kycCredentials.persona.templateId && (
+              <Grid item>
+                <PersonaModal spaceId={space.id} />
+              </Grid>
+            )}
+          {isAdmin && kycCredentials && isDirty && (
+            <Grid item alignSelf='end'>
+              {isDirty && (
+                <Button
+                  disableElevation
+                  variant='outlined'
+                  disabled={isLoading || !isDirty}
+                  onClick={resetValues}
+                  sx={{ mr: 2 }}
+                >
+                  Cancel
+                </Button>
+              )}
               <Button
                 disableElevation
-                variant='outlined'
                 disabled={isLoading || !isDirty}
-                onClick={resetValues}
-                sx={{ mr: 2 }}
+                type='submit'
+                loading={isLoading}
+                data-test='save-kyc-form'
               >
-                Cancel
+                Save
               </Button>
-            )}
-            <Button
-              disableElevation
-              disabled={isLoading || !isDirty}
-              type='submit'
-              loading={isLoading}
-              data-test='save-kyc-form'
-            >
-              Save
-            </Button>
-          </Grid>
-        )}
-      </Grid>
-    </form>
+            </Grid>
+          )}
+        </Grid>
+      </form>
+    </IntegrationContainer>
   );
 }
 

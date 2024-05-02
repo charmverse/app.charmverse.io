@@ -1,4 +1,5 @@
 import CheckCircleOutlineOutlined from '@mui/icons-material/CheckCircleOutlineOutlined';
+import LaunchIcon from '@mui/icons-material/LaunchOutlined';
 import { Chip, List, ListItem, Stack, TextField, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -9,17 +10,15 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { isProdEnv } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
 
-import { IntegrationContainer } from './IntegrationContainer';
+import { IntegrationContainer } from '../IntegrationContainer';
 
 const collablandStoreUrl = isProdEnv ? 'https://cc.collab.land/dashboard' : 'https://cc-qa.collab.land/dashboard';
 
-export function ConnectCollabland() {
+export function ConnectCollabland({ isAdmin }: { isAdmin: boolean }) {
   const [expanded, setExpanded] = useState(false);
   const { space } = useCurrentSpace();
-  const isAdmin = useIsAdmin();
   const [isConnecting, setIsConnecting] = useState(false);
   const { showMessage } = useSnackbar();
   const connectCollablandModalState = usePopupState({ variant: 'popover', popupId: 'connect-collabland' });
@@ -44,28 +43,26 @@ export function ConnectCollabland() {
       expanded={expanded}
       setExpanded={setExpanded}
       title='Collab.Land'
-      disableConnectTooltip={
-        !isAdmin ? 'Collab.Land is not connected yet. Only space admins can configure this' : undefined
-      }
+      subheader='Sync members and roles with Discord'
+      disableConnectTooltip={!isAdmin ? 'Collab.Land is not connected yet. Only admins can configure this' : undefined}
     >
       <Stack gap={2}>
         <Typography variant='body2'>
-          To connect your space with Collab.Land, you will need to install our mini-app in their marketplace
+          To connect your space with Collab.Land, you will need to install our mini-app in their marketplace.
         </Typography>
-        <List dense sx={{ mt: -1, mx: 2, listStyleType: 'disc', listStylePosition: 'outside' }}>
-          {[
-            'You will visit CollabLand Command Center',
-            'Connect your Discord Account',
-            'Install one of the CharmVerse plugin',
-            'Return to your CharmVerse space and your roles will be synced'
-          ].map((step) => (
-            <ListItem key={step} sx={{ px: 0, display: 'list-item' }}>
-              <Typography variant='body2'>{step}</Typography>
-            </ListItem>
-          ))}
+        <List dense sx={{ my: 0, mx: 2, p: 0, listStyleType: 'numeral', listStylePosition: 'outside' }}>
+          {['Visit CollabLand Command Center', 'Login with your Discord Account', 'Install the CharmVerse plugin'].map(
+            (step) => (
+              <ListItem key={step} sx={{ px: 1, display: 'list-item' }}>
+                <Typography variant='body2'>{step}</Typography>
+              </ListItem>
+            )
+          )}
         </List>
         <div>
-          <Button onClick={redirectToCollablandStore}>Go to Collab.Land</Button>
+          <Button variant='outlined' endIcon={<LaunchIcon fontSize='small' />} onClick={redirectToCollablandStore}>
+            Visit Collab.Land
+          </Button>
         </div>
       </Stack>
     </IntegrationContainer>

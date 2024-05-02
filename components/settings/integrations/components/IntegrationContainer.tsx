@@ -1,13 +1,21 @@
-import { Card, CardContent, CardHeader, Collapse, Divider, Slide } from '@mui/material';
+import styled from '@emotion/styled';
+import { Card, CardContent, CardHeader, Collapse, Divider, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
 import { Button } from 'components/common/Button';
+
+const StyledCard = styled(Card)`
+  .MuiCardHeader-action {
+    margin: 0;
+  }
+`;
 
 export function IntegrationContainer({
   expanded,
   setExpanded,
   title,
   isConnected,
+  subheader,
   connectedSummary,
   disableConnectTooltip,
   children
@@ -15,6 +23,7 @@ export function IntegrationContainer({
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
   title: string;
+  subheader: string;
   isConnected: boolean;
   connectedSummary?: ReactNode | string;
   disableConnectTooltip?: string;
@@ -24,10 +33,16 @@ export function IntegrationContainer({
     setExpanded(!expanded);
   }
   return (
-    <Card variant='outlined'>
+    <StyledCard variant='outlined'>
       <CardHeader
-        subheader={<strong>{title}</strong>}
-        sx={{ cursor: !expanded ? 'pointer' : undefined, p: 3 }}
+        disableTypography
+        title={
+          <Typography fontWeight='bold' lineHeight={1}>
+            {title}
+          </Typography>
+        }
+        subheader={<Typography variant='caption'>{subheader}</Typography>}
+        sx={{ cursor: !expanded ? 'pointer' : undefined, p: 2 }}
         onClick={!expanded ? clickAction : undefined}
         action={
           !isConnected ? (
@@ -60,6 +75,6 @@ export function IntegrationContainer({
       <Collapse in={expanded}>
         <CardContent>{children}</CardContent>
       </Collapse>
-    </Card>
+    </StyledCard>
   );
 }

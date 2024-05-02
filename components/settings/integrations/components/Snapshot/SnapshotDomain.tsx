@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, TextField } from '@mui/material';
+import { Box, Stack, TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -8,11 +8,13 @@ import * as yup from 'yup';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
+import FieldLabel from 'components/common/form/FieldLabel';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { isTruthy } from 'lib/utils/types';
 
-import { IntegrationContainer } from './IntegrationContainer';
+import { IntegrationContainer } from '../IntegrationContainer';
 
 const schema = yup.object({
   snapshotDomain: yup
@@ -66,19 +68,23 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
           Connected to <strong>{space.snapshotDomain}</strong>
         </>
       }
-      title='Snapshot.org domain'
+      title='Snapshot.org'
+      subheader='Publish votes to Snapshot'
     >
-      <Box display='flex' gap={2} flexDirection='column'>
-        <TextField
-          {...register('snapshotDomain')}
-          InputProps={{
-            startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
-          }}
-          disabled={!isAdmin}
-          fullWidth
-          error={!!errors.snapshotDomain?.message}
-          helperText={errors.snapshotDomain?.message}
-        />
+      <Stack gap={2}>
+        <div>
+          <FieldLabel>Snapshot domain</FieldLabel>
+          <TextField
+            {...register('snapshotDomain')}
+            InputProps={{
+              startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
+            }}
+            disabled={!isAdmin}
+            fullWidth
+            error={!!errors.snapshotDomain?.message}
+            helperText={errors.snapshotDomain?.message}
+          />
+        </div>
         <Box display='flex' justifyContent='flex-end'>
           <Button
             disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
@@ -90,7 +96,7 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
             Save
           </Button>
         </Box>
-      </Box>
+      </Stack>
     </IntegrationContainer>
   );
 }
