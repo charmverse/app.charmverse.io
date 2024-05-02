@@ -31,16 +31,27 @@ const schema = yup.object({
     .nullable()
     .when('kycOption', {
       is: (val: KycOption | null) => val === 'persona',
-      then: () => yup.string().required('Field is required'),
+      then: () =>
+        yup
+          .string()
+          .required('Field is required')
+          .test('personaApiKey', 'Invalid api key', (value) => value.startsWith('persona_')),
       otherwise: () => yup.string()
     }),
-  personaSecret: yup.string().nullable(),
+  personaSecret: yup
+    .string()
+    .nullable()
+    .test('personaSecret', 'Invalid secret', (value) => (value ? value?.startsWith('wbhsec_') : true)),
   personaTemplateId: yup
     .string()
     .nullable()
     .when('kycOption', {
       is: (val: KycOption | null) => val === 'persona',
-      then: () => yup.string().required('Field is required'),
+      then: () =>
+        yup
+          .string()
+          .required('Field is required')
+          .test('templateId', 'Invalid template id', (value) => value.startsWith('itmpl_')),
       otherwise: () => yup.string()
     }),
   kycOption: yup.string().oneOf<KycOption | ''>(['synaps', 'persona', '']).nullable()
