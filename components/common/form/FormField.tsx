@@ -23,6 +23,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ProjectFormEditor } from 'components/settings/projects/components/ProjectForm';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { emptyDocument } from 'lib/prosemirror/constants';
@@ -42,7 +43,6 @@ import {
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
-import type { FormFieldInput } from './interfaces';
 
 export const FormFieldContainer = styled(Stack, {
   shouldForwardProp(propName) {

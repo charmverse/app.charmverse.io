@@ -1,6 +1,6 @@
 import { CharmEditor } from 'components/common/CharmEditor';
+import { jsonDoc, builders as _ } from 'lib/prosemirror/builders';
 import { render, MockDataProvider } from 'testing/customRender';
-import { jsonDoc, builders as _ } from 'testing/prosemirror/builders';
 
 jest.mock('components/common/CharmEditor/components/inlineDatabase/components/InlineDatabase', () => ({}));
 jest.mock('components/common/CharmEditor/components/poll/PollComponent', () => ({}));

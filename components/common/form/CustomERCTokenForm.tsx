@@ -289,7 +289,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
               <Alert severity={formError.severity}>{formError.message}</Alert>
             </Grid>
           )}
-          <Grid item>
+          <Grid item sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               data-test='create-token-payment-method'
               type='submit'

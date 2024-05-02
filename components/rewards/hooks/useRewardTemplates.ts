@@ -18,7 +18,7 @@ export function useRewardTemplates(
   const { subscribe } = useWebSocketClient();
   const { data: templates, mutate, isLoading } = useGetRewardTemplatesBySpace(load ? space?.id : null);
 
-  const filteredTemplates = skipDraft ? templates?.filter((template) => template.reward.status !== 'draft') : templates;
+  const filteredTemplates = skipDraft ? templates?.filter((template) => template.status !== 'draft') : templates;
 
   useEffect(() => {
     function handleDeleteEvent(deletedPages: WebSocketPayload<'pages_deleted'>) {

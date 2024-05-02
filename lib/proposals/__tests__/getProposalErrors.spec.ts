@@ -2,12 +2,11 @@ import { createMockPage } from 'testing/mocks/page';
 import { createMockProposal } from 'testing/mocks/proposal';
 
 import { getProposalErrors } from '../getProposalErrors';
+import type { ProposalFields } from '../interfaces';
 
 describe('getProposalErrors', () => {
   it(`Should return true for the default state`, async () => {
-    const proposal = createMockProposal({
-      workflowId: 'test'
-    });
+    const proposal = createMockProposal();
     const input = getFunctionInput({ proposal });
     const errors = getProposalErrors(input);
 
@@ -44,13 +43,67 @@ describe('getProposalErrors', () => {
 
     expect(errors).toContain('Rubric criteria is missing a label in the "Test" step');
   });
+
+  it(`Should return false when token amount is missing`, async () => {
+    const proposal = createMockProposal({
+      fields: {
+        pendingRewards: [
+          {
+            draftId: 'draftId',
+            page: { content: null, contentText: '' },
+            reward: {
+              chainId: 1,
+              rewardType: 'token',
+              rewardToken: 'ETH',
+              rewardAmount: null
+            }
+          }
+        ]
+      },
+      workflowId: 'workflowId'
+    });
+    const errors = getProposalErrors(
+      getFunctionInput({
+        proposal
+      })
+    );
+
+    expect(errors).toContain('Token amount is required for milestones');
+  });
+
+  it(`Should return true when token amount is valid`, async () => {
+    const proposal = createMockProposal({
+      fields: {
+        pendingRewards: [
+          {
+            draftId: 'draftId',
+            page: { content: null, contentText: '' },
+            reward: {
+              chainId: 1,
+              rewardType: 'token',
+              rewardToken: 'ETH',
+              rewardAmount: 0.002
+            }
+          }
+        ]
+      },
+      workflowId: 'workflowId'
+    });
+    const errors = getProposalErrors(
+      getFunctionInput({
+        proposal
+      })
+    );
+
+    expect(errors).toHaveLength(0);
+  });
 });
 
 type GetProposalErrorsInput = Parameters<typeof getProposalErrors>[0];
 
 function getFunctionInput({
   proposal,
-  page = createMockPage({ title: 'dummy title' })
+  page = createMockPage({ type: 'proposal', title: 'dummy title' })
 }: {
   proposal: ReturnType<typeof createMockProposal>;
   page?: ReturnType<typeof createMockPage>;
@@ -61,12 +114,13 @@ function getFunctionInput({
     requireTemplates: false,
     proposal: {
       ...proposal,
+      fields: proposal.fields as ProposalFields,
       authors: proposal.authors.map((author) => author.userId),
       evaluations: proposal.evaluations.map((evaluation) => ({
         ...evaluation,
         voteSettings: evaluation.voteSettings as any
       }))
-    },
+    } as any,
     page
   };
 }

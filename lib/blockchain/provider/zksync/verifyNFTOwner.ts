@@ -1,8 +1,8 @@
 import ERC721_ABI from 'abis/ERC721.json';
 
+import { getPublicClient } from 'lib/blockchain/publicClient';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
-import { getClient } from './client';
 import type { SupportedChainId } from './config';
 
 /**
@@ -19,7 +19,7 @@ export async function verifyNFTOwner({
   tokenId: number | string;
   chainId: SupportedChainId;
 }): Promise<boolean> {
-  const { client } = getClient({ chainId });
+  const client = getPublicClient(chainId);
 
   const owner = await client.readContract({
     abi: ERC721_ABI,

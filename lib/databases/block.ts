@@ -1,17 +1,15 @@
-import type { PageType, Block as PrismaBlock, Page } from '@charmverse/core/prisma';
+import type { Page, PageType, Block as PrismaBlock } from '@charmverse/core/prisma';
 import difference from 'lodash/difference';
 import { v4 } from 'uuid';
 
 import type { OptionalFalseyFields } from 'lib/utils/objects';
 import { replaceS3Domain } from 'lib/utils/url';
 
-import { Constants } from './constants';
-
 // export const contentBlockTypes = ['text', 'image', 'divider', 'checkbox'] as const;
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
 export type BlockTypes = (typeof blockTypes)[number];
 
-type PageFields = Pick<
+export type PageFieldsForBlock = Pick<
   Page,
   | 'bountyId'
   | 'deletedAt'
@@ -25,7 +23,24 @@ type PageFields = Pick<
   | 'type'
   | 'updatedBy'
   | 'updatedAt'
->;
+> &
+  Partial<Pick<Page, 'isLocked'>>;
+
+export const pageFieldsForBlockPrismaSelect: Record<keyof PageFieldsForBlock, true> = {
+  bountyId: true,
+  deletedAt: true,
+  galleryImage: true,
+  hasContent: true,
+  headerImage: true,
+  icon: true,
+  id: true,
+  syncWithPageId: true,
+  title: true,
+  type: true,
+  updatedBy: true,
+  updatedAt: true,
+  isLocked: true
+};
 
 export type BlockPatch = {
   spaceId?: string;
@@ -70,6 +85,7 @@ export type BlockWithDetails = OptionalFalseyFields<
     hasContent?: boolean;
     pageType?: PageType;
     syncWithPageId?: string;
+    isLocked?: boolean | null;
   }
 > &
   Pick<PrismaBlock, RequiredFields> & { fields: Record<string, any>; type: BlockTypes };
@@ -81,6 +97,7 @@ export type UIBlockWithDetails = Block & {
   icon?: string;
   hasContent?: boolean;
   pageType?: PageType;
+  isLocked?: boolean | null;
 };
 
 // cant think of a better word for this.. handle some edge cases with types from the prisma client
@@ -116,14 +133,14 @@ export function createPatchesFromBlocks(newBlock: Block, oldBlock: Block): Block
   const newDeletedFields = difference(Object.keys(newBlock.fields), Object.keys(oldBlock.fields));
   const newUpdatedFields: Record<string, any> = {};
   const newUpdatedData: Record<string, any> = {};
-  Object.keys(newBlock.fields).forEach((val) => {
-    if (oldBlock.fields[val] !== newBlock.fields[val]) {
-      newUpdatedFields[val] = newBlock.fields[val];
+  Object.keys(newBlock.fields).forEach((key) => {
+    if (oldBlock.fields[key] !== newBlock.fields[key]) {
+      newUpdatedFields[key] = newBlock.fields[key];
     }
   });
-  Object.keys(newBlock).forEach((val) => {
-    if (val !== 'fields' && (oldBlock as any)[val] !== (newBlock as any)[val]) {
-      newUpdatedData[val] = (newBlock as any)[val];
+  Object.keys(newBlock).forEach((key) => {
+    if (key !== 'fields' && (oldBlock as any)[key] !== (newBlock as any)[key]) {
+      newUpdatedData[key] = (newBlock as any)[key];
     }
   });
 
@@ -208,7 +225,7 @@ export function prismaToBlock(block: PrismaBlock): Block {
   };
 }
 
-export function prismaToUIBlock(block: PrismaBlock, page: PageFields): UIBlockWithDetails {
+export function prismaToUIBlock(block: PrismaBlock, page: PageFieldsForBlock): UIBlockWithDetails {
   return blockToUIBlock(applyPageToBlock(block, page));
 }
 
@@ -233,7 +250,7 @@ export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
 }
 
 // mutative method, for performance reasons
-export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWithDetails {
+export function applyPageToBlock(block: PrismaBlock, page: PageFieldsForBlock): BlockWithDetails {
   const blockWithDetails = block as BlockWithDetails;
   blockWithDetails.deletedAt = page.deletedAt || undefined;
   blockWithDetails.bountyId = page.bountyId || undefined;
@@ -246,6 +263,7 @@ export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWit
   blockWithDetails.pageType = page.type;
   blockWithDetails.updatedAt = page.updatedAt;
   blockWithDetails.updatedBy = page.updatedBy;
+  blockWithDetails.isLocked = !!page.isLocked;
   // used for sorting
   // if (blockWithDetails.type === 'card') {
   //   blockWithDetails.fields ||= { properties: {} };

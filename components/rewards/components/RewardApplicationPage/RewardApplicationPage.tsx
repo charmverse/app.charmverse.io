@@ -298,6 +298,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
                         readOnly={!page?.permissionFlags?.edit_content}
                         application={application}
                         reward={reward}
+                        templateId={page?.sourceTemplateId}
                         refreshApplication={refreshApplication}
                         onChangeReward={updateReward}
                         refreshReward={refreshReward}
@@ -317,6 +318,7 @@ export function RewardApplicationPage({ applicationId: _applicationId, rewardId 
             openSidebar: () => setActiveView('reward_evaluation')
           }}
           page={page}
+          templateId={page?.sourceTemplateId}
           readOnly={!page?.permissionFlags?.edit_content}
           application={application}
           reward={reward}

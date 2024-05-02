@@ -1,6 +1,8 @@
-import type { Block, Prisma } from '@charmverse/core/prisma-client';
+import type { Block, Page, Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { PageFieldsForBlock } from '../block';
+import { applyPageToBlock, pageFieldsForBlockPrismaSelect } from '../block';
 import type { IPropertyTemplate } from '../board';
 import type { CardFields } from '../card';
 
@@ -125,7 +127,7 @@ export async function syncRelatedCardsValues(
     }
   }
 
-  return prisma.$transaction([
+  const updatedBlocks = await prisma.$transaction([
     ...prismaPromises,
     prisma.block.update({
       where: {
@@ -143,4 +145,30 @@ export async function syncRelatedCardsValues(
       }
     })
   ]);
+
+  const pages = await prisma.page
+    .findMany({
+      where: {
+        id: {
+          in: updatedBlocks.map((b) => b.id)
+        }
+      },
+      select: { ...pageFieldsForBlockPrismaSelect }
+    })
+    .then((_pages) =>
+      _pages.reduce((acc, page) => {
+        acc[page.id] = page;
+
+        return acc;
+      }, {} as Record<string, Pick<Page, keyof PageFieldsForBlock>>)
+    );
+
+  for (const block of updatedBlocks) {
+    const matchingPage = pages[block.id];
+    if (matchingPage) {
+      applyPageToBlock(block, matchingPage);
+    }
+  }
+
+  return updatedBlocks;
 }

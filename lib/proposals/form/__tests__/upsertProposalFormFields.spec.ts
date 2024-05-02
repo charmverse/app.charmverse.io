@@ -4,8 +4,8 @@ import type { FormField, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
 import { createForm } from 'lib/forms/createForm';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { upsertProposalFormFields } from 'lib/proposals/form/upsertProposalFormFields';
 
 const numberFieldInput: FormFieldInput = {

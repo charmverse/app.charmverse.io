@@ -1,11 +1,12 @@
 import styled from '@emotion/styled';
-import { Box, Checkbox, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { Box, Checkbox, Stack, TextField } from '@mui/material';
 import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
+import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 
 import type { EvaluationStepSettingsProps } from './EvaluationStepSettings';
 
@@ -34,11 +35,7 @@ export function SubmitStepSettings({
   return (
     <Stack gap={2}>
       <Box>
-        <FormLabel>
-          <Typography sx={{ mb: 1 }} variant='subtitle1'>
-            Due date
-          </Typography>
-        </FormLabel>
+        <FieldLabel>Due date</FieldLabel>
         <DateTimePicker
           sx={{
             width: '100%'
@@ -50,14 +47,12 @@ export function SubmitStepSettings({
           placeholder='Select due date'
           onAccept={(date) => {
             onChange({
-              dueDate: date?.toJSDate() || undefined,
-              allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
+              dueDate: date?.toJSDate() || undefined
             });
           }}
           onChange={(value) => {
             onChange({
-              dueDate: value?.toJSDate() || undefined,
-              allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
+              dueDate: value?.toJSDate() || undefined
             });
           }}
         />
@@ -66,11 +61,7 @@ export function SubmitStepSettings({
       {!isAssignedReward ? (
         <>
           <RowStack>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Allow multiple entries
-              </Typography>
-            </FormLabel>
+            <FieldLabel>Allow multiple entries</FieldLabel>
             <Checkbox
               sx={{
                 p: 0
@@ -79,8 +70,7 @@ export function SubmitStepSettings({
               checked={Boolean(rewardInput?.allowMultipleApplications)}
               onChange={(e) => {
                 onChange({
-                  allowMultipleApplications: e.target.checked,
-                  allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
+                  allowMultipleApplications: e.target.checked
                 });
               }}
               disabled={readOnly}
@@ -88,11 +78,7 @@ export function SubmitStepSettings({
             />
           </RowStack>
           <Box>
-            <FormLabel>
-              <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                Applicant Roles
-              </Typography>
-            </FormLabel>
+            <FieldLabel>Applicant Roles</FieldLabel>
             <UserAndRoleSelect
               type='role'
               readOnly={readOnly}
@@ -109,17 +95,12 @@ export function SubmitStepSettings({
           </Box>
 
           <Box>
-            <FormLabel>
-              <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                # Available
-              </Typography>
-            </FormLabel>
+            <FieldLabel># Available</FieldLabel>
             <TextField
               onChange={(e) => {
                 const value = Number(e.target.value);
                 onChange({
-                  maxSubmissions: value <= 0 ? null : value,
-                  allowedSubmitterRoles: rewardInput?.allowedSubmitterRoles
+                  maxSubmissions: value <= 0 ? null : value
                 });
               }}
               variant='outlined'
@@ -140,11 +121,7 @@ export function SubmitStepSettings({
         </>
       ) : (
         <Box>
-          <FormLabel>
-            <Typography sx={{ mb: 1 }} variant='subtitle1'>
-              Assigned applicants
-            </Typography>
-          </FormLabel>
+          <FieldLabel>Assigned applicants</FieldLabel>
           <UserSelect
             memberIds={rewardInput.assignedSubmitters ?? []}
             readOnly={readOnly}

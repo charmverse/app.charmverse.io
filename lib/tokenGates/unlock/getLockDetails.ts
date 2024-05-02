@@ -1,4 +1,5 @@
 import { DataNotFoundError, InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { getAddress } from 'viem';
 
 import { PublicLockV13 } from 'lib/tokenGates/unlock/abi';
@@ -57,6 +58,7 @@ export async function getLockDetails(
 
     return lockMetadata;
   } catch (error: any) {
+    log.error('Error fetching Unlock details', { error });
     throw new DataNotFoundError('Error fetching lock details. Check the contract address and chain.');
   }
 }

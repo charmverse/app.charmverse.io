@@ -10,7 +10,6 @@ import Link from 'components/common/Link';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { KanbanPageActionsMenuButton } from 'components/common/PageActions/KanbanPageActionButton';
 import { PageIcon } from 'components/common/PageIcon';
-import { RewardStatusBadge } from 'components/rewards/components/RewardStatusBadge';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
@@ -18,6 +17,8 @@ import { isTouchScreen } from 'lib/utils/browser';
 
 import { useSortable } from '../../hooks/sortable';
 import PropertyValueElement from '../propertyValueElement';
+
+import { KanbanRewardStatus } from './kanbanCardReward';
 
 type Props = {
   card: Card;
@@ -55,7 +56,7 @@ function RewardMetadata({ bountyId }: { bountyId: string }) {
 
   return (
     <BountyFooter>
-      <RewardStatusBadge reward={linkedBounty} truncate />
+      <KanbanRewardStatus reward={linkedBounty} />
     </BountyFooter>
   );
 }

@@ -24,7 +24,7 @@ export async function generateTokenGate({
             contractAddress: '',
             quantity: '1',
             condition: 'evm',
-            image: '/images/cryptoLogos/ethereum-eth-logo.svg'
+            image: '/images/cryptoLogos/ethereum-icon-purple.svg'
           }
         ],
         operator: 'OR'

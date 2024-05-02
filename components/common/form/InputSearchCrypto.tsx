@@ -16,7 +16,7 @@ import { getTokenInfo } from 'lib/tokens/tokenData';
 
 type CryptoValue = string | CryptoCurrency | { chainId: number; tokenAddress: string };
 
-export interface IInputSearchCryptoProps<Value extends CryptoValue>
+interface IInputSearchCryptoProps<Value extends CryptoValue>
   extends Omit<Partial<AutocompleteProps<Value, true, true, true>>, 'onChange' | 'defaultValue' | 'value'> {
   onChange?: (value: Value) => void;
   onNewPaymentMethod?: (method: PaymentMethod) => void;

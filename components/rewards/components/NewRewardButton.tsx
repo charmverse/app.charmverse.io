@@ -11,7 +11,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
+import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
 
 import { useRewardTemplates } from '../hooks/useRewardTemplates';
 
@@ -68,7 +68,7 @@ export function NewRewardButton() {
       </ButtonGroup>
       <TemplatesMenu
         isLoading={isLoading}
-        templates={templates?.map((tpl) => ({ ...tpl.page, draft: tpl.reward.status === 'draft' })) ?? []}
+        templates={templates?.map((tpl) => ({ ...tpl.page, draft: tpl.status === 'draft' })) ?? []}
         addPageFromTemplate={(page) => {
           const template = templates?.find((tpl) => tpl.page.id === page.id);
           if (template) {

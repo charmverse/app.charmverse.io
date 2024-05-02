@@ -3,11 +3,12 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import type { FieldAnswerInput, FormFieldInput } from 'components/common/form/interfaces';
+import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
+import type { ProposalFields } from 'lib/proposals/interfaces';
 import { publishProposal } from 'lib/proposals/publishProposal';
 import { validateProposalProject } from 'lib/proposals/validateProposalProject';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -92,6 +93,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
         voteSettings: e.voteSettings as any,
         rubricCriteria: e.rubricCriteria as any[]
       })),
+      fields: proposalPage.proposal!.fields as ProposalFields,
       authors: proposalPage.proposal!.authors.map((a) => a.userId),
       formAnswers: proposalPage.proposal!.formAnswers as unknown as FieldAnswerInput[],
       formFields: proposalPage.proposal!.form?.formFields as unknown as FormFieldInput[]

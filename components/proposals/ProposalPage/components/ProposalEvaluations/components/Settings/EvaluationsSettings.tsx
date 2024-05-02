@@ -5,15 +5,15 @@ import { read } from '@popperjs/core';
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
-import { WorkflowSelect } from 'components/common/workflows/WorkflowSelect';
-import type { ProposalEvaluationValues } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/EvaluationStepSettings';
-import type { ProposalPropertiesInput } from 'components/proposals/ProposalPage/components/ProposalProperties/ProposalPropertiesBase';
+import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
+import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
-import { EvaluationStepRow } from '../../../../../../common/workflows/EvaluationStepRow';
+import type { ProposalPropertiesInput } from '../../../ProposalProperties/ProposalPropertiesBase';
 
+import type { ProposalEvaluationValues } from './components/EvaluationStepSettings';
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 import { ProposalCredentialSettings } from './components/ProposalCredentialSettings';
 import type { RewardSettingsProps } from './components/RewardSettings';

@@ -2,29 +2,22 @@ import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { Delete, Edit } from '@mui/icons-material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Box, Grid, Hidden, IconButton, Stack, Tooltip, Typography } from '@mui/material';
-import { uniqBy } from 'lodash';
-import { useState } from 'react';
-import { v4 } from 'uuid';
 
 import { SelectPreviewContainer } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
-import { useNewPage } from 'components/common/PageDialog/hooks/useNewPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { RewardPropertiesForm } from 'components/rewards/components/RewardProperties/RewardPropertiesForm';
-import { RewardAmount } from 'components/rewards/components/RewardStatusBadge';
-import { useNewReward } from 'components/rewards/hooks/useNewReward';
+import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { useRewardPage } from 'components/rewards/hooks/useRewardPage';
 import { useRewards } from 'components/rewards/hooks/useRewards';
-import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
-import { getRewardErrors } from 'lib/rewards/getRewardErrors';
-import type { RewardTemplate } from 'lib/rewards/getRewardTemplates';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
+import { useProposalRewards } from '../../hooks/useProposalRewards';
+
 import { AttachRewardButton } from './AttachRewardButton';
+import { ProposalRewardsForm } from './ProposalRewardsForm';
 
 type Props = {
   pendingRewards: ProposalPendingReward[] | undefined;
@@ -51,102 +44,39 @@ export function ProposalRewards({
   variant,
   isProposalTemplate
 }: Props) {
-  const { isDirty, clearNewPage, openNewPage, newPageValues, updateNewPageValues } = useNewPage();
-  const { clearRewardValues, contentUpdated, rewardValues, setRewardValues, isSavingReward } = useNewReward();
-  const [currentPendingId, setCurrentPendingId] = useState<null | string>(null);
   const { getRewardPage } = useRewardPage();
   const { rewards: allRewards } = useRewards();
-  const { templates } = useRewardTemplates({ load: !!requiredTemplateId });
-
   const { getFeatureTitle } = useSpaceFeatures();
   const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
   const canCreatePendingRewards = !readOnly && !rewardIds?.length;
 
-  function closeDialog() {
-    clearRewardValues();
-    clearNewPage();
-    setCurrentPendingId(null);
-  }
-
-  async function saveForm() {
-    if (newPageValues) {
-      onSave({ reward: rewardValues, page: newPageValues, draftId: currentPendingId || '' });
-      closeDialog();
-    }
-  }
-
-  function createNewReward() {
-    clearRewardValues();
-    const template = templates?.find((t) => t.page.id === requiredTemplateId);
-    // use reviewers from the proposal if not set in the template
-    const rewardReviewers = template?.reward.reviewers?.length
-      ? template.reward.reviewers
-      : uniqBy(
-          reviewers
-            .map((reviewer) =>
-              reviewer.roleId
-                ? { group: 'role', id: reviewer.roleId }
-                : reviewer.userId
-                ? { group: 'user', id: reviewer.userId }
-                : null
-            )
-            .filter(isTruthy) as RewardReviewer[],
-          'id'
-        );
-    const rewardAssignedSubmitters = template?.reward.allowedSubmitterRoles?.length
-      ? template.reward.allowedSubmitterRoles
-      : assignedSubmitters;
-
-    const newReward = { ...template?.reward, reviewers: rewardReviewers, assignedSubmitters: rewardAssignedSubmitters };
-
-    setRewardValues(newReward, { skipDirty: true });
-
-    openNewPage({
-      ...template?.page,
-      content: template?.page.content as any,
-      templateId: requiredTemplateId || undefined,
-      title: undefined,
-      type: 'bounty'
-    });
-    // set a new draftId
-    setCurrentPendingId(v4());
-  }
-
-  function showReward({ reward, page, draftId }: ProposalPendingReward) {
-    setRewardValues(reward);
-    openNewPage(page || undefined);
-    setCurrentPendingId(draftId);
-  }
+  const {
+    createNewReward,
+    closeDialog,
+    newRewardErrors,
+    saveForm,
+    selectTemplate,
+    contentUpdated,
+    isDirty,
+    isSavingReward,
+    newPageValues,
+    showReward,
+    setRewardValues,
+    updateNewPageValues,
+    rewardValues
+  } = useProposalRewards({
+    assignedSubmitters,
+    onSave,
+    reviewers,
+    requiredTemplateId,
+    isProposalTemplate
+  });
 
   function openReward(rewardId: string | null) {
     if (!rewardId) return;
     navigateToSpacePath(`/${getRewardPage(rewardId)?.path || ''}`);
   }
-
-  function selectTemplate(template: RewardTemplate | null) {
-    if (template) {
-      setRewardValues({ ...template.reward });
-      updateNewPageValues({
-        ...template.page,
-        content: template.page.content as any,
-        title: undefined,
-        type: 'bounty',
-        templateId: template.page.id
-      });
-    } else {
-      updateNewPageValues({
-        templateId: undefined
-      });
-    }
-  }
-
-  const newRewardErrors = getRewardErrors({
-    page: newPageValues,
-    reward: rewardValues,
-    rewardType: rewardValues.rewardType,
-    isProposalTemplate
-  }).join(', ');
 
   if (rewards.length) {
     return (
@@ -172,12 +102,7 @@ export function ProposalRewards({
                   </Typography>
                   <Hidden mdDown>
                     <Stack alignItems='center' direction='row' height='100%'>
-                      <RewardAmount
-                        reward={reward}
-                        truncate={true}
-                        truncatePrecision={2}
-                        typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                      />
+                      <RewardAmount reward={reward} />
                     </Stack>
                   </Hidden>
                 </Stack>
@@ -218,12 +143,7 @@ export function ProposalRewards({
                       <Hidden lgDown>
                         <Grid item xs={5}>
                           <Stack alignItems='center' direction='row' height='100%'>
-                            <RewardAmount
-                              reward={reward}
-                              truncate={true}
-                              truncatePrecision={2}
-                              typographyProps={{ variant: 'body2', fontWeight: 'normal', fontSize: 'normal' }}
-                            />
+                            <RewardAmount reward={reward} />
                           </Stack>
                         </Grid>
                       </Hidden>
@@ -260,13 +180,15 @@ export function ProposalRewards({
           })}
 
           {canCreatePendingRewards && (
-            <Box>
+            <Box className='dont-print-me'>
               <AttachRewardButton createNewReward={createNewReward} variant={variant} />
             </Box>
           )}
         </Stack>
       )}
-      {!pendingRewards?.length && <AttachRewardButton createNewReward={createNewReward} variant={variant} />}
+      {canCreatePendingRewards && !pendingRewards?.length && (
+        <AttachRewardButton createNewReward={createNewReward} variant={variant} />
+      )}
 
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
@@ -283,14 +205,13 @@ export function ProposalRewards({
           values={newPageValues}
           onChange={updateNewPageValues}
         >
-          <RewardPropertiesForm
+          <ProposalRewardsForm
             onChange={setRewardValues}
             values={rewardValues}
             isNewReward
             readOnly={readOnly}
             isTemplate={false}
             expandedByDefault
-            forcedApplicationType='assigned'
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}

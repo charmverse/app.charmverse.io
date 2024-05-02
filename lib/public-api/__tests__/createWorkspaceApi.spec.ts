@@ -7,6 +7,30 @@ import { uid } from 'lib/utils/strings';
 import { createWorkspaceApi } from '../createWorkspaceApi';
 import type { CreateWorkspaceRequestBody } from '../interfaces';
 
+jest.mock('lib/blockchain/getNFTs', () => {
+  return {
+    getNFTs: (input: { wallets: any[] }) => {
+      return [];
+    }
+  };
+});
+
+jest.mock('lib/discord/collabland/upsertUserRolesFromDiscord', () => {
+  return {
+    upsertUserRolesFromDiscord: () => Promise.resolve()
+  };
+});
+
+jest.mock('lib/discord/collabland/upsertSpaceRolesFromDiscord', () => {
+  return {
+    upsertSpaceRolesFromDiscord: () => Promise.resolve()
+  };
+});
+
+afterAll(async () => {
+  jest.resetModules();
+});
+
 describe('createWorkspaceApi', () => {
   it('should create a space allowing for an xpsengine and discord integration, and register the token used to create the space, as well as auto create a bot user', async () => {
     const tokenName = `Integration partner ${uid()}`;

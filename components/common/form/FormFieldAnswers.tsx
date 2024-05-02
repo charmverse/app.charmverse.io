@@ -9,6 +9,7 @@ import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
+import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -24,7 +25,6 @@ import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
 import { useFormFields } from './hooks/useFormFields';
-import type { FormFieldValue } from './interfaces';
 
 const FormFieldAnswersContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};

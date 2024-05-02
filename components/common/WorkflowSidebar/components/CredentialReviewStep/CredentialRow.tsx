@@ -47,9 +47,6 @@ export function CredentialRow({ credential, isSmallScreen, verificationUrl }: Us
           color='secondary'
           size='small'
           endIcon={<LaunchIcon />}
-          onClick={() => {
-            window.open(verificationUrl, '_blank');
-          }}
         >
           View
         </Button>

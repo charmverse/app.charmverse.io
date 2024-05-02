@@ -129,7 +129,8 @@ describe('applyPropertiesToCard', () => {
       space: {
         credentialTemplates: [],
         features: testSpace.features,
-        id: testSpace.id
+        id: testSpace.id,
+        useOnchainCredentials: false
       },
       cardProperties: database1.fields.cardProperties
     });

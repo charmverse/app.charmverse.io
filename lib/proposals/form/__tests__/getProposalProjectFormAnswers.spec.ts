@@ -2,15 +2,15 @@ import type { User } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
-import type { FormFieldInput } from 'components/common/form/interfaces';
+import type { FormFieldInput } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { randomETHWalletAddress } from 'testing/generateStubs';
-import { getProfectProfileFieldConfig } from 'testing/mocks/form';
+import { getProjectProfileFieldConfig } from 'testing/mocks/form';
 
-import { getProposalProjectFormField } from '../getProposalProjectFormField';
+import { getProposalProjectFormAnswers } from '../getProposalProjectFormAnswers';
 
 const fieldsInput: FormFieldInput[] = [
   {
@@ -22,7 +22,7 @@ const fieldsInput: FormFieldInput[] = [
     options: [],
     private: false,
     required: true,
-    fieldConfig: getProfectProfileFieldConfig({
+    fieldConfig: getProjectProfileFieldConfig({
       walletAddress: {
         private: true
       },
@@ -38,7 +38,7 @@ const fieldsInput: FormFieldInput[] = [
   }
 ];
 
-describe('getProposalProjectFormField', () => {
+describe('getProposalProjectFormAnswers', () => {
   let user: User;
   let projectWithMembers: ProjectWithMembers;
 
@@ -63,7 +63,7 @@ describe('getProposalProjectFormField', () => {
   });
 
   it('should replace private field with empty string if the user does not have access to view the private project fields', async () => {
-    const projectWithoutPrivateFields = getProposalProjectFormField({
+    const projectWithoutPrivateFields = getProposalProjectFormAnswers({
       canViewPrivateFields: false,
       projectWithMembers,
       fieldConfig: fieldsInput[0].fieldConfig as ProjectAndMembersFieldConfig
@@ -78,7 +78,7 @@ describe('getProposalProjectFormField', () => {
   });
 
   it('should not replace private field with empty string if the user have access to view the private project fields', async () => {
-    const projectWithoutPrivateFields = getProposalProjectFormField({
+    const projectWithoutPrivateFields = getProposalProjectFormAnswers({
       canViewPrivateFields: true,
       projectWithMembers,
       fieldConfig: fieldsInput[0].fieldConfig as ProjectAndMembersFieldConfig

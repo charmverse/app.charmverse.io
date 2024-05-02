@@ -93,6 +93,7 @@ type Props = {
   mutator?: Mutator;
   subRowsEmptyValueContent?: ReactElement | string;
   showCard?: (cardId: string | null) => void;
+  disableEditPropertyOption?: boolean;
 };
 
 export const validatePropertyValue = (propType: string, val: string): boolean => {
@@ -144,7 +145,8 @@ function PropertyValueElement(props: Props) {
     updatedAt,
     displayType,
     mutator = defaultMutator,
-    subRowsEmptyValueContent
+    subRowsEmptyValueContent,
+    disableEditPropertyOption
   } = props;
   const { proposal, reward } = card;
   const { trigger } = useUpdateProposalEvaluation({ proposalId: proposal?.id });
@@ -250,18 +252,20 @@ function PropertyValueElement(props: Props) {
     const symbolOrAddress = card.fields.properties[REWARD_TOKEN] as string;
     const chainId = card.fields.properties[REWARD_CHAIN] as string;
     const rewardAmount = card.fields.properties[REWARD_AMOUNT] as number;
+    const _rewardOnly =
+      readOnly ||
+      !isAdmin ||
+      !reward ||
+      getRewardType({
+        chainId: Number(chainId),
+        rewardAmount,
+        rewardToken: symbolOrAddress
+      }) !== 'token';
+
     propertyValueElement = (
       <RewardTokenDialog
-        readOnly={
-          readOnly ||
-          !isAdmin ||
-          !reward ||
-          getRewardType({
-            chainId: Number(chainId),
-            rewardAmount,
-            rewardToken: symbolOrAddress
-          }) !== 'token'
-        }
+        readOnly={_rewardOnly}
+        readOnlyToken={_rewardOnly}
         requireTokenAmount
         currentReward={{
           chainId: Number(chainId),
@@ -438,7 +442,7 @@ function PropertyValueElement(props: Props) {
       <TagSelect
         data-test='closed-select-input'
         dataTestActive='active-select-autocomplete'
-        canEditOptions={!readOnly}
+        canEditOptions={!readOnly && !disableEditPropertyOption}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         multiselect={propertyTemplate.type === 'multiSelect'}
         displayValueAsOptions={propertyTemplate.dynamicOptions}

@@ -43,11 +43,6 @@
     break-before: auto;
     break-inside: avoid;
 
-    &::before {
-      display: block;
-      break-before: auto;
-      break-inside: avoid;
-    }
   }
 
   body.dark-mode * {

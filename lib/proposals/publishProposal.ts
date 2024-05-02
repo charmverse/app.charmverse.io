@@ -23,6 +23,26 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
           type: true
         }
       },
+      issuedCredentials: {
+        select: {
+          credentialTemplateId: true,
+          onchainAttestationId: true,
+          ceramicId: true
+        }
+      },
+      space: {
+        select: {
+          useOnchainCredentials: true,
+          credentialTemplates: {
+            select: {
+              id: true
+            },
+            where: {
+              schemaType: 'proposal'
+            }
+          }
+        }
+      },
       evaluations: true
     }
   });
@@ -53,6 +73,10 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
     proposalId
   });
 
+  const applicableSelectedCredentials = result.selectedCredentialTemplates.filter((template) =>
+    result.space.credentialTemplates.some((spaceTemplate) => spaceTemplate.id === template)
+  );
+
   relay.broadcast(
     {
       type: 'proposals_updated',
@@ -63,7 +87,17 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
             evaluations: result.evaluations,
             hasPendingRewards: ((result.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
             proposalStatus: result.status,
-            hasPublishedRewards: false
+            hasPublishedRewards: false,
+            credentialsEnabled: result.space.credentialTemplates.some((template) =>
+              result.selectedCredentialTemplates.includes(template.id)
+            ),
+            hasPendingCredentials: applicableSelectedCredentials.every((cred) =>
+              result.issuedCredentials.some((issuedCred) =>
+                issuedCred.credentialTemplateId === cred && result.space.useOnchainCredentials
+                  ? issuedCred.onchainAttestationId
+                  : !!issuedCred.ceramicId
+              )
+            )
           })
         }
       ]
