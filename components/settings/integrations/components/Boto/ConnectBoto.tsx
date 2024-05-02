@@ -29,12 +29,7 @@ export function ConnectBoto({ isAdmin }: { isAdmin: boolean }) {
           You will need to request an <Link href='/api-docs'>API Key</Link> to use Boto.
         </Typography>
         <div>
-          <Button
-            variant='outlined'
-            endIcon={<LaunchIcon fontSize='small' />}
-            href='https://boto.io/integrations/charmverse'
-            external
-          >
+          <Button endIcon={<LaunchIcon fontSize='small' />} href='https://boto.io/integrations/charmverse' external>
             Visit Boto
           </Button>
         </div>

@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import CheckCircleOutlineOutlined from '@mui/icons-material/CheckCircleOutlineOutlined';
 import { Card, CardContent, CardHeader, Collapse, Divider, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 
@@ -62,7 +63,13 @@ export function IntegrationContainer({
               </Button>
             )
           ) : (
-            <Button color='secondary' variant='outlined' sx={{ width: 100 }} onClick={clickAction}>
+            <Button
+              startIcon={<CheckCircleOutlineOutlined />}
+              color='secondary'
+              variant='outlined'
+              sx={{ width: 130 }}
+              onClick={clickAction}
+            >
               Connected
             </Button>
           )

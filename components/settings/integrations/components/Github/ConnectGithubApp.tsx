@@ -67,7 +67,7 @@ export function ConnectGithubApp({
                 })
               )}`}
             >
-              Connect
+              Authorize
             </Button>
           </div>
         ) : (
