@@ -57,10 +57,7 @@ export function getProposalErrors({
       // creating template - check if form fields exists
       errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
     } else if (proposal.formFields && proposal.formAnswers) {
-      const isValid = validateAnswers(
-        proposal.formAnswers || [],
-        proposal.formFields.filter((formField) => formField.type !== 'milestone' && formField.type !== 'label') || []
-      );
+      const isValid = validateAnswers(proposal.formAnswers || [], proposal.formFields || []);
       // saving proposal - check if required answers are filled
       if (!isValid) {
         errors.push('All required fields must be answered');

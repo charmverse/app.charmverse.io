@@ -1,6 +1,5 @@
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { Box, Chip, Collapse, Stack, Switch } from '@mui/material';
-import { read } from '@popperjs/core';
+import { Box, Collapse } from '@mui/material';
 
 import { useGetProposalTemplate } from 'charmClient/hooks/proposals';
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
@@ -138,17 +137,6 @@ export function EvaluationsSettings({
                 title={mappedFeatures.rewards.title}
                 expanded={expandedContainer}
                 expandedContainer={expandedContainer}
-                actions={
-                  isStructuredProposal && (
-                    <Stack direction='row' alignItems='center' gap={1}>
-                      {!proposal.fields?.enableRewards && <Chip label='Disabled' size='small' />}
-                      <Switch
-                        checked={proposal.fields?.enableRewards}
-                        onChange={(e, checked) => onChangeRewardSettings({ enableRewards: checked })}
-                      />
-                    </Stack>
-                  )
-                }
               >
                 {(proposal.fields?.enableRewards || !isStructuredProposal) && (
                   <RewardSettings value={proposal.fields} onChange={onChangeRewardSettings} />
