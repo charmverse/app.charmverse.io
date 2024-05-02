@@ -1,3 +1,4 @@
+import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
@@ -35,7 +36,7 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
   };
 
   return (
-    <>
+    <Box>
       {personaUserKyc && disabled ? (
         <Chip
           clickable={false}
@@ -52,7 +53,7 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
           size='small'
           variant='outlined'
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
-          label='Test KYC'
+          label='Test'
           data-test='start-persona-kyc'
         />
       ) : (
@@ -78,6 +79,6 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
           />
         </Modal>
       )}
-    </>
+    </Box>
   );
 }

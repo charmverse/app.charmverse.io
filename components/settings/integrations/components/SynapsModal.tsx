@@ -42,7 +42,7 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
 
     await showConfirmation({
       message: 'Verify your identity securely and seamlessly with our trusted partner Synaps.',
-      title: 'Start KYC',
+      title: 'Start',
       confirmButton: 'Confirm',
       loading: isSynapsUserKycLoading || initSessionLoading,
       onConfirm: async () => {
@@ -96,7 +96,7 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
           size='small'
           variant='outlined'
           disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading}
-          label='Test KYC'
+          label='Test'
           data-test='start-synaps-kyc'
         />
       ) : (
