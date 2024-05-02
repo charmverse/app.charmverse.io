@@ -1,3 +1,4 @@
+import type { ProposalEvaluationTestInput } from '@charmverse/core/dist/cjs/lib/testing/proposals';
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
@@ -194,19 +195,29 @@ describe('Saving space workflows', () => {
       ]
     });
 
+    const evaluationInputs: ProposalEvaluationTestInput[] = [
+      {
+        title: 'Review',
+        evaluationType: 'pass_fail',
+        reviewers: [],
+        permissions: []
+      }
+    ] as const;
+
     const proposalTemplate = await testUtilsProposals.generateProposal({
       spaceId: space.id,
       userId: user.id,
       pageType: 'proposal_template',
       workflowId: workflow.id,
-      evaluationInputs: [
-        {
-          title: 'Review',
-          evaluationType: 'pass_fail',
-          reviewers: [],
-          permissions: []
-        }
-      ]
+      evaluationInputs
+    });
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      pageType: 'proposal',
+      workflowId: workflow.id,
+      evaluationInputs
     });
 
     await upsertWorkflowTemplate({
@@ -232,8 +243,24 @@ describe('Saving space workflows', () => {
         evaluations: true
       }
     });
-    expect(template?.evaluations[0].id).toBe(proposalTemplate.evaluations[0].id);
-    expect(template?.evaluations[0].actionLabels).toStrictEqual({
+
+    const proposalAfterUpdate = await prisma.proposal.findUniqueOrThrow({
+      where: {
+        id: proposal.id
+      },
+      include: {
+        evaluations: true
+      }
+    });
+
+    expect(template.evaluations[0].id).toBe(proposalTemplate.evaluations[0].id);
+    expect(template.evaluations[0].actionLabels).toStrictEqual({
+      approve: 'Approve',
+      reject: 'Reject'
+    });
+
+    expect(proposalAfterUpdate.evaluations[0].id).toBe(proposalAfterUpdate.evaluations[0].id);
+    expect(proposalAfterUpdate.evaluations[0].actionLabels).toStrictEqual({
       approve: 'Approve',
       reject: 'Reject'
     });
