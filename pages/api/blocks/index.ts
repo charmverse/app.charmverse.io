@@ -114,17 +114,19 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
     }
   }
 
-  const newBlocks = data.map((block) => ({
-    ...block,
-    fields: block.fields as any,
-    parentId: block.parentId || '',
-    schema: 1,
-    spaceId: space.id,
-    title: block.title || '',
-    createdBy: req.session.user.id,
-    updatedBy: req.session.user.id,
-    deletedAt: null
-  }));
+  const newBlocks = data.map((block) => {
+    return {
+      ...block,
+      fields: block.fields as any,
+      parentId: block.parentId || '',
+      schema: 1,
+      spaceId: space.id,
+      title: block.title || '',
+      createdBy: req.session.user.id,
+      updatedBy: req.session.user.id,
+      deletedAt: null
+    };
+  });
 
   const cardBlocks = newBlocks.filter((newBlock) => newBlock.type === 'card');
 
@@ -286,30 +288,31 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     }
   });
 
-  // const pages = await prisma.page.findMany({
-  //   where: {
-  //     id: {
-  //       in: [...dbBlocks.map((block) => block.id), ...dbBlocks.map((b) => b.rootId)]
-  //     }
-  //   },
-  //   select: {
-  //     id: true,
-  //     isLocked: true
-  //   }
-  // });
+  const pages = await prisma.page.findMany({
+    where: {
+      id: {
+        in: [...dbBlocks.map((block) => block.id), ...dbBlocks.map((b) => b.rootId)]
+      }
+    },
+    select: {
+      id: true,
+      isLocked: true,
+      type: true
+    }
+  });
 
-  // const pagePermissions = await permissionsApiClient.pages.bulkComputePagePermissions({
-  //   pageIds: pages.map((p) => p.id),
-  //   userId
-  // });
+  const pagePermissions = await permissionsApiClient.pages.bulkComputePagePermissions({
+    pageIds: pages.map((p) => p.id),
+    userId
+  });
 
-  // for (const block of dbBlocks) {
-  //   const targetPageId = block.type === 'view' ? block.rootId : block.id;
+  for (const block of dbBlocks) {
+    const targetPageId = block.type === 'view' ? block.rootId : block.id;
 
-  //   if (!pagePermissions[targetPageId]?.edit_content) {
-  //     throw new ActionNotPermittedError('You do not have permission to edit this block');
-  //   }
-  // }
+    if (!pagePermissions[targetPageId]?.edit_content) {
+      throw new ActionNotPermittedError('You do not have permission to edit this block');
+    }
+  }
 
   // validate access to the space
   const spaceIds: Record<string, boolean> = {};
@@ -328,8 +331,8 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
   );
 
   const updatedBlocks = await prisma.$transaction(
-    blocks.map((block) => {
-      return prisma.block.update({
+    blocks.map((block) =>
+      prisma.block.update({
         where: { id: block.id },
         data: {
           ...block,
@@ -337,9 +340,23 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
           updatedAt: new Date(),
           updatedBy: req.session.user.id
         }
-      });
-    })
+      })
+    )
   );
+
+  const mappedBoardPages = pages.reduce((acc, page) => {
+    if (page.type === 'board') {
+      acc[page.id] = !!page.isLocked;
+    }
+    return acc;
+  }, {} as Record<string, boolean>);
+
+  const blocksWithLocked = updatedBlocks.map((block) => {
+    if (block.type === 'board') {
+      (block as BlockWithDetails).isLocked = mappedBoardPages[block.id];
+    }
+    return block;
+  });
 
   relay.broadcast(
     {
@@ -349,7 +366,7 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     updatedBlocks[0].spaceId
   );
 
-  return res.status(200).json(updatedBlocks as BlockWithDetails[]);
+  return res.status(200).json(blocksWithLocked as BlockWithDetails[]);
 }
 
 async function deleteBlocks(req: NextApiRequest, res: NextApiResponse) {

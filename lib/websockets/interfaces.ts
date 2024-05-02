@@ -1,7 +1,7 @@
 // import type { Block } from '@charmverse/core/prisma';
 
 import type { PageMeta } from '@charmverse/core/pages';
-import type { Page, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
+import type { Page, PageType, Prisma, SubscriptionTier } from '@charmverse/core/prisma';
 import type { Node } from 'prosemirror-model';
 import type { Server, Socket } from 'socket.io';
 

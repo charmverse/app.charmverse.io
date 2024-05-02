@@ -266,7 +266,7 @@ class CharmClient {
       fields: { ...(currentFBBlock.fields as object), ...updatedFields }
     });
     deletedFields.forEach((field) => delete fbBlockInput.fields[field]);
-    const blockInput = fbBlockToBlock(fbBlockInput);
+    const { isLocked, ...blockInput } = fbBlockToBlock(fbBlockInput);
     const updatedBlocks = await http.PUT<BlockWithDetails[]>('/api/blocks', [blockInput]);
     const fbBlock = blockToFBBlock(updatedBlocks[0]);
     updater([fbBlock]);

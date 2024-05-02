@@ -439,6 +439,7 @@ function DocumentPageComponent({
                       readOnly={readOnly}
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
+                      disableEditPropertyOption={!!board.isLocked}
                     />
                   )}
                   {proposalId && (
