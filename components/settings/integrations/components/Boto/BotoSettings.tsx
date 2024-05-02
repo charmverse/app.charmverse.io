@@ -15,10 +15,10 @@ export function BotoSettings({ isAdmin }: { isAdmin: boolean }) {
     <IntegrationContainer
       title='Boto'
       subheader='Send events to Discord or Telegram'
-      isConnected={false}
       expanded={expanded}
       setExpanded={setExpanded}
-      disableConnectTooltip={!isAdmin ? 'Only admins can configure this' : undefined}
+      isAdmin={isAdmin}
+      isConnected={false}
     >
       <Stack gap={2}>
         <Typography variant='body2'>

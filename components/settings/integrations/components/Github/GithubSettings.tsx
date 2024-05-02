@@ -28,11 +28,12 @@ export function GithubSettings({
 
   return (
     <IntegrationContainer
-      isConnected={!!githubApplicationData}
-      expanded={expanded}
-      setExpanded={setExpanded}
       title='Github'
       subheader={`Link issues to ${getFeatureTitle('rewards')}`}
+      expanded={expanded}
+      setExpanded={setExpanded}
+      isAdmin={isAdmin}
+      isConnected={!!githubApplicationData}
     >
       <Stack gap={2}>
         {isLoadingGithubApplicationData || isConnectingWithGithubApp ? (

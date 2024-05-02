@@ -12,25 +12,26 @@ const StyledCard = styled(Card)`
 `;
 
 export function IntegrationContainer({
+  title,
+  subheader,
   expanded,
   setExpanded,
-  title,
+  isAdmin,
   isConnected,
-  subheader,
   onCancel,
-  disableConnectTooltip,
   children
 }: {
-  expanded: boolean;
-  setExpanded: (expanded: boolean) => void;
-  onCancel?: () => void;
   title: string;
   subheader: string;
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
+  isAdmin: boolean;
   isConnected: boolean;
-  disableConnectTooltip?: string;
+  onCancel?: () => void;
   children: ReactNode;
 }) {
   function clickAction() {
+    if (!isAdmin) return;
     setExpanded(!expanded);
   }
 
@@ -50,8 +51,8 @@ export function IntegrationContainer({
           </Typography>
         }
         subheader={<Typography variant='caption'>{subheader}</Typography>}
-        sx={{ cursor: !expanded ? 'pointer' : undefined, p: 2 }}
-        onClick={!expanded ? clickAction : undefined}
+        sx={{ cursor: !expanded && isAdmin ? 'pointer' : undefined, p: 2 }}
+        onClick={!expanded && isAdmin ? clickAction : undefined}
         action={
           !isConnected ? (
             expanded ? (
@@ -63,8 +64,8 @@ export function IntegrationContainer({
                 sx={{ width: 100 }}
                 color='primary'
                 data-test='connect-button'
-                disabled={!!disableConnectTooltip}
-                disabledTooltip={disableConnectTooltip}
+                disabled={!isAdmin}
+                disabledTooltip='Admin role required'
                 onClick={clickAction}
               >
                 Connect
@@ -74,6 +75,8 @@ export function IntegrationContainer({
             <Button
               startIcon={<CheckCircleOutlineOutlined />}
               color='secondary'
+              disabled={!isAdmin}
+              disabledTooltip='Admin role required'
               variant='outlined'
               sx={{ width: 130 }}
               onClick={clickAction}
