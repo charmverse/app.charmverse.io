@@ -32,7 +32,8 @@ test('Space settings - add kyc integrations', async ({ page, spaceSettings }) =>
   await spaceSettings.openSettingsModal();
   await spaceSettings.goToTab('integrations');
 
-  await expect(spaceSettings.saveButton).not.toBeVisible();
+  await spaceSettings.connectButton.click(); // open the form
+  await expect(spaceSettings.saveButton).toBeDisabled();
   await expect(spaceSettings.kycOption).toHaveValue('');
 
   await spaceSettings.kycOption.fill('synaps');

@@ -34,7 +34,7 @@ export function IntegrationContainer({
     setExpanded(!expanded);
   }
   return (
-    <StyledCard variant='outlined'>
+    <StyledCard variant='outlined' data-test={`integration-${title}`}>
       <CardHeader
         disableTypography
         title={
@@ -55,6 +55,7 @@ export function IntegrationContainer({
               <Button
                 sx={{ width: 100 }}
                 color='primary'
+                data-test='connect-button'
                 disabled={!!disableConnectTooltip}
                 disabledTooltip={disableConnectTooltip}
                 onClick={clickAction}
