@@ -65,7 +65,8 @@ async function getBlock(req: NextApiRequest, res: NextApiResponse<BlockWithDetai
       select: {
         id: true,
         features: true,
-        credentialTemplates: true
+        credentialTemplates: true,
+        useOnchainCredentials: true
       }
     });
     const { boardBlock, card: proposalCardProps } = await getCardPropertiesFromProposal({

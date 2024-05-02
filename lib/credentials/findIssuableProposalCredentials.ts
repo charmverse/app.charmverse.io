@@ -23,7 +23,7 @@ export type IssuableProposalCredentialAuthor = {
   author: { id: string; primaryWallet: { address: string } | null; wallets: { address: string }[] };
 };
 
-export type IssuableProposalCredentialSpace = Pick<Space, 'id' | 'features'> & {
+export type IssuableProposalCredentialSpace = Pick<Space, 'id' | 'features' | 'useOnchainCredentials'> & {
   credentialTemplates: Pick<
     CredentialTemplate,
     'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
@@ -75,7 +75,7 @@ export function generateCredentialInputsForProposal({
   space,
   pendingIssuableCredentials
 }: GenerateCredentialsParams): IssuableProposalCredentialContent[] {
-  if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length) {
+  if (proposal.status === 'draft' || !proposal.selectedCredentialTemplates.length || !space.useOnchainCredentials) {
     return [];
   }
 
@@ -214,6 +214,7 @@ export async function findSpaceIssuableProposalCredentials({
     select: {
       id: true,
       features: true,
+      useOnchainCredentials: true,
       credentialTemplates: {
         where: {
           credentialEvents: {
