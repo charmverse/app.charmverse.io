@@ -1,4 +1,4 @@
-import { getAddress } from 'viem';
+import { formatUnits, getAddress, parseEther } from 'viem';
 
 import { getPoapsFromAddress } from 'lib/blockchain/poaps';
 import { getPublicClient } from 'lib/blockchain/publicClient';
@@ -21,7 +21,17 @@ export async function validateTokenGateCondition(
   switch (true) {
     // ERC721 Collection or ERC20 Custom Token quantity
     case condition.type === 'Builder' && !!contractAddress && !!condition.quantity:
-    case condition.type === 'ERC721' && !!contractAddress && !!condition.quantity:
+    case condition.type === 'ERC721' && !!contractAddress && !!condition.quantity: {
+      const minimumQuantity = BigInt(condition.quantity);
+      const balance = await publicClient.readContract({
+        abi: ercAbi,
+        address: contractAddress,
+        functionName: 'balanceOf',
+        args: [userAddress]
+      });
+
+      return balance >= minimumQuantity;
+    }
     case condition.type === 'ERC20' && !!contractAddress && !!condition.quantity: {
       const minimumQuantity = BigInt(condition.quantity);
       const balance = await publicClient.readContract({
@@ -30,6 +40,17 @@ export async function validateTokenGateCondition(
         functionName: 'balanceOf',
         args: [userAddress]
       });
+      const decimals = await publicClient.readContract({
+        abi: ercAbi,
+        address: contractAddress,
+        functionName: 'decimals'
+      });
+
+      if (decimals !== 18) {
+        const regularUnits = formatUnits(balance, decimals);
+        const weiBalance = parseEther(regularUnits);
+        return weiBalance >= minimumQuantity;
+      }
 
       return balance >= minimumQuantity;
     }
