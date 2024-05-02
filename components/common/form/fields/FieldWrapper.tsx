@@ -93,5 +93,11 @@ export function ReadonlyCharmContent({ content }: { content?: PageContent | null
   if (!content || checkIsContentEmpty(content)) {
     return null;
   }
-  return <CharmEditor readOnly isContentControlled content={content} />;
+  return (
+    // Do not remove this div without testing PDF export on proposal forms first!
+    // For unknown reasons, it prevents elements from being pushed down at the top of the exported pages
+    <div>
+      <CharmEditor readOnly isContentControlled content={content} />
+    </div>
+  );
 }
