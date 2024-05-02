@@ -10,7 +10,8 @@ export function getProposalErrors({
   proposal,
   proposalType,
   isDraft,
-  requireTemplates
+  requireTemplates,
+  requireMilestone
 }: {
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
     content?: any | null;
@@ -24,6 +25,7 @@ export function getProposalErrors({
   proposalType: 'structured' | 'free_form';
   isDraft: boolean;
   requireTemplates: boolean;
+  requireMilestone?: boolean;
 }) {
   const errors: string[] = [];
 
@@ -55,7 +57,10 @@ export function getProposalErrors({
       // creating template - check if form fields exists
       errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
     } else if (proposal.formFields && proposal.formAnswers) {
-      const isValid = validateAnswers(proposal.formAnswers || [], proposal.formFields || []);
+      const isValid = validateAnswers(
+        proposal.formAnswers || [],
+        proposal.formFields.filter((formField) => formField.type !== 'milestone' && formField.type !== 'label') || []
+      );
       // saving proposal - check if required answers are filled
       if (!isValid) {
         errors.push('All required fields must be answered');
@@ -63,6 +68,12 @@ export function getProposalErrors({
     }
   } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
+  }
+
+  if (requireMilestone && page.type !== 'proposal_template' && proposalType === 'structured') {
+    if (!proposal.fields?.pendingRewards?.length) {
+      errors.push('At least one milestone is required');
+    }
   }
   // check evaluation configurations
   errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));

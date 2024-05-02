@@ -1,5 +1,5 @@
 import { log } from '@charmverse/core/log';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { v4 as uuid } from 'uuid';
 
 import { useCreateProposal } from 'charmClient/hooks/proposals';
@@ -109,15 +109,18 @@ export function useNewProposal({ newProposal }: Props) {
     }
   }
 
+  const milestoneFormInput = formInputs.formFields?.find((field) => field.type === 'milestone');
+
   const disabledTooltip = getProposalErrors({
     page: {
       title: formInputs.title,
       type: formInputs.type,
       content: formInputs.content
     },
-    proposalType: formInputs.proposalType,
+    proposalType: isStructured ? 'structured' : 'free_form',
     proposal: formInputs,
     isDraft: false,
+    requireMilestone: milestoneFormInput?.required,
     requireTemplates: !!currentSpace?.requireProposalTemplate
   }).join('\n');
 
