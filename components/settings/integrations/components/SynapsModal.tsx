@@ -41,8 +41,8 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
     await initSession();
 
     await showConfirmation({
-      message: 'You will be required to finish your KYC check provided by our partner Synaps.',
-      title: 'KYC aknowledgement',
+      message: 'Verify your identity securely and seamlessly with our trusted partner Synaps.',
+      title: 'Start KYC',
       confirmButton: 'Confirm',
       loading: isSynapsUserKycLoading || initSessionLoading,
       onConfirm: async () => {
