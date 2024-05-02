@@ -6,6 +6,8 @@ import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 import { AttachRewardButton } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/AttachRewardButton';
+import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
+import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { FieldType } from 'lib/forms/interfaces';
 
@@ -46,6 +48,7 @@ type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
   type: FieldType;
   textInputConfig?: TextInputConfig;
   walletInputConfig?: WalletInputConfig;
+  milestoneProps?: ProposalRewardsTableProps;
 } & TextInputConfig;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
@@ -81,9 +84,13 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       case 'milestone': {
         return (
           <FieldWrapper description={fieldProps.description} label={fieldProps.label} required={fieldProps.required}>
-            <Box>
-              <AttachRewardButton disabled createNewReward={() => {}} variant='solid_button' />
-            </Box>
+            {fieldProps.milestoneProps ? (
+              <ProposalRewardsTable {...fieldProps.milestoneProps} variant='solid_button' />
+            ) : (
+              <Box>
+                <AttachRewardButton disabled createNewReward={() => {}} variant='solid_button' />
+              </Box>
+            )}
           </FieldWrapper>
         );
       }

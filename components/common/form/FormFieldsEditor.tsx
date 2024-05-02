@@ -6,7 +6,6 @@ import { useRef, useEffect, useState, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import { useUpdateProposalFormFields } from 'charmClient/hooks/proposals';
-import { useSnackbar } from 'hooks/useSnackbar';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 
