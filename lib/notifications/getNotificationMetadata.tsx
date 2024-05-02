@@ -216,18 +216,15 @@ function getProposalContent({
     case 'reward_published': {
       return `Your ${proposalFeatureTitle} reward has been created`;
     }
-    case 'step_passed':
-    case 'proposal_passed':
-    case 'proposal_failed': {
-      const isFailed = type === 'proposal_failed';
-      const evaluation = isFailed ? notification.evaluation : notification.previousEvaluation;
-      const evaluationTitle = evaluation?.title;
-      const actionLabels = getActionButtonLabels(evaluation);
-      if (isFailed) {
-        return `Your ${proposalFeatureTitle} failed at ${evaluationTitle} with the status: ${actionLabels.reject}`;
-      } else {
-        return `Your ${proposalFeatureTitle} moved from ${evaluationTitle} with the status: ${actionLabels.approve}`;
-      }
+    case 'step_passed': {
+      return `Your ${proposalFeatureTitle} has successfully completed the ${notification.previousEvaluation?.title} step and is now moving to the ${notification.evaluation?.title} step`;
+    }
+    case 'proposal_failed':
+    case 'proposal_passed': {
+      const actionLabels = getActionButtonLabels(notification.evaluation);
+      return `The status of your ${proposalFeatureTitle} has changed to: ${
+        type === 'proposal_failed' ? actionLabels.reject : actionLabels.approve
+      }`;
     }
     case 'vote': {
       return `Voting started for a ${proposalFeatureTitle}`;

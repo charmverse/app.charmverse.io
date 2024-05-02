@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
+import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
 import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels';
@@ -66,10 +67,12 @@ function StepActionButtonLabel({
   setValue: UseFormSetValue<FormValues>;
 }) {
   return customLabelEvaluationTypes.includes(type) ? (
-    <div>
+    <Box className='octo-propertyrow'>
       <FieldLabel>Action labels</FieldLabel>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
-        <Typography width='50%'>Pass</Typography>
+        <Box width={150}>
+          <PropertyLabel readOnly>Pass</PropertyLabel>
+        </Box>
         <TextField
           placeholder='Pass'
           onChange={(e) => {
@@ -83,7 +86,9 @@ function StepActionButtonLabel({
         />
       </Stack>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Typography width='50%'>Decline</Typography>
+        <Box width={150}>
+          <PropertyLabel readOnly>Decline</PropertyLabel>
+        </Box>
         <TextField
           placeholder='Decline'
           onChange={(e) => {
@@ -96,7 +101,7 @@ function StepActionButtonLabel({
           value={actionLabels?.reject}
         />
       </Stack>
-    </div>
+    </Box>
   ) : null;
 }
 
