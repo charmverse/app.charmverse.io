@@ -312,7 +312,7 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
     // dont throw an error if we didnt retrieve permissions for some reason
     if (pagePermissions[targetPageId] && !pagePermissions[targetPageId].edit_content) {
       throw new ActionNotPermittedError('You do not have permission to edit this page');
-    } else if (pagePermissions[targetPageId]) {
+    } else if (!pagePermissions[targetPageId]) {
       log.warn('Did not retrieve permissions for page when updating a block', {
         pageId: targetPageId,
         blockId: block.id,
