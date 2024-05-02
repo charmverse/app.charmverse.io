@@ -38,6 +38,24 @@ async function togglePageLockController(req: NextApiRequest, res: NextApiRespons
     updatedPage.spaceId
   );
 
+  if (updatedPage.boardId) {
+    relay.broadcast(
+      {
+        type: 'blocks_updated',
+        payload: [
+          {
+            id: updatedPage.id,
+            spaceId: updatedPage.spaceId,
+            type: 'board',
+            isLocked: updatedPage.isLocked,
+            pageType: updatedPage.type
+          }
+        ]
+      },
+      updatedPage.spaceId
+    );
+  }
+
   res.status(200).json(updatedPage);
 }
 
