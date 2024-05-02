@@ -27,7 +27,6 @@ export function FormFieldsEditor({
   const [formFields, setFormFields] = useState([...initialFormFields]);
   const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
   const { trigger } = useUpdateProposalFormFields({ proposalId });
-  const { showError } = useSnackbar();
   const debouncedUpdate = useMemo(() => {
     return debounce(trigger, 200);
   }, [trigger]);
@@ -41,7 +40,6 @@ export function FormFieldsEditor({
       await debouncedUpdate({ formFields: _formFields });
     } catch (error) {
       // dont show error modal, the UI should show red borders now instead
-      // showError(error, 'Error saving form fields');
     }
   }
 

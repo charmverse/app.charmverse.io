@@ -1,10 +1,11 @@
-import { type SxProps } from '@mui/material';
+import { Box, type SxProps } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
 import { TextInputField } from 'components/common/form/fields/TextInputField';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
+import { AttachRewardButton } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/AttachRewardButton';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
 import type { FieldType } from 'lib/forms/interfaces';
 
@@ -12,6 +13,7 @@ import { InputSearchBlockchain } from '../InputSearchBlockchain';
 
 import { CharmEditorInputField } from './CharmEditorInputField';
 import { DateInputField } from './DateInputField';
+import { FieldWrapper } from './FieldWrapper';
 import { FileField } from './FileField';
 import { ImageField } from './ImageField';
 import { LabelField } from './LabelField';
@@ -74,6 +76,15 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
             ref={ref}
             multiline
           />
+        );
+      }
+      case 'milestone': {
+        return (
+          <FieldWrapper description={fieldProps.description} label={fieldProps.label} required={fieldProps.required}>
+            <Box>
+              <AttachRewardButton disabled createNewReward={() => {}} variant='solid_button' />
+            </Box>
+          </FieldWrapper>
         );
       }
       case 'long_text': {
