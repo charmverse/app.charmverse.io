@@ -67,7 +67,8 @@ export function SnapshotSettings({ isAdmin, space }: { isAdmin: boolean; space: 
 
   function clearDomain() {
     showConfirmation({
-      message: 'Reset the Snapshot domain?',
+      message: 'Clear the Snapshot domain?',
+      confirmButton: 'Disconnect',
       onConfirm: () => updateSpace({ snapshotDomain: null }, { onSuccess: refreshCurrentSpace })
     });
   }
@@ -119,7 +120,7 @@ export function SnapshotSettings({ isAdmin, space }: { isAdmin: boolean; space: 
             Save
           </Button>
           {isConnected && (
-            <Button color='secondary' variant='text' onClick={clearDomain}>
+            <Button color='error' variant='outlined' onClick={clearDomain}>
               Disconnect
             </Button>
           )}

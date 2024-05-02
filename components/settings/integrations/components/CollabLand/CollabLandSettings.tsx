@@ -21,7 +21,7 @@ export function CollabLandSettings({ isAdmin }: { isAdmin: boolean }) {
   const [isConnecting, setIsConnecting] = useState(false);
   const { showMessage } = useSnackbar();
   const disconnectPopup = usePopupState({ variant: 'popover', popupId: 'disconnect-collabland' });
-
+  if (space) space.discordServerId = 'goo';
   const isConnected = !!space?.discordServerId;
 
   const redirectToCollablandStore = async () => {
@@ -49,11 +49,11 @@ export function CollabLandSettings({ isAdmin }: { isAdmin: boolean }) {
     >
       {isConnected ? (
         <Stack gap={2}>
-          <FieldWrapper label='Discord server id'>
+          <FieldWrapper label='Discord server ID'>
             <TextField disabled value={space.discordServerId} />
           </FieldWrapper>
           <div>
-            <Button color='secondary' variant='outlined' onClick={disconnectPopup.open}>
+            <Button color='error' variant='outlined' onClick={disconnectPopup.open}>
               Disconnect
             </Button>
           </div>
