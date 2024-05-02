@@ -230,7 +230,12 @@ export default function CharmEditor({
       noPadding={noPadding}
       pmViewOpts={{
         editable: () => !readOnly,
-        plugins: []
+        plugins: [],
+        attributes: () => ({
+          translate: readOnly ? 'yes' : 'no',
+          class: 'bangle-editor',
+          'data-test': 'charm-editor-input'
+        })
       }}
       state={state}
       renderNodeViews={({ children: _children, ...props }) => {
