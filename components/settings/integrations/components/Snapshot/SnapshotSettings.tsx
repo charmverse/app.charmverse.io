@@ -83,6 +83,7 @@ export function SnapshotSettings({ isAdmin, space }: { isAdmin: boolean; space: 
     <IntegrationContainer
       expanded={expanded}
       setExpanded={setExpanded}
+      onCancel={() => reset({ snapshotDomain: space.snapshotDomain || '' })}
       isConnected={isConnected}
       disableConnectTooltip={!isAdmin ? 'Only an admin can change Snapshot domain' : undefined}
       title='Snapshot.org'
