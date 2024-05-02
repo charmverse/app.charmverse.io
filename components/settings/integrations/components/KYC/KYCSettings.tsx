@@ -135,6 +135,7 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
       isConnected={!!space.kycOption}
       expanded={expanded}
       setExpanded={setExpanded}
+      onCancel={resetValues}
       title='KYC'
       subheader='Verify the identity of your members'
     >

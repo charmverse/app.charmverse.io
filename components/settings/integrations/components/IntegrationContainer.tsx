@@ -17,22 +17,29 @@ export function IntegrationContainer({
   title,
   isConnected,
   subheader,
-  connectedSummary,
+  onCancel,
   disableConnectTooltip,
   children
 }: {
   expanded: boolean;
   setExpanded: (expanded: boolean) => void;
+  onCancel?: () => void;
   title: string;
   subheader: string;
   isConnected: boolean;
-  connectedSummary?: ReactNode | string;
   disableConnectTooltip?: string;
   children: ReactNode;
 }) {
   function clickAction() {
     setExpanded(!expanded);
   }
+
+  // a special handler to allow forms to reset themselves on cancel
+  function cancelAction() {
+    setExpanded(false);
+    onCancel?.();
+  }
+
   return (
     <StyledCard variant='outlined' data-test={`integration-${title}`}>
       <CardHeader
@@ -48,7 +55,7 @@ export function IntegrationContainer({
         action={
           !isConnected ? (
             expanded ? (
-              <Button sx={{ width: 100 }} variant='text' onClick={clickAction}>
+              <Button sx={{ width: 100 }} variant='text' onClick={cancelAction}>
                 Cancel
               </Button>
             ) : (

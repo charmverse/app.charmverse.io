@@ -85,11 +85,6 @@ export function SnapshotSettings({ isAdmin, space }: { isAdmin: boolean; space: 
       setExpanded={setExpanded}
       isConnected={isConnected}
       disableConnectTooltip={!isAdmin ? 'Only an admin can change Snapshot domain' : undefined}
-      connectedSummary={
-        <>
-          Connected to <strong>{space.snapshotDomain}</strong>
-        </>
-      }
       title='Snapshot.org'
       subheader='Publish votes to Snapshot'
     >
