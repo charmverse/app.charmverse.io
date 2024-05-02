@@ -13,6 +13,7 @@ type Props = {
   size?: string;
   className?: string;
   rightIcon?: boolean;
+  disabled?: boolean;
 };
 
 function Button({ size = 'small', ...props }: Props & NestedDataTest): JSX.Element {
@@ -30,6 +31,7 @@ function Button({ size = 'small', ...props }: Props & NestedDataTest): JSX.Eleme
       className={Utils.generateClassName(classNames)}
       title={props.title}
       onBlur={props.onBlur}
+      disabled={props.disabled}
     >
       {!props.rightIcon && props.icon}
       <span>{props.children}</span>
