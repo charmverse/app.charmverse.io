@@ -9,7 +9,7 @@ import { replaceS3Domain } from 'lib/utils/url';
 export const blockTypes = ['board', 'view', 'card', 'unknown'] as const;
 export type BlockTypes = (typeof blockTypes)[number];
 
-type PageFields = Pick<
+export type PageFieldsForBlock = Pick<
   Page,
   | 'bountyId'
   | 'deletedAt'
@@ -25,6 +25,22 @@ type PageFields = Pick<
   | 'updatedAt'
 > &
   Partial<Pick<Page, 'isLocked'>>;
+
+export const pageFieldsForBlockPrismaSelect: Record<keyof PageFieldsForBlock, true> = {
+  bountyId: true,
+  deletedAt: true,
+  galleryImage: true,
+  hasContent: true,
+  headerImage: true,
+  icon: true,
+  id: true,
+  syncWithPageId: true,
+  title: true,
+  type: true,
+  updatedBy: true,
+  updatedAt: true,
+  isLocked: true
+};
 
 export type BlockPatch = {
   spaceId?: string;
@@ -209,7 +225,7 @@ export function prismaToBlock(block: PrismaBlock): Block {
   };
 }
 
-export function prismaToUIBlock(block: PrismaBlock, page: PageFields): UIBlockWithDetails {
+export function prismaToUIBlock(block: PrismaBlock, page: PageFieldsForBlock): UIBlockWithDetails {
   return blockToUIBlock(applyPageToBlock(block, page));
 }
 
@@ -234,7 +250,7 @@ export function blockToUIBlock(block: BlockWithDetails): UIBlockWithDetails {
 }
 
 // mutative method, for performance reasons
-export function applyPageToBlock(block: PrismaBlock, page: PageFields): BlockWithDetails {
+export function applyPageToBlock(block: PrismaBlock, page: PageFieldsForBlock): BlockWithDetails {
   const blockWithDetails = block as BlockWithDetails;
   blockWithDetails.deletedAt = page.deletedAt || undefined;
   blockWithDetails.bountyId = page.bountyId || undefined;
