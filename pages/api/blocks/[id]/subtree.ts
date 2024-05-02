@@ -60,6 +60,10 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
   const { blocks } = await getRelatedBlocks(blockId);
   const block = blocks.find((b) => b.id === blockId);
 
+  if (block?.type === 'board') {
+    (block as any as Board).isLocked = !!page.isLocked;
+  }
+
   // Hydrate and filter blocks based on proposal permissions
   if (block && (block.fields as BoardFields).sourceType === 'proposals') {
     let result = await getBlocksAndRefresh(block, blocks);

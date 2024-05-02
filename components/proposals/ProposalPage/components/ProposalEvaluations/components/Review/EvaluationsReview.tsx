@@ -147,11 +147,13 @@ export function EvaluationsReview({
     if (proposal?.currentEvaluationId) {
       if (isRewardsActive) {
         setExpandedEvaluationId('rewards');
+      } else if (isCredentialsActive) {
+        setExpandedEvaluationId('credentials');
       } else {
         setExpandedEvaluationId(proposal.currentEvaluationId);
       }
     }
-  }, [proposal?.currentEvaluationId, isRewardsActive, setExpandedEvaluationId]);
+  }, [proposal?.currentEvaluationId, isRewardsActive, isCredentialsActive, setExpandedEvaluationId]);
 
   const expandedEvaluationId = expandedContainer && _expandedEvaluationId;
 

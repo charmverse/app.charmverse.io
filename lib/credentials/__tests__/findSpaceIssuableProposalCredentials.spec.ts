@@ -13,13 +13,25 @@ import {
 import type {
   ProposalWithJoinedData,
   IssuableProposalCredentialContent,
-  PartialIssuableProposalCredentialContent
+  PartialIssuableProposalCredentialContent,
+  IssuableProposalCredentialSpace
 } from '../findIssuableProposalCredentials';
 
 describe('findSpaceIssuableProposalCredentials', () => {
   it('should only return issuable credentials for a specific proposal if this is provided', async () => {
     const authorWalletAddress = randomETHWallet().address;
-    const { space, user: author } = await testUtilsUser.generateUserAndSpace({ wallet: authorWalletAddress });
+
+    const generated = await testUtilsUser.generateUserAndSpace({ wallet: authorWalletAddress });
+    const author = generated.user;
+
+    const space = await prisma.space.update({
+      where: {
+        id: generated.space.id
+      },
+      data: {
+        useOnchainCredentials: true
+      }
+    });
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
@@ -119,7 +131,17 @@ describe('findSpaceIssuableProposalCredentials', () => {
 
   it('should not duplicate credentials for proposals where credentials with the same proposalId and event already feature in a pending Gnosis Safe transaction', async () => {
     const userWalletAddress = randomETHWallet().address;
-    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWalletAddress });
+    const generated = await testUtilsUser.generateUserAndSpace({ wallet: userWalletAddress });
+    const user = generated.user;
+
+    const space = await prisma.space.update({
+      where: {
+        id: generated.space.id
+      },
+      data: {
+        useOnchainCredentials: true
+      }
+    });
 
     const secondAuthorWalletAddress = randomETHWallet().address;
     const secondAuthor = await testUtilsUser.generateSpaceUser({
@@ -284,9 +306,10 @@ describe('generateCredentialInputsForProposal', () => {
       page: { id: uuid() }
     };
 
-    const space = {
+    const space: IssuableProposalCredentialSpace = {
       id: uuid(),
       features: [],
+      useOnchainCredentials: true,
       credentialTemplates: [
         {
           id: credentialTemplateId1,
@@ -339,6 +362,53 @@ describe('generateCredentialInputsForProposal', () => {
     expect(result).toMatchObject(expect.arrayContaining(expectedOutput));
   });
 
+  it('should not return any credentials if the space does not use onchain credentials', () => {
+    const proposalId = uuid();
+    const authorId1 = uuid();
+    const authorWalletAddress1 = randomETHWallet().address;
+    const credentialTemplateId1 = uuid();
+
+    const proposal: ProposalWithJoinedData = {
+      id: proposalId,
+      status: 'published',
+      evaluations: [{ id: uuid(), index: 1, result: 'pass' }],
+      selectedCredentialTemplates: [credentialTemplateId1],
+      authors: [
+        {
+          author: {
+            id: authorId1,
+            primaryWallet: { address: authorWalletAddress1 },
+            wallets: [{ address: randomETHWallet().address }, { address: authorWalletAddress1 }]
+          }
+        }
+      ],
+      issuedCredentials: [],
+      page: { id: uuid() }
+    };
+
+    const space: IssuableProposalCredentialSpace = {
+      id: uuid(),
+      features: [],
+      useOnchainCredentials: false,
+      credentialTemplates: [
+        {
+          id: credentialTemplateId1,
+          name: 'Template 1',
+          description: 'Description 1',
+          organization: 'Org 1',
+          credentialEvents: ['proposal_approved']
+        }
+      ] as Pick<
+        CredentialTemplate,
+        'credentialEvents' | 'id' | 'name' | 'description' | 'organization' | 'schemaAddress'
+      >[]
+    };
+
+    const result = generateCredentialInputsForProposal({ proposal, space });
+
+    expect(result).toEqual([]);
+  });
+
   it('should not generate credentials for proposals with status "draft"', () => {
     const proposalId = uuid();
     const authorId1 = uuid();
@@ -364,9 +434,10 @@ describe('generateCredentialInputsForProposal', () => {
       page: { id: uuid() }
     };
 
-    const space = {
+    const space: IssuableProposalCredentialSpace = {
       id: uuid(),
       features: [],
+      useOnchainCredentials: true,
       credentialTemplates: [
         {
           id: credentialTemplateId1,
@@ -410,9 +481,10 @@ describe('generateCredentialInputsForProposal', () => {
       page: { id: uuid() }
     };
 
-    const space = {
+    const space: IssuableProposalCredentialSpace = {
       id: uuid(),
       features: [],
+      useOnchainCredentials: true,
       credentialTemplates: [
         {
           id: credentialTemplateId1,
@@ -464,9 +536,10 @@ describe('generateCredentialInputsForProposal', () => {
       page: { id: uuid() }
     };
 
-    const space = {
+    const space: IssuableProposalCredentialSpace = {
       id: uuid(),
       features: [],
+      useOnchainCredentials: true,
       credentialTemplates: [
         {
           id: credentialTemplateId1,
@@ -534,9 +607,10 @@ describe('generateCredentialInputsForProposal', () => {
       page: { id: uuid() }
     };
 
-    const space = {
+    const space: IssuableProposalCredentialSpace = {
       id: uuid(),
       features: [],
+      useOnchainCredentials: true,
       credentialTemplates: [
         {
           id: credentialTemplateId1,
@@ -558,7 +632,17 @@ describe('generateCredentialInputsForProposal', () => {
 
   it('should filter out credentials that were already issued onchain', async () => {
     const userWallet = randomETHWalletAddress().toLowerCase();
-    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+    const generated = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+    const user = generated.user;
+
+    const space = await prisma.space.update({
+      where: {
+        id: generated.space.id
+      },
+      data: {
+        useOnchainCredentials: true
+      }
+    });
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
@@ -593,7 +677,17 @@ describe('generateCredentialInputsForProposal', () => {
 
   it('should return credentials that were only issued offchain but not yet onchain', async () => {
     const userWallet = randomETHWalletAddress().toLowerCase();
-    const { space, user } = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+    const generated = await testUtilsUser.generateUserAndSpace({ wallet: userWallet });
+    const user = generated.user;
+
+    const space = await prisma.space.update({
+      where: {
+        id: generated.space.id
+      },
+      data: {
+        useOnchainCredentials: true
+      }
+    });
 
     const credentialTemplate = await testUtilsCredentials.generateCredentialTemplate({
       spaceId: space.id,
