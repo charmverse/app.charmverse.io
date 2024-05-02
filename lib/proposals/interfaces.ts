@@ -54,7 +54,7 @@ export type ProposalFields = {
   enableRewards?: boolean; // used by form templates to enable rewards for new proposals
 };
 
-export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'actionButtonLabels'> & {
+export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'actionLabels'> & {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria: RubricCriteriaTyped[];
@@ -62,7 +62,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   reviewers: ProposalReviewer[];
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
-  actionButtonLabels?: WorkflowEvaluationJson['actionButtonLabels'] | null;
+  actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
 };
 
 export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {

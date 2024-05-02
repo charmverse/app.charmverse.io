@@ -12,6 +12,7 @@ import * as yup from 'yup';
 import { Button } from 'components/common/Button';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels';
 
 import { evaluationIcons } from '../constants';
 
@@ -34,7 +35,7 @@ export const schema = yup.object({
   id: yup.string().required(),
   title: yup.string().required(),
   type: yup.mixed<ProposalEvaluationType>().oneOf(evaluationTypes).required(),
-  actionButtonLabels: yup
+  actionLabels: yup
     .object({
       approve: yup.string().optional(),
       reject: yup.string().optional()
@@ -58,27 +59,27 @@ type FormValues = yup.InferType<typeof schema>;
 function StepActionButtonLabel({
   type,
   setValue,
-  actionButtonLabels
+  actionLabels
 }: {
   type: ProposalEvaluationType;
-  actionButtonLabels: WorkflowEvaluationJson['actionButtonLabels'];
+  actionLabels: WorkflowEvaluationJson['actionLabels'];
   setValue: UseFormSetValue<FormValues>;
 }) {
-  return type === 'pass_fail' || type === 'rubric' ? (
+  return customLabelEvaluationTypes.includes(type) ? (
     <div>
-      <FieldLabel>Action button labels</FieldLabel>
+      <FieldLabel>Action labels</FieldLabel>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
         <Typography width='50%'>Pass</Typography>
         <TextField
           placeholder='Pass'
           onChange={(e) => {
-            setValue('actionButtonLabels', {
-              ...actionButtonLabels,
+            setValue('actionLabels', {
+              ...actionLabels,
               approve: e.target.value
             });
           }}
           fullWidth
-          value={actionButtonLabels?.approve}
+          value={actionLabels?.approve}
         />
       </Stack>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
@@ -86,13 +87,13 @@ function StepActionButtonLabel({
         <TextField
           placeholder='Decline'
           onChange={(e) => {
-            setValue('actionButtonLabels', {
-              ...actionButtonLabels,
+            setValue('actionLabels', {
+              ...actionLabels,
               reject: e.target.value
             });
           }}
           fullWidth
-          value={actionButtonLabels?.reject}
+          value={actionLabels?.reject}
         />
       </Stack>
     </div>
@@ -133,7 +134,7 @@ export function EvaluationDialog({
       title: evaluation?.title,
       type: evaluation?.type,
       permissions: evaluation?.permissions ?? [],
-      actionButtonLabels: evaluation?.actionButtonLabels
+      actionLabels: evaluation?.actionLabels
     });
   }, [evaluation?.id]);
 
@@ -146,7 +147,7 @@ export function EvaluationDialog({
     onClose();
   }
 
-  const actionButtonLabels = formValues?.actionButtonLabels as WorkflowEvaluationJson['actionButtonLabels'];
+  const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
 
   return (
     <Dialog
@@ -197,7 +198,7 @@ export function EvaluationDialog({
           />
         </div>
         {evaluation?.id && (
-          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionButtonLabels={actionButtonLabels} />
+          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
         )}
         {!evaluation?.id && (
           <>
@@ -237,7 +238,7 @@ export function EvaluationDialog({
                 )}
               />
             </div>
-            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionButtonLabels={actionButtonLabels} />
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (

@@ -32,8 +32,8 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
   const hasChangedActionButtonLabels = workflow.evaluations.some((evaluation) => {
     const workflowEvaluation = originalEvaluations.find((e) => e.id === evaluation.id);
     if (
-      workflowEvaluation?.actionButtonLabels?.approve !== evaluation.actionButtonLabels?.approve ||
-      workflowEvaluation?.actionButtonLabels?.reject !== evaluation.actionButtonLabels?.reject
+      workflowEvaluation?.actionLabels?.approve !== evaluation.actionLabels?.approve ||
+      workflowEvaluation?.actionLabels?.reject !== evaluation.actionLabels?.reject
     ) {
       return true;
     }
@@ -153,7 +153,7 @@ export async function upsertWorkflowActionButtonLabels(workflow: ProposalWorkflo
             id: originalProposalEvaluation.id
           },
           data: {
-            actionButtonLabels: workflowEvaluation.actionButtonLabels as Prisma.InputJsonValue
+            actionLabels: workflowEvaluation.actionLabels as Prisma.InputJsonValue
           }
         });
       }

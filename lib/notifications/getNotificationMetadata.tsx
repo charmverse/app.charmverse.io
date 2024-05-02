@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma-client';
 import type { ReactNode } from 'react';
 
-import { STATIC_PAGES, type FeatureJson } from 'lib/features/constants';
+import { type FeatureJson } from 'lib/features/constants';
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import type {
   ApplicationCommentNotificationType,
@@ -16,6 +16,7 @@ import type {
   PostNotification,
   ProposalNotification
 } from 'lib/notifications/interfaces';
+import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
 
 import { getNotificationUrl } from './getNotificationUrl';
 
@@ -196,9 +197,7 @@ function getProposalContent({
   actorUsername?: string;
   spaceFeatures: FeatureJson[];
 }): string | ReactNode {
-  const proposalFeature = spaceFeatures.find((spaceFeature) => spaceFeature.id === 'proposals')!;
-  const defaultProposalFeature = STATIC_PAGES.find((page) => page.path === 'proposals')!;
-  const proposalFeatureTitle = (proposalFeature.title || defaultProposalFeature.title).toLowerCase();
+  const proposalFeatureTitle = getFeatureTitle('proposals', spaceFeatures);
   const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
@@ -223,13 +222,11 @@ function getProposalContent({
       const isFailed = type === 'proposal_failed';
       const evaluation = isFailed ? notification.evaluation : notification.previousEvaluation;
       const evaluationTitle = evaluation?.title;
-      const actionButtonLabels = evaluation?.actionButtonLabels;
-      const passActionLabel = actionButtonLabels?.approve ?? 'Pass';
-      const declineActionLabel = actionButtonLabels?.reject ?? 'Decline';
+      const actionLabels = getActionButtonLabels(evaluation);
       if (isFailed) {
-        return `Your ${proposalFeatureTitle} failed at ${evaluationTitle} with the status: ${declineActionLabel}`;
+        return `Your ${proposalFeatureTitle} failed at ${evaluationTitle} with the status: ${actionLabels.reject}`;
       } else {
-        return `Your ${proposalFeatureTitle} moved from ${evaluationTitle} with the status: ${passActionLabel}`;
+        return `Your ${proposalFeatureTitle} moved from ${evaluationTitle} with the status: ${actionLabels.approve}`;
       }
     }
     case 'vote': {

@@ -17,10 +17,8 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
           status: true,
           evaluations: {
             select: {
-              id: true,
-              actionButtonLabels: true,
-              title: true,
-              index: true
+              actionLabels: true,
+              title: true
             },
             orderBy: {
               index: 'asc'
@@ -37,10 +35,9 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       },
       evaluation: {
         select: {
-          id: true,
           title: true,
           index: true,
-          actionButtonLabels: true
+          actionLabels: true
         }
       },
       notificationMetadata: {
@@ -71,14 +68,14 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       group: 'proposal',
       evaluation: notification.evaluation
         ? {
-            actionButtonLabels: notification.evaluation.actionButtonLabels,
+            actionLabels: notification.evaluation.actionLabels,
             title: notification.evaluation.title
           }
         : null,
       previousEvaluation: previousEvaluation
         ? {
             title: previousEvaluation.title,
-            actionButtonLabels: previousEvaluation.actionButtonLabels
+            actionLabels: previousEvaluation.actionLabels
           }
         : null
     } as ProposalNotification;

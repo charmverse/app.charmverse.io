@@ -8,7 +8,7 @@ export async function getVoteEvaluationStepsWithBlockNumber<
     type: ProposalEvaluationType;
     id: string;
     voteSettings?: Prisma.JsonValue;
-    actionButtonLabels?: WorkflowEvaluationJson['actionButtonLabels'] | Prisma.JsonValue;
+    actionLabels?: WorkflowEvaluationJson['actionLabels'] | Prisma.JsonValue;
   }
 >({ evaluations, pageType, isDraft }: { isDraft: boolean; evaluations: E[]; pageType?: PageType }): Promise<E[]> {
   if (isDraft || !pageType || pageType !== 'proposal') {

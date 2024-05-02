@@ -36,7 +36,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
-  actionButtonLabels?: WorkflowEvaluationJson['actionButtonLabels'] | null;
+  actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
 };
 
 export type CreateProposalInput = {
@@ -182,7 +182,7 @@ export async function createProposal({
               index: evaluation.index,
               title: evaluation.title,
               type: evaluation.type,
-              actionButtonLabels: (evaluation.actionButtonLabels ?? null) as Prisma.InputJsonValue
+              actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue
             }))
           }
         },

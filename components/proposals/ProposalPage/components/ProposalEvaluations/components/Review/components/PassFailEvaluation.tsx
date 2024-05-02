@@ -1,4 +1,3 @@
-import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
@@ -9,16 +8,14 @@ import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/p
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 export type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
-  evaluation: Pick<
-    PopulatedEvaluation,
-    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionButtonLabels'
-  >;
+  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels'>;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
   isCurrent: boolean;
@@ -54,16 +51,13 @@ export function PassFailEvaluation({
     ? 'You cannot move an archived proposal'
     : null;
 
-  const actionButtonLabels = evaluation?.actionButtonLabels as WorkflowEvaluationJson['actionButtonLabels'];
-
-  const approveLabel = actionButtonLabels?.approve || 'Pass';
-  const declineLabel = actionButtonLabels?.reject || 'Decline';
+  const actionLabels = getActionButtonLabels(evaluation);
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (confirmationMessage) {
       const { confirmed } = await showConfirmation({
         message: confirmationMessage,
-        confirmButton: result === 'pass' ? approveLabel : declineLabel
+        confirmButton: result === 'pass' ? actionLabels.approve : actionLabels.reject
       });
       if (!confirmed) {
         return;
@@ -119,7 +113,7 @@ export function PassFailEvaluation({
                 disabledTooltip={disabledTooltip}
                 color='errorPale'
               >
-                {declineLabel}
+                {actionLabels.reject}
               </Button>
               <Button
                 data-test='evaluation-pass-button'
@@ -128,7 +122,7 @@ export function PassFailEvaluation({
                 disabledTooltip={disabledTooltip}
                 color='successPale'
               >
-                {approveLabel}
+                {actionLabels.approve}
               </Button>
             </Box>
           </Box>

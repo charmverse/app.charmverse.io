@@ -150,11 +150,11 @@ export type ProposalNotification = NotificationBase & {
   type: ProposalNotificationType;
   group: 'proposal';
   evaluation: Pick<ProposalEvaluation, 'title'> & {
-    actionButtonLabels?: WorkflowEvaluationJson['actionButtonLabels'];
+    actionLabels?: WorkflowEvaluationJson['actionLabels'];
   };
   previousEvaluation:
     | (Pick<ProposalEvaluation, 'title'> & {
-        actionButtonLabels?: WorkflowEvaluationJson['actionButtonLabels'];
+        actionLabels?: WorkflowEvaluationJson['actionLabels'];
       })
     | null;
 };

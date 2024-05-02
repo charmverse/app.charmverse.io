@@ -216,7 +216,7 @@ describe('Saving space workflows', () => {
           id: originalEvaluationId,
           title: 'Review title',
           type: 'pass_fail',
-          actionButtonLabels: {
+          actionLabels: {
             approve: 'Approve',
             reject: 'Reject'
           },
@@ -233,7 +233,7 @@ describe('Saving space workflows', () => {
       }
     });
     expect(template?.evaluations[0].id).toBe(proposalTemplate.evaluations[0].id);
-    expect(template?.evaluations[0].actionButtonLabels).toStrictEqual({
+    expect(template?.evaluations[0].actionLabels).toStrictEqual({
       approve: 'Approve',
       reject: 'Reject'
     });
