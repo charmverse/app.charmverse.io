@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { withCharmEditorProviders } from 'stories/CharmEditor/renderEditor';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 
@@ -60,7 +60,7 @@ export function ProposalInEvaluation() {
 ProposalInEvaluation.parameters = {
   msw: {
     handlers: {
-      proposal: rest.get('/api/proposals/:proposalId', (req, res, ctx) => {
+      proposal: http.get('/api/proposals/:proposalId', () => {
         const rubricCriteria: PopulatedEvaluation['rubricCriteria'] = [
           {
             id: '1',
@@ -205,7 +205,7 @@ ProposalInEvaluation.parameters = {
             }
           ]
         });
-        return res(ctx.json(proposal));
+        return HttpResponse.json(proposal);
       })
     }
   }

@@ -1,6 +1,6 @@
 import type { PageMeta } from '@charmverse/core/pages';
 import { Paper } from '@mui/material';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
 
@@ -125,8 +125,8 @@ export function CardPropsView() {
 CardPropsView.parameters = {
   msw: {
     handlers: {
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([boardPage, page1]);
       })
     }
   }
