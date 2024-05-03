@@ -23,7 +23,7 @@ export async function createSynapsSession(spaceId: string, userId: string): Prom
     throw new DataNotFoundError('Synaps API key not found');
   }
 
-  if (synapsUserKyc?.sessionId) {
+  if (synapsUserKyc?.sessionId && synapsUserKyc.status !== 'RESUBMISSION_REQUIRED') {
     const isReadOnly = ['APPROVED', 'PENDING_VERIFICATION', 'REJECTED'].includes(synapsUserKyc.status || '');
 
     if (isReadOnly) {

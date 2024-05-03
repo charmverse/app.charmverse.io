@@ -17,7 +17,12 @@ export async function getSynapsSessionDetails(spaceId: string, userId: string): 
     })
   ]);
 
-  if (!synapsCredential?.apiKey || !synapsUserKyc?.sessionId || !synapsUserKyc?.status) {
+  if (
+    !synapsCredential?.apiKey ||
+    !synapsUserKyc?.sessionId ||
+    !synapsUserKyc?.status ||
+    synapsUserKyc?.status === 'RESUBMISSION_REQUIRED'
+  ) {
     return null;
   }
 

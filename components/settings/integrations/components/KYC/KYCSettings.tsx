@@ -1,11 +1,13 @@
 import type { Space, KycOption } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Grid } from '@mui/material';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
-import { useGetKycCredentials, useUpdateSpace, useUpdateKycCredentials } from 'charmClient/hooks/spaces';
+import { useGetKycCredentials, useUpdateKycCredentials } from 'charmClient/hooks/kyc';
+import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -32,19 +34,30 @@ const schema = yup.object({
     .nullable()
     .when('kycOption', {
       is: (val: KycOption | null) => val === 'persona',
-      then: () => yup.string().required('Field is required'),
+      then: () =>
+        yup
+          .string()
+          .required('Field is required')
+          .test('personaApiKey', 'Invalid api key', (value) => value.startsWith('persona_')),
       otherwise: () => yup.string()
     }),
-  personaSecret: yup.string().nullable(),
+  personaSecret: yup
+    .string()
+    .nullable()
+    .test('personaSecret', 'Invalid secret', (value) => (value ? value?.startsWith('wbhsec_') : true)),
   personaTemplateId: yup
     .string()
     .nullable()
     .when('kycOption', {
       is: (val: KycOption | null) => val === 'persona',
-      then: () => yup.string().required('Field is required'),
+      then: () =>
+        yup
+          .string()
+          .required('Field is required')
+          .test('templateId', 'Invalid template id', (value) => value.startsWith('itmpl_')),
       otherwise: () => yup.string()
     }),
-  kycOption: yup.string().oneOf<KycOption>(['synaps', 'persona']).nullable()
+  kycOption: yup.string().oneOf<KycOption | ''>(['synaps', 'persona', '']).nullable()
 });
 export type FormValues = yup.InferType<typeof schema>;
 
@@ -60,7 +73,7 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
     control,
     watch,
     reset,
-    formState: { isDirty, dirtyFields, isValid }
+    formState: { isDirty, dirtyFields, isValid, errors }
   } = useForm<FormValues>({
     defaultValues: getDefaultValues({ kycCredentials, space }),
     resolver: yupResolver(schema),
@@ -103,7 +116,9 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
       return;
     }
 
-    await updateSpace({ kycOption: values.kycOption }, { onSuccess: () => refreshCurrentSpace() });
+    if (values.kycOption) {
+      await updateSpace({ kycOption: values.kycOption }, { onSuccess: () => refreshCurrentSpace() });
+    }
 
     if (
       dirtyFields.synapsApiKey ||
@@ -112,7 +127,7 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
       dirtyFields.personaSecret ||
       dirtyFields.personaTemplateId
     ) {
-      const synapsPayload: KycCredentials = {
+      const payload: KycCredentials = {
         synaps: {
           spaceId: space.id,
           apiKey: values.synapsApiKey ?? '',
@@ -126,7 +141,7 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
         }
       };
 
-      await updateKycCredential({ ...synapsPayload }, { onSuccess: (data) => mutateKycCredentials(data) });
+      await updateKycCredential({ ...payload }, { onSuccess: (data) => mutateKycCredentials(data) });
     }
   };
 
@@ -148,7 +163,7 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
           )}
           {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
             <div>
-              <SynapsModal spaceId={space.id} />
+              <SynapsModal spaceId={space.id} isAdmin={isAdmin} />
             </div>
           )}
           {isAdmin &&
@@ -156,22 +171,11 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
             kycCredentials?.persona?.apiKey &&
             kycCredentials.persona.templateId && (
               <div>
-                <PersonaModal spaceId={space.id} />
+                <PersonaModal spaceId={space.id} isAdmin={isAdmin} />
               </div>
             )}
           {isAdmin && kycCredentials && (
             <Box display='flex' gap={2}>
-              {/* {isDirty && (
-                <Button
-                  disableElevation
-                  variant='outlined'
-                  disabled={isLoading || !isDirty}
-                  onClick={resetValues}
-                  sx={{ mr: 2 }}
-                >
-                  Cancel
-                </Button>
-              )} */}
               <Button
                 disabled={isLoading || !isDirty || !isValid || !kycOption}
                 type='submit'

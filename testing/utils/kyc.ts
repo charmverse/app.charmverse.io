@@ -52,3 +52,18 @@ export async function generatePersonaUserKyc({
     }
   });
 }
+
+export async function generateUserAndSpaceKyc({ spaceId, userId }: { spaceId: string; userId: string }) {
+  const synapsCredentials = await generateSynapsCredential({ spaceId });
+  const synapsUserKyc = await generateSynapsUserKyc({ spaceId, userId });
+  await prisma.space.update({
+    where: {
+      id: spaceId
+    },
+    data: {
+      kycOption: 'synaps'
+    }
+  });
+
+  return { synapsCredentials, synapsUserKyc };
+}

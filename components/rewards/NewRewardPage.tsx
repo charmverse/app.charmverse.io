@@ -163,6 +163,16 @@ export function NewRewardPage({
         assignedSubmitters: [user!.id],
         allowedSubmitterRoles: []
       });
+    } else if (workflow.id === 'assigned_kyc') {
+      setRewardValues({
+        approveSubmitters: false,
+        allowMultipleApplications: false,
+        assignedSubmitters: [user!.id],
+        fields: {
+          ...(rewardValues.fields as object | undefined | null),
+          hasKyc: true
+        }
+      });
     }
   }
 

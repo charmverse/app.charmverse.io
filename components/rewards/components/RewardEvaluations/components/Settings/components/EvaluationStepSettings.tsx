@@ -5,6 +5,7 @@ import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 import { CredentialsStepSettings } from './CredentialsStepSettings';
+import { KycStepSettings } from './KycStepSettings';
 import { PaymentStepSettings } from './PaymentStepSettings/PaymentStepSettings';
 import { ReviewStepSettings } from './ReviewStepSettings';
 import { SubmitStepSettings } from './SubmitStepSettings';
@@ -30,6 +31,8 @@ export function EvaluationStepSettings(props: EvaluationStepSettingsProps) {
     return <CredentialsStepSettings {...props} />;
   } else if (evaluationType === 'payment') {
     return <PaymentStepSettings {...props} />;
+  } else if (evaluationType === 'kyc') {
+    return <KycStepSettings {...props} readOnly />;
   }
 
   return null;

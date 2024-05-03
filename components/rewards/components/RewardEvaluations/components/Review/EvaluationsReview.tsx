@@ -1,9 +1,10 @@
+import type { KycOption, PersonaUserKycStatus, SynapsUserKycStatus } from '@charmverse/core/prisma-client';
 import { Collapse, Divider, Tooltip } from '@mui/material';
-import { cloneDeep } from 'lodash';
-import { useRouter } from 'next/router';
+import cloneDeep from 'lodash/cloneDeep';
 import { useEffect, useMemo, useState } from 'react';
 
-import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
+import { useGetPersonaInquiry, useGetSynapsSession } from 'charmClient/hooks/kyc';
+import { useGetRewardPermissions, useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
 import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
@@ -19,6 +20,7 @@ import type { ApplicationWithTransactions, RewardWithUsers } from 'lib/rewards/i
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import { getAbsolutePath } from 'lib/utils/browser';
 
+import { KycStepSettings } from '../Settings/components/KycStepSettings';
 import type { EvaluationSettingsProps } from '../Settings/EvaluationsSettings';
 
 import { CredentialsStepReview } from './components/CredentialsStepReview';
@@ -59,6 +61,21 @@ export function EvaluationsReview({
     currentSpace?.credentialsWallet &&
     (application?.issuableOnchainCredentials ?? []).length > 0
   );
+  const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: reward.id });
+  const { data: userSynapsSession } = useGetSynapsSession(
+    currentSpace?.kycOption === 'synaps' ? currentSpace?.id : null,
+    application?.createdBy
+  );
+  const { data: userPersonaSession } = useGetPersonaInquiry(
+    currentSpace?.kycOption === 'persona' ? currentSpace?.id : null,
+    application?.createdBy
+  );
+
+  const kycStatus = getKycStatus(
+    currentSpace?.kycOption,
+    currentSpace?.kycOption === 'synaps' ? userSynapsSession?.status : userPersonaSession?.status
+  );
+  const workPermission = rewardPermissions?.work;
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow
@@ -66,7 +83,8 @@ export function EvaluationsReview({
           applicationStatus: application?.status,
           workflow,
           hasCredentials: reward.selectedCredentialTemplates.length > 0,
-          hasIssuableOnchainCredentials
+          hasIssuableOnchainCredentials,
+          kycStatus
         })
       : workflow;
 
@@ -76,7 +94,7 @@ export function EvaluationsReview({
       updatedWorkflow: _updatedWorkflow,
       currentEvaluation: _currentEvaluation
     };
-  }, [workflow, application, hasIssuableOnchainCredentials, reward.selectedCredentialTemplates.length]);
+  }, [workflow, application, hasIssuableOnchainCredentials, reward.selectedCredentialTemplates.length, kycStatus]);
 
   const [expandedEvaluationId, setExpandedEvaluationId] = useState<string | undefined>(
     application || isNewApplication ? currentEvaluation?.id : undefined
@@ -141,7 +159,7 @@ export function EvaluationsReview({
             title={evaluation.title}
             result={application ? evaluation.result ?? null : null}
             actions={
-              evaluation.type === 'apply' || readOnly ? null : (
+              evaluation.type === 'apply' || evaluation.type === 'kyc' || readOnly ? null : (
                 <EvaluationStepActions canEdit openSettings={() => openSettings(evaluation)} />
               )
             }
@@ -160,6 +178,11 @@ export function EvaluationsReview({
                 hidePaymentButton={!isCurrent}
                 reward={reward}
                 refreshApplication={refreshApplication}
+              />
+            ) : evaluation.type === 'kyc' ? (
+              <KycStepSettings
+                readOnly={!application || (!isCurrent && evaluation.result === null)}
+                userId={application?.createdBy}
               />
             ) : evaluation.type === 'submit' ? (
               <SubmitStepReview reward={reward} />
@@ -238,4 +261,28 @@ export function EvaluationsReview({
       )}
     </LoadingComponent>
   );
+}
+
+function getKycStatus<T extends KycOption>(
+  kycOption?: T | null,
+  status?: T extends 'persona' ? SynapsUserKycStatus : PersonaUserKycStatus
+) {
+  if (kycOption === 'synaps') {
+    if (status === 'APPROVED') {
+      return true;
+    } else if (status === 'REJECTED') {
+      return false;
+    } else {
+      return null;
+    }
+  } else if (kycOption === 'persona') {
+    if (status === 'completed') {
+      return true;
+    } else if (status === 'failed') {
+      return false;
+    } else {
+      return null;
+    }
+  }
+  return null;
 }

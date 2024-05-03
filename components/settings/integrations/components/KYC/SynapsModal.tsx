@@ -3,9 +3,11 @@ import Chip from '@mui/material/Chip';
 import { Synaps } from '@synaps-io/verify-sdk';
 import { useEffect } from 'react';
 
-import { useGetSynapsSession, useInitSynapsSession } from 'charmClient/hooks/spaces';
+import { useGetSynapsSession, useInitSynapsSession } from 'charmClient/hooks/kyc';
+import { Button } from 'components/common/Button';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useUser } from 'hooks/useUser';
 
 const mapSynapsStatus = {
   APPROVED: 'Approved',
@@ -15,18 +17,19 @@ const mapSynapsStatus = {
   SUBMISSION_REQUIRED: 'Submission required'
 };
 
-export function SynapsModal({ spaceId }: { spaceId: string }) {
+export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; userId?: string; isAdmin?: boolean }) {
   const {
     data: synapsUserKyc,
     isLoading: isSynapsUserKycLoading,
     mutate: mutateSynapsUserKyc
-  } = useGetSynapsSession(spaceId);
+  } = useGetSynapsSession(spaceId, userId);
   const {
     trigger: initSession,
     data: synapsSession,
     isMutating: initSessionLoading,
     reset
   } = useInitSynapsSession(spaceId);
+  const { user } = useUser();
   const { showConfirmation } = useConfirmationModal();
   const { onClose: closeSettingsModal } = useSettingsDialog();
 
@@ -40,8 +43,8 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
     await initSession();
 
     await showConfirmation({
-      message: 'You will be required to finish your KYC check provided by our partner Persona.',
-      title: 'KYC aknowledgement',
+      message: 'Verify your identity securely and seamlessly with our trusted partner Synaps.',
+      title: 'Start',
       confirmButton: 'Confirm',
       loading: isSynapsUserKycLoading || initSessionLoading,
       onConfirm: async () => {
@@ -77,9 +80,9 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
     };
   }, [synapsSession?.session_id]);
 
-  return (
-    <Box>
-      {synapsUserKyc && disabled ? (
+  if (synapsUserKyc?.status && disabled) {
+    return (
+      <Box>
         <Chip
           clickable={false}
           color='secondary'
@@ -87,7 +90,17 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
           variant='outlined'
           label={`Status: ${mapSynapsStatus[synapsUserKyc.status] || 'Unknown'}`}
         />
-      ) : (
+      </Box>
+    );
+  }
+
+  if (userId && userId !== user?.id) {
+    return null;
+  }
+
+  return (
+    <Box display='flex' flexDirection='column' alignItems='start' gap={2}>
+      {isAdmin ? (
         <Chip
           onClick={openModal}
           clickable={true}
@@ -95,8 +108,25 @@ export function SynapsModal({ spaceId }: { spaceId: string }) {
           size='small'
           variant='outlined'
           disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading}
-          label='Test KYC'
+          label='Test'
           data-test='start-synaps-kyc'
+        />
+      ) : (
+        <Button
+          onClick={openModal}
+          data-test='start-synaps-kyc'
+          disabled={synapsUserKyc === undefined || initSessionLoading || isSynapsUserKycLoading}
+        >
+          Start KYC
+        </Button>
+      )}
+      {synapsUserKyc?.status && (
+        <Chip
+          clickable={false}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          label={`Status: ${mapSynapsStatus[synapsUserKyc.status] || 'Unknown'}`}
         />
       )}
     </Box>

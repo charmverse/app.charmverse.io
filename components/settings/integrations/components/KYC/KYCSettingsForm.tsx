@@ -1,9 +1,10 @@
 import type { KycOption } from '@charmverse/core/prisma-client';
-import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
+import FormHelperText from '@mui/material/FormHelperText';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import type { Control } from 'react-hook-form';
 import { useController } from 'react-hook-form';
 
@@ -54,7 +55,10 @@ export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; contro
     control
   });
 
-  const { field: kycOption } = useController({
+  const {
+    field: kycOption,
+    fieldState: { error: kycOptionError }
+  } = useController({
     name: 'kycOption',
     control
   });
@@ -69,6 +73,7 @@ export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; contro
           value={kycOption.value || ''}
           disabled={!isAdmin}
           renderValue={(val) => (val ? capitalize(val) : 'Select')}
+          error={!!kycOptionError?.message}
         >
           <MenuItem disabled sx={{ color: 'text.secondary' }} value=''>
             Select
@@ -76,6 +81,9 @@ export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; contro
           <MenuItem value='synaps'>Synaps</MenuItem>
           <MenuItem value='persona'>Persona</MenuItem>
         </Select>
+        {kycOptionError?.message && (
+          <FormHelperText error={!!kycOptionError.message}>{kycOptionError.message}</FormHelperText>
+        )}
       </Box>
       {kycOption.value === 'synaps' && (
         <>
@@ -102,6 +110,9 @@ export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; contro
               helperText={synapsSecretError?.message}
             />
             <Typography variant='caption'>{'Select a secret from: Synaps Manager > Integration > Webhook'}</Typography>
+            <Typography variant='caption'>
+              Add https://webhooks.charmverse.co/synaps-events as the webhook url
+            </Typography>
           </Box>
         </>
       )}
@@ -137,6 +148,9 @@ export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; contro
               <Link color='inherit' href='https://app.withpersona.com/dashboard/webhooks' external>
                 https://app.withpersona.com/dashboard/webhooks
               </Link>
+            </Typography>
+            <Typography variant='caption'>
+              Add https://webhooks.charmverse.co/synaps-events as the webhook url
             </Typography>
           </Box>
           <Box>

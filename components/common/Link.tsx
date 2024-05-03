@@ -1,5 +1,6 @@
 import styled from '@emotion/styled';
 import type { LinkProps } from '@mui/material';
+import Box from '@mui/material/Box';
 import MuiLink from '@mui/material/Link';
 import NextLink from 'next/link';
 import type { MouseEvent, MouseEventHandler } from 'react';
@@ -47,13 +48,15 @@ export default function Link({ external, href, onClick, children, color = 'prima
 
   if (!href) {
     return (
-      <div
+      <Box
         className={restProps.className}
         onClick={onClick as unknown as MouseEventHandler<HTMLDivElement>}
         data-test={restProps['data-test']}
+        color={color}
+        sx={restProps.sx}
       >
         {children}
-      </div>
+      </Box>
     );
   }
 

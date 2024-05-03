@@ -1,8 +1,10 @@
+import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import dynamic from 'next/dynamic';
 
-import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/spaces';
+import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/kyc';
+import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { useUser } from 'hooks/useUser';
 
@@ -19,9 +21,8 @@ const mapPersonaStatus = {
   declined: 'Declined'
 };
 
-export function PersonaModal({ spaceId }: { spaceId: string }) {
-  const { user } = useUser();
-  const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId);
+export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; userId?: string; isAdmin?: boolean }) {
+  const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId, userId);
   const {
     data: personaInquiry,
     trigger: initPersonaInquiry,
@@ -29,15 +30,16 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
   } = useInitPersonaInquiry(spaceId);
   const popupPersonaState = usePopupState({ variant: 'popover', popupId: 'kyc-persona' });
   const disabled = ['pending', 'completed', 'needs_review', 'approved'].includes(personaUserKyc?.status || '');
+  const { user } = useUser();
 
   const onConfirm = async () => {
     await initPersonaInquiry();
     popupPersonaState.open();
   };
 
-  return (
-    <>
-      {personaUserKyc && disabled ? (
+  if (personaUserKyc?.status && disabled) {
+    return (
+      <Box>
         <Chip
           clickable={false}
           color='secondary'
@@ -45,7 +47,17 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           variant='outlined'
           label={`Status: ${mapPersonaStatus[personaUserKyc.status] || 'Unknown'}`}
         />
-      ) : (
+      </Box>
+    );
+  }
+
+  if (userId && user?.id !== userId) {
+    return null;
+  }
+
+  return (
+    <Box display='flex' flexDirection='column' alignItems='start' gap={2}>
+      {isAdmin ? (
         <Chip
           onClick={onConfirm}
           clickable={true}
@@ -53,9 +65,17 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           size='small'
           variant='outlined'
           disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
-          label='Test KYC'
+          label='Test'
           data-test='start-persona-kyc'
         />
+      ) : (
+        <Button
+          onClick={onConfirm}
+          disabled={isPersonaUserKycLoading || isLoadingPersonaInquiry || disabled}
+          data-test='start-persona-kyc'
+        >
+          Start KYC
+        </Button>
       )}
       {personaInquiry?.inquiryId && (
         <Modal
@@ -65,15 +85,21 @@ export function PersonaModal({ spaceId }: { spaceId: string }) {
           sx={{ '& iframe': { minWidth: '375px', width: '100%', minHeight: '600px', height: '100%' } }}
         >
           <PersonaInquiry
-            inquiryId={personaInquiry?.inquiryId}
-            referenceId={user?.id}
-            onComplete={() => {
-              // Inquiry completed. Close the modal
-              popupPersonaState.close();
-            }}
+            inquiryId={personaInquiry.inquiryId}
+            referenceId={userId}
+            onComplete={() => popupPersonaState.close()}
           />
         </Modal>
       )}
-    </>
+      {personaUserKyc?.status && (
+        <Chip
+          clickable={false}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          label={`Status: ${mapPersonaStatus[personaUserKyc.status] || 'Unknown'}`}
+        />
+      )}
+    </Box>
   );
 }
