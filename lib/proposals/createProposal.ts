@@ -3,7 +3,7 @@ import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
 import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
@@ -36,6 +36,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
+  actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
 };
 
 export type CreateProposalInput = {
@@ -180,7 +181,8 @@ export async function createProposal({
               voteSettings: evaluation.voteSettings || undefined,
               index: evaluation.index,
               title: evaluation.title,
-              type: evaluation.type
+              type: evaluation.type,
+              actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue
             }))
           }
         },

@@ -4,12 +4,12 @@ import { EditorView } from 'prosemirror-view';
 
 import { BangleEditorState } from './bangle-editor-state';
 
-type PMViewOpts = Omit<DirectEditorProps, 'state' | 'dispatchTransaction' | 'attributes'>;
+type PMViewOpts = Omit<DirectEditorProps, 'state' | 'dispatchTransaction'>;
 
 export interface BangleEditorProps<PluginMetadata> {
   focusOnInit?: boolean;
   state: BangleEditorState<PluginMetadata>;
-  pmViewOpts?: PMViewOpts;
+  pmViewOpts: PMViewOpts;
 }
 
 export class BangleEditor<PluginMetadata = any> {
@@ -17,7 +17,7 @@ export class BangleEditor<PluginMetadata = any> {
 
   view: EditorView;
 
-  constructor(element: HTMLElement, { focusOnInit = true, state, pmViewOpts = {} }: BangleEditorProps<PluginMetadata>) {
+  constructor(element: HTMLElement, { focusOnInit = true, state, pmViewOpts }: BangleEditorProps<PluginMetadata>) {
     this.destroyed = false;
     if (!(state instanceof BangleEditorState)) {
       throw new Error('state is required and must be an instance of BangleEditorState');
@@ -29,7 +29,6 @@ export class BangleEditor<PluginMetadata = any> {
         const newState = this.view.state.apply(transaction);
         this.view.updateState(newState);
       },
-      attributes: { class: 'bangle-editor', 'data-test': 'charm-editor-input' },
       ...pmViewOpts
     });
 

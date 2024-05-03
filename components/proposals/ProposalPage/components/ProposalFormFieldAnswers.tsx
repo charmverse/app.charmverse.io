@@ -9,6 +9,8 @@ import type { FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { ThreadWithComments } from 'lib/threads/interfaces';
 
+import type { ProposalRewardsTableProps } from './ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
+
 export function ProposalFormFieldAnswers({
   proposalId,
   formFields,
@@ -17,8 +19,10 @@ export function ProposalFormFieldAnswers({
   pageId,
   threads,
   isDraft,
-  project
+  project,
+  milestoneProps
 }: {
+  milestoneProps: ProposalRewardsTableProps;
   readOnly?: boolean;
   enableComments: boolean;
   proposalId: string;
@@ -70,6 +74,7 @@ export function ProposalFormFieldAnswers({
 
   return (
     <FormFieldAnswers
+      milestoneProps={milestoneProps}
       enableComments={enableComments}
       formFields={fields}
       onSave={onSave}

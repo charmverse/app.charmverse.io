@@ -16,6 +16,7 @@ import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuabl
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import { prettyPrint } from 'lib/utils/strings';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -214,7 +215,12 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     proposalStatus: proposal.status,
     hasPublishedRewards: proposal.rewards.length > 0,
     credentialsEnabled: !!proposal.selectedCredentialTemplates.length,
-    hasPendingOnchainCredentials: !!pendingCredentials.length
+    hasPendingCredentials:
+      !!pendingCredentials.length ||
+      (!space.useOnchainCredentials &&
+        proposal.selectedCredentialTemplates.some(
+          (cred) => !proposal.issuedCredentials.some((issuedCred) => issuedCred.credentialTemplateId === cred)
+        ))
   });
 
   if (currentStep && proposalProps.proposalStatus) {

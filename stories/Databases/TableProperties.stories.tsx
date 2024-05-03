@@ -1,5 +1,5 @@
 import type { PageMeta } from '@charmverse/core/pages';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import type { MockStoreEnhanced } from 'redux-mock-store';
 import { GlobalContext } from 'stories/lib/GlobalContext';
 import { v4 as uuid } from 'uuid';
@@ -150,17 +150,18 @@ export function DatabaseTableView() {
 DatabaseTableView.parameters = {
   msw: {
     handlers: {
-      pages: rest.get('/api/spaces/:spaceId/pages', (req, res, ctx) => {
-        return res(ctx.json([boardPage, page1, page2]));
+      pages: http.get('/api/spaces/:spaceId/pages', () => {
+        return HttpResponse.json([boardPage, page1, page2]);
       }),
-      getBlock: rest.get('/api/blocks/:pageId', (req, res, ctx) => {
-        return res(ctx.json(reduxStore.getState().cards.cards[req.params.pageId as string]));
+      getBlock: http.get('/api/blocks/:pageId', ({ params }) => {
+        return HttpResponse.json(reduxStore.getState().cards.cards[params.pageId as string]);
       }),
-      updateBlocks: rest.put('/api/blocks', async (req, res, ctx) => {
-        return res(ctx.json(req.json()));
+      updateBlocks: http.put('/api/blocks', async ({ request }) => {
+        const body = await request.json();
+        return HttpResponse.json(body);
       }),
-      views: rest.get('/api/blocks/:pageId/views', (req, res, ctx) => {
-        return res(ctx.json([view]));
+      views: http.get('/api/blocks/:pageId/views', () => {
+        return HttpResponse.json([view]);
       })
     }
   }

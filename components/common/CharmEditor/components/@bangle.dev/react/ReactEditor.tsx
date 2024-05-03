@@ -355,7 +355,7 @@ export const BangleEditor = React.forwardRef<CoreBangleEditor | undefined, Bangl
         }}
       >
         <StyledLoadingComponent isLoading={showLoader && isLoadingRef.current} />
-        <div ref={renderRef} id={pageId} className={className} style={style} />
+        <div translate={readOnly ? 'yes' : 'no'} ref={renderRef} id={pageId} className={className} style={style} />
         {allowClickingFooter && (
           <div contentEditable='false' className='charm-empty-footer' onMouseDown={onClickEditorBottom} />
         )}

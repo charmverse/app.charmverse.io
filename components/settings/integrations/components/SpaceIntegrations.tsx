@@ -1,40 +1,24 @@
 import type { Space } from '@charmverse/core/prisma-client';
-import Grid from '@mui/material/Grid';
+import { Stack } from '@mui/material';
 
-import FieldLabel from 'components/common/form/FieldLabel';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 
-import { ConnectBoto } from './ConnectBoto';
-import { ConnectCollabland } from './ConnectCollabland';
-import { ConnectGithubApp } from './ConnectGithubApp';
-import { KycIntegration } from './KycIntegration';
-import { SnapshotIntegration } from './SnapshotDomain';
+import { BotoSettings } from './Boto/BotoSettings';
+import { CollabLandSettings } from './CollabLand/CollabLandSettings';
+import { GithubSettings } from './Github/GithubSettings';
+import { KYCSettings } from './KYC/KYCSettings';
+import { SnapshotSettings } from './Snapshot/SnapshotSettings';
 
 export function SpaceIntegrations({ space }: { space: Space }) {
   const isAdmin = useIsAdmin();
 
   return (
-    <Grid container spacing={3} direction='column'>
-      <Grid item>
-        <FieldLabel>Snapshot.org domain</FieldLabel>
-        <SnapshotIntegration isAdmin={isAdmin} space={space} />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Collab.Land</FieldLabel>
-        <ConnectCollabland />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Send events to Discord/Telegram</FieldLabel>
-        <ConnectBoto />
-      </Grid>
-      <Grid item>
-        <FieldLabel>Sync with Github Repo</FieldLabel>
-        <ConnectGithubApp spaceId={space.id} spaceDomain={space.domain} />
-      </Grid>
-      <Grid item>
-        <FieldLabel>KYC (Know Your Customer)</FieldLabel>
-        <KycIntegration space={space} isAdmin={isAdmin} />
-      </Grid>
-    </Grid>
+    <Stack gap={2} mt={2}>
+      <SnapshotSettings isAdmin={isAdmin} space={space} />
+      <CollabLandSettings isAdmin={isAdmin} />
+      <BotoSettings isAdmin={isAdmin} />
+      <GithubSettings isAdmin={isAdmin} spaceId={space.id} spaceDomain={space.domain} />
+      <KYCSettings isAdmin={isAdmin} space={space} />
+    </Stack>
   );
 }

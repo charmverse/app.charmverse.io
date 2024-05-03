@@ -496,7 +496,7 @@ export function NotificationContent({
             </Badge>
           </Box>
           <Box overflow='hidden' display='flex' flexDirection='column' flex={1}>
-            <Stack direction='row' justifyContent='space-between'>
+            <Stack direction='row' justifyContent='space-between' alignItems='center'>
               <Stack direction='row' gap={1} alignItems='center'>
                 <Typography
                   sx={{
@@ -518,7 +518,16 @@ export function NotificationContent({
               {!archived && (
                 <Card
                   className='icons'
-                  sx={{ px: 0.5, pt: 0.5, flexDirection: 'row', gap: 0.5, display: 'flex' }}
+                  sx={{
+                    px: 0.5,
+                    pt: 0.5,
+                    minWidth: 52.5,
+                    ml: 1,
+                    height: 'fit-content',
+                    flexDirection: 'row',
+                    gap: 0.5,
+                    display: 'flex'
+                  }}
                   onClick={(e) => {
                     e.stopPropagation();
                     e.preventDefault();

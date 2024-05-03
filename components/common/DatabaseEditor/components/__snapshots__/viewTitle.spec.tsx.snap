@@ -207,6 +207,7 @@ exports[`components/viewTitle should match snapshot 1`] = `
             class="css-1m71jyw"
             id="test-id"
             style="margin-left: 35px; width: 100%; height: 100%;"
+            translate="no"
           >
             <div
               class="ProseMirror bangle-editor"
@@ -344,12 +345,13 @@ exports[`components/viewTitle should match snapshot readonly 1`] = `
             class="css-1m71jyw"
             id="test-id"
             style="margin-left: 35px; width: 100%; height: 100%;"
+            translate="yes"
           >
             <div
               class="ProseMirror bangle-editor"
               contenteditable="false"
               data-test="charm-editor-input"
-              translate="no"
+              translate="yes"
             >
               <p>
                 <br
@@ -528,6 +530,7 @@ exports[`components/viewTitle show description 1`] = `
             class="css-1m71jyw"
             id="test-id"
             style="margin-left: 35px; width: 100%; height: 100%;"
+            translate="no"
           >
             <div
               class="ProseMirror bangle-editor"

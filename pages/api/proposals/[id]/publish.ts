@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
@@ -90,6 +91,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       ...proposalPage.proposal!,
       evaluations: proposalPage.proposal!.evaluations.map((e) => ({
         ...e,
+        actionLabels: e.actionLabels as WorkflowEvaluationJson['actionLabels'],
         voteSettings: e.voteSettings as any,
         rubricCriteria: e.rubricCriteria as any[]
       })),

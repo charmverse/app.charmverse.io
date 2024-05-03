@@ -75,7 +75,8 @@ export async function getRelatedBlocks(blockId: string): Promise<{ blocks: Block
       syncWithPageId: true,
       type: true,
       updatedAt: true,
-      updatedBy: true
+      updatedBy: true,
+      isLocked: true
     }
   });
 

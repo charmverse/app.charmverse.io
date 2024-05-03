@@ -464,7 +464,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && failure()
     # pass in all steps so we can check if any failed
-    needs: [build-app, test, test-matrix, deploy]
+    needs: [build-app, test, test-matrix, e2e-test-matrix, deploy]
     steps:
       - name: If any of prev jobs failed notify discord
         if: contains(needs.*.result, 'failure')

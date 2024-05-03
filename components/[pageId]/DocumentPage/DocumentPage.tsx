@@ -23,7 +23,6 @@ import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/vi
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
-import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
@@ -439,6 +438,7 @@ function DocumentPageComponent({
                       readOnly={readOnly}
                       pageUpdatedAt={page.updatedAt.toString()}
                       pageUpdatedBy={page.updatedBy}
+                      disableEditPropertyOption={!!board.isLocked}
                     />
                   )}
                   {proposalId && (
@@ -481,6 +481,43 @@ function DocumentPageComponent({
                       threads={threads}
                       project={proposal.project}
                       isDraft={proposal?.status === 'draft'}
+                      milestoneProps={{
+                        containerWidth,
+                        pendingRewards: proposal.fields?.pendingRewards || [],
+                        requiredTemplateId: proposal.fields?.rewardsTemplateId,
+                        reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
+                        assignedSubmitters: proposal.authors.map((a) => a.userId),
+                        readOnly: !proposal.permissions.edit,
+                        rewardIds: proposal.rewardIds || [],
+                        onSave: (pendingReward) => {
+                          const isExisting = proposal.fields?.pendingRewards?.find(
+                            (r) => r.draftId === pendingReward.draftId
+                          );
+                          if (!isExisting) {
+                            onChangeRewardSettings({
+                              pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                            });
+
+                            return;
+                          }
+
+                          onChangeRewardSettings({
+                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                              if (draft.draftId === pendingReward.draftId) {
+                                return pendingReward;
+                              }
+                              return draft;
+                            })
+                          });
+                        },
+                        onDelete: (draftId: string) => {
+                          onChangeRewardSettings({
+                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                              (draft) => draft.draftId !== draftId
+                            )
+                          });
+                        }
+                      }}
                     />
                   )
                 ) : (
@@ -517,52 +554,6 @@ function DocumentPageComponent({
                     threadIds={threadIds}
                   />
                 )}
-
-                {isStructuredProposal &&
-                  proposal?.fields?.enableRewards &&
-                  (!!proposal.fields.pendingRewards?.length || !readOnly) && (
-                    <Box mt={1}>
-                      <ProposalRewardsTable
-                        containerWidth={containerWidth}
-                        pendingRewards={proposal.fields.pendingRewards || []}
-                        requiredTemplateId={proposal.fields.rewardsTemplateId}
-                        reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                        assignedSubmitters={proposal.authors.map((a) => a.userId)}
-                        variant='solid_button'
-                        readOnly={!proposal.permissions.edit}
-                        rewardIds={proposal.rewardIds || []}
-                        isProposalTemplate={page.type === 'proposal_template'}
-                        onSave={(pendingReward) => {
-                          const isExisting = proposal.fields?.pendingRewards?.find(
-                            (r) => r.draftId === pendingReward.draftId
-                          );
-                          if (!isExisting) {
-                            onChangeRewardSettings({
-                              pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
-                            });
-
-                            return;
-                          }
-
-                          onChangeRewardSettings({
-                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                              if (draft.draftId === pendingReward.draftId) {
-                                return pendingReward;
-                              }
-                              return draft;
-                            })
-                          });
-                        }}
-                        onDelete={(draftId: string) => {
-                          onChangeRewardSettings({
-                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
-                              (draft) => draft.draftId !== draftId
-                            )
-                          });
-                        }}
-                      />
-                    </Box>
-                  )}
 
                 {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                   <Box className='dont-print-me'>

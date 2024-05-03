@@ -18,14 +18,14 @@ export function getCurrentStep({
   hasPendingRewards,
   credentialsEnabled,
   hasPublishedRewards,
-  hasPendingOnchainCredentials
+  hasPendingCredentials
 }: {
   proposalStatus: ProposalStatus;
   evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'title' | 'type' | 'id'>[];
   hasPublishedRewards: boolean;
   hasPendingRewards: boolean;
-  credentialsEnabled?: boolean;
-  hasPendingOnchainCredentials?: boolean;
+  credentialsEnabled: boolean;
+  hasPendingCredentials: boolean;
 }): ProposalStep {
   const hasRewards = hasPublishedRewards || hasPendingRewards;
 
@@ -40,11 +40,11 @@ export function getCurrentStep({
   const proposalEvaluationStepsCompleted =
     currentEvaluation.id === lastEvaluation?.id && lastEvaluation?.result === 'pass';
 
-  if (proposalEvaluationStepsCompleted && (hasPendingOnchainCredentials || (credentialsEnabled && !hasRewards))) {
+  if (proposalEvaluationStepsCompleted && (hasPendingCredentials || (credentialsEnabled && !hasRewards))) {
     return {
       title: 'Credentials',
       step: 'credentials' as ProposalEvaluationStep,
-      result: !hasPendingOnchainCredentials ? ProposalEvaluationResult.pass : 'in_progress',
+      result: !hasPendingCredentials ? ProposalEvaluationResult.pass : 'in_progress',
       id: 'credentials',
       // Add 1 with total evaluations so that draft step is also included
       index: evaluations.length + 1

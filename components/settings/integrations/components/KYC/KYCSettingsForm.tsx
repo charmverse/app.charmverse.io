@@ -12,9 +12,9 @@ import FieldLabel from 'components/common/form/FieldLabel';
 import Link from 'components/common/Link';
 import { capitalize } from 'lib/utils/strings';
 
-import type { FormValues } from './KycIntegration';
+import type { FormValues } from './KYCSettings';
 
-export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
+export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; control: Control<FormValues> }) {
   const {
     field: synapsApiKeyField,
     fieldState: { error: synapsApiKeyError }
@@ -66,15 +66,18 @@ export function KycIntegrationFields({ isAdmin, control }: { isAdmin: boolean; c
   return (
     <Box display='flex' flexWrap='wrap' flexDirection='column' gap={2}>
       <Box>
+        <FieldLabel>Select a provider</FieldLabel>
         <Select<KycOption | null>
           {...kycOption}
           displayEmpty
           value={kycOption.value || ''}
           disabled={!isAdmin}
-          renderValue={(val) => (val ? capitalize(val) : 'None')}
+          renderValue={(val) => (val ? capitalize(val) : 'Select')}
           error={!!kycOptionError?.message}
         >
-          <MenuItem value=''>None</MenuItem>
+          <MenuItem disabled sx={{ color: 'text.secondary' }} value=''>
+            Select
+          </MenuItem>
           <MenuItem value='synaps'>Synaps</MenuItem>
           <MenuItem value='persona'>Persona</MenuItem>
         </Select>

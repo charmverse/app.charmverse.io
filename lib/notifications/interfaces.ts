@@ -6,6 +6,7 @@ import type {
   User,
   VoteStatus
 } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import type { CardPropertyEntity, WebhookEventNames } from 'lib/webhookPublisher/interfaces';
@@ -148,7 +149,14 @@ export type ProposalNotification = NotificationBase & {
   pageId: string;
   type: ProposalNotificationType;
   group: 'proposal';
-  evaluation: Pick<ProposalEvaluation, 'title'>;
+  evaluation: Pick<ProposalEvaluation, 'title'> & {
+    actionLabels?: WorkflowEvaluationJson['actionLabels'];
+  };
+  previousEvaluation:
+    | (Pick<ProposalEvaluation, 'title'> & {
+        actionLabels?: WorkflowEvaluationJson['actionLabels'];
+      })
+    | null;
 };
 
 export type VoteNotificationType = 'new_vote';

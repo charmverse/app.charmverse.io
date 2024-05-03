@@ -6,6 +6,7 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
+import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
@@ -54,6 +55,7 @@ type FormFieldAnswersProps = {
   threads?: Record<string, ThreadWithComments | undefined>;
   project?: ProjectWithMembers | null;
   proposalId?: string;
+  milestoneProps?: ProposalRewardsTableProps;
 };
 
 const StyledStack = styled(Stack)`
@@ -94,7 +96,8 @@ export function FormFieldAnswersControlled({
   pageId,
   project,
   threads = {},
-  proposalId
+  proposalId,
+  milestoneProps
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -238,6 +241,7 @@ export function FormFieldAnswersControlled({
                           }
                         : undefined
                     }
+                    milestoneProps={milestoneProps}
                     inputEndAdornment={
                       pageId &&
                       formField.type !== 'label' &&

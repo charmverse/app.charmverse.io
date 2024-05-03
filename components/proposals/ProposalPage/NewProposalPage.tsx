@@ -48,7 +48,6 @@ import type { PageContent } from 'lib/prosemirror/interfaces';
 import { fontClassName } from 'theme/fonts';
 
 import { getNewCriteria } from './components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
-import { ProposalRewardsTable } from './components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { ProposalPropertiesInput } from './components/ProposalProperties/ProposalPropertiesBase';
 import { ProposalPropertiesBase } from './components/ProposalProperties/ProposalPropertiesBase';
 import { TemplateSelect } from './components/TemplateSelect';
@@ -255,7 +254,8 @@ export function NewProposalPage({
             type: evaluation.type,
             result: null,
             voteSettings: existingStep?.voteSettings,
-            permissions: evaluation.permissions as ProposalEvaluationPermission[]
+            permissions: evaluation.permissions as ProposalEvaluationPermission[],
+            actionLabels: evaluation.actionLabels
           };
         })
       },
@@ -448,6 +448,54 @@ export function NewProposalPage({
                         <FormFieldAnswersControlled
                           control={proposalFormFieldControl}
                           enableComments={false}
+                          milestoneProps={{
+                            containerWidth,
+                            pendingRewards,
+                            requiredTemplateId: formInputs.fields?.rewardsTemplateId,
+                            reviewers: formInputs.evaluations
+                              .map((e) => e.reviewers.filter((r) => !r.systemRole))
+                              .flat(),
+                            assignedSubmitters: formInputs.authors,
+                            isProposalTemplate: !!isTemplate,
+                            rewardIds: [],
+                            onSave: (pendingReward) => {
+                              const isExisting = pendingRewards.find(
+                                (reward) => reward.draftId === pendingReward.draftId
+                              );
+                              if (!isExisting) {
+                                setFormInputs({
+                                  fields: {
+                                    ...formInputs.fields,
+                                    pendingRewards: [...(formInputs.fields?.pendingRewards || []), pendingReward]
+                                  }
+                                });
+
+                                return;
+                              }
+
+                              setFormInputs({
+                                fields: {
+                                  ...formInputs.fields,
+                                  pendingRewards: (formInputs.fields?.pendingRewards || []).map((draft) => {
+                                    if (draft.draftId === pendingReward.draftId) {
+                                      return pendingReward;
+                                    }
+                                    return draft;
+                                  })
+                                }
+                              });
+                            },
+                            onDelete: (draftId: string) => {
+                              setFormInputs({
+                                fields: {
+                                  ...formInputs.fields,
+                                  pendingRewards: (formInputs.fields?.pendingRewards || []).filter(
+                                    (draft) => draft.draftId !== draftId
+                                  )
+                                }
+                              });
+                            }
+                          }}
                           errors={proposalFormFieldErrors}
                           onFormChange={(updatedFormFields) => {
                             setFormInputs({
@@ -484,55 +532,6 @@ export function NewProposalPage({
                       isContentControlled
                       key={`${contentTemplateId ?? formInputs.sourcePageId ?? formInputs.sourcePostId}`}
                     />
-                  )}
-                  {isStructured && formInputs.fields?.enableRewards && (
-                    <Box mt={1}>
-                      <ProposalRewardsTable
-                        containerWidth={containerWidth}
-                        pendingRewards={pendingRewards}
-                        requiredTemplateId={formInputs.fields?.rewardsTemplateId}
-                        reviewers={formInputs.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                        assignedSubmitters={formInputs.authors}
-                        variant='solid_button'
-                        isProposalTemplate={!!isTemplate}
-                        rewardIds={[]}
-                        onSave={(pendingReward) => {
-                          const isExisting = pendingRewards.find((reward) => reward.draftId === pendingReward.draftId);
-                          if (!isExisting) {
-                            setFormInputs({
-                              fields: {
-                                ...formInputs.fields,
-                                pendingRewards: [...(formInputs.fields?.pendingRewards || []), pendingReward]
-                              }
-                            });
-
-                            return;
-                          }
-
-                          setFormInputs({
-                            fields: {
-                              ...formInputs.fields,
-                              pendingRewards: (formInputs.fields?.pendingRewards || []).map((draft) => {
-                                if (draft.draftId === pendingReward.draftId) {
-                                  return pendingReward;
-                                }
-                                return draft;
-                              })
-                            }
-                          });
-                        }}
-                        onDelete={(draftId: string) => {
-                          setFormInputs({
-                            fields: {
-                              ...formInputs.fields,
-                              pendingRewards: (formInputs.fields?.pendingRewards || []).filter(
-                                (draft) => draft.draftId !== draftId
-                              )
-                            }
-                          });
-                        }}
-                      />
-                    </Box>
                   )}
                 </Box>
               </StyledContainer>

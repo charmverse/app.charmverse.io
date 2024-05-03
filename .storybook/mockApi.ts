@@ -1,4 +1,4 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import type { BlockCountInfo } from '../lib/spaces/getSpaceBlockCount';
 import { getDefaultWorkflows } from '../lib/proposals/workflows/defaultWorkflows';
 import type { SpacePermissionFlags } from '../lib/permissions/spaces';
@@ -16,16 +16,16 @@ import {
 
 const spaceHandlers = {
   // mock tracking requests
-  track: rest.post(`/api/events`, (req, res, ctx) => {
-    return res(ctx.json({}));
+  track: http.post(`/api/events`, () => {
+    return HttpResponse.json({});
   }),
-  spaceMembers: rest.get(`/api/spaces/:spaceId/members`, (req, res, ctx) => {
-    return res(ctx.json([userMemberProfile, ...members]));
+  spaceMembers: http.get(`/api/spaces/:spaceId/members`, () => {
+    return HttpResponse.json([userMemberProfile, ...members]);
   }),
-  spaceMemberProperties: rest.get(`/api/spaces/:spaceId/members/properties`, (req, res, ctx) => {
-    return res(ctx.json([]));
+  spaceMemberProperties: http.get(`/api/spaces/:spaceId/members/properties`, () => {
+    return HttpResponse.json([]);
   }),
-  spacePermissions: rest.get(`/api/permissions/space/:spaceId/compute`, (req, res, ctx) => {
+  spacePermissions: http.get(`/api/permissions/space/:spaceId/compute`, () => {
     const permissions: SpacePermissionFlags = {
       createPage: true,
       createBounty: true,
@@ -36,50 +36,50 @@ const spaceHandlers = {
       deleteAnyBounty: true,
       deleteAnyProposal: true
     };
-    return res(ctx.json(permissions));
+    return HttpResponse.json(permissions);
   }),
-  spaceRoles: rest.get(`/api/roles`, (req, res, ctx) => {
-    return res(ctx.json(spaceRoles));
+  spaceRoles: http.get(`/api/roles`, () => {
+    return HttpResponse.json(spaceRoles);
   }),
-  spaces: rest.get(`/api/spaces`, (req, res, ctx) => {
-    return res(ctx.json(spaces));
+  spaces: http.get(`/api/spaces`, () => {
+    return HttpResponse.json(spaces);
   }),
-  spaceBlockCount: rest.get(`/api/spaces/:spaceId/block-count`, (req, res, ctx) => {
+  spaceBlockCount: http.get(`/api/spaces/:spaceId/block-count`, () => {
     const result: Partial<BlockCountInfo> = { count: 1000 };
-    return res(ctx.json(result));
+    return HttpResponse.json(result);
   })
 };
 
 const pageHandlers = {
-  pageComments: rest.get(`/api/pages/:pageId/comments`, (req, res, ctx) => {
-    return res(ctx.json([]));
+  pageComments: http.get(`/api/pages/:pageId/comments`, () => {
+    return HttpResponse.json([]);
   })
 };
 
 const proposalHandlers = {
-  proposalTemplates: rest.get(`/api/spaces/:spaceId/proposal-templates`, (req, res, ctx) => {
-    return res(ctx.json(proposalTemplates));
+  proposalTemplates: http.get(`/api/spaces/:spaceId/proposal-templates`, () => {
+    return HttpResponse.json(proposalTemplates);
   }),
-  proposalWorkflows: rest.get(`/api/spaces/:spaceId/proposals/workflows`, (req, res, ctx) => {
-    return res(ctx.json(getDefaultWorkflows(req.params.spaceId as string)));
+  proposalWorkflows: http.get(`/api/spaces/:spaceId/proposals/workflows`, ({ params }) => {
+    return HttpResponse.json(getDefaultWorkflows(params.spaceId as string));
   })
 };
 
 const rewardHandlers = {
-  rewardBlocks: rest.get(`/api/spaces/:spaceId/rewards/blocks`, (req, res, ctx) => {
-    return res(ctx.json([]));
+  rewardBlocks: http.get(`/api/spaces/:spaceId/rewards/blocks`, () => {
+    return HttpResponse.json([]);
   }),
-  rewardTemplates: rest.get(`/api/spaces/:spaceId/reward-templates`, (req, res, ctx) => {
-    return res(ctx.json([]));
+  rewardTemplates: http.get(`/api/spaces/:spaceId/reward-templates`, () => {
+    return HttpResponse.json([]);
   })
 };
 
 const userHandlers = {
-  userProfile: rest.get(`/api/profile`, (req, res, ctx) => {
-    return res(ctx.json(userProfile));
+  userProfile: http.get(`/api/profile`, () => {
+    return HttpResponse.json(userProfile);
   }),
-  notificationsList: rest.get(`/api/notifications/list`, (req, res, ctx) => {
-    return res(ctx.json([]));
+  notificationsList: http.get(`/api/notifications/list`, () => {
+    return HttpResponse.json([]);
   })
 };
 
