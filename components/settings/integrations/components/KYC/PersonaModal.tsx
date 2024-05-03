@@ -22,7 +22,11 @@ const mapPersonaStatus = {
 };
 
 export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; userId?: string; isAdmin?: boolean }) {
-  const { data: personaUserKyc, isLoading: isPersonaUserKycLoading } = useGetPersonaInquiry(spaceId, userId);
+  const {
+    data: personaUserKyc,
+    isLoading: isPersonaUserKycLoading,
+    mutate: mutatePersonaUserKyc
+  } = useGetPersonaInquiry(spaceId, userId);
   const {
     data: personaInquiry,
     trigger: initPersonaInquiry,
@@ -87,7 +91,10 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
           <PersonaInquiry
             inquiryId={personaInquiry.inquiryId}
             referenceId={userId}
-            onComplete={() => popupPersonaState.close()}
+            onComplete={() => {
+              mutatePersonaUserKyc();
+              popupPersonaState.close();
+            }}
           />
         </Modal>
       )}
