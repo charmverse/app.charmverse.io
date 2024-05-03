@@ -1,6 +1,7 @@
 import type { Space, KycOption } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack, Grid, Typography } from '@mui/material';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -162,7 +163,7 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
           )}
           {isAdmin && space.kycOption === 'synaps' && kycCredentials?.synaps?.apiKey && (
             <div>
-              <SynapsModal spaceId={space.id} />
+              <SynapsModal spaceId={space.id} isAdmin={isAdmin} />
             </div>
           )}
           {isAdmin &&
@@ -170,22 +171,11 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
             kycCredentials?.persona?.apiKey &&
             kycCredentials.persona.templateId && (
               <div>
-                <PersonaModal spaceId={space.id} />
+                <PersonaModal spaceId={space.id} isAdmin={isAdmin} />
               </div>
             )}
           {isAdmin && kycCredentials && (
             <Box display='flex' gap={2}>
-              {/* {isDirty && (
-                <Button
-                  disableElevation
-                  variant='outlined'
-                  disabled={isLoading || !isDirty}
-                  onClick={resetValues}
-                  sx={{ mr: 2 }}
-                >
-                  Cancel
-                </Button>
-              )} */}
               <Button
                 disabled={isLoading || !isDirty || !isValid || !kycOption}
                 type='submit'

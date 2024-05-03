@@ -7,6 +7,7 @@ import { useGetSynapsSession, useInitSynapsSession } from 'charmClient/hooks/kyc
 import { Button } from 'components/common/Button';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
+import { useUser } from 'hooks/useUser';
 
 const mapSynapsStatus = {
   APPROVED: 'Approved',
@@ -28,6 +29,7 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
     isMutating: initSessionLoading,
     reset
   } = useInitSynapsSession(spaceId);
+  const { user } = useUser();
   const { showConfirmation } = useConfirmationModal();
   const { onClose: closeSettingsModal } = useSettingsDialog();
 
@@ -78,9 +80,9 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
     };
   }, [synapsSession?.session_id]);
 
-  return (
-    <Box>
-      {synapsUserKyc && disabled ? (
+  if (synapsUserKyc?.status && disabled) {
+    return (
+      <Box>
         <Chip
           clickable={false}
           color='secondary'
@@ -88,7 +90,17 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
           variant='outlined'
           label={`Status: ${mapSynapsStatus[synapsUserKyc.status] || 'Unknown'}`}
         />
-      ) : isAdmin ? (
+      </Box>
+    );
+  }
+
+  if (userId && userId !== user?.id) {
+    return null;
+  }
+
+  return (
+    <Box display='flex' flexDirection='column' alignItems='start' gap={2}>
+      {isAdmin ? (
         <Chip
           onClick={openModal}
           clickable={true}
@@ -107,6 +119,15 @@ export function SynapsModal({ spaceId, userId, isAdmin }: { spaceId: string; use
         >
           Start KYC
         </Button>
+      )}
+      {synapsUserKyc?.status && (
+        <Chip
+          clickable={false}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          label={`Status: ${mapSynapsStatus[synapsUserKyc.status] || 'Unknown'}`}
+        />
       )}
     </Box>
   );

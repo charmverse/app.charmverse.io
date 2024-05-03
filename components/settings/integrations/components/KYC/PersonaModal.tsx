@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { useGetPersonaInquiry, useInitPersonaInquiry } from 'charmClient/hooks/kyc';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import { useUser } from 'hooks/useUser';
 
 const PersonaInquiry = dynamic(() => import('persona').then((module) => module.Inquiry), { ssr: false });
 
@@ -29,15 +30,16 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
   } = useInitPersonaInquiry(spaceId);
   const popupPersonaState = usePopupState({ variant: 'popover', popupId: 'kyc-persona' });
   const disabled = ['pending', 'completed', 'needs_review', 'approved'].includes(personaUserKyc?.status || '');
+  const { user } = useUser();
 
   const onConfirm = async () => {
     await initPersonaInquiry();
     popupPersonaState.open();
   };
 
-  return (
-    <Box>
-      {personaUserKyc && disabled ? (
+  if (personaUserKyc?.status && disabled) {
+    return (
+      <Box>
         <Chip
           clickable={false}
           color='secondary'
@@ -45,7 +47,17 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
           variant='outlined'
           label={`Status: ${mapPersonaStatus[personaUserKyc.status] || 'Unknown'}`}
         />
-      ) : isAdmin ? (
+      </Box>
+    );
+  }
+
+  if (user?.id !== userId) {
+    return null;
+  }
+
+  return (
+    <Box display='flex' flexDirection='column' alignItems='start' gap={2}>
+      {isAdmin ? (
         <Chip
           onClick={onConfirm}
           clickable={true}
@@ -73,11 +85,20 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
           sx={{ '& iframe': { minWidth: '375px', width: '100%', minHeight: '600px', height: '100%' } }}
         >
           <PersonaInquiry
-            inquiryId={personaInquiry?.inquiryId}
+            inquiryId={personaInquiry.inquiryId}
             referenceId={userId}
             onComplete={() => popupPersonaState.close()}
           />
         </Modal>
+      )}
+      {personaUserKyc?.status && (
+        <Chip
+          clickable={false}
+          color='secondary'
+          size='small'
+          variant='outlined'
+          label={`Status: ${mapPersonaStatus[personaUserKyc.status] || 'Unknown'}`}
+        />
       )}
     </Box>
   );
