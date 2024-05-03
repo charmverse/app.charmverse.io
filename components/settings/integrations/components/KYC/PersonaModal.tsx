@@ -51,7 +51,7 @@ export function PersonaModal({ spaceId, userId, isAdmin }: { spaceId: string; us
     );
   }
 
-  if (user?.id !== userId) {
+  if (userId && user?.id !== userId) {
     return null;
   }
 

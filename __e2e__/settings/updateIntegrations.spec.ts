@@ -46,9 +46,9 @@ test('Space settings - add kyc integrations', async ({ page, spaceSettings }) =>
   await spaceSettings.modalCancelButton.click();
 
   await spaceSettings.kycOption.fill('persona');
-  await spaceSettings.personaApiKey.fill('test-api-key');
-  await spaceSettings.personaSecret.fill('test-secret');
-  await spaceSettings.personaTemplateId.fill('test-template-id');
+  await spaceSettings.personaApiKey.fill('persona_test_api_key');
+  await spaceSettings.personaSecret.fill('wbhsec_test_secret');
+  await spaceSettings.personaTemplateId.fill('itmpl_test-template-id');
   await spaceSettings.saveButton.click();
   await expect(spaceSettings.personaKycButton).toBeVisible();
   await expect(spaceSettings.personaKycButton).toBeEnabled();
