@@ -356,7 +356,7 @@ export function RewardsPage({ title }: { title: string }) {
                     cards={cards}
                     groupByProperty={groupByProperty}
                     views={views}
-                    visibleGroups={[]}
+                    visibleGroups={visibleGroups}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     disableAddingCards
@@ -430,7 +430,6 @@ export function RewardsPage({ title }: { title: string }) {
                 hideLayoutOptions
                 hideLayoutSelectOptions={undefined}
                 hideSourceOptions
-                hideGroupOptions
                 groupByProperty={groupByProperty}
                 page={undefined}
                 pageId={undefined}

@@ -739,30 +739,54 @@ export function groupCardsByOptions(
   optionIds: string[],
   groupByProperty?: IPropertyTemplate
 ): BoardGroup[] {
-  const groups = [];
+  const groups: BoardGroup[] = [];
 
-  for (const optionId of optionIds) {
-    if (optionId) {
-      const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
-      if (groupByProperty && option) {
-        const filteredCards = cards.filter((o) => optionId === o.fields.properties[groupByProperty.id]);
+  // TODO: allow other type of properties besides select/multiSelect and proposalUrl
+  if (groupByProperty?.type === 'proposalUrl') {
+    // group cards based on the value of the proposalUrl property
+    const valueMap: Record<string, Card[]> = {};
+    for (const card of cards) {
+      const cardValue = card.fields.properties[groupByProperty.id];
+      const proposalTitle = typeof cardValue === 'string' ? cardValue : Array.isArray(cardValue) ? cardValue[0] : null;
+      if (typeof proposalTitle === 'string') {
+        if (!valueMap[proposalTitle]) {
+          valueMap[proposalTitle] = [];
+        }
+        valueMap[proposalTitle].push(card);
+      }
+    }
+
+    for (const [value, valueCards] of Object.entries(valueMap)) {
+      const group: BoardGroup = {
+        option: { id: value, value: value || `No ${groupByProperty?.name}`, color: '' },
+        cards: valueCards
+      };
+      groups.push(group);
+    }
+  } else {
+    for (const optionId of optionIds) {
+      if (optionId) {
+        const option = (groupByProperty?.options ?? []).find((o) => o.id === optionId);
+        if (groupByProperty && option) {
+          const filteredCards = cards.filter((o) => optionId === o.fields.properties[groupByProperty.id]);
+          const group: BoardGroup = {
+            option,
+            cards: filteredCards
+          };
+          groups.push(group);
+        }
+      } else {
+        // Empty group
+        const emptyGroupCards = cards.filter((card) => {
+          const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
+          return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
+        });
         const group: BoardGroup = {
-          option,
-          cards: filteredCards
+          option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },
+          cards: emptyGroupCards
         };
         groups.push(group);
       }
-    } else {
-      // Empty group
-      const emptyGroupCards = cards.filter((card) => {
-        const groupByOptionId = card.fields.properties[groupByProperty?.id || ''];
-        return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
-      });
-      const group: BoardGroup = {
-        option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },
-        cards: emptyGroupCards
-      };
-      groups.push(group);
     }
   }
   return groups;
@@ -781,7 +805,6 @@ export function getVisibleAndHiddenGroups(
       .map((o: IPropertyOption) => o.id);
   }
   const allVisibleOptionIds = [...visibleOptionIds, ...unassignedOptionIds];
-
   // If the empty group position is not explicitly specified, make it the first visible column
   if (!allVisibleOptionIds.includes('') && !hiddenOptionIds.includes('')) {
     allVisibleOptionIds.unshift('');
