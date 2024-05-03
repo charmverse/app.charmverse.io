@@ -181,10 +181,7 @@ export function EvaluationsReview({
               />
             ) : evaluation.type === 'kyc' ? (
               <KycStepSettings
-                readOnly={
-                  // It will be readonly if there is no application or is current application
-                  !application || (!isCurrent && evaluation.result === null) || !workPermission
-                }
+                readOnly={!application || (!isCurrent && evaluation.result === null)}
                 userId={application?.createdBy}
               />
             ) : evaluation.type === 'submit' ? (
