@@ -2,8 +2,8 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import Link from 'components/common/Link';
-import { PersonaModal } from 'components/settings/integrations/components/PersonaModal';
-import { SynapsModal } from 'components/settings/integrations/components/SynapsModal';
+import { PersonaModal } from 'components/settings/integrations/components/KYC/PersonaModal';
+import { SynapsModal } from 'components/settings/integrations/components/KYC/SynapsModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSettingsDialog } from 'hooks/useSettingsDialog';
