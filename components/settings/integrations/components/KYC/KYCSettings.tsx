@@ -147,12 +147,13 @@ export function KYCSettings({ space, isAdmin }: { space: Space; isAdmin: boolean
 
   return (
     <IntegrationContainer
-      isConnected={!!space.kycOption}
-      expanded={expanded}
-      setExpanded={setExpanded}
-      onCancel={resetValues}
       title='KYC'
       subheader='Verify the identity of your members'
+      expanded={expanded}
+      setExpanded={setExpanded}
+      isAdmin={isAdmin}
+      isConnected={!!space.kycOption}
+      onCancel={resetValues}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack gap={2}>

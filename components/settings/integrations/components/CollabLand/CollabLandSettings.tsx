@@ -40,12 +40,12 @@ export function CollabLandSettings({ isAdmin }: { isAdmin: boolean }) {
 
   return (
     <IntegrationContainer
-      isConnected={isConnected}
-      expanded={expanded}
-      setExpanded={setExpanded}
       title='Collab.Land'
       subheader='Sync members and roles with Discord'
-      disableConnectTooltip={!isAdmin ? 'Collab.Land is not connected yet. Only admins can configure this' : undefined}
+      expanded={expanded}
+      setExpanded={setExpanded}
+      isAdmin={isAdmin}
+      isConnected={isConnected}
     >
       {isConnected ? (
         <Stack gap={2}>
