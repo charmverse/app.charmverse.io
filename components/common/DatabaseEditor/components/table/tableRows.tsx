@@ -64,7 +64,9 @@ function TableRows(props: Props): JSX.Element {
   );
 
   const setIsExpanded = ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
-    setCollapsedCardIds((prev) => (expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId]));
+    setCollapsedCardIds((prev) => {
+      return expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId];
+    });
   };
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {

@@ -29,6 +29,8 @@ type Props = {
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
+  expandSubRowsOnLoad?: boolean;
+  rowExpansionLocalStoragePrefix?: string;
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
@@ -90,6 +92,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           onCardClicked={props.onCardClicked}
           onDrop={props.onDropToCard}
           readOnlyTitle={props.readOnlyTitle}
+          expandSubRowsOnLoad={props.expandSubRowsOnLoad}
+          rowExpansionLocalStoragePrefix={props.rowExpansionLocalStoragePrefix}
           subRowsEmptyValueContent={props.subRowsEmptyValueContent}
           checkedIds={props.checkedIds}
           setCheckedIds={props.setCheckedIds}

@@ -364,6 +364,8 @@ function Table(props: Props): JSX.Element {
                     onDropToGroup={onDropToGroup}
                     readOnlyTitle={props.readOnlyTitle}
                     disableAddingCards={props.disableAddingCards}
+                    expandSubRowsOnLoad={expandSubRowsOnLoad}
+                    rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
                     subRowsEmptyValueContent={subRowsEmptyValueContent}
                     checkedIds={checkedIds}
                     setCheckedIds={setCheckedIds}
