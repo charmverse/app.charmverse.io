@@ -1,6 +1,7 @@
 import { Menu } from '@mui/material';
 import { bindMenu, bindTrigger, type PopupState } from 'material-ui-popup-state/hooks';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import { TbArrowsSort } from 'react-icons/tb';
 import { FormattedMessage } from 'react-intl';
 
 import { Button } from 'components/common/Button';
@@ -8,6 +9,8 @@ import { useViewSortOptions } from 'hooks/useViewSortOptions';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
+
+import IconButton from '../widgets/buttons/iconButton';
 
 import ViewHeaderSortMenu from './viewHeader/viewHeaderSortMenu';
 
@@ -39,7 +42,15 @@ export function SortMenuButton({ hasSort, menuItems }: { hasSort: boolean; menuI
 
   return (
     <>
-      <Button
+      <IconButton
+        tooltip='Sort'
+        icon={
+          <TbArrowsSort style={{ color: hasSort ? 'var(--primary-color)' : 'var(--secondary-text)', fontSize: 16 }} />
+        }
+        style={{ width: '32px' }}
+        {...bindTrigger(viewSortPopup)}
+      />
+      {/* <Button
         color={hasSort ? 'primary' : 'secondary'}
         variant='text'
         size='small'
@@ -47,7 +58,7 @@ export function SortMenuButton({ hasSort, menuItems }: { hasSort: boolean; menuI
         {...bindTrigger(viewSortPopup)}
       >
         <FormattedMessage id='ViewHeader.sort' defaultMessage='Sort' />
-      </Button>
+      </Button> */}
       <Menu
         {...bindMenu(viewSortPopup)}
         slotProps={{

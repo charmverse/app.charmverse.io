@@ -742,6 +742,7 @@ export function groupCardsByOptions(
   const groups: BoardGroup[] = [];
 
   // TODO: allow other type of properties besides select/multiSelect and proposalUrl
+  // Note: when adding a new field here, make sure it can be updated or editing is disabled in the onSave handler inside tableGroupHeaderRow.tsx
   if (groupByProperty?.type === 'proposalUrl') {
     // group cards based on the value of the proposalUrl property
     const valueMap: Record<string, Card[]> = {};
@@ -758,7 +759,9 @@ export function groupCardsByOptions(
 
     for (const [value, valueCards] of Object.entries(valueMap)) {
       const group: BoardGroup = {
-        option: { id: value, value: value || `No ${groupByProperty?.name}`, color: '' },
+        id: value || '',
+        // option: { id: 'proposalUrl', value: value || `No ${groupByProperty?.name}`, color: '' },
+        value: value || '',
         cards: valueCards
       };
       groups.push(group);
@@ -770,6 +773,7 @@ export function groupCardsByOptions(
         if (groupByProperty && option) {
           const filteredCards = cards.filter((o) => optionId === o.fields.properties[groupByProperty.id]);
           const group: BoardGroup = {
+            id: option.id,
             option,
             cards: filteredCards
           };
@@ -782,6 +786,7 @@ export function groupCardsByOptions(
           return !groupByOptionId || !(groupByProperty?.options ?? []).find((option) => option.id === groupByOptionId);
         });
         const group: BoardGroup = {
+          id: '',
           option: { id: '', value: `No ${groupByProperty?.name}`, color: '' },
           cards: emptyGroupCards
         };

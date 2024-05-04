@@ -91,10 +91,12 @@ describe('src/component/kanban/kanban', () => {
 
   const visibleGroups: BoardGroup[] = [
     {
+      id: optionQ1.id,
       option: optionQ1,
       cards: [card1, card2]
     },
     {
+      id: optionQ2.id,
       option: optionQ2,
       cards: [card3]
     }
@@ -102,6 +104,7 @@ describe('src/component/kanban/kanban', () => {
 
   const hiddenGroups: BoardGroup[] = [
     {
+      id: optionQ3.id,
       option: optionQ3,
       cards: []
     }

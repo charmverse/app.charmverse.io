@@ -193,8 +193,14 @@ function TableRow(props: Props) {
 
   if (isGrouped) {
     const groupID = activeView.fields.groupById || '';
-    const groupValue = (card.fields.properties[groupID] as string) || 'undefined';
-    if (activeView.fields.collapsedOptionIds.indexOf(groupValue) > -1) {
+    // look up property id if we grouped by column type (eg proposalUrl)
+    const groupTemplate = board.fields.cardProperties.find((prop) => prop.type === groupID);
+    const groupValue =
+      (groupTemplate ? card.fields.properties[groupTemplate.id] : (card.fields.properties[groupID] as string)) ||
+      'undefined';
+    const groupValueStr =
+      typeof groupValue === 'string' ? groupValue : Array.isArray(groupValue) ? groupValue[0] : null;
+    if (groupValueStr !== null && activeView.fields.collapsedOptionIds.indexOf(groupValueStr) > -1) {
       className += ' hidden';
     }
   }
@@ -404,7 +410,7 @@ function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean
                 indentTitle={30}
                 isNested
                 // Don't allow subrows to be selected
-                setCheckedIds={() => {}}
+                setCheckedIds={undefined}
                 subRowsEmptyValueContent={props.subRowsEmptyValueContent}
               />
             )))}

@@ -150,8 +150,8 @@ export function DatabaseKanbanView() {
           onCardClicked={voidFunction}
           selectedCardIds={[]}
           visibleGroups={[
-            { cards: [card1], option: schema.select.options[0] },
-            { cards: [card2], option: schema.select.options[1] }
+            { id: card1.id, cards: [card1], option: schema.select.options[0] },
+            { id: card2.id, cards: [card2], option: schema.select.options[1] }
           ]}
         />
       </div>

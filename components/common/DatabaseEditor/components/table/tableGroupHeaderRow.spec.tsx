@@ -15,6 +15,7 @@ const view2 = TestBlockFactory.createBoardView(board);
 view2.fields.sortOptions = [];
 
 const boardTreeNoGroup = {
+  id: '',
   option: {
     id: '',
     value: '',
@@ -24,6 +25,7 @@ const boardTreeNoGroup = {
 };
 
 const boardTreeGroup = {
+  id: '',
   option: {
     id: 'value1',
     value: 'value 1',
@@ -109,7 +111,7 @@ test('should match snapshot, hide group', async () => {
   );
 
   const { container } = render(component);
-  const triangle = container.querySelector('[data-testid="ArrowDropDownOutlinedIcon"]');
+  const triangle = container.querySelector('[data-testid="ArrowDropDownIcon"]');
   expect(triangle).not.toBeNull();
 
   act(() => {

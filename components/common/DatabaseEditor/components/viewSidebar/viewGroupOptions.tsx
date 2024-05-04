@@ -1,4 +1,4 @@
-import { Delete } from '@mui/icons-material';
+import { DeleteOutlined } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Box, Divider, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 
@@ -76,7 +76,7 @@ function GroupByOptions(props: LayoutOptionsProps) {
             }}
           >
             <ListItemIcon>
-              <Delete color='secondary' />
+              <DeleteOutlined color='secondary' />
             </ListItemIcon>
             <ListItemText color='secondary'>Remove grouping</ListItemText>
           </MenuItem>

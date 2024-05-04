@@ -24,7 +24,7 @@ type Props = {
   showCard: (cardId: string) => void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  onDropToGroupHeader: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
+  onDropToGroupHeader: (srcOption: BoardGroup, dstOption?: BoardGroup) => void;
   onDropToCard: (srcCard: Card, dstCard: Card) => void;
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
   disableAddingCards?: boolean;
@@ -36,7 +36,7 @@ type Props = {
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, onDropToGroup, groupByProperty } = props;
-  const groupId = group.option.id;
+  const groupId = group.id;
 
   const [{ isOver }, drop] = useDrop<Card, any, { isOver: boolean }>(
     () => ({
@@ -59,7 +59,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
   }
 
   return (
-    <div ref={drop} className={className} key={group.option.id}>
+    <div ref={drop} className={className} key={group.option?.id || group.value}>
       <TableGroupHeaderRow
         group={group}
         board={board}

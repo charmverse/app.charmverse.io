@@ -391,8 +391,8 @@ export function RewardsPage({ title }: { title: string }) {
                     activeView={activeView}
                     cards={cards}
                     groupByProperty={groupByProperty}
-                    visibleGroups={visibleGroups.filter((g) => !!g.option.id)}
-                    hiddenGroups={hiddenGroups.filter((g) => !!g.option.id)}
+                    visibleGroups={visibleGroups.filter((g) => !!g.id)}
+                    hiddenGroups={hiddenGroups.filter((g) => !!g.id)}
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     addCard={async () => {}}

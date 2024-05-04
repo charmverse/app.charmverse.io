@@ -187,14 +187,18 @@ function Table(props: Props): JSX.Element {
   );
 
   const onDropToGroupHeader = useCallback(
-    async (option: IPropertyOption, dstOption?: IPropertyOption) => {
-      if (dstOption) {
-        Utils.log(`ondrop. Header target: ${dstOption.value}, source: ${option?.value}`);
+    async (group: BoardGroup, dstGroup?: BoardGroup) => {
+      if (dstGroup) {
+        Utils.log(
+          `ondrop. Header target: ${dstGroup.option?.value || dstGroup.value}, source: ${
+            group?.option?.value || group?.value
+          }`
+        );
 
         // Move option to new index
-        const visibleOptionIds = visibleGroups.map((o) => o.option.id);
-        const srcIndex = visibleOptionIds.indexOf(dstOption.id);
-        const destIndex = visibleOptionIds.indexOf(option.id);
+        const visibleOptionIds = visibleGroups.map((o) => o.id);
+        const srcIndex = visibleOptionIds.indexOf(dstGroup.id);
+        const destIndex = visibleOptionIds.indexOf(group.id);
 
         visibleOptionIds.splice(srcIndex, 0, visibleOptionIds.splice(destIndex, 1)[0]);
         Utils.log(`ondrop. updated visibleoptionids: ${visibleOptionIds}`);
@@ -341,7 +345,7 @@ function Table(props: Props): JSX.Element {
               visibleGroups.map((group) => {
                 return (
                   <TableGroup
-                    key={group.option.id}
+                    key={group.id}
                     board={board}
                     activeView={activeView}
                     groupByProperty={groupByProperty}
