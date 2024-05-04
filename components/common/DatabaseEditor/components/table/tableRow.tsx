@@ -179,7 +179,7 @@ function TableRow(props: Props) {
         return checkedIds;
       });
     }
-  }, [isSelected, selection]);
+  }, [isSelected, !!selection]);
 
   useEffect(() => {
     setTitle(pageTitle);

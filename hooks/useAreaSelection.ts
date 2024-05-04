@@ -195,8 +195,13 @@ export function useSelected(elementRef: RefObject<HTMLElement>, selection: DOMRe
       setIsSelected(false);
     } else {
       const a = elementRef.current.getBoundingClientRect();
-      const b = selection;
-      setIsSelected(!(a.y + a.height < b.y || a.y > b.y + b.height || a.x + a.width < b.x || a.x > b.x + b.width));
+      // element is hidden
+      if (a.height === 0 || a.width === 0) {
+        setIsSelected(false);
+      } else {
+        const b = selection;
+        setIsSelected(!(a.y + a.height < b.y || a.y > b.y + b.height || a.x + a.width < b.x || a.x > b.x + b.width));
+      }
     }
   }, [elementRef, selection]);
 
