@@ -246,7 +246,6 @@ function TableHeaders(props: Props): JSX.Element {
         }
         return (
           <TableHeader
-            data-test={`table-property-${template.type}`}
             sorted={sorted}
             readOnly={props.readOnly}
             board={board}
