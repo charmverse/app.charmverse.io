@@ -82,6 +82,9 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           activeView={activeView}
           columnRefs={props.columnRefs}
           cards={group.cards}
+          disableDragAndDrop={
+            groupByProperty && groupByProperty.type !== 'select' && groupByProperty.type !== 'multiSelect'
+          } // disables drag and drop
           selectedCardIds={props.selectedCardIds}
           readOnly={props.readOnly}
           cardIdToFocusOnRender={props.cardIdToFocusOnRender}

@@ -65,6 +65,7 @@ type Props = {
   emptySubPagesPlaceholder?: ReactNode;
   isChecked?: boolean;
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  disableDragAndDrop?: boolean;
 };
 
 export const StyledCheckbox = styled(Checkbox, {
@@ -114,6 +115,7 @@ function TableRow(props: Props) {
     setIsExpanded,
     isExpanded,
     indentTitle,
+    disableDragAndDrop,
     isNested,
     subRowsEmptyValueContent,
     isChecked,
@@ -126,13 +128,13 @@ function TableRow(props: Props) {
   const titleRef = useRef<{ focus(selectAll?: boolean): void }>(null);
   const [title, setTitle] = useState('');
   const isGrouped = Boolean(activeView.fields.groupById);
-  const enabled = !isTouchScreen() && !props.readOnly;
+  const isDragAndDropEnabled = !isTouchScreen() && !props.readOnly && !props.disableDragAndDrop;
 
   const { drag, drop, preview, style } = useDragDrop({
     item: card,
     itemType: 'card',
     onDrop: props.onDrop,
-    enabled
+    enabled: isDragAndDropEnabled
   });
 
   const { selection } = useContext(SelectionContext);
@@ -232,7 +234,7 @@ function TableRow(props: Props) {
     >
       {!props.readOnly && (
         <Stack flexDirection='row' gap={1} alignItems='center'>
-          {!isNested && (
+          {!isNested && isDragAndDropEnabled && (
             <div
               className='icons row-actions'
               onClick={handleClick}

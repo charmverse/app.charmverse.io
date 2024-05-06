@@ -35,6 +35,7 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  disableDragAndDrop?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
@@ -46,6 +47,7 @@ function TableRows(props: Props): JSX.Element {
     expandSubRowsOnLoad,
     subRowsEmptyValueContent,
     setCheckedIds,
+    disableDragAndDrop,
     checkedIds = []
   } = props;
   const hasSubPages = allCards.some((card) => card.subPages?.length);
@@ -124,6 +126,7 @@ function TableRows(props: Props): JSX.Element {
           setIsExpanded={setIsExpanded}
           setCheckedIds={setCheckedIds}
           isChecked={checkedIds.includes(card.id)}
+          disableDragAndDrop={disableDragAndDrop}
           emptySubPagesPlaceholder={
             card.reward ? (
               <Box
