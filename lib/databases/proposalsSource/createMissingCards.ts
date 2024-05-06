@@ -28,10 +28,11 @@ export async function createMissingCards({ boardId }: { boardId: string }): Prom
     }
   });
 
-  const pagesMissingCards = await prisma.page.findMany({
+  const proposalPages = await prisma.page.findMany({
     where: {
       // create blocks for missing proposals
-      createdAt: latestTimestamp
+      // use updatedAt to avoid querying all proposals all the time
+      updatedAt: latestTimestamp
         ? {
             gt: latestTimestamp
           }
@@ -58,6 +59,23 @@ export async function createMissingCards({ boardId }: { boardId: string }): Prom
       createdAt: true,
       spaceId: true
     }
+  });
+
+  const existingBlocks = await prisma.page.findMany({
+    where: {
+      parentId: boardId,
+      syncWithPageId: {
+        in: [...proposalPages.map((p) => p.id)]
+      },
+      type: 'card'
+    },
+    select: {
+      syncWithPageId: true
+    }
+  });
+
+  const pagesMissingCards = proposalPages.filter((proposalPage) => {
+    return !existingBlocks.some((block) => block.syncWithPageId === proposalPage.id);
   });
 
   if (pagesMissingCards.length > 0) {
