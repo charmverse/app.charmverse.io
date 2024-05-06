@@ -1,4 +1,4 @@
-import type { DocusignEnvelope, DocusignEnvelopeToCreate, DocusignTemplate } from 'lib/docusign/api';
+import type { DocusignEnvelope, DocusignEnvelopeToCreate, DocusignSearch, DocusignTemplate } from 'lib/docusign/api';
 import type { PublicDocuSignProfile } from 'lib/docusign/authentication';
 
 import { useGET, usePOST, type MaybeString } from './helpers';
@@ -15,10 +15,14 @@ export function useGetSpaceDocusignEnvelopes({ spaceId }: { spaceId: MaybeString
   return useGET<DocusignEnvelope[]>(spaceId ? '/api/docusign/envelopes' : null, { spaceId });
 }
 
+export function useGetSearchSpaceDocusignEnvelopes({ spaceId, ...search }: { spaceId: MaybeString } & DocusignSearch) {
+  return useGET<DocusignEnvelope[]>(spaceId ? '/api/docusign/search' : null, { spaceId, ...search });
+}
+
 export function usePostCreateEnvelope() {
   return usePOST<{ spaceId: string } & DocusignEnvelopeToCreate, unknown>(`/api/docusign/envelopes`);
 }
 
 export function usePostRequestDocusignLink() {
-  return usePOST<{ envelopeId: string }, { url: string }>(`/api/docusign/signature-link`);
+  return usePOST<{ envelopeId: string; spaceId: string }, { url: string }>(`/api/docusign/signature-link`);
 }

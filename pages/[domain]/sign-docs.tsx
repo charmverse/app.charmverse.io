@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { POST } from 'adapters/http';
 import { Button } from 'components/common/Button';
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
+import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
 import { ScrollableWindow } from 'components/common/PageLayout';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
@@ -21,7 +22,9 @@ export default function SignDocs() {
     triggerCreateEnvelope,
     envelopes,
     refreshEnvelopes,
-    requestSigningLink
+    requestSigningLink,
+    envelopeSearchResults,
+    searchDocusign
   } = useDocusign();
 
   const [selectedDocusignTemplate, setSelectedDocusignTemplate] = useState<string | null>(null);
@@ -42,7 +45,7 @@ export default function SignDocs() {
   }
 
   async function handleSignDocument(envelopeId: string) {
-    const { url } = await requestSigningLink({ envelopeId });
+    const { url } = await requestSigningLink({ envelopeId, spaceId: space?.id as string });
 
     router.push(url);
   }
@@ -94,7 +97,7 @@ export default function SignDocs() {
         )}
         <Divider></Divider>
 
-        <h2>2. Display templates</h2>
+        {/* <h2>2. Display templates</h2>
 
         {docusignTemplates?.map((t) => (
           <Box key={t.templateId}>
@@ -133,6 +136,19 @@ export default function SignDocs() {
           </Box>
         )}
 
+        <Divider></Divider> */}
+
+        <h2>3. Search envelopes</h2>
+        <Box>
+          <FormLabel>Search</FormLabel>
+          <TextField onChange={(ev) => searchDocusign({ title: ev.target.value })} />
+          {envelopeSearchResults?.map((e) => (
+            <Box key={e.emailSubject}>
+              {e.emailSubject}
+              <Button onClick={() => handleSignDocument(e.envelopeId)}>Sign</Button>
+            </Box>
+          ))}
+        </Box>
         <Divider></Divider>
 
         <h2>4. Interact with a pending envelope</h2>

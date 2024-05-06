@@ -1,6 +1,9 @@
+import { useState } from 'react';
+
 import {
   useGetDocusignProfile,
   useGetDocusignTemplates,
+  useGetSearchSpaceDocusignEnvelopes,
   useGetSpaceDocusignEnvelopes,
   usePostCreateEnvelope,
   usePostRequestDocusignLink
@@ -8,6 +11,7 @@ import {
 import { useGET } from 'charmClient/hooks/helpers';
 import { docusignClientId, docusignOauthBaseUri } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { DocusignSearch } from 'lib/docusign/api';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 
 /**
@@ -35,7 +39,22 @@ export function useDocusign() {
 
   const { trigger: requestSigningLink } = usePostRequestDocusignLink();
 
+  const [docusignSearchTitle, setDocusignSearchTitle] = useState('');
+
   const { data: envelopes, mutate: refreshEnvelopes } = useGetSpaceDocusignEnvelopes({ spaceId: space?.id });
+
+  const {
+    data: envelopeSearchResults,
+    mutate: refreshEnvelopeSearchResults,
+    isLoading: isSearchingEnvelopes
+  } = useGetSearchSpaceDocusignEnvelopes({
+    spaceId: space?.id,
+    title: docusignSearchTitle
+  });
+
+  function searchDocusign(search: DocusignSearch) {
+    setDocusignSearchTitle(search.title ?? '');
+  }
 
   const {
     data: docusignTemplates,
@@ -54,6 +73,9 @@ export function useDocusign() {
     createdEnvelope,
     envelopes,
     refreshEnvelopes,
-    requestSigningLink
+    requestSigningLink,
+    isSearchingEnvelopes,
+    envelopeSearchResults,
+    searchDocusign
   };
 }

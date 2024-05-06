@@ -2,6 +2,7 @@
  * Below methods are the API reference links for the Docusign API
  */
 
+import type { DocumentToSign } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { GET, POST } from 'adapters/http';
@@ -74,6 +75,9 @@ export type CreatedEnvelope = {
   status: 'created';
 };
 
+/**
+ * This function cannot be used with the curent version since we are not creating envelopes from CharmVerse
+ */
 export async function createEnvelope({
   apiBaseUrl,
   accountId,
@@ -209,7 +213,10 @@ export async function listSpaceEnvelopes({ spaceId }: { spaceId: string }): Prom
   return envelopeData;
 }
 
-export async function createEnvelopeSigningLink({ envelopeId }: { envelopeId: string }): Promise<string> {
+/**
+ * This function cannot be used with the curent version since we are not creating envelopes from CharmVerse
+ */
+async function createEnvelopeSigningLink({ envelopeId }: { envelopeId: string }): Promise<string> {
   const envelopeInDb = await prisma.documentToSign.findFirstOrThrow({
     where: {
       docusignEnvelopeId: envelopeId
@@ -255,4 +262,87 @@ export async function createEnvelopeSigningLink({ envelopeId }: { envelopeId: st
   })) as { url: string };
 
   return url.url;
+}
+
+export type DocusignEnvelopeId = {
+  docusignEnvelopeId: string;
+};
+
+/**
+ * @external https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopeviews/createrecipient/
+ */
+export async function requestEnvelopeSigningLink({
+  docusignEnvelopeId,
+  spaceId
+}: DocusignEnvelopeId & { spaceId: string }) {
+  const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
+
+  const docusignEnvelope = await getEnvelope({
+    accountId: spaceCreds.docusignAccountId,
+    apiBaseUrl: spaceCreds.docusignApiBaseUrl,
+    authToken: spaceCreds.accessToken,
+    envelopeId: docusignEnvelopeId
+  });
+
+  const senderId = docusignEnvelope.sender.userId;
+
+  const recipient = docusignEnvelope.recipients.signers.find((r) => r.userId === senderId);
+
+  prettyPrint({ recipients: docusignEnvelope.recipients.signers, senderId, found: recipient });
+
+  if (!recipient) {
+    throw new InvalidStateError('No signer found for envelope');
+  }
+
+  const { domain: spaceDomain } = await prisma.space.findUniqueOrThrow({
+    where: { id: spaceId },
+    select: { domain: true }
+  });
+
+  const signerData = {
+    returnUrl: `${baseUrl}/${spaceDomain}/sign-docs`,
+    authenticationMethod: 'none',
+    // userId: recipient.userId,
+    recipientId: recipient.recipientId,
+    userName: recipient.name,
+    email: recipient.email
+  };
+
+  prettyPrint({ signerData, spaceCreds, docusignEnvelopeId });
+
+  const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes/${docusignEnvelopeId}/views/recipient`;
+
+  const url = (await POST<{ url: string }>(apiUrl, signerData, {
+    headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
+  })) as { url: string };
+
+  return url.url;
+}
+
+export type DocusignSearch = {
+  title?: string;
+};
+
+/**
+ * https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopes/liststatuschanges/
+ */
+export async function searchDocusignDocs({
+  title,
+  spaceId
+}: DocusignSearch & {
+  spaceId: string;
+}): Promise<DocusignEnvelope[]> {
+  const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
+
+  const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes`;
+
+  const envelopes = await GET<{ envelopes: DocusignEnvelope[] }>(
+    apiUrl,
+    { search_text: title, from_date: new Date('2021-01-01').toISOString() },
+    {
+      headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
+    }
+  );
+
+  return envelopes.envelopes;
 }
