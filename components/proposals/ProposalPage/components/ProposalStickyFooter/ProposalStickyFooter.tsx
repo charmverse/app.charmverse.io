@@ -45,7 +45,7 @@ export function ProposalStickyFooter({
     },
     requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
-    proposalType: isStructuredProposal ? 'structured' : 'free_form',
+    contentType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {
       ...proposal,
       formFields: proposal.form?.formFields || undefined,

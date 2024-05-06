@@ -8,7 +8,7 @@ import type { CreateProposalInput, ProposalEvaluationInput } from './createPropo
 export function getProposalErrors({
   page,
   proposal,
-  proposalType,
+  contentType,
   isDraft,
   requireTemplates,
   requireMilestone
@@ -16,13 +16,10 @@ export function getProposalErrors({
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
     content?: any | null;
   };
-  proposal: Pick<
-    CreateProposalInput,
-    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'
-  > & {
-    workflowId?: string | null;
+  proposal: Pick<CreateProposalInput, 'authors' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'> & {
+    workflowId: string | null;
   };
-  proposalType: 'structured' | 'free_form';
+  contentType: 'structured' | 'free_form';
   isDraft: boolean;
   requireTemplates: boolean;
   requireMilestone?: boolean;
@@ -41,7 +38,7 @@ export function getProposalErrors({
 
   // non-templates
   if (page.type === 'proposal') {
-    if (requireTemplates && !proposal.proposalTemplateId && !page.sourceTemplateId) {
+    if (requireTemplates && !page.sourceTemplateId) {
       errors.push('Template is required');
     }
     if (proposal.authors.length === 0) {
@@ -52,7 +49,7 @@ export function getProposalErrors({
     }
   }
 
-  if (proposalType === 'structured') {
+  if (contentType === 'structured') {
     if (page.type === 'proposal_template') {
       // creating template - check if form fields exists
       errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
@@ -63,11 +60,11 @@ export function getProposalErrors({
         errors.push('All required fields must be answered');
       }
     }
-  } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
+  } else if (contentType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
     errors.push('Content is required for free-form proposals');
   }
 
-  if (requireMilestone && page.type !== 'proposal_template' && proposalType === 'structured') {
+  if (requireMilestone && page.type !== 'proposal_template' && contentType === 'structured') {
     if (!proposal.fields?.pendingRewards?.length) {
       errors.push('At least one milestone is required');
     }

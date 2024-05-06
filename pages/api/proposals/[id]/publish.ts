@@ -86,7 +86,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       type: proposalPage.type,
       content: proposalPage.content
     },
-    proposalType: proposalPage.proposal?.formId ? 'structured' : 'free_form',
+    contentType: proposalPage.proposal?.formId ? 'structured' : 'free_form',
     proposal: {
       ...proposalPage.proposal!,
       evaluations: proposalPage.proposal!.evaluations.map((e) => ({
