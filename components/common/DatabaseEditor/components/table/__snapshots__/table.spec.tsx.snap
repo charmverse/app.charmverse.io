@@ -17,6 +17,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -69,6 +70,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -133,6 +135,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -197,6 +200,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -801,6 +805,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -853,6 +858,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -917,6 +923,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -981,6 +988,7 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -1585,6 +1593,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -1637,6 +1646,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -1701,6 +1711,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -1765,6 +1776,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -2369,6 +2381,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -2421,6 +2434,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -2485,6 +2499,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -2549,6 +2564,7 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3153,6 +3169,7 @@ exports[`components/table/Table should match snapshot 1`] = `
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3205,6 +3222,7 @@ exports[`components/table/Table should match snapshot 1`] = `
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3269,6 +3287,7 @@ exports[`components/table/Table should match snapshot 1`] = `
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3481,6 +3500,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3533,6 +3553,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3597,6 +3618,7 @@ exports[`components/table/Table should match snapshot with GroupBy 1`] = `
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3886,6 +3908,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
         >
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-text"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3925,6 +3948,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >
@@ -3964,6 +3988,7 @@ exports[`components/table/Table should match snapshot, read-only 1`] = `
           </div>
           <div
             class="octo-table-cell header-cell disable-drag-selection"
+            data-test="table-property-select"
             draggable="true"
             style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
           >

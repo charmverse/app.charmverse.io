@@ -136,6 +136,8 @@ function DocumentPageComponent({
   const selectSortedViews = useMemo(makeSelectSortedViews, []);
   const board = useAppSelector((state) => selectBoard(state, card?.parentId ?? ''));
   const boardViews = useAppSelector((state) => selectSortedViews(state, board?.id || ''));
+  const currentViewId = router.query.viewId as string | undefined;
+  const activeView = boardViews.find((view) => view.id === currentViewId);
   const cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: board?.id || '',
@@ -432,6 +434,7 @@ function DocumentPageComponent({
                       syncWithPageId={page.syncWithPageId}
                       board={board}
                       card={card}
+                      activeView={activeView}
                       showCard={_showCard}
                       cards={cards}
                       views={boardViews}

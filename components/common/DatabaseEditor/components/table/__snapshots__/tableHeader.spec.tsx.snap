@@ -7,6 +7,7 @@ exports[`components/table/TableHeaderMenu should match snapshot, title column 1`
   >
     <div
       class="octo-table-cell header-cell disable-drag-selection"
+      data-test="table-property-select"
       draggable="true"
       style="overflow: unset; width: 100px; opacity: 1; transition: background-color 150ms ease-in-out;"
     >
