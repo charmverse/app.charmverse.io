@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { Tooltip } from '@mui/material';
 import React from 'react';
 
 type Props = {
@@ -8,6 +9,7 @@ type Props = {
   className?: string;
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   style?: React.CSSProperties;
+  tooltip?: string;
 };
 
 const StyledButton = styled.button`
@@ -22,17 +24,21 @@ function IconButton(props: Props): JSX.Element {
     className += ` ${props.className}`;
   }
   return (
-    <StyledButton
-      type='button'
-      onClick={props.onClick}
-      onMouseDown={props.onMouseDown}
-      className={className}
-      title={props.title}
-      aria-label={props.title}
-      style={props.style}
-    >
-      {props.icon}
-    </StyledButton>
+    <Tooltip title={props.tooltip} enterDelay={100}>
+      <span>
+        <StyledButton
+          type='button'
+          onClick={props.onClick}
+          onMouseDown={props.onMouseDown}
+          className={className}
+          title={props.title}
+          aria-label={props.title}
+          style={props.style}
+        >
+          {props.icon}
+        </StyledButton>
+      </span>
+    </Tooltip>
   );
 }
 

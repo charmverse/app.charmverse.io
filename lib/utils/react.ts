@@ -1,3 +1,5 @@
+import type { KeyboardEvent, ClipboardEvent, MouseEvent } from 'react';
+
 // pulled from react-merge-refs
 export function mergeRefs(refs: any) {
   return (value: any) => {

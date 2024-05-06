@@ -35,6 +35,7 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  disableDragAndDrop?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
@@ -46,6 +47,7 @@ function TableRows(props: Props): JSX.Element {
     expandSubRowsOnLoad,
     subRowsEmptyValueContent,
     setCheckedIds,
+    disableDragAndDrop,
     checkedIds = []
   } = props;
   const hasSubPages = allCards.some((card) => card.subPages?.length);
@@ -64,7 +66,9 @@ function TableRows(props: Props): JSX.Element {
   );
 
   const setIsExpanded = ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
-    setCollapsedCardIds((prev) => (expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId]));
+    setCollapsedCardIds((prev) => {
+      return expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId];
+    });
   };
 
   const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
@@ -122,6 +126,7 @@ function TableRows(props: Props): JSX.Element {
           setIsExpanded={setIsExpanded}
           setCheckedIds={setCheckedIds}
           isChecked={checkedIds.includes(card.id)}
+          disableDragAndDrop={disableDragAndDrop}
           emptySubPagesPlaceholder={
             card.reward ? (
               <Box

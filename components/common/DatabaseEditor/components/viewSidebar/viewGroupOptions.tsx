@@ -1,4 +1,4 @@
-import { Delete } from '@mui/icons-material';
+import { DeleteOutlined } from '@mui/icons-material';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import { Box, Divider, ListItem, ListItemIcon, ListItemText, MenuItem, Typography } from '@mui/material';
 
@@ -18,7 +18,13 @@ function GroupByOptions(props: LayoutOptionsProps) {
   const { groupByProperty, properties, view } = props;
   const showTableUngroup = view.fields.viewType === 'table' && view.fields.groupById;
 
-  const groupablePropertyTypes: PropertyType[] = ['select', 'proposalStatus', 'proposalEvaluationType', 'proposalStep'];
+  const groupablePropertyTypes: PropertyType[] = [
+    'select',
+    'proposalStatus',
+    'proposalEvaluationType',
+    'proposalStep',
+    'proposalUrl'
+  ];
 
   const filteredProperties = (properties ?? [])?.filter((o: IPropertyTemplate) =>
     groupablePropertyTypes.includes(o.type)
@@ -70,7 +76,7 @@ function GroupByOptions(props: LayoutOptionsProps) {
             }}
           >
             <ListItemIcon>
-              <Delete color='secondary' />
+              <DeleteOutlined color='secondary' />
             </ListItemIcon>
             <ListItemText color='secondary'>Remove grouping</ListItemText>
           </MenuItem>

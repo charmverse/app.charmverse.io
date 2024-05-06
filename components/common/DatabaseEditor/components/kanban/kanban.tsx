@@ -115,7 +115,7 @@ function Kanban(props: Props) {
   const orderAfterMoveToColumn = useCallback(
     (cardIds: string[], columnId?: string): string[] => {
       let cardOrder = activeView.fields.cardOrder.slice();
-      const columnGroup = visibleGroups.find((g) => g.option.id === columnId);
+      const columnGroup = visibleGroups.find((g) => g.id === columnId);
       const columnCards = columnGroup?.cards;
       if (!columnCards || columnCards.length === 0) {
         return cardOrder;
@@ -166,7 +166,7 @@ function Kanban(props: Props) {
       } else if (dstOption) {
         Utils.log(`ondrop. Header option: ${dstOption.value}, column: ${option?.value}`);
 
-        const visibleOptionIds = visibleGroups.map((o) => o.option.id);
+        const visibleOptionIds = visibleGroups.map((o) => o.id);
         const srcBlockX = visibleOptionIds.indexOf(option.id);
         const dstBlockX = visibleOptionIds.indexOf(dstOption.id);
 
@@ -331,7 +331,7 @@ function Kanban(props: Props) {
 
         {visibleGroups.map((group) => (
           <KanbanColumnHeader
-            key={group.option.id}
+            key={group.id}
             group={group}
             board={board}
             activeView={activeView}
@@ -341,9 +341,9 @@ function Kanban(props: Props) {
             readOnly={props.readOnly}
             propertyNameChanged={propertyNameChanged}
             onDropToColumn={onDropToColumn}
-            calculationMenuOpen={showCalculationsMenu.get(group.option.id) || false}
-            onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.option.id, _anchorEl)}
-            onCalculationMenuClose={() => toggleOptions(group.option.id)}
+            calculationMenuOpen={showCalculationsMenu.get(group.id) || false}
+            onCalculationMenuOpen={(_anchorEl) => toggleOptions(group.id, _anchorEl)}
+            onCalculationMenuClose={() => toggleOptions(group.id)}
             anchorEl={anchorEl}
             readOnlyTitle={props.readOnlyTitle}
             disableAddingCards={props.disableAddingCards}
@@ -389,7 +389,7 @@ function Kanban(props: Props) {
               group={group}
               board={board}
               visiblePropertyTemplates={visiblePropertyTemplates}
-              key={group.option.id || 'empty'}
+              key={group.id || 'empty'}
               readOnly={props.readOnly}
               onDropToCard={props.disableDnd ? undefined : onDropToCard}
               selectedCardIds={props.selectedCardIds}
@@ -412,12 +412,12 @@ function Kanban(props: Props) {
             <div className='octo-board-column narrow'>
               {hiddenGroups.map((group) => (
                 <KanbanHiddenColumnItem
-                  key={group.option.id}
+                  key={group.id}
                   group={group}
                   activeView={activeView}
                   intl={props.intl}
                   readOnly={props.readOnly}
-                  onDrop={(card: Card) => onDropToColumn(group.option, card)}
+                  onDrop={(card: Card) => onDropToColumn(group.option!, card)}
                 />
               ))}
             </div>

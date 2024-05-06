@@ -1,4 +1,5 @@
-import { Popover } from '@mui/material';
+import { FilterList } from '@mui/icons-material';
+import { Popover, Tooltip } from '@mui/material';
 import { bindPopover, bindTrigger, usePopupState } from 'material-ui-popup-state/hooks';
 import { FormattedMessage } from 'react-intl';
 
@@ -6,6 +7,8 @@ import { Button } from 'components/common/Button';
 import { useViewFilter } from 'hooks/useViewFilter';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
+
+import IconButton from '../widgets/buttons/iconButton';
 
 import FilterComponent from './viewHeader/filterComponent';
 
@@ -21,15 +24,12 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
 
   return (
     <>
-      <Button
-        color={hasFilter ? 'primary' : 'secondary'}
-        variant='text'
-        size='small'
-        sx={{ minWidth: 0 }}
+      <IconButton
+        tooltip='Filter'
+        icon={<FilterList color={hasFilter ? 'primary' : 'secondary'} fontSize='small' />}
+        style={{ width: '32px' }}
         {...bindTrigger(viewFilterPopup)}
-      >
-        <FormattedMessage id='ViewHeader.filter' defaultMessage='Filter' />
-      </Button>
+      />
       <Popover
         {...bindPopover(viewFilterPopup)}
         anchorOrigin={{

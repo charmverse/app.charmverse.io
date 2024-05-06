@@ -44,7 +44,7 @@ export function KanbanGroupColumn({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
   return (
-    <KanbanColumn onDrop={(card: Card) => onDropToColumn(group.option, card)}>
+    <KanbanColumn onDrop={(card: Card) => onDropToColumn(group.option!, card)}>
       {cards.map((card) => (
         <KanbanCard
           card={card}
@@ -83,7 +83,7 @@ export function KanbanGroupColumn({
           color='secondary'
           sx={{ justifyContent: 'flex-start' }}
           onClick={() => {
-            addCard(group.option.id, true, {}, true);
+            addCard(group.id, true, {}, true);
           }}
           startIcon={<Add fontSize='small' />}
         >

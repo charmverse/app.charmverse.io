@@ -107,7 +107,9 @@ export type Board = UIBlockWithDetails & {
 };
 
 export type BoardGroup = {
-  option: IPropertyOption;
+  id: string;
+  option?: IPropertyOption;
+  value?: string;
   cards: Card[];
 };
 

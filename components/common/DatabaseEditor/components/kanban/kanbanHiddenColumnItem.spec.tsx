@@ -31,6 +31,7 @@ describe('src/components/kanban/kanbanHiddenColumnItem', () => {
   beforeAll(() => {});
 
   const group = {
+    id: option.id,
     option,
     cards: [card]
   };
