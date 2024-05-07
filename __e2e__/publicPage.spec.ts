@@ -206,7 +206,7 @@ test.describe('Public pages', async () => {
     await expect(documentPage.documentTitle).toHaveText(createdPage.title);
   });
 
-  test.only('show the sidebar for free tier spaces', async ({ page, documentPage, pagesSidebar }) => {
+  test('show the sidebar for free tier spaces', async ({ page, documentPage, pagesSidebar }) => {
     const { space, user } = await generateUserAndSpace({ paidTier: 'community' });
 
     const publicPage = await generatePage({
