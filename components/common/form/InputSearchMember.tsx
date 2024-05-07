@@ -3,7 +3,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
 import type { ReactNode } from 'react';
-import { createRef, useEffect, useState } from 'react';
+import { createRef, useMemo } from 'react';
 import { v4 } from 'uuid';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -147,7 +147,10 @@ export function InputSearchMemberMultiple({
   ...props
 }: IInputSearchMemberMultipleProps) {
   const { members, membersRecord } = useMembers();
-  const selectedMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
+  const selectedMembers = useMemo(
+    () => (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean),
+    [defaultValue, membersRecord]
+  );
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
