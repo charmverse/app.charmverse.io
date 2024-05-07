@@ -72,10 +72,10 @@ export function RewardPropertiesForm({
 
     onChange({
       rewardType,
-      customReward: rewardType === 'custom' ? values.customReward : undefined,
-      rewardAmount: rewardType === 'token' ? values.rewardAmount : undefined,
-      rewardToken: rewardType === 'token' ? values.rewardToken : undefined,
-      chainId: rewardType === 'token' ? values.chainId : undefined
+      customReward: rewardType === 'custom' ? values.customReward : null,
+      rewardAmount: rewardType === 'token' ? values.rewardAmount : null,
+      rewardToken: rewardType === 'token' ? values.rewardToken : null,
+      chainId: rewardType === 'token' ? values.chainId : null
     });
   }
 

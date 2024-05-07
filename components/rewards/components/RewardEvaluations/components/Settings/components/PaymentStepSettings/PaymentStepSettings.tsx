@@ -48,10 +48,10 @@ export function PaymentStepSettings({
 
     onChange({
       rewardType: _rewardType,
-      customReward: _rewardType === 'custom' ? rewardInput?.customReward : undefined,
-      rewardAmount: _rewardType === 'token' ? rewardInput?.rewardAmount : undefined,
-      rewardToken: _rewardType === 'token' ? rewardInput?.rewardToken : undefined,
-      chainId: _rewardType === 'token' ? rewardInput?.chainId : undefined
+      customReward: _rewardType === 'custom' ? rewardInput?.customReward : null,
+      rewardAmount: _rewardType === 'token' ? rewardInput?.rewardAmount : null,
+      rewardToken: _rewardType === 'token' ? rewardInput?.rewardToken : null,
+      chainId: _rewardType === 'token' ? rewardInput?.chainId : null
     });
   }
 
