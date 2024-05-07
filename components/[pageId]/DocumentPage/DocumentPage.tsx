@@ -474,6 +474,7 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
+                      expandFieldsByDefault={proposal.status === 'draft'}
                       formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
