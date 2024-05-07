@@ -106,7 +106,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   }, []);
 
   return (
-    <DocumentColumnLayout>
+    <DocumentColumnLayout data-test='document-page'>
       <DocumentColumn>
         <DocumentPage
           {...props}
