@@ -2,7 +2,20 @@ import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
-import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import {
+  Autocomplete,
+  Box,
+  Chip,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
 import { useEffect } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
@@ -42,6 +55,7 @@ export const schema = yup.object({
       reject: yup.string().optional()
     })
     .nullable(),
+  failReasons: yup.array().of(yup.string().required()).nullable(),
   permissions: yup
     .array()
     .of(
@@ -105,6 +119,77 @@ function StepActionButtonLabel({
   ) : null;
 }
 
+function StepFailReasonSelect({
+  setValue,
+  failReasons
+}: {
+  failReasons: string[];
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  return (
+    <Box className='octo-propertyrow'>
+      <FieldLabel>Fail reasons</FieldLabel>
+      <Autocomplete<string, true, true, true>
+        freeSolo
+        value={failReasons}
+        getOptionLabel={(option) => option}
+        options={failReasons}
+        multiple
+        disableClearable
+        renderInput={(params) => (
+          <TextField
+            variant='outlined'
+            placeholder={failReasons.length === 0 ? 'Create a fail reason option' : ''}
+            {...params}
+          />
+        )}
+        onChange={(_, value, reason) => {
+          if (reason === 'createOption') {
+            setValue('failReasons', value);
+          }
+        }}
+        renderTags={() => {
+          return failReasons.map((reason) => (
+            <Chip
+              sx={{
+                mx: 0.25
+              }}
+              size='small'
+              variant='outlined'
+              key={reason}
+              label={reason}
+            />
+          ));
+        }}
+        renderOption={(props, option) => {
+          return (
+            <MenuItem>
+              <Typography
+                sx={{
+                  width: '100%'
+                }}
+              >
+                {option}
+              </Typography>
+              <IconButton
+                size='small'
+                onClick={() => {
+                  setValue(
+                    'failReasons',
+                    failReasons.filter((reason) => reason !== option)
+                  );
+                }}
+              >
+                <DeleteIcon color='error' fontSize='small' />
+              </IconButton>
+            </MenuItem>
+          );
+        }}
+      />
+    </Box>
+  );
+}
+
 export function EvaluationDialog({
   evaluation,
   isFirstEvaluation,
@@ -139,7 +224,8 @@ export function EvaluationDialog({
       title: evaluation?.title,
       type: evaluation?.type,
       permissions: evaluation?.permissions ?? [],
-      actionLabels: evaluation?.actionLabels
+      actionLabels: evaluation?.actionLabels,
+      failReasons: evaluation?.failReasons ?? []
     });
   }, [evaluation?.id]);
 
@@ -153,6 +239,7 @@ export function EvaluationDialog({
   }
 
   const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
+  const failReasons = (formValues?.failReasons as WorkflowEvaluationJson['failReasons']) ?? [];
 
   return (
     <Dialog
@@ -244,6 +331,7 @@ export function EvaluationDialog({
               />
             </div>
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && <StepFailReasonSelect failReasons={failReasons} setValue={setValue} />}
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (
