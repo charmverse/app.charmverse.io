@@ -88,8 +88,8 @@ export class ProposalPage extends DocumentPage {
     return this.page.locator(`data-test=select-option-${optionId}`);
   }
 
-  async waitForNewProposalPage(domain: string) {
-    return this.page.waitForURL(`**/${domain}/**`);
+  async waitForNewProposalPage() {
+    await expect(this.rootSelector).toBeVisible();
   }
 
   async selectWorkflow(workflowId: string) {

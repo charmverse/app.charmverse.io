@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import { getProjectProfileFieldConfigDefaultHidden } from 'testing/mocks/form';
+import { getProjectProfileFieldConfigDefaultHidden, getProjectProfileFieldConfig } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
