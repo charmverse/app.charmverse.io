@@ -42,7 +42,6 @@ test.describe.serial('Review reward applications', () => {
 
     await rewardPage.workflowSelect.click();
     await rewardPage.page.locator(`data-test=select-option-application_required`).click();
-    await rewardPage.page.locator('[data-test="modal-confirm-button"]').click();
     await rewardPage.selectRewardReviewer(adminUser.id);
     await rewardPage.selectRewardType('custom');
     await rewardPage.customRewardInput.fill('Custom Reward');
