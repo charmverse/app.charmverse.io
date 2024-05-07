@@ -124,7 +124,7 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await proposalsListPage.structuredProposalTemplateMenu.click();
 
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
     await proposalFormFieldPage.toggleProjectFieldConfig({
@@ -239,7 +239,7 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalsListPage.proposalTemplateSelect.click();
 
     await proposalPage.getSelectOption(proposalTemplateId).click();
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
     await documentPage.documentTitleInput.fill('Proposal from structured template');
 
     // Disabled since no project is selected
@@ -353,7 +353,7 @@ test.describe.serial('Structured proposal template with project', () => {
     const projectWalletAddress = randomETHWalletAddress().toLowerCase();
 
     await proposalPage.getSelectOption(proposalTemplateId).click();
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
     await documentPage.documentTitleInput.fill('Proposal structured template');
     await proposalFormFieldPage.clickProjectOption('new');
     expect(proposalPage.publishNewProposalButton).toBeDisabled();

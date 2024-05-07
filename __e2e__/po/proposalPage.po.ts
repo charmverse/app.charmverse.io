@@ -1,4 +1,5 @@
 import type { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma-client';
+import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
 
 import { DocumentPage } from './document.po';

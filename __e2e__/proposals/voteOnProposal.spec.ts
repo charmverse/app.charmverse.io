@@ -180,7 +180,7 @@ test.describe.serial('Proposal Evaluation Votes', () => {
 
     await proposalsListPage.proposalTemplateSelect.click();
     await proposalsListPage.getTemplateOptionLocator(voteProposalTemplateId).click();
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await expect(documentPage.charmEditor).toBeVisible();
 

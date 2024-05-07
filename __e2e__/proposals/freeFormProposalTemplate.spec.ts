@@ -272,7 +272,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await proposalsListPage.proposalTemplateSelect.click();
     await proposalsListPage.getTemplateOptionLocator(savedProposalTemplate.id).click();
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await expect(proposalPage.templateSelect).toHaveText(savedProposalTemplate.title);
 

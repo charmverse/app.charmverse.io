@@ -131,7 +131,7 @@ test.describe.serial('Structured proposal template', () => {
 
     await proposalsListPage.structuredProposalTemplateMenu.click();
 
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await expect(documentPage.charmEditor).not.toBeVisible();
 
@@ -302,7 +302,7 @@ test.describe.serial('Structured proposal template', () => {
 
     await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
 
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     // Should be disabled as the required fields are not filled
     await expect(proposalPage.publishNewProposalButton).toBeDisabled();
