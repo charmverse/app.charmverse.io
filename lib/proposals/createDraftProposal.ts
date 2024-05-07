@@ -88,7 +88,6 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
         ...criteria,
         parameters: criteria.parameters as RubricDataInput['parameters']
       })),
-      reviewers: evaluation.type === 'feedback' ? [{ systemRole: 'author' as const }] : [],
       voteSettings: evaluation.voteSettings as VoteSettings,
       proposalId: undefined
     })) ||

@@ -109,10 +109,7 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
 
-    await Promise.all([
-      proposalPage.page.waitForResponse('**/api/proposals'),
-      proposalPage.publishNewProposalButton.click()
-    ]);
+    await Promise.all([proposalPage.page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     // Test proposal data at the database level to ensure correct persistence
     const proposalTemplate = await prisma.proposal.findFirstOrThrow({
@@ -199,10 +196,7 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     // Workflow auto-selected when loading the proposal
     await expect(proposalPage.workflowSelect).toHaveText(workflow.title);
 
-    await Promise.all([
-      proposalPage.page.waitForResponse('**/api/proposals'),
-      proposalPage.publishNewProposalButton.click()
-    ]);
+    await Promise.all([proposalPage.page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     // Test proposal data at the database level to ensure correct persistence
     const proposal = await prisma.proposal.findFirstOrThrow({
