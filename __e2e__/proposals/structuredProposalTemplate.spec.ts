@@ -140,7 +140,7 @@ test.describe.serial('Structured proposal template', () => {
     await expect(proposalPage.publishNewProposalButton).toBeDisabled();
 
     // Set the title
-    await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
+    await documentPage.documentTitleInput.fill('Structured proposal template');
 
     // Start from a fresh state
     await proposalFormFieldPage.fieldMoreOptions.click();

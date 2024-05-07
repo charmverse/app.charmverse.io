@@ -126,7 +126,7 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await proposalPage.waitForNewProposalPage();
 
-    await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
+    await documentPage.documentTitleInput.fill('Structured proposal template');
     await proposalFormFieldPage.toggleProjectFieldConfig({
       fieldName: 'project-excerpt',
       required: false
