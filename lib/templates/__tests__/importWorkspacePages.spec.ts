@@ -372,7 +372,8 @@ describe('importWorkspacePages - proposal content', () => {
           permissions: [],
           reviewers: [],
           rubricCriteria: [],
-          actionLabels: null
+          actionLabels: null,
+          failReasons: []
         },
         {
           completedAt: null,
@@ -414,6 +415,7 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.anything()
             })
           ]),
+          failReasons: [],
           reviewers: [
             {
               roleId: sourceSpaceRole.id,
@@ -532,7 +534,8 @@ describe('importWorkspacePages - proposal content', () => {
           permissions: [],
           reviewers: [],
           rubricCriteria: [],
-          actionLabels: null
+          actionLabels: null,
+          failReasons: []
         },
         {
           completedAt: null,
@@ -566,6 +569,7 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.anything()
             })
           ]),
+          failReasons: [],
           reviewers: [
             {
               roleId: targetSpaceRole.id,

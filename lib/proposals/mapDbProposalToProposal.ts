@@ -43,7 +43,6 @@ export function mapDbProposalToProposal({
         rubricAnswers: ProposalRubricCriteriaAnswer[];
         rubricCriteria: ProposalRubricCriteria[];
         draftRubricAnswers: ProposalRubricCriteriaAnswer[];
-        failReasonOptions: string[] | null;
       })[];
       page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
       rewards: { id: string }[];
