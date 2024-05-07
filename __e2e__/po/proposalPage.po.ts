@@ -90,7 +90,7 @@ export class ProposalPage extends DocumentPage {
   }
 
   waitForNewProposalPage() {
-    return expect(this.rootSelector).toBeVisible();
+    return expect(this.documentTitleInput).toBeVisible();
   }
 
   async selectWorkflow(workflowId: string) {

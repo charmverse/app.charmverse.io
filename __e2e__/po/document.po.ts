@@ -50,7 +50,7 @@ export class DocumentPage extends GlobalPage {
 
   public saveNewPage: Locator;
 
-  public rootSelector: Locator;
+  public rootSelector: Pick<Locator, 'locator'>;
 
   public closeSidebar: Locator;
 
@@ -58,9 +58,9 @@ export class DocumentPage extends GlobalPage {
 
   public charmverseInlineCommentThread: Locator;
 
-  constructor(public page: Page, rootSelector: string = 'data-test=document-page') {
+  constructor(public page: Page, rootSelector?: string) {
     super(page);
-    this.rootSelector = this.page.locator(rootSelector);
+    this.rootSelector = rootSelector ? this.page.locator(rootSelector) : this.page;
     this.header = new PageHeader(page);
     this.archivedBanner = this.rootSelector.locator('data-test=archived-page-banner');
     this.commentsSidebar = this.rootSelector.locator('data-test=inline-comment-sidebar');
