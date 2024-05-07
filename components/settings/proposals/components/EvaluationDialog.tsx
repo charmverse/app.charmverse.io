@@ -210,7 +210,7 @@ export function EvaluationDialog({
     formState: { isValid }
   } = useForm<FormValues>({});
 
-  const dialogTitle = evaluation?.id ? 'Rename evaluation' : evaluation ? 'New evaluation step' : '';
+  const dialogTitle = evaluation?.id ? 'Edit evaluation' : evaluation ? 'New evaluation step' : '';
 
   const formValues = watch();
 
@@ -290,7 +290,10 @@ export function EvaluationDialog({
           />
         </div>
         {evaluation?.id && (
-          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+          <>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && <StepFailReasonSelect failReasons={failReasons} setValue={setValue} />}
+          </>
         )}
         {!evaluation?.id && (
           <>

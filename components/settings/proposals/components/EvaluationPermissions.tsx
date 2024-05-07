@@ -102,7 +102,7 @@ export function EvaluationPermissionsRow({
   evaluation,
   onDelete,
   onDuplicate,
-  onRename,
+  onEdit,
   onChange,
   readOnly,
   isFirstEvaluation
@@ -124,7 +124,7 @@ export function EvaluationPermissionsRow({
             evaluation={evaluation}
             onDelete={onDelete}
             onDuplicate={onDuplicate}
-            onRename={onRename}
+            onEdit={onEdit}
             readOnly={readOnly}
           />
         </Box>

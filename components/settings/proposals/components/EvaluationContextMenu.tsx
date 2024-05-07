@@ -7,11 +7,11 @@ export type ContextMenuProps = {
   evaluation: WorkflowEvaluationJson;
   onDelete: (id: string) => void;
   onDuplicate: (evaluation: WorkflowEvaluationJson) => void;
-  onRename: (evaluation: WorkflowEvaluationJson) => void;
+  onEdit: (evaluation: WorkflowEvaluationJson) => void;
   readOnly: boolean;
 };
 
-export function EvaluationContextMenu({ evaluation, onDelete, onDuplicate, onRename, readOnly }: ContextMenuProps) {
+export function EvaluationContextMenu({ evaluation, onDelete, onDuplicate, onEdit, readOnly }: ContextMenuProps) {
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${evaluation.id}` });
 
   function duplicateEvaluation() {
@@ -22,17 +22,17 @@ export function EvaluationContextMenu({ evaluation, onDelete, onDuplicate, onRen
     onDelete(evaluation.id);
   }
 
-  function renameEvaluation() {
-    onRename(evaluation);
+  function onEditEvaluation() {
+    onEdit(evaluation);
   }
   return (
     <>
       <Menu {...bindMenu(popupState)} onClick={popupState.close}>
-        <MenuItem disabled={readOnly} onClick={renameEvaluation}>
+        <MenuItem disabled={readOnly} onClick={onEditEvaluation}>
           <ListItemIcon>
             <EditOutlined fontSize='small' />
           </ListItemIcon>
-          <ListItemText>Rename</ListItemText>
+          <ListItemText>Edit</ListItemText>
         </MenuItem>
         <MenuItem disabled={readOnly} onClick={duplicateEvaluation}>
           <ListItemIcon>
