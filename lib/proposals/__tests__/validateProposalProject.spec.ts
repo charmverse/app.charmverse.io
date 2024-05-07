@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import { getProjectProfileFieldConfig } from 'testing/mocks/form';
+import { getProjectProfileFieldConfigDefaultHidden } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
@@ -84,7 +84,7 @@ describe('validateProposalProject', () => {
           {
             id: projectFieldId,
             type: 'project_profile',
-            fieldConfig: getProjectProfileFieldConfig({
+            fieldConfig: getProjectProfileFieldConfigDefaultHidden({
               name: {
                 required: true
               }
