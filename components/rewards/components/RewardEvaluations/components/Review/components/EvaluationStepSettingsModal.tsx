@@ -40,6 +40,7 @@ export function EvaluationStepSettingsModal({
           rewardInput={reward}
           rewardStatus={reward.status}
           onChange={updateEvaluation}
+          rewardPublished
         />
       </Box>
       <Box display='flex' justifyContent='flex-end' gap={1}>

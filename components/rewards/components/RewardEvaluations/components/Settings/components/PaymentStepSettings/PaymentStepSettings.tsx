@@ -24,10 +24,11 @@ export function PaymentStepSettings({
   readOnly,
   onChange,
   rewardStatus,
-  isTemplate
+  isTemplate,
+  rewardPublished
 }: Pick<
   EvaluationStepSettingsProps,
-  'rewardInput' | 'rewardTemplateInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate'
+  'rewardInput' | 'rewardTemplateInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate' | 'rewardPublished'
 >) {
   const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
@@ -70,7 +71,11 @@ export function PaymentStepSettings({
       <RowStack>
         <FieldLabel style={{ width: 150 }}>Type</FieldLabel>
         <Box flexGrow={1}>
-          <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
+          <RewardTypeSelect
+            readOnly={readOnly || (!rewardPublished && !!rewardTemplateInput?.id)}
+            value={rewardType}
+            onChange={setRewardType}
+          />
         </Box>
       </RowStack>
 
@@ -81,8 +86,9 @@ export function PaymentStepSettings({
             onChange={onRewardTokenUpdate}
             defaultValues={rewardInput}
             readOnly={!!readOnly}
-            readOnlyToken={!!rewardTemplateInput?.rewardToken}
-            readOnlyTokenAmount={!!rewardTemplateInput?.rewardAmount}
+            readOnlyChain={!rewardPublished && !!rewardTemplateInput?.chainId}
+            readOnlyToken={!rewardPublished && !!rewardTemplateInput?.rewardToken}
+            readOnlyTokenAmount={!rewardPublished && !!rewardTemplateInput?.rewardAmount}
             requireTokenAmount={!isTemplate}
           />
         </Box>
