@@ -89,7 +89,7 @@ export class ProposalPage extends DocumentPage {
   }
 
   async waitForNewProposalPage(domain: string) {
-    return this.page.waitForURL(`**/${domain}/proposals/new?**`);
+    return this.page.waitForURL(`**/${domain}/**`);
   }
 
   async selectWorkflow(workflowId: string) {
