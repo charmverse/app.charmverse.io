@@ -17,11 +17,10 @@ export function ProposalStickyFooter({
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
-  page: { title: string; content?: any; sourceTemplateId: string | null; type: PageType };
+  page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
   isStructuredProposal: boolean;
 }) {
   const projectForm = useFormContext<ProjectAndMembersPayload>();
-  const projectField = proposal.form?.formFields?.find((field) => field.type === 'project_profile');
 
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
@@ -39,7 +38,7 @@ export function ProposalStickyFooter({
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
-      content: page.content,
+      hasContent: page.hasContent,
       title: page.title,
       type: page.type
     },
@@ -61,7 +60,7 @@ export function ProposalStickyFooter({
         <Button
           disabledTooltip={disabledTooltip}
           disabled={!!disabledTooltip}
-          data-test='complete-draft-button'
+          data-test='publish-proposal-button'
           loading={isMutating}
           onClick={onClick}
         >

@@ -7,7 +7,7 @@ import { DocumentPage } from './document.po';
 export class ProposalPage extends DocumentPage {
   constructor(
     page: Page,
-    public publishNewProposalButton = page.locator('data-test=publish-new-proposal-button'),
+    public publishNewProposalButton = page.locator('data-test=publish-proposal-button'),
     public categorySelect = page.locator('data-test=proposal-category-select'),
     public reviewerSelect = page.locator('data-test=proposal-reviewer-select'),
     public nextStatusButton = page.locator('data-test=next-status-button'),
@@ -19,7 +19,6 @@ export class ProposalPage extends DocumentPage {
     public templateSelect = page.locator('data-test=proposal-template-select'),
     public workflowSelect = page.locator('data-test=workflow-select'),
     public voterSelect = page.locator('data-test=proposal-vote-select'),
-    public completeDraftButton = page.locator('data-test=complete-draft-button'),
     public evaluationSettingsSidebar = page.locator('data-test=evaluation-settings-sidebar'),
     public addRubricCriteriaButton = page.locator('data-test=add-rubric-criteria-button'),
     // Simple utility for editing the first rubric criteria

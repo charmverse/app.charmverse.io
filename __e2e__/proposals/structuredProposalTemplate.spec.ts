@@ -394,7 +394,7 @@ test.describe.serial('Structured proposal template', () => {
 
       await Promise.all([
         page.waitForResponse('**/api/proposals/**/publish'),
-        proposalPage.completeDraftButton.click()
+        proposalPage.publishNewProposalButton.click()
       ]);
 
       await proposalPage.page.reload();

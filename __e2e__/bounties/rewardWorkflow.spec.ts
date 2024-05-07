@@ -103,7 +103,7 @@ test.describe.serial('Review reward applications', () => {
     await generateUserAndSpaceKyc({ spaceId: space.id, userId: adminUser.id });
 
     await rewardPage.page.goto(`${baseUrl}/${space.domain}/rewards`);
-    await rewardPage.page.pause();
+    // await rewardPage.page.pause();
     await rewardPage.createBountyButton.click();
     await rewardPage.documentTitleInput.fill('Reward 2');
 

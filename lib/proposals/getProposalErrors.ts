@@ -1,7 +1,6 @@
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import { validateAnswers } from 'lib/forms/validateAnswers';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utils/types';
 
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
@@ -17,7 +16,7 @@ export function getProposalErrors({
   requireMilestone
 }: {
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
-    content?: any | null;
+    hasContent?: boolean;
   };
   proposal: Pick<CreateProposalInput, 'authors' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'> & {
     workflowId: string | null;
@@ -64,7 +63,7 @@ export function getProposalErrors({
         errors.push('All required fields must be answered');
       }
     }
-  } else if (contentType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
+  } else if (contentType === 'free_form' && page.type === 'proposal_template' && !page.hasContent) {
     errors.push('Content is required for free-form proposals');
   }
 

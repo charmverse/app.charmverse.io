@@ -105,7 +105,9 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await expect(proposalPage.workflowSelect).toBeVisible();
 
     // Select a workflow
+    const updatedProposalResponse = page.waitForResponse('**/proposals/**');
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
+    await updatedProposalResponse;
 
     // Configure reviewers for rubric evaluation
     await proposalPage.selectEvaluationReviewer('rubric', role.id);
@@ -152,7 +154,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // Edit the proposal content
     await documentPage.typeText(templatePageContent.description);
 
-    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.publishNewProposalButton.click()]);
+    await Promise.all([page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     // Check the actual data
     savedProposalTemplate = (await prisma.page.findFirstOrThrow({
@@ -291,7 +293,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     await expect(proposalPage.charmEditor).toHaveText(templatePageContent.description);
 
-    await Promise.all([page.waitForResponse('**/api/proposals'), proposalPage.publishNewProposalButton.click()]);
+    await Promise.all([page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     const savedUserProposalFromTemplate = await prisma.page.findFirstOrThrow({
       where: {
