@@ -9,6 +9,7 @@ import type {
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
 import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
@@ -30,8 +31,10 @@ type FormFieldsIncludeType = {
 export function mapDbProposalToProposal({
   proposal,
   permissions,
-  permissionsByStep
+  permissionsByStep,
+  workflow
 }: {
+  workflow?: { evaluations: WorkflowEvaluationJson[] } | null;
   proposal: Proposal &
     FormFieldsIncludeType & {
       authors: ProposalAuthor[];
@@ -40,6 +43,7 @@ export function mapDbProposalToProposal({
         rubricAnswers: ProposalRubricCriteriaAnswer[];
         rubricCriteria: ProposalRubricCriteria[];
         draftRubricAnswers: ProposalRubricCriteriaAnswer[];
+        failReasonOptions: string[] | null;
       })[];
       page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
       rewards: { id: string }[];
@@ -67,6 +71,9 @@ export function mapDbProposalToProposal({
     : null;
 
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
+    const workflowEvaluation = workflow?.evaluations.find(
+      (e) => e.type === evaluation.type && e.title === evaluation.title
+    );
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
       evaluation.draftRubricAnswers = [];
@@ -74,6 +81,7 @@ export function mapDbProposalToProposal({
     }
     return {
       ...evaluation,
+      failReasonOptions: workflowEvaluation?.failReasons || null,
       isReviewer: !!stepPermissions?.evaluate
     } as unknown as PopulatedEvaluation;
   });

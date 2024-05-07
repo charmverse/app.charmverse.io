@@ -185,6 +185,7 @@ export function EvaluationsReview({
       />
       {proposal?.evaluations.map((evaluation, index) => {
         const isCurrentEval = currentEvaluation?.id === evaluation.id;
+
         const isCurrent = isCurrentEval && !isCredentialsActive && !isRewardsActive;
         return (
           <EvaluationStepRow

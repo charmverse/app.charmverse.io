@@ -91,7 +91,8 @@ export async function goBackToStep({
       result: null,
       decidedBy: null,
       completedAt: null,
-      voteId: null
+      voteId: null,
+      failReasons: []
     }
   });
 

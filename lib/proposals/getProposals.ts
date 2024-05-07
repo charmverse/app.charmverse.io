@@ -1,7 +1,6 @@
 import type { ProposalPermissionFlags } from '@charmverse/core/permissions';
 import type {
   IssuedCredential,
-  Prisma,
   Proposal,
   ProposalAuthor,
   ProposalEvaluation,
@@ -10,7 +9,6 @@ import type {
   ProposalReviewer
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
 import { sortBy } from 'lodash';
@@ -21,7 +19,6 @@ import type {
   ProposalWithJoinedData
 } from 'lib/credentials/findIssuableProposalCredentials';
 import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
-import { isTruthy } from 'lib/utils/types';
 
 import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';
@@ -114,27 +111,6 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
     }
   });
 
-  const workflowIds = arrayUtils.uniqueValues(proposals.map((p) => p.workflowId)).filter(isTruthy);
-  const workflows = await prisma.proposalWorkflow.findMany({
-    where: {
-      id: {
-        in: workflowIds
-      }
-    },
-    select: {
-      evaluations: true,
-      id: true
-    }
-  });
-
-  const workflowsRecord = workflows.reduce((acc, workflow) => {
-    acc[workflow.id] = {
-      id: workflow.id,
-      evaluations: workflow.evaluations as WorkflowEvaluationJson[]
-    };
-    return acc;
-  }, {} as Record<string, { id: string; evaluations: WorkflowEvaluationJson[] }>);
-
   const spaces = await prisma.space.findMany({
     where: {
       id: {
@@ -151,10 +127,8 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
   });
 
   return proposals.map((proposal) => {
-    const workflow = proposal.workflowId ? workflowsRecord[proposal.workflowId] : null;
     return mapDbProposalToProposalLite({
       proposal,
-      workflow,
       space: spaces.find((s) => s.id === proposal.spaceId) as IssuableProposalCredentialSpace
     });
   });
@@ -164,10 +138,8 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
 function mapDbProposalToProposalLite({
   proposal,
   permissions,
-  space,
-  workflow
+  space
 }: {
-  workflow?: { id: string; evaluations: WorkflowEvaluationJson[] } | null;
   proposal: Proposal & {
     authors: (ProposalAuthor & IssuableProposalCredentialAuthor)[];
     evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[]; failReasonOptions?: string[] })[];
@@ -202,17 +174,13 @@ function mapDbProposalToProposalLite({
     archived: proposal.archived || undefined,
     formId: rest.formId || undefined,
     // spaceId: rest.spaceId,
-    evaluations: sortBy(proposal.evaluations, 'index').map((e) => {
-      const workflowEvaluation = workflow?.evaluations.find((we) => we.type === e.type && we.title === e.title);
-      return {
-        title: e.title,
-        index: e.index,
-        type: e.type,
-        result: e.result,
-        id: e.id,
-        failReasonOptions: workflowEvaluation?.failReasons ?? []
-      };
-    }),
+    evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
+      title: e.title,
+      index: e.index,
+      type: e.type,
+      result: e.result,
+      id: e.id
+    })),
     permissions,
     currentStep: getCurrentStep({
       evaluations: proposal.evaluations,

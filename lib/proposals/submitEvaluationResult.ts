@@ -11,6 +11,7 @@ export type ReviewEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   result: ProposalEvaluationResult;
+  failReasons?: string[];
 };
 
 export async function submitEvaluationResult({
@@ -18,7 +19,8 @@ export async function submitEvaluationResult({
   evaluationId,
   proposalId,
   result,
-  spaceId
+  spaceId,
+  failReasons
 }: ReviewEvaluationRequest & {
   spaceId: string;
 }) {
@@ -29,7 +31,8 @@ export async function submitEvaluationResult({
     data: {
       result,
       decidedBy,
-      completedAt: new Date()
+      completedAt: new Date(),
+      failReasons
     }
   });
 

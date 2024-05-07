@@ -1,10 +1,13 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
+import { useState } from 'react';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -15,7 +18,10 @@ import { getRelativeTimeInThePast } from 'lib/utils/dates';
 export type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels'>;
+  evaluation: Pick<
+    PopulatedEvaluation,
+    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels' | 'failReasonOptions' | 'failReasons'
+  >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
   isCurrent: boolean;
@@ -31,8 +37,10 @@ export function PassFailEvaluation({
   confirmationMessage,
   archived
 }: Props) {
+  const [failReasons, setFailReasons] = useState<string[]>([]);
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
-
+  const failReasonModalPopupState = usePopupState({ variant: 'dialog' });
+  const failReasonOptions = evaluation.failReasonOptions ?? [];
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
@@ -66,7 +74,8 @@ export function PassFailEvaluation({
     try {
       await trigger({
         evaluationId: evaluation.id,
-        result
+        result,
+        failReasons
       });
       refreshProposal?.();
     } catch (error) {
@@ -108,7 +117,13 @@ export function PassFailEvaluation({
             <Box display='flex' justifyContent='flex-end' gap={1}>
               <Button
                 data-test='evaluation-fail-button'
-                onClick={() => onSubmitReview('fail')}
+                onClick={() => {
+                  if (failReasonOptions.length) {
+                    failReasonModalPopupState.open();
+                  } else {
+                    onSubmitReview('fail');
+                  }
+                }}
                 disabled={!!disabledTooltip}
                 disabledTooltip={disabledTooltip}
                 color='errorPale'
@@ -134,12 +149,67 @@ export function PassFailEvaluation({
           </Stack>
         )}
         {evaluation.result === 'fail' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-            <RejectedIcon color='error' />
-            <Typography variant='body2'>Declined {completedDate}</Typography>
+          <Stack>
+            <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+              <RejectedIcon color='error' />
+              <Typography variant='body2'>Declined {completedDate}</Typography>
+            </Stack>
           </Stack>
         )}
       </Card>
+      {evaluation.result === 'fail' && evaluation.failReasons.length ? (
+        <Stack mt={2} gap={1}>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Fail reasons:
+            </Typography>
+          </FormLabel>
+          <Stack flexDirection='row' gap={1}>
+            {evaluation.failReasons.map((reason) => (
+              <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
+            ))}
+          </Stack>
+        </Stack>
+      ) : null}
+      <ConfirmDeleteModal
+        onClose={() => {
+          setFailReasons([]);
+          failReasonModalPopupState.close();
+        }}
+        onConfirm={async () => {
+          await onSubmitReview('fail');
+          setFailReasons([]);
+          failReasonModalPopupState.close();
+        }}
+        open={!!failReasonModalPopupState.isOpen}
+        question={
+          <Stack gap={1}>
+            <Typography>Please select at least one reason for declining this proposal.</Typography>
+            <Select
+              value={failReasons}
+              onChange={(e) => {
+                setFailReasons(e.target.value as string[]);
+              }}
+              renderValue={(selected) =>
+                selected.map((reason) => (
+                  <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
+                ))
+              }
+              multiple
+            >
+              {failReasonOptions.map((reason) => (
+                <MenuItem key={reason} value={reason}>
+                  {reason}
+                </MenuItem>
+              ))}
+            </Select>
+          </Stack>
+        }
+        disabled={failReasons.length === 0}
+        buttonText={actionLabels.reject}
+        primaryButtonColor='error'
+        title='Reason for decline'
+      />
     </>
   );
 }
