@@ -72,17 +72,16 @@ export function UserDetailsForm({ errors, userDetails, user, onChange, sx = {} }
   const identityModalState = usePopupState({ variant: 'popover', popupId: 'identity-modal' });
 
   const { updateProfileAvatar, isSaving: isSavingAvatar } = useUpdateProfileAvatar();
-  const { saveUser } = useUserDetails();
 
-  const setDescription = async (description: string) => {
+  const setDescription = (description: string) => {
     onChange({ description });
   };
 
-  const setTimezone = async (timezone: string | null = null) => {
+  const setTimezone = (timezone: string | null = null) => {
     onChange({ timezone });
   };
 
-  const setSocial = async (social: Social) => {
+  const setSocial = (social: Social) => {
     onChange({ social });
   };
 

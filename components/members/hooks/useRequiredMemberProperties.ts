@@ -141,21 +141,19 @@ export function useRequiredMemberPropertiesForm({ userId }: { userId: string }) 
       }));
   }, [memberProperties]);
 
-  const { getValues, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit } = useFormFields({
+  const { values, control, errors, isDirty, isSubmitting, isValid, onFormChange, onSubmit } = useFormFields({
     fields: nonDefaultMemberProperties,
-    onSubmit: async (values) => {
+    onSubmit: async (_values) => {
       if (space) {
         await updateSpaceValues(
           space.id,
-          Object.entries(values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
+          Object.entries(_values).map(([memberPropertyId, value]) => ({ memberPropertyId, value }))
         );
         refreshPropertyValues();
         mutateMembers();
       }
     }
   });
-
-  const values = getValues();
 
   return {
     values,
@@ -186,7 +184,8 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     setValue,
     handleSubmit,
     getValues,
-    reset
+    reset,
+    watch
   } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -226,7 +225,7 @@ export function useRequiredUserDetailsForm({ userId }: { userId: string }) {
     });
   }
 
-  const values = getValues();
+  const values = watch();
 
   function onSubmit() {
     if (isDirty && isValid) {

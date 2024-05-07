@@ -168,8 +168,8 @@ export function ProposalProjectFormAnswers({
 }
 
 export function SettingsProjectFormAnswers({ isTeamLead }: { isTeamLead: boolean }) {
-  const { getValues, setValue, control } = useFormContext<ProjectAndMembersPayload>();
-  const projectValues = getValues();
+  const { watch, setValue, control } = useFormContext<ProjectAndMembersPayload>();
+  const projectValues = watch();
   const { user } = useUser();
   const extraProjectMembers = projectValues.projectMembers.slice(1);
   const fieldConfig = createDefaultProjectAndMembersFieldConfig();

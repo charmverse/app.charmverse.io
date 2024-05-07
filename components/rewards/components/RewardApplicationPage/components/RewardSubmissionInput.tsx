@@ -79,7 +79,7 @@ export function RewardSubmissionInput({
     register,
     handleSubmit,
     setValue,
-    getValues,
+    watch,
     formState: { errors, isValid }
   } = useForm<FormValues>({
     mode: 'onChange',
@@ -91,7 +91,7 @@ export function RewardSubmissionInput({
     resolver: yupResolver(schema(rewardType))
   });
 
-  const formValues = getValues();
+  const submissionNodes = watch('submissionNodes');
 
   async function onSubmit(values: FormValues) {
     const hasSaved = await onSubmitProp({
@@ -186,7 +186,7 @@ export function RewardSubmissionInput({
                 disabled={
                   (!isValid && submission?.status === 'inProgress') ||
                   !isEditorTouched ||
-                  checkIsContentEmpty(formValues.submissionNodes as unknown as PageContent)
+                  checkIsContentEmpty(submissionNodes as unknown as PageContent)
                 }
                 data-test='submit-submission-button'
                 type='submit'
