@@ -274,7 +274,7 @@ function DocumentPageComponent({
   });
 
   return (
-    <Box id='file-drop-container' display='flex' flexDirection='column' height='100%'>
+    <Box id='file-drop-container' display='flex' flexDirection='column' height='100%' data-test='document-page'>
       <FormProvider {...form}>
         <Box
           ref={printRef}
