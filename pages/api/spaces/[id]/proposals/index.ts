@@ -33,7 +33,7 @@ async function getProposalsEndpoint(req: NextApiRequest, res: NextApiResponse<Pr
     spaceId
   });
 
-  const proposals = await getProposals({ ids });
+  const proposals = await getProposals({ ids, spaceId });
 
   return res.status(200).json(proposals);
 }
