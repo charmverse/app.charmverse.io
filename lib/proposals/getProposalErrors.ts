@@ -1,15 +1,18 @@
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import { validateAnswers } from 'lib/forms/validateAnswers';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
 import { isTruthy } from 'lib/utils/types';
 
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
+import { validateProposalProject } from './validateProposalProject';
 
 export function getProposalErrors({
   page,
   proposal,
   contentType,
   isDraft,
+  project,
   requireTemplates,
   requireMilestone
 }: {
@@ -19,6 +22,7 @@ export function getProposalErrors({
   proposal: Pick<CreateProposalInput, 'authors' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'> & {
     workflowId: string | null;
   };
+  project?: ProjectWithMembers | null;
   contentType: 'structured' | 'free_form';
   isDraft: boolean;
   requireTemplates: boolean;
@@ -67,6 +71,18 @@ export function getProposalErrors({
   if (requireMilestone && page.type !== 'proposal_template' && contentType === 'structured') {
     if (!proposal.fields?.pendingRewards?.length) {
       errors.push('At least one milestone is required');
+    }
+  }
+
+  if (project && proposal.formAnswers) {
+    try {
+      validateProposalProject({
+        formAnswers: proposal.formAnswers,
+        formFields: proposal.formFields,
+        project
+      });
+    } catch (error) {
+      errors.push((error as Error).message);
     }
   }
   // check evaluation configurations

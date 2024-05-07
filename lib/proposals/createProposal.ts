@@ -13,6 +13,7 @@ import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { upsertProposalFormAnswers } from 'lib/forms/upsertProposalFormAnswers';
 import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { createPage } from 'lib/pages/server/createPage';
+import { getProjectById } from 'lib/projects/getProjectById';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 
 import { generatePagePathFromPathAndTitle } from '../pages/utils';
@@ -84,6 +85,8 @@ export async function createProposal({
 
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
 
+  const project = projectId ? await getProjectById(projectId) : null;
+
   const errors = getProposalErrors({
     page: {
       title: pageProps.title ?? '',
@@ -93,11 +96,13 @@ export async function createProposal({
     contentType: formId || formFields?.length ? 'structured' : 'free_form',
     proposal: {
       authors: authorsList,
+      formAnswers,
       formFields,
       evaluations,
       workflowId
     },
     isDraft: !!isDraft,
+    project,
     requireTemplates: false
   });
 
@@ -109,14 +114,6 @@ export async function createProposal({
 
   if (errors.length > 0) {
     throw new InvalidInputError(errors.join('\n'));
-  }
-
-  if (!isDraft && formAnswers && projectId) {
-    await validateProposalProject({
-      projectId,
-      formFields,
-      formAnswers
-    });
   }
 
   // retrieve permissions and apply evaluation ids to reviewers

@@ -7,7 +7,7 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -43,6 +43,7 @@ export function ProposalStickyFooter({
       title: page.title,
       type: page.type
     },
+    project: projectForm.getValues() as ProjectWithMembers,
     requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
     contentType: isStructuredProposal ? 'structured' : 'free_form',
@@ -54,14 +55,12 @@ export function ProposalStickyFooter({
     requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
 
-  const isProjectFormValid = projectField ? projectForm.formState.isValid : true;
-
   return (
     <StickyFooterContainer>
       <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
         <Button
-          disabledTooltip={disabledTooltip || !isProjectFormValid ? 'Project fields are missing or invalid' : undefined}
-          disabled={!!disabledTooltip || !isProjectFormValid}
+          disabledTooltip={disabledTooltip}
+          disabled={!!disabledTooltip}
           data-test='complete-draft-button'
           loading={isMutating}
           onClick={onClick}

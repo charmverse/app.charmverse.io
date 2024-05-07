@@ -22,9 +22,9 @@ describe('validateProposalProject', () => {
     });
     const projectFieldId = v4();
 
-    await expect(
+    expect(() =>
       validateProposalProject({
-        projectId: createdProject.id,
+        project: createdProject,
         formAnswers: [
           {
             fieldId: projectFieldId,
@@ -46,7 +46,7 @@ describe('validateProposalProject', () => {
           }
         ]
       })
-    ).rejects.toBeInstanceOf(InvalidInputError);
+    ).toThrow(InvalidInputError);
   });
 
   it('Should not throw error if proposal project information is valid', async () => {
@@ -68,10 +68,9 @@ describe('validateProposalProject', () => {
       }
     });
 
-    await expect(
+    expect(() =>
       validateProposalProject({
-        defaultRequired: false,
-        projectId: createdProject.id,
+        project: createdProject,
         formAnswers: [
           {
             fieldId: projectFieldId,
@@ -93,6 +92,6 @@ describe('validateProposalProject', () => {
           }
         ]
       })
-    ).resolves.toBeUndefined();
+    ).not.toThrow();
   });
 });
