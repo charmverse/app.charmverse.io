@@ -44,7 +44,8 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       ...workflow,
       isNew: true,
       id: uuid(),
-      index: lowestIndex - 1
+      index: lowestIndex - 1,
+      privateEvaluations: false
     };
     // insert the new evaluation after the existing one
     if (existingIndex > -1) {
