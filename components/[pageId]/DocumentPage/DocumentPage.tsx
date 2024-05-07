@@ -107,6 +107,7 @@ function DocumentPageComponent({
     proposal,
     refreshProposal,
     onChangeEvaluation,
+    onChangeTemplate,
     onChangeWorkflow,
     onChangeRewardSettings,
     onChangeSelectedCredentialTemplates
@@ -405,6 +406,7 @@ function DocumentPageComponent({
                   proposalInput={proposal}
                   templateId={proposal?.page?.sourceTemplateId}
                   onChangeEvaluation={onChangeEvaluation}
+                  onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}
                   onChangeWorkflow={onChangeWorkflow}
                   onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}

@@ -12,10 +12,10 @@ import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/p
 import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { RewardTokenProperty } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/RewardTokenProperty';
-import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { RewardTypeSelect } from 'components/rewards/components/RewardEvaluations/components/Settings/components/PaymentStepSettings/components/RewardTypeSelect';
 import { RewardPropertiesHeader } from 'components/rewards/components/RewardProperties/components/RewardPropertiesHeader';
 import { CustomPropertiesAdapter } from 'components/rewards/components/RewardProperties/CustomPropertiesAdapter';
+import { TemplateSelect } from 'components/rewards/components/TemplateSelect';
 import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';

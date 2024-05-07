@@ -20,7 +20,6 @@ import { CharmEditor } from 'components/common/CharmEditor';
 import { focusEventName } from 'components/common/CharmEditor/constants';
 import type { ICharmEditorOutput } from 'components/common/CharmEditor/specRegistry';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
-import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -41,6 +40,7 @@ import { fontClassName } from 'theme/fonts';
 
 import { RewardEvaluations } from './components/RewardEvaluations/RewardEvaluations';
 import { CustomPropertiesAdapter } from './components/RewardProperties/CustomPropertiesAdapter';
+import { TemplateSelect } from './components/TemplateSelect';
 import { useNewReward } from './hooks/useNewReward';
 
 const StyledContainer = styled(PageEditorContainer)`

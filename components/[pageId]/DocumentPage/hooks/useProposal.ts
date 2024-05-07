@@ -4,6 +4,7 @@ import {
   useUpdateProposalEvaluation,
   useGetProposalDetails,
   useUpsertRubricCriteria,
+  useUpdateTemplate,
   useUpdateWorkflow,
   useUpdateProposal
 } from 'charmClient/hooks/proposals';
@@ -18,6 +19,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
+  const { trigger: updateProposalTemplate } = useUpdateTemplate({ proposalId });
   const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
   const { subscribe } = useWebSocketClient();
   const { refreshIssuableCredentials } = useProposalCredentials({ proposalId });
@@ -64,6 +66,11 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
             ...updatedEvaluation
           });
         }
+        await refreshProposal();
+      },
+      onChangeTemplate: async (value: { id: string } | null) => {
+        // null will remove the template
+        await updateProposalTemplate({ id: value?.id || null });
         await refreshProposal();
       },
       onChangeWorkflow: async ({ id }: { id: string }) => {

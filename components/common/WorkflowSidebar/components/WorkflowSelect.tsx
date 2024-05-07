@@ -3,7 +3,6 @@ import { Box } from '@mui/material';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { IPropertyOption } from 'lib/databases/board';
 
@@ -14,7 +13,7 @@ type Props<Option extends { id: string; title: string }> = {
   required?: boolean;
   requireConfirmation?: boolean;
   options: Option[];
-  disableAddNew?: boolean;
+  addNewAction?: VoidFunction;
 };
 
 export function WorkflowSelect<Option extends { id: string; title: string }>({
@@ -24,9 +23,8 @@ export function WorkflowSelect<Option extends { id: string; title: string }>({
   readOnly,
   required,
   requireConfirmation,
-  disableAddNew
+  addNewAction
 }: Props<Option>) {
-  const { openSettings } = useSettingsDialog();
   const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
   const propertyOptions: IPropertyOption[] = [
@@ -35,16 +33,16 @@ export function WorkflowSelect<Option extends { id: string; title: string }>({
       value: option.title,
       color: 'grey'
     })),
-    ...(disableAddNew
-      ? []
-      : [
+    ...(addNewAction
+      ? [
           {
             id: 'add_new',
             value: '+ Add New',
             color: 'gray',
             variant: 'plain'
           } as const
-        ])
+        ]
+      : [])
   ];
 
   async function changeWorkflow(newValue: string) {
@@ -64,12 +62,7 @@ export function WorkflowSelect<Option extends { id: string; title: string }>({
       return;
     }
     if (newValue === 'add_new') {
-      openSettings('proposals');
-      // open the new workflow input after the settings dialog is open
-      setTimeout(() => {
-        const btnElement = document.getElementById('new-workflow-btn');
-        btnElement?.click();
-      }, 100);
+      addNewAction!();
       return;
     }
 
@@ -92,16 +85,17 @@ export function WorkflowSelect<Option extends { id: string; title: string }>({
         <PropertyLabel readOnly required={required} highlighted>
           Workflow
         </PropertyLabel>
-        <TagSelect
-          data-test='workflow-select'
-          disableClearable
-          wrapColumn
-          options={propertyOptions}
-          propertyValue={value || ''}
-          onChange={onConfirmValueChange}
-          readOnly={readOnly}
-          fluidWidth
-        />
+        <Box display='flex' flex={1}>
+          <TagSelect
+            data-test='workflow-select'
+            disableClearable
+            wrapColumn
+            options={propertyOptions}
+            propertyValue={value || ''}
+            onChange={onConfirmValueChange}
+            readOnly={readOnly}
+          />
+        </Box>
       </Box>
     </Box>
   );
