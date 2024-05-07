@@ -5,7 +5,6 @@ import { getChainById } from 'connectors/chains';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
@@ -26,9 +25,9 @@ export type FormInput = {
 type Props = {
   defaultValues?: FormInput;
   readOnly: boolean;
-  readOnlyToken: boolean;
-  readOnlyChain: boolean;
-  readOnlyTokenAmount: boolean;
+  readOnlyToken?: boolean;
+  readOnlyChain?: boolean;
+  readOnlyTokenAmount?: boolean;
   requireTokenAmount: boolean;
   onChange: (value: FormInput) => void;
   setIsValid?: (value: boolean) => void;
