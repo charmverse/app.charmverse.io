@@ -8,6 +8,7 @@ import { SharedPage } from 'components/[pageId]/SharedPage/SharedPage';
 import ErrorPage from 'components/common/errors/ErrorPage';
 import getPageLayout from 'components/common/PageLayout/getLayout';
 import { useSpaceSubscription } from 'components/settings/subscription/hooks/useSpaceSubscription';
+import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
 import { usePageIdFromPath } from 'hooks/usePageFromPath';
@@ -114,7 +115,7 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
 export default function PageView() {
   const { publicPage } = useSharedPage();
   const basePageId = usePageIdFromPath();
-  const router = useRouter();
+  const { router, clearURLQuery } = useCharmRouter();
   const { isSpaceMember } = useIsSpaceMember();
   const { user } = useUser();
   const { space } = useCurrentSpace();
@@ -154,6 +155,16 @@ export default function PageView() {
       unsubscribe();
     };
   }, []);
+
+  // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
+  useEffect(() => {
+    if (router.query.reload) {
+      clearURLQuery();
+      setTimeout(() => {
+        window.location.reload();
+      }, 0);
+    }
+  }, [router.query.reload, clearURLQuery]);
 
   if (!isSpaceMember && publicPage) {
     if (subscriptionEnded) {

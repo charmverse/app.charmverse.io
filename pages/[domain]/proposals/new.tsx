@@ -67,7 +67,8 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         destination: getPagePath({
           hostName: context.req.headers.host,
           path: proposal.page.path,
-          spaceDomain: space.domain
+          spaceDomain: space.domain,
+          query: { reload: '1' }
         }),
         permanent: false
       }
@@ -100,13 +101,13 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       params: { proposalTemplate: template as string }
     });
     const proposal = await createDraftProposal(newDraftParams);
-
     return {
       redirect: {
         destination: getPagePath({
           hostName: context.req.headers.host,
           path: proposal.page.path,
-          spaceDomain: space.domain
+          spaceDomain: space.domain,
+          query: { reload: '1' }
         }),
         permanent: false
       }

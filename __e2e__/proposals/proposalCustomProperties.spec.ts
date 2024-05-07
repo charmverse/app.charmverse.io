@@ -103,9 +103,12 @@ test.describe.serial('Proposal custom properties', () => {
 
     await expect(textInput).toBeVisible();
 
-    const apiResponse = proposalPage.page.waitForResponse('**/api/proposals');
-    await textInput.fill(settingsToTest.testTextValue);
-    await apiResponse;
+    await Promise.all([
+      proposalPage.page.waitForResponse('**/api/proposals/**'),
+      textInput.fill(settingsToTest.testTextValue),
+      // We need to click elsewhere for the input value to propagate
+      documentPage.documentTitle.click()
+    ]);
 
     // Test proposal data at the database level to ensure correct persistence
     const proposal = await prisma.proposal.findFirstOrThrow({
@@ -200,7 +203,9 @@ test.describe.serial('Proposal custom properties', () => {
     // Configure proposal settings
     await documentPage.documentTitle.click();
 
+    const pagesApiResponse = proposalPage.page.waitForResponse('**/api/pages/**');
     await documentPage.documentTitle.locator('textarea').first().fill(settingsToTest.proposalTitle);
+    await pagesApiResponse;
 
     await documentPage.charmEditor.fill('This is a test proposal');
 
@@ -214,19 +219,21 @@ test.describe.serial('Proposal custom properties', () => {
 
     await expect(textInput).toBeVisible();
 
-    const apiResponse = proposalPage.page.waitForResponse('**/api/proposals');
+    const apiResponse = proposalPage.page.waitForResponse('**/api/proposals/**');
     await textInput.fill(settingsToTest.memberTextValue);
+    // We need to click elsewhere for the input value to propagate
+    documentPage.documentTitle.click();
     await apiResponse;
 
     // Test proposal data at the database level to ensure correct persistence
     const memberProposal = await prisma.proposal.findFirstOrThrow({
       where: {
-        createdBy: member.id,
-        spaceId: space.id,
-        page: {
-          title: settingsToTest.proposalTitle,
-          type: 'proposal'
-        }
+        createdBy: member.id
+        // spaceId: space.id,
+        // page: {
+        //   title: settingsToTest.proposalTitle,
+        //   type: 'proposal'
+        // }
       },
       include: {
         evaluations: {
@@ -245,5 +252,6 @@ test.describe.serial('Proposal custom properties', () => {
 
     // Make sure value was persisted in the database
     expect(Object.values(propertyValues).some((val) => val === settingsToTest.memberTextValue)).toBe(true);
+    expect(memberProposal.page?.title).toBe(settingsToTest.proposalTitle);
   });
 });

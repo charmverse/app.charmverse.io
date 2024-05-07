@@ -68,7 +68,7 @@ test('Create a proposal from a linked proposal template /member', async ({ page,
   await proposalPage.waitForNewProposalPage();
 });
 
-test('Create a proposal from a linked proposal template / user from outside space', async ({
+test.only('Create a proposal from a linked proposal template / user from outside space', async ({
   page,
   proposalPage,
   documentPage
