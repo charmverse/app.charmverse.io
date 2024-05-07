@@ -45,10 +45,19 @@ export const getServerSideProps = withSessionSsr(async (context) => {
     sourcePostId
   };
 
-  const { success: isMember } = await hasAccessToSpace({
+  const { success: isMember, isAdmin } = await hasAccessToSpace({
     userId: sessionUserId,
     spaceId: space.id
   });
+
+  if (!isAdmin && pageType === 'proposal_template') {
+    log.warn("User is not an admin and can't create a proposal from a template", {
+      userId: sessionUserId
+    });
+    return {
+      notFound: true
+    };
+  }
 
   // User is a member, early exit
   if (isMember) {

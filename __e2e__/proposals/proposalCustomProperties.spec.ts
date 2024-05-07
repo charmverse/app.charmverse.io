@@ -101,13 +101,11 @@ test.describe.serial('Proposal custom properties', () => {
 
     const textInput = databasePage.getCardDetailsTextInput();
 
-    await textInput.fill(settingsToTest.testTextValue);
-
     await expect(textInput).toBeVisible();
 
-    proposalPage.saveDraftButton.click();
-
-    await proposalPage.page.waitForResponse('**/api/proposals');
+    const apiResponse = proposalPage.page.waitForResponse('**/api/proposals');
+    await textInput.fill(settingsToTest.testTextValue);
+    await apiResponse;
 
     // Test proposal data at the database level to ensure correct persistence
     const proposal = await prisma.proposal.findFirstOrThrow({
@@ -214,13 +212,11 @@ test.describe.serial('Proposal custom properties', () => {
 
     const textInput = databasePage.getCardDetailsTextInput();
 
-    await textInput.fill(settingsToTest.memberTextValue);
-
     await expect(textInput).toBeVisible();
 
-    proposalPage.saveDraftButton.click();
-
-    await proposalPage.page.waitForResponse('**/api/proposals');
+    const apiResponse = proposalPage.page.waitForResponse('**/api/proposals');
+    await textInput.fill(settingsToTest.memberTextValue);
+    await apiResponse;
 
     // Test proposal data at the database level to ensure correct persistence
     const memberProposal = await prisma.proposal.findFirstOrThrow({

@@ -32,7 +32,7 @@ export default function ErrorPage({
 }) {
   return (
     <Container>
-      <Box sx={{ textAlign: 'center' }} data-test='error-title'>
+      <Box sx={{ textAlign: 'center' }} data-test='error-page'>
         <StyledBolt />
         <Text sx={{ mt: 3 }}>{message}</Text>
         {children}

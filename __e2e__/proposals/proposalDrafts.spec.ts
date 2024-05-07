@@ -5,9 +5,9 @@ import { v4 as uuid } from 'uuid';
 
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
-import { generateUserAndSpace, loginBrowserUser } from '../utils/mocks';
+import { generateUserAndSpace, loginBrowserUser, generateUser } from '../utils/mocks';
 
-test.describe('Proposal Drafts', () => {
+test.describe('Creating a proposal', () => {
   let space: Space;
   let member: User;
 
@@ -23,7 +23,7 @@ test.describe('Proposal Drafts', () => {
     });
   });
 
-  test('Can save a draft without filling out required fields', async ({ proposalListPage, proposalPage }) => {
+  test('Non-admin can create a new proposal', async ({ proposalListPage, proposalPage }) => {
     // Initial setup
     await loginBrowserUser({
       browserPage: proposalListPage.page,
@@ -31,54 +31,16 @@ test.describe('Proposal Drafts', () => {
     });
 
     await proposalListPage.goToNewProposalForm(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
-    proposalPage.saveDraftButton.click();
-
-    const result = await proposalPage.page.waitForResponse('**/api/proposals');
-
-    const pageId = await result.json().then((data) => data.id);
+    const path = await proposalPage.page.url();
+    const pagePath = path.split('/').pop();
 
     // Test proposal data at the database level to ensure correct persistence
     const proposal = await prisma.proposal.findFirst({
       where: {
-        id: pageId
-      },
-      include: {
-        evaluations: {
-          include: {
-            reviewers: true,
-            permissions: true,
-            rubricCriteria: true
-          },
-          orderBy: { index: 'asc' }
-        },
-        page: true
-      }
-    });
-    expect(proposal).toBeTruthy();
-  });
-
-  test('Can save a template draft', async ({ proposalListPage, proposalPage }) => {
-    // Initial setup
-    await loginBrowserUser({
-      browserPage: proposalListPage.page,
-      userId: member.id
-    });
-
-    await proposalListPage.goToNewProposalForm(space.domain, '?type=proposal_template');
-
-    proposalPage.saveDraftButton.click();
-
-    const result = await proposalPage.page.waitForResponse('**/api/proposals');
-
-    const pageId = await result.json().then((data) => data.id);
-
-    // Test proposal data at the database level to ensure correct persistence
-    const proposal = await prisma.proposal.findFirst({
-      where: {
-        id: pageId,
         page: {
-          type: 'proposal_template'
+          path: pagePath
         }
       },
       include: {
@@ -94,5 +56,56 @@ test.describe('Proposal Drafts', () => {
       }
     });
     expect(proposal).toBeTruthy();
+    expect(proposal?.status).toBe('draft');
+    expect(proposal?.page?.type).toBe('proposal');
+  });
+
+  test('Non-admin cannot create a template', async ({ proposalListPage, proposalPage }) => {
+    // Initial setup
+    await loginBrowserUser({
+      browserPage: proposalListPage.page,
+      userId: member.id
+    });
+
+    await proposalListPage.goToNewProposalForm(space.domain, '?type=proposal_template');
+    await expect(proposalPage.errorPage).toBeVisible();
+  });
+
+  test('Admin can create a template ', async ({ proposalListPage, proposalPage }) => {
+    const admin = await generateUser({ space: { id: space.id, isAdmin: true } });
+    // Initial setup
+    await loginBrowserUser({
+      browserPage: proposalListPage.page,
+      userId: admin.id
+    });
+
+    await proposalListPage.goToNewProposalForm(space.domain, '?type=proposal_template');
+    await proposalPage.waitForNewProposalPage();
+
+    const path = await proposalPage.page.url();
+    const pagePath = path.split('/').pop();
+
+    // Test proposal data at the database level to ensure correct persistence
+    const proposal = await prisma.proposal.findFirst({
+      where: {
+        page: {
+          path: pagePath
+        }
+      },
+      include: {
+        evaluations: {
+          include: {
+            reviewers: true,
+            permissions: true,
+            rubricCriteria: true
+          },
+          orderBy: { index: 'asc' }
+        },
+        page: true
+      }
+    });
+    expect(proposal).toBeTruthy();
+    expect(proposal?.status).toBe('draft');
+    expect(proposal?.page?.type).toBe('proposal_template');
   });
 });

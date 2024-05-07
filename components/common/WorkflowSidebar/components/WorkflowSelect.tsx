@@ -72,7 +72,7 @@ export function WorkflowSelect<Option extends { id: string; title: string }>({
       }, 100);
       return;
     }
-    // no confirmation needed for draft or feedback
+
     if (!requireConfirmation) {
       changeWorkflow(newValue);
     } else {

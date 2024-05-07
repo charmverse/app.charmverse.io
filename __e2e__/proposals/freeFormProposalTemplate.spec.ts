@@ -38,7 +38,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
   const templatePageContent = {
     title: 'Proposal template for E2E',
-    description: 'This is some proposal content that should show in the template'
+    description: 'Some freeform content'
   };
 
   const firstRubricConfig = {

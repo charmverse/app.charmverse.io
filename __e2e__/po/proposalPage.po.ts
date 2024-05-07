@@ -7,7 +7,6 @@ import { DocumentPage } from './document.po';
 export class ProposalPage extends DocumentPage {
   constructor(
     page: Page,
-    public saveDraftButton = page.locator('data-test=create-proposal-button'),
     public publishNewProposalButton = page.locator('data-test=publish-new-proposal-button'),
     public categorySelect = page.locator('data-test=proposal-category-select'),
     public reviewerSelect = page.locator('data-test=proposal-reviewer-select'),
