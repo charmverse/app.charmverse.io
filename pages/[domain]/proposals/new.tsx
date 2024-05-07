@@ -67,8 +67,7 @@ export const getServerSideProps = withSessionSsr(async (context) => {
         destination: getPagePath({
           hostName: context.req.headers.host,
           path: proposal.page.path,
-          spaceDomain: space.domain,
-          query: { reload: '1' }
+          spaceDomain: space.domain
         }),
         permanent: false
       }
