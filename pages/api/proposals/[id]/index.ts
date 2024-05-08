@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
+import { concealProposalSteps } from 'lib/proposals/concealProposalSteps';
 import { getProposal } from 'lib/proposals/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
@@ -31,7 +32,9 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     throw new NotFoundError();
   }
 
-  return res.status(200).json(proposal);
+  const proposalWithConcealedSteps = await concealProposalSteps({ proposal, userId });
+
+  return res.status(200).json(proposalWithConcealedSteps);
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
