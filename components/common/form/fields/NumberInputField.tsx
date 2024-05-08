@@ -1,11 +1,10 @@
 import styled from '@emotion/styled';
-import type { SxProps, Theme, TextFieldProps } from '@mui/material';
+import type { TextFieldProps } from '@mui/material';
 import { TextField } from '@mui/material';
 import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
-import type { NestedDataTest } from 'testing/e2eType';
 
 type Props = ControlFieldProps &
   FieldProps & { disableArrows?: boolean } & Pick<TextFieldProps, 'fullWidth' | 'inputProps' | 'sx'>;
@@ -28,7 +27,7 @@ const StyledTextField = styled(TextField)<{ disableArrows: boolean }>`
       : ''}
 `;
 
-export const NumberInputField = forwardRef<HTMLDivElement, Props & NestedDataTest>(
+export const NumberInputField = forwardRef<HTMLDivElement, Props>(
   (
     {
       label,
@@ -41,9 +40,9 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props & NestedDataTes
       placeholder,
       disableArrows = false,
       inputEndAdornment,
-      dataTest,
+      'data-test': dataTest,
       ...textFieldProps
-    }: Props & NestedDataTest,
+    }: Props,
     ref
   ) => {
     return (

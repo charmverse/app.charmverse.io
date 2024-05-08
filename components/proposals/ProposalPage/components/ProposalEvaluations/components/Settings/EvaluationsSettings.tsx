@@ -97,7 +97,9 @@ export function EvaluationsSettings({
           }}
           // only require confirmation change if rubric criteria have been set up
           // this may be extended in the future if we add other sophisticated evaluation configurations
-          requireConfirmation={proposal?.evaluations.some((e) => e.rubricCriteria.length)}
+          requireConfirmation={proposal?.evaluations.some(
+            (e) => e.rubricCriteria.filter((criteria) => criteria.title).length
+          )}
         />
       </Collapse>
       <EvaluationStepRow

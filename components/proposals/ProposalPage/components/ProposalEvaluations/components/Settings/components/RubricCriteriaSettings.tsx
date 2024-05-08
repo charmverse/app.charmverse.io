@@ -95,7 +95,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const updatedList = [...criteriaList, newCriteria];
     setCriteriaList(updatedList);
   }
-
+  // console.log('criteriaList', criteriaList, value);
   function deleteCriteria(id: string) {
     if (readOnly || !id) {
       return;
@@ -262,15 +262,13 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
           question='Are you sure you want to delete this criteria? Any linked answers will also be deleted'
         />
       )}
-      {!readOnly && (
-        <AddAPropertyButton
-          dataTest='add-rubric-criteria-button'
-          style={{ flex: 'none', margin: 0 }}
-          onClick={addCriteria}
-        >
-          + Add a criteria
-        </AddAPropertyButton>
-      )}
+      <AddAPropertyButton
+        data-test='add-rubric-criteria-button'
+        style={{ display: readOnly ? 'none' : 'block', flex: 'none', margin: 0 }}
+        onClick={addCriteria}
+      >
+        + Add a criteria
+      </AddAPropertyButton>
     </ReactDndProvider>
   );
 }

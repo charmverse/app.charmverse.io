@@ -14,7 +14,6 @@ import { Button } from 'components/common/Button';
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { getNumberFromString } from 'lib/utils/numbers';
-import type { NestedDataTest } from 'testing/e2eType';
 
 export type FormInput = { answers: ProposalRubricCriteriaAnswer[] };
 
@@ -417,7 +416,7 @@ function CriteriaInput({
                     </Typography>
                   </FormLabel>
                   <IntegerInput
-                    dataTest='rubric-criteria-score-input'
+                    data-test='rubric-criteria-score-input'
                     onChange={(score) => {
                       _field.onChange(score);
                     }}
@@ -473,17 +472,18 @@ function IntegerInput({
   inputProps,
   disabled,
   error,
-  dataTest
+  'data-test': dataTest
 }: {
   value?: number | string | null;
   onChange: (num: number | null) => void;
   error?: string;
   inputProps?: any;
   disabled?: boolean;
-} & NestedDataTest) {
+  'data-test'?: string;
+}) {
   return (
     <NumberInputField
-      dataTest={dataTest}
+      data-test={dataTest}
       disableArrows
       inline
       error={error}
