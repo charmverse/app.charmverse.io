@@ -1,7 +1,7 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material';
 
-import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
+import { useResetProposalReview, useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -46,6 +46,9 @@ export function PassFailEvaluation({
   const { showMessage } = useSnackbar();
   const currentUserEvaluationReview = evaluation.reviews?.find((review) => review.reviewerId === user?.id);
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
+  const { trigger: resetProposalReview, isMutating: isResettingProposalReview } = useResetProposalReview({
+    proposalId
+  });
 
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
@@ -125,11 +128,28 @@ export function PassFailEvaluation({
                       {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
                     </Typography>
                   </Stack>
-                  {evaluationReview.result === 'pass' ? (
-                    <ApprovedIcon fontSize='small' color='success' />
-                  ) : (
-                    <RejectedIcon fontSize='small' color='error' />
-                  )}
+                  <Stack direction='row' gap={1.5} alignItems='center'>
+                    {evaluationReview.reviewerId === user?.id && !evaluation.result && (
+                      <Button
+                        size='small'
+                        color='secondary'
+                        variant='outlined'
+                        loading={isResettingProposalReview}
+                        onClick={() => {
+                          resetProposalReview({
+                            evaluationId: evaluation.id
+                          }).then(refreshProposal);
+                        }}
+                      >
+                        Reset
+                      </Button>
+                    )}
+                    {evaluationReview.result === 'pass' ? (
+                      <ApprovedIcon fontSize='small' color='success' />
+                    ) : (
+                      <RejectedIcon fontSize='small' color='error' />
+                    )}
+                  </Stack>
                 </Stack>
               ))}
               <Divider />
