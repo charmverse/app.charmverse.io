@@ -4,21 +4,21 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { applyProposalWorkflow } from 'lib/proposals/applyProposalWorkflow';
-import type { UpdateWorkflowRequest } from 'lib/proposals/applyProposalWorkflow';
+import { applyProposalTemplate } from 'lib/proposals/applyProposalTemplate';
+import type { ApplyWorkflowTemplate } from 'lib/proposals/applyProposalTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
-handler.put(updateWorkflowEndpoint);
+handler.put(applyTemplateEndpoint);
 
-async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse) {
+async function applyTemplateEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { workflowId } = req.body as UpdateWorkflowRequest;
+  const { id } = req.body as ApplyWorkflowTemplate;
 
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
@@ -61,9 +61,9 @@ async function updateWorkflowEndpoint(req: NextApiRequest, res: NextApiResponse)
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
-  await applyProposalWorkflow({
+  await applyProposalTemplate({
     proposalId: proposal.id,
-    workflowId,
+    id,
     actorId: userId
   });
 

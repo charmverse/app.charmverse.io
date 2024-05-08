@@ -56,7 +56,7 @@ export function PageTemplateBanner({ isNewPage, pageType, parentId, customTitle 
   }
 
   return (
-    <StyledPageTemplateBanner card={isShowingCard}>
+    <StyledPageTemplateBanner card={isShowingCard} data-test='template-page-banner'>
       <Grid container display='flex' gap={1} alignItems='center' fontSize={theme.palette.templateBanner.fontSize}>
         <Grid item xs={2}>
           {isShowingCard && (

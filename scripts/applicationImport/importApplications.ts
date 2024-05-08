@@ -229,7 +229,6 @@ async function importApplications({
         evaluations: populatedWorkflowSteps,
         spaceId: formProposal.spaceId,
         workflowId: formProposal.workflowId!,
-        proposalTemplateId: formProposal.page!.id,
         fields: formProposal.fields as any,
         isDraft: true,
         selectedCredentialTemplates: formProposal.selectedCredentialTemplates,

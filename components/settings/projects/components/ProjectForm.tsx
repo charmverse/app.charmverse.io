@@ -127,36 +127,27 @@ export function ProposalProjectFormAnswers({
         displayEmpty
         data-test='project-team-members-select'
         disabled={disabled}
+        value=''
+        onChange={(event) => {
+          onChange(event.target.value as string);
+        }}
         renderValue={() => {
           return 'Select a team member';
         }}
       >
-        {nonSelectedProjectMembers.length ? (
-          <>
-            {nonSelectedProjectMembers.map((projectMember, index) => (
-              <MenuItem
-                key={`project-member-${index.toString()}`}
-                data-test='project-member-option'
-                onClick={() => {
-                  onChange(projectMember.id as string);
-                }}
-              >
-                <Typography color={projectMember.name ? '' : 'secondary'}>
-                  {projectMember.name || 'Untitled Project Member'}
-                </Typography>
-              </MenuItem>
-            ))}
-            <Divider />
-          </>
-        ) : null}
-        <MenuItem
-          value='ADD_TEAM_MEMBER'
-          data-test='project-member-option'
-          disabled={!isTeamLead || disabled}
-          onClick={() => {
-            onChange('ADD_TEAM_MEMBER');
-          }}
-        >
+        {nonSelectedProjectMembers.map((projectMember) => (
+          <MenuItem
+            key={`project-member-${projectMember.id}`}
+            value={projectMember.id}
+            data-test='project-member-option'
+          >
+            <Typography color={projectMember.name ? '' : 'secondary'}>
+              {projectMember.name || 'Untitled Project Member'}
+            </Typography>
+          </MenuItem>
+        ))}
+        {nonSelectedProjectMembers.length && <Divider />}
+        <MenuItem data-test='project-member-option' value='ADD_TEAM_MEMBER' disabled={!isTeamLead || disabled}>
           <Stack flexDirection='row' alignItems='center' gap={0.05}>
             <AddIcon fontSize='small' />
             <Typography>Add a new project member</Typography>

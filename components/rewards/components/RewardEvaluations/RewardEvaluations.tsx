@@ -7,8 +7,9 @@ import { EvaluationsSettings } from './components/Settings/EvaluationsSettings';
 
 export type RewardEvaluationsProps = Pick<
   EvaluationSettingsProps,
-  'expanded' | 'rewardInput' | 'onChangeReward' | 'onChangeWorkflow'
+  'rewardInput' | 'onChangeReward' | 'onChangeWorkflow' // | 'onChangeTemplate'
 > & {
+  expanded?: boolean;
   isUnpublishedReward?: boolean;
   templateId?: string | null;
   reward?: RewardWithUsers;
@@ -28,6 +29,7 @@ export function RewardEvaluations({
   templateId,
   expanded = true,
   onChangeReward,
+  // onChangeTemplate,
   onChangeWorkflow,
   isUnpublishedReward,
   readOnly,
@@ -45,9 +47,9 @@ export function RewardEvaluations({
         rewardInput={rewardInput}
         isTemplate={!!isTemplate}
         templateId={templateId}
-        readOnly={readOnly}
-        requireWorkflowChangeConfirmation={!!reward}
+        readOnly={!!readOnly}
         expanded={expanded}
+        // onChangeTemplate={onChangeTemplate}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
         isUnpublishedReward={isUnpublishedReward}
@@ -60,7 +62,7 @@ export function RewardEvaluations({
         application={application}
         expanded={expanded}
         isTemplate={!!isTemplate}
-        readOnly={readOnly}
+        readOnly={!!readOnly}
         templateId={templateId}
         reward={reward}
         onChangeReward={onChangeReward}

@@ -16,15 +16,19 @@ import { FormField } from './FormField';
 
 export function FormFieldsEditor({
   proposalId,
+  expandFieldsByDefault,
   formFields: initialFormFields,
   readOnly
 }: {
   proposalId: string;
+  expandFieldsByDefault?: boolean;
   formFields: FormFieldInput[];
   readOnly?: boolean;
 }) {
   const [formFields, setFormFields] = useState([...initialFormFields]);
-  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(formFields.map((field) => field.id));
+  const [collapsedFieldIds, setCollapsedFieldIds] = useState<string[]>(
+    expandFieldsByDefault ? [] : formFields.map((field) => field.id)
+  );
   const { trigger } = useUpdateProposalFormFields({ proposalId });
   const debouncedUpdate = useMemo(() => {
     return debounce(trigger, 200);

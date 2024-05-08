@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -16,7 +15,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getProposalFormAnswersHandler).use(requireUser).put(upsertProposalFormAnswersHandler);
 
-async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {
+async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FieldAnswerInput[]>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user?.id;
 

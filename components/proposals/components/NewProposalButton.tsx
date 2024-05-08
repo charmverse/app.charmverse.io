@@ -21,9 +21,9 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
+import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposals/createDraftProposal';
 
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
-import type { ProposalPageAndPropertiesInput } from '../ProposalPage/NewProposalPage';
 
 const ProposalTemplateMenu = styled(Stack)`
   border: 1px solid ${({ theme }) => theme.palette.divider};
@@ -71,8 +71,8 @@ export function NewProposalButton() {
     navigateToSpacePath(`/${pageId}`);
   }
 
-  function createTemplate(proposalType: ProposalPageAndPropertiesInput['proposalType']) {
-    navigateToSpacePath('/proposals/new', { type: 'proposal_template', proposalType });
+  function createTemplate(contentType: ProposalContentType) {
+    navigateToSpacePath('/proposals/new', { type: 'proposal_template', contentType });
   }
 
   function createFromTemplate(template: TemplateItem) {

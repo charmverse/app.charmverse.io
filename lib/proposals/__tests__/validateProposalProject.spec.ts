@@ -3,7 +3,7 @@ import { v4 } from 'uuid';
 
 import { createDefaultProjectAndMembersPayload } from 'lib/projects/constants';
 import { createProject } from 'lib/projects/createProject';
-import { getProjectProfileFieldConfig } from 'testing/mocks/form';
+import { getProjectProfileFieldConfigDefaultHidden, getProjectProfileFieldConfig } from 'testing/mocks/form';
 import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { validateProposalProject } from '../validateProposalProject';
@@ -22,9 +22,9 @@ describe('validateProposalProject', () => {
     });
     const projectFieldId = v4();
 
-    await expect(
+    expect(() =>
       validateProposalProject({
-        projectId: createdProject.id,
+        project: createdProject,
         formAnswers: [
           {
             fieldId: projectFieldId,
@@ -46,7 +46,7 @@ describe('validateProposalProject', () => {
           }
         ]
       })
-    ).rejects.toBeInstanceOf(InvalidInputError);
+    ).toThrow(InvalidInputError);
   });
 
   it('Should not throw error if proposal project information is valid', async () => {
@@ -68,10 +68,9 @@ describe('validateProposalProject', () => {
       }
     });
 
-    await expect(
+    expect(() =>
       validateProposalProject({
-        defaultRequired: false,
-        projectId: createdProject.id,
+        project: createdProject,
         formAnswers: [
           {
             fieldId: projectFieldId,
@@ -85,7 +84,7 @@ describe('validateProposalProject', () => {
           {
             id: projectFieldId,
             type: 'project_profile',
-            fieldConfig: getProjectProfileFieldConfig({
+            fieldConfig: getProjectProfileFieldConfigDefaultHidden({
               name: {
                 required: true
               }
@@ -93,6 +92,6 @@ describe('validateProposalProject', () => {
           }
         ]
       })
-    ).resolves.toBeUndefined();
+    ).not.toThrow();
   });
 });

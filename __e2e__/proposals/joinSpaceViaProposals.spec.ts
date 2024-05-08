@@ -65,7 +65,7 @@ test('Create a proposal from a linked proposal template /member', async ({ page,
 
   await documentPage.getLinkedPage(template.id).click();
 
-  await proposalPage.waitForNewProposalPage(space.domain);
+  await proposalPage.waitForNewProposalPage();
 });
 
 test('Create a proposal from a linked proposal template / user from outside space', async ({
@@ -128,7 +128,7 @@ test('Create a proposal from a linked proposal template / user from outside spac
 
   await documentPage.getLinkedPage(template.id).click();
 
-  await proposalPage.waitForNewProposalPage(space.domain);
+  await proposalPage.waitForNewProposalPage();
 });
 
 test('Try to create a proposal from a linked proposal template / user from outside space / public templates disabled', async ({
@@ -265,5 +265,5 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
 
   await page.reload();
 
-  await proposalPage.waitForNewProposalPage(space.domain);
+  await proposalPage.waitForNewProposalPage();
 });
