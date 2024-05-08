@@ -16,7 +16,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler.get(getProposalFormAnswersHandler).use(requireUser).put(upsertProposalFormAnswersHandler);
 
-async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FormFieldAnswer[]>) {
+async function getProposalFormAnswersHandler(req: NextApiRequest, res: NextApiResponse<FieldAnswerInput[]>) {
   const proposalId = req.query.id as string;
   const userId = req.session.user?.id;
 

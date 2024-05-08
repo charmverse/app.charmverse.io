@@ -19,8 +19,8 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
   const { trigger: updateProposal } = useUpdateProposal({ proposalId });
   const { trigger: updateProposalEvaluation } = useUpdateProposalEvaluation({ proposalId });
   const { trigger: upsertRubricCriteria } = useUpsertRubricCriteria({ proposalId });
-  const { trigger: updateProposalTemplate } = useUpdateTemplate({ proposalId });
-  const { trigger: updateProposalWorkflow } = useUpdateWorkflow({ proposalId });
+  const { trigger: applyProposalTemplate } = useUpdateTemplate({ proposalId });
+  const { trigger: applyProposalWorkflow } = useUpdateWorkflow({ proposalId });
   const { subscribe } = useWebSocketClient();
   const { refreshIssuableCredentials } = useProposalCredentials({ proposalId });
 
@@ -70,11 +70,11 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       },
       onChangeTemplate: async (value: { id: string } | null) => {
         // null will remove the template
-        await updateProposalTemplate({ id: value?.id || null });
+        await applyProposalTemplate({ id: value?.id || null });
         await refreshProposal();
       },
       onChangeWorkflow: async ({ id }: { id: string }) => {
-        await updateProposalWorkflow({ workflowId: id });
+        await applyProposalWorkflow({ workflowId: id });
         await refreshProposal();
       },
       onChangeRewardSettings: async (values: Partial<ProposalFields>) => {
@@ -98,6 +98,6 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
         }
       }
     }),
-    [proposal, refreshProposal, updateProposalEvaluation, updateProposalWorkflow, upsertRubricCriteria, updateProposal]
+    [proposal, refreshProposal, updateProposalEvaluation, applyProposalWorkflow, upsertRubricCriteria, updateProposal]
   );
 }

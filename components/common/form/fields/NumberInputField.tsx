@@ -7,7 +7,10 @@ import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
 
 type Props = ControlFieldProps &
-  FieldProps & { disableArrows?: boolean } & Pick<TextFieldProps, 'fullWidth' | 'inputProps' | 'sx'>;
+  FieldProps & { disableArrows?: boolean; 'data-test'?: string } & Pick<
+    TextFieldProps,
+    'fullWidth' | 'inputProps' | 'sx'
+  >;
 
 const StyledTextField = styled(TextField)<{ disableArrows: boolean }>`
   ${({ disableArrows }) =>

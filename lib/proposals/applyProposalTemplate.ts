@@ -1,17 +1,13 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { updateProposalWorkflow } from './applyProposalWorkflow';
+import { applyProposalWorkflow } from './applyProposalWorkflow';
 
-export type UpdateWorkflowTemplate = {
+export type ApplyWorkflowTemplate = {
   proposalId: string;
   id: string;
 };
 
-export async function updateProposalTemplate({
-  actorId,
-  proposalId,
-  id
-}: UpdateWorkflowTemplate & { actorId: string }) {
+export async function applyProposalTemplate({ actorId, proposalId, id }: ApplyWorkflowTemplate & { actorId: string }) {
   const template = await prisma.proposal.findUniqueOrThrow({
     where: {
       id
@@ -21,6 +17,9 @@ export async function updateProposalTemplate({
       page: true
     }
   });
+  if (!template.workflowId) {
+    throw new Error('Template does not have a workflow attached');
+  }
 
   const authorIds = [...new Set([actorId].concat(template.authors.map(({ userId }) => userId) || []))];
 
@@ -64,9 +63,10 @@ export async function updateProposalTemplate({
       }
     })
   ]);
-  await updateProposalWorkflow({
+
+  await applyProposalWorkflow({
     actorId,
-    workflowId: template.workflowId!,
+    workflowId: template.workflowId,
     proposalId
   });
 }

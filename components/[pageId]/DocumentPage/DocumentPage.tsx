@@ -572,7 +572,12 @@ function DocumentPageComponent({
           </PageEditorContainer>
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
-          <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
+          <ProposalStickyFooter
+            page={page}
+            proposal={proposal}
+            formAnswers={proposalFormFieldAnswers}
+            isStructuredProposal={isStructuredProposal}
+          />
         )}
         {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
           <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />

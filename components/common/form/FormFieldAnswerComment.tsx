@@ -159,13 +159,13 @@ function FormFieldAnswerThreads({
 export function FormFieldAnswerInput({
   pageId,
   disabled,
-  formFieldAnswer,
+  formFieldAnswerId,
   enableComments,
   formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
-  formFieldAnswer: FormFieldAnswer;
+  formFieldAnswerId: string;
   enableComments?: boolean;
   formFieldName: string;
 }) {
@@ -184,7 +184,7 @@ export function FormFieldAnswerInput({
         id: threadAccessGroup.id,
         group: threadAccessGroup.group
       })),
-      fieldAnswerId: formFieldAnswer.id
+      fieldAnswerId: formFieldAnswerId
     });
     await refetchThreads();
     setIsOpen(false);
@@ -231,14 +231,14 @@ export function FormFieldAnswerComment({
   pageId,
   disabled,
   fieldAnswerThreads = [],
-  formFieldAnswer,
+  formFieldAnswerId,
   enableComments,
   formFieldName
 }: {
   disabled?: boolean;
   pageId: string;
   fieldAnswerThreads?: ThreadWithComments[];
-  formFieldAnswer: FormFieldAnswer;
+  formFieldAnswerId: string;
   enableComments?: boolean;
   formFieldName: string;
 }) {
@@ -265,7 +265,7 @@ export function FormFieldAnswerComment({
           formFieldName={formFieldName}
           disabled={disabled}
           pageId={pageId}
-          formFieldAnswer={formFieldAnswer}
+          formFieldAnswerId={formFieldAnswerId}
           enableComments={enableComments}
         />
       </span>

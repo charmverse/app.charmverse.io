@@ -1,6 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { FormFieldInput } from 'lib/forms/interfaces';
+import type { FieldAnswerInput, FormFieldInput } from 'lib/forms/interfaces';
 import { getProposalFormFields } from 'lib/proposals/form/getProposalFormFields';
 
 export async function getProposalFormAnswers({
@@ -27,7 +27,7 @@ export async function getProposalFormAnswers({
     }
   });
 
-  const allAnswers = proposal.formAnswers;
+  const allAnswers = proposal.formAnswers as FieldAnswerInput[];
   if (!allAnswers) {
     return [];
   }

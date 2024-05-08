@@ -1,16 +1,15 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 
-import { getNewCriteria } from 'components/proposals/ProposalPage/components/ProposalEvaluations/components/Settings/components/RubricCriteriaSettings';
-
 import { setPageUpdatedAt } from './setPageUpdatedAt';
+import { getNewCriteria } from './workflows/getNewCriteria';
 
 export type UpdateWorkflowRequest = {
   proposalId: string;
   workflowId: string;
 };
 
-export async function updateProposalWorkflow({
+export async function applyProposalWorkflow({
   actorId,
   proposalId,
   workflowId

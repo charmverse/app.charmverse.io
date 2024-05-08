@@ -7,20 +7,25 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
+import type { FieldAnswerInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 export function ProposalStickyFooter({
   proposal,
+  formAnswers,
   page,
   isStructuredProposal
 }: {
   proposal: ProposalWithUsersAndRubric;
+  formAnswers: FieldAnswerInput[];
   page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
   isStructuredProposal: boolean;
 }) {
   const projectForm = useFormContext<ProjectAndMembersPayload>();
+
+  const projectFormValues = projectForm.watch() as ProjectWithMembers;
 
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
@@ -42,12 +47,13 @@ export function ProposalStickyFooter({
       title: page.title,
       type: page.type
     },
-    project: projectForm.getValues() as ProjectWithMembers,
+    project: projectFormValues,
     requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
     contentType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {
       ...proposal,
+      formAnswers,
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
     },

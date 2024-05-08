@@ -93,7 +93,7 @@ export function EditorPage({ pageId: pageIdOrPath }: { pageId: string }) {
 
   useEffect(() => {
     // make sure current page is loaded
-    if (page?.title) {
+    if (page) {
       setTitleState(page.title || 'Untitled');
     }
   }, [page?.title]);
