@@ -68,7 +68,7 @@ export function useProposalRewards({
   }).join(', ');
 
   function getTemplateAppliedReward(template?: RewardTemplate) {
-    const rewardType = template ? getRewardType(template) : 'token';
+    const rewardType = template ? template.rewardType : 'token';
     return {
       rewardType,
       fields: template?.fields,

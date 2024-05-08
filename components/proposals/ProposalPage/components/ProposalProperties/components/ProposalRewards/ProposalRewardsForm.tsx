@@ -19,10 +19,7 @@ import { CustomPropertiesAdapter } from 'components/rewards/components/RewardPro
 import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/useNewReward';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
-import {
-  allReviewersSystemRole,
-  authorSystemRole
-} from 'components/settings/proposals/components/EvaluationPermissions';
+import { allReviewersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
@@ -44,7 +41,6 @@ type Props = {
   templateId?: string;
   readOnlyTemplate?: boolean;
   rewardStatus?: BountyStatus | null;
-  isProposalTemplate?: boolean;
 };
 export function ProposalRewardsForm({
   onChange,
@@ -57,16 +53,18 @@ export function ProposalRewardsForm({
   selectTemplate,
   templateId,
   readOnlyTemplate,
-  rewardStatus,
-  isProposalTemplate
+  rewardStatus
 }: Props) {
-  const { getFeatureTitle } = useSpaceFeatures();
   const isAdmin = useIsAdmin();
+  const { getFeatureTitle } = useSpaceFeatures();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const { data: template } = useGetRewardTemplate(templateId);
-  const readOnlyProperties = !isAdmin && (readOnly || !!template);
+  const readOnlyType = !isAdmin && (readOnly || !!template?.rewardType);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.dueDate);
   const readOnlyToken = !isAdmin && (readOnly || !!template?.rewardToken);
+  const readOnlyTokenAmount = !isAdmin && (readOnly || !!template?.rewardAmount);
+  const readOnlyCustomReward = !isAdmin && (readOnly || !!template?.customReward);
+
   const { templates: nonDraftRewardTemplates = [] } = useRewardTemplates();
 
   async function applyUpdates(updates: Partial<UpdateableRewardFields>) {
@@ -228,28 +226,18 @@ export function ProposalRewardsForm({
                 Assigned applicants
               </PropertyLabel>
               <Box display='flex' flex={1}>
-                {isProposalTemplate ? (
-                  <UserAndRoleSelect
-                    readOnly
-                    wrapColumn
-                    value={[{ group: 'system_role', id: ProposalSystemRole.author }]}
-                    systemRoles={[authorSystemRole]}
-                    onChange={() => {}}
-                  />
-                ) : (
-                  <UserSelect
-                    memberIds={values.assignedSubmitters ?? []}
-                    readOnly={readOnly}
-                    onChange={updateAssignedSubmitters}
-                    wrapColumn
-                    showEmptyPlaceholder
-                    error={
-                      !isNewReward && !values.assignedSubmitters?.length && !readOnly
-                        ? 'Requires at least one assignee'
-                        : undefined
-                    }
-                  />
-                )}
+                <UserSelect
+                  memberIds={values.assignedSubmitters ?? []}
+                  readOnly={readOnly}
+                  onChange={updateAssignedSubmitters}
+                  wrapColumn
+                  showEmptyPlaceholder
+                  error={
+                    !isNewReward && !values.assignedSubmitters?.length && !readOnly
+                      ? 'Requires at least one assignee'
+                      : undefined
+                  }
+                />
               </Box>
             </Box>
 
@@ -257,7 +245,7 @@ export function ProposalRewardsForm({
               <PropertyLabel readOnly highlighted>
                 Type
               </PropertyLabel>
-              <RewardTypeSelect readOnly={readOnlyProperties} value={values.rewardType} onChange={setRewardType} />
+              <RewardTypeSelect readOnly={readOnlyType} value={values.rewardType} onChange={setRewardType} />
             </Box>
 
             {values.rewardType === 'token' && (
@@ -266,11 +254,11 @@ export function ProposalRewardsForm({
                   Token
                 </PropertyLabel>
                 <RewardTokenProperty
-                  requireTokenAmount={!isProposalTemplate}
+                  readOnlyTokenAmount={readOnlyTokenAmount}
+                  readOnlyToken={readOnlyToken}
+                  requireTokenAmount
                   onChange={onRewardTokenUpdate}
                   currentReward={values as (RewardCreationData & RewardWithUsers) | null}
-                  readOnly={readOnlyProperties}
-                  readOnlyToken={readOnlyToken}
                 />
               </Box>
             )}
@@ -288,12 +276,12 @@ export function ProposalRewardsForm({
                   size='small'
                   inputProps={{
                     style: { height: 'auto' },
-                    className: clsx('Editable octo-propertyvalue', { readonly: readOnly })
+                    className: clsx('Editable octo-propertyvalue', { readonly: readOnlyCustomReward })
                   }}
                   sx={{
                     width: '100%'
                   }}
-                  disabled={readOnlyProperties}
+                  disabled={readOnlyCustomReward}
                   placeholder='T-shirt'
                   autoFocus
                   rows={1}

@@ -5,7 +5,6 @@ import { getChainById } from 'connectors/chains';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { InputSearchBlockchain } from 'components/common/form/InputSearchBlockchain';
 import { InputSearchCrypto } from 'components/common/form/InputSearchCrypto';
 import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
@@ -26,8 +25,8 @@ export type FormInput = {
 type Props = {
   defaultValues?: FormInput;
   readOnly: boolean;
-  readOnlyToken: boolean;
-  readOnlyTokenAmount: boolean;
+  readOnlyToken?: boolean;
+  readOnlyTokenAmount?: boolean;
   requireTokenAmount: boolean;
   onChange: (value: FormInput) => void;
   setIsValid?: (value: boolean) => void;
@@ -115,8 +114,8 @@ export function RewardTokenForm({
           rules={{ required: true }}
           render={({ field: { onChange: _onChange, value } }) => (
             <InputSearchBlockchain
-              disabled={readOnly}
-              readOnly={readOnly}
+              disabled={readOnly || readOnlyToken}
+              readOnly={readOnly || readOnlyToken}
               chainId={value || undefined}
               sx={{
                 flexGrow: 1
@@ -137,9 +136,9 @@ export function RewardTokenForm({
           rules={{ required: true }}
           render={({ field: { onChange: _onChange, value } }) => (
             <InputSearchCrypto
-              readOnly={readOnly}
+              readOnly={readOnly || readOnlyToken}
               placeholder='Empty'
-              disabled={readOnly || !isTruthy(values.chainId)}
+              disabled={readOnly || readOnlyToken || !isTruthy(values.chainId)}
               cryptoList={availableCryptos}
               chainId={values.chainId || undefined}
               defaultValue={value ?? undefined}
@@ -179,7 +178,7 @@ export function RewardTokenForm({
                 flexGrow: 1
               }}
               required={requireTokenAmount}
-              disabled={readOnly && readOnlyTokenAmount}
+              disabled={readOnly || readOnlyTokenAmount}
               placeholder='Enter amount'
               error={!!errors.rewardAmount}
             />

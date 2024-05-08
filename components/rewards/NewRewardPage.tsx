@@ -212,6 +212,10 @@ export function NewRewardPage({
   useEffect(() => {
     if (sourceTemplate) {
       applyTemplate(sourceTemplate);
+    } else {
+      setPageData({
+        sourceTemplateId: null
+      });
     }
   }, [sourceTemplate]);
 

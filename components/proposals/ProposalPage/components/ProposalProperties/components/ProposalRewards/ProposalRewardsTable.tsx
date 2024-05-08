@@ -225,7 +225,6 @@ export function ProposalRewardsTable({
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}
-            isProposalTemplate={isProposalTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>
