@@ -283,7 +283,6 @@ test.describe.serial('Structured proposal template with project', () => {
 
     // Add a new project member and update their project fields
     await proposalPage.projectTeamMembersSelect.click();
-    await proposalPage.projectTeamMembersSelect.click();
     await proposalPage.getProjectMemberOption(0).click();
     await proposalPage.page.waitForResponse((response) => {
       return response.request().method() === 'PUT' && response.url().endsWith('/form/answers');
