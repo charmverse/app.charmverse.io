@@ -1,5 +1,4 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
