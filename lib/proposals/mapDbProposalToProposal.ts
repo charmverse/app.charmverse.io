@@ -78,7 +78,7 @@ export function mapDbProposalToProposal({
       (e) => e.title === evaluation.title && e.type === evaluation.type
     );
     const reviews = proposalEvaluationReviews?.filter((review) => review.evaluationId === evaluation.id);
-    const minReviews = workflowEvaluation?.minReviews ?? 1;
+    const requiredReviews = workflowEvaluation?.requiredReviews ?? 1;
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
       evaluation.draftRubricAnswers = [];
@@ -86,7 +86,7 @@ export function mapDbProposalToProposal({
     }
     return {
       ...evaluation,
-      minReviews,
+      requiredReviews,
       reviews,
       isReviewer: !!stepPermissions?.evaluate
     } as unknown as PopulatedEvaluation;

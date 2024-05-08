@@ -40,14 +40,14 @@ export async function submitEvaluationResult({
   const workflowEvaluation = (workflow.evaluations as WorkflowEvaluationJson[]).find(
     (e) => e.type === evaluation.type && e.title === evaluation.title
   );
-  const minReviews = workflowEvaluation?.minReviews ?? 1;
+  const requiredReviews = workflowEvaluation?.requiredReviews ?? 1;
   const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
     where: {
       evaluationId
     }
   });
 
-  if (minReviews !== 1) {
+  if (requiredReviews !== 1) {
     await prisma.proposalEvaluationReview.create({
       data: {
         evaluationId,
@@ -57,7 +57,7 @@ export async function submitEvaluationResult({
     });
   }
 
-  if (existingEvaluationReviews.length + 1 === minReviews) {
+  if (existingEvaluationReviews.length + 1 === requiredReviews) {
     const totalPassed =
       existingEvaluationReviews.filter((r) => r.result === 'pass').length + (result === 'pass' ? 1 : 0);
     const totalFailed =

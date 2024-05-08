@@ -64,7 +64,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
   actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
-  minReviews: number;
+  requiredReviews: number;
   reviews?: ProposalEvaluationReview[];
 };
 

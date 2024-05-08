@@ -42,7 +42,7 @@ export const schema = yup.object({
       reject: yup.string().optional()
     })
     .nullable(),
-  minReviews: yup.number().optional(),
+  requiredReviews: yup.number().optional(),
   permissions: yup
     .array()
     .of(
@@ -108,14 +108,14 @@ function StepActionButtonLabel({
 
 function StepMinReviews({
   setValue,
-  minReviews
+  requiredReviews
 }: {
-  minReviews: WorkflowEvaluationJson['minReviews'];
+  requiredReviews: WorkflowEvaluationJson['requiredReviews'];
   setValue: UseFormSetValue<FormValues>;
 }) {
   return (
     <Box className='octo-propertyrow'>
-      <FieldLabel>Min reviews</FieldLabel>
+      <FieldLabel>Required reviews</FieldLabel>
       <TextField
         type='number'
         InputProps={{
@@ -124,10 +124,10 @@ function StepMinReviews({
           }
         }}
         onChange={(e) => {
-          setValue('minReviews', Math.max(1, Number(e.target.value)));
+          setValue('requiredReviews', Math.max(1, Number(e.target.value)));
         }}
         fullWidth
-        value={minReviews}
+        value={requiredReviews}
       />
     </Box>
   );
@@ -168,7 +168,7 @@ export function EvaluationDialog({
       type: evaluation?.type,
       permissions: evaluation?.permissions ?? [],
       actionLabels: evaluation?.actionLabels,
-      minReviews: evaluation?.minReviews ?? 1
+      requiredReviews: evaluation?.requiredReviews ?? 1
     });
   }, [evaluation?.id]);
 
@@ -274,7 +274,7 @@ export function EvaluationDialog({
             </div>
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             {formValues.type === 'pass_fail' && (
-              <StepMinReviews minReviews={formValues.minReviews} setValue={setValue} />
+              <StepMinReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
             )}
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>

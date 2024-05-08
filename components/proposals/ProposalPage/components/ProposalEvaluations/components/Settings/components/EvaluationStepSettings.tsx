@@ -49,7 +49,7 @@ export function EvaluationStepSettings({
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
   const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
-  const minReviews = evaluation.minReviews ?? 1;
+  const requiredReviews = evaluation.requiredReviews ?? 1;
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers.map((r) => ({
@@ -70,7 +70,11 @@ export function EvaluationStepSettings({
     <>
       <FormLabel required>
         <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote' ? 'Voters' : minReviews !== 1 ? `Reviewers (min. ${minReviews})` : 'Reviewers'}
+          {evaluation.type === 'vote'
+            ? 'Voters'
+            : requiredReviews !== 1
+            ? `Reviewers (min. ${requiredReviews})`
+            : 'Reviewers'}
         </Typography>
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>

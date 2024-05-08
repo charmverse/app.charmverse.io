@@ -8,7 +8,6 @@ import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/p
 import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
-import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
@@ -20,7 +19,7 @@ export type Props = {
   proposalId?: string;
   evaluation: Pick<
     PopulatedEvaluation,
-    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels' | 'minReviews' | 'reviews'
+    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels' | 'requiredReviews' | 'reviews'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -43,7 +42,6 @@ export function PassFailEvaluation({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
-  const { membersRecord } = useMembers();
   const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
   const currentUserEvaluationReview = evaluation.reviews?.find((review) => review.reviewerId === user?.id);
@@ -61,10 +59,10 @@ export function PassFailEvaluation({
 
   const actionLabels = getActionButtonLabels(evaluation);
   const evaluationReviews = evaluation.reviews ?? [];
-  const minReviews = evaluation.minReviews;
+  const requiredReviews = evaluation.requiredReviews;
   const canReview =
     evaluation.isReviewer &&
-    evaluationReviews.length < minReviews &&
+    evaluationReviews.length < requiredReviews &&
     !evaluation.result &&
     !currentUserEvaluationReview;
   const totalPassed = evaluationReviews.filter((r) => r.result === 'pass').length;
@@ -137,19 +135,19 @@ export function PassFailEvaluation({
               <Divider />
               <Stack direction='row' gap={1}>
                 <Typography variant='body2'>
-                  Minimum:{' '}
+                  Requires:{' '}
                   <Typography variant='body2' fontWeight='bold' component='span' color='secondary'>
-                    {minReviews}
+                    {requiredReviews}
                   </Typography>
                 </Typography>
                 <Typography variant='body2'>
-                  Passed:{' '}
+                  {actionLabels.approve}:{' '}
                   <Typography variant='body2' fontWeight='bold' component='span' color='success.main'>
                     {totalPassed}
                   </Typography>
                 </Typography>
                 <Typography variant='body2'>
-                  Failed:{' '}
+                  {actionLabels.reject}:{' '}
                   <Typography variant='body2' component='span' fontWeight='bold' color='error'>
                     {totalFailed}
                   </Typography>

@@ -37,7 +37,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
   actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
-  minReviews?: WorkflowEvaluationJson['minReviews'];
+  requiredReviews?: WorkflowEvaluationJson['requiredReviews'];
 };
 
 export type CreateProposalInput = {

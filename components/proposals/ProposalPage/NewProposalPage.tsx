@@ -256,7 +256,7 @@ export function NewProposalPage({
             voteSettings: existingStep?.voteSettings,
             permissions: evaluation.permissions as ProposalEvaluationPermission[],
             actionLabels: evaluation.actionLabels,
-            minReviews: evaluation.minReviews
+            requiredReviews: evaluation.requiredReviews
           };
         })
       },
