@@ -1,10 +1,8 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
@@ -42,19 +40,6 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     }
   });
 
-  const workflow = await prisma.proposalWorkflow.findUniqueOrThrow({
-    where: {
-      id: evaluation.proposal.workflowId!
-    },
-    select: {
-      evaluations: true
-    }
-  });
-
-  const workflowEvaluation = (workflow.evaluations as WorkflowEvaluationJson[]).find(
-    (e) => e.type === evaluation.type && e.title === evaluation.title
-  );
-
   if (evaluation.proposal.archived) {
     throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
   }
@@ -72,41 +57,15 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     return res.status(200).end();
   }
 
-  const minReviews = workflowEvaluation?.minReviews ?? 1;
-  const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
-    where: {
-      evaluationId
-    }
+  await submitEvaluationResult({
+    evaluation,
+    proposalId,
+    evaluationId,
+    result,
+    decidedBy: userId,
+    spaceId: evaluation.proposal.spaceId,
+    workflowId: evaluation.proposal.workflowId!
   });
-
-  if (existingEvaluationReviews.length + 1 === minReviews) {
-    const totalPassed =
-      existingEvaluationReviews.filter((r) => r.result === 'pass').length + (result === 'pass' ? 1 : 0);
-    const totalFailed =
-      existingEvaluationReviews.filter((r) => r.result === 'fail').length + (result === 'fail' ? 1 : 0);
-    const finalResult = totalPassed > totalFailed ? 'pass' : 'fail';
-    await submitEvaluationResult({
-      proposalId,
-      evaluationId,
-      result: finalResult,
-      decidedBy: userId,
-      spaceId: evaluation.proposal.spaceId
-    });
-    if (finalResult === 'pass') {
-      await issueOffchainProposalCredentialsIfNecessary({
-        event: 'proposal_approved',
-        proposalId
-      });
-    }
-  } else {
-    await prisma.proposalEvaluationReview.create({
-      data: {
-        evaluationId,
-        result,
-        reviewerId: userId
-      }
-    });
-  }
 
   return res.status(200).end();
 }

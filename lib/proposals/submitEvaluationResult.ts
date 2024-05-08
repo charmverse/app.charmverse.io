@@ -1,6 +1,8 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
+import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
@@ -17,36 +19,84 @@ export async function submitEvaluationResult({
   decidedBy,
   evaluationId,
   proposalId,
+  workflowId,
   result,
-  spaceId
+  spaceId,
+  evaluation
 }: ReviewEvaluationRequest & {
   spaceId: string;
+  workflowId: string;
+  evaluation: { type: string; title: string };
 }) {
-  await prisma.proposalEvaluation.update({
+  const workflow = await prisma.proposalWorkflow.findUniqueOrThrow({
     where: {
-      id: evaluationId
+      id: workflowId
     },
-    data: {
-      result,
-      decidedBy,
-      completedAt: new Date()
+    select: {
+      evaluations: true
     }
   });
 
-  await setPageUpdatedAt({ proposalId, userId: decidedBy });
+  const workflowEvaluation = (workflow.evaluations as WorkflowEvaluationJson[]).find(
+    (e) => e.type === evaluation.type && e.title === evaluation.title
+  );
+  const minReviews = workflowEvaluation?.minReviews ?? 1;
+  const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+    where: {
+      evaluationId
+    }
+  });
 
-  // determine if we should create vote for the next stage
-  if (result === 'pass') {
-    await createVoteIfNecessary({
-      createdBy: decidedBy,
-      proposalId
+  if (minReviews !== 1) {
+    await prisma.proposalEvaluationReview.create({
+      data: {
+        evaluationId,
+        result,
+        reviewerId: decidedBy
+      }
     });
   }
 
-  await publishProposalEvent({
-    currentEvaluationId: evaluationId,
-    proposalId,
-    spaceId,
-    userId: decidedBy
-  });
+  if (existingEvaluationReviews.length + 1 === minReviews) {
+    const totalPassed =
+      existingEvaluationReviews.filter((r) => r.result === 'pass').length + (result === 'pass' ? 1 : 0);
+    const totalFailed =
+      existingEvaluationReviews.filter((r) => r.result === 'fail').length + (result === 'fail' ? 1 : 0);
+    const finalResult = totalPassed > totalFailed ? 'pass' : 'fail';
+
+    await prisma.proposalEvaluation.update({
+      where: {
+        id: evaluationId
+      },
+      data: {
+        result,
+        decidedBy,
+        completedAt: new Date()
+      }
+    });
+
+    await setPageUpdatedAt({ proposalId, userId: decidedBy });
+
+    // determine if we should create vote for the next stage
+    if (result === 'pass') {
+      await createVoteIfNecessary({
+        createdBy: decidedBy,
+        proposalId
+      });
+    }
+
+    await publishProposalEvent({
+      currentEvaluationId: evaluationId,
+      proposalId,
+      spaceId,
+      userId: decidedBy
+    });
+
+    if (finalResult === 'pass') {
+      await issueOffchainProposalCredentialsIfNecessary({
+        event: 'proposal_approved',
+        proposalId
+      });
+    }
+  }
 }
