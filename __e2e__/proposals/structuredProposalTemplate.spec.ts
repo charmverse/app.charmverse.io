@@ -178,8 +178,9 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
-    proposalPage.publishNewProposalButton.click();
-    await proposalPage.page.waitForResponse(/\/api\/proposals/);
+    const publishResponse = proposalPage.page.waitForResponse('**/publish');
+    await proposalPage.publishNewProposalButton.click();
+    await publishResponse;
   });
 
   test('Visit structured proposal template and edit/add fields', async ({
@@ -307,9 +308,9 @@ test.describe.serial('Structured proposal template', () => {
     // Should be disabled as the required fields are not filled
     await expect(proposalPage.publishNewProposalButton).toBeDisabled();
 
-    const apiResponse = proposalPage.page.waitForResponse('**/api/proposals');
     await documentPage.documentTitleInput.fill('Proposal from structured template');
 
+    const apiResponse = proposalPage.page.waitForResponse('**/form/answers');
     for (let i = 0; i < formFields.length; i++) {
       const field = formFields[i];
 

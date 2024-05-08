@@ -7,11 +7,13 @@ import type { FormFieldInput } from 'lib/forms/interfaces';
 import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalFields } from 'lib/proposals/interfaces';
+import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
 
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
 import type { VoteSettings } from './interfaces';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
+import { getNewCriteria } from './workflows/getNewCriteria';
 
 export type ProposalContentType = 'structured' | 'free_form';
 
@@ -91,12 +93,15 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
       voteSettings: evaluation.voteSettings as VoteSettings,
       proposalId: undefined
     })) ||
-    (workflow.evaluations as WorkflowEvaluationJson[]).map((evaluation, index) => ({
-      ...evaluation,
-      index,
-      reviewers: evaluation.type === 'feedback' ? [{ systemRole: 'author' as const }] : [],
-      rubricCriteria: []
-    }));
+    (workflow.evaluations as WorkflowEvaluationJson[]).map((evaluation, index) => {
+      const rubricCriteria = evaluation.type === 'rubric' ? ([getNewCriteria()] as RubricCriteriaTyped[]) : [];
+      return {
+        ...evaluation,
+        index,
+        reviewers: evaluation.type === 'feedback' ? [{ systemRole: 'author' as const }] : [],
+        rubricCriteria
+      };
+    });
 
   const templateFields = template?.proposal?.fields as ProposalFields | undefined;
   const fields: ProposalFields = {
