@@ -40,7 +40,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     select: {
       id: true,
       title: true,
-      content: true,
+      hasContent: true,
       type: true,
       proposal: {
         include: {
@@ -94,7 +94,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     page: {
       title: proposalPage.title ?? '',
       type: proposalPage.type,
-      content: proposalPage.content
+      hasContent: proposalPage.hasContent
     },
     contentType: proposalPage.proposal.formId ? 'structured' : 'free_form',
     proposal: {
