@@ -9,7 +9,8 @@ import type {
   ProposalEvaluationPermission,
   ProposalEvaluationResult,
   ProposalEvaluationType,
-  Vote
+  Vote,
+  ProposalEvaluationReview
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
@@ -64,6 +65,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   isReviewer?: boolean; // added by the webapp api
   actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
   minReviews: number;
+  reviews?: ProposalEvaluationReview[];
 };
 
 export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {

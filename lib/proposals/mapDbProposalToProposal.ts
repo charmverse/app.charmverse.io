@@ -8,7 +8,7 @@ import type {
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
-import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluation, ProposalEvaluationReview } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
@@ -32,8 +32,10 @@ export function mapDbProposalToProposal({
   proposal,
   permissions,
   permissionsByStep,
-  workflow
+  workflow,
+  proposalEvaluationReviews
 }: {
+  proposalEvaluationReviews?: ProposalEvaluationReview[];
   workflow?: {
     evaluations: WorkflowEvaluationJson[];
   } | null;
@@ -75,6 +77,7 @@ export function mapDbProposalToProposal({
     const workflowEvaluation = workflow?.evaluations.find(
       (e) => e.title === evaluation.title && e.type === evaluation.type
     );
+    const reviews = proposalEvaluationReviews?.filter((review) => review.evaluationId === evaluation.id);
     const minReviews = workflowEvaluation?.minReviews ?? 1;
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
@@ -84,6 +87,7 @@ export function mapDbProposalToProposal({
     return {
       ...evaluation,
       minReviews,
+      reviews,
       isReviewer: !!stepPermissions?.evaluate
     } as unknown as PopulatedEvaluation;
   });

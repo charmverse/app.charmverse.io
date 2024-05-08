@@ -1,13 +1,16 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material';
 
 import { useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useUser } from 'hooks/useUser';
 import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
@@ -17,7 +20,7 @@ export type Props = {
   proposalId?: string;
   evaluation: Pick<
     PopulatedEvaluation,
-    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels' | 'minReviews'
+    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels' | 'minReviews' | 'reviews'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -35,15 +38,17 @@ export function PassFailEvaluation({
   archived
 }: Props) {
   const { trigger, isMutating } = useSubmitEvaluationResult({ proposalId });
-
+  const { user } = useUser();
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
+  const { membersRecord } = useMembers();
   const { showConfirmation } = useConfirmationModal();
   const { showMessage } = useSnackbar();
-
+  const currentUserEvaluationReview = evaluation.reviews?.find((review) => review.reviewerId === user?.id);
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
+
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
     : !evaluation.isReviewer
@@ -55,8 +60,15 @@ export function PassFailEvaluation({
     : null;
 
   const actionLabels = getActionButtonLabels(evaluation);
-
+  const evaluationReviews = evaluation.reviews ?? [];
   const minReviews = evaluation.minReviews;
+  const canReview =
+    evaluation.isReviewer &&
+    evaluationReviews.length < minReviews &&
+    !evaluation.result &&
+    !currentUserEvaluationReview;
+  const totalPassed = evaluationReviews.filter((r) => r.result === 'pass').length;
+  const totalFailed = evaluationReviews.filter((r) => r.result === 'fail').length;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (confirmationMessage) {
@@ -86,7 +98,7 @@ export function PassFailEvaluation({
           <Box mb={2}>
             <FormLabel>
               <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                Reviewers
+                Reviewers {minReviews !== 1 ? `(min. ${minReviews})` : ''}
               </Typography>
             </FormLabel>
             <UserAndRoleSelect
@@ -103,7 +115,45 @@ export function PassFailEvaluation({
         </>
       )}
       <Card variant='outlined'>
-        {!evaluation.result && (
+        {evaluationReviews.length > 0 && (
+          <>
+            <Stack p={2} gap={2}>
+              {evaluationReviews.map((evaluationReview, index) => (
+                <Stack key={evaluationReview.id} direction='row' justifyContent='space-between' alignItems='center'>
+                  <Stack direction='row' gap={1} alignItems='center'>
+                    <Typography variant='body2'>{index + 1}.</Typography>
+                    <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
+                    <Typography variant='subtitle1'>
+                      {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
+                    </Typography>
+                  </Stack>
+                  {evaluationReview.result === 'pass' ? (
+                    <ApprovedIcon fontSize='small' color='success' />
+                  ) : (
+                    <RejectedIcon fontSize='small' color='error' />
+                  )}
+                </Stack>
+              ))}
+              <Divider />
+              <Stack direction='row' gap={1}>
+                <Typography variant='body2'>
+                  Passed:{' '}
+                  <Typography variant='body2' fontWeight='bold' component='span' color='success.main'>
+                    {totalPassed}
+                  </Typography>
+                </Typography>
+                <Typography variant='body2'>
+                  Failed:{' '}
+                  <Typography variant='body2' component='span' fontWeight='bold' color='error'>
+                    {totalFailed}
+                  </Typography>
+                </Typography>
+              </Stack>
+            </Stack>
+            {(canReview || !!evaluation.result) && <Divider sx={{ mx: 2 }} />}
+          </>
+        )}
+        {canReview && (
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
