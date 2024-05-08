@@ -55,6 +55,7 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
       rubricCriteria: [],
       reviewers: [],
       permissions: [],
+      minReviews: 1,
       ...evaluation
     }))
   };

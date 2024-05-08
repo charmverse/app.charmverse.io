@@ -15,7 +15,10 @@ import { getRelativeTimeInThePast } from 'lib/utils/dates';
 export type Props = {
   hideReviewer?: boolean;
   proposalId?: string;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels'>;
+  evaluation: Pick<
+    PopulatedEvaluation,
+    'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels' | 'minReviews'
+  >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
   isCurrent: boolean;
@@ -52,6 +55,8 @@ export function PassFailEvaluation({
     : null;
 
   const actionLabels = getActionButtonLabels(evaluation);
+
+  const minReviews = evaluation.minReviews;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (confirmationMessage) {

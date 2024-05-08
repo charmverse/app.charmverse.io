@@ -117,15 +117,14 @@ function StepMinReviews({
     <Box className='octo-propertyrow'>
       <FieldLabel>Min reviews</FieldLabel>
       <TextField
-        placeholder='Decline'
         type='number'
         InputProps={{
           inputProps: {
-            min: 10
+            min: 1
           }
         }}
         onChange={(e) => {
-          setValue('minReviews', Math.min(1, Number(e.target.value)));
+          setValue('minReviews', Math.max(1, Number(e.target.value)));
         }}
         fullWidth
         value={minReviews}
