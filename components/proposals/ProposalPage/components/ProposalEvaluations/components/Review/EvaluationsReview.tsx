@@ -47,6 +47,7 @@ export type Props = {
     | 'formId'
     | 'form'
     | 'selectedCredentialTemplates'
+    | 'issuedCredentials'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnlyCredentialTemplates?: boolean;
@@ -86,7 +87,7 @@ export function EvaluationsReview({
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
-  const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length;
+  const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length || !!proposal?.issuedCredentials.length;
 
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
