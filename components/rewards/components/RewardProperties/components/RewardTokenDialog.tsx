@@ -25,9 +25,9 @@ export function RewardTokenDialog({
 }: {
   displayType?: PropertyValueDisplayType;
   readOnly: boolean;
-  readOnlyToken: boolean;
-  readOnlyChain: boolean;
-  readOnlyTokenAmount: boolean;
+  readOnlyToken?: boolean;
+  readOnlyChain?: boolean;
+  readOnlyTokenAmount?: boolean;
   requireTokenAmount: boolean;
   currentReward: Pick<RewardCreationData & RewardWithUsers, 'rewardAmount' | 'rewardToken' | 'chainId'>;
   children: ReactNode;
