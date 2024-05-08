@@ -118,6 +118,10 @@ function applyProjectProfileProperties(
   boardProperties: IPropertyTemplate[],
   fieldConfig: ProjectAndMembersFieldConfig
 ) {
+  if (!fieldConfig) {
+    return;
+  }
+
   projectFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
     if (config.show) {
