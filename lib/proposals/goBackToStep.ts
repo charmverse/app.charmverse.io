@@ -69,6 +69,7 @@ export async function goBackToStep({
   const evaluationsToUpdate = proposal.evaluations.slice(evaluationIndex);
 
   const evaluationsWithResult = evaluationsToUpdate.filter((e) => e.result);
+  const evaluationIds = evaluationsWithResult.map((e) => e.id);
 
   if (evaluationsWithResult.some((e) => e.type === 'vote')) {
     throw new InvalidInputError('Cannot clear the results of a vote');
@@ -84,7 +85,7 @@ export async function goBackToStep({
   await prisma.proposalEvaluation.updateMany({
     where: {
       id: {
-        in: evaluationsWithResult.map((e) => e.id)
+        in: evaluationIds
       }
     },
     data: {
@@ -105,6 +106,14 @@ export async function goBackToStep({
     });
     log.info('Cleared vote tied to proposal', { proposalId, evaluationId });
   }
+
+  await prisma.proposalEvaluationReview.deleteMany({
+    where: {
+      evaluationId: {
+        in: evaluationIds
+      }
+    }
+  });
 
   if (backToDraft) {
     const result = await prisma.proposal.update({

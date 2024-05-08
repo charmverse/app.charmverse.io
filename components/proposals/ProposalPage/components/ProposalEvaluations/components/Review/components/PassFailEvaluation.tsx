@@ -98,7 +98,7 @@ export function PassFailEvaluation({
           <Box mb={2}>
             <FormLabel>
               <Typography sx={{ mb: 1 }} variant='subtitle1'>
-                Reviewers {minReviews !== 1 ? `(min. ${minReviews})` : ''}
+                Reviewers
               </Typography>
             </FormLabel>
             <UserAndRoleSelect
@@ -136,6 +136,12 @@ export function PassFailEvaluation({
               ))}
               <Divider />
               <Stack direction='row' gap={1}>
+                <Typography variant='body2'>
+                  Minimum:{' '}
+                  <Typography variant='body2' fontWeight='bold' component='span' color='secondary'>
+                    {minReviews}
+                  </Typography>
+                </Typography>
                 <Typography variant='body2'>
                   Passed:{' '}
                   <Typography variant='body2' fontWeight='bold' component='span' color='success.main'>
