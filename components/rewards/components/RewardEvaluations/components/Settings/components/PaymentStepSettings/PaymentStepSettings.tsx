@@ -86,7 +86,6 @@ export function PaymentStepSettings({
             onChange={onRewardTokenUpdate}
             defaultValues={rewardInput}
             readOnly={!!readOnly}
-            readOnlyChain={!rewardPublished && !!rewardTemplateInput?.chainId}
             readOnlyToken={!rewardPublished && !!rewardTemplateInput?.rewardToken}
             readOnlyTokenAmount={!rewardPublished && !!rewardTemplateInput?.rewardAmount}
             requireTokenAmount={!isTemplate}

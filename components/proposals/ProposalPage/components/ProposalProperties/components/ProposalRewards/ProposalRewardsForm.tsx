@@ -62,7 +62,6 @@ export function ProposalRewardsForm({
   const readOnlyType = !isAdmin && (readOnly || !!template?.rewardType);
   const readOnlyDueDate = !isAdmin && (readOnly || !!template?.dueDate);
   const readOnlyToken = !isAdmin && (readOnly || !!template?.rewardToken);
-  const readOnlyChain = !isAdmin && (readOnly || !!template?.chainId);
   const readOnlyTokenAmount = !isAdmin && (readOnly || !!template?.rewardAmount);
   const readOnlyCustomReward = !isAdmin && (readOnly || !!template?.customReward);
 
@@ -255,7 +254,6 @@ export function ProposalRewardsForm({
                   Token
                 </PropertyLabel>
                 <RewardTokenProperty
-                  readOnlyChain={readOnlyChain}
                   readOnlyTokenAmount={readOnlyTokenAmount}
                   readOnlyToken={readOnlyToken}
                   requireTokenAmount

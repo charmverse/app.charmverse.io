@@ -12,12 +12,10 @@ type Props = {
   requireTokenAmount: boolean;
   readOnlyToken: boolean;
   readOnlyTokenAmount: boolean;
-  readOnlyChain: boolean;
 };
 
 export function RewardTokenProperty({
   onChange,
-  readOnlyChain,
   readOnlyTokenAmount,
   currentReward,
   requireTokenAmount,
@@ -27,7 +25,7 @@ export function RewardTokenProperty({
     return null;
   }
 
-  const readOnly = readOnlyToken && readOnlyChain && readOnlyTokenAmount;
+  const readOnly = readOnlyToken && readOnlyTokenAmount;
 
   return (
     <RewardTokenDialog
@@ -38,7 +36,6 @@ export function RewardTokenProperty({
       readOnlyToken={readOnlyToken}
       currentReward={currentReward}
       readOnlyTokenAmount={readOnlyTokenAmount}
-      readOnlyChain={readOnlyChain}
     >
       <RewardAmount
         reward={currentReward}

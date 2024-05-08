@@ -18,7 +18,6 @@ export function RewardTokenDialog({
   requireTokenAmount,
   readOnly,
   readOnlyToken,
-  readOnlyChain,
   readOnlyTokenAmount,
   children,
   onChange
@@ -26,7 +25,6 @@ export function RewardTokenDialog({
   displayType?: PropertyValueDisplayType;
   readOnly: boolean;
   readOnlyToken?: boolean;
-  readOnlyChain?: boolean;
   readOnlyTokenAmount?: boolean;
   requireTokenAmount: boolean;
   currentReward: Pick<RewardCreationData & RewardWithUsers, 'rewardAmount' | 'rewardToken' | 'chainId'>;
@@ -76,7 +74,6 @@ export function RewardTokenDialog({
             defaultValues={tokenInput}
             readOnly={readOnly}
             readOnlyToken={readOnlyToken}
-            readOnlyChain={readOnlyChain}
             readOnlyTokenAmount={readOnlyTokenAmount}
             requireTokenAmount={requireTokenAmount}
             setIsValid={setIsValid}

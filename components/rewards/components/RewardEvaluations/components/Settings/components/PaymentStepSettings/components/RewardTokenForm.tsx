@@ -26,7 +26,6 @@ type Props = {
   defaultValues?: FormInput;
   readOnly: boolean;
   readOnlyToken?: boolean;
-  readOnlyChain?: boolean;
   readOnlyTokenAmount?: boolean;
   requireTokenAmount: boolean;
   onChange: (value: FormInput) => void;
@@ -38,7 +37,6 @@ export function RewardTokenForm({
   onChange,
   setIsValid,
   readOnly,
-  readOnlyChain,
   readOnlyToken,
   readOnlyTokenAmount,
   requireTokenAmount
@@ -116,8 +114,8 @@ export function RewardTokenForm({
           rules={{ required: true }}
           render={({ field: { onChange: _onChange, value } }) => (
             <InputSearchBlockchain
-              disabled={readOnly || readOnlyChain}
-              readOnly={readOnly || readOnlyChain}
+              disabled={readOnly || readOnlyToken}
+              readOnly={readOnly || readOnlyToken}
               chainId={value || undefined}
               sx={{
                 flexGrow: 1
