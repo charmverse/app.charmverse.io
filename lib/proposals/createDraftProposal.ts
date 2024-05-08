@@ -77,10 +77,9 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
 
   // authors should be empty by default for new templates
   // but include authors from templates if they were added
+  const authorsFromTemplate = template?.proposal?.authors.map(({ userId }) => userId) || [];
   const authors: string[] =
-    input.pageType === 'proposal_template'
-      ? []
-      : [...new Set([input.createdBy].concat(template?.proposal?.authors.map(({ userId }) => userId) || []))];
+    input.pageType === 'proposal_template' ? [] : [...new Set([input.createdBy].concat(authorsFromTemplate))];
 
   const evaluations: ProposalEvaluationInput[] =
     template?.proposal?.evaluations.map((evaluation) => ({
@@ -134,7 +133,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
               required: true,
               id: uuid(),
               fieldConfig: createDefaultProjectAndMembersFieldConfig()
-            } as FormFieldInput
+            }
           ]
         : [],
     formId: template?.proposal?.formId || undefined,
