@@ -52,10 +52,10 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const board = boards?.[pageId];
 
   useEffect(() => {
-    if (!board && pageId) {
+    if (pageId) {
       dispatch(initialDatabaseLoad({ pageId }));
     }
-  }, [!!board, pageId]);
+  }, [pageId]);
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 
