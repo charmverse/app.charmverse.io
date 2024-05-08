@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 
 import { TagSelect } from 'components/common/DatabaseEditor/components/properties/TagSelect/TagSelect';
 import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { IPropertyOption } from 'lib/databases/board';
 import {
   EVALUATION_STATUS_LABELS,
@@ -83,6 +84,10 @@ function ProposalStatusSelectBase({
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
   const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
 
+  const { getFeatureTitle } = useSpaceFeatures();
+
+  const rewardLabel = getFeatureTitle('Rewards');
+
   const statusOptions: ProposalEvaluationStatus[] = useMemo(() => {
     const evaluationStep = lastEvaluation && hasPublishedRewards ? lastEvaluation.type : currentEvaluationStep;
 
@@ -98,18 +103,35 @@ function ProposalStatusSelectBase({
     }
   }, [currentEvaluationStep, lastEvaluation, hasPublishedRewards]);
 
-  const options: IPropertyOption[] = statusOptions.map((status) => ({
-    id: status,
-    value: EVALUATION_STATUS_LABELS[status],
-    dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
-    color: proposalStatusColors[status]
-  }));
+  const options: IPropertyOption[] = statusOptions.map((status) => {
+    const statusLabel = EVALUATION_STATUS_LABELS[status];
+
+    const value =
+      currentEvaluationStep === 'rewards'
+        ? `${rewardLabel} ${statusLabel}`
+        : currentEvaluationStep === 'credentials'
+        ? `Credentials ${statusLabel}`
+        : statusLabel;
+
+    return {
+      id: status,
+      value,
+      dropdownValue: EVALUATION_STATUS_VERB_LABELS[status as ProposalEvaluationStatus],
+      color: proposalStatusColors[status]
+    };
+  });
 
   return (
     <TagSelect
       displayType={displayType}
       wrapColumn
-      readOnly={proposal.archived || readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
+      readOnly={
+        proposal.archived ||
+        readOnly ||
+        currentEvaluationStep === 'vote' ||
+        hasPublishedRewards ||
+        currentEvaluationStep === 'credentials'
+      }
       options={
         proposal.archived
           ? [

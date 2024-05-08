@@ -1,16 +1,13 @@
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
+import type { IPropertyTemplate, ProposalPropertyType } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID,
-  PROPOSAL_STEP_BLOCK_ID
+  PROPOSAL_STATUS_BLOCK_ID
 } from 'lib/proposals/blocks/constants';
 import type {
   ProposalEvaluationResultExtended,
