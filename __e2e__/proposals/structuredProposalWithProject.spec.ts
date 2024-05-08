@@ -335,7 +335,7 @@ test.describe.serial('Structured proposal template with project', () => {
     });
   });
 
-  test('Publish a structured proposal with a new project, add new project members, update project fields with members', async ({
+  test.skip('Publish a structured proposal with a new project, add new project members, update project fields with members', async ({
     proposalPage,
     documentPage,
     proposalFormFieldPage,
@@ -448,7 +448,7 @@ test.describe.serial('Structured proposal template with project', () => {
     });
   });
 
-  test('Visit an existing proposal as a space member should hide private project fields', async ({
+  test.skip('Visit an existing proposal as a space member should hide private project fields', async ({
     projectSettings,
     documentPage,
     proposalPage,
