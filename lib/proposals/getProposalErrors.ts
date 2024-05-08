@@ -73,7 +73,7 @@ export function getProposalErrors({
     }
   }
 
-  if (project && proposal.formAnswers) {
+  if (project && contentType === 'structured' && proposal.formAnswers) {
     try {
       validateProposalProject({
         formAnswers: proposal.formAnswers,

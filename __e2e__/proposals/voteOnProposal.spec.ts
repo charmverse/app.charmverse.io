@@ -109,6 +109,7 @@ test.describe.serial('Proposal Evaluation Votes', () => {
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
 
+    await expect(proposalPage.publishNewProposalButton).toBeEnabled();
     await Promise.all([proposalPage.page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     // Test proposal data at the database level to ensure correct persistence
