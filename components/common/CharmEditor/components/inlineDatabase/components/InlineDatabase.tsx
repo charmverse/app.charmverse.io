@@ -52,6 +52,7 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const board = boards?.[pageId];
 
   useEffect(() => {
+    // Load the database if it's not already loaded, otherwise the Inline Database might show options for a new db
     if (pageId) {
       dispatch(initialDatabaseLoad({ pageId }));
     }
