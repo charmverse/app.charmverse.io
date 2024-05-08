@@ -20,6 +20,7 @@ import type { UpdateableRewardFieldsWithType } from 'components/rewards/hooks/us
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { allReviewersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardCreationData } from 'lib/rewards/createReward';
@@ -54,15 +55,16 @@ export function ProposalRewardsForm({
   readOnlyTemplate,
   rewardStatus
 }: Props) {
+  const isAdmin = useIsAdmin();
   const { getFeatureTitle } = useSpaceFeatures();
   const [isExpanded, setIsExpanded] = useState(!!expandedByDefault);
   const { data: template } = useGetRewardTemplate(templateId);
-  const readOnlyType = readOnly || !!template?.rewardType;
-  const readOnlyDueDate = readOnly || !!template?.dueDate;
-  const readOnlyToken = readOnly || !!template?.rewardToken;
-  const readOnlyChain = readOnly || !!template?.chainId;
-  const readOnlyTokenAmount = readOnly || !!template?.rewardAmount;
-  const readOnlyCustomReward = readOnly || !!template?.customReward;
+  const readOnlyType = !isAdmin && (readOnly || !!template?.rewardType);
+  const readOnlyDueDate = !isAdmin && (readOnly || !!template?.dueDate);
+  const readOnlyToken = !isAdmin && (readOnly || !!template?.rewardToken);
+  const readOnlyChain = !isAdmin && (readOnly || !!template?.chainId);
+  const readOnlyTokenAmount = !isAdmin && (readOnly || !!template?.rewardAmount);
+  const readOnlyCustomReward = !isAdmin && (readOnly || !!template?.customReward);
 
   const { templates: nonDraftRewardTemplates = [] } = useRewardTemplates();
 
