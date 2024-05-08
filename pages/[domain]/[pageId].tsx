@@ -159,9 +159,8 @@ export default function PageView() {
   // reload is used by new proposal endpoint. see pages/[domain]/proposals/new.tsx
   useEffect(() => {
     if (router.query.reload) {
-      clearURLQuery();
       setTimeout(() => {
-        window.location.reload();
+        window.location.search = '';
       }, 0);
     }
   }, [router.query.reload, clearURLQuery]);
