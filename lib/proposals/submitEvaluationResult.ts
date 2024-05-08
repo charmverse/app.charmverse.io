@@ -69,7 +69,7 @@ export async function submitEvaluationResult({
         id: evaluationId
       },
       data: {
-        result,
+        result: finalResult,
         decidedBy,
         completedAt: new Date()
       }

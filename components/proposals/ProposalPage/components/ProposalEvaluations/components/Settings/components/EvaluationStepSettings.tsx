@@ -73,7 +73,7 @@ export function EvaluationStepSettings({
           {evaluation.type === 'vote'
             ? 'Voters'
             : requiredReviews !== 1
-            ? `Reviewers (min. ${requiredReviews})`
+            ? `Reviewers (required. ${requiredReviews})`
             : 'Reviewers'}
         </Typography>
       </FormLabel>
