@@ -3,7 +3,7 @@ import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
-import { getCurrentStep, getDraftStep } from 'lib/proposals/getCurrentStep';
+import { getDraftStep } from 'lib/proposals/getCurrentStep';
 import { isTruthy } from 'lib/utils/types';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { relay } from 'lib/websockets/relay';
