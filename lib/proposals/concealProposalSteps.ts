@@ -3,9 +3,8 @@ import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
-import { prettyPrint } from 'lib/utils/strings';
 
-import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from './interfaces';
+import type { ProposalWithUsersAndRubric } from './interfaces';
 
 const privateEvaluationSteps: ProposalEvaluationType[] = ['rubric', 'pass_fail', 'vote'];
 
@@ -112,14 +111,6 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
   }
 
   proposal.evaluations = stepsWithCollapsedEvaluations;
-
-  prettyPrint({
-    stepsWithCollapsedEvaluations: stepsWithCollapsedEvaluations.map((s) => ({
-      id: s.id,
-      result: s.result,
-      type: s.type
-    }))
-  });
 
   return proposal;
 }
