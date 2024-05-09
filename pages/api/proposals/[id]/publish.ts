@@ -29,7 +29,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     userId
   });
 
-  if (!permissions.move) {
+  if (!permissions.edit) {
     throw new ActionNotPermittedError(`You do not have permission to publish this proposal`);
   }
 
@@ -77,6 +77,15 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
 
   if (!proposalPage.proposal) {
     throw new Error('Proposal not found for page');
+  }
+
+  const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+    resourceId: proposalPage.spaceId,
+    userId
+  });
+
+  if (!computedPermissions.createProposals) {
+    throw new ActionNotPermittedError(`You do not have permission to create a proposal`);
   }
 
   const { isAdmin } = await hasAccessToSpace({
