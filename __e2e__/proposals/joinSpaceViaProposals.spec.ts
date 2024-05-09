@@ -267,9 +267,5 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
 
   await page.reload();
 
-  // the loginBrowserUser method does not consider redirectUri so just click the button again
-  const pageLink2 = documentPage.getLinkedPage(template.id);
-  await pageLink2.click();
-
   await proposalPage.waitForNewProposalPage();
 });
