@@ -8,6 +8,8 @@ import type {
 } from '@charmverse/core/prisma';
 import { ProposalSystemRole, prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import { testUtilsProposals } from '@charmverse/core/test';
+import { sortBy } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 import { prismaToBlock } from 'lib/databases/block';
@@ -26,6 +28,57 @@ export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
   rewardIds?: string[] | null;
   page: Pick<Page, 'title' | 'path'>;
 };
+
+type GenerateProposalOptions = Parameters<typeof testUtilsProposals.generateProposal>[0];
+type GenerateProposalResult = ReturnType<typeof testUtilsProposals.generateProposal>;
+
+/**
+ * A wrapper around core lib method, (with changes to be added in core later when we have time)
+ */
+export async function generateProposalV2({
+  selectedCredentialTemplates,
+  workflowId,
+  ...input
+}: GenerateProposalOptions & {
+  selectedCredentialTemplates?: string[];
+  workflowId?: string;
+}): Promise<GenerateProposalResult> {
+  const proposal = await testUtilsProposals.generateProposal(input);
+  if (selectedCredentialTemplates) {
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: { selectedCredentialTemplates }
+    });
+    proposal.selectedCredentialTemplates = selectedCredentialTemplates;
+  }
+  // every proposal should be part of a workflow
+  if (!workflowId) {
+    const workflow = await generateProposalWorkflow({
+      spaceId: input.spaceId,
+      evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
+        id: e.id,
+        type: e.type,
+        title: e.title,
+        permissions: e.permissions.map(({ operation, systemRole, userId, roleId }) => ({
+          operation,
+          systemRole,
+          userId,
+          roleId
+        }))
+      }))
+    });
+    await prisma.proposal.update({
+      where: {
+        id: proposal.id
+      },
+      data: { workflowId: workflow.id }
+    });
+    proposal.workflowId = workflow.id;
+  }
+  return proposal;
+}
 
 /**
  * Creates a proposal with the linked authors and reviewers
