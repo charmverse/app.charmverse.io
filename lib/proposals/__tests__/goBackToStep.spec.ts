@@ -114,9 +114,18 @@ describe('goBackToStep()', () => {
       ]
     });
 
+    const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
+      where: {
+        id: proposal.evaluations[1].id
+      },
+      include: {
+        proposalEvaluationReviews: true
+      }
+    });
+
     await submitEvaluationResult({
       decidedBy: user.id,
-      evaluation: proposal.evaluations[1],
+      evaluation,
       proposalId: proposal.id,
       result: 'pass',
       spaceId: space.id
@@ -177,9 +186,18 @@ describe('goBackToStep()', () => {
       ]
     });
 
+    const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
+      where: {
+        id: proposal.evaluations[0].id
+      },
+      include: {
+        proposalEvaluationReviews: true
+      }
+    });
+
     await submitEvaluationResult({
       decidedBy: user.id,
-      evaluation: proposal.evaluations[0],
+      evaluation,
       proposalId: proposal.id,
       result: 'pass',
       spaceId: space.id

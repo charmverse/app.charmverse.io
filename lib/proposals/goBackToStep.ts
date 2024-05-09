@@ -1,7 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getDraftStep } from 'lib/proposals/getCurrentStep';
 import { isTruthy } from 'lib/utils/types';
@@ -67,6 +66,7 @@ export async function goBackToStep({
     }
   }
 
+  const allEvaluationIds = proposal.evaluations.map((e) => e.id);
   const evaluationsToUpdate = proposal.evaluations.slice(evaluationIndex);
   const evaluationsWithResult = evaluationsToUpdate.filter((e) => e.result);
   const evaluationIds = evaluationsWithResult.map((e) => e.id);
@@ -107,12 +107,10 @@ export async function goBackToStep({
     log.info('Cleared vote tied to proposal', { proposalId, evaluationId });
   }
 
-  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-
   await prisma.proposalEvaluationReview.deleteMany({
     where: {
       evaluationId: {
-        in: currentEvaluation ? [currentEvaluation.id, ...evaluationIds] : evaluationIds
+        in: allEvaluationIds
       }
     }
   });

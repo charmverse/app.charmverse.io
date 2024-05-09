@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsProposals } from '@charmverse/core/test';
 
-import { ActionNotPermittedError } from 'lib/middleware';
 import { generateSpaceUser, generateUserAndSpace } from 'testing/setupDatabase';
 
 import { submitEvaluationResult } from '../submitEvaluationResult';
@@ -33,6 +32,9 @@ describe('submitEvaluationResult()', () => {
     const proposalEvaluations = await prisma.proposalEvaluation.findMany({
       where: {
         proposalId
+      },
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -97,6 +99,9 @@ describe('submitEvaluationResult()', () => {
     const proposalEvaluations = await prisma.proposalEvaluation.findMany({
       where: {
         proposalId
+      },
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -114,8 +119,8 @@ describe('submitEvaluationResult()', () => {
       where: {
         id: evaluation.id
       },
-      select: {
-        result: true
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -123,7 +128,7 @@ describe('submitEvaluationResult()', () => {
 
     await submitEvaluationResult({
       decidedBy: user2.id,
-      evaluation,
+      evaluation: updatedEvaluation1,
       proposalId,
       result: 'fail',
       spaceId: space.id
@@ -133,8 +138,8 @@ describe('submitEvaluationResult()', () => {
       where: {
         id: evaluation.id
       },
-      select: {
-        result: true
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -142,7 +147,7 @@ describe('submitEvaluationResult()', () => {
 
     await submitEvaluationResult({
       decidedBy: user3.id,
-      evaluation,
+      evaluation: updatedEvaluation2,
       proposalId,
       result: 'fail',
       spaceId: space.id
@@ -210,6 +215,9 @@ describe('submitEvaluationResult()', () => {
     const proposalEvaluations = await prisma.proposalEvaluation.findMany({
       where: {
         proposalId
+      },
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -227,8 +235,8 @@ describe('submitEvaluationResult()', () => {
       where: {
         id: evaluation.id
       },
-      select: {
-        result: true
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -236,7 +244,7 @@ describe('submitEvaluationResult()', () => {
 
     await submitEvaluationResult({
       decidedBy: user2.id,
-      evaluation,
+      evaluation: updatedEvaluation1,
       proposalId,
       result: 'fail',
       spaceId: space.id
@@ -246,8 +254,8 @@ describe('submitEvaluationResult()', () => {
       where: {
         id: evaluation.id
       },
-      select: {
-        result: true
+      include: {
+        proposalEvaluationReviews: true
       }
     });
 
@@ -255,7 +263,7 @@ describe('submitEvaluationResult()', () => {
 
     await submitEvaluationResult({
       decidedBy: user3.id,
-      evaluation,
+      evaluation: updatedEvaluation2,
       proposalId,
       result: 'fail',
       spaceId: space.id
