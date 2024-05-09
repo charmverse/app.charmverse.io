@@ -8,6 +8,7 @@ export type UpdateEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   voteSettings?: VoteSettings | null;
+  requiredReviews?: number;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
 };
 
@@ -16,7 +17,8 @@ export async function updateProposalEvaluation({
   evaluationId,
   voteSettings,
   reviewers,
-  actorId
+  actorId,
+  requiredReviews
 }: UpdateEvaluationRequest & { actorId: string }) {
   await prisma.$transaction(async (tx) => {
     // update reviewers only when it is present in request payload
@@ -42,6 +44,16 @@ export async function updateProposalEvaluation({
         },
         data: {
           voteSettings
+        }
+      });
+    }
+    if (requiredReviews) {
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          requiredReviews
         }
       });
     }

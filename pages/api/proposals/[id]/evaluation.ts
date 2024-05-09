@@ -18,13 +18,20 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, reviewers } = req.body as UpdateEvaluationRequest;
+  const { evaluationId, reviewers, requiredReviews } = req.body as UpdateEvaluationRequest;
 
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: proposalId
     },
     include: {
+      evaluations: {
+        select: {
+          id: true,
+          result: true,
+          requiredReviews: true
+        }
+      },
       page: {
         select: {
           sourceTemplateId: true,
@@ -59,12 +66,18 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError(`You can't update this proposal.`);
   }
 
+  const currentEvaluation = proposal.evaluations.find((e) => e.id === evaluationId);
+  if (currentEvaluation?.requiredReviews !== requiredReviews && !!currentEvaluation?.result) {
+    throw new ActionNotPermittedError('Cannot change the number of required reviews for a completed evaluation');
+  }
+
   await updateProposalEvaluation({
     proposalId: proposal.id,
     evaluationId,
     voteSettings: req.body.voteSettings,
     reviewers,
-    actorId: userId
+    actorId: userId,
+    requiredReviews
   });
 
   return res.status(200).end();
