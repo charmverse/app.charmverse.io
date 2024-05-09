@@ -1,18 +1,21 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
 
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { getRelativeTimeInThePast } from 'lib/utils/dates';
 
 export type Props = {
-  proposalId?: string;
-  isCurrent: boolean;
-  archived?: boolean;
-  evaluation: Pick<PopulatedEvaluation, 'id' | 'completedAt' | 'reviewers' | 'result' | 'isReviewer' | 'actionLabels'>;
+  isCurrent?: boolean;
+  evaluation: Partial<Pick<PopulatedEvaluation, 'completedAt' | 'result'>>;
 };
 
-export function PrivateEvaluation({ proposalId, isCurrent, archived, evaluation }: Props) {
+export function PrivateEvaluation({ isCurrent, evaluation }: Props) {
   const completedDate = evaluation.completedAt ? getRelativeTimeInThePast(new Date(evaluation.completedAt)) : null;
+
+  const { getFeatureTitle } = useSpaceFeatures();
+
+  const proposalLabel = getFeatureTitle('proposal');
 
   return (
     <Card variant='outlined'>
@@ -20,7 +23,9 @@ export function PrivateEvaluation({ proposalId, isCurrent, archived, evaluation 
         <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
           <FormLabel>
             <Typography component='span' variant='subtitle1'>
-              {isCurrent ? 'This proposal is being evaluated' : 'This proposal will be evaluated'}
+              {isCurrent
+                ? `This ${proposalLabel} is being evaluated`
+                : `This ${proposalLabel} will be evaluated by reviewers`}
             </Typography>
           </FormLabel>
         </Box>

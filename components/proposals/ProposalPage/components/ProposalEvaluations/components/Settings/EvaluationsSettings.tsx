@@ -15,6 +15,7 @@ import { useSettingsDialog } from 'hooks/useSettingsDialog';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 
 import type { ProposalPropertiesInput } from '../../../ProposalProperties/ProposalPropertiesBase';
+import { PrivateEvaluation } from '../Review/components/PrivateEvaluation';
 
 import type { ProposalEvaluationValues } from './components/EvaluationStepSettings';
 import { EvaluationStepSettings } from './components/EvaluationStepSettings';
@@ -134,14 +135,18 @@ export function EvaluationsSettings({
                   )
                 }
               >
-                <EvaluationStepSettings
-                  evaluation={evaluation}
-                  evaluationTemplate={matchingTemplateStep}
-                  readOnly={readOnly}
-                  onChange={(updated) => {
-                    onChangeEvaluation?.(evaluation.id, updated);
-                  }}
-                />
+                {evaluation.type === 'private_evaluation' ? (
+                  <PrivateEvaluation evaluation={evaluation} />
+                ) : (
+                  <EvaluationStepSettings
+                    evaluation={evaluation}
+                    evaluationTemplate={matchingTemplateStep}
+                    readOnly={readOnly}
+                    onChange={(updated) => {
+                      onChangeEvaluation?.(evaluation.id, updated);
+                    }}
+                  />
+                )}
               </EvaluationStepRow>
             );
           })}
