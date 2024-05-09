@@ -1,5 +1,5 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, Divider, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material';
 
 import { useResetProposalReview, useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';

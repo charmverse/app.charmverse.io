@@ -2,6 +2,7 @@ import type { ProposalEvaluationResult, ProposalEvaluationType } from '@charmver
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
+import { ActionNotPermittedError } from 'lib/middleware';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
@@ -14,7 +15,44 @@ export type ReviewEvaluationRequest = {
   result: ProposalEvaluationResult;
 };
 
-export async function updateEvaluationResult({
+export async function updatePassFailEvaluationResultIfRequired({
+  currentEvaluationType,
+  evaluationId,
+  proposalId,
+  requiredReviews,
+  spaceId,
+  userId
+}: {
+  evaluationId: string;
+  proposalId: string;
+  requiredReviews?: number;
+  userId: string;
+  spaceId: string;
+  currentEvaluationType?: ProposalEvaluationType;
+}) {
+  if (currentEvaluationType === 'pass_fail') {
+    const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId
+      },
+      select: {
+        result: true
+      }
+    });
+
+    if (existingEvaluationReviews.length === requiredReviews) {
+      await updateEvaluationResult({
+        decidedBy: userId,
+        evaluationId,
+        existingEvaluationReviews,
+        proposalId,
+        spaceId
+      });
+    }
+  }
+}
+
+async function updateEvaluationResult({
   decidedBy,
   evaluationId,
   existingEvaluationReviews,
@@ -68,21 +106,30 @@ export async function updateEvaluationResult({
 
 export async function submitEvaluationResult({
   decidedBy,
-  evaluationId,
   proposalId,
   result,
   spaceId,
   evaluation
-}: ReviewEvaluationRequest & {
+}: Omit<ReviewEvaluationRequest, 'evaluationId'> & {
   spaceId: string;
-  evaluation: { type: ProposalEvaluationType; title: string; requiredReviews: number };
+  evaluation: { id: string; type: ProposalEvaluationType; title: string; requiredReviews: number };
 }) {
+  const evaluationId = evaluation.id;
   const requiredReviews = evaluation.requiredReviews;
   const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
     where: {
       evaluationId
+    },
+    select: {
+      result: true,
+      reviewerId: true
     }
   });
+
+  const hasCurrentReviewerReviewed = existingEvaluationReviews.some((r) => r.reviewerId === decidedBy);
+  if (hasCurrentReviewerReviewed) {
+    throw new ActionNotPermittedError('You have already reviewed this evaluation');
+  }
 
   if (evaluation.type === 'pass_fail') {
     await prisma.proposalEvaluationReview.create({

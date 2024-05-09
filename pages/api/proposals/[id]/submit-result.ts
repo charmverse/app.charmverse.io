@@ -60,7 +60,6 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   await submitEvaluationResult({
     evaluation,
     proposalId,
-    evaluationId,
     result,
     decidedBy: userId,
     spaceId: evaluation.proposal.spaceId
