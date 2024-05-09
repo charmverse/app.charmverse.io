@@ -20,6 +20,7 @@ export type ControlFieldProps<T extends FormFieldValue = FormFieldValue> = {
 export type FieldProps = {
   placeholder?: string;
   label?: string;
+  'data-test'?: string;
   iconLabel?: ReactNode;
   inline?: boolean;
   error?: string;

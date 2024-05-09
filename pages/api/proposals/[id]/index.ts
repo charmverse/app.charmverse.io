@@ -100,13 +100,14 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  const selectedCredentialTemplates: string[] = req.body.selectedCredentialTemplates ?? [];
+  const newSelectedCredentialTemplates: string[] = req.body.selectedCredentialTemplates;
   const proposalCredentials: string[] = proposal.selectedCredentialTemplates ?? [];
 
   if (
+    newSelectedCredentialTemplates &&
     !isAdmin &&
-    (selectedCredentialTemplates.length !== proposalCredentials.length ||
-      !selectedCredentialTemplates.every((id) => proposalCredentials.includes(id)))
+    (newSelectedCredentialTemplates.length !== proposalCredentials.length ||
+      !newSelectedCredentialTemplates.every((id) => proposalCredentials.includes(id)))
   ) {
     throw new ActionNotPermittedError('You cannot change the selected credential templates');
   }
@@ -116,7 +117,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     authors,
     projectId,
     fields,
-    selectedCredentialTemplates,
+    selectedCredentialTemplates: newSelectedCredentialTemplates,
     actorId: userId
   });
 

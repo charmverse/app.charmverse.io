@@ -50,7 +50,7 @@ export class DocumentPage extends GlobalPage {
 
   public saveNewPage: Locator;
 
-  public rootSelector: { locator: Locator['locator'] };
+  public rootSelector: Pick<Locator, 'locator'>;
 
   public closeSidebar: Locator;
 
@@ -61,7 +61,7 @@ export class DocumentPage extends GlobalPage {
   constructor(public page: Page, rootSelector?: string) {
     super(page);
     this.rootSelector = rootSelector ? this.page.locator(rootSelector) : this.page;
-    this.header = new PageHeader(page, rootSelector);
+    this.header = new PageHeader(page);
     this.archivedBanner = this.rootSelector.locator('data-test=archived-page-banner');
     this.commentsSidebar = this.rootSelector.locator('data-test=inline-comment-sidebar');
     this.commentsSidebarEmptyMessage = this.rootSelector.locator(
@@ -70,10 +70,10 @@ export class DocumentPage extends GlobalPage {
     this.contextMenuButton = this.rootSelector.locator('data-test=page-context-menu-button');
     this.contextMenuViewCommentsButton = this.rootSelector.locator('data-test=view-comments-button');
     this.shareDialog = new PagePermissionsDialog(page);
-    this.trashToggle = this.rootSelector.locator('data-test=sidebar--trash-toggle');
+    this.trashToggle = this.page.locator('data-test=sidebar--trash-toggle');
     this.deletePermanentlyButton = this.rootSelector.locator('data-test=banner--permanently-delete');
     this.restoreArchivedButton = this.rootSelector.locator('data-test=banner--restore-archived-page');
-    this.trashModal = this.rootSelector.locator('data-test=trash-modal');
+    this.trashModal = this.page.locator('data-test=trash-modal');
     this.charmEditor = this.rootSelector.locator('data-test=page-charmeditor >> .bangle-editor').first();
     this.proposalBanner = this.rootSelector.locator('data-test=proposal-banner');
     this.documentTitle = this.rootSelector.locator(`data-test=editor-page-title`);
@@ -105,7 +105,7 @@ export class DocumentPage extends GlobalPage {
   }
 
   getTrashItem(pageId: string) {
-    return this.rootSelector.locator(`data-test=archived-page-${pageId}`);
+    return this.page.locator(`data-test=archived-page-${pageId}`);
   }
 
   closeDialog() {

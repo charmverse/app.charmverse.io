@@ -14,12 +14,11 @@ import type { ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function useProjectForm(options: {
   fieldConfig: ProjectAndMembersFieldConfig;
-  defaultRequired?: boolean;
   projectId?: string | null;
   selectedMemberIds?: string[];
   initialProjectValues?: ProjectWithMembers | null;
 }) {
-  const { defaultRequired, fieldConfig } = options;
+  const { fieldConfig } = options;
   const { user } = useUser();
   const { membersRecord } = useMembers();
   const { data: projectsWithMembers } = useGetProjects();
@@ -34,10 +33,10 @@ export function useProjectForm(options: {
 
   useEffect(() => {
     yupSchema.current = createProjectYupSchema({
-      fieldConfig,
-      defaultRequired
+      defaultRequired: true,
+      fieldConfig
     });
-  }, [fieldConfig, defaultRequired]);
+  }, [fieldConfig]);
 
   const form = useForm({
     defaultValues: defaultProjectAndMembersPayload,

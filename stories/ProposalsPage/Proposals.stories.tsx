@@ -5,7 +5,6 @@ import { GlobalContext } from 'stories/lib/GlobalContext';
 
 import { DocumentPageWithSidebars } from 'components/[pageId]/DocumentPage/DocumentPageWithSidebars';
 import { HeaderSpacer } from 'components/common/PageLayout/components/Header/Header';
-import { NewProposalPage as ProposalPageComponent } from 'components/proposals/ProposalPage/NewProposalPage';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import { builders as _, jsonDoc } from 'lib/prosemirror/builders';
 import { createMockPage } from 'testing/mocks/page';
@@ -17,7 +16,7 @@ import { ProposalsPageStory, withProposalProviders } from './components/Proposal
 
 export default {
   title: 'Proposals/Views',
-  component: ProposalPageComponent,
+  component: ProposalInEvaluation,
   decorators: [withProposalProviders, withCharmEditorProviders]
 };
 
@@ -30,15 +29,6 @@ export function ProposalsPage() {
 }
 
 ProposalsPage.parameters = ProposalsPageStory.parameters;
-
-export function NewProposal() {
-  return (
-    <GlobalContext>
-      <HeaderSpacer />
-      <ProposalPageComponent />
-    </GlobalContext>
-  );
-}
 
 export function ProposalInEvaluation() {
   const page = createMockPage({

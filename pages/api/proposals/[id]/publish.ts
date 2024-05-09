@@ -40,7 +40,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     select: {
       id: true,
       title: true,
-      content: true,
+      hasContent: true,
       type: true,
       proposal: {
         include: {
@@ -63,12 +63,22 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
                 }
               }
             }
+          },
+          project: {
+            include: {
+              projectMembers: true
+            }
           }
         }
       },
       spaceId: true
     }
   });
+
+  if (!proposalPage.proposal) {
+    throw new Error('Proposal not found for page');
+  }
+
   const { isAdmin } = await hasAccessToSpace({
     spaceId: proposalPage.spaceId,
     userId,
@@ -84,23 +94,24 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     page: {
       title: proposalPage.title ?? '',
       type: proposalPage.type,
-      content: proposalPage.content
+      hasContent: proposalPage.hasContent
     },
-    proposalType: proposalPage.proposal?.formId ? 'structured' : 'free_form',
+    contentType: proposalPage.proposal.formId ? 'structured' : 'free_form',
     proposal: {
-      ...proposalPage.proposal!,
-      evaluations: proposalPage.proposal!.evaluations.map((e) => ({
+      ...proposalPage.proposal,
+      evaluations: proposalPage.proposal.evaluations.map((e) => ({
         ...e,
         actionLabels: e.actionLabels as WorkflowEvaluationJson['actionLabels'],
         voteSettings: e.voteSettings as any,
         rubricCriteria: e.rubricCriteria as any[]
       })),
-      fields: proposalPage.proposal!.fields as ProposalFields,
-      authors: proposalPage.proposal!.authors.map((a) => a.userId),
-      formAnswers: proposalPage.proposal!.formAnswers as unknown as FieldAnswerInput[],
-      formFields: proposalPage.proposal!.form?.formFields as unknown as FormFieldInput[]
+      fields: proposalPage.proposal.fields as ProposalFields,
+      authors: proposalPage.proposal.authors.map((a) => a.userId),
+      formAnswers: proposalPage.proposal.formAnswers as FieldAnswerInput[],
+      formFields: proposalPage.proposal.form?.formFields as unknown as FormFieldInput[]
     },
     isDraft: false,
+    project: proposalPage.proposal.project,
     requireTemplates: false
   });
 
@@ -109,40 +120,6 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
   }
 
   const currentEvaluationId = proposalPage?.proposal?.evaluations[0]?.id || null;
-
-  const proposalForm = await prisma.proposal.findUnique({
-    where: {
-      id: proposalId
-    },
-    select: {
-      projectId: true,
-      formAnswers: {
-        select: {
-          fieldId: true,
-          value: true
-        }
-      },
-      form: {
-        select: {
-          formFields: {
-            select: {
-              fieldConfig: true,
-              id: true,
-              type: true
-            }
-          }
-        }
-      }
-    }
-  });
-
-  if (proposalForm?.projectId) {
-    await validateProposalProject({
-      formAnswers: proposalForm?.formAnswers,
-      projectId: proposalForm.projectId,
-      formFields: proposalForm?.form?.formFields
-    });
-  }
 
   await publishProposal({
     proposalId,

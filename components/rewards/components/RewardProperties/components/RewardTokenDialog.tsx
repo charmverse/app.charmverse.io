@@ -18,12 +18,14 @@ export function RewardTokenDialog({
   requireTokenAmount,
   readOnly,
   readOnlyToken,
+  readOnlyTokenAmount,
   children,
   onChange
 }: {
   displayType?: PropertyValueDisplayType;
   readOnly: boolean;
-  readOnlyToken: boolean;
+  readOnlyToken?: boolean;
+  readOnlyTokenAmount?: boolean;
   requireTokenAmount: boolean;
   currentReward: Pick<RewardCreationData & RewardWithUsers, 'rewardAmount' | 'rewardToken' | 'chainId'>;
   children: ReactNode;
@@ -43,7 +45,9 @@ export function RewardTokenDialog({
   };
 
   function openTokenSettings() {
-    setIsOpen(true);
+    if (!readOnly) {
+      setIsOpen(true);
+    }
   }
 
   return (
@@ -70,8 +74,8 @@ export function RewardTokenDialog({
             defaultValues={tokenInput}
             readOnly={readOnly}
             readOnlyToken={readOnlyToken}
+            readOnlyTokenAmount={readOnlyTokenAmount}
             requireTokenAmount={requireTokenAmount}
-            readOnlyTokenAmount={false} // TODO: probably needs to be based on some prop?
             setIsValid={setIsValid}
           />
         </Box>

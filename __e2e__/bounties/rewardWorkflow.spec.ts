@@ -42,7 +42,6 @@ test.describe.serial('Review reward applications', () => {
 
     await rewardPage.workflowSelect.click();
     await rewardPage.page.locator(`data-test=select-option-application_required`).click();
-    await rewardPage.page.locator('[data-test="modal-confirm-button"]').click();
     await rewardPage.selectRewardReviewer(adminUser.id);
     await rewardPage.selectRewardType('custom');
     await rewardPage.customRewardInput.fill('Custom Reward');
@@ -104,7 +103,7 @@ test.describe.serial('Review reward applications', () => {
     await generateUserAndSpaceKyc({ spaceId: space.id, userId: adminUser.id });
 
     await rewardPage.page.goto(`${baseUrl}/${space.domain}/rewards`);
-    await rewardPage.page.pause();
+    // await rewardPage.page.pause();
     await rewardPage.createBountyButton.click();
     await rewardPage.documentTitleInput.fill('Reward 2');
 

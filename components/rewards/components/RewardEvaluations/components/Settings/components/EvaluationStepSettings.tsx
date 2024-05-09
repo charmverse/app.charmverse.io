@@ -18,11 +18,11 @@ export type EvaluationStepSettingsProps = {
   rewardInput?: UpdateableRewardFields;
   rewardTemplateInput?: RewardTemplate;
   rewardStatus?: BountyStatus | null;
+  rewardPublished?: boolean;
 };
 
 export function EvaluationStepSettings(props: EvaluationStepSettingsProps) {
   const evaluationType = props.evaluation.type;
-
   if (evaluationType === 'submit') {
     return <SubmitStepSettings {...props} />;
   } else if (evaluationType === 'review' || evaluationType === 'application_review') {

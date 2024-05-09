@@ -1,4 +1,5 @@
 import type {
+  FormFieldAnswer,
   IssuedCredential,
   Proposal,
   ProposalEvaluation,
@@ -16,7 +17,6 @@ import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuabl
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { prettyPrint } from 'lib/utils/strings';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -30,6 +30,27 @@ import { getCardPropertiesFromProject } from './getCardPropertiesFromProject';
 import { getCardPropertiesFromRubric } from './getCardPropertiesFromRubric';
 
 export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
+
+type ProposalData = {
+  page: {
+    id: string;
+    title: string;
+    path: string;
+  };
+  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
+    authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
+    evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'> & {
+      rubricAnswers: ProposalRubricCriteriaAnswer[];
+      rubricCriteria: ProposalRubricCriteria[];
+    })[];
+    formAnswers: Pick<FormFieldAnswer, 'fieldId' | 'value'>[];
+    issuedCredentials: IssuedCredential[];
+    rewards: { id: string }[];
+    project: ProjectInformation | null;
+  };
+  cardProperties: IPropertyTemplate[];
+  space: IssuableProposalCredentialSpace;
+};
 
 const pageSelectObject = {
   id: true,
@@ -159,27 +180,6 @@ export async function getCardPropertiesFromProposal({
   };
 }
 
-type ProposalData = {
-  page: {
-    id: string;
-    title: string;
-    path: string;
-  };
-  proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
-    authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
-    evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type'> & {
-      rubricAnswers: ProposalRubricCriteriaAnswer[];
-      rubricCriteria: ProposalRubricCriteria[];
-    })[];
-    formAnswers: FormAnswerData[];
-    issuedCredentials: IssuedCredential[];
-    rewards: { id: string }[];
-    project: ProjectInformation | null;
-  };
-  cardProperties: IPropertyTemplate[];
-  space: IssuableProposalCredentialSpace;
-};
-
 function getCardProperties({ page, proposal, cardProperties, space }: ProposalData): ProposalCardData {
   const proposalProps = getCardPropertyTemplates({ cardProperties });
 
@@ -253,7 +253,7 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
 
   const formFieldProperties = getCardPropertiesFromForm({
     cardProperties,
-    formAnswers: proposal.formAnswers
+    formAnswers: proposal.formAnswers as FormAnswerData[]
   });
 
   if (proposal.project) {

@@ -12,9 +12,9 @@ import {
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
 import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import type { RangeProposalCriteria } from 'lib/proposals/workflows/getNewCriteria';
 
 import { RubricCriteriaSettings } from './RubricCriteriaSettings';
-import type { RangeProposalCriteria } from './RubricCriteriaSettings';
 import { VoteSettings } from './VoteSettings';
 
 // result and id are not used for creating evaluations, so add them here

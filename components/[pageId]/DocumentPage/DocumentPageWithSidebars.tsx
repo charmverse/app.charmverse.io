@@ -39,6 +39,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
     proposal,
     refreshProposal,
     onChangeEvaluation,
+    onChangeTemplate,
     onChangeWorkflow,
     onChangeRewardSettings,
     onChangeSelectedCredentialTemplates
@@ -106,7 +107,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
   }, []);
 
   return (
-    <DocumentColumnLayout>
+    <DocumentColumnLayout data-test='document-page'>
       <DocumentColumn>
         <DocumentPage
           {...props}
@@ -150,6 +151,7 @@ function DocumentPageWithSidebarsComponent(props: DocumentPageWithSidebarsProps)
           proposalInput={proposal}
           templateId={proposal?.page?.sourceTemplateId}
           onChangeEvaluation={onChangeEvaluation}
+          onChangeTemplate={onChangeTemplate}
           refreshProposal={refreshProposal}
           onChangeWorkflow={onChangeWorkflow}
           onChangeRewardSettings={onChangeRewardSettings}
