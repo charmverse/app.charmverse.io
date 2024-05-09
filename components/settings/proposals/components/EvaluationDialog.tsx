@@ -106,7 +106,7 @@ function StepActionButtonLabel({
   ) : null;
 }
 
-function StepMinReviews({
+function StepRequiredReviews({
   setValue,
   requiredReviews
 }: {
@@ -232,7 +232,12 @@ export function EvaluationDialog({
           />
         </div>
         {evaluation?.id && (
-          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+          <>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && (
+              <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+            )}
+          </>
         )}
         {!evaluation?.id && (
           <>
@@ -274,7 +279,7 @@ export function EvaluationDialog({
             </div>
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             {formValues.type === 'pass_fail' && (
-              <StepMinReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+              <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
             )}
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
