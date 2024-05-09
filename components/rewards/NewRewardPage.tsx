@@ -146,23 +146,22 @@ export function NewRewardPage({
   }
 
   function applyWorkflow(workflow: RewardWorkflow) {
+    const updatedFields = {
+      ...(rewardValues.fields as object | undefined | null),
+      workflowId: workflow.id
+    };
+
     if (workflow.id === 'application_required') {
       setRewardValues({
         approveSubmitters: true,
         assignedSubmitters: null,
-        fields: {
-          ...(rewardValues.fields as object | undefined | null),
-          workflowId: workflow.id
-        }
+        fields: updatedFields
       });
     } else if (workflow.id === 'direct_submission') {
       setRewardValues({
         approveSubmitters: false,
         assignedSubmitters: null,
-        fields: {
-          ...(rewardValues.fields as object | undefined | null),
-          workflowId: workflow.id
-        }
+        fields: updatedFields
       });
     } else if (workflow.id === 'assigned') {
       setRewardValues({
@@ -170,20 +169,14 @@ export function NewRewardPage({
         allowMultipleApplications: false,
         assignedSubmitters: [],
         allowedSubmitterRoles: [],
-        fields: {
-          ...(rewardValues.fields as object | undefined | null),
-          workflowId: workflow.id
-        }
+        fields: updatedFields
       });
     } else if (workflow.id === 'assigned_kyc') {
       setRewardValues({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: [user!.id],
-        fields: {
-          ...(rewardValues.fields as object | undefined | null),
-          workflowId: workflow.id
-        }
+        assignedSubmitters: [],
+        fields: updatedFields
       });
     }
   }
