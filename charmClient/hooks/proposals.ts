@@ -144,7 +144,7 @@ export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeStr
 }
 
 export function useUpdateTemplate({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<{ id: string | null }>(`/api/proposals/${proposalId}/template`);
+  return usePUT<{ templateId: string | null }>(`/api/proposals/${proposalId}/template`);
 }
 
 export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {

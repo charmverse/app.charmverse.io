@@ -3,11 +3,12 @@ import type {
   Proposal,
   ProposalAuthor,
   ProposalOperation,
+  ProposalEvaluation,
   ProposalReviewer,
   ProposalStatus
 } from '@charmverse/core/prisma';
 import { ProposalSystemRole, prisma } from '@charmverse/core/prisma-client';
-import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
+import type { ProposalWorkflowTyped, WorkflowEvaluationJson, PermissionJson } from '@charmverse/core/proposals';
 import { testUtilsProposals } from '@charmverse/core/test';
 import { sortBy } from 'lodash';
 import { v4 as uuid } from 'uuid';
@@ -17,7 +18,7 @@ import type { Board } from 'lib/databases/board';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { updateViews } from 'lib/databases/proposalsSource/updateViews';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
-import type { ProposalFields } from 'lib/proposals/interfaces';
+import type { PopulatedEvaluation, ProposalFields } from 'lib/proposals/interfaces';
 import { getDefaultPermissions } from 'lib/proposals/workflows/defaultEvaluation';
 import { generateBoard } from 'testing/setupDatabase';
 
@@ -30,7 +31,18 @@ export type ProposalWithUsersAndPageMeta = Omit<Proposal, 'fields'> & {
 };
 
 type GenerateProposalOptions = Parameters<typeof testUtilsProposals.generateProposal>[0];
-type GenerateProposalResult = ReturnType<typeof testUtilsProposals.generateProposal>;
+
+type TypedEvaluation = ProposalEvaluation & {
+  permissions: PermissionJson[];
+  reviewers: ProposalReviewer[];
+  rubricCriteria: PopulatedEvaluation['rubricCriteria'];
+};
+export type GenerateProposalResponse = Proposal & {
+  authors: ProposalAuthor[];
+  reviewers: ProposalReviewer[];
+  page: Page;
+  evaluations: TypedEvaluation[];
+};
 
 /**
  * A wrapper around core lib method, (with changes to be added in core later when we have time)
@@ -42,7 +54,7 @@ export async function generateProposalV2({
 }: GenerateProposalOptions & {
   selectedCredentialTemplates?: string[];
   workflowId?: string;
-}): Promise<GenerateProposalResult> {
+}): Promise<GenerateProposalResponse> {
   const proposal = await testUtilsProposals.generateProposal(input);
   if (selectedCredentialTemplates) {
     await prisma.proposal.update({
@@ -77,7 +89,33 @@ export async function generateProposalV2({
     });
     proposal.workflowId = workflow.id;
   }
-  return proposal;
+
+  // copied from core lib method
+  const result = await prisma.proposal.findUniqueOrThrow({
+    where: {
+      id: proposal.id
+    },
+    include: {
+      authors: true,
+      reviewers: true,
+      page: true,
+      evaluations: {
+        include: {
+          permissions: true,
+          reviewers: true,
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          }
+        },
+        orderBy: {
+          index: 'asc'
+        }
+      }
+    }
+  });
+  return result as unknown as GenerateProposalResponse;
 }
 
 /**

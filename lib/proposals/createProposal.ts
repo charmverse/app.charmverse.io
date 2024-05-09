@@ -24,7 +24,6 @@ import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsW
 import type { VoteSettings } from './interfaces';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
-import { validateProposalProject } from './validateProposalProject';
 
 type PageProps = Partial<
   Pick<

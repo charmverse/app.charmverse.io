@@ -49,6 +49,7 @@ export async function applyProposalWorkflow({
       const evaluation = typedWorkflow.evaluations[index];
       // try to retain existing reviewers and configuration
       const existingStep = existingEvaluations.find((e) => e.title === evaluation.title);
+
       const rubricCriteria =
         evaluation.type === 'rubric'
           ? (existingStep?.rubricCriteria.length &&

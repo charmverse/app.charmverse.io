@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { applyProposalTemplate } from 'lib/proposals/applyProposalTemplate';
-import type { ApplyWorkflowTemplate } from 'lib/proposals/applyProposalTemplate';
+import type { ApplyTemplateRequest } from 'lib/proposals/applyProposalTemplate';
 import { withSessionRoute } from 'lib/session/withSession';
 import { AdministratorOnlyError } from 'lib/users/errors';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
@@ -18,7 +18,7 @@ async function applyTemplateEndpoint(req: NextApiRequest, res: NextApiResponse) 
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { id } = req.body as ApplyWorkflowTemplate;
+  const { templateId } = req.body as ApplyTemplateRequest;
 
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
@@ -63,7 +63,7 @@ async function applyTemplateEndpoint(req: NextApiRequest, res: NextApiResponse) 
 
   await applyProposalTemplate({
     proposalId: proposal.id,
-    id,
+    templateId,
     actorId: userId
   });
 
