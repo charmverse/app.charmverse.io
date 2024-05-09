@@ -1,4 +1,4 @@
-import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
+import type { ProposalEvaluationResult, ProposalEvaluationType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
@@ -23,7 +23,7 @@ export async function submitEvaluationResult({
   evaluation
 }: ReviewEvaluationRequest & {
   spaceId: string;
-  evaluation: { type: string; title: string; requiredReviews: number };
+  evaluation: { type: ProposalEvaluationType; title: string; requiredReviews: number };
 }) {
   const requiredReviews = evaluation.requiredReviews;
   const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
@@ -32,7 +32,7 @@ export async function submitEvaluationResult({
     }
   });
 
-  if (requiredReviews !== 1) {
+  if (evaluation.type === 'pass_fail') {
     await prisma.proposalEvaluationReview.create({
       data: {
         evaluationId,
