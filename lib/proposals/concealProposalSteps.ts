@@ -2,19 +2,25 @@ import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
 import { prettyPrint } from 'lib/utils/strings';
 
 import type { PopulatedEvaluation, ProposalWithUsersAndRubric } from './interfaces';
 
 const privateEvaluationSteps: ProposalEvaluationType[] = ['rubric', 'pass_fail', 'vote'];
 
-export async function concealProposalSteps({
+type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
+  evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &
+    Partial<ProposalWithUsersAndRubric['evaluations'][0]>)[];
+};
+
+export async function concealProposalSteps<T extends MinimalProposal = MinimalProposal>({
   proposal,
   userId,
   applicableRoleIds,
   isAdmin
 }: {
-  proposal: Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'evaluations' | 'id'>;
+  proposal: T;
   userId?: string;
   applicableRoleIds?: string[];
   isAdmin?: boolean;
@@ -36,6 +42,7 @@ export async function concealProposalSteps({
     return proposal;
   }
 
+  // Search conditions allowing for early exit without needing to conceal the evaluation steps
   if (userId) {
     const _isAdmin =
       typeof isAdmin === 'boolean'
@@ -49,21 +56,7 @@ export async function concealProposalSteps({
       return proposal;
     }
 
-    const applicableRoles =
-      applicableRoleIds ??
-      (await prisma.spaceRoleToRole
-        .findMany({
-          where: {
-            spaceRole: {
-              spaceId: proposal.spaceId,
-              userId
-            }
-          },
-          select: {
-            roleId: true
-          }
-        })
-        .then((data) => data.map((role) => role.roleId)));
+    const applicableRoles = applicableRoleIds ?? (await getAssignedRoleIds({ spaceId: proposal.spaceId, userId }));
 
     const isReviewer = proposal.evaluations.some(
       (evaluation) =>
@@ -80,7 +73,7 @@ export async function concealProposalSteps({
     }
   }
 
-  const stepsWithCollapsedEvaluations: PopulatedEvaluation[] = [];
+  const stepsWithCollapsedEvaluations: MinimalProposal['evaluations'][number][] = [];
 
   for (let i = 0; i < proposal.evaluations.length; i++) {
     const previousStep = stepsWithCollapsedEvaluations[stepsWithCollapsedEvaluations.length - 1];

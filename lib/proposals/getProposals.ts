@@ -23,7 +23,10 @@ import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';
 import type { ProposalFields } from './interfaces';
 
-export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selectedCredentialTemplates'> & {
+export type ProposalWithUsersLite = Pick<
+  Proposal,
+  'createdBy' | 'id' | 'selectedCredentialTemplates' | 'spaceId' | 'workflowId'
+> & {
   archived?: boolean;
   authors: ProposalAuthor[];
   fields: ProposalFields | null;
@@ -176,13 +179,16 @@ function mapDbProposalToProposalLite({
     selectedCredentialTemplates: validSelectedCredentials,
     archived: proposal.archived || undefined,
     formId: rest.formId || undefined,
+    spaceId: rest.spaceId,
+    workflowId: rest.workflowId,
     // spaceId: rest.spaceId,
     evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
       title: e.title,
       index: e.index,
       type: e.type,
       result: e.result,
-      id: e.id
+      id: e.id,
+      reviewers: e.reviewers
     })),
     permissions,
     currentStep: getCurrentStep({
