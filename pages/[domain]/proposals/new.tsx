@@ -117,8 +117,9 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       resourceId: space.id,
       userId: sessionUserId
     });
+
     if (!computedPermissions.createProposals) {
-      log.warn('User is not a member and does not have permission to create proposals', {
+      log.warn('User does not have permission to create proposals', {
         userId: sessionUserId,
         spaceId: space.id
       });

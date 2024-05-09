@@ -73,7 +73,9 @@ test('Create a proposal from a linked proposal template / user from outside spac
   proposalPage,
   documentPage
 }) => {
-  const { user: admin, space } = await generateUserAndSpace();
+  const { user: admin, space } = await generateUserAndSpace({
+    memberSpacePermissions: ['createProposals']
+  });
 
   await prisma.space.update({
     where: {
@@ -202,7 +204,7 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
   documentPage,
   proposalPage
 }) => {
-  const { user: admin, space } = await generateUserAndSpace();
+  const { user: admin, space } = await generateUserAndSpace({ memberSpacePermissions: ['createProposals'] });
 
   await prisma.space.update({
     where: {
@@ -264,6 +266,10 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
   await loginBrowserUser({ browserPage: page, userId: newUser.id });
 
   await page.reload();
+
+  // the loginBrowserUser method does not consider redirectUri so just click the button again
+  const pageLink2 = documentPage.getLinkedPage(template.id);
+  await pageLink2.click();
 
   await proposalPage.waitForNewProposalPage();
 });
