@@ -1,3 +1,4 @@
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -8,6 +9,7 @@ import {
   upsertWorkflowTemplate,
   deleteWorkflowTemplate
 } from 'lib/proposals/workflows/controller';
+import { obfuscateWorkflow } from 'lib/proposals/workflows/obfuscateWorkflow';
 import { withSessionRoute } from 'lib/session/withSession';
 import { InvalidInputError } from 'lib/utils/errors';
 
@@ -23,6 +25,16 @@ async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<
   const spaceId = req.query.id as string;
 
   const workflows = await getWorkflowTemplates(spaceId);
+
+  const { isAdmin } = await hasAccessToSpace({ spaceId, userId: req.session.user?.id });
+
+  if (!isAdmin) {
+    for (const workflow of workflows) {
+      if (workflow.privateEvaluations) {
+        workflow.evaluations = obfuscateWorkflow(workflow);
+      }
+    }
+  }
 
   return res.status(200).json(workflows);
 }

@@ -5,8 +5,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
-
-const privateEvaluationSteps: ProposalEvaluationType[] = ['rubric', 'pass_fail', 'vote'];
+import { privateEvaluationSteps } from './workflows/obfuscateWorkflow';
 
 type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
   evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &

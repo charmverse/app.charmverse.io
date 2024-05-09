@@ -12,6 +12,7 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     id: uuid(),
     createdAt: new Date(),
     title: defaultWorkflowTitle,
+    privateEvaluations: false,
     evaluations: [
       getDefaultFeedbackEvaluation(),
       getDefaultEvaluation({
@@ -30,6 +31,7 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     id: uuid(),
     createdAt: new Date(),
     title: decisionMatrixWorkflowTitle,
+    privateEvaluations: false,
     evaluations: [
       getDefaultEvaluation({
         title: 'Feedback',
@@ -47,6 +49,7 @@ export const getDefaultWorkflows: (spaceId: string) => ProposalWorkflowTyped[] =
     id: uuid(),
     createdAt: new Date(),
     title: grantApplicationsWorkflowTitle,
+    privateEvaluations: false,
     evaluations: [
       getDefaultEvaluation({
         title: 'Rubric evaluation',

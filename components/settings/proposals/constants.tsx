@@ -42,7 +42,7 @@ export const evaluationIcons = {
       </SvgIconWithRef>
     </Tooltip>
   ),
-  [ProposalEvaluationType.private_evaluation]: (props: SvgIconProps = {}) => (
+  private_evaluation: (props: SvgIconProps = {}) => (
     <Tooltip title='Evaluation'>
       <SvgIconWithRef inheritViewBox {...defaultProps} {...props}>
         <MdOutlineThumbsUpDown />
