@@ -76,6 +76,8 @@ export function ProposalStepSelectBase({
   const currentEvaluationStep = proposal.currentStep.step;
   const currentEvaluationIndex = proposal.currentStep.index;
   const currentEvaluationResult = proposal.currentStep.result;
+  const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
+
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
   const { options } = useMemo(() => {
@@ -122,6 +124,8 @@ export function ProposalStepSelectBase({
         index === currentEvaluationIndex ||
         index < currentEvaluationIndex - 1 ||
         index > currentEvaluationIndex + 1 ||
+        // Disable option if it is a pass_fail step and it requires more than 1 review
+        (currentEvaluationStepRequiredReviews !== 1 && index > currentEvaluationIndex) ||
         // Disable option if it is a vote step and its not in progress
         (evaluation?.type === 'vote' && evaluation?.result !== null) ||
         // If we are on the vote step, then we can only go back to the previous step

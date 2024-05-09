@@ -1,6 +1,6 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Typography, FormLabel } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Typography, FormLabel, TextField } from '@mui/material';
+import { useEffect } from 'react';
 
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -24,7 +24,7 @@ export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permission
 
 type Props = {
   evaluation: ProposalEvaluationValues;
-  evaluationTemplate?: Pick<PopulatedEvaluation, 'reviewers' | 'rubricCriteria' | 'voteSettings'>;
+  evaluationTemplate?: Pick<PopulatedEvaluation, 'reviewers' | 'rubricCriteria' | 'voteSettings' | 'requiredReviews'>;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   isPublishedProposal?: boolean;
@@ -44,12 +44,13 @@ export function EvaluationStepSettings({
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
+  const readOnlyRequireReviews = readOnly || !!evaluationTemplate?.requiredReviews || !!evaluation.result;
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
   const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
-
+  const requiredReviews = evaluation.requiredReviews;
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers.map((r) => ({
@@ -70,7 +71,11 @@ export function EvaluationStepSettings({
     <>
       <FormLabel required>
         <Typography component='span' variant='subtitle1'>
-          {evaluation.type === 'vote' ? 'Voters' : 'Reviewers'}
+          {evaluation.type === 'vote'
+            ? 'Voters'
+            : requiredReviews !== 1
+            ? `Reviewers (required ${requiredReviews})`
+            : 'Reviewers'}
         </Typography>
       </FormLabel>
       <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
@@ -85,6 +90,27 @@ export function EvaluationStepSettings({
           required
         />
       </Box>
+      {evaluation.type === 'pass_fail' && (
+        <Box className='octo-propertyrow'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Required reviews
+            </Typography>
+          </FormLabel>
+          <TextField
+            placeholder='1'
+            disabled={readOnlyRequireReviews}
+            type='number'
+            onChange={(e) => {
+              onChange({
+                requiredReviews: Math.max(1, Number(e.target.value))
+              });
+            }}
+            fullWidth
+            value={requiredReviews}
+          />
+        </Box>
+      )}
       {evaluation.type === 'rubric' && (
         <>
           <FormLabel required>

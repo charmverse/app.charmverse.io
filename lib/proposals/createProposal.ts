@@ -24,7 +24,6 @@ import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsW
 import type { VoteSettings } from './interfaces';
 import type { RubricDataInput } from './rubric/upsertRubricCriteria';
 import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
-import { validateProposalProject } from './validateProposalProject';
 
 type PageProps = Partial<
   Pick<
@@ -37,6 +36,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
+  requiredReviews?: WorkflowEvaluationJson['requiredReviews'];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
 };
 
@@ -179,7 +179,8 @@ export async function createProposal({
               index: evaluation.index,
               title: evaluation.title,
               type: evaluation.type,
-              actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue
+              actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue,
+              requiredReviews: evaluation.requiredReviews ?? 1
             }))
           }
         },
