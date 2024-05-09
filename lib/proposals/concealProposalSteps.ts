@@ -1,11 +1,11 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { privateEvaluationSteps } from '@charmverse/core/proposals';
 
 import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
-import { privateEvaluationSteps } from './workflows/obfuscateWorkflow';
 
 type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
   evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &

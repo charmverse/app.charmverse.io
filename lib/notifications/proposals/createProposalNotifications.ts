@@ -1,10 +1,9 @@
 /* eslint-disable no-continue */
 import { prisma } from '@charmverse/core/prisma-client';
-import { getCurrentEvaluation } from '@charmverse/core/proposals';
+import { getCurrentEvaluation, privateEvaluationSteps } from '@charmverse/core/proposals';
 
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalAction } from 'lib/proposals/getProposalAction';
-import { privateEvaluationSteps } from 'lib/proposals/workflows/obfuscateWorkflow';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
