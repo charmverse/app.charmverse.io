@@ -73,14 +73,14 @@ export function EvaluationsSettings({
   return (
     <LoadingComponent isLoading={!proposal} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
-        {!isTemplate && (
+        {/* {!isTemplate && (
           <TemplateSelect
             onChange={onChangeTemplate}
             options={templatePageOptions}
             required={isTemplateRequired}
             value={templateId}
           />
-        )}
+        )} */}
         <WorkflowSelect
           options={workflowOptions}
           value={proposal?.workflowId}
