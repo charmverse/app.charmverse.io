@@ -12,6 +12,7 @@ import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/Wor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import { getRewardWorkflowWithApplication } from 'lib/rewards/getRewardWorkflowWithApplication';
@@ -55,7 +56,7 @@ export function EvaluationsReview({
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = inferRewardWorkflow(workflowOptions, reward);
+  const workflow = inferRewardWorkflow(workflowOptions, reward.fields as RewardFields);
   const hasIssuableOnchainCredentials = !!(
     currentSpace?.useOnchainCredentials &&
     currentSpace?.credentialsWallet &&

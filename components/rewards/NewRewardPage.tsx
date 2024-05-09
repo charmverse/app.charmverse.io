@@ -139,7 +139,7 @@ export function NewRewardPage({
       selectedCredentialTemplates: template.selectedCredentialTemplates,
       fields: template.fields
     });
-    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template);
+    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template.fields as RewardFields);
     if (workflow) {
       applyWorkflow(workflow);
     }
@@ -149,19 +149,31 @@ export function NewRewardPage({
     if (workflow.id === 'application_required') {
       setRewardValues({
         approveSubmitters: true,
-        assignedSubmitters: null
+        assignedSubmitters: null,
+        fields: {
+          ...(rewardValues.fields as object | undefined | null),
+          workflowId: workflow.id
+        }
       });
     } else if (workflow.id === 'direct_submission') {
       setRewardValues({
         approveSubmitters: false,
-        assignedSubmitters: null
+        assignedSubmitters: null,
+        fields: {
+          ...(rewardValues.fields as object | undefined | null),
+          workflowId: workflow.id
+        }
       });
     } else if (workflow.id === 'assigned') {
       setRewardValues({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: [user!.id],
-        allowedSubmitterRoles: []
+        assignedSubmitters: [],
+        allowedSubmitterRoles: [],
+        fields: {
+          ...(rewardValues.fields as object | undefined | null),
+          workflowId: workflow.id
+        }
       });
     } else if (workflow.id === 'assigned_kyc') {
       setRewardValues({
@@ -170,7 +182,7 @@ export function NewRewardPage({
         assignedSubmitters: [user!.id],
         fields: {
           ...(rewardValues.fields as object | undefined | null),
-          hasKyc: true
+          workflowId: workflow.id
         }
       });
     }
@@ -318,7 +330,10 @@ export function NewRewardPage({
                             }}
                             onChange={(properties: RewardPropertiesField) => {
                               setRewardValues({
-                                fields: { properties: properties ? { ...properties } : {} } as Prisma.JsonValue
+                                fields: {
+                                  ...((rewardValues.fields as RewardFields) ?? {}),
+                                  properties: properties ? { ...properties } : {}
+                                } as Prisma.JsonValue
                               });
                             }}
                           />
@@ -389,9 +404,7 @@ export function NewRewardPage({
           templateId={pageData.sourceTemplateId}
           isUnpublishedReward
           rewardInput={rewardValues}
-          onChangeReward={(updates) => {
-            setRewardValues(updates);
-          }}
+          onChangeReward={setRewardValues}
         />
       </DocumentColumnLayout>
     </Box>

@@ -20,9 +20,11 @@ const RowStack = styled(Stack)`
 export function SubmitStepSettings({
   rewardInput,
   readOnly,
-  onChange
-}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
-  const isAssignedReward = !!rewardInput?.assignedSubmitters;
+  onChange,
+  isTemplate,
+  workflowId
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'isTemplate' | 'workflowId'>) {
+  const isAssignedReward = workflowId === 'assigned' || workflowId === 'assigned_kyc';
 
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
     onChange({
@@ -123,12 +125,17 @@ export function SubmitStepSettings({
         <Box>
           <FieldLabel>Assigned applicants</FieldLabel>
           <UserSelect
-            memberIds={rewardInput.assignedSubmitters ?? []}
+            displayType='details'
+            memberIds={rewardInput?.assignedSubmitters ?? []}
             readOnly={readOnly}
             onChange={updateAssignedSubmitters}
             wrapColumn
             showEmptyPlaceholder
-            error={!rewardInput.assignedSubmitters?.length && !readOnly ? 'Requires at least one assignee' : undefined}
+            error={
+              !rewardInput?.assignedSubmitters?.length && !readOnly && !isTemplate
+                ? 'Requires at least one assignee'
+                : undefined
+            }
           />
         </Box>
       )}

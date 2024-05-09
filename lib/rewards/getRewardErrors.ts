@@ -70,7 +70,7 @@ export function getRewardErrors({
     // these values are not required for templates
     if (!reward.reviewers?.length) {
       errors.push('Reviewer is required');
-    } else if (reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
+    } else if (!isTemplate && reward.assignedSubmitters && reward.assignedSubmitters.length === 0) {
       errors.push('You need to assign at least one submitter');
     }
   } else if (!isProposalTemplate) {
