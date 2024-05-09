@@ -110,6 +110,11 @@ export async function applyProposalTemplate({
         proposalId
       }))
     }),
+    prisma.proposalReviewer.deleteMany({
+      where: {
+        proposalId
+      }
+    }),
     prisma.proposalReviewer.createMany({
       data: reviewersInput
     }),
