@@ -4,6 +4,7 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalAction } from 'lib/proposals/getProposalAction';
+import { privateEvaluationSteps } from 'lib/proposals/workflows/obfuscateWorkflow';
 import type { WebhookEvent } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -32,6 +33,11 @@ export async function createProposalNotifications(webhookData: {
           id: proposalId
         },
         select: {
+          workflow: {
+            select: {
+              privateEvaluations: true
+            }
+          },
           evaluations: {
             select: {
               index: true,
@@ -105,6 +111,16 @@ export async function createProposalNotifications(webhookData: {
 
         const isAuthor = proposalAuthorIds.includes(spaceRole.userId);
         const isReviewer = proposalPermissions.evaluate;
+
+        // Only notify reviewers for hidden evaluations
+        if (
+          proposal.workflow?.privateEvaluations &&
+          !isReviewer &&
+          privateEvaluationSteps.includes(currentEvaluation.type)
+        ) {
+          continue;
+        }
+
         // New proposal permissions .vote is invalid
         const isVoter = proposalPermissions.evaluate;
         const canComment = proposalPermissions.comment && proposalPermissions.view;
