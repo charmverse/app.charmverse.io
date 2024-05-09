@@ -1,5 +1,5 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Card, Divider, FormLabel, Stack, TextField, Typography } from '@mui/material';
 
 import { useResetProposalReview, useSubmitEvaluationResult } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
@@ -110,6 +110,18 @@ export function PassFailEvaluation({
               onChange={() => {}}
             />
           </Box>
+          {requiredReviews !== 1 && (
+            <Box className='octo-propertyrow' mb={2}>
+              <Stack direction='row' justifyContent='space-between'>
+                <FormLabel>
+                  <Typography component='span' variant='subtitle1'>
+                    Required reviews
+                  </Typography>
+                </FormLabel>
+                <Typography component='span'>{requiredReviews}</Typography>
+              </Stack>
+            </Box>
+          )}
           <FormLabel>
             <Typography variant='subtitle1'>Result</Typography>
           </FormLabel>
