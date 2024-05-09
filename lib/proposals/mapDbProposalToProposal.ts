@@ -32,8 +32,12 @@ export function mapDbProposalToProposal({
   proposal,
   permissions,
   permissionsByStep,
-  proposalEvaluationReviews
+  proposalEvaluationReviews,
+  workflow
 }: {
+  workflow: {
+    evaluations: WorkflowEvaluationJson[];
+  } | null;
   proposalEvaluationReviews?: ProposalEvaluationReview[];
   proposal: Proposal &
     FormFieldsIncludeType & {
@@ -70,6 +74,9 @@ export function mapDbProposalToProposal({
     : null;
 
   const mappedEvaluations = proposal.evaluations.map((evaluation) => {
+    const workflowEvaluation = workflow?.evaluations.find(
+      (e) => e.title === evaluation.title && e.type === evaluation.type
+    );
     const reviews = proposalEvaluationReviews?.filter((review) => review.evaluationId === evaluation.id);
     const stepPermissions = permissionsByStep?.[evaluation.id];
     if (!stepPermissions?.evaluate) {
@@ -79,6 +86,7 @@ export function mapDbProposalToProposal({
     return {
       ...evaluation,
       reviews,
+      declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
       isReviewer: !!stepPermissions?.evaluate
     } as unknown as PopulatedEvaluation;
   });
