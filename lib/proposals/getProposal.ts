@@ -1,6 +1,5 @@
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getProposalOrApplicationCredentials } from 'lib/credentials/getProposalOrApplicationCredentials';
@@ -61,17 +60,6 @@ export async function getProposal({
     }
   });
 
-  const workflow = proposal.workflowId
-    ? await prisma.proposalWorkflow.findFirst({
-        where: {
-          id: proposal.workflowId
-        },
-        select: {
-          evaluations: true
-        }
-      })
-    : null;
-
   const templates = await prisma.credentialTemplate.findMany({
     where: {
       spaceId: proposal.spaceId,
@@ -114,11 +102,6 @@ export async function getProposal({
 
   return mapDbProposalToProposal({
     proposalEvaluationReviews,
-    workflow: workflow
-      ? {
-          evaluations: workflow.evaluations as WorkflowEvaluationJson[]
-        }
-      : null,
     proposal: { ...proposal, issuedCredentials: credentials },
     permissions: currentPermissions,
     permissionsByStep

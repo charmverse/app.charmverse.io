@@ -1,6 +1,6 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Typography, FormLabel } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Typography, FormLabel, TextField } from '@mui/material';
+import { useEffect } from 'react';
 
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -89,6 +89,31 @@ export function EvaluationStepSettings({
           required
         />
       </Box>
+      {evaluation.type === 'pass_fail' && (
+        <Box className='octo-propertyrow'>
+          <FormLabel>
+            <Typography component='span' variant='subtitle1'>
+              Required reviews
+            </Typography>
+          </FormLabel>
+          <TextField
+            disabled={!!evaluation.result}
+            type='number'
+            InputProps={{
+              inputProps: {
+                min: 1
+              }
+            }}
+            onChange={(e) => {
+              onChange({
+                requiredReviews: Math.max(1, Number(e.target.value))
+              });
+            }}
+            fullWidth
+            value={requiredReviews}
+          />
+        </Box>
+      )}
       {evaluation.type === 'rubric' && (
         <>
           <FormLabel required>

@@ -63,8 +63,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     evaluationId,
     result,
     decidedBy: userId,
-    spaceId: evaluation.proposal.spaceId,
-    workflowId: evaluation.proposal.workflowId!
+    spaceId: evaluation.proposal.spaceId
   });
 
   return res.status(200).end();

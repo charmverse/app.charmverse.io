@@ -1,6 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
 import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -19,28 +18,14 @@ export async function submitEvaluationResult({
   decidedBy,
   evaluationId,
   proposalId,
-  workflowId,
   result,
   spaceId,
   evaluation
 }: ReviewEvaluationRequest & {
   spaceId: string;
-  workflowId: string;
-  evaluation: { type: string; title: string };
+  evaluation: { type: string; title: string; requiredReviews: number };
 }) {
-  const workflow = await prisma.proposalWorkflow.findUniqueOrThrow({
-    where: {
-      id: workflowId
-    },
-    select: {
-      evaluations: true
-    }
-  });
-
-  const workflowEvaluation = (workflow.evaluations as WorkflowEvaluationJson[]).find(
-    (e) => e.type === evaluation.type && e.title === evaluation.title
-  );
-  const requiredReviews = workflowEvaluation?.requiredReviews ?? 1;
+  const requiredReviews = evaluation.requiredReviews;
   const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
     where: {
       evaluationId
