@@ -195,11 +195,6 @@ function StepRequiredReviews({
       <FieldLabel>Required reviews</FieldLabel>
       <TextField
         type='number'
-        InputProps={{
-          inputProps: {
-            min: 1
-          }
-        }}
         onChange={(e) => {
           setValue('requiredReviews', Math.max(1, Number(e.target.value)));
         }}

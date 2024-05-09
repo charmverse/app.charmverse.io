@@ -7,7 +7,6 @@ import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { RubricCriteriaTyped } from 'lib/proposals/rubric/interfaces';
-import { prettyPrint } from 'lib/utils/strings';
 
 import type { ProposalEvaluationInput } from './createProposal';
 import { createProposal } from './createProposal';
@@ -80,8 +79,6 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
   const authorsFromTemplate = template?.proposal?.authors.map(({ userId }) => userId) || [];
   const authors: string[] =
     input.pageType === 'proposal_template' ? [] : [...new Set([input.createdBy].concat(authorsFromTemplate))];
-
-  prettyPrint(template?.proposal?.evaluations);
 
   const evaluations: ProposalEvaluationInput[] =
     template?.proposal?.evaluations.map((evaluation) => ({

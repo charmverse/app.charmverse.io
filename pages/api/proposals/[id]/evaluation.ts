@@ -4,7 +4,6 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
-import { updatePassFailEvaluationResultIfRequired } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
 import { updateProposalEvaluation } from 'lib/proposals/updateProposalEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -73,22 +72,15 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw new ActionNotPermittedError('Cannot change the number of required reviews for a completed evaluation');
   }
 
-  await updatePassFailEvaluationResultIfRequired({
-    currentEvaluationType: currentEvaluation?.type,
-    evaluationId,
-    proposalId,
-    requiredReviews,
-    spaceId: proposal.spaceId,
-    userId
-  });
-
   await updateProposalEvaluation({
+    currentEvaluationType: currentEvaluation?.type,
     proposalId: proposal.id,
     evaluationId,
     voteSettings: req.body.voteSettings,
     reviewers,
     actorId: userId,
-    requiredReviews
+    requiredReviews,
+    spaceId: proposal.spaceId
   });
 
   return res.status(200).end();

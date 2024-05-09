@@ -33,6 +33,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
             prev
               ? {
                   ...prev,
+                  currentEvaluationId: match.currentStep?.id,
                   archived: match.archived ?? prev.archived,
                   status: match.currentStep ? (match.currentStep.step === 'draft' ? 'draft' : 'published') : prev.status
                 }

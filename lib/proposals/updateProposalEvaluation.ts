@@ -1,8 +1,9 @@
-import type { ProposalReviewer } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interfaces';
 import { setPageUpdatedAt } from './setPageUpdatedAt';
+import { updatePassFailEvaluationResultIfRequired } from './updatePassFailEvaluationResultIfRequired';
 
 export type UpdateEvaluationRequest = {
   proposalId: string;
@@ -10,15 +11,19 @@ export type UpdateEvaluationRequest = {
   voteSettings?: VoteSettings | null;
   requiredReviews?: number;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
+  currentEvaluationType?: ProposalEvaluationType;
+  spaceId: string;
 };
 
 export async function updateProposalEvaluation({
   proposalId,
+  spaceId,
   evaluationId,
   voteSettings,
   reviewers,
   actorId,
-  requiredReviews
+  requiredReviews,
+  currentEvaluationType
 }: UpdateEvaluationRequest & { actorId: string }) {
   await prisma.$transaction(async (tx) => {
     // update reviewers only when it is present in request payload
@@ -58,6 +63,17 @@ export async function updateProposalEvaluation({
       });
     }
   });
+
+  if (requiredReviews) {
+    await updatePassFailEvaluationResultIfRequired({
+      currentEvaluationType,
+      evaluationId,
+      proposalId,
+      requiredReviews,
+      spaceId,
+      userId: actorId
+    });
+  }
 
   await setPageUpdatedAt({ proposalId, userId: actorId });
 }

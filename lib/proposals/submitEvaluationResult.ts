@@ -2,7 +2,6 @@ import type { ProposalEvaluationResult, ProposalEvaluationType } from '@charmver
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
-import { ActionNotPermittedError } from 'lib/middleware';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
@@ -16,50 +15,13 @@ export type ReviewEvaluationRequest = {
   declineReasons?: string[];
 };
 
-export async function updatePassFailEvaluationResultIfRequired({
-  currentEvaluationType,
-  evaluationId,
-  proposalId,
-  requiredReviews,
-  spaceId,
-  userId
-}: {
-  evaluationId: string;
-  proposalId: string;
-  requiredReviews?: number;
-  userId: string;
-  spaceId: string;
-  currentEvaluationType?: ProposalEvaluationType;
-}) {
-  if (currentEvaluationType === 'pass_fail') {
-    const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
-      where: {
-        evaluationId
-      },
-      select: {
-        result: true
-      }
-    });
-
-    if (existingEvaluationReviews.length === requiredReviews) {
-      await updateEvaluationResult({
-        decidedBy: userId,
-        evaluationId,
-        existingEvaluationReviews,
-        proposalId,
-        spaceId
-      });
-    }
-  }
-}
-
-async function updateEvaluationResult({
+export async function updateEvaluationResult({
   decidedBy,
   evaluationId,
-  existingEvaluationReviews,
   proposalId,
   result,
-  spaceId
+  spaceId,
+  existingEvaluationReviews
 }: {
   decidedBy: string;
   proposalId: string;
@@ -114,24 +76,18 @@ export async function submitEvaluationResult({
   declineReasons
 }: Omit<ReviewEvaluationRequest, 'evaluationId'> & {
   spaceId: string;
-  evaluation: { id: string; type: ProposalEvaluationType; title: string; requiredReviews: number };
+  evaluation: {
+    id: string;
+    type: ProposalEvaluationType;
+    title: string;
+    requiredReviews: number;
+    proposalEvaluationReviews: {
+      result: ProposalEvaluationResult;
+    }[];
+  };
 }) {
   const evaluationId = evaluation.id;
   const requiredReviews = evaluation.requiredReviews;
-  const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
-    where: {
-      evaluationId
-    },
-    select: {
-      result: true,
-      reviewerId: true
-    }
-  });
-
-  const hasCurrentReviewerReviewed = existingEvaluationReviews.some((r) => r.reviewerId === decidedBy);
-  if (hasCurrentReviewerReviewed) {
-    throw new ActionNotPermittedError('You have already reviewed this evaluation');
-  }
 
   if (evaluation.type === 'pass_fail') {
     await prisma.proposalEvaluationReview.create({
@@ -144,14 +100,14 @@ export async function submitEvaluationResult({
     });
   }
 
-  if (existingEvaluationReviews.length + 1 === requiredReviews) {
+  if (evaluation.proposalEvaluationReviews.length + 1 >= requiredReviews) {
     await updateEvaluationResult({
       decidedBy,
       proposalId,
       evaluationId,
       result,
-      existingEvaluationReviews,
-      spaceId
+      spaceId,
+      existingEvaluationReviews: evaluation.proposalEvaluationReviews
     });
   }
 }

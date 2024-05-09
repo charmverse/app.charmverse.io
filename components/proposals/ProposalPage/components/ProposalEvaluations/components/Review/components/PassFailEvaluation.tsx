@@ -83,8 +83,6 @@ export function PassFailEvaluation({
     evaluationReviews.length < requiredReviews &&
     !evaluation.result &&
     !currentUserEvaluationReview;
-  const totalPassed = evaluationReviews.filter((r) => r.result === 'pass').length;
-  const totalFailed = evaluationReviews.filter((r) => r.result === 'fail').length;
 
   async function onSubmitReview(result: NonNullable<PopulatedEvaluation['result']>) {
     if (confirmationMessage) {
@@ -126,93 +124,58 @@ export function PassFailEvaluation({
               onChange={() => {}}
             />
           </Box>
-          {requiredReviews !== 1 && (
-            <Box className='octo-propertyrow' mb={2}>
-              <Stack direction='row' justifyContent='space-between'>
-                <FormLabel>
-                  <Typography component='span' variant='subtitle1'>
-                    Required reviews
-                  </Typography>
-                </FormLabel>
-                <Typography component='span'>{requiredReviews}</Typography>
-              </Stack>
-            </Box>
-          )}
           <FormLabel>
-            <Typography variant='subtitle1'>Result</Typography>
+            <Typography variant='subtitle1'>
+              Result{requiredReviews !== 1 ? ` (required ${requiredReviews})` : ''}
+            </Typography>
           </FormLabel>
         </>
       )}
       <Card variant='outlined'>
-        {evaluationReviews.length > 0 && (
-          <>
-            <Stack p={2} gap={2.5}>
-              {evaluationReviews.map((evaluationReview, index) => (
-                <Stack key={evaluationReview.id} gap={1}>
-                  <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                    <Stack direction='row' gap={1} alignItems='center'>
-                      <Typography variant='body2'>{index + 1}.</Typography>
-                      <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
-                      <Typography variant='subtitle1'>
-                        {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
-                      </Typography>
-                    </Stack>
-                    <Stack direction='row' gap={1.5} alignItems='center'>
-                      {evaluationReview.reviewerId === user?.id && !evaluation.result && (
-                        <Button
-                          size='small'
-                          color='secondary'
-                          variant='outlined'
-                          loading={isResettingProposalReview}
-                          onClick={() => {
-                            resetProposalReview({
-                              evaluationId: evaluation.id
-                            }).then(refreshProposal);
-                          }}
-                        >
-                          Reset
-                        </Button>
-                      )}
-                      {evaluationReview.result === 'pass' ? (
-                        <ApprovedIcon fontSize='small' color='success' />
-                      ) : (
-                        <RejectedIcon fontSize='small' color='error' />
-                      )}
-                    </Stack>
+        {requiredReviews !== 1 && evaluationReviews.length > 0 && (
+          <Stack p={2} gap={2.5}>
+            {evaluationReviews.map((evaluationReview) => (
+              <Stack key={evaluationReview.id} gap={1}>
+                <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                  <Stack direction='row' gap={1} alignItems='center'>
+                    <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
+                    <Typography variant='subtitle1'>
+                      {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
+                    </Typography>
                   </Stack>
-                  {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
-                    <Stack flexDirection='row' gap={1.5}>
-                      {evaluationReview.declineReasons.map((reason) => (
-                        <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
-                      ))}
-                    </Stack>
-                  ) : null}
+                  <Stack direction='row' gap={1.5} alignItems='center'>
+                    {evaluationReview.reviewerId === user?.id && !evaluation.result && (
+                      <Button
+                        size='small'
+                        color='secondary'
+                        variant='outlined'
+                        loading={isResettingProposalReview}
+                        onClick={() => {
+                          resetProposalReview({
+                            evaluationId: evaluation.id
+                          }).then(refreshProposal);
+                        }}
+                      >
+                        Reset
+                      </Button>
+                    )}
+                    {evaluationReview.result === 'pass' ? (
+                      <ApprovedIcon fontSize='small' color='success' />
+                    ) : (
+                      <RejectedIcon fontSize='small' color='error' />
+                    )}
+                  </Stack>
                 </Stack>
-              ))}
-              <Divider />
-              <Stack direction='row' gap={1}>
-                <Typography variant='body2'>
-                  Requires:{' '}
-                  <Typography variant='body2' fontWeight='bold' component='span' color='secondary'>
-                    {requiredReviews}
-                  </Typography>
-                </Typography>
-                <Typography variant='body2'>
-                  {actionLabels.approve}:{' '}
-                  <Typography variant='body2' fontWeight='bold' component='span' color='success.main'>
-                    {totalPassed}
-                  </Typography>
-                </Typography>
-                <Typography variant='body2'>
-                  {actionLabels.reject}:{' '}
-                  <Typography variant='body2' component='span' fontWeight='bold' color='error'>
-                    {totalFailed}
-                  </Typography>
-                </Typography>
+                {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
+                  <Stack flexDirection='row' gap={1.5}>
+                    {evaluationReview.declineReasons.map((reason) => (
+                      <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
+                    ))}
+                  </Stack>
+                ) : null}
               </Stack>
-            </Stack>
-            {(canReview || !!evaluation.result) && <Divider sx={{ mx: 2 }} />}
-          </>
+            ))}
+          </Stack>
         )}
         {canReview && (
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>

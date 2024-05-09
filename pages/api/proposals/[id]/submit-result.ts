@@ -30,6 +30,12 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
       id: evaluationId
     },
     include: {
+      proposalEvaluationReviews: {
+        select: {
+          result: true,
+          reviewerId: true
+        }
+      },
       proposal: {
         select: {
           workflowId: true,
@@ -55,6 +61,11 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   if (evaluation.result === result) {
     log.debug('Evaluation result is the same', { proposalId, evaluationId, result });
     return res.status(200).end();
+  }
+
+  const hasCurrentReviewerReviewed = evaluation.proposalEvaluationReviews.some((r) => r.reviewerId === userId);
+  if (hasCurrentReviewerReviewed) {
+    throw new ActionNotPermittedError('You have already reviewed this evaluation');
   }
 
   await submitEvaluationResult({

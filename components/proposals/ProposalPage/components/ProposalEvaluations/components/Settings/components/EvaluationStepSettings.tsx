@@ -50,7 +50,7 @@ export function EvaluationStepSettings({
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
   }));
   const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
-  const requiredReviews = evaluation.requiredReviews ?? 1;
+  const requiredReviews = evaluation.requiredReviews;
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers.map((r) => ({
@@ -74,7 +74,7 @@ export function EvaluationStepSettings({
           {evaluation.type === 'vote'
             ? 'Voters'
             : requiredReviews !== 1
-            ? `Reviewers (required. ${requiredReviews})`
+            ? `Reviewers (required ${requiredReviews})`
             : 'Reviewers'}
         </Typography>
       </FormLabel>
@@ -98,13 +98,9 @@ export function EvaluationStepSettings({
             </Typography>
           </FormLabel>
           <TextField
+            placeholder='1'
             disabled={readOnlyRequireReviews}
             type='number'
-            InputProps={{
-              inputProps: {
-                min: 1
-              }
-            }}
             onChange={(e) => {
               onChange({
                 requiredReviews: Math.max(1, Number(e.target.value))
