@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
+import { updateEvaluationResult } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
 import { updateProposalEvaluation } from 'lib/proposals/updateProposalEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
@@ -28,6 +29,7 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
       evaluations: {
         select: {
           id: true,
+          type: true,
           result: true,
           requiredReviews: true
         }
@@ -69,6 +71,27 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   const currentEvaluation = proposal.evaluations.find((e) => e.id === evaluationId);
   if (currentEvaluation?.requiredReviews !== requiredReviews && !!currentEvaluation?.result) {
     throw new ActionNotPermittedError('Cannot change the number of required reviews for a completed evaluation');
+  }
+
+  if (currentEvaluation?.type === 'pass_fail') {
+    const existingEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId
+      },
+      select: {
+        result: true
+      }
+    });
+
+    if (existingEvaluationReviews.length === requiredReviews) {
+      await updateEvaluationResult({
+        decidedBy: userId,
+        evaluationId,
+        existingEvaluationReviews,
+        proposalId,
+        spaceId: proposal.spaceId
+      });
+    }
   }
 
   await updateProposalEvaluation({
