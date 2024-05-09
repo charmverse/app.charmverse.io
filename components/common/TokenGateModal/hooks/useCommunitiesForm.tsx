@@ -66,7 +66,7 @@ const schema = yup.object({
               functionName: 'hatSupply',
               args: [hatId]
             });
-            return supply >= 1;
+            return supply >= 0;
           } catch (err) {
             return false;
           }
