@@ -110,7 +110,7 @@ function getFunctionInput({
 }): GetProposalErrorsInput {
   return {
     isDraft: false,
-    proposalType: 'free_form',
+    contentType: 'free_form',
     requireTemplates: false,
     proposal: {
       ...proposal,

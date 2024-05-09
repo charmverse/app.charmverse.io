@@ -1,11 +1,11 @@
-import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma-client';
 
-import type { FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
+import type { FieldAnswerInput, FormFieldValue, LongTextValue } from 'lib/forms/interfaces';
 
 import type { IPropertyTemplate } from '../board';
 
 export type FormFieldData = Pick<FormField, 'id' | 'type' | 'private'>;
-export type FormAnswerData = Pick<FormFieldAnswer, 'value' | 'fieldId'>;
+export type FormAnswerData = Pick<FieldAnswerInput, 'value' | 'fieldId'>;
 
 type PropertiesMap = Record<string, FormFieldValue>;
 

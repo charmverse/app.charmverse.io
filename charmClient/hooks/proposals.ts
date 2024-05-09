@@ -1,4 +1,3 @@
-import type { FormFieldAnswer } from '@charmverse/core/prisma-client';
 import type { ListProposalsRequest } from '@charmverse/core/proposals';
 
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -131,7 +130,7 @@ export function useUpdateProposalFormFields({ proposalId }: { proposalId: string
 }
 
 export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
-  return useGET<FormFieldAnswer[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
+  return useGET<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
 }
 
 export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
@@ -142,6 +141,10 @@ export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: 
 
 export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ snapshotProposalId: string | null; evaluationId: string }>(`/api/proposals/${proposalId}/snapshot`);
+}
+
+export function useUpdateTemplate({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{ id: string | null }>(`/api/proposals/${proposalId}/template`);
 }
 
 export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {

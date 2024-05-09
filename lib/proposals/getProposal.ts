@@ -60,20 +60,6 @@ export async function getProposal({
     }
   });
 
-  const templates = await prisma.credentialTemplate.findMany({
-    where: {
-      spaceId: proposal.spaceId,
-      id: {
-        in: proposal.selectedCredentialTemplates
-      }
-    },
-    select: {
-      id: true
-    }
-  });
-
-  proposal.selectedCredentialTemplates = templates.map((t) => t.id);
-
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
 
   const currentPermissions =

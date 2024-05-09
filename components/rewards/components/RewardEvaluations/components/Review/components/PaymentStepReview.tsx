@@ -1,5 +1,3 @@
-import { truncate } from 'fs';
-
 import LaunchIcon from '@mui/icons-material/Launch';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import { getChainExplorerLink } from 'connectors/chains';

@@ -104,7 +104,7 @@ test.describe('Duplicate a proposal template', async () => {
     await proposalsListPage.templateContextMenu.click();
     // select Duplicate action
     await proposalsListPage.duplicateTemplateButton.click();
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await expect(proposalPage.charmEditor).toHaveText('This is a template description');
 

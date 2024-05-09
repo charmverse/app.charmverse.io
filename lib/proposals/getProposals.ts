@@ -10,7 +10,6 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { arrayUtils } from '@charmverse/core/utilities';
 import { sortBy } from 'lodash';
 
 import type {
@@ -49,7 +48,13 @@ export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selecte
   title: string;
 };
 
-export async function getProposals({ ids }: { ids: string[] }): Promise<ProposalWithUsersLite[]> {
+export async function getProposals({
+  ids,
+  spaceId
+}: {
+  ids: string[];
+  spaceId: string;
+}): Promise<ProposalWithUsersLite[]> {
   const proposals = await prisma.proposal.findMany({
     where: {
       id: {
@@ -111,11 +116,9 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
     }
   });
 
-  const spaces = await prisma.space.findMany({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
-      id: {
-        in: arrayUtils.uniqueValues(proposals.map((p) => p.spaceId))
-      }
+      id: spaceId
     },
     include: {
       credentialTemplates: {
@@ -129,7 +132,7 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
   return proposals.map((proposal) => {
     return mapDbProposalToProposalLite({
       proposal,
-      space: spaces.find((s) => s.id === proposal.spaceId) as IssuableProposalCredentialSpace
+      space: space as IssuableProposalCredentialSpace
     });
   });
 }

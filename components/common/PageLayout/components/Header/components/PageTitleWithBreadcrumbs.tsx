@@ -327,11 +327,7 @@ export function PageTitleWithBreadcrumbs({
         rewardId={router.query.rewardId as string}
       />
     );
-  } else if (
-    pageType === 'proposal' ||
-    pageType === 'proposal_template' ||
-    router.route === '/[domain]/proposals/new'
-  ) {
+  } else if (pageType === 'proposal' || pageType === 'proposal_template') {
     const sectionName = mappedFeatures.proposals.title;
     return <ProposalPageTitle basePath={`/${router.query.domain}`} sectionName={sectionName} />;
   } else if (pageType === 'proposal_notes') {

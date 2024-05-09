@@ -123,8 +123,12 @@ test.describe.serial('Proposal Evaluations', () => {
     // Configure rubric
     await proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole);
 
+    // while editing this form, the response from the api updates the state, so we need to wait for it to finish between inputs or it will override the next one with stale values
+    // TODO: find way to simplify state in the ui so it is one-directional
     await proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel);
+    await proposalPage.page.waitForTimeout(100); // let api update before continuing
     await proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription);
+    await proposalPage.page.waitForTimeout(100); // let api update before continuing
     await proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString());
     await proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString());
 
@@ -136,11 +140,14 @@ test.describe.serial('Proposal Evaluations', () => {
     await proposalPage.evaluationVoteSettings.click();
 
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
+    const apiResponse = proposalPage.page.waitForResponse('**/evaluation');
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
+    await apiResponse;
 
-    proposalPage.saveDraftButton.click();
-
-    await proposalPage.page.waitForResponse('**/api/proposals');
+    await Promise.all([
+      proposalPage.page.waitForResponse('**/api/proposals/**/publish'),
+      proposalPage.publishNewProposalButton.click()
+    ]);
 
     // Test proposal data at the database level to ensure correct persistence
     const proposal = await prisma.proposal.findFirstOrThrow({
