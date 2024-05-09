@@ -59,13 +59,13 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       notFound: true
     };
   }
-  const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
-    resourceId: space.id,
-    userId: sessionUserId
-  });
 
   // User is a member, early exit
   if (isMember) {
+    const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: space.id,
+      userId: sessionUserId
+    });
     if (!computedPermissions.createProposals) {
       log.warn('User is a member but does not have permission to create proposals', {
         userId: sessionUserId,
@@ -113,6 +113,19 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       spaceId: space.id,
       params: { proposalTemplate: template as string }
     });
+    const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: space.id,
+      userId: sessionUserId
+    });
+    if (!computedPermissions.createProposals) {
+      log.warn('User is not a member and does not have permission to create proposals', {
+        userId: sessionUserId,
+        spaceId: space.id
+      });
+      return {
+        notFound: true
+      };
+    }
     const proposal = await createDraftProposal(newDraftParams);
     return {
       redirect: {
