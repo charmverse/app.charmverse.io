@@ -71,7 +71,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       },
       onChangeTemplate: async (value: { id: string } | null) => {
         // null will remove the template
-        await applyProposalTemplate({ id: value?.id || null });
+        await applyProposalTemplate({ templateId: value?.id || null });
         await refreshProposal();
       },
       onChangeWorkflow: async ({ id }: { id: string }) => {
