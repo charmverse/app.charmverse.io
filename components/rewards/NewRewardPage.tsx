@@ -5,7 +5,7 @@ import { Box, Divider, Tab, Tabs, useMediaQuery } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useResizeObserver } from 'usehooks-ts';
 
-import { useGetRewardWorkflows, useGetRewardTemplate, useGetRewardTemplatesBySpace } from 'charmClient/hooks/rewards';
+import { useGetRewardTemplate, useGetRewardTemplatesBySpace, useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import { DocumentColumn, DocumentColumnLayout } from 'components/[pageId]/DocumentPage/components/DocumentColumnLayout';
 import { PageEditorContainer } from 'components/[pageId]/DocumentPage/components/PageEditorContainer';
 import { PageTemplateBanner } from 'components/[pageId]/DocumentPage/components/PageTemplateBanner';
@@ -28,9 +28,8 @@ import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMdScreen } from 'hooks/useMediaScreens';
 import { usePageTitle } from 'hooks/usePageTitle';
 import { usePreventReload } from 'hooks/usePreventReload';
-import { useUser } from 'hooks/useUser';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import type { RewardFields, RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
+import type { RewardFields, RewardPropertiesField, RewardPropertyValues } from 'lib/rewards/blocks/interfaces';
 import type { RewardPageProps } from 'lib/rewards/createReward';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
@@ -41,6 +40,7 @@ import { fontClassName } from 'theme/fonts';
 import { RewardEvaluations } from './components/RewardEvaluations/RewardEvaluations';
 import { CustomPropertiesAdapter } from './components/RewardProperties/CustomPropertiesAdapter';
 import { TemplateSelect } from './components/TemplateSelect';
+import type { UpdateableRewardFieldsWithType } from './hooks/useNewReward';
 import { useNewReward } from './hooks/useNewReward';
 
 const StyledContainer = styled(PageEditorContainer)`
@@ -54,8 +54,6 @@ export function NewRewardPage({
   isTemplate?: boolean;
   templateId?: string;
 }) {
-  const { user } = useUser();
-
   const { showConfirmation } = useConfirmationModal();
   const spacePermissions = useCurrentSpacePermissions();
   const { navigateToSpacePath } = useCharmRouter();
@@ -141,11 +139,11 @@ export function NewRewardPage({
     });
     const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template.fields as RewardFields);
     if (workflow) {
-      applyWorkflow(workflow);
+      applyWorkflow(workflow, template.assignedSubmitters);
     }
   }
 
-  function applyWorkflow(workflow: RewardWorkflow) {
+  function applyWorkflow(workflow: RewardWorkflow, assignedSubmitters?: string[] | null) {
     const updatedFields = {
       ...(rewardValues.fields as object | undefined | null),
       workflowId: workflow.id
@@ -163,19 +161,12 @@ export function NewRewardPage({
         assignedSubmitters: null,
         fields: updatedFields
       });
-    } else if (workflow.id === 'assigned') {
+    } else if (workflow.id === 'assigned' || workflow.id === 'assigned_kyc') {
       setRewardValues({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: [],
+        assignedSubmitters: assignedSubmitters ?? rewardValues.assignedSubmitters ?? [],
         allowedSubmitterRoles: [],
-        fields: updatedFields
-      });
-    } else if (workflow.id === 'assigned_kyc') {
-      setRewardValues({
-        approveSubmitters: false,
-        allowMultipleApplications: false,
-        assignedSubmitters: [],
         fields: updatedFields
       });
     }

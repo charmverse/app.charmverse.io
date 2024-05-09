@@ -1,5 +1,6 @@
 import type { Bounty, Page } from '@charmverse/core/prisma';
 
+import type { RewardFields } from './blocks/interfaces';
 import type { RewardEvaluation } from './getRewardWorkflows';
 import type { RewardType, RewardWithUsers } from './interfaces';
 
@@ -99,8 +100,14 @@ export function getEvaluationFormError(
 ): string | false {
   switch (evaluation.type) {
     case 'apply':
-    case 'submit':
       return false;
+    case 'submit': {
+      const workflowId = (reward.fields as RewardFields).workflowId;
+      if (workflowId === 'assigned' || workflowId === 'assigned_kyc') {
+        return (reward.assignedSubmitters ?? []).length !== 0 ? false : 'Applicants are required for the step';
+      }
+      return false;
+    }
     case 'application_review':
     case 'review':
       return reward.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;

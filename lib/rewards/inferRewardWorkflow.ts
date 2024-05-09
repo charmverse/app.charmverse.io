@@ -3,6 +3,6 @@ import type { RewardWorkflow } from './getRewardWorkflows';
 
 export function inferRewardWorkflow(workflows: RewardWorkflow[], rewardFields: RewardFields) {
   const workflowId = rewardFields.workflowId;
-  const assignedWorkflow = workflows.find((workflow) => workflow.id === 'assigned');
-  return workflows.find((workflow) => workflow.id === workflowId) ?? assignedWorkflow;
+  const directSubmissionWorkflow = workflows.find((workflow) => workflow.id === 'direct_submission');
+  return workflows.find((workflow) => workflow.id === workflowId) ?? directSubmissionWorkflow;
 }

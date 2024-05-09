@@ -38,14 +38,7 @@ export function useReward({ rewardId }: { rewardId: MaybeString }) {
         assignedSubmitters: null,
         fields: updatedFields
       });
-    } else if (workflow.id === 'assigned') {
-      updateReward({
-        approveSubmitters: false,
-        allowMultipleApplications: false,
-        assignedSubmitters: [],
-        fields: updatedFields
-      });
-    } else if (workflow.id === 'assigned_kyc') {
+    } else if (workflow.id === 'assigned' || workflow.id === 'assigned_kyc') {
       updateReward({
         approveSubmitters: false,
         allowMultipleApplications: false,
