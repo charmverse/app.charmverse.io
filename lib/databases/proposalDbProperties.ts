@@ -6,8 +6,6 @@ import type { Constants } from 'lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
-  DEFAULT_BOARD_BLOCK_ID,
-  DEFAULT_VIEW_BLOCK_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
   PROPOSAL_STATUS_BLOCK_ID,
   PROPOSAL_STEP_BLOCK_ID
@@ -59,7 +57,7 @@ export const proposalDbProperties: {
     type: 'proposalStatus'
   }),
   proposalStep: ({ name, options = [] } = {}) => ({
-    id: uuid(),
+    id: PROPOSAL_STEP_BLOCK_ID,
     name: name || 'Proposal Step',
     options: options.map((title) => ({
       color: 'propColorGray',
