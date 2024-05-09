@@ -146,7 +146,7 @@ function mapDbProposalToProposalLite({
 }: {
   proposal: Proposal & {
     authors: (ProposalAuthor & IssuableProposalCredentialAuthor)[];
-    evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
+    evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[]; declineReasonOptions?: string[] })[];
     rewards: { id: string }[];
     page: { id: string; title: string; updatedAt: Date; createdAt: Date; updatedBy: string } | null;
     issuedCredentials: Pick<

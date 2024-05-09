@@ -13,6 +13,7 @@ export type ReviewEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   result: ProposalEvaluationResult;
+  declineReasons?: string[];
 };
 
 export async function updatePassFailEvaluationResultIfRequired({
@@ -109,7 +110,8 @@ export async function submitEvaluationResult({
   proposalId,
   result,
   spaceId,
-  evaluation
+  evaluation,
+  declineReasons
 }: Omit<ReviewEvaluationRequest, 'evaluationId'> & {
   spaceId: string;
   evaluation: { id: string; type: ProposalEvaluationType; title: string; requiredReviews: number };
@@ -136,7 +138,8 @@ export async function submitEvaluationResult({
       data: {
         evaluationId,
         result,
-        reviewerId: decidedBy
+        reviewerId: decidedBy,
+        declineReasons
       }
     });
   }
