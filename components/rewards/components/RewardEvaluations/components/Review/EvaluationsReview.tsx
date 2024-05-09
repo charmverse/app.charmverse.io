@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPersonaInquiry, useGetSynapsSession } from 'charmClient/hooks/kyc';
-import { useGetRewardPermissions, useGetRewardWorkflows } from 'charmClient/hooks/rewards';
+import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
 import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
@@ -62,7 +62,6 @@ export function EvaluationsReview({
     currentSpace?.credentialsWallet &&
     (application?.issuableOnchainCredentials ?? []).length > 0
   );
-  const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: reward.id });
   const { data: userSynapsSession } = useGetSynapsSession(
     currentSpace?.kycOption === 'synaps' ? currentSpace?.id : null,
     application?.createdBy
@@ -76,7 +75,6 @@ export function EvaluationsReview({
     currentSpace?.kycOption,
     currentSpace?.kycOption === 'synaps' ? userSynapsSession?.status : userPersonaSession?.status
   );
-  const workPermission = rewardPermissions?.work;
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow

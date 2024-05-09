@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
-import { IconButton, Box, Stack } from '@mui/material';
+import { IconButton, Box, Stack, TextField } from '@mui/material';
 import { useCallback, useState } from 'react';
 
 import { InputSearchMemberMultiple } from 'components/common/form/InputSearchMember';
@@ -124,6 +124,65 @@ function MembersDisplay({
     <Stack flexDirection='row' flexWrap='nowrap'>
       {selectedTags}
     </Stack>
+  );
+}
+
+export function UserSelectWithoutPreview({
+  memberIds,
+  onChange,
+  readOnly,
+  defaultOpened,
+  error
+}: Pick<UserSelectProps, 'memberIds' | 'onChange' | 'readOnly' | 'defaultOpened' | 'error'>) {
+  const [isOpen, setIsOpen] = useState(defaultOpened);
+
+  const _onChange = useCallback(
+    (newMemberIds: string[]) => {
+      if (!readOnly) {
+        onChange(newMemberIds);
+      }
+    },
+    [readOnly, onChange]
+  );
+
+  return (
+    <ErrorWrapper error={error}>
+      <StyledUserPropertyContainer>
+        <InputSearchMemberMultiple
+          disableClearable
+          clearOnBlur
+          open={isOpen}
+          openOnFocus
+          disableCloseOnSelect
+          defaultValue={memberIds}
+          onClose={() => setIsOpen(false)}
+          fullWidth
+          onChange={_onChange}
+          getOptionLabel={(user) => (typeof user === 'string' ? user : user?.username)}
+          readOnly={readOnly}
+          placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
+          inputVariant='outlined'
+          forcePopupIcon={false}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              size='small'
+              value={memberIds}
+              placeholder={memberIds.length === 0 ? 'Search for a person...' : ''}
+              error={!!error}
+              InputProps={{
+                ...params.InputProps,
+                disableUnderline: true
+              }}
+              variant='outlined'
+            />
+          )}
+          renderTags={() => (
+            <MembersDisplay wrapColumn readOnly={!!readOnly} memberIds={memberIds} setMemberIds={_onChange} />
+          )}
+        />
+      </StyledUserPropertyContainer>
+    </ErrorWrapper>
   );
 }
 

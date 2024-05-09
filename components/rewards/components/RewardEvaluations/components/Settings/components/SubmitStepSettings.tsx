@@ -4,7 +4,10 @@ import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
-import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
+import {
+  UserSelect,
+  UserSelectWithoutPreview
+} from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 
@@ -124,13 +127,10 @@ export function SubmitStepSettings({
       ) : (
         <Box>
           <FieldLabel>Assigned applicants</FieldLabel>
-          <UserSelect
-            displayType='details'
+          <UserSelectWithoutPreview
             memberIds={rewardInput?.assignedSubmitters ?? []}
             readOnly={readOnly}
             onChange={updateAssignedSubmitters}
-            wrapColumn
-            showEmptyPlaceholder
             error={
               !rewardInput?.assignedSubmitters?.length && !readOnly && !isTemplate
                 ? 'Requires at least one assignee'
