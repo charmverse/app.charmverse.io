@@ -17,7 +17,8 @@ import type {
   Thread,
   Transaction,
   User,
-  Vote
+  Vote,
+  SpaceOperation
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
 import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
@@ -202,6 +203,7 @@ type CreateUserAndSpaceInput = {
   xpsEngineId?: string;
   snapshotDomain?: string;
   apiToken?: string;
+  memberSpacePermissions?: SpaceOperation[];
 };
 
 export async function generateUserAndSpace({
@@ -218,6 +220,7 @@ export async function generateUserAndSpace({
   spaceNotificationToggles,
   xpsEngineId,
   snapshotDomain,
+  memberSpacePermissions,
   apiToken
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
@@ -238,6 +241,15 @@ export async function generateUserAndSpace({
                   id: userId
                 }
               },
+              ...(memberSpacePermissions
+                ? {
+                    permittedGroups: {
+                      create: {
+                        operations: memberSpacePermissions ?? ['reviewProposals']
+                      }
+                    }
+                  }
+                : undefined),
               paidTier,
               updatedBy: userId,
               name: spaceName,

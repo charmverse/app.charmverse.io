@@ -14,8 +14,12 @@ let space: Space;
 let authorCookie: string;
 
 beforeAll(async () => {
-  const generated1 = await generateUserAndSpace(undefined);
-  const generated2 = await generateUserAndSpace(undefined);
+  const generated1 = await generateUserAndSpace({
+    memberSpacePermissions: ['createProposals']
+  });
+  const generated2 = await generateUserAndSpace({
+    memberSpacePermissions: ['createProposals']
+  });
   author = generated1.user;
   reviewer = generated2.user;
   space = generated1.space;
