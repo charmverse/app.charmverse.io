@@ -22,7 +22,7 @@ export function VisibilityIcon({
   }
 
   const icon = visible ? (
-    <MuiVisibilityIcon fontSize={size} onClick={handleClick} />
+    <MuiVisibilityIcon color='gray' fontSize={size} onClick={handleClick} />
   ) : (
     <VisibilityOffIcon color='gray' fontSize={size} onClick={handleClick} />
   );

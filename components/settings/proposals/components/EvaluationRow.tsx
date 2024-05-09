@@ -1,9 +1,11 @@
+import type { ProposalEvaluationType } from '@charmverse/core/dist/cjs/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { DragIndicator } from '@mui/icons-material';
-import { Box, Card, Typography } from '@mui/material';
+import { Box, Card, Chip, Tooltip, Typography } from '@mui/material';
 
 import { useSortable } from 'components/common/DatabaseEditor/hooks/sortable';
+import { privateEvaluationSteps } from 'lib/proposals/workflows/obfuscateWorkflow';
 
 import { evaluationIcons } from '../constants';
 
@@ -33,11 +35,13 @@ export function EvaluationRow({
   onDuplicate,
   onRename,
   onChangeOrder,
-  readOnly
+  readOnly,
+  privateEvaluationsEnabled
 }: {
   evaluation: WorkflowEvaluationJson;
   onChangeOrder: (selectedId: WorkflowEvaluationJson, targetId: WorkflowEvaluationJson) => void;
   readOnly: boolean;
+  privateEvaluationsEnabled: boolean;
 } & ContextMenuProps) {
   const [, , draggableRef, draggableStyle] = useSortable('evaluation_row', evaluation, !readOnly, onChangeOrder);
 
@@ -46,14 +50,23 @@ export function EvaluationRow({
       <Box p={1} display='flex' alignItems='center' gap={1} justifyContent='space-between'>
         {!readOnly && <DragIndicator className='show-on-hover' color='secondary' fontSize='small' />}
         {evaluationIcons[evaluation.type]()}
-        <Typography sx={{ flexGrow: 1 }}>{evaluation.title}</Typography>
-        <EvaluationContextMenu
-          evaluation={evaluation}
-          onDelete={onDelete}
-          onDuplicate={onDuplicate}
-          onRename={onRename}
-          readOnly={readOnly}
-        />
+        <Typography sx={{ flexGrow: 1 }}>{evaluation.title} </Typography>
+        <Box display='flex' gap={2} justifyContent='flex-end' alignItems='center'>
+          {privateEvaluationsEnabled &&
+            (privateEvaluationSteps.includes(evaluation.type) ||
+              evaluation.type === ('private_evaluation' as ProposalEvaluationType)) && (
+              <Tooltip title='This workflow uses private evaluations. Only proposal reviewers can view details for this step'>
+                <Chip size='small' variant='outlined' label='Private' />
+              </Tooltip>
+            )}
+          <EvaluationContextMenu
+            evaluation={evaluation}
+            onDelete={onDelete}
+            onDuplicate={onDuplicate}
+            onRename={onRename}
+            readOnly={readOnly}
+          />
+        </Box>
       </Box>
     </StyledCard>
   );

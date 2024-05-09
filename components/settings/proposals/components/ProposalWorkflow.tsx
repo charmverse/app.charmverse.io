@@ -185,15 +185,6 @@ export function ProposalWorkflowItem({
             {!isExpanded && hasUnsavedChanges && (
               <Chip variant='outlined' size='small' color='warning' label='unsaved changes' sx={{ mr: 1 }} />
             )}
-            <VisibilityIcon
-              visible={!workflow.privateEvaluations}
-              size='small'
-              hiddenTooltip='Only reviewers can see all evaluation steps'
-              visibleTooltip='All users can see all evaluation steps'
-              onClick={() => {
-                updatePrivateEvaluations(!workflow.privateEvaluations);
-              }}
-            />
             {!readOnly && (
               <span onClick={(e) => e.stopPropagation()}>
                 <Menu {...bindMenu(popupState)} onClick={popupState.close}>
@@ -210,6 +201,29 @@ export function ProposalWorkflowItem({
                           <DeleteOutlined fontSize='small' />
                         </ListItemIcon>
                         <ListItemText>Delete</ListItemText>
+                      </MenuItem>
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    title={
+                      workflow.privateEvaluations
+                        ? 'Only reviewers can see all evaluation steps'
+                        : 'All users can see all evaluation steps'
+                    }
+                  >
+                    <span>
+                      <MenuItem
+                        onClick={() => {
+                          updatePrivateEvaluations(!workflow.privateEvaluations);
+                        }}
+                        disabled={preventDelete}
+                      >
+                        <ListItemIcon>
+                          <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
+                        </ListItemIcon>
+                        <ListItemText>
+                          {workflow.privateEvaluations ? 'Show evaluations' : 'Hide evaluations'}
+                        </ListItemText>
                       </MenuItem>
                     </span>
                   </Tooltip>
@@ -238,6 +252,7 @@ export function ProposalWorkflowItem({
                     onRename={openEvaluationStep}
                     onChangeOrder={changeEvaluationStepOrder}
                     readOnly={readOnly}
+                    privateEvaluationsEnabled={!!workflow.privateEvaluations}
                   />
                 ))}
               {value === 'Permissions' &&

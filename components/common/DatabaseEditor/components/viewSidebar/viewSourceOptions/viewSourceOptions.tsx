@@ -15,6 +15,7 @@ import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/data
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
 import { webhookEndpoint } from 'config/constants';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 
@@ -49,6 +50,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     activeView,
     showView
   });
+
+  const isAdmin = useIsAdmin();
 
   const rootDatabaseId = rootBoard.id;
 
@@ -145,7 +148,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               </SourceType>
             )}
 
-            {allowedSourceOptions.includes('proposals') && (
+            {/** Only admins can create proposals as datasource, to avoid accidentally revealing proposal data */}
+            {allowedSourceOptions.includes('proposals') && isAdmin && (
               <SourceType
                 data-test='source-proposals'
                 active={activeSourceType === 'proposals'}
