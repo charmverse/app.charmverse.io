@@ -2,6 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposals/createDraftProposal';
 import { createDraftProposal } from 'lib/proposals/createDraftProposal';
 import { withSessionSsr } from 'lib/session/withSession';
@@ -61,6 +62,19 @@ export const getServerSideProps = withSessionSsr(async (context) => {
 
   // User is a member, early exit
   if (isMember) {
+    const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: space.id,
+      userId: sessionUserId
+    });
+    if (!computedPermissions.createProposals) {
+      log.warn('User is a member but does not have permission to create proposals', {
+        userId: sessionUserId,
+        spaceId: space.id
+      });
+      return {
+        notFound: true
+      };
+    }
     const proposal = await createDraftProposal(newDraftParams);
     return {
       redirect: {
@@ -99,6 +113,19 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       spaceId: space.id,
       params: { proposalTemplate: template as string }
     });
+    const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: space.id,
+      userId: sessionUserId
+    });
+    if (!computedPermissions.createProposals) {
+      log.warn('User is not a member and does not have permission to create proposals', {
+        userId: sessionUserId,
+        spaceId: space.id
+      });
+      return {
+        notFound: true
+      };
+    }
     const proposal = await createDraftProposal(newDraftParams);
     return {
       redirect: {
