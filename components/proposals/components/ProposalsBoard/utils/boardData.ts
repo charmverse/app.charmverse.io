@@ -62,8 +62,9 @@ export function getDefaultBoard({
   return board;
 }
 
+// NOTE: All properties should have a static id beginning with "__" to avoid conflicts with user-defined properties
 function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: string[] }) {
-  return [
+  const properties = [
     getDefaultStepProperty({ evaluationStepTitles }),
     getDefaultStatusProperty(),
     {
@@ -79,6 +80,10 @@ function getDefaultProperties({ evaluationStepTitles }: { evaluationStepTitles: 
       type: 'updatedTime'
     }
   ];
+  if (properties.some((prop) => !prop.id.startsWith('__'))) {
+    throw new Error('All default properties should have a static id beginning with "__"');
+  }
+  return properties;
 }
 
 export function getDefaultStatusProperty() {
