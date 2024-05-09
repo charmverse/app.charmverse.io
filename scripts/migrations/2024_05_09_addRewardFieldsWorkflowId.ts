@@ -14,8 +14,8 @@ export function inferRewardWorkflowOld(
 
   const rewardFields = reward.fields as { isAssigned?: boolean; hasKyc?: boolean } | undefined | null;
 
-  if (assignedKycWorkflow && assignedWorkflow && rewardFields?.isAssigned) {
-    return rewardFields?.hasKyc ? assignedKycWorkflow : assignedWorkflow;
+  if (rewardFields?.hasKyc) {
+    return assignedKycWorkflow
   }
 
   if (reward.assignedSubmitters === null || reward.assignedSubmitters?.length === 0) {
