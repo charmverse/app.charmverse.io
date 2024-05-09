@@ -24,7 +24,7 @@ export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permission
 
 type Props = {
   evaluation: ProposalEvaluationValues;
-  evaluationTemplate?: Pick<PopulatedEvaluation, 'reviewers' | 'rubricCriteria' | 'voteSettings'>;
+  evaluationTemplate?: Pick<PopulatedEvaluation, 'reviewers' | 'rubricCriteria' | 'voteSettings' | 'requiredReviews'>;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
   isPublishedProposal?: boolean;
@@ -44,6 +44,7 @@ export function EvaluationStepSettings({
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
+  const readOnlyRequireReviews = readOnly || !!evaluationTemplate?.requiredReviews || !!evaluation.result;
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
@@ -97,7 +98,7 @@ export function EvaluationStepSettings({
             </Typography>
           </FormLabel>
           <TextField
-            disabled={!!evaluation.result}
+            disabled={readOnlyRequireReviews}
             type='number'
             InputProps={{
               inputProps: {

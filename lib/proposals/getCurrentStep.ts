@@ -10,6 +10,7 @@ export type ProposalStep = {
   result: ProposalEvaluationResultExtended;
   id: string;
   index: number;
+  requiredReviews: number;
 };
 
 export function getCurrentStep({
@@ -21,7 +22,7 @@ export function getCurrentStep({
   hasPendingCredentials
 }: {
   proposalStatus: ProposalStatus;
-  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'title' | 'type' | 'id'>[];
+  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews'>[];
   hasPublishedRewards: boolean;
   hasPendingRewards: boolean;
   credentialsEnabled: boolean;
@@ -47,7 +48,8 @@ export function getCurrentStep({
       result: !hasPendingCredentials ? ProposalEvaluationResult.pass : 'in_progress',
       id: 'credentials',
       // Add 1 with total evaluations so that draft step is also included
-      index: evaluations.length + 1
+      index: evaluations.length + 1,
+      requiredReviews: 1
     };
   }
 
@@ -58,7 +60,8 @@ export function getCurrentStep({
       result: hasPublishedRewards ? ProposalEvaluationResult.pass : 'in_progress',
       id: 'rewards',
       // Add 1 with total evaluations so that draft step is also included
-      index: evaluations.length + (credentialsEnabled ? 2 : 1)
+      index: evaluations.length + (credentialsEnabled ? 2 : 1),
+      requiredReviews: 1
     };
   }
 
@@ -68,7 +71,8 @@ export function getCurrentStep({
     result: currentEvaluation.result ?? 'in_progress',
     id: currentEvaluation.id,
     // Add 1 with total evaluations so that draft step is also included
-    index: currentEvaluation.index + 1
+    index: currentEvaluation.index + 1,
+    requiredReviews: currentEvaluation.requiredReviews
   };
 }
 
@@ -78,6 +82,7 @@ export function getDraftStep(): ProposalStep {
     step: 'draft' as ProposalEvaluationStep,
     result: 'in_progress',
     id: 'draft',
-    index: 0
+    index: 0,
+    requiredReviews: 1
   };
 }
