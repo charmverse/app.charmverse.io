@@ -575,6 +575,7 @@ function DocumentPageComponent({
           <ProposalStickyFooter
             page={page}
             proposal={proposal}
+            refreshProposal={refreshProposal}
             formAnswers={proposalFormFieldAnswers}
             isStructuredProposal={isStructuredProposal}
           />
