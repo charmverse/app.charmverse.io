@@ -29,7 +29,7 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
 
   const proposal: ProposalWithUsersLite = {
     authors: [],
-    currentStep: { title: '', step: 'draft', id: '', index: 0, result: 'in_progress' },
+    currentStep: { title: '', step: 'draft', id: '', index: 0, result: 'in_progress', requiredReviews: 1 },
     reviewers: [],
     evaluations: [],
     id: '',

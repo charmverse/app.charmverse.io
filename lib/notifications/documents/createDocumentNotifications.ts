@@ -214,7 +214,8 @@ export async function createDocumentNotifications(webhookData: {
         }
       });
 
-      const notificationTargetUserIds = data.document.authors.map((author) => author.id);
+      const notificationTargetUserIds =
+        threadAccessGroups.length === 0 ? data.document.authors.map((author) => author.id) : [];
 
       // Get all the users that have access to the thread
       for (const threadAccessGroup of threadAccessGroups) {
@@ -251,11 +252,6 @@ export async function createDocumentNotifications(webhookData: {
         ids.push(id);
         notificationSentUserIds.add(previousInlineComment.userId);
       }
-
-      const permissionsClient = await getPermissionsClient({
-        resourceId: webhookData.spaceId,
-        resourceIdType: 'space'
-      });
 
       for (const userId of new Set(notificationTargetUserIds)) {
         if (

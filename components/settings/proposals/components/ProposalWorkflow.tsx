@@ -249,7 +249,7 @@ export function ProposalWorkflowItem({
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
-                    onRename={openEvaluationStep}
+                    onEdit={openEvaluationStep}
                     onChangeOrder={changeEvaluationStepOrder}
                     readOnly={readOnly}
                     privateEvaluationsEnabled={!!workflow.privateEvaluations}
@@ -263,7 +263,7 @@ export function ProposalWorkflowItem({
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
-                    onRename={openEvaluationStep}
+                    onEdit={openEvaluationStep}
                     onChange={updateEvaluationStep}
                     readOnly={readOnly}
                   />

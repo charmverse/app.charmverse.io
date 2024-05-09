@@ -59,14 +59,14 @@ const schema = yup.object({
         .test('isHat', 'Invalid hat id', async (value, context) => {
           try {
             const hatId = BigInt(value);
-            const supply = await readContract(wagmiConfig, {
+            const isActive = await readContract(wagmiConfig, {
               address: hatsProtocolContractAddress,
               chainId: Number(context.parent.chain),
               abi: hatsProtocolAbi,
-              functionName: 'hatSupply',
+              functionName: 'isActive',
               args: [hatId]
             });
-            return supply >= 1;
+            return isActive;
           } catch (err) {
             return false;
           }

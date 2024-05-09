@@ -2,8 +2,19 @@ import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
-import { Box, ListItemIcon, ListItemText, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import { useEffect } from 'react';
+import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import {
+  Box,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+  Typography
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
 import { useForm, Controller } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
@@ -42,6 +53,8 @@ export const schema = yup.object({
       reject: yup.string().optional()
     })
     .nullable(),
+  requiredReviews: yup.number().optional(),
+  declineReasons: yup.array().of(yup.string().required()).nullable(),
   permissions: yup
     .array()
     .of(
@@ -105,6 +118,93 @@ function StepActionButtonLabel({
   ) : null;
 }
 
+function StepFailReasonSelect({
+  setValue,
+  declineReasons
+}: {
+  declineReasons: string[];
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  const [declineReason, setDeclineReason] = useState('');
+  const isDuplicate = declineReasons.includes(declineReason);
+
+  function addDeclineReason() {
+    setValue('declineReasons', [...declineReasons, declineReason.trim()]);
+    setDeclineReason('');
+  }
+
+  return (
+    <Box className='octo-propertyrow'>
+      <FieldLabel>Decline reasons</FieldLabel>
+      <Stack direction='row' gap={1} mb={1.5} alignItems='center'>
+        <TextField
+          value={declineReason}
+          placeholder='Add a decline reason'
+          variant='outlined'
+          sx={{ flexGrow: 1 }}
+          onChange={(e) => {
+            setDeclineReason(e.target.value);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              addDeclineReason();
+            }
+          }}
+        />
+        <Button
+          variant='outlined'
+          disabledTooltip={isDuplicate ? 'This decline reason already exists' : ''}
+          disabled={isDuplicate || declineReason.length === 0}
+          onClick={addDeclineReason}
+        >
+          Add
+        </Button>
+      </Stack>
+      <Stack gap={0.5}>
+        {declineReasons.length === 0 && <Typography color='textSecondary'>No decline reasons added</Typography>}
+        {declineReasons.map((reason) => (
+          <Stack key={reason} direction='row' gap={1} justifyContent='space-between' alignItems='center'>
+            <Typography variant='body2'>{reason}</Typography>
+            <IconButton
+              size='small'
+              onClick={() => {
+                setValue(
+                  'declineReasons',
+                  declineReasons.filter((_reason) => reason !== _reason)
+                );
+              }}
+            >
+              <DeleteIcon color='error' fontSize='small' />
+            </IconButton>
+          </Stack>
+        ))}
+      </Stack>
+    </Box>
+  );
+}
+
+function StepRequiredReviews({
+  setValue,
+  requiredReviews
+}: {
+  requiredReviews: WorkflowEvaluationJson['requiredReviews'];
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  return (
+    <Box className='octo-propertyrow'>
+      <FieldLabel>Required reviews</FieldLabel>
+      <TextField
+        type='number'
+        onChange={(e) => {
+          setValue('requiredReviews', Math.max(1, Number(e.target.value)));
+        }}
+        fullWidth
+        value={requiredReviews}
+      />
+    </Box>
+  );
+}
+
 export function EvaluationDialog({
   evaluation,
   isFirstEvaluation,
@@ -125,7 +225,7 @@ export function EvaluationDialog({
     formState: { isValid }
   } = useForm<FormValues>({});
 
-  const dialogTitle = evaluation?.id ? 'Rename evaluation' : evaluation ? 'New evaluation step' : '';
+  const dialogTitle = evaluation?.id ? 'Edit evaluation' : evaluation ? 'New evaluation step' : '';
 
   const formValues = watch();
 
@@ -139,7 +239,9 @@ export function EvaluationDialog({
       title: evaluation?.title,
       type: evaluation?.type,
       permissions: evaluation?.permissions ?? [],
-      actionLabels: evaluation?.actionLabels
+      actionLabels: evaluation?.actionLabels,
+      requiredReviews: evaluation?.requiredReviews ?? 1,
+      declineReasons: evaluation?.declineReasons ?? []
     });
   }, [evaluation?.id]);
 
@@ -153,6 +255,7 @@ export function EvaluationDialog({
   }
 
   const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
+  const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
 
   return (
     <Dialog
@@ -203,7 +306,15 @@ export function EvaluationDialog({
           />
         </div>
         {evaluation?.id && (
-          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+          <>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && (
+              <>
+                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+              </>
+            )}
+          </>
         )}
         {!evaluation?.id && (
           <>
@@ -244,6 +355,12 @@ export function EvaluationDialog({
               />
             </div>
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && (
+              <>
+                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+              </>
+            )}
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (
