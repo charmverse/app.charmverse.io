@@ -108,15 +108,6 @@ export const getServerSideProps = withSessionSsr(async (context) => {
   }
 
   try {
-    if (!computedPermissions.createProposals) {
-      log.warn('User is not a member and does not have permission to create proposals', {
-        userId: sessionUserId,
-        spaceId: space.id
-      });
-      return {
-        notFound: true
-      };
-    }
     await customConditionJoinSpace({
       userId: sessionUserId,
       spaceId: space.id,
