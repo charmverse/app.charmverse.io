@@ -91,7 +91,16 @@ export function ProposalsHeaderRowsMenu({
 
     proposalIds.forEach((proposalId) => {
       const proposal = proposalsMap[proposalId];
-      if (proposal?.currentStep.step === firstProposal.currentStep.step && !proposal.archived) {
+      const proposalEvaluation = proposal?.evaluations.find(
+        (evaluation) => evaluation.id === proposal.currentEvaluationId
+      );
+
+      if (
+        proposal?.currentStep.step === firstProposal.currentStep.step &&
+        !proposal.archived &&
+        proposalEvaluation &&
+        !(proposalEvaluation?.type === 'pass_fail' && proposalEvaluation.requiredReviews > 1)
+      ) {
         proposalsData.push({
           proposalId: proposal.id,
           evaluationId: proposal.currentEvaluationId
@@ -134,10 +143,19 @@ export function ProposalsHeaderRowsMenu({
     proposalIds.forEach((proposalId) => {
       const proposal = proposalsMap[proposalId];
       if (proposal && !proposal.archived) {
+        const proposalEvaluation = proposal.evaluations.find(
+          (evaluation) => evaluation.id === proposal.currentEvaluationId
+        );
         if (
           (evaluationId === 'rewards' &&
             ((proposal.fields?.pendingRewards ?? []).length > 0 || (proposal.rewardIds ?? [])?.length > 0)) ||
-          evaluationId !== 'rewards'
+          (evaluationId !== 'rewards' &&
+            proposalEvaluation &&
+            !(
+              proposalEvaluation.type === 'pass_fail' &&
+              proposalEvaluation.requiredReviews > 1 &&
+              evaluationId !== 'draft'
+            ))
         ) {
           proposalsData.push({
             proposalId: proposal.id,

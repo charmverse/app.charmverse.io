@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
@@ -19,7 +18,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, result } = req.body as ReviewEvaluationRequest;
+  const { evaluationId, result, declineReasons } = req.body as ReviewEvaluationRequest;
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
@@ -31,8 +30,15 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
       id: evaluationId
     },
     include: {
+      proposalEvaluationReviews: {
+        select: {
+          result: true,
+          reviewerId: true
+        }
+      },
       proposal: {
         select: {
+          workflowId: true,
           archived: true,
           spaceId: true
         }
@@ -57,20 +63,19 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     return res.status(200).end();
   }
 
+  const hasCurrentReviewerReviewed = evaluation.proposalEvaluationReviews.some((r) => r.reviewerId === userId);
+  if (hasCurrentReviewerReviewed) {
+    throw new ActionNotPermittedError('You have already reviewed this evaluation');
+  }
+
   await submitEvaluationResult({
+    evaluation,
     proposalId,
-    evaluationId,
     result,
     decidedBy: userId,
-    spaceId: evaluation.proposal.spaceId
+    spaceId: evaluation.proposal.spaceId,
+    declineReasons
   });
-
-  if (result === 'pass') {
-    await issueOffchainProposalCredentialsIfNecessary({
-      event: 'proposal_approved',
-      proposalId
-    });
-  }
 
   return res.status(200).end();
 }

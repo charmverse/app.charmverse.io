@@ -75,6 +75,7 @@ export async function applyProposalWorkflow({
               data: reviewers
             }
           },
+          requiredReviews: evaluation.requiredReviews,
           rubricCriteria: {
             createMany: {
               data: rubricCriteria

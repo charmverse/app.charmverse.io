@@ -7,7 +7,7 @@ import { upsertRubricCriteria } from './rubric/upsertRubricCriteria';
 
 export type ApplyTemplateRequest = {
   proposalId: string;
-  templateId: string;
+  templateId: string | null;
 };
 
 export async function applyProposalTemplate({
@@ -15,6 +15,19 @@ export async function applyProposalTemplate({
   proposalId,
   templateId
 }: ApplyTemplateRequest & { actorId: string }) {
+  if (!templateId) {
+    return prisma.page.updateMany({
+      where: {
+        proposal: {
+          id: proposalId
+        }
+      },
+      data: {
+        sourceTemplateId: null
+      }
+    });
+  }
+
   const template = await prisma.proposal.findUniqueOrThrow({
     where: {
       id: templateId

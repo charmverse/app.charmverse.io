@@ -173,3 +173,9 @@ export function useGetIssuableProposalCredentials({ proposalIds }: { proposalIds
     }
   );
 }
+
+export function useResetProposalReview({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{
+    evaluationId: string;
+  }>(`/api/proposals/${proposalId}/reset-review`);
+}
