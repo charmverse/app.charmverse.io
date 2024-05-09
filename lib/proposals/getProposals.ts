@@ -38,6 +38,7 @@ export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selecte
     id: string;
     result: ProposalEvaluationResult | null;
     index: number;
+    requiredReviews: number;
   }[];
   currentStep: ProposalStep;
   templateId?: string | null;
@@ -182,7 +183,8 @@ function mapDbProposalToProposalLite({
       index: e.index,
       type: e.type,
       result: e.result,
-      id: e.id
+      id: e.id,
+      requiredReviews: e.requiredReviews
     })),
     permissions,
     currentStep: getCurrentStep({
