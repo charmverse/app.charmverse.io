@@ -149,8 +149,9 @@ export function KYCSettingsForm({ isAdmin, control }: { isAdmin: boolean; contro
                 https://app.withpersona.com/dashboard/webhooks
               </Link>
             </Typography>
+            <br />
             <Typography variant='caption'>
-              Add https://webhooks.charmverse.co/synaps-events as the webhook url
+              Add https://app.charmverse.io/api/v1/webhooks/persona as the webhook url
             </Typography>
           </Box>
           <Box>

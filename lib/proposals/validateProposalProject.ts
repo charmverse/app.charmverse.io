@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { Prisma, Project } from '@charmverse/core/prisma';
+import type { Prisma } from '@charmverse/core/prisma';
 
 import type { FormFieldInput, FormFieldValue } from 'lib/forms/interfaces';
 import { convertToProjectValues } from 'lib/projects/convertToProjectValues';
