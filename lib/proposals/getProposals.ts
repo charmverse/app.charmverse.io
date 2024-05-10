@@ -108,6 +108,11 @@ export async function getProposals({
           reviewers: true
         }
       },
+      workflow: {
+        select: {
+          privateEvaluations: true
+        }
+      },
       form: {
         include: {
           formFields: {

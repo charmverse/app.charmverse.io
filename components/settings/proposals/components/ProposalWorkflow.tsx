@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
@@ -62,6 +63,8 @@ export function ProposalWorkflowItem({
   const [hasUnsavedChanges, setUnsavedChanges] = useState(!!workflow.isNew);
   const { showMessage } = useSnackbar();
   const popupState = usePopupState({ variant: 'popover', popupId: `menu-${workflow.id}` });
+
+  const showPrivateEvaluationsOption = useIsCharmverseSpace();
 
   function duplicateWorkflow() {
     onDuplicate(workflow);
@@ -204,29 +207,31 @@ export function ProposalWorkflowItem({
                       </MenuItem>
                     </span>
                   </Tooltip>
-                  <Tooltip
-                    title={
-                      workflow.privateEvaluations
-                        ? 'Only reviewers can see all evaluation steps'
-                        : 'All users can see all evaluation steps'
-                    }
-                  >
-                    <span>
-                      <MenuItem
-                        onClick={() => {
-                          updatePrivateEvaluations(!workflow.privateEvaluations);
-                        }}
-                        disabled={preventDelete}
-                      >
-                        <ListItemIcon>
-                          <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
-                        </ListItemIcon>
-                        <ListItemText>
-                          {workflow.privateEvaluations ? 'Show evaluations' : 'Hide evaluations'}
-                        </ListItemText>
-                      </MenuItem>
-                    </span>
-                  </Tooltip>
+                  {showPrivateEvaluationsOption && (
+                    <Tooltip
+                      title={
+                        workflow.privateEvaluations
+                          ? 'Only reviewers can see all evaluation steps'
+                          : 'All users can see all evaluation steps'
+                      }
+                    >
+                      <span>
+                        <MenuItem
+                          onClick={() => {
+                            updatePrivateEvaluations(!workflow.privateEvaluations);
+                          }}
+                          disabled={preventDelete}
+                        >
+                          <ListItemIcon>
+                            <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
+                          </ListItemIcon>
+                          <ListItemText>
+                            {workflow.privateEvaluations ? 'Show evaluations' : 'Hide evaluations'}
+                          </ListItemText>
+                        </MenuItem>
+                      </span>
+                    </Tooltip>
+                  )}
                 </Menu>
                 <Box display='flex' gap={2} alignItems='center'>
                   <IconButton size='small' {...bindTrigger(popupState)}>

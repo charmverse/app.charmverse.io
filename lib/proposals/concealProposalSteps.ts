@@ -7,7 +7,9 @@ import { getAssignedRoleIds } from 'lib/roles/getAssignedRoleIds';
 
 import type { ProposalWithUsersAndRubric } from './interfaces';
 
-type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
+export type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
+  workflow?: { privateEvaluations: boolean | null };
+} & {
   evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &
     Partial<ProposalWithUsersAndRubric['evaluations'][0]>)[];
 };
@@ -27,16 +29,18 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
     return proposal;
   }
 
-  const workflow = await prisma.proposalWorkflow.findUnique({
-    where: {
-      id: proposal.workflowId
-    },
-    select: {
-      privateEvaluations: true
-    }
-  });
+  const workflow =
+    proposal.workflow ??
+    (await prisma.proposalWorkflow.findUnique({
+      where: {
+        id: proposal.workflowId
+      },
+      select: {
+        privateEvaluations: true
+      }
+    }));
 
-  if (!workflow) {
+  if (!workflow || !workflow.privateEvaluations) {
     return proposal;
   }
 
