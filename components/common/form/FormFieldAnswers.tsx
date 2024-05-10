@@ -84,7 +84,7 @@ export function FormFieldAnswers({
     async (answer: { id: string; value: FormFieldValue }) => {
       if (onSave && !disabled) {
         try {
-          // await onSave([answer]);
+          await onSave([answer]);
         } catch (e: any) {
           showMessage(e.message, 'error');
         }
