@@ -4,7 +4,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import { useEffect, useMemo, useState } from 'react';
 
 import { useGetPersonaInquiry, useGetSynapsSession } from 'charmClient/hooks/kyc';
-import { useGetRewardPermissions, useGetRewardWorkflows } from 'charmClient/hooks/rewards';
+import { useGetRewardWorkflows } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
 import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
@@ -12,6 +12,7 @@ import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/Wor
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { PageWithContent } from 'lib/pages';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getCurrentRewardEvaluation } from 'lib/rewards/getCurrentRewardEvaluation';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import { getRewardWorkflowWithApplication } from 'lib/rewards/getRewardWorkflowWithApplication';
@@ -55,13 +56,12 @@ export function EvaluationsReview({
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = inferRewardWorkflow(workflowOptions, reward);
+  const workflow = reward.fields ? inferRewardWorkflow(workflowOptions, reward.fields as RewardFields) : null;
   const hasIssuableOnchainCredentials = !!(
     currentSpace?.useOnchainCredentials &&
     currentSpace?.credentialsWallet &&
     (application?.issuableOnchainCredentials ?? []).length > 0
   );
-  const { data: rewardPermissions } = useGetRewardPermissions({ rewardId: reward.id });
   const { data: userSynapsSession } = useGetSynapsSession(
     currentSpace?.kycOption === 'synaps' ? currentSpace?.id : null,
     application?.createdBy
@@ -75,7 +75,6 @@ export function EvaluationsReview({
     currentSpace?.kycOption,
     currentSpace?.kycOption === 'synaps' ? userSynapsSession?.status : userPersonaSession?.status
   );
-  const workPermission = rewardPermissions?.work;
 
   const { currentEvaluation, updatedWorkflow } = useMemo(() => {
     const _updatedWorkflow = workflow

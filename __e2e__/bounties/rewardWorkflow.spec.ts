@@ -11,7 +11,6 @@ import { expect, test } from '../utils/test';
 test.describe.serial('Review reward applications', () => {
   let space: Space;
   let adminUser: User;
-  let spaceMember: User;
   let reward: Bounty & {
     page: Page;
   };
@@ -20,7 +19,6 @@ test.describe.serial('Review reward applications', () => {
     const { space: generatedSpace, user: generatedUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
     space = generatedSpace;
     adminUser = generatedUser;
-    spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
   });
 
   test('Create a draft reward template, change workflow to application required and publish template', async ({
@@ -105,12 +103,14 @@ test.describe.serial('Review reward applications', () => {
     await generateUserAndSpaceKyc({ spaceId: space.id, userId: adminUser.id });
 
     await rewardPage.page.goto(`${baseUrl}/${space.domain}/rewards`);
-    // await rewardPage.page.pause();
     await rewardPage.createBountyButton.click();
     await rewardPage.documentTitleInput.fill('Reward 2');
 
     await rewardPage.workflowSelect.click();
     await rewardPage.page.locator(`data-test=select-option-assigned_kyc`).click();
+    await rewardPage.page.locator('data-test=user-select-without-preview').click();
+    await rewardPage.page.locator(`data-test=user-option-${adminUser.id}`).click();
+
     await rewardPage.selectRewardReviewer(adminUser.id);
     await rewardPage.selectRewardType('custom');
     await rewardPage.customRewardInput.fill('Custom Reward');

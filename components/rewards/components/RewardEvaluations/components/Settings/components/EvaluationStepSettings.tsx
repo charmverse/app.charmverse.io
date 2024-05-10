@@ -18,6 +18,7 @@ export type EvaluationStepSettingsProps = {
   rewardInput?: UpdateableRewardFields;
   rewardTemplateInput?: RewardTemplate;
   rewardStatus?: BountyStatus | null;
+  workflowId?: string;
   rewardPublished?: boolean;
 };
 

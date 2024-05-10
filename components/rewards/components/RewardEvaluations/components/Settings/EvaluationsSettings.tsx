@@ -4,9 +4,9 @@ import { useMemo } from 'react';
 import { useGetRewardWorkflows, useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
-import { TemplateSelect } from 'components/common/WorkflowSidebar/components/TemplateSelect';
 import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
@@ -39,7 +39,7 @@ export function EvaluationsSettings({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const { data: rewardTemplate } = useGetRewardTemplate(templateId);
-  const workflow = rewardInput && inferRewardWorkflow(workflowOptions, rewardInput);
+  const workflow = rewardInput?.fields && inferRewardWorkflow(workflowOptions, rewardInput.fields as RewardFields);
   const transformedWorkflow = useMemo(() => {
     // Make sure to remove credential step if a new reward is created without any credential templates
     if (!workflow) {
@@ -89,6 +89,7 @@ export function EvaluationsSettings({
                   onChange={(updated) => {
                     onChangeReward?.(updated);
                   }}
+                  workflowId={transformedWorkflow.id}
                   rewardInput={rewardInput}
                 />
               )}
