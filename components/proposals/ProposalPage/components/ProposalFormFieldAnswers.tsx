@@ -1,5 +1,5 @@
 import type { FormField } from '@charmverse/core/prisma-client';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -56,17 +56,20 @@ export function ProposalFormFieldAnswers({
     [formFields, isLoading, proposalFormFieldAnswers]
   );
 
-  const onSave = async (answers: { id: string; value: FormFieldValue }[]) => {
-    await trigger({
-      answers: answers.map((answer) => {
-        return {
-          fieldId: answer.id,
-          value: answer.value,
-          id: proposalFormFieldAnswers.find((proposalFormFieldAnswer) => proposalFormFieldAnswer.id === answer.id)?.id
-        };
-      })
-    });
-  };
+  const onSave = useCallback(
+    async (answers: { id: string; value: FormFieldValue }[]) => {
+      await trigger({
+        answers: answers.map((answer) => {
+          return {
+            fieldId: answer.id,
+            value: answer.value,
+            id: proposalFormFieldAnswers.find((proposalFormFieldAnswer) => proposalFormFieldAnswer.id === answer.id)?.id
+          };
+        })
+      });
+    },
+    [trigger, proposalFormFieldAnswers.length]
+  );
 
   if (isLoading) {
     return <LoadingComponent />;

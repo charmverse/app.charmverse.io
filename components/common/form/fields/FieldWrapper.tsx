@@ -1,6 +1,7 @@
 import { Stack, type SxProps } from '@mui/material';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import { memo } from 'react';
 import type { ReactNode } from 'react';
 
 import { CharmEditor } from 'components/common/CharmEditor';
@@ -45,7 +46,7 @@ type ContentProps = {
 };
 
 // a wrapper for FieldWrapper with props for label and description
-export function FieldWrapper({
+function FieldWrapperComponent({
   sx,
   labelEndAdornment,
   description,
@@ -88,6 +89,8 @@ export function FieldWrapper({
     </FieldWrapperContainer>
   );
 }
+
+export const FieldWrapper = memo(FieldWrapperComponent);
 
 export function ReadonlyCharmContent({ content }: { content?: PageContent | null }) {
   if (!content || checkIsContentEmpty(content)) {

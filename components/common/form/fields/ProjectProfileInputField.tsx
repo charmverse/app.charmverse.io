@@ -1,6 +1,7 @@
 import MuiAddIcon from '@mui/icons-material/Add';
 import { Box, Divider, MenuItem, Select, Stack, Typography } from '@mui/material';
-import { useState } from 'react';
+import { debounce } from 'lodash';
+import { useCallback, useMemo, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useCreateProject, useGetProjects } from 'charmClient/hooks/projects';
@@ -14,14 +15,17 @@ import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
 
 export function ProjectProfileInputField({
-  onChange,
+  onChange: _onChange,
+  onChangeDebounced: _onChangeDebounced,
   fieldConfig,
   disabled,
   project,
   inputEndAdornment,
   proposalId,
+  formFieldId,
   formFieldValue
 }: {
+  formFieldId: string;
   formFieldValue?: { selectedMemberIds: string[] } | null;
   proposalId?: string;
   inputEndAdornment?: React.ReactNode;
@@ -29,6 +33,7 @@ export function ProjectProfileInputField({
   fieldConfig?: ProjectAndMembersFieldConfig;
   project?: ProjectWithMembers | null;
   onChange: (updatedValue: FormFieldValue) => void;
+  onChangeDebounced: (updatedValue: { id: string; value: FormFieldValue }) => void;
 }) {
   const selectedMemberIds = formFieldValue?.selectedMemberIds ?? [];
   const { trigger: updateProposal } = useUpdateProposal({
@@ -42,6 +47,12 @@ export function ProjectProfileInputField({
   const { trigger: createProject } = useCreateProject();
 
   const isTeamLead = !!selectedProject?.projectMembers.find((pm) => pm.teamLead && pm.userId === user?.id);
+
+  const onChangeDebounced = useMemo(() => debounce(_onChangeDebounced, 300), [_onChangeDebounced]);
+  const onChange = (updatedValue: FormFieldValue) => {
+    _onChange(updatedValue);
+    onChangeDebounced({ value: updatedValue, id: formFieldId });
+  };
 
   function onOptionClick(_selectedProject: ProjectWithMembers) {
     if (proposalId) {
@@ -60,6 +71,18 @@ export function ProjectProfileInputField({
       })
     );
   }
+
+  const onFormFieldChange = useCallback(
+    (newProjectMemberIds: string[]) => {
+      if (selectedProject) {
+        onChange({
+          projectId: selectedProject.id,
+          selectedMemberIds: newProjectMemberIds
+        });
+      }
+    },
+    [selectedProject?.id]
+  );
 
   return (
     <Stack gap={1} width='100%' mb={1}>
@@ -136,12 +159,7 @@ export function ProjectProfileInputField({
             disabled={disabled}
             projectId={selectedProject.id}
             selectedProjectMemberIds={selectedMemberIds}
-            onFormFieldChange={(newProjectMemberIds) => {
-              onChange({
-                projectId: selectedProject.id,
-                selectedMemberIds: newProjectMemberIds
-              });
-            }}
+            onFormFieldChange={onFormFieldChange}
           />
         </Box>
       )}

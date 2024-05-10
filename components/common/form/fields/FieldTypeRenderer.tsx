@@ -1,5 +1,6 @@
 import { Box, type SxProps } from '@mui/material';
-import { forwardRef } from 'react';
+import { debounce } from 'lodash';
+import { forwardRef, useMemo } from 'react';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
@@ -9,7 +10,7 @@ import { AttachRewardButton } from 'components/proposals/ProposalPage/components
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import type { UploadedFileInfo } from 'hooks/useS3UploadInput';
-import type { FieldType } from 'lib/forms/interfaces';
+import type { FormFieldValue, FieldType } from 'lib/forms/interfaces';
 
 import { InputSearchBlockchain } from '../InputSearchBlockchain';
 
@@ -49,10 +50,42 @@ type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
   textInputConfig?: TextInputConfig;
   walletInputConfig?: WalletInputConfig;
   milestoneProps?: ProposalRewardsTableProps;
+  formFieldId?: string;
+  onChangeDebounced?: (updatedValue: { id: string; value: FormFieldValue }) => void;
 } & TextInputConfig;
 
 export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
-  ({ type, options, walletInputConfig, onCreateOption, onDeleteOption, onUpdateOption, ...fieldProps }: Props, ref) => {
+  (
+    {
+      type,
+      options,
+      walletInputConfig,
+      onCreateOption,
+      onDeleteOption,
+      onUpdateOption,
+      onChangeDebounced: _onChangeDebounced,
+      formFieldId,
+      ...fieldProps
+    }: Props,
+    ref
+  ) => {
+    const onChangeDebounced = useMemo(
+      () => (_onChangeDebounced ? debounce(_onChangeDebounced, 300) : null),
+      [_onChangeDebounced]
+    );
+    const _onChange = fieldProps.onChange;
+    if (_onChange) {
+      fieldProps.onChange = (e) => {
+        _onChange(e);
+        // currently only used by proposal forms
+        if (formFieldId && onChangeDebounced) {
+          onChangeDebounced({
+            id: formFieldId,
+            value: typeof e?.target?.value === 'string' ? e.target.value : e
+          });
+        }
+      };
+    }
     switch (type) {
       case 'text':
       case 'email':
