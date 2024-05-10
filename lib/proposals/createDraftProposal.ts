@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { v4 as uuid } from 'uuid';
 
-import type { FormFieldInput } from 'lib/forms/interfaces';
 import { generatePagePathFromPathAndTitle } from 'lib/pages/utils';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalFields } from 'lib/proposals/interfaces';

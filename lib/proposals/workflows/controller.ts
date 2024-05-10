@@ -79,7 +79,8 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
           data: {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
-            index
+            index,
+            requiredReviews: workflowEvaluation.requiredReviews
           }
         });
         processedIds.push(originalTemplateEvaluation.id);
@@ -90,7 +91,8 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             proposalId: template.id,
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
-            index
+            index,
+            requiredReviews: workflowEvaluation.requiredReviews
           }
         });
       }

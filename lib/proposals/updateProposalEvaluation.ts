@@ -1,23 +1,28 @@
-import type { ProposalReviewer } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interfaces';
 import { setPageUpdatedAt } from './setPageUpdatedAt';
+import { updatePassFailEvaluationResultIfRequired } from './updatePassFailEvaluationResultIfRequired';
 
 export type UpdateEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   voteSettings?: VoteSettings | null;
+  requiredReviews?: number;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
 };
 
 export async function updateProposalEvaluation({
   proposalId,
+  spaceId,
   evaluationId,
   voteSettings,
   reviewers,
-  actorId
-}: UpdateEvaluationRequest & { actorId: string }) {
+  actorId,
+  requiredReviews,
+  currentEvaluationType
+}: UpdateEvaluationRequest & { currentEvaluationType?: ProposalEvaluationType; actorId: string; spaceId: string }) {
   await prisma.$transaction(async (tx) => {
     // update reviewers only when it is present in request payload
     if (reviewers) {
@@ -45,7 +50,28 @@ export async function updateProposalEvaluation({
         }
       });
     }
+    if (requiredReviews) {
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          requiredReviews
+        }
+      });
+    }
   });
+
+  if (requiredReviews) {
+    await updatePassFailEvaluationResultIfRequired({
+      currentEvaluationType,
+      evaluationId,
+      proposalId,
+      requiredReviews,
+      spaceId,
+      userId: actorId
+    });
+  }
 
   await setPageUpdatedAt({ proposalId, userId: actorId });
 }

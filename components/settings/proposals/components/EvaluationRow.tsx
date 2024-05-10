@@ -31,7 +31,7 @@ export function EvaluationRow({
   evaluation,
   onDelete,
   onDuplicate,
-  onRename,
+  onEdit,
   onChangeOrder,
   readOnly
 }: {
@@ -51,7 +51,7 @@ export function EvaluationRow({
           evaluation={evaluation}
           onDelete={onDelete}
           onDuplicate={onDuplicate}
-          onRename={onRename}
+          onEdit={onEdit}
           readOnly={readOnly}
         />
       </Box>

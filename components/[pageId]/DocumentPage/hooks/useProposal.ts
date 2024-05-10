@@ -33,6 +33,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
             prev
               ? {
                   ...prev,
+                  currentEvaluationId: match.currentStep ? match.currentStep?.id : prev.currentEvaluationId,
                   archived: match.archived ?? prev.archived,
                   status: match.currentStep ? (match.currentStep.step === 'draft' ? 'draft' : 'published') : prev.status
                 }
@@ -70,7 +71,7 @@ export function useProposal({ proposalId }: { proposalId?: string | null }) {
       },
       onChangeTemplate: async (value: { id: string } | null) => {
         // null will remove the template
-        await applyProposalTemplate({ id: value?.id || null });
+        await applyProposalTemplate({ templateId: value?.id || null });
         await refreshProposal();
       },
       onChangeWorkflow: async ({ id }: { id: string }) => {

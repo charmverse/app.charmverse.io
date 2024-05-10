@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { prisma } from '@charmverse/core/prisma-client';
 import { submitEvaluationResult } from 'lib/proposals/submitEvaluationResult';

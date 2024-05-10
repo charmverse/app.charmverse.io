@@ -4,6 +4,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { createVote, generateBounty } from 'testing/setupDatabase';
 
 import { goBackToStep } from '../goBackToStep';
+import { submitEvaluationResult } from '../submitEvaluationResult';
 
 describe('goBackToStep()', () => {
   it('should return a proposal to draft state', async () => {
@@ -107,10 +108,36 @@ describe('goBackToStep()', () => {
           title: 'Review',
           result: 'pass',
           reviewers: [],
-          permissions: []
+          permissions: [],
+          requiredReviews: 3
         }
       ]
     });
+
+    const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
+      where: {
+        id: proposal.evaluations[1].id
+      },
+      include: {
+        proposalEvaluationReviews: true
+      }
+    });
+
+    await submitEvaluationResult({
+      decidedBy: user.id,
+      evaluation,
+      proposalId: proposal.id,
+      result: 'pass',
+      spaceId: space.id
+    });
+
+    const proposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId: proposal.evaluations[1].id
+      }
+    });
+
+    expect(proposalEvaluationReviews.length).toBe(1);
 
     await goBackToStep({
       proposalId: proposal.id,
@@ -132,6 +159,70 @@ describe('goBackToStep()', () => {
     });
     expect(updated.evaluations[0].result).toBe(null);
     expect(updated.evaluations[1].result).toBe(null);
+    const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId: proposal.evaluations[1].id
+      }
+    });
+    expect(updatedProposalEvaluationReviews.length).toBe(0);
+  });
+
+  it('Should delete previous evaluation reviews when moving back to draft state', async () => {
+    const { space, user } = await testUtilsUser.generateUserAndSpace();
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: space.id,
+      userId: user.id,
+      proposalStatus: 'published',
+      evaluationInputs: [
+        {
+          evaluationType: 'pass_fail',
+          title: 'Review',
+          result: 'pass',
+          reviewers: [],
+          permissions: [],
+          requiredReviews: 3
+        }
+      ]
+    });
+
+    const evaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
+      where: {
+        id: proposal.evaluations[0].id
+      },
+      include: {
+        proposalEvaluationReviews: true
+      }
+    });
+
+    await submitEvaluationResult({
+      decidedBy: user.id,
+      evaluation,
+      proposalId: proposal.id,
+      result: 'pass',
+      spaceId: space.id
+    });
+
+    const proposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId: proposal.evaluations[0].id
+      }
+    });
+
+    expect(proposalEvaluationReviews.length).toBe(1);
+
+    await goBackToStep({
+      proposalId: proposal.id,
+      evaluationId: 'draft',
+      userId: user.id
+    });
+
+    const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+      where: {
+        evaluationId: proposal.evaluations[0].id
+      }
+    });
+    expect(updatedProposalEvaluationReviews.length).toBe(0);
   });
 
   it('should delete the vote from the current step', async () => {

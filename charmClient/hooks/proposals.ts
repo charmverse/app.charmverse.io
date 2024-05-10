@@ -144,7 +144,7 @@ export function useUpdateSnapshotProposal({ proposalId }: { proposalId: MaybeStr
 }
 
 export function useUpdateTemplate({ proposalId }: { proposalId: MaybeString }) {
-  return usePUT<{ id: string | null }>(`/api/proposals/${proposalId}/template`);
+  return usePUT<{ templateId: string | null }>(`/api/proposals/${proposalId}/template`);
 }
 
 export function useUpdateWorkflow({ proposalId }: { proposalId: MaybeString }) {
@@ -172,4 +172,10 @@ export function useGetIssuableProposalCredentials({ proposalIds }: { proposalIds
       proposalIds
     }
   );
+}
+
+export function useResetProposalReview({ proposalId }: { proposalId: MaybeString }) {
+  return usePUT<{
+    evaluationId: string;
+  }>(`/api/proposals/${proposalId}/reset-review`);
 }
