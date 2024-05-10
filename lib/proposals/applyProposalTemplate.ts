@@ -162,6 +162,7 @@ export async function applyProposalTemplate({
           id: proposal.evaluations[index].id
         },
         data: {
+          requiredReviews: evaluation.requiredReviews,
           actionLabels: evaluation.actionLabels as any,
           voteSettings: evaluation.voteSettings as any
         }

@@ -14,7 +14,6 @@ import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card, CardWithRelations } from 'lib/databases/card';
 import { CardFilter } from 'lib/databases/cardFilter';
-import { Constants } from 'lib/databases/constants';
 import { PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import {
   AUTHORS_BLOCK_ID,
@@ -58,7 +57,6 @@ export function useProposalsBoardAdapter() {
       }),
     [evaluationStepTitles, proposalBoardBlock]
   );
-
   const activeView = useMemo(() => {
     // use saved default block or build on the fly
     const viewBlock = proposalBlocks?.find((b) => b.id === DEFAULT_VIEW_BLOCK_ID);

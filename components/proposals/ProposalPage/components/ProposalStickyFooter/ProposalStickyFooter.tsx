@@ -16,15 +16,16 @@ export function ProposalStickyFooter({
   proposal,
   formAnswers,
   page,
-  isStructuredProposal
+  isStructuredProposal,
+  hasProjectField
 }: {
   proposal: ProposalWithUsersAndRubric;
   formAnswers: FieldAnswerInput[];
   page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
   isStructuredProposal: boolean;
+  hasProjectField: boolean;
 }) {
   const projectForm = useFormContext<ProjectAndMembersPayload>();
-
   const projectFormValues = projectForm.watch() as ProjectWithMembers;
 
   const { showMessage } = useSnackbar();
@@ -47,7 +48,7 @@ export function ProposalStickyFooter({
       title: page.title,
       type: page.type
     },
-    project: projectFormValues,
+    project: hasProjectField ? projectFormValues : null,
     requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
     contentType: isStructuredProposal ? 'structured' : 'free_form',

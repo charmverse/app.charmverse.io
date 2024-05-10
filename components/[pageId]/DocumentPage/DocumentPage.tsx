@@ -574,6 +574,7 @@ function DocumentPageComponent({
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
           <ProposalStickyFooter
             page={page}
+            hasProjectField={!!projectProfileField}
             proposal={proposal}
             formAnswers={proposalFormFieldAnswers}
             isStructuredProposal={isStructuredProposal}

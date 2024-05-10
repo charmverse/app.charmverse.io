@@ -1,32 +1,18 @@
 import crypto from 'crypto';
 
-import type { PersonaEventData } from '../interfaces';
-
-export function checkSignature({
-  body,
-  headers,
-  secret
-}: {
-  headers: { 'Persona-Signature'?: string };
-  secret: string;
-  body: PersonaEventData;
-}) {
+export function checkSignature({ body, signature, secret }: { signature?: string; secret: string; body: string }) {
   // Basic signature verification on a newly created webhook
-  const signatureParams: Record<string, string> = {};
-  headers['Persona-Signature']?.split(',').forEach((pair) => {
-    const [key, value] = pair.split('=');
-    signatureParams[key] = value;
+  const t = signature?.split(',')?.[0]?.split('=')?.[1];
+  const signatures = signature?.split(' ')?.map((pair) => pair.split('v1=')?.[1]);
+
+  const hmac = crypto.createHmac('sha256', secret).update(`${t}.${body}`).digest('hex');
+  const isVerified = signatures?.some((sig) => {
+    return crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(sig));
   });
 
-  if (signatureParams.t && signatureParams.v1) {
-    const hmac = crypto
-      .createHmac('sha256', secret)
-      .update(`${signatureParams.t}.${JSON.stringify(body)}`)
-      .digest('hex');
-
-    if (crypto.timingSafeEqual(Buffer.from(hmac), Buffer.from(signatureParams.v1))) {
-      return true;
-    }
+  if (isVerified) {
+    return true;
   }
+
   return false;
 }
