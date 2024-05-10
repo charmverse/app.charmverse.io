@@ -40,6 +40,8 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     createdBy: '',
     updatedAt: proposalForm?.createdAt || '',
     updatedBy: '',
+    workflowId: '',
+    spaceId: space?.id as string,
     ...proposalFromDb,
     fields: {
       ...proposalFromDb?.fields,

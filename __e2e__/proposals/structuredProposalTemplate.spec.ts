@@ -85,6 +85,7 @@ test.beforeAll(async () => {
       id: uuid(),
       createdAt: new Date(),
       title: defaultWorkflowTitle,
+      privateEvaluations: false,
       evaluations: [
         getDefaultFeedbackEvaluation(),
         getDefaultEvaluation({

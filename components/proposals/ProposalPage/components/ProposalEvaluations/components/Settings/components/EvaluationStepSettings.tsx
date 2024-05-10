@@ -11,7 +11,7 @@ import {
 } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { ProposalEvaluationInput } from 'lib/proposals/createProposal';
-import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
+import type { ConcealableEvaluationType, PopulatedEvaluation } from 'lib/proposals/interfaces';
 import type { RangeProposalCriteria } from 'lib/proposals/workflows/getNewCriteria';
 
 import { RubricCriteriaSettings } from './RubricCriteriaSettings';
@@ -19,8 +19,9 @@ import { VoteSettings } from './VoteSettings';
 
 // result and id are not used for creating evaluations, so add them here
 // leave out permissions which are picked up on the backend based on workflowId
-export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permissions'> &
-  Pick<ProposalEvaluation, 'result' | 'id'>;
+export type ProposalEvaluationValues = Omit<ProposalEvaluationInput, 'permissions' | 'type'> & {
+  type: ConcealableEvaluationType;
+} & Pick<ProposalEvaluation, 'result' | 'id'>;
 
 type Props = {
   evaluation: ProposalEvaluationValues;

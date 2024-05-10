@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
-import type { CredentialEventType, IssuedCredential, Prisma } from '@charmverse/core/prisma-client';
+import type { CredentialEventType, IssuedCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 import type { EAS } from '@ethereum-attestation-service/eas-sdk';
@@ -9,7 +9,7 @@ import { RateLimit } from 'async-sema';
 import { getChainById } from 'connectors/chains';
 
 import { getPublicClient } from 'lib/blockchain/publicClient';
-import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { getEasConnector, getEasInstance, type EasSchemaChain } from './connectors';
 import { rewardSubmissionApprovedVerb } from './constants';
