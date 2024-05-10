@@ -34,6 +34,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
     rewardToken: null,
     rewardType: 'custom',
     fields: {
+      workflowId: 'direct_submission',
       properties: {
         [REWARDS_APPLICANTS_BLOCK_ID]: [],
         [REWARDS_AVAILABLE_BLOCK_ID]: '',
@@ -96,6 +97,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
     rewardToken: null,
     rewardType: 'none',
     fields: {
+      workflowId: 'direct_submission',
       properties: {
         [REWARDS_APPLICANTS_BLOCK_ID]: [],
         [REWARDS_AVAILABLE_BLOCK_ID]: '',

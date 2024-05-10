@@ -29,7 +29,6 @@ export function RewardEvaluations({
   templateId,
   expanded = true,
   onChangeReward,
-  // onChangeTemplate,
   onChangeWorkflow,
   isUnpublishedReward,
   readOnly,
@@ -49,7 +48,6 @@ export function RewardEvaluations({
         templateId={templateId}
         readOnly={!!readOnly}
         expanded={expanded}
-        // onChangeTemplate={onChangeTemplate}
         onChangeWorkflow={onChangeWorkflow}
         onChangeReward={onChangeReward}
         isUnpublishedReward={isUnpublishedReward}

@@ -97,6 +97,7 @@ function InputSearchMemberBase({
       renderOption={(_props, user) => (
         <UserDisplay
           {...(_props as any)}
+          data-test={`user-option-${user.id}`}
           userId={user.id}
           avatarSize='small'
           avatarIcon={user.id.startsWith('email') ? <EmailIcon fontSize='large' /> : undefined}
