@@ -11,7 +11,6 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { publishProposal } from 'lib/proposals/publishProposal';
-import { validateProposalProject } from 'lib/proposals/validateProposalProject';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -29,7 +28,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     userId
   });
 
-  if (!permissions.move) {
+  if (!permissions.edit) {
     throw new ActionNotPermittedError(`You do not have permission to publish this proposal`);
   }
 
@@ -77,6 +76,15 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
 
   if (!proposalPage.proposal) {
     throw new Error('Proposal not found for page');
+  }
+
+  const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+    resourceId: proposalPage.spaceId,
+    userId
+  });
+
+  if (!computedPermissions.createProposals) {
+    throw new ActionNotPermittedError(`You do not have permission to create a proposal`);
   }
 
   const { isAdmin } = await hasAccessToSpace({
