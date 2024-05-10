@@ -137,7 +137,8 @@ export function NewRewardPage({
       selectedCredentialTemplates: template.selectedCredentialTemplates,
       fields: template.fields
     });
-    const workflow = workflowOptions && inferRewardWorkflow(workflowOptions, template.fields as RewardFields);
+    const workflow =
+      workflowOptions && template.fields && inferRewardWorkflow(workflowOptions, template.fields as RewardFields);
     if (workflow) {
       applyWorkflow(workflow, template.assignedSubmitters);
     }

@@ -56,7 +56,7 @@ export function EvaluationsReview({
 }: Props) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
-  const workflow = inferRewardWorkflow(workflowOptions, reward.fields as RewardFields);
+  const workflow = reward.fields ? inferRewardWorkflow(workflowOptions, reward.fields as RewardFields) : null;
   const hasIssuableOnchainCredentials = !!(
     currentSpace?.useOnchainCredentials &&
     currentSpace?.credentialsWallet &&

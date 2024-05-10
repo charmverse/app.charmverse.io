@@ -43,7 +43,7 @@ async function addRewardFieldsWorkflowId() {
   const totalBounties = bounties.length;
   let currentBounty = 0;
 
-  const workflows = getRewardWorkflows('');
+  const workflows = getRewardWorkflows();
 
   for (const bounty of bounties) {
     try {

@@ -39,7 +39,7 @@ export function EvaluationsSettings({
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const { data: rewardTemplate } = useGetRewardTemplate(templateId);
-  const workflow = rewardInput && inferRewardWorkflow(workflowOptions, rewardInput.fields as RewardFields);
+  const workflow = rewardInput?.fields && inferRewardWorkflow(workflowOptions, rewardInput.fields as RewardFields);
   const transformedWorkflow = useMemo(() => {
     // Make sure to remove credential step if a new reward is created without any credential templates
     if (!workflow) {

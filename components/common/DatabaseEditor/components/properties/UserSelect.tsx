@@ -152,6 +152,7 @@ export function UserSelectWithoutPreview({
           disableClearable
           clearOnBlur
           open={isOpen}
+          data-test='user-select-without-preview'
           openOnFocus
           disableCloseOnSelect
           defaultValue={memberIds}
