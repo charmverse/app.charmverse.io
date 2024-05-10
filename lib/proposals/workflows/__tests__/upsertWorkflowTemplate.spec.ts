@@ -25,6 +25,7 @@ describe('Saving space workflows', () => {
       id: uuid(),
       index: 0,
       spaceId: space.id,
+      privateEvaluations: false,
       title: 'My feedback workflow',
       evaluations: [
         {

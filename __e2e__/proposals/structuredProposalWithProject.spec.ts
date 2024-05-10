@@ -69,7 +69,8 @@ test.beforeAll(async () => {
       title: defaultWorkflowTitle,
       evaluations: [getDefaultFeedbackEvaluation()],
       index: 0,
-      spaceId: space.id
+      spaceId: space.id,
+      privateEvaluations: false
     }
   ];
 

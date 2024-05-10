@@ -272,13 +272,7 @@ export function EvaluationsReview({
               />
             )}
             {evaluation.type === 'private_evaluation' && (
-              <PrivateEvaluation
-                archived={proposal?.archived ?? false}
-                key={evaluation.id}
-                evaluation={evaluation}
-                proposalId={proposal?.id}
-                isCurrent={isCurrent}
-              />
+              <PrivateEvaluation key={evaluation.id} evaluation={evaluation} isCurrent={isCurrent} />
             )}
           </EvaluationStepRow>
         );

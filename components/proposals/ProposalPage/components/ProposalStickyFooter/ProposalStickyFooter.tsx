@@ -9,6 +9,7 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import type { FieldAnswerInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProposalToErrorCheck } from 'lib/proposals/getProposalErrors';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
@@ -57,7 +58,7 @@ export function ProposalStickyFooter({
       formAnswers,
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
-    },
+    } as ProposalToErrorCheck,
     requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
 
