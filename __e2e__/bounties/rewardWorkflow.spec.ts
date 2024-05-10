@@ -17,7 +17,9 @@ test.describe.serial('Review reward applications', () => {
   };
 
   test.beforeAll(async () => {
-    ({ space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
+    const { space: generatedSpace, user: generatedUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    space = generatedSpace;
+    adminUser = generatedUser;
     spaceMember = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
   });
 
