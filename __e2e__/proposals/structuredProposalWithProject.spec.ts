@@ -284,15 +284,17 @@ test.describe.serial('Structured proposal template with project', () => {
     // Add a new project member and update their project fields
     await proposalPage.projectTeamMembersSelect.click();
     await proposalPage.getProjectMemberOption(0).click();
-    await proposalPage.page.waitForResponse((response) => {
-      return response.request().method() === 'PUT' && response.url().endsWith('/form/answers');
-    });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
     await proposalFormFieldPage.fillProjectField({
       fieldName: 'projectMembers[1].email',
       content: 'new-email@gmail.com'
     });
+
+    const apiResponse = proposalPage.page.waitForResponse((response) => {
+      return response.request().method() === 'PUT' && response.url().endsWith('/form/answers');
+    });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
+    await apiResponse;
 
     // Assert that the project member values were auto updated
     const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({
