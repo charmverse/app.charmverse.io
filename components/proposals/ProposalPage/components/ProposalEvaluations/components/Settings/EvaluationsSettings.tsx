@@ -66,6 +66,11 @@ export function EvaluationsSettings({
     [proposalTemplates]
   );
 
+  // We need to provide all necessary data for the proposal. A private evaluation won't allow users to populate all workflow options
+  const filteredWorkflowOptions = isTemplate
+    ? workflowOptions
+    : workflowOptions.filter((w) => !w.privateEvaluations || (!!proposal?.workflowId && proposal.workflowId === w.id));
+
   const isTemplateRequired = Boolean(currentSpace?.requireProposalTemplate);
   const showCredentials = isAdmin || !!proposal?.selectedCredentialTemplates?.length || !templateId;
   const readOnlyCredentials = !isAdmin && (readOnly || !!templateId);
@@ -83,7 +88,7 @@ export function EvaluationsSettings({
           />
         )}
         <WorkflowSelect
-          options={workflowOptions}
+          options={filteredWorkflowOptions}
           value={proposal?.workflowId}
           onChange={onChangeWorkflow}
           readOnly={!!templateId && !isAdmin}
