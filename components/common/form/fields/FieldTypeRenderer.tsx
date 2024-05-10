@@ -78,7 +78,8 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       fieldProps.onChange = (e) => {
         _onChange(e);
         // currently only used by proposal forms
-        if (formFieldId && onChangeDebounced) {
+        // do not save updates if field is invalid
+        if (formFieldId && onChangeDebounced && !fieldProps.error) {
           onChangeDebounced({
             id: formFieldId,
             value: typeof e?.target?.value === 'string' ? e.target.value : e
