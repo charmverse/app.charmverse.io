@@ -224,6 +224,7 @@ export async function generateUserAndSpace({
   apiToken
 }: CreateUserAndSpaceInput = {}) {
   const userId = v4();
+  const spaceId = v4();
   const newUser = await prisma.user.create({
     data: {
       id: userId,
@@ -236,6 +237,7 @@ export async function generateUserAndSpace({
           onboarded,
           space: {
             create: {
+              id: spaceId,
               author: {
                 connect: {
                   id: userId
@@ -245,7 +247,8 @@ export async function generateUserAndSpace({
                 ? {
                     permittedGroups: {
                       create: {
-                        operations: memberSpacePermissions ?? ['reviewProposals']
+                        operations: memberSpacePermissions,
+                        spaceId
                       }
                     }
                   }

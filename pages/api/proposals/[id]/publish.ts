@@ -11,7 +11,6 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import { publishProposal } from 'lib/proposals/publishProposal';
-import { validateProposalProject } from 'lib/proposals/validateProposalProject';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';

@@ -17,21 +17,13 @@ beforeAll(async () => {
   const generated1 = await generateUserAndSpace({
     memberSpacePermissions: ['createProposals']
   });
-  const generated2 = await generateUserAndSpace({
-    memberSpacePermissions: ['createProposals']
-  });
   author = generated1.user;
-  reviewer = generated2.user;
+  reviewer = await generateSpaceUser({
+    spaceId: generated1.space.id
+  });
   space = generated1.space;
 
   authorCookie = await loginUser(author.id);
-
-  await prisma.spaceRole.create({
-    data: {
-      spaceId: space.id,
-      userId: reviewer.id
-    }
-  });
 });
 
 describe('PUT /api/proposals/[id]/publish - Publish proposal', () => {
