@@ -1,5 +1,6 @@
 import type { Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { testUtilsUser } from '@charmverse/core/test';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
@@ -13,6 +14,12 @@ test.describe.serial('Review reward applications', () => {
   let reward: Bounty & {
     page: Page;
   };
+
+  test.beforeAll(async () => {
+    const { space: generatedSpace, user: generatedUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true });
+    space = generatedSpace;
+    adminUser = generatedUser;
+  });
 
   test('Create a draft reward template, change workflow to application required and publish template', async ({
     page,
