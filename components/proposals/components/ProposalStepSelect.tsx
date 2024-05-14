@@ -77,8 +77,6 @@ export function ProposalStepSelectBase({
   const currentEvaluationIndex = proposal.currentStep.index;
   const currentEvaluationResult = proposal.currentStep.result;
   const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
-  const isEvaluationFinalStep =
-    proposal.currentStep?.finalStep || proposal.currentStep.index === proposal.evaluations.length - 1;
 
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
 
@@ -126,7 +124,6 @@ export function ProposalStepSelectBase({
         index === currentEvaluationIndex ||
         index < currentEvaluationIndex - 1 ||
         index > currentEvaluationIndex + 1 ||
-        (isEvaluationFinalStep ? index > currentEvaluationIndex : false) ||
         // Disable option if it is a pass_fail step and it requires more than 1 review
         (currentEvaluationStepRequiredReviews !== 1 && index > currentEvaluationIndex) ||
         // Disable option if it is a vote step and its not in progress
