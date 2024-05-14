@@ -216,6 +216,11 @@ export function EvaluationsReview({
             index={index + 1}
             result={evaluation.result}
             title={evaluation.title}
+            showDash={
+              currentEvaluation
+                ? evaluation.index > currentEvaluation.index && currentEvaluation.result === 'pass'
+                : false
+            }
             actions={
               evaluation.type !== 'private_evaluation' && (
                 <EvaluationStepActions

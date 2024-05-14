@@ -38,11 +38,13 @@ export type Result = 'pass' | 'fail';
 export function StepperResultIcon({
   result,
   isCurrent,
-  position
+  position,
+  showDash
 }: {
   isCurrent?: boolean;
   result: Result | null;
   position: number;
+  showDash?: boolean;
 }) {
   return (
     <StyledIconContainer result={result} isCurrent={isCurrent}>
@@ -51,7 +53,7 @@ export function StepperResultIcon({
       ) : result === 'fail' ? (
         <CloseIcon fontSize='small' />
       ) : (
-        <Typography fontWeight={500}>{position}</Typography>
+        <Typography fontWeight={500}>{showDash ? '-' : `${position}`}</Typography>
       )}
     </StyledIconContainer>
   );
