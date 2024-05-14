@@ -1,14 +1,14 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
+
 import charmClient from 'charmClient';
 import type { MaybeString } from 'charmClient/hooks/helpers';
 import { useGetReward } from 'charmClient/hooks/rewards';
-import { useUser } from 'hooks/useUser';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
 export function useReward({ rewardId }: { rewardId: MaybeString }) {
   const { data: reward, mutate: refreshReward } = useGetReward({ rewardId });
-
-  const { user } = useUser();
 
   async function updateReward(updateContent: UpdateableRewardFields) {
     if (rewardId) {
@@ -21,21 +21,29 @@ export function useReward({ rewardId }: { rewardId: MaybeString }) {
   }
 
   async function onChangeRewardWorkflow(workflow: RewardWorkflow) {
+    const updatedFields = {
+      ...((reward?.fields as RewardFields) ?? {}),
+      workflowId: workflow.id
+    } as Prisma.JsonObject;
+
     if (workflow.id === 'application_required') {
       updateReward({
         approveSubmitters: true,
-        assignedSubmitters: null
+        assignedSubmitters: null,
+        fields: updatedFields
       });
     } else if (workflow.id === 'direct_submission') {
       updateReward({
         approveSubmitters: false,
-        assignedSubmitters: null
+        assignedSubmitters: null,
+        fields: updatedFields
       });
-    } else if (workflow.id === 'assigned') {
+    } else if (workflow.id === 'assigned' || workflow.id === 'assigned_kyc') {
       updateReward({
         approveSubmitters: false,
         allowMultipleApplications: false,
-        assignedSubmitters: [user!.id]
+        assignedSubmitters: [],
+        fields: updatedFields
       });
     }
   }

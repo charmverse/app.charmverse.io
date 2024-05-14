@@ -1,14 +1,17 @@
 import { Collapse, Divider, Tooltip } from '@mui/material';
 import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useGetProposalWorkflows } from 'charmClient/hooks/spaces';
 import LoadingComponent from 'components/common/LoadingComponent';
 import Modal from 'components/common/Modal';
+import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
 import { SocialShareLinksStep } from 'components/common/WorkflowSidebar/components/SocialShareLinksStep/SocialShareLinksStep';
+import { TemplateSelect } from 'components/common/WorkflowSidebar/components/TemplateSelect';
 import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { CredentialSelect } from 'components/credentials/CredentialsSelect';
 import { useProposalCredentials } from 'components/proposals/hooks/useProposalCredentials';
+import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
@@ -16,7 +19,6 @@ import { useUser } from 'hooks/useUser';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 
-import { EvaluationStepRow } from '../../../../../../common/WorkflowSidebar/components/EvaluationStepRow';
 import type { ProposalEvaluationValues } from '../Settings/components/EvaluationStepSettings';
 
 import { EditStepButton } from './components/EditStepButton';
@@ -24,6 +26,7 @@ import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { PrivateEvaluation } from './components/PrivateEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { RewardReviewStep } from './components/RewardReviewStep';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
@@ -47,6 +50,7 @@ export type Props = {
     | 'formId'
     | 'form'
     | 'selectedCredentialTemplates'
+    | 'issuedCredentials'
   >;
   onChangeEvaluation?: (evaluationId: string, updated: Partial<ProposalEvaluationValues>) => void;
   readOnlyCredentialTemplates?: boolean;
@@ -86,13 +90,24 @@ export function EvaluationsReview({
   const rewardsTitle = mappedFeatures.rewards.title;
   const currentEvaluation = proposal?.evaluations.find((e) => e.id === proposal?.currentEvaluationId);
   const pendingRewards = proposal?.fields?.pendingRewards;
-  const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length;
+  const hasCredentialsStep = !!proposal?.selectedCredentialTemplates.length || !!proposal?.issuedCredentials.length;
 
   const isRewardsComplete = !!proposal?.rewardIds?.length;
   const hasRewardsStep = Boolean(pendingRewards?.length || isRewardsComplete);
 
   const { space: currentSpace } = useCurrentSpace();
+  const { proposalTemplates } = useProposalTemplates();
   const { data: workflowOptions = [] } = useGetProposalWorkflows(currentSpace?.id);
+
+  const templatePageOptions = useMemo(
+    () =>
+      (proposalTemplates || []).map((template) => ({
+        id: template.proposalId,
+        title: template.title
+      })),
+    [proposalTemplates]
+  );
+
   const isCredentialsComplete =
     hasCredentialsStep && currentEvaluation?.result === 'pass' && !hasPendingOnchainCredentials;
   const isCredentialsActive =
@@ -160,6 +175,11 @@ export function EvaluationsReview({
   return (
     <LoadingComponent isLoading={!proposal}>
       <Collapse in={expandedContainer}>
+        <Tooltip title='Template can only be changed in Draft step'>
+          <span>
+            <TemplateSelect options={templatePageOptions} value={templateId} readOnly />
+          </span>
+        </Tooltip>
         <Tooltip title='Workflow can only be changed in Draft step'>
           <span>
             <WorkflowSelect options={workflowOptions} value={proposal?.workflowId} readOnly />
@@ -197,16 +217,18 @@ export function EvaluationsReview({
             result={evaluation.result}
             title={evaluation.title}
             actions={
-              <EvaluationStepActions
-                archived={proposal?.archived ?? false}
-                isCurrentStep={isCurrent}
-                isPreviousStep={previousStepIndex === index + 1}
-                permissions={proposal?.permissions}
-                proposalId={proposal?.id}
-                refreshProposal={refreshProposal}
-                evaluation={evaluation}
-                openSettings={() => openSettings(evaluation)}
-              />
+              evaluation.type !== 'private_evaluation' && (
+                <EvaluationStepActions
+                  archived={proposal?.archived ?? false}
+                  isCurrentStep={isCurrent}
+                  isPreviousStep={previousStepIndex === index + 1}
+                  permissions={proposal?.permissions}
+                  proposalId={proposal?.id}
+                  refreshProposal={refreshProposal}
+                  evaluation={evaluation}
+                  openSettings={() => openSettings(evaluation)}
+                />
+              )
             }
           >
             {evaluation.type === 'feedback' && (
@@ -248,6 +270,9 @@ export function EvaluationsReview({
                 evaluation={evaluation}
                 refreshProposal={refreshProposal}
               />
+            )}
+            {evaluation.type === 'private_evaluation' && (
+              <PrivateEvaluation key={evaluation.id} evaluation={evaluation} isCurrent={isCurrent} />
             )}
           </EvaluationStepRow>
         );

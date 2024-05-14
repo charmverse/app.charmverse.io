@@ -6,12 +6,14 @@ import {
   AccordionSummary,
   Box,
   Chip,
+  FormLabel,
   IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography
@@ -20,7 +22,9 @@ import { usePopupState, bindMenu, bindTrigger } from 'material-ui-popup-state/ho
 import { useState } from 'react';
 
 import { Button } from 'components/common/Button';
+import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
@@ -75,6 +79,11 @@ export function ProposalWorkflowItem({
 
   function updateWorkflowTitle(title: string) {
     onUpdate({ ...workflow, title });
+    setUnsavedChanges(true);
+  }
+
+  function updatePrivateEvaluations(privateEvaluations: boolean) {
+    onUpdate({ ...workflow, privateEvaluations });
     setUnsavedChanges(true);
   }
 
@@ -172,36 +181,62 @@ export function ProposalWorkflowItem({
           ) : (
             <Typography color={!workflow.title ? 'secondary' : 'inherit'}>{workflow.title || 'Untitled'}</Typography>
           )}
-          {!readOnly && (
-            <span onClick={(e) => e.stopPropagation()}>
-              <Menu {...bindMenu(popupState)} onClick={popupState.close}>
-                <MenuItem onClick={duplicateWorkflow}>
-                  <ListItemIcon>
-                    <ContentCopyOutlined fontSize='small' />
-                  </ListItemIcon>
-                  <ListItemText>Duplicate</ListItemText>
-                </MenuItem>
-                <Tooltip title={preventDelete ? 'There must be at least one workflow' : ''}>
-                  <span>
-                    <MenuItem onClick={deleteWorkflow} disabled={preventDelete}>
-                      <ListItemIcon>
-                        <DeleteOutlined fontSize='small' />
-                      </ListItemIcon>
-                      <ListItemText>Delete</ListItemText>
-                    </MenuItem>
-                  </span>
-                </Tooltip>
-              </Menu>
-              <Box display='flex' gap={2} alignItems='center'>
-                {!isExpanded && hasUnsavedChanges && (
-                  <Chip variant='outlined' size='small' color='warning' label='unsaved changes' />
-                )}
-                <IconButton size='small' {...bindTrigger(popupState)}>
-                  <MoreHoriz fontSize='small' />
-                </IconButton>
-              </Box>
-            </span>
-          )}
+
+          <Box display='flex' justifyContent='flex-end' alignItems='center'>
+            {!isExpanded && hasUnsavedChanges && (
+              <Chip variant='outlined' size='small' color='warning' label='unsaved changes' sx={{ mr: 1 }} />
+            )}
+            {!readOnly && (
+              <span onClick={(e) => e.stopPropagation()}>
+                <Menu {...bindMenu(popupState)} onClick={popupState.close}>
+                  <MenuItem onClick={duplicateWorkflow}>
+                    <ListItemIcon>
+                      <ContentCopyOutlined fontSize='small' />
+                    </ListItemIcon>
+                    <ListItemText>Duplicate</ListItemText>
+                  </MenuItem>
+                  <Tooltip title={preventDelete ? 'There must be at least one workflow' : ''}>
+                    <span>
+                      <MenuItem onClick={deleteWorkflow} disabled={preventDelete}>
+                        <ListItemIcon>
+                          <DeleteOutlined fontSize='small' />
+                        </ListItemIcon>
+                        <ListItemText>Delete</ListItemText>
+                      </MenuItem>
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    title={
+                      workflow.privateEvaluations
+                        ? 'Only reviewers can see all evaluation steps'
+                        : 'All users can see all evaluation steps'
+                    }
+                  >
+                    <span>
+                      <MenuItem
+                        onClick={() => {
+                          updatePrivateEvaluations(!workflow.privateEvaluations);
+                        }}
+                        disabled={preventDelete}
+                      >
+                        <ListItemIcon>
+                          <VisibilityIcon visible={!workflow.privateEvaluations} size='small' />
+                        </ListItemIcon>
+                        <ListItemText>
+                          {workflow.privateEvaluations ? 'Show evaluations' : 'Hide evaluations'}
+                        </ListItemText>
+                      </MenuItem>
+                    </span>
+                  </Tooltip>
+                </Menu>
+                <Box display='flex' gap={2} alignItems='center'>
+                  <IconButton size='small' {...bindTrigger(popupState)}>
+                    <MoreHoriz fontSize='small' />
+                  </IconButton>
+                </Box>
+              </span>
+            )}
+          </Box>
         </Box>
       </AccordionSummary>
       <AccordionDetails>
@@ -215,9 +250,10 @@ export function ProposalWorkflowItem({
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
-                    onRename={openEvaluationStep}
+                    onEdit={openEvaluationStep}
                     onChangeOrder={changeEvaluationStepOrder}
                     readOnly={readOnly}
+                    privateEvaluationsEnabled={!!workflow.privateEvaluations}
                   />
                 ))}
               {value === 'Permissions' &&
@@ -228,7 +264,7 @@ export function ProposalWorkflowItem({
                     evaluation={evaluation}
                     onDelete={deleteEvaluationStep}
                     onDuplicate={duplicateEvaluationStep}
-                    onRename={openEvaluationStep}
+                    onEdit={openEvaluationStep}
                     onChange={updateEvaluationStep}
                     readOnly={readOnly}
                   />

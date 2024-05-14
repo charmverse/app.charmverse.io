@@ -23,7 +23,6 @@ import { makeSelectSortedViews } from 'components/common/DatabaseEditor/store/vi
 import { FormFieldsEditor } from 'components/common/form/FormFieldsEditor';
 import { ProposalEvaluations } from 'components/proposals/ProposalPage/components/ProposalEvaluations/ProposalEvaluations';
 import { ProposalFormFieldAnswers } from 'components/proposals/ProposalPage/components/ProposalFormFieldAnswers';
-import { ProposalRewardsTable } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { ProposalStickyFooter } from 'components/proposals/ProposalPage/components/ProposalStickyFooter/ProposalStickyFooter';
 import { RewardEvaluations } from 'components/rewards/components/RewardEvaluations/RewardEvaluations';
 import { RewardStickyFooter } from 'components/rewards/components/RewardStickyFooter';
@@ -108,6 +107,7 @@ function DocumentPageComponent({
     proposal,
     refreshProposal,
     onChangeEvaluation,
+    onChangeTemplate,
     onChangeWorkflow,
     onChangeRewardSettings,
     onChangeSelectedCredentialTemplates
@@ -137,6 +137,8 @@ function DocumentPageComponent({
   const selectSortedViews = useMemo(makeSelectSortedViews, []);
   const board = useAppSelector((state) => selectBoard(state, card?.parentId ?? ''));
   const boardViews = useAppSelector((state) => selectSortedViews(state, board?.id || ''));
+  const currentViewId = router.query.viewId as string | undefined;
+  const activeView = boardViews.find((view) => view.id === currentViewId);
   const cards = useAppSelector((state) =>
     selectViewCardsSortedFilteredAndGrouped(state, {
       boardId: board?.id || '',
@@ -404,6 +406,7 @@ function DocumentPageComponent({
                   proposalInput={proposal}
                   templateId={proposal?.page?.sourceTemplateId}
                   onChangeEvaluation={onChangeEvaluation}
+                  onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}
                   onChangeWorkflow={onChangeWorkflow}
                   onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
@@ -433,6 +436,7 @@ function DocumentPageComponent({
                       syncWithPageId={page.syncWithPageId}
                       board={board}
                       card={card}
+                      activeView={activeView}
                       showCard={_showCard}
                       cards={cards}
                       views={boardViews}
@@ -470,6 +474,7 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
+                      expandFieldsByDefault={proposal.status === 'draft'}
                       formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
@@ -482,6 +487,43 @@ function DocumentPageComponent({
                       threads={threads}
                       project={proposal.project}
                       isDraft={proposal?.status === 'draft'}
+                      milestoneProps={{
+                        containerWidth,
+                        pendingRewards: proposal.fields?.pendingRewards || [],
+                        requiredTemplateId: proposal.fields?.rewardsTemplateId,
+                        reviewers: proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat(),
+                        assignedSubmitters: proposal.authors.map((a) => a.userId),
+                        readOnly: !proposal.permissions.edit,
+                        rewardIds: proposal.rewardIds || [],
+                        onSave: (pendingReward) => {
+                          const isExisting = proposal.fields?.pendingRewards?.find(
+                            (r) => r.draftId === pendingReward.draftId
+                          );
+                          if (!isExisting) {
+                            onChangeRewardSettings({
+                              pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
+                            });
+
+                            return;
+                          }
+
+                          onChangeRewardSettings({
+                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
+                              if (draft.draftId === pendingReward.draftId) {
+                                return pendingReward;
+                              }
+                              return draft;
+                            })
+                          });
+                        },
+                        onDelete: (draftId: string) => {
+                          onChangeRewardSettings({
+                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
+                              (draft) => draft.draftId !== draftId
+                            )
+                          });
+                        }
+                      }}
                     />
                   )
                 ) : (
@@ -519,52 +561,6 @@ function DocumentPageComponent({
                   />
                 )}
 
-                {isStructuredProposal &&
-                  proposal?.fields?.enableRewards &&
-                  (!!proposal.fields.pendingRewards?.length || !readOnly) && (
-                    <Box mt={1}>
-                      <ProposalRewardsTable
-                        containerWidth={containerWidth}
-                        pendingRewards={proposal.fields.pendingRewards || []}
-                        requiredTemplateId={proposal.fields.rewardsTemplateId}
-                        reviewers={proposal.evaluations.map((e) => e.reviewers.filter((r) => !r.systemRole)).flat()}
-                        assignedSubmitters={proposal.authors.map((a) => a.userId)}
-                        variant='solid_button'
-                        readOnly={!proposal.permissions.edit}
-                        rewardIds={proposal.rewardIds || []}
-                        isProposalTemplate={page.type === 'proposal_template'}
-                        onSave={(pendingReward) => {
-                          const isExisting = proposal.fields?.pendingRewards?.find(
-                            (r) => r.draftId === pendingReward.draftId
-                          );
-                          if (!isExisting) {
-                            onChangeRewardSettings({
-                              pendingRewards: [...(proposal.fields?.pendingRewards || []), pendingReward]
-                            });
-
-                            return;
-                          }
-
-                          onChangeRewardSettings({
-                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].map((draft) => {
-                              if (draft.draftId === pendingReward.draftId) {
-                                return pendingReward;
-                              }
-                              return draft;
-                            })
-                          });
-                        }}
-                        onDelete={(draftId: string) => {
-                          onChangeRewardSettings({
-                            pendingRewards: [...(proposal.fields?.pendingRewards || [])].filter(
-                              (draft) => draft.draftId !== draftId
-                            )
-                          });
-                        }}
-                      />
-                    </Box>
-                  )}
-
                 {(page.type === 'proposal' || page.type === 'card' || page.type === 'card_synced') && (
                   <Box className='dont-print-me'>
                     {/* add negative margin to offset height of .charm-empty-footer */}
@@ -576,7 +572,13 @@ function DocumentPageComponent({
           </PageEditorContainer>
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
-          <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
+          <ProposalStickyFooter
+            page={page}
+            hasProjectField={!!projectProfileField}
+            proposal={proposal}
+            formAnswers={proposalFormFieldAnswers}
+            isStructuredProposal={isStructuredProposal}
+          />
         )}
         {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
           <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />

@@ -49,7 +49,7 @@ export function ProposalRewards({
   const { getFeatureTitle } = useSpaceFeatures();
   const { navigateToSpacePath } = useCharmRouter();
   const rewards = rewardIds?.map((rId) => allRewards?.find((r) => r.id === rId)).filter(isTruthy) || [];
-  const canCreatePendingRewards = !readOnly && !rewardIds?.length;
+  const canCreatePendingRewards = !readOnly && !rewardIds?.length && !isProposalTemplate;
 
   const {
     createNewReward,
@@ -215,7 +215,6 @@ export function ProposalRewards({
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}
-            isProposalTemplate={isProposalTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>

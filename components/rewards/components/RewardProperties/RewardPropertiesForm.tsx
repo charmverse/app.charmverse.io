@@ -3,7 +3,7 @@ import { Box, Collapse, Divider, Stack } from '@mui/material';
 import { useState } from 'react';
 
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
-import { TemplateSelect } from 'components/proposals/ProposalPage/components/TemplateSelect';
+import { TemplateSelect } from 'components/common/WorkflowSidebar/components/TemplateSelect';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
@@ -72,10 +72,10 @@ export function RewardPropertiesForm({
 
     onChange({
       rewardType,
-      customReward: rewardType === 'custom' ? values.customReward : undefined,
-      rewardAmount: rewardType === 'token' ? values.rewardAmount : undefined,
-      rewardToken: rewardType === 'token' ? values.rewardToken : undefined,
-      chainId: rewardType === 'token' ? values.chainId : undefined
+      customReward: rewardType === 'custom' ? values.customReward : null,
+      rewardAmount: rewardType === 'token' ? values.rewardAmount : null,
+      rewardToken: rewardType === 'token' ? values.rewardToken : null,
+      chainId: rewardType === 'token' ? values.chainId : null
     });
   }
 
@@ -109,7 +109,7 @@ export function RewardPropertiesForm({
 
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <>
-            {!isTemplate && isNewReward && (
+            {/* {!isTemplate && isNewReward && (
               <Box justifyContent='space-between' gap={2} alignItems='center' mb='6px'>
                 <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                   <PropertyLabel readOnly highlighted>
@@ -134,7 +134,7 @@ export function RewardPropertiesForm({
                   </Box>
                 </Box>
               </Box>
-            )}
+            )} */}
 
             <CustomPropertiesAdapter
               readOnly={readOnly}

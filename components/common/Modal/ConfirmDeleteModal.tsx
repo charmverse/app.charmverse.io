@@ -11,6 +11,7 @@ type Props = Pick<ModalProps, 'onClose' | 'open' | 'size'> & {
   question: string | ReactNode;
   loading?: boolean;
   buttonText?: string;
+  buttonIcon?: ReactNode;
   title?: string;
   onConfirm: () => Promise<void> | void;
   secondaryButtonText?: string;
@@ -25,6 +26,7 @@ export default function ConfirmDeleteModal({
   question,
   loading,
   buttonText = 'Delete',
+  buttonIcon,
   title,
   onConfirm,
   size,
@@ -40,25 +42,26 @@ export default function ConfirmDeleteModal({
   return (
     <Modal open={open} onClose={onClose} title={title} size={size}>
       {typeof question === 'string' ? <Typography>{question}</Typography> : question}
-      <Box sx={{ columnSpacing: 2, mt: 3, display: 'flex' }}>
+      <Box display='flex' justifyContent='flex-end' mt={3} gap={2}>
+        <Button color='secondary' variant='outlined' onClick={onClose}>
+          {secondaryButtonText}
+        </Button>
         <Button
           color={primaryButtonColor}
           sx={{
-            mr: 2,
-            fontWeight: 'bold',
-            display: 'block',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
+            fontWeight: 'bold'
+            // not sure why we needed to clip the labels
+            // display: 'block',
+            // overflow: 'hidden',
+            // textOverflow: 'ellipsis'
           }}
+          endIcon={buttonIcon}
           loading={loading}
           data-testid='confirm-delete-button'
           onClick={_onConfirm}
           disabled={disabled || loading}
         >
           {buttonText}
-        </Button>
-        <Button color='secondary' variant='outlined' onClick={onClose}>
-          {secondaryButtonText}
         </Button>
       </Box>
     </Modal>

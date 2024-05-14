@@ -1,10 +1,16 @@
+import type { WorkflowEvaluationJson } from '@charmverse/core/dist/cjs/proposals';
 import type { PageType, Prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interfaces';
 
 export async function getVoteEvaluationStepsWithBlockNumber<
-  E extends { type: ProposalEvaluationType; id: string; voteSettings?: Prisma.JsonValue }
->({ evaluations, pageType, isDraft }: { isDraft: boolean; evaluations: E[]; pageType?: PageType }) {
+  E extends {
+    type: ProposalEvaluationType;
+    id: string;
+    voteSettings?: Prisma.JsonValue;
+    actionLabels?: WorkflowEvaluationJson['actionLabels'] | Prisma.JsonValue;
+  }
+>({ evaluations, pageType, isDraft }: { isDraft: boolean; evaluations: E[]; pageType?: PageType }): Promise<E[]> {
   if (isDraft || !pageType || pageType !== 'proposal') {
     return evaluations;
   }

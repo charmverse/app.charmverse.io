@@ -12,11 +12,7 @@ export type RubricAnswerUpsert = {
   answers: FieldAnswerInput[];
 };
 
-export async function upsertProposalFormAnswers({
-  answers,
-  proposalId,
-  skipRequiredFieldCheck
-}: RubricAnswerUpsert & { skipRequiredFieldCheck?: boolean }) {
+export async function upsertProposalFormAnswers({ answers, proposalId }: RubricAnswerUpsert) {
   if (!stringUtils.isUUID(proposalId)) {
     throw new InvalidInputError(`Valid proposalId is required`);
   }
@@ -45,7 +41,7 @@ export async function upsertProposalFormAnswers({
       }
 
       // do not save answers for labels
-      if (field.type === 'label') {
+      if (field.type === 'label' || field.type === 'milestone') {
         return null;
       }
 

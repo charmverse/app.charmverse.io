@@ -79,6 +79,7 @@ function ProposalStatusSelectBase({
   displayType?: PropertyValueDisplayType;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
   const currentEvaluationResult = proposal.currentStep.result;
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
   const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
@@ -109,7 +110,13 @@ function ProposalStatusSelectBase({
     <TagSelect
       displayType={displayType}
       wrapColumn
-      readOnly={proposal.archived || readOnly || currentEvaluationStep === 'vote' || hasPublishedRewards}
+      readOnly={
+        proposal.archived ||
+        readOnly ||
+        currentEvaluationStep === 'vote' ||
+        (currentEvaluationStep === 'pass_fail' && currentEvaluationStepRequiredReviews !== 1) ||
+        hasPublishedRewards
+      }
       options={
         proposal.archived
           ? [

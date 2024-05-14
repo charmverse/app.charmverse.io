@@ -34,6 +34,7 @@ describe('src/components/kanban/kanbanColumnHeader', () => {
   };
 
   const group = {
+    id: option.id,
     option,
     cards: [card]
   };

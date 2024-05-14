@@ -46,7 +46,8 @@ const testValues: Record<TestedFormFieldTypes, string> = {
   wallet: '0x888888CfAebbEd5554c3F36BfBD233f822e9455f',
   date: '2022-12-31',
   label: 'Label',
-  project_profile: 'Project profile'
+  project_profile: 'Project profile',
+  milestone: 'Milestone'
 };
 
 test.beforeAll(async () => {
@@ -84,6 +85,7 @@ test.beforeAll(async () => {
       id: uuid(),
       createdAt: new Date(),
       title: defaultWorkflowTitle,
+      privateEvaluations: false,
       evaluations: [
         getDefaultFeedbackEvaluation(),
         getDefaultEvaluation({
@@ -130,7 +132,7 @@ test.describe.serial('Structured proposal template', () => {
 
     await proposalsListPage.structuredProposalTemplateMenu.click();
 
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await expect(documentPage.charmEditor).not.toBeVisible();
 
@@ -139,7 +141,7 @@ test.describe.serial('Structured proposal template', () => {
     await expect(proposalPage.publishNewProposalButton).toBeDisabled();
 
     // Set the title
-    await documentPage.documentTitle.getByPlaceholder('Title (required)').fill('Structured proposal template');
+    await documentPage.documentTitleInput.fill('Structured proposal template');
 
     // Start from a fresh state
     await proposalFormFieldPage.fieldMoreOptions.click();
@@ -177,8 +179,9 @@ test.describe.serial('Structured proposal template', () => {
     await proposalPage.selectEvaluationReviewer('pass_fail', spaceAdmin.id);
     await proposalPage.selectEvaluationReviewer('vote', 'space_member');
 
-    proposalPage.publishNewProposalButton.click();
-    await proposalPage.page.waitForResponse(/\/api\/proposals/);
+    const publishResponse = proposalPage.page.waitForResponse('**/publish');
+    await proposalPage.publishNewProposalButton.click();
+    await publishResponse;
   });
 
   test('Visit structured proposal template and edit/add fields', async ({
@@ -301,14 +304,14 @@ test.describe.serial('Structured proposal template', () => {
 
     await proposalPage.getSelectOption(proposalTemplate.page!.id).click();
 
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     // Should be disabled as the required fields are not filled
     await expect(proposalPage.publishNewProposalButton).toBeDisabled();
-    await expect(proposalPage.saveDraftButton).toBeEnabled();
 
     await documentPage.documentTitleInput.fill('Proposal from structured template');
 
+    const apiResponse = proposalPage.page.waitForResponse('**/form/answers');
     for (let i = 0; i < formFields.length; i++) {
       const field = formFields[i];
 
@@ -323,9 +326,7 @@ test.describe.serial('Structured proposal template', () => {
       }
     }
 
-    await proposalPage.saveDraftButton.click();
-
-    await proposalPage.page.waitForResponse(/\/api\/proposals/);
+    await apiResponse;
   });
 
   test.fixme(
@@ -395,7 +396,7 @@ test.describe.serial('Structured proposal template', () => {
 
       await Promise.all([
         page.waitForResponse('**/api/proposals/**/publish'),
-        proposalPage.completeDraftButton.click()
+        proposalPage.publishNewProposalButton.click()
       ]);
 
       await proposalPage.page.reload();

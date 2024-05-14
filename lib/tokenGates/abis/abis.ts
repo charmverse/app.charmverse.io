@@ -26,6 +26,19 @@ export const ercAbi = [
     ],
     stateMutability: 'view',
     type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'decimals',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'uint8'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
   }
 ] as const;
 
@@ -103,6 +116,13 @@ export const hatsProtocolAbi = [
     inputs: [{ internalType: 'uint256', name: '_hatId', type: 'uint256' }],
     name: 'hatSupply',
     outputs: [{ internalType: 'uint32', name: 'supply', type: 'uint32' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '_hatId', type: 'uint256' }],
+    name: 'isActive',
+    outputs: [{ internalType: 'bool', name: 'active', type: 'bool' }],
     stateMutability: 'view',
     type: 'function'
   },

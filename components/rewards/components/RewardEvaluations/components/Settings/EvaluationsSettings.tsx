@@ -6,6 +6,7 @@ import LoadingComponent from 'components/common/LoadingComponent';
 import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/EvaluationStepRow';
 import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
@@ -14,13 +15,13 @@ import { EvaluationStepSettings } from './components/EvaluationStepSettings';
 
 export type EvaluationSettingsProps = {
   rewardInput?: UpdateableRewardFields;
-  readOnly?: boolean;
+  readOnly: boolean;
   isTemplate: boolean;
   templateId: string | null | undefined;
-  requireWorkflowChangeConfirmation?: boolean;
-  expanded?: boolean;
-  onChangeReward?: (updatedReward: UpdateableRewardFields) => void;
-  onChangeWorkflow?: (workflow: RewardWorkflow) => void;
+  expanded: boolean;
+  onChangeReward: (updatedReward: UpdateableRewardFields) => void;
+  // onChangeTemplate: (value: { id: string } | null) => void;
+  onChangeWorkflow?: (workflow: RewardWorkflow) => void; // this prop is not used on application pages
   isUnpublishedReward?: boolean;
 };
 
@@ -30,15 +31,15 @@ export function EvaluationsSettings({
   readOnly,
   templateId,
   isUnpublishedReward,
-  requireWorkflowChangeConfirmation,
   expanded: expandedContainer,
   onChangeReward,
+  // onChangeTemplate,
   onChangeWorkflow
 }: EvaluationSettingsProps) {
   const { space: currentSpace } = useCurrentSpace();
   const { data: workflowOptions = [] } = useGetRewardWorkflows(currentSpace?.id);
   const { data: rewardTemplate } = useGetRewardTemplate(templateId);
-  const workflow = rewardInput && inferRewardWorkflow(workflowOptions, rewardInput);
+  const workflow = rewardInput?.fields && inferRewardWorkflow(workflowOptions, rewardInput.fields as RewardFields);
   const transformedWorkflow = useMemo(() => {
     // Make sure to remove credential step if a new reward is created without any credential templates
     if (!workflow) {
@@ -58,14 +59,13 @@ export function EvaluationsSettings({
   return (
     <LoadingComponent isLoading={!rewardInput} data-test='evaluation-settings-sidebar'>
       <Collapse in={expandedContainer}>
+        {/* <TemplateSelect onChange={onChangeTemplate} options={templatePageOptions} value={templateId} readOnly /> */}
         <WorkflowSelect
           options={workflowOptions}
           value={transformedWorkflow?.id}
           readOnly={readOnly}
           required
-          disableAddNew
           onChange={onChangeWorkflow}
-          requireConfirmation={requireWorkflowChangeConfirmation}
         />
       </Collapse>
       {transformedWorkflow &&
@@ -89,6 +89,7 @@ export function EvaluationsSettings({
                   onChange={(updated) => {
                     onChangeReward?.(updated);
                   }}
+                  workflowId={transformedWorkflow.id}
                   rewardInput={rewardInput}
                 />
               )}

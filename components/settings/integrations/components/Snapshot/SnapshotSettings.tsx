@@ -1,19 +1,21 @@
-import type { Space } from '@charmverse/core/prisma-client';
+import type { Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Box from '@mui/material/Box';
+import { Box, Stack, TextField } from '@mui/material';
 import InputAdornment from '@mui/material/InputAdornment';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useUpdateSpace } from 'charmClient/hooks/spaces';
 import { Button } from 'components/common/Button';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { useConfirmationModal } from 'hooks/useConfirmationModal';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { getSnapshotSpace } from 'lib/snapshot/getSpace';
 import { isTruthy } from 'lib/utils/types';
+
+import { IntegrationContainer } from '../IntegrationContainer';
 
 const schema = yup.object({
   snapshotDomain: yup
@@ -31,12 +33,16 @@ const schema = yup.object({
 
 type FormValues = yup.InferType<typeof schema>;
 
-export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; space: Space }) {
+export function SnapshotSettings({ isAdmin, space }: { isAdmin: boolean; space: Space }) {
   const { trigger: updateSpace, isMutating: updateSpaceLoading } = useUpdateSpace(space.id);
   const { refreshCurrentSpace } = useCurrentSpace();
+  const [expanded, setExpanded] = useState(false);
+  const { showError } = useSnackbar();
+  const { showConfirmation } = useConfirmationModal();
   const {
     getValues,
     register,
+    reset,
     formState: { isDirty, errors }
   } = useForm<FormValues>({
     defaultValues: {
@@ -46,20 +52,49 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
     mode: 'onSubmit'
   });
 
-  const updateSnapshotDomain = async () => {
+  const isConnected = !!space.snapshotDomain;
+
+  async function updateSnapshotDomain() {
     const values = getValues();
     if (isDirty && isAdmin) {
-      await updateSpace({ snapshotDomain: values.snapshotDomain || null }, { onSuccess: () => refreshCurrentSpace() });
+      try {
+        await updateSpace({ snapshotDomain: values.snapshotDomain || null }, { onSuccess: refreshCurrentSpace });
+      } catch (error) {
+        showError(error, 'Error updating Snapshot domain');
+      }
     }
-  };
+  }
+
+  function clearDomain() {
+    showConfirmation({
+      message: 'Clear the Snapshot domain?',
+      confirmButton: 'Disconnect',
+      onConfirm: () => updateSpace({ snapshotDomain: null }, { onSuccess: refreshCurrentSpace })
+    });
+  }
+
+  useEffect(() => {
+    reset({
+      snapshotDomain: space.snapshotDomain || ''
+    });
+  }, [space?.snapshotDomain, reset]);
 
   return (
-    <Box>
-      <Stack flexDirection='row' alignItems='center' gap={1}>
-        {!space.snapshotDomain && !isAdmin ? (
-          <Typography>No Snapshot domain connected yet. Only space admins can configure this.</Typography>
-        ) : (
+    <IntegrationContainer
+      title='Snapshot.org'
+      subheader='Publish votes to Snapshot'
+      expanded={expanded}
+      setExpanded={setExpanded}
+      isAdmin={isAdmin}
+      isConnected={isConnected}
+      onCancel={() => reset({ snapshotDomain: space.snapshotDomain || '' })}
+    >
+      <Stack gap={2}>
+        <div>
+          <FieldLabel>Snapshot domain</FieldLabel>
           <TextField
+            autoFocus
+            placeholder='your-domain.eth'
             {...register('snapshotDomain')}
             InputProps={{
               startAdornment: <InputAdornment position='start'>https://snapshot.org/</InputAdornment>
@@ -69,8 +104,8 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
             error={!!errors.snapshotDomain?.message}
             helperText={errors.snapshotDomain?.message}
           />
-        )}
-        {isAdmin && (
+        </div>
+        <Box display='flex' justifyContent='flex-start' gap={2}>
           <Button
             disabledTooltip={!isAdmin ? 'Only admins can change snapshot domain' : undefined}
             disableElevation
@@ -80,8 +115,13 @@ export function SnapshotIntegration({ isAdmin, space }: { isAdmin: boolean; spac
           >
             Save
           </Button>
-        )}
+          {isConnected && (
+            <Button color='error' variant='outlined' onClick={clearDomain}>
+              Disconnect
+            </Button>
+          )}
+        </Box>
       </Stack>
-    </Box>
+    </IntegrationContainer>
   );
 }

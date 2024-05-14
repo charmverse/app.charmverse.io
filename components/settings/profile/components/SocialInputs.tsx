@@ -7,7 +7,7 @@ import type { Social } from 'lib/members/interfaces';
 
 type SocialInputsProps = {
   social?: Social;
-  onChange: (social: Social) => Promise<void>;
+  onChange: (social: Social) => void;
   readOnly?: boolean;
   errors?: FieldErrors<Record<keyof Social, string | null>>;
   required?: Record<keyof Social, boolean>;

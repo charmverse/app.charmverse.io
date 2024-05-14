@@ -38,7 +38,8 @@ import {
   fieldTypeLabelRecord,
   fieldTypePlaceholderRecord,
   formFieldTypes,
-  nonDuplicateFieldTypes
+  nonDuplicateFieldTypes,
+  nonPrivateFieldTypes
 } from './constants';
 import { FieldTypeRenderer } from './fields/FieldTypeRenderer';
 import type { SelectOptionType } from './fields/Select/interfaces';
@@ -254,7 +255,7 @@ function ExpandedFormField({
         </>
       )}
 
-      {formField.type !== 'project_profile' && (
+      {!nonPrivateFieldTypes.includes(formField.type) && (
         <Stack gap={0.5} flexDirection='row' alignItems='center'>
           <Switch
             data-test='form-field-private-switch'

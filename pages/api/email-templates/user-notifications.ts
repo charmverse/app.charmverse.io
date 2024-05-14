@@ -178,6 +178,9 @@ const createProposalNotification = ({
     read: false,
     evaluation: {
       title: 'Review'
+    },
+    previousEvaluation: {
+      title: 'Feedback'
     }
   };
 };

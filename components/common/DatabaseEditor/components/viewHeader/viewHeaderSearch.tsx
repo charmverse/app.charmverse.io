@@ -83,6 +83,7 @@ function ViewHeaderSearch(): JSX.Element {
   }
   return (
     <IconButton
+      tooltip='Search'
       style={{ width: '32px' }}
       onClick={() => setIsSearching(true)}
       icon={<SearchIcon color='secondary' fontSize='small' />}

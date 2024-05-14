@@ -8,7 +8,6 @@ import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { Constants } from 'lib/databases/constants';
-import { prettyPrint } from 'lib/utils/strings';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';

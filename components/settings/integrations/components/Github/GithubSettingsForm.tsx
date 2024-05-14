@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import type { RewardsGithubRepo } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { SelectChangeEvent } from '@mui/material';
-import { alpha, Chip, Grid, Link, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Chip, Grid, Link, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useForm } from 'react-hook-form';
 import useSWRMutation from 'swr/mutation';
@@ -21,6 +21,7 @@ import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { GithubApplicationData } from 'pages/api/spaces/[id]/github';
 import type { ConnectRewardGithubRepoPayload } from 'pages/api/spaces/[id]/github/repo';
 import type { UpdateGithubRepoWithReward } from 'pages/api/spaces/[id]/github/repo/[repoId]';
@@ -39,7 +40,7 @@ const formFieldOptions = {
   shouldValidate: true
 };
 
-export function ConnectGithubRepoForm({
+export function GithubSettingsForm({
   installationId,
   spaceId,
   repositories,
@@ -56,6 +57,7 @@ export function ConnectGithubRepoForm({
   githubAppName: string;
   hideDisconnect?: boolean;
 }) {
+  const { getFeatureTitle } = useSpaceFeatures();
   const disconnectGithubModalState = usePopupState({ variant: 'popover', popupId: 'disconnect-github' });
   const isAdmin = useIsAdmin();
   const { trigger: disconnectGithubApplication, isMutating: isDisconnectingGithubApplication } =
@@ -276,11 +278,8 @@ export function ConnectGithubRepoForm({
             </Select>
           </FieldWrapper>
 
-          <Stack flexDirection='row' gap={1}>
+          <Stack flexDirection='row' gap={2}>
             <Button
-              sx={{
-                width: 'fit-content'
-              }}
               variant='contained'
               color='primary'
               loading={isConnectingGithubRepository || isUpdatingGithubRepoWithReward}
@@ -292,9 +291,6 @@ export function ConnectGithubRepoForm({
             </Button>
             {!hideDisconnect && (
               <Button
-                sx={{
-                  width: 'fit-content'
-                }}
                 variant='outlined'
                 color='error'
                 loading={isDisconnectingGithubApplication}
@@ -309,7 +305,7 @@ export function ConnectGithubRepoForm({
               onClose={disconnectGithubModalState.close}
               open={disconnectGithubModalState.isOpen}
               buttonText='Disconnect'
-              question='You will disconnect the Github application from this space. This will stop syncing rewards with repository issues.'
+              question={`This will stop syncing ${getFeatureTitle('rewards')} with repository issues.`}
               onConfirm={handleDisconnect}
             />
           </Stack>

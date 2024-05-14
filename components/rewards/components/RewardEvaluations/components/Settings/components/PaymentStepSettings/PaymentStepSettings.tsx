@@ -24,10 +24,11 @@ export function PaymentStepSettings({
   readOnly,
   onChange,
   rewardStatus,
-  isTemplate
+  isTemplate,
+  rewardPublished
 }: Pick<
   EvaluationStepSettingsProps,
-  'rewardInput' | 'rewardTemplateInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate'
+  'rewardInput' | 'rewardTemplateInput' | 'readOnly' | 'onChange' | 'rewardStatus' | 'isTemplate' | 'rewardPublished'
 >) {
   const rewardType = rewardInput ? rewardInput.rewardType ?? getRewardType(rewardInput) : 'token';
 
@@ -47,10 +48,10 @@ export function PaymentStepSettings({
 
     onChange({
       rewardType: _rewardType,
-      customReward: _rewardType === 'custom' ? rewardInput?.customReward : undefined,
-      rewardAmount: _rewardType === 'token' ? rewardInput?.rewardAmount : undefined,
-      rewardToken: _rewardType === 'token' ? rewardInput?.rewardToken : undefined,
-      chainId: _rewardType === 'token' ? rewardInput?.chainId : undefined
+      customReward: _rewardType === 'custom' ? rewardInput?.customReward : null,
+      rewardAmount: _rewardType === 'token' ? rewardInput?.rewardAmount : null,
+      rewardToken: _rewardType === 'token' ? rewardInput?.rewardToken : null,
+      chainId: _rewardType === 'token' ? rewardInput?.chainId : null
     });
   }
 
@@ -70,7 +71,11 @@ export function PaymentStepSettings({
       <RowStack>
         <FieldLabel style={{ width: 150 }}>Type</FieldLabel>
         <Box flexGrow={1}>
-          <RewardTypeSelect readOnly={readOnly} value={rewardType} onChange={setRewardType} />
+          <RewardTypeSelect
+            readOnly={readOnly || (!rewardPublished && !!rewardTemplateInput?.id)}
+            value={rewardType}
+            onChange={setRewardType}
+          />
         </Box>
       </RowStack>
 
@@ -81,8 +86,8 @@ export function PaymentStepSettings({
             onChange={onRewardTokenUpdate}
             defaultValues={rewardInput}
             readOnly={!!readOnly}
-            readOnlyToken={!!rewardTemplateInput?.rewardToken}
-            readOnlyTokenAmount={!!rewardTemplateInput?.rewardAmount}
+            readOnlyToken={!rewardPublished && !!rewardTemplateInput?.rewardToken}
+            readOnlyTokenAmount={!rewardPublished && !!rewardTemplateInput?.rewardAmount}
             requireTokenAmount={!isTemplate}
           />
         </Box>

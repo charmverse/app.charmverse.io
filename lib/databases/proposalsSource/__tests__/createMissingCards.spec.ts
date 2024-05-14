@@ -4,46 +4,27 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { v4 } from 'uuid';
 
+import { setPageUpdatedAt } from 'lib/proposals/setPageUpdatedAt';
 import { generateBoard, generateProposal } from 'testing/setupDatabase';
 
 import { createMissingCards } from '../createMissingCards';
 
+async function createTestData() {
+  const generated = await testUtilsUser.generateUserAndSpace();
+  const board = await generateBoard({
+    createdBy: generated.user.id,
+    spaceId: generated.space.id,
+    viewDataSource: 'proposals'
+  });
+  return {
+    ...generated,
+    board
+  };
+}
+
 describe('createMissingCards', () => {
-  let user: User;
-  let space: Space;
-  let board: Page;
-
-  beforeAll(async () => {
-    const generated = await testUtilsUser.generateUserAndSpace();
-    user = generated.user;
-    space = generated.space;
-    const generatedBoard = await generateBoard({
-      createdBy: user.id,
-      spaceId: space.id,
-      viewDataSource: 'proposals'
-    });
-    board = generatedBoard;
-  });
-
-  beforeEach(async () => {
-    await prisma.$transaction([
-      prisma.page.deleteMany({
-        where: {
-          spaceId: space.id,
-          id: {
-            not: board.id
-          }
-        }
-      }),
-      prisma.proposal.deleteMany({
-        where: {
-          spaceId: space.id
-        }
-      })
-    ]);
-  });
-
   it('should create cards from proposals', async () => {
+    const { user, space, board } = await createTestData();
     const newProposal = await testUtilsProposals.generateProposal({
       authors: [user.id],
       proposalStatus: 'published',
@@ -57,7 +38,7 @@ describe('createMissingCards', () => {
       userId: user.id
     });
     const cards = await createMissingCards({ boardId: board.id });
-    expect(cards.length).toBe(1);
+    expect(cards).toHaveLength(1);
     expect(
       cards.every(
         (card) =>
@@ -68,7 +49,24 @@ describe('createMissingCards', () => {
     ).toBeTruthy();
   });
 
+  it('should only create cards once', async () => {
+    const { user, space, board } = await createTestData();
+    const newProposal = await testUtilsProposals.generateProposal({
+      authors: [user.id],
+      proposalStatus: 'published',
+      spaceId: space.id,
+      userId: user.id
+    });
+    const cards = await createMissingCards({ boardId: board.id });
+    expect(cards).toHaveLength(1);
+
+    // check that we dont create the same cards again
+    const newCards = await createMissingCards({ boardId: board.id });
+    expect(newCards).toHaveLength(0);
+  });
+
   it('should not create cards from draft proposals', async () => {
+    const { user, space, board } = await createTestData();
     await generateProposal({
       authors: [],
       proposalStatus: 'draft',
@@ -92,27 +90,21 @@ describe('createMissingCards', () => {
   });
 
   it('should not create cards if no proposals are found', async () => {
+    const { board } = await createTestData();
     const cards = await createMissingCards({ boardId: board.id });
 
     expect(cards.length).toBe(0);
   });
 
-  // TODO ---- Cleanup tests above. They are mutating the same board, and only returning newly created cards.
   it('should not create cards from archived proposals', async () => {
-    const { space: testSpace, user: testUser } = await testUtilsUser.generateUserAndSpace();
-
-    const testBoard = await generateBoard({
-      createdBy: testUser.id,
-      spaceId: testSpace.id,
-      viewDataSource: 'proposals'
-    });
+    const { user, space, board } = await createTestData();
 
     const visibleProposal = await testUtilsProposals.generateProposal({
       authors: [],
       proposalStatus: 'published',
       reviewers: [],
-      spaceId: testSpace.id,
-      userId: testUser.id
+      spaceId: space.id,
+      userId: user.id
     });
 
     const ignoredProposal = await testUtilsProposals.generateProposal({
@@ -120,11 +112,11 @@ describe('createMissingCards', () => {
       archived: true,
       proposalStatus: 'published',
       reviewers: [],
-      spaceId: testSpace.id,
-      userId: testUser.id
+      spaceId: space.id,
+      userId: user.id
     });
 
-    const cards = await createMissingCards({ boardId: testBoard.id });
+    const cards = await createMissingCards({ boardId: board.id });
 
     expect(cards.length).toBe(1);
 
@@ -202,5 +194,43 @@ describe('createMissingCards', () => {
         }))
       )
     );
+  });
+
+  it('should create cards for proposals that were published later', async () => {
+    const { user, space, board } = await createTestData();
+
+    const ignoredProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'draft',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const visibleProposal = await testUtilsProposals.generateProposal({
+      authors: [],
+      proposalStatus: 'published',
+      reviewers: [],
+      spaceId: space.id,
+      userId: user.id
+    });
+
+    const cards = await createMissingCards({ boardId: board.id });
+    // expect only one card to be created
+    expect(cards.map((c) => c.syncWithPageId)).toEqual([visibleProposal.id]);
+
+    // publish older proposal
+    await prisma.proposal.update({
+      where: {
+        id: ignoredProposal.id
+      },
+      data: {
+        status: 'published'
+      }
+    });
+    await setPageUpdatedAt({ proposalId: ignoredProposal.id, userId: user.id });
+
+    const newCards = await createMissingCards({ boardId: board.id });
+    expect(newCards.map((c) => c.syncWithPageId)).toEqual([ignoredProposal.id]);
   });
 });

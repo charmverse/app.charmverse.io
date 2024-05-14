@@ -45,7 +45,7 @@ async function resizeImage(req: NextApiRequest, res: NextApiResponse) {
     const image = Array.isArray(files[FORM_DATA_FILE_PART_NAME])
       ? files[FORM_DATA_FILE_PART_NAME][0]
       : files.uploadedFile;
-    const optimizedBuffer = await sharp(Buffer.concat(chunks))
+    const optimizedBuffer = await sharp(Buffer.concat(chunks), { animated: true })
       .resize({
         withoutEnlargement: true,
         width: resizeType ? IMAGE_MAX_WIDTH[resizeType] : IMAGE_MAX_WIDTH.emoji

@@ -73,7 +73,9 @@ export function SubmitStepReview({ reward }: { reward: RewardWithUsers }) {
       ) : (
         <Box>
           <FormLabel>
-            <Typography variant='subtitle1'>Assigned applicants</Typography>
+            <Typography variant='subtitle1' sx={{ mb: 1 }}>
+              Assigned applicants
+            </Typography>
           </FormLabel>
           <UserSelect
             memberIds={reward.assignedSubmitters ?? []}

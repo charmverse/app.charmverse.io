@@ -1,4 +1,4 @@
-import type { CredentialTemplate } from '@charmverse/core/dist/cjs/prisma-client';
+import type { CredentialTemplate } from '@charmverse/core/prisma-client';
 import { Box, Stack } from '@mui/material';
 
 import { IssueProposalCredentials } from 'components/common/DatabaseEditor/components/viewHeader/ViewHeaderRowsMenu/components/IssueProposalCredentials';

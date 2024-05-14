@@ -162,7 +162,7 @@ export function useFormFields({
     )
   });
 
-  const values = watch() as Record<string, FormFieldValue>;
+  const values = watch();
 
   function onFormChange(updatedFields: { id: string; value: FormFieldValue }[]) {
     updatedFields.forEach((updatedField) => {

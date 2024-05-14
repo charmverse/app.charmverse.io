@@ -50,8 +50,6 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
         } as ProposalEvaluationInput)
     ) as ProposalEvaluationInput[],
     pageProps: {
-      headerImage: null,
-      icon: null,
       sourceTemplateId: null,
       contentText: '',
       type: 'proposal',

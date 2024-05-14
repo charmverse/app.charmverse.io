@@ -24,11 +24,13 @@ type Props = {
   showCard: (cardId: string) => void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
-  onDropToGroupHeader: (srcOption: IPropertyOption, dstOption?: IPropertyOption) => void;
+  onDropToGroupHeader: (srcOption: BoardGroup, dstOption?: BoardGroup) => void;
   onDropToCard: (srcCard: Card, dstCard: Card) => void;
   onDropToGroup: (srcCard: Card, groupID: string, dstCardID: string) => void;
   disableAddingCards?: boolean;
   readOnlyTitle?: boolean;
+  expandSubRowsOnLoad?: boolean;
+  rowExpansionLocalStoragePrefix?: string;
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
@@ -36,7 +38,7 @@ type Props = {
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
   const { board, activeView, group, onDropToGroup, groupByProperty } = props;
-  const groupId = group.option.id;
+  const groupId = group.id;
 
   const [{ isOver }, drop] = useDrop<Card, any, { isOver: boolean }>(
     () => ({
@@ -59,7 +61,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
   }
 
   return (
-    <div ref={drop} className={className} key={group.option.id}>
+    <div ref={drop} className={className} key={group.option?.id || group.value}>
       <TableGroupHeaderRow
         group={group}
         board={board}
@@ -80,6 +82,9 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           activeView={activeView}
           columnRefs={props.columnRefs}
           cards={group.cards}
+          disableDragAndDrop={
+            groupByProperty && groupByProperty.type !== 'select' && groupByProperty.type !== 'multiSelect'
+          } // disables drag and drop
           selectedCardIds={props.selectedCardIds}
           readOnly={props.readOnly}
           cardIdToFocusOnRender={props.cardIdToFocusOnRender}
@@ -90,6 +95,8 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           onCardClicked={props.onCardClicked}
           onDrop={props.onDropToCard}
           readOnlyTitle={props.readOnlyTitle}
+          expandSubRowsOnLoad={props.expandSubRowsOnLoad}
+          rowExpansionLocalStoragePrefix={props.rowExpansionLocalStoragePrefix}
           subRowsEmptyValueContent={props.subRowsEmptyValueContent}
           checkedIds={props.checkedIds}
           setCheckedIds={props.setCheckedIds}

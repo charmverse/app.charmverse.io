@@ -14,7 +14,6 @@ test.describe('Review reward', () => {
   let adminUser: User;
   let spaceMember: User;
   let reward: Bounty;
-  let rewardDocument: Page;
   let application: Application;
   let applicationFromMember: Application;
 
@@ -27,11 +26,6 @@ test.describe('Review reward', () => {
       status: 'open',
       maxSubmissions: 10,
       rewardToken: 'ETH'
-    });
-    rewardDocument = await prisma.page.findUniqueOrThrow({
-      where: {
-        id: reward.id
-      }
     });
     application = await prisma.application.create({
       data: {

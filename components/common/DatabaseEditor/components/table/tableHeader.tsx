@@ -355,6 +355,7 @@ function TableHeader(props: Props): JSX.Element {
         backgroundColor: isOver ? 'var(--charmeditor-active)' : ''
       }}
       ref={columnRef}
+      data-test={`table-property-${template.type}`}
     >
       <Stack width='100%' justifyContent='center'>
         {readOnly ? (

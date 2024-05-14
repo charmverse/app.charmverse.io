@@ -1,6 +1,6 @@
 import type { ProposalReviewer } from '@charmverse/core/prisma';
 import { DeleteOutlineOutlined as TrashIcon } from '@mui/icons-material';
-import { Box, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
+import { Box, ListItemIcon, ListItemText, MenuItem, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
 import { InlineDatabaseContainer } from 'components/common/CharmEditor/components/inlineDatabase/components/InlineDatabaseContainer';
@@ -9,7 +9,6 @@ import Table from 'components/common/DatabaseEditor/components/table/table';
 import LoadingComponent from 'components/common/LoadingComponent';
 import { NewDocumentPage } from 'components/common/PageDialog/components/NewDocumentPage';
 import { NewPageDialog } from 'components/common/PageDialog/NewPageDialog';
-import { DatabaseStickyHeader } from 'components/common/PageLayout/components/DatabasePageContent';
 import { useRewards } from 'components/rewards/hooks/useRewards';
 import { useRewardsBoard } from 'components/rewards/hooks/useRewardsBoard';
 import type { BoardReward } from 'components/rewards/hooks/useRewardsBoardAdapter';
@@ -30,7 +29,7 @@ import { useProposalRewards } from '../../hooks/useProposalRewards';
 import { AttachRewardButton } from './AttachRewardButton';
 import { ProposalRewardsForm } from './ProposalRewardsForm';
 
-type Props = {
+export type ProposalRewardsTableProps = {
   containerWidth: number;
   pendingRewards: ProposalPendingReward[] | undefined;
   rewardIds: string[];
@@ -56,7 +55,7 @@ export function ProposalRewardsTable({
   requiredTemplateId,
   variant,
   isProposalTemplate
-}: Props) {
+}: ProposalRewardsTableProps) {
   const { space } = useCurrentSpace();
   const { boardBlock, isLoading } = useRewardsBoard();
   const { rewards: allRewards, isLoading: isLoadingRewards } = useRewards();
@@ -147,18 +146,6 @@ export function ProposalRewardsTable({
     <>
       <InlineDatabaseContainer className='focalboard-body' containerWidth={containerWidth}>
         <div className='BoardComponent drag-area-container'>
-          <DatabaseStickyHeader>
-            <Box display={cards.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
-              <Box my={1}>
-                <Typography variant='h5'>{getFeatureTitle('Rewards')}</Typography>
-              </Box>
-              <Box my={1} className='dont-print-me'>
-                {canCreatePendingRewards && !loadingData && (
-                  <AttachRewardButton createNewReward={createNewReward} variant={variant} />
-                )}
-              </Box>
-            </Box>
-          </DatabaseStickyHeader>
           {loadingData ? (
             <LoadingComponent height={500} isLoading />
           ) : cards.length ? (
@@ -191,6 +178,14 @@ export function ProposalRewardsTable({
           ) : null}
         </div>
       </InlineDatabaseContainer>
+      <Box display={cards.length ? 'flex' : 'block'} justifyContent='space-between' alignItems='center'>
+        <AttachRewardButton
+          disabled={!canCreatePendingRewards || isProposalTemplate}
+          createNewReward={createNewReward}
+          variant={variant}
+        />
+      </Box>
+
       <NewPageDialog
         contentUpdated={!readOnly && (contentUpdated || isDirty)}
         disabledTooltip={newRewardErrors}
@@ -230,7 +225,6 @@ export function ProposalRewardsTable({
             templateId={newPageValues?.templateId}
             readOnlyTemplate={!!requiredTemplateId}
             selectTemplate={selectTemplate}
-            isProposalTemplate={isProposalTemplate}
           />
         </NewDocumentPage>
       </NewPageDialog>

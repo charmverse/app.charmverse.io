@@ -50,7 +50,7 @@ const defaultProperty: IPropertyTemplate = {
 
 export default function KanbanColumnHeader(props: Props): JSX.Element {
   const { board, activeView, intl, group, groupByProperty } = props;
-  const [groupTitle, setGroupTitle] = useState(group.option.value);
+  const [groupTitle, setGroupTitle] = useState(group.option?.value || group.value || '');
 
   const headerRef = useRef<HTMLDivElement>(null);
 
@@ -75,8 +75,8 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
   );
 
   useEffect(() => {
-    setGroupTitle(group.option.value);
-  }, [group.option.value]);
+    setGroupTitle(group.option?.value || group.value || '');
+  }, [group.option?.value, group.value]);
 
   drop(drag(headerRef));
   let className = 'octo-board-header-cell KanbanColumnHeader';
@@ -84,7 +84,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
     className += ' dragover';
   }
 
-  const groupCalculation = props.activeView.fields.kanbanCalculations[props.group.option.id];
+  const groupCalculation = props.activeView.fields.kanbanCalculations[props.group.id];
   const calculationValue = groupCalculation ? groupCalculation.calculation : defaultCalculation;
   const calculationProperty = groupCalculation
     ? props.board.fields.cardProperties.find((property) => property.id === groupCalculation.propertyId) ||
@@ -93,18 +93,18 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
 
   const formattedGroupTitle =
     groupByProperty?.type === 'proposalStatus'
-      ? EVALUATION_STATUS_LABELS[group.option.value as ProposalEvaluationStatus]
+      ? EVALUATION_STATUS_LABELS[group.option?.value as ProposalEvaluationStatus]
       : groupTitle;
 
   return (
     <div
-      key={group.option.id || 'empty'}
+      key={group.id || 'empty'}
       ref={headerRef}
       style={{ opacity: isDragging ? 0.5 : 1 }}
       className={className}
       draggable={!props.readOnly}
     >
-      {groupByProperty && !group.option.id && (
+      {groupByProperty && !group.id && (
         <Label
           title={intl.formatMessage(
             {
@@ -114,29 +114,23 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             { property: groupByProperty.name }
           )}
         >
-          <FormattedMessage
-            id='BoardComponent.no-property'
-            defaultMessage='No {property}'
-            values={{
-              property: groupByProperty.name
-            }}
-          />
+          {group.value || group.option?.value || ''}
         </Label>
       )}
-      {group.option.id && (
-        <Label color={group.option.color}>
+      {group.option?.id && (
+        <Label color={group.option!.color}>
           <Editable
             value={formattedGroupTitle}
             placeholderText='New Select'
             onChange={setGroupTitle}
             onSave={() => {
               if (groupTitle.trim() === '') {
-                setGroupTitle(group.option.value);
+                setGroupTitle(group.option!.value);
               }
-              props.propertyNameChanged(group.option, groupTitle);
+              props.propertyNameChanged(group.option!, groupTitle);
             }}
             onCancel={() => {
-              setGroupTitle(group.option.value);
+              setGroupTitle(group.option!.value);
             }}
             readOnly={props.readOnly || props.readOnlyTitle}
             spellCheck={true}
@@ -161,7 +155,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
           const newCalculations = {
             ...props.activeView.fields.kanbanCalculations
           };
-          newCalculations[props.group.option.id] = {
+          newCalculations[props.group.id] = {
             calculation: data.calculation,
             propertyId: data.propertyId
           };
@@ -183,16 +177,16 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
                 id='hide-column-action'
                 icon={<VisibilityOffOutlinedIcon fontSize='small' />}
                 name={intl.formatMessage({ id: 'BoardComponent.hide', defaultMessage: 'Hide' })}
-                onClick={() => mutator.hideViewColumn(activeView, group.option.id || '')}
+                onClick={() => mutator.hideViewColumn(activeView, group.id || '')}
               />
-              {group.option.id && !props.readOnlyTitle && (
+              {group.option?.id && !props.readOnlyTitle && (
                 <>
                   {!proposalPropertyTypesList.includes((groupByProperty?.type || '') as any) && (
                     <Menu.Text
                       id='delete'
                       icon={<DeleteOutlineIcon fontSize='small' color='secondary' />}
                       name={intl.formatMessage({ id: 'BoardComponent.delete', defaultMessage: 'Delete' })}
-                      onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option)}
+                      onClick={() => mutator.deletePropertyOption(board, groupByProperty!, group.option!)}
                     />
                   )}
 
@@ -202,7 +196,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
                       key={key}
                       id={key}
                       name={color}
-                      onClick={() => mutator.changePropertyOptionColor(board, groupByProperty!, group.option, key)}
+                      onClick={() => mutator.changePropertyOptionColor(board, groupByProperty!, group.option!, key)}
                     />
                   ))}
                 </>
@@ -213,7 +207,7 @@ export default function KanbanColumnHeader(props: Props): JSX.Element {
             <IconButton
               icon={<AddIcon fontSize='small' />}
               onClick={() => {
-                props.addCard(group.option.id, true);
+                props.addCard(group.option!.id, true);
               }}
             />
           )}

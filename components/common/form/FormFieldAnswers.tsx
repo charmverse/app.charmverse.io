@@ -1,4 +1,4 @@
-import type { FormField, FormFieldAnswer } from '@charmverse/core/prisma-client';
+import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { useEffect, useMemo, useState } from 'react';
@@ -6,10 +6,11 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
 import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
+import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { FormFieldValue } from 'lib/forms/interfaces';
+import type { FormFieldValue, FieldAnswerInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -35,7 +36,7 @@ type FormFieldAnswersProps = {
   formFields?: (Pick<FormField, 'type' | 'name' | 'required' | 'id' | 'description' | 'private' | 'fieldConfig'> & {
     value?: FormFieldValue;
     options?: SelectOptionType[];
-    formFieldAnswer?: FormFieldAnswer | null;
+    formFieldAnswer?: FieldAnswerInput | null;
   })[];
   disabled?: boolean;
   enableComments: boolean;
@@ -54,6 +55,7 @@ type FormFieldAnswersProps = {
   threads?: Record<string, ThreadWithComments | undefined>;
   project?: ProjectWithMembers | null;
   proposalId?: string;
+  milestoneProps?: ProposalRewardsTableProps;
 };
 
 const StyledStack = styled(Stack)`
@@ -94,7 +96,8 @@ export function FormFieldAnswersControlled({
   pageId,
   project,
   threads = {},
-  proposalId
+  proposalId,
+  milestoneProps
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
@@ -164,7 +167,7 @@ export function FormFieldAnswersControlled({
     <FormFieldAnswersContainer>
       {formFields?.map((formField) => {
         const fieldAnswerThreads =
-          (formField.formFieldAnswer ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
+          (formField.formFieldAnswer?.id ? fieldAnswerIdThreadRecord[formField.formFieldAnswer.id] : []) ?? [];
         return (
           <StyledStack
             key={formField.id}
@@ -194,7 +197,7 @@ export function FormFieldAnswersControlled({
                       }}
                       inputEndAdornment={
                         pageId &&
-                        formField.formFieldAnswer &&
+                        formField.formFieldAnswer?.id &&
                         user && (
                           <Box
                             sx={{
@@ -207,7 +210,7 @@ export function FormFieldAnswersControlled({
                             }}
                           >
                             <FormFieldAnswerComment
-                              formFieldAnswer={formField.formFieldAnswer}
+                              formFieldAnswerId={formField.formFieldAnswer.id}
                               pageId={pageId}
                               formFieldName='Project profile'
                               disabled={disabled}
@@ -238,10 +241,11 @@ export function FormFieldAnswersControlled({
                           }
                         : undefined
                     }
+                    milestoneProps={milestoneProps}
                     inputEndAdornment={
                       pageId &&
                       formField.type !== 'label' &&
-                      formField.formFieldAnswer &&
+                      formField.formFieldAnswer?.id &&
                       user && (
                         <Box
                           sx={{
@@ -254,7 +258,7 @@ export function FormFieldAnswersControlled({
                           }}
                         >
                           <FormFieldAnswerComment
-                            formFieldAnswer={formField.formFieldAnswer}
+                            formFieldAnswerId={formField.formFieldAnswer.id}
                             pageId={pageId}
                             formFieldName={formField.name}
                             disabled={disabled}

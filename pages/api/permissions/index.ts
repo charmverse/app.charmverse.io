@@ -166,6 +166,12 @@ async function addPagePermission(req: NextApiRequest, res: NextApiResponse<Assig
 
   updateTrackPageProfile(pageId);
 
+  log.info('User added page permissions', {
+    pageId,
+    permission: createdPermission,
+    userId: req.session.user.id
+  });
+
   return res.status(201).json(createdPermission);
 }
 async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
@@ -192,6 +198,12 @@ async function removePagePermission(req: NextApiRequest, res: NextApiResponse) {
   await req.premiumPermissionsClient.pages.deletePagePermission({ permissionId });
 
   updateTrackPageProfile(permission.pageId);
+
+  log.info('User removed page permissions', {
+    pageId: permission.pageId,
+    permission,
+    userId: req.session.user.id
+  });
 
   return res.status(200).json({
     success: true

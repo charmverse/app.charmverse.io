@@ -1,4 +1,4 @@
-import type { SynapsUserKycStatus } from '@charmverse/core/dist/cjs/prisma-client';
+import type { SynapsUserKycStatus } from '@charmverse/core/prisma-client';
 
 export type SynapsSession = {
   session_id: string;

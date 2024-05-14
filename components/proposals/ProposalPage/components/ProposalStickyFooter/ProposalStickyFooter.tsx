@@ -7,21 +7,27 @@ import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/componen
 import { Button } from 'components/common/Button';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useSnackbar } from 'hooks/useSnackbar';
-import type { ProjectAndMembersPayload } from 'lib/projects/interfaces';
+import type { FieldAnswerInput } from 'lib/forms/interfaces';
+import type { ProjectAndMembersPayload, ProjectWithMembers } from 'lib/projects/interfaces';
+import type { ProposalToErrorCheck } from 'lib/proposals/getProposalErrors';
 import { getProposalErrors } from 'lib/proposals/getProposalErrors';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 export function ProposalStickyFooter({
   proposal,
+  formAnswers,
   page,
-  isStructuredProposal
+  isStructuredProposal,
+  hasProjectField
 }: {
   proposal: ProposalWithUsersAndRubric;
-  page: { title: string; content?: any; sourceTemplateId: string | null; type: PageType };
+  formAnswers: FieldAnswerInput[];
+  page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
   isStructuredProposal: boolean;
+  hasProjectField: boolean;
 }) {
   const projectForm = useFormContext<ProjectAndMembersPayload>();
-  const projectField = proposal.form?.formFields?.find((field) => field.type === 'project_profile');
+  const projectFormValues = projectForm.watch() as ProjectWithMembers;
 
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
@@ -34,33 +40,35 @@ export function ProposalStickyFooter({
       showMessage((error as Error).message, 'error');
     }
   }
+  const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
 
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
-      content: page.content,
+      hasContent: page.hasContent,
       title: page.title,
       type: page.type
     },
+    project: hasProjectField ? projectFormValues : null,
+    requireMilestone: milestoneFormInput?.required,
     isDraft: false, // isDraft skips all errors
-    proposalType: isStructuredProposal ? 'structured' : 'free_form',
+    contentType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {
       ...proposal,
+      formAnswers,
       formFields: proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
-    },
+    } as ProposalToErrorCheck,
     requireTemplates: !!space?.requireProposalTemplate
   }).join('\n');
-
-  const isProjectFormValid = projectField ? projectForm.formState.isValid : true;
 
   return (
     <StickyFooterContainer>
       <Box display='flex' justifyContent='flex-end' alignItems='center' width='100%'>
         <Button
-          disabledTooltip={disabledTooltip || !isProjectFormValid ? 'Project fields are missing or invalid' : undefined}
-          disabled={!!disabledTooltip || !isProjectFormValid}
-          data-test='complete-draft-button'
+          disabledTooltip={disabledTooltip}
+          disabled={!!disabledTooltip}
+          data-test='publish-proposal-button'
           loading={isMutating}
           onClick={onClick}
         >

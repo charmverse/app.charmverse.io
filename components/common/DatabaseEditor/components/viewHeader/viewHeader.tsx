@@ -178,21 +178,16 @@ function ViewHeader(props: Props) {
             </>
           )}
 
-          {/* Search - disabled until we can access page data inside the redux selector */}
-
           <ViewHeaderSearch />
 
           {/* Link to view embedded table in full - check that at least one view is created */}
           {props.embeddedBoardPath && !!views.length && (
             <Link href={`/${router.query.domain}/${props.embeddedBoardPath}`}>
-              <Tooltip title='Open as full page' placement='top'>
-                <span>
-                  <IconButton
-                    icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
-                    style={{ width: '32px' }}
-                  />
-                </span>
-              </Tooltip>
+              <IconButton
+                tooltip='Open as full page'
+                icon={<OpenInFullIcon color='secondary' sx={{ fontSize: 14 }} />}
+                style={{ width: '32px' }}
+              />
             </Link>
           )}
 

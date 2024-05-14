@@ -138,7 +138,7 @@ describe('components/table/Table', () => {
           cards={[]}
           board={board}
           activeView={{ ...view, fields: { ...view.fields, groupById: 'property1' } } as BoardView}
-          visibleGroups={[{ option: { id: '', value: 'test', color: '' }, cards: [] }]}
+          visibleGroups={[{ id: '', option: { id: '', value: 'test', color: '' }, cards: [] }]}
           groupByProperty={{
             id: '',
             name: 'Property 1',

@@ -1,5 +1,3 @@
-import { Box } from '@mui/material';
-
 import { RewardAmount } from 'components/rewards/components/RewardAmount';
 import { RewardTokenDialog } from 'components/rewards/components/RewardProperties/components/RewardTokenDialog';
 import type { RewardCreationData } from 'lib/rewards/createReward';
@@ -12,14 +10,22 @@ type Props = {
     'rewardAmount' | 'rewardToken' | 'chainId' | 'customReward' | 'rewardType'
   > | null;
   requireTokenAmount: boolean;
-  readOnly: boolean;
   readOnlyToken: boolean;
+  readOnlyTokenAmount: boolean;
 };
 
-export function RewardTokenProperty({ onChange, currentReward, requireTokenAmount, readOnlyToken, readOnly }: Props) {
+export function RewardTokenProperty({
+  onChange,
+  readOnlyTokenAmount,
+  currentReward,
+  requireTokenAmount,
+  readOnlyToken
+}: Props) {
   if (!currentReward) {
     return null;
   }
+
+  const readOnly = readOnlyToken && readOnlyTokenAmount;
 
   return (
     <RewardTokenDialog
@@ -29,6 +35,7 @@ export function RewardTokenProperty({ onChange, currentReward, requireTokenAmoun
       readOnly={readOnly}
       readOnlyToken={readOnlyToken}
       currentReward={currentReward}
+      readOnlyTokenAmount={readOnlyTokenAmount}
     >
       <RewardAmount
         reward={currentReward}

@@ -139,6 +139,10 @@ export class DatabasePage extends GlobalPage {
     return this.page.locator('data-test=card-detail-properties').locator('textarea.octo-propertyvalue').first();
   }
 
+  getTableRowOpenLocator(cardId: string) {
+    return this.page.locator(`data-test=database-open-button-${cardId}`);
+  }
+
   async waitForBlocksUpdate() {
     await this.page.waitForResponse('**/api/blocks');
   }
