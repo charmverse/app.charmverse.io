@@ -11,6 +11,7 @@ import {
   MenuItem,
   Select,
   Stack,
+  Switch,
   TextField,
   Typography
 } from '@mui/material';
@@ -55,6 +56,7 @@ export const schema = yup.object({
     .nullable(),
   requiredReviews: yup.number().optional(),
   declineReasons: yup.array().of(yup.string().required()).nullable(),
+  finalStep: yup.boolean().optional(),
   permissions: yup
     .array()
     .of(
@@ -205,6 +207,21 @@ function StepRequiredReviews({
   );
 }
 
+function EvaluationFinalStepToggle({
+  setValue,
+  finalStep
+}: {
+  finalStep: WorkflowEvaluationJson['finalStep'];
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  return (
+    <Box flexDirection='row' justifyContent='space-between' alignItems='center' display='flex'>
+      <FieldLabel>Final step</FieldLabel>
+      <Switch checked={finalStep} onChange={(e) => setValue('finalStep', e.target.checked)} />
+    </Box>
+  );
+}
+
 export function EvaluationDialog({
   evaluation,
   isFirstEvaluation,
@@ -241,7 +258,8 @@ export function EvaluationDialog({
       permissions: evaluation?.permissions ?? [],
       actionLabels: evaluation?.actionLabels,
       requiredReviews: evaluation?.requiredReviews ?? 1,
-      declineReasons: evaluation?.declineReasons ?? []
+      declineReasons: evaluation?.declineReasons ?? [],
+      finalStep: evaluation?.finalStep ?? false
     });
   }, [evaluation?.id]);
 
@@ -310,6 +328,7 @@ export function EvaluationDialog({
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             {formValues.type === 'pass_fail' && (
               <>
+                <EvaluationFinalStepToggle finalStep={formValues.finalStep} setValue={setValue} />
                 <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
                 <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
               </>
@@ -357,6 +376,7 @@ export function EvaluationDialog({
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             {formValues.type === 'pass_fail' && (
               <>
+                <EvaluationFinalStepToggle finalStep={formValues.finalStep} setValue={setValue} />
                 <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
                 <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
               </>
