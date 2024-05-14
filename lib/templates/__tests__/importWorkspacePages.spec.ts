@@ -197,7 +197,9 @@ describe('importWorkspacePages - proposal content', () => {
   let sourceSpaceRole: Role;
   let sourceWorkflow: ProposalWorkflowTyped;
   let sourceProposal: Proposal & {
-    evaluations: (ProposalEvaluation & {
+    evaluations: (Omit<ProposalEvaluation, 'finalStep'> & {
+      finalStep?: boolean | null;
+    } & {
       reviewers: ProposalReviewer[];
       permissions: ProposalEvaluationPermission[];
       rubricCriteria: ProposalRubricCriteria[];

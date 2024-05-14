@@ -5,7 +5,9 @@ import type { ProposalNotificationType } from 'lib/notifications/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
 
 export type ProposalWithEvaluation = Pick<Proposal, 'status'> & {
-  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'>[];
+  evaluations: (Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'> & {
+    finalStep?: boolean | null;
+  })[];
   rewards: Pick<Reward, 'id'>[];
 };
 

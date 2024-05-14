@@ -33,6 +33,7 @@ type PageProps = Partial<
 >;
 
 export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 'title' | 'type'> & {
+  finalStep?: boolean | null;
   reviewers: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
@@ -180,7 +181,8 @@ export async function createProposal({
               title: evaluation.title,
               type: evaluation.type,
               actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue,
-              requiredReviews: evaluation.requiredReviews ?? 1
+              requiredReviews: evaluation.requiredReviews ?? 1,
+              finalStep: evaluation.finalStep
             }))
           }
         },

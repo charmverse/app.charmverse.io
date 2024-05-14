@@ -22,7 +22,10 @@ export function getCurrentStep({
   hasPendingCredentials
 }: {
   proposalStatus: ProposalStatus;
-  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews'>[];
+  evaluations: Pick<
+    ProposalEvaluation,
+    'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews' | 'finalStep'
+  >[];
   hasPublishedRewards: boolean;
   hasPendingRewards: boolean;
   credentialsEnabled: boolean;

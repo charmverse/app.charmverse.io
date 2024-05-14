@@ -42,7 +42,8 @@ export async function createProposalNotifications(webhookData: {
               index: true,
               result: true,
               type: true,
-              id: true
+              id: true,
+              finalStep: true
             },
             orderBy: {
               index: 'asc'
