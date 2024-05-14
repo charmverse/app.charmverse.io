@@ -1,10 +1,9 @@
 import { InvalidInputError } from '@charmverse/core/errors';
-import {
-  prisma,
-  type AttestationType,
-  type CredentialEventType,
-  type IssuedCredential
-} from '@charmverse/core/prisma-client';
+import type { CredentialEventType, IssuedCredential } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
+
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishBountyEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 
 type NonNullableValues<T> = {
   [P in keyof T]: NonNullable<T[P]>;
@@ -78,6 +77,42 @@ export async function saveIssuedCredential({
         rewardApplication: rewardApplicationId ? { connect: { id: rewardApplicationId } } : undefined
       }
     });
+
+    if (proposalId) {
+      const proposal = await prisma.proposal.findUnique({
+        where: {
+          id: proposalId
+        }
+      });
+
+      if (proposal) {
+        await publishProposalEventBase({
+          scope: WebhookEventNames.ProposalCredentialCreated,
+          proposalId,
+          spaceId: proposal.spaceId
+        });
+      }
+    } else if (rewardApplicationId) {
+      const reward = await prisma.bounty.findFirst({
+        where: {
+          applications: {
+            some: {
+              id: rewardApplicationId
+            }
+          }
+        }
+      });
+
+      if (reward) {
+        await publishBountyEvent({
+          scope: WebhookEventNames.RewardCredentialCreated,
+          applicationId: rewardApplicationId,
+          userId: returnedCredential.userId,
+          bountyId: reward.id,
+          spaceId: reward.spaceId
+        });
+      }
+    }
   }
 
   return returnedCredential;
