@@ -209,15 +209,21 @@ function StepRequiredReviews({
 
 function EvaluationFinalStepToggle({
   setValue,
-  finalStep
+  finalStep,
+  isLastEvaluation
 }: {
+  isLastEvaluation: boolean;
   finalStep: WorkflowEvaluationJson['finalStep'];
   setValue: UseFormSetValue<FormValues>;
 }) {
   return (
     <Box flexDirection='row' justifyContent='space-between' alignItems='center' display='flex'>
       <FieldLabel>Final step</FieldLabel>
-      <Switch checked={finalStep} onChange={(e) => setValue('finalStep', e.target.checked)} />
+      <Switch
+        checked={isLastEvaluation ? true : finalStep}
+        disabled={isLastEvaluation}
+        onChange={(e) => setValue('finalStep', e.target.checked)}
+      />
     </Box>
   );
 }
@@ -225,11 +231,13 @@ function EvaluationFinalStepToggle({
 export function EvaluationDialog({
   evaluation,
   isFirstEvaluation,
+  isLastEvaluation,
   onClose,
   onSave
 }: {
   evaluation: EvaluationTemplateFormItem | null;
   isFirstEvaluation: boolean;
+  isLastEvaluation: boolean;
   onClose: VoidFunction;
   onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
@@ -328,7 +336,12 @@ export function EvaluationDialog({
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             {formValues.type === 'pass_fail' && (
               <>
-                <EvaluationFinalStepToggle finalStep={formValues.finalStep} setValue={setValue} />
+                <EvaluationFinalStepToggle
+                  // new evaluation step is always the last step
+                  isLastEvaluation={isLastEvaluation || !evaluation?.id}
+                  finalStep={formValues.finalStep}
+                  setValue={setValue}
+                />
                 <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
                 <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
               </>
@@ -376,7 +389,11 @@ export function EvaluationDialog({
             <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
             {formValues.type === 'pass_fail' && (
               <>
-                <EvaluationFinalStepToggle finalStep={formValues.finalStep} setValue={setValue} />
+                <EvaluationFinalStepToggle
+                  isLastEvaluation={isLastEvaluation || !evaluation?.id}
+                  finalStep={formValues.finalStep}
+                  setValue={setValue}
+                />
                 <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
                 <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
               </>

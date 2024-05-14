@@ -296,6 +296,7 @@ export function ProposalWorkflowItem({
 
         <EvaluationDialog
           isFirstEvaluation={workflow.evaluations[0]?.id === activeEvaluation?.id}
+          isLastEvaluation={workflow.evaluations[workflow.evaluations.length - 1]?.id === activeEvaluation?.id}
           evaluation={activeEvaluation}
           onClose={closeEvaluationStep}
           onSave={updateEvaluationStep}
