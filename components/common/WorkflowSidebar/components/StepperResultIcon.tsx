@@ -44,6 +44,7 @@ export function StepperResultIcon({
   isCurrent?: boolean;
   result: Result | null;
   position: number;
+  // Show dash if an intermediate step was skipped (when final step is on a step before the current one)
   showDash?: boolean;
 }) {
   return (

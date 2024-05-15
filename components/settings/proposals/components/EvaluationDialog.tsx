@@ -28,6 +28,7 @@ import { Button } from 'components/common/Button';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels';
 
 import { evaluationIcons } from '../constants';
@@ -212,12 +213,13 @@ function EvaluationFinalStepToggle({
   finalStep: WorkflowEvaluationJson['finalStep'];
   setValue: UseFormSetValue<FormValues>;
 }) {
+  const { getFeatureTitle } = useSpaceFeatures();
   return (
     <Box>
       <FieldLabel>Final step</FieldLabel>
       <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
         <Typography color='textSecondary' variant='body2'>
-          If this step passes, the entire workflow passes
+          If this step passes, the entire {getFeatureTitle('proposal')} passes
         </Typography>
         <Tooltip title={isLastEvaluation ? 'Last evaluation is always the final step' : ''} arrow>
           <div>
