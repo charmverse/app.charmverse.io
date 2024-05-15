@@ -150,10 +150,10 @@ export function sortCards(
   const sortOptions = localSort || globalSortOptions;
 
   if (sortOptions?.length < 1) {
-    return cards.sort((a, b) => manualOrder(activeView, a, b));
+    return [...cards].sort((a, b) => manualOrder(activeView, a, b));
   }
 
-  let sortedCards = cards;
+  let sortedCards = [...cards];
   for (const sortOption of sortOptions) {
     if (sortOption.propertyId === Constants.titleColumnId) {
       Utils.log('Sort by title');
