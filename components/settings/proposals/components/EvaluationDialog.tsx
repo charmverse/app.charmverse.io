@@ -354,18 +354,20 @@ export function EvaluationDialog({
               <Typography>Advanced settings</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-              {formValues.type === 'pass_fail' && (
-                <>
-                  <EvaluationFinalStepToggle
-                    isLastEvaluation={isLastEvaluation || !evaluation?.id}
-                    finalStep={formValues.finalStep}
-                    setValue={setValue}
-                  />
-                  <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-                  <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-                </>
-              )}
+              <Stack gap={2}>
+                <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+                {formValues.type === 'pass_fail' && (
+                  <>
+                    <EvaluationFinalStepToggle
+                      isLastEvaluation={isLastEvaluation || !evaluation?.id}
+                      finalStep={formValues.finalStep}
+                      setValue={setValue}
+                    />
+                    <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                    <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                  </>
+                )}
+              </Stack>
             </AccordionDetails>
           </Accordion>
         )}
@@ -426,18 +428,20 @@ export function EvaluationDialog({
                 <Typography>Advanced settings</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-                {formValues.type === 'pass_fail' && (
-                  <>
-                    <EvaluationFinalStepToggle
-                      isLastEvaluation={isLastEvaluation || !evaluation?.id}
-                      finalStep={formValues.finalStep}
-                      setValue={setValue}
-                    />
-                    <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-                    <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-                  </>
-                )}
+                <Stack gap={2}>
+                  <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+                  {formValues.type === 'pass_fail' && (
+                    <>
+                      <EvaluationFinalStepToggle
+                        isLastEvaluation={isLastEvaluation || !evaluation?.id}
+                        finalStep={formValues.finalStep}
+                        setValue={setValue}
+                      />
+                      <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                      <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                    </>
+                  )}
+                </Stack>
               </AccordionDetails>
             </Accordion>
           </>
