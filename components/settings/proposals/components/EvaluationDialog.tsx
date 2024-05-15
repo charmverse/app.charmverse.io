@@ -1,5 +1,4 @@
-import type { ProposalOperation } from '@charmverse/core/prisma';
-import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
 import { ExpandMore } from '@mui/icons-material';
@@ -21,9 +20,8 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
-import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
@@ -33,9 +31,7 @@ import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels'
 
 import { evaluationIcons } from '../constants';
 
-import { proposalOperations, EvaluationPermissions } from './EvaluationPermissions';
-
-const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
+import { EvaluationPermissions } from './EvaluationPermissions';
 
 const StyledListItemText = styled(ListItemText)`
   display: flex;
@@ -48,33 +44,24 @@ const StyledListItemText = styled(ListItemText)`
 // This type is used for existing and new workflows (id is null until it is saved)
 export type EvaluationTemplateFormItem = Omit<WorkflowEvaluationJson, 'id'> & { id: string | null };
 
-export const schema = yup.object({
-  id: yup.string().required(),
-  title: yup.string().required(),
-  type: yup.mixed<ProposalEvaluationType>().oneOf(evaluationTypes).required(),
-  actionLabels: yup
-    .object({
-      approve: yup.string().optional(),
-      reject: yup.string().optional()
-    })
-    .nullable(),
-  requiredReviews: yup.number().optional(),
-  declineReasons: yup.array().of(yup.string().required()).nullable(),
-  finalStep: yup.boolean().optional(),
-  permissions: yup
-    .array()
-    .of(
-      yup.object({
-        operation: yup.mixed<ProposalOperation>().oneOf(proposalOperations).required(),
-        userId: yup.string().nullable(),
-        roleId: yup.string().nullable(),
-        systemRole: yup.mixed<ProposalSystemRole>().oneOf(Object.values(ProposalSystemRole)).nullable()
-      })
-    )
-    .required()
-});
-
-type FormValues = yup.InferType<typeof schema>;
+type FormValues = {
+  id: string;
+  title: string;
+  type: ProposalEvaluationType;
+  actionLabels?: {
+    approve?: string;
+    reject?: string;
+  } | null;
+  requiredReviews?: number;
+  declineReasons?: string[] | null;
+  finalStep?: boolean;
+  permissions: {
+    operation: ProposalOperation;
+    userId?: string | null;
+    roleId?: string | null;
+    systemRole?: ProposalSystemRole | null;
+  }[];
+};
 
 function StepActionButtonLabel({
   type,
