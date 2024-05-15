@@ -36,7 +36,8 @@ export function getCurrentStep({
 
   const currentEvaluation = getCurrentEvaluation(evaluations);
 
-  const lastEvaluation = evaluations[evaluations.length - 1];
+  const lastEvaluation =
+    currentEvaluation && currentEvaluation.finalStep ? currentEvaluation : evaluations[evaluations.length - 1];
 
   if (proposalStatus === 'draft' || !currentEvaluation) {
     return getDraftStep();
