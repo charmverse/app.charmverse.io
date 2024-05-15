@@ -116,7 +116,7 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       </Box>
       {loadingWorkflows && <LoadingComponent minHeight={200} />}
       <Box mb={2}>
-        {workflows.map((workflow, index) => (
+        {workflows.map((workflow) => (
           <ProposalWorkflowItem
             key={workflow.id}
             workflow={workflow}

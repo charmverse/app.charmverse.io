@@ -2,8 +2,12 @@ import type { ProposalOperation } from '@charmverse/core/prisma';
 import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
+import { ExpandMore } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   IconButton,
   ListItemIcon,
@@ -163,7 +167,11 @@ function StepFailReasonSelect({
         </Button>
       </Stack>
       <Stack gap={0.5}>
-        {declineReasons.length === 0 && <Typography color='textSecondary'>No decline reasons added</Typography>}
+        {declineReasons.length === 0 && (
+          <Typography variant='body2' color='textSecondary'>
+            No decline reasons added
+          </Typography>
+        )}
         {declineReasons.map((reason) => (
           <Stack key={reason} direction='row' gap={1} justifyContent='space-between' alignItems='center'>
             <Typography variant='body2'>{reason}</Typography>
@@ -217,13 +225,18 @@ function EvaluationFinalStepToggle({
   setValue: UseFormSetValue<FormValues>;
 }) {
   return (
-    <Box flexDirection='row' justifyContent='space-between' alignItems='center' display='flex'>
+    <Box>
       <FieldLabel>Final step</FieldLabel>
-      <Switch
-        checked={isLastEvaluation ? true : finalStep}
-        disabled={isLastEvaluation}
-        onChange={(e) => setValue('finalStep', e.target.checked)}
-      />
+      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+        <Typography color='textSecondary' variant='body2'>
+          If this step passes, the entire workflow passes
+        </Typography>
+        <Switch
+          checked={isLastEvaluation ? true : finalStep}
+          disabled={isLastEvaluation}
+          onChange={(e) => setValue('finalStep', e.target.checked)}
+        />
+      </Stack>
     </Box>
   );
 }
@@ -241,6 +254,7 @@ export function EvaluationDialog({
   onClose: VoidFunction;
   onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const {
     control,
     handleSubmit,
@@ -332,21 +346,28 @@ export function EvaluationDialog({
           />
         </div>
         {evaluation?.id && (
-          <>
-            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-            {formValues.type === 'pass_fail' && (
-              <>
-                <EvaluationFinalStepToggle
-                  // new evaluation step is always the last step
-                  isLastEvaluation={isLastEvaluation || !evaluation?.id}
-                  finalStep={formValues.finalStep}
-                  setValue={setValue}
-                />
-                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-              </>
-            )}
-          </>
+          <Accordion
+            expanded={isAdvancedSettingsOpen}
+            onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+          >
+            <AccordionSummary expandIcon={<ExpandMore />}>
+              <Typography>Advanced settings</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+              {formValues.type === 'pass_fail' && (
+                <>
+                  <EvaluationFinalStepToggle
+                    isLastEvaluation={isLastEvaluation || !evaluation?.id}
+                    finalStep={formValues.finalStep}
+                    setValue={setValue}
+                  />
+                  <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                  <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                </>
+              )}
+            </AccordionDetails>
+          </Accordion>
         )}
         {!evaluation?.id && (
           <>
@@ -386,18 +407,7 @@ export function EvaluationDialog({
                 )}
               />
             </div>
-            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-            {formValues.type === 'pass_fail' && (
-              <>
-                <EvaluationFinalStepToggle
-                  isLastEvaluation={isLastEvaluation || !evaluation?.id}
-                  finalStep={formValues.finalStep}
-                  setValue={setValue}
-                />
-                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-              </>
-            )}
+
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (
@@ -408,6 +418,28 @@ export function EvaluationDialog({
                 />
               )}
             </Stack>
+            <Accordion
+              expanded={isAdvancedSettingsOpen}
+              onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+            >
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Typography>Advanced settings</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+                {formValues.type === 'pass_fail' && (
+                  <>
+                    <EvaluationFinalStepToggle
+                      isLastEvaluation={isLastEvaluation || !evaluation?.id}
+                      finalStep={formValues.finalStep}
+                      setValue={setValue}
+                    />
+                    <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                    <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                  </>
+                )}
+              </AccordionDetails>
+            </Accordion>
           </>
         )}
       </Stack>
