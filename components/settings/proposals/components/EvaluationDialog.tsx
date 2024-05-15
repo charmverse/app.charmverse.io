@@ -17,6 +17,7 @@ import {
   Stack,
   Switch,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -231,11 +232,15 @@ function EvaluationFinalStepToggle({
         <Typography color='textSecondary' variant='body2'>
           If this step passes, the entire workflow passes
         </Typography>
-        <Switch
-          checked={isLastEvaluation ? true : finalStep}
-          disabled={isLastEvaluation}
-          onChange={(e) => setValue('finalStep', e.target.checked)}
-        />
+        <Tooltip title={isLastEvaluation ? 'Last evaluation is always the final step' : ''} arrow>
+          <div>
+            <Switch
+              checked={isLastEvaluation ? true : finalStep}
+              disabled={isLastEvaluation}
+              onChange={(e) => setValue('finalStep', e.target.checked)}
+            />
+          </div>
+        </Tooltip>
       </Stack>
     </Box>
   );
@@ -294,7 +299,6 @@ export function EvaluationDialog({
   onClose: VoidFunction;
   onSave: (evaluation: WorkflowEvaluationJson) => void;
 }) {
-  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
   const {
     control,
     handleSubmit,
@@ -333,9 +337,6 @@ export function EvaluationDialog({
     });
     onClose();
   }
-
-  const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
-  const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
 
   return (
     <Dialog
