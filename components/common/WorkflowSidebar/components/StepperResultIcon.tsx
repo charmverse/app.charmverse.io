@@ -50,7 +50,7 @@ export function StepperResultIcon({
   return (
     <StyledIconContainer result={result} isCurrent={isCurrent}>
       {result === 'pass' ? (
-        <CheckIcon fontSize='small' />
+        <CheckIcon fontSize='small' data-test={`evaluation-passed-icon-${position}`} />
       ) : result === 'fail' ? (
         <CloseIcon fontSize='small' />
       ) : (
