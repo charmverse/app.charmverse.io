@@ -4,7 +4,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { test as base, expect } from '@playwright/test';
 import { DatabasePage } from '__e2e__/po/databasePage.po';
 import { DocumentPage } from '__e2e__/po/document.po';
-import { PagesSidebarPage } from '__e2e__/po/pagesSiderbar.po';
+import { PagesSidebarPage } from '__e2e__/po/pagesSidebar.po';
 
 import { baseUrl } from 'config/constants';
 
