@@ -96,6 +96,17 @@ export async function goBackToStep({
     }
   });
 
+  await prisma.proposalEvaluation.updateMany({
+    where: {
+      id: {
+        in: evaluationsToUpdate.map((e) => e.id)
+      }
+    },
+    data: {
+      appealedAt: null
+    }
+  });
+
   // clear out vote
   const votesToDelete = evaluationsToUpdate.map((e) => e.voteId).filter(isTruthy);
   for (const voteId of votesToDelete) {
