@@ -80,6 +80,7 @@ function ProposalStatusSelectBase({
   displayType?: PropertyValueDisplayType;
 }) {
   const currentEvaluationStep = proposal.currentStep.step;
+  const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
   const currentEvaluationResult = proposal.currentStep.result;
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
   const lastEvaluation = proposal.evaluations[proposal.evaluations.length - 1];
@@ -130,7 +131,8 @@ function ProposalStatusSelectBase({
         readOnly ||
         currentEvaluationStep === 'vote' ||
         hasPublishedRewards ||
-        currentEvaluationStep === 'credentials'
+        currentEvaluationStep === 'credentials' ||
+        (currentEvaluationStep === 'pass_fail' && currentEvaluationStepRequiredReviews !== 1)
       }
       options={
         proposal.archived

@@ -4,7 +4,10 @@ import { DateTime } from 'luxon';
 import { useCallback } from 'react';
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
-import { UserSelect } from 'components/common/DatabaseEditor/components/properties/UserSelect';
+import {
+  UserSelect,
+  UserSelectWithoutPreview
+} from 'components/common/DatabaseEditor/components/properties/UserSelect';
 import { DateTimePicker } from 'components/common/DateTimePicker';
 import { FieldLabel } from 'components/common/WorkflowSidebar/components/FieldLabel';
 
@@ -20,9 +23,11 @@ const RowStack = styled(Stack)`
 export function SubmitStepSettings({
   rewardInput,
   readOnly,
-  onChange
-}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
-  const isAssignedReward = !!rewardInput?.assignedSubmitters;
+  onChange,
+  isTemplate,
+  workflowId
+}: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange' | 'isTemplate' | 'workflowId'>) {
+  const isAssignedReward = workflowId === 'assigned' || workflowId === 'assigned_kyc';
 
   const updateAssignedSubmitters = useCallback((submitters: string[]) => {
     onChange({
@@ -122,13 +127,15 @@ export function SubmitStepSettings({
       ) : (
         <Box>
           <FieldLabel>Assigned applicants</FieldLabel>
-          <UserSelect
-            memberIds={rewardInput.assignedSubmitters ?? []}
+          <UserSelectWithoutPreview
+            memberIds={rewardInput?.assignedSubmitters ?? []}
             readOnly={readOnly}
             onChange={updateAssignedSubmitters}
-            wrapColumn
-            showEmptyPlaceholder
-            error={!rewardInput.assignedSubmitters?.length && !readOnly ? 'Requires at least one assignee' : undefined}
+            error={
+              !rewardInput?.assignedSubmitters?.length && !readOnly && !isTemplate
+                ? 'Requires at least one assignee'
+                : undefined
+            }
           />
         </Box>
       )}

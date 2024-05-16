@@ -4,6 +4,7 @@ import nc from 'next-connect';
 
 import { ActionNotPermittedError, NotFoundError, onError, onNoMatch, requireUser } from 'lib/middleware';
 import { permissionsApiClient } from 'lib/permissions/api/client';
+import { concealProposalSteps } from 'lib/proposals/concealProposalSteps';
 import { getProposal } from 'lib/proposals/getProposal';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
@@ -31,7 +32,9 @@ async function getProposalController(req: NextApiRequest, res: NextApiResponse<P
     throw new NotFoundError();
   }
 
-  return res.status(200).json(proposal);
+  const proposalWithConcealedSteps = await concealProposalSteps({ proposal, userId });
+
+  return res.status(200).json(proposalWithConcealedSteps);
 }
 
 async function updateProposalController(req: NextApiRequest, res: NextApiResponse) {
@@ -97,13 +100,14 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     }
   }
 
-  const selectedCredentialTemplates: string[] = req.body.selectedCredentialTemplates ?? [];
+  const newSelectedCredentialTemplates: string[] = req.body.selectedCredentialTemplates;
   const proposalCredentials: string[] = proposal.selectedCredentialTemplates ?? [];
 
   if (
+    newSelectedCredentialTemplates &&
     !isAdmin &&
-    (selectedCredentialTemplates.length !== proposalCredentials.length ||
-      !selectedCredentialTemplates.every((id) => proposalCredentials.includes(id)))
+    (newSelectedCredentialTemplates.length !== proposalCredentials.length ||
+      !newSelectedCredentialTemplates.every((id) => proposalCredentials.includes(id)))
   ) {
     throw new ActionNotPermittedError('You cannot change the selected credential templates');
   }
@@ -113,7 +117,7 @@ async function updateProposalController(req: NextApiRequest, res: NextApiRespons
     authors,
     projectId,
     fields,
-    selectedCredentialTemplates,
+    selectedCredentialTemplates: newSelectedCredentialTemplates,
     actorId: userId
   });
 

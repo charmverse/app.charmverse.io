@@ -52,10 +52,11 @@ export function InlineDatabase({ containerWidth, readOnly: readOnlyOverride, nod
   const board = boards?.[pageId];
 
   useEffect(() => {
-    if (!board && pageId) {
+    // Load the database if it's not already loaded, otherwise the Inline Database might show options for a new db
+    if (pageId) {
       dispatch(initialDatabaseLoad({ pageId }));
     }
-  }, [!!board, pageId]);
+  }, [pageId]);
 
   const { permissions: currentPagePermissions } = usePagePermissions({ pageIdOrPath: pageId });
 

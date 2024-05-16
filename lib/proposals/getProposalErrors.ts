@@ -1,28 +1,33 @@
 import { checkFormFieldErrors } from 'components/common/form/checkFormFieldErrors';
 import { validateAnswers } from 'lib/forms/validateAnswers';
-import { checkIsContentEmpty } from 'lib/prosemirror/checkIsContentEmpty';
+import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import { isTruthy } from 'lib/utils/types';
 
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
+import { validateProposalProject } from './validateProposalProject';
+
+export type ProposalToErrorCheck = Pick<
+  CreateProposalInput,
+  'authors' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'
+> & {
+  workflowId: string | null;
+};
 
 export function getProposalErrors({
   page,
   proposal,
-  proposalType,
+  contentType,
   isDraft,
+  project,
   requireTemplates,
   requireMilestone
 }: {
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
-    content?: any | null;
+    hasContent?: boolean;
   };
-  proposal: Pick<
-    CreateProposalInput,
-    'authors' | 'proposalTemplateId' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'
-  > & {
-    workflowId?: string | null;
-  };
-  proposalType: 'structured' | 'free_form';
+  proposal: ProposalToErrorCheck;
+  project?: ProjectWithMembers | null;
+  contentType: 'structured' | 'free_form';
   isDraft: boolean;
   requireTemplates: boolean;
   requireMilestone?: boolean;
@@ -39,9 +44,8 @@ export function getProposalErrors({
     errors.push('Workflow is required');
   }
 
-  // non-templates
   if (page.type === 'proposal') {
-    if (requireTemplates && !proposal.proposalTemplateId && !page.sourceTemplateId) {
+    if (requireTemplates && !page.sourceTemplateId) {
       errors.push('Template is required');
     }
     if (proposal.authors.length === 0) {
@@ -50,28 +54,40 @@ export function getProposalErrors({
     if (proposal.fields?.pendingRewards?.some((r) => r.reward.rewardType === 'token' && !r.reward.rewardAmount)) {
       errors.push('Token amount is required for milestones');
     }
-  }
-
-  if (proposalType === 'structured') {
-    if (page.type === 'proposal_template') {
-      // creating template - check if form fields exists
-      errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
-    } else if (proposal.formFields && proposal.formAnswers) {
+    if (contentType === 'structured' && proposal.formFields && proposal.formAnswers) {
       const isValid = validateAnswers(proposal.formAnswers || [], proposal.formFields || []);
       // saving proposal - check if required answers are filled
       if (!isValid) {
         errors.push('All required fields must be answered');
       }
+      if (requireMilestone) {
+        if (!proposal.fields?.pendingRewards?.length) {
+          errors.push('At least one milestone is required');
+        }
+      }
+      if (project) {
+        try {
+          validateProposalProject({
+            formAnswers: proposal.formAnswers,
+            formFields: proposal.formFields,
+            project
+          });
+        } catch (error) {
+          errors.push((error as Error).message);
+        }
+      }
     }
-  } else if (proposalType === 'free_form' && page.type === 'proposal_template' && checkIsContentEmpty(page.content)) {
-    errors.push('Content is required for free-form proposals');
+  }
+  // validate templates
+  else if (page.type === 'proposal_template') {
+    if (contentType === 'structured') {
+      // creating template - check if form fields exists
+      errors.push(...[checkFormFieldErrors(proposal.formFields ?? [])].filter(isTruthy));
+    } else if (contentType === 'free_form' && !page.hasContent) {
+      errors.push('Content is required for free-form proposals');
+    }
   }
 
-  if (requireMilestone && page.type !== 'proposal_template' && proposalType === 'structured') {
-    if (!proposal.fields?.pendingRewards?.length) {
-      errors.push('At least one milestone is required');
-    }
-  }
   // check evaluation configurations
   errors.push(...proposal.evaluations.map(getEvaluationFormError).filter(isTruthy));
 

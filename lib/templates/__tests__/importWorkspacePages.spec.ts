@@ -197,7 +197,9 @@ describe('importWorkspacePages - proposal content', () => {
   let sourceSpaceRole: Role;
   let sourceWorkflow: ProposalWorkflowTyped;
   let sourceProposal: Proposal & {
-    evaluations: (ProposalEvaluation & {
+    evaluations: (Omit<ProposalEvaluation, 'finalStep'> & {
+      finalStep?: boolean | null;
+    } & {
       reviewers: ProposalReviewer[];
       permissions: ProposalEvaluationPermission[];
       rubricCriteria: ProposalRubricCriteria[];
@@ -372,7 +374,8 @@ describe('importWorkspacePages - proposal content', () => {
           permissions: [],
           reviewers: [],
           rubricCriteria: [],
-          actionLabels: null
+          actionLabels: null,
+          requiredReviews: 1
         },
         {
           completedAt: null,
@@ -388,6 +391,7 @@ describe('importWorkspacePages - proposal content', () => {
           id: copiedSecondEvaluation.id,
           proposalId: copiedProposal.id,
           actionLabels: null,
+          requiredReviews: 1,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,
@@ -532,7 +536,8 @@ describe('importWorkspacePages - proposal content', () => {
           permissions: [],
           reviewers: [],
           rubricCriteria: [],
-          actionLabels: null
+          actionLabels: null,
+          requiredReviews: 1
         },
         {
           completedAt: null,
@@ -548,6 +553,7 @@ describe('importWorkspacePages - proposal content', () => {
           id: copiedSecondEvaluation.id,
           proposalId: copiedProposal.id,
           actionLabels: null,
+          requiredReviews: 1,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,

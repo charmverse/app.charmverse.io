@@ -107,6 +107,7 @@ function DocumentPageComponent({
     proposal,
     refreshProposal,
     onChangeEvaluation,
+    onChangeTemplate,
     onChangeWorkflow,
     onChangeRewardSettings,
     onChangeSelectedCredentialTemplates
@@ -405,6 +406,7 @@ function DocumentPageComponent({
                   proposalInput={proposal}
                   templateId={proposal?.page?.sourceTemplateId}
                   onChangeEvaluation={onChangeEvaluation}
+                  onChangeTemplate={onChangeTemplate}
                   refreshProposal={refreshProposal}
                   onChangeWorkflow={onChangeWorkflow}
                   onChangeSelectedCredentialTemplates={onChangeSelectedCredentialTemplates}
@@ -472,6 +474,7 @@ function DocumentPageComponent({
                     <FormFieldsEditor
                       readOnly={(!isAdmin && (!user || !proposalAuthors.includes(user.id))) || !!proposal?.archived}
                       proposalId={proposal.id}
+                      expandFieldsByDefault={proposal.status === 'draft'}
                       formFields={proposal.form?.formFields ?? []}
                     />
                   ) : (
@@ -569,7 +572,13 @@ function DocumentPageComponent({
           </PageEditorContainer>
         </Box>
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
-          <ProposalStickyFooter page={page} proposal={proposal} isStructuredProposal={isStructuredProposal} />
+          <ProposalStickyFooter
+            page={page}
+            hasProjectField={!!projectProfileField}
+            proposal={proposal}
+            formAnswers={proposalFormFieldAnswers}
+            isStructuredProposal={isStructuredProposal}
+          />
         )}
         {(page.type === 'bounty' || page.type === 'bounty_template') && reward?.status === 'draft' && (
           <RewardStickyFooter page={page} reward={reward} refreshReward={refreshReward} />

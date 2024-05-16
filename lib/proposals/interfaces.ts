@@ -9,7 +9,8 @@ import type {
   ProposalEvaluationPermission,
   ProposalEvaluationResult,
   ProposalEvaluationType,
-  Vote
+  Vote,
+  ProposalEvaluationReview
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
@@ -54,7 +55,9 @@ export type ProposalFields = {
   enableRewards?: boolean; // used by form templates to enable rewards for new proposals
 };
 
-export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'actionLabels'> & {
+export type ConcealableEvaluationType = ProposalEvaluationType | 'private_evaluation';
+
+export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'actionLabels' | 'type'> & {
   draftRubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricAnswers: ProposalRubricCriteriaAnswerWithTypedResponse[];
   rubricCriteria: RubricCriteriaTyped[];
@@ -62,7 +65,11 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   reviewers: ProposalReviewer[];
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
-  actionLabels?: WorkflowEvaluationJson['actionLabels'] | null;
+  requiredReviews: number;
+  declineReasonOptions: string[];
+  reviews?: ProposalEvaluationReview[];
+  actionLabels?: WorkflowEvaluationJson['actionLabels'];
+  type: ConcealableEvaluationType;
 };
 
 export type ProposalWithUsersAndRubric = Omit<Proposal, 'fields'> & {

@@ -1,21 +1,10 @@
-import type {
-  Page,
-  Proposal,
-  ProposalEvaluation,
-  ProposalEvaluationPermission,
-  ProposalReviewer,
-  Role,
-  Space,
-  User
-} from '@charmverse/core/prisma-client';
+import type { Page, Role, Space, User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped } from '@charmverse/core/proposals';
-import { testUtilsProposals, testUtilsUser, testUtilsMembers } from '@charmverse/core/test';
+import { testUtilsProposals, testUtilsMembers } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
-import { optimism } from 'viem/chains';
 
-import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { generateProposalWorkflow } from 'testing/utils/proposals';
 
 test.describe('Duplicate a proposal template', async () => {
@@ -104,7 +93,7 @@ test.describe('Duplicate a proposal template', async () => {
     await proposalsListPage.templateContextMenu.click();
     // select Duplicate action
     await proposalsListPage.duplicateTemplateButton.click();
-    await proposalPage.waitForNewProposalPage(space.domain);
+    await proposalPage.waitForNewProposalPage();
 
     await expect(proposalPage.charmEditor).toHaveText('This is a template description');
 

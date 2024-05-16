@@ -13,7 +13,7 @@ import { LoggedInPage } from './po/loggedIn.po';
 import { LoginPage } from './po/login.po';
 import { PageHeader } from './po/pageHeader.po';
 import { PagePermissionsDialog } from './po/pagePermissions.po';
-import { PagesSidebarPage } from './po/pagesSiderbar.po';
+import { PagesSidebarPage } from './po/pagesSidebar.po';
 import { ProposalPage } from './po/proposalPage.po';
 import { ProposalsListPage } from './po/proposalsList.po';
 import { RewardPage } from './po/rewardPage.po';

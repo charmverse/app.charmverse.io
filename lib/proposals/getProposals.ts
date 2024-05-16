@@ -10,7 +10,6 @@ import type {
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
-import { arrayUtils } from '@charmverse/core/utilities';
 import { sortBy } from 'lodash';
 
 import type {
@@ -24,7 +23,10 @@ import type { ProposalStep } from './getCurrentStep';
 import { getCurrentStep } from './getCurrentStep';
 import type { ProposalFields } from './interfaces';
 
-export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selectedCredentialTemplates'> & {
+export type ProposalWithUsersLite = Pick<
+  Proposal,
+  'createdBy' | 'id' | 'selectedCredentialTemplates' | 'spaceId' | 'workflowId'
+> & {
   archived?: boolean;
   authors: ProposalAuthor[];
   fields: ProposalFields | null;
@@ -39,6 +41,7 @@ export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selecte
     id: string;
     result: ProposalEvaluationResult | null;
     index: number;
+    requiredReviews: number;
   }[];
   currentStep: ProposalStep;
   templateId?: string | null;
@@ -49,7 +52,13 @@ export type ProposalWithUsersLite = Pick<Proposal, 'createdBy' | 'id' | 'selecte
   title: string;
 };
 
-export async function getProposals({ ids }: { ids: string[] }): Promise<ProposalWithUsersLite[]> {
+export async function getProposals({
+  ids,
+  spaceId
+}: {
+  ids: string[];
+  spaceId: string;
+}): Promise<ProposalWithUsersLite[]> {
   const proposals = await prisma.proposal.findMany({
     where: {
       id: {
@@ -99,6 +108,11 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
           reviewers: true
         }
       },
+      workflow: {
+        select: {
+          privateEvaluations: true
+        }
+      },
       form: {
         include: {
           formFields: {
@@ -111,11 +125,9 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
     }
   });
 
-  const spaces = await prisma.space.findMany({
+  const space = await prisma.space.findUniqueOrThrow({
     where: {
-      id: {
-        in: arrayUtils.uniqueValues(proposals.map((p) => p.spaceId))
-      }
+      id: spaceId
     },
     include: {
       credentialTemplates: {
@@ -129,7 +141,7 @@ export async function getProposals({ ids }: { ids: string[] }): Promise<Proposal
   return proposals.map((proposal) => {
     return mapDbProposalToProposalLite({
       proposal,
-      space: spaces.find((s) => s.id === proposal.spaceId) as IssuableProposalCredentialSpace
+      space: space as IssuableProposalCredentialSpace
     });
   });
 }
@@ -142,7 +154,7 @@ function mapDbProposalToProposalLite({
 }: {
   proposal: Proposal & {
     authors: (ProposalAuthor & IssuableProposalCredentialAuthor)[];
-    evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[] })[];
+    evaluations: (ProposalEvaluation & { reviewers: ProposalReviewer[]; declineReasonOptions?: string[] })[];
     rewards: { id: string }[];
     page: { id: string; title: string; updatedAt: Date; createdAt: Date; updatedBy: string } | null;
     issuedCredentials: Pick<
@@ -173,13 +185,16 @@ function mapDbProposalToProposalLite({
     selectedCredentialTemplates: validSelectedCredentials,
     archived: proposal.archived || undefined,
     formId: rest.formId || undefined,
+    spaceId: rest.spaceId,
+    workflowId: rest.workflowId,
     // spaceId: rest.spaceId,
     evaluations: sortBy(proposal.evaluations, 'index').map((e) => ({
       title: e.title,
       index: e.index,
       type: e.type,
       result: e.result,
-      id: e.id
+      id: e.id,
+      requiredReviews: e.requiredReviews
     })),
     permissions,
     currentStep: getCurrentStep({

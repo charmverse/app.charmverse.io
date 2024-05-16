@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { useGetRewardTemplate } from 'charmClient/hooks/rewards';
 import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getEvaluationFormError } from 'lib/rewards/getRewardErrors';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
 import type { RewardWithUsers } from 'lib/rewards/interfaces';
@@ -33,6 +34,7 @@ export function EvaluationStepSettingsModal({
     <Modal open onClose={close} title={`Edit ${evaluationInput?.title}`}>
       <Box mb={2}>
         <EvaluationStepSettings
+          workflowId={(reward.fields as RewardFields).workflowId}
           evaluation={evaluationInput}
           rewardTemplateInput={rewardTemplate}
           isTemplate={isTemplate}
@@ -40,6 +42,7 @@ export function EvaluationStepSettingsModal({
           rewardInput={reward}
           rewardStatus={reward.status}
           onChange={updateEvaluation}
+          rewardPublished
         />
       </Box>
       <Box display='flex' justifyContent='flex-end' gap={1}>

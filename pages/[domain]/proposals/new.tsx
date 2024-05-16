@@ -1,21 +1,25 @@
 import { log } from '@charmverse/core/log';
+import type { PageType } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 
-import getPageLayout from 'components/common/PageLayout/getLayout';
-import type { ProposalPageAndPropertiesInput } from 'components/proposals/ProposalPage/NewProposalPage';
-import { NewProposalPage } from 'components/proposals/ProposalPage/NewProposalPage';
-import { useIsSpaceMember } from 'hooks/useIsSpaceMember';
+import { permissionsApiClient } from 'lib/permissions/api/client';
+import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposals/createDraftProposal';
+import { createDraftProposal } from 'lib/proposals/createDraftProposal';
 import { withSessionSsr } from 'lib/session/withSession';
 import { customConditionJoinSpace } from 'lib/spaces/customConditionJoinSpace';
+import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
+import { getPagePath } from 'lib/utils/domains/getPagePath';
 
 export const getServerSideProps = withSessionSsr(async (context) => {
-  const template = context.query?.template;
+  const template = context.query?.template as string | undefined;
+  const pageType = context.query.type as PageType | undefined;
+  const sourcePageId = context.query.sourcePageId as string | undefined;
+  const sourcePostId = context.query.sourcePostId as string | undefined;
+  const contentType = context.query.contentType as ProposalContentType;
+  const sessionUserId = context.req.session?.user?.id;
 
   // retrieve space by domain, and then last page view by spaceId
   const domainOrCustomDomain = context.query.domain as string;
-  const sessionUserId = context.req.session?.user?.id;
   const space = await prisma.space.findFirstOrThrow({
     where: {
       OR: [
@@ -32,20 +36,55 @@ export const getServerSideProps = withSessionSsr(async (context) => {
     }
   });
 
-  const spaceRole =
-    sessionUserId && space
-      ? await prisma.spaceRole.findFirst({
-          where: {
-            userId: sessionUserId,
-            spaceId: space.id
-          }
-        })
-      : null;
+  const newDraftParams: CreateDraftProposalInput = {
+    createdBy: sessionUserId,
+    spaceId: space.id,
+    templateId: template,
+    contentType,
+    pageType: pageType === 'proposal_template' ? pageType : undefined,
+    sourcePageId,
+    sourcePostId
+  };
+
+  const { success: isMember, isAdmin } = await hasAccessToSpace({
+    userId: sessionUserId,
+    spaceId: space.id
+  });
+
+  if (!isAdmin && pageType === 'proposal_template') {
+    log.warn("User is not an admin and can't create a proposal from a template", {
+      userId: sessionUserId
+    });
+    return {
+      notFound: true
+    };
+  }
 
   // User is a member, early exit
-  if (spaceRole) {
+  if (isMember) {
+    const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: space.id,
+      userId: sessionUserId
+    });
+    if (!computedPermissions.createProposals) {
+      log.warn('User is a member but does not have permission to create proposals', {
+        userId: sessionUserId,
+        spaceId: space.id
+      });
+      return {
+        notFound: true
+      };
+    }
+    const proposal = await createDraftProposal(newDraftParams);
     return {
-      props: {}
+      redirect: {
+        destination: getPagePath({
+          hostName: context.req.headers.host,
+          path: proposal.page.path,
+          spaceDomain: space.domain
+        }),
+        permanent: false
+      }
     };
   }
 
@@ -74,10 +113,30 @@ export const getServerSideProps = withSessionSsr(async (context) => {
       spaceId: space.id,
       params: { proposalTemplate: template as string }
     });
+    const computedPermissions = await permissionsApiClient.spaces.computeSpacePermissions({
+      resourceId: space.id,
+      userId: sessionUserId
+    });
 
+    if (!computedPermissions.createProposals) {
+      log.warn('User does not have permission to create proposals', {
+        userId: sessionUserId,
+        spaceId: space.id
+      });
+      return {
+        notFound: true
+      };
+    }
+    const proposal = await createDraftProposal(newDraftParams);
     return {
-      props: {
-        reload: true
+      redirect: {
+        destination: getPagePath({
+          hostName: context.req.headers.host,
+          path: proposal.page.path,
+          spaceDomain: space.domain,
+          query: { reload: '1' }
+        }),
+        permanent: false
       }
     };
   } catch (err) {
@@ -97,35 +156,7 @@ export const getServerSideProps = withSessionSsr(async (context) => {
   }
 });
 
-export default function PageView({ reload }: { reload?: boolean }) {
-  const router = useRouter();
-  const isTemplate = router.query.type === 'proposal_template';
-  const selectedTemplate = router.query.template as string | undefined;
-  const sourcePageId = router.query.sourcePageId as string | undefined;
-  const sourcePostId = router.query.sourcePostId as string | undefined;
-  const proposalType = router.query.proposalType as ProposalPageAndPropertiesInput['proposalType'];
-
-  const { isSpaceMember } = useIsSpaceMember();
-
-  useEffect(() => {
-    if (reload) {
-      window.location.reload();
-    }
-  }, [reload]);
-
-  if (!isSpaceMember) {
-    return null;
-  }
-
-  return (
-    <NewProposalPage
-      proposalType={proposalType}
-      templateId={selectedTemplate}
-      sourcePageId={sourcePageId}
-      sourcePostId={sourcePostId}
-      isTemplate={isTemplate}
-    />
-  );
+// user will never see this page and instead be redirected somewhere else
+export default function PageView() {
+  return null;
 }
-
-PageView.getLayout = getPageLayout;

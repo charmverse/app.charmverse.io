@@ -1,9 +1,8 @@
-import type { ProposalRubricCriteriaAnswer, ProposalStatus } from '@charmverse/core/prisma-client';
+import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { v4 as uuid } from 'uuid';
 
 import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
@@ -11,16 +10,9 @@ import { DraggableListItem } from 'components/common/DraggableListItem';
 import ConfirmDeleteModal from 'components/common/Modal/ConfirmDeleteModal';
 import ReactDndProvider from 'components/common/ReactDndProvider';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import type { RangeProposalCriteria } from 'lib/proposals/workflows/getNewCriteria';
+import { getNewCriteria } from 'lib/proposals/workflows/getNewCriteria';
 import { getNumberFromString } from 'lib/utils/numbers';
-
-export type RangeProposalCriteria = {
-  id: string;
-  index: number;
-  title: string;
-  description?: string | null;
-  type: 'range';
-  parameters: { min: number | null; max: number | null };
-};
 
 type Props = {
   readOnly?: boolean;
@@ -70,18 +62,6 @@ export const CriteriaRow = styled(Box)`
     color: var(--secondary-text);
   }
 `;
-
-export function getNewCriteria({ parameters }: Partial<RangeProposalCriteria> = {}): RangeProposalCriteria {
-  return {
-    id: uuid(),
-    index: -1,
-    description: '',
-    title: '',
-    type: 'range',
-    parameters: parameters || { min: 1, max: 5 }
-  };
-}
-
 export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value, onChange, answers }: Props) {
   const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>(value);
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
@@ -95,7 +75,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const updatedList = [...criteriaList, newCriteria];
     setCriteriaList(updatedList);
   }
-
+  // console.log('criteriaList', criteriaList, value);
   function deleteCriteria(id: string) {
     if (readOnly || !id) {
       return;
@@ -262,15 +242,13 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
           question='Are you sure you want to delete this criteria? Any linked answers will also be deleted'
         />
       )}
-      {!readOnly && (
-        <AddAPropertyButton
-          dataTest='add-rubric-criteria-button'
-          style={{ flex: 'none', margin: 0 }}
-          onClick={addCriteria}
-        >
-          + Add a criteria
-        </AddAPropertyButton>
-      )}
+      <AddAPropertyButton
+        data-test='add-rubric-criteria-button'
+        style={{ display: readOnly ? 'none' : 'block', flex: 'none', margin: 0 }}
+        onClick={addCriteria}
+      >
+        + Add a criteria
+      </AddAPropertyButton>
     </ReactDndProvider>
   );
 }

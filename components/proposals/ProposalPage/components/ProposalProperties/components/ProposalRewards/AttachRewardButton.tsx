@@ -16,7 +16,7 @@ export function AttachRewardButton({
   const { getFeatureTitle } = useSpaceFeatures();
   if (variant === 'card_property') {
     return (
-      <AddAPropertyButton disabled={disabled} style={{ marginTop: 0 }} dataTest='add-reward' onClick={createNewReward}>
+      <AddAPropertyButton disabled={disabled} style={{ marginTop: 0 }} data-test='add-reward' onClick={createNewReward}>
         + Add a {getFeatureTitle('reward')}
       </AddAPropertyButton>
     );

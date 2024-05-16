@@ -95,7 +95,7 @@ export const assignedKycFlow = {
   ]
 } as RewardWorkflow;
 
-export function getRewardWorkflows(spaceId: string): RewardWorkflow[] {
+export function getRewardWorkflows(): RewardWorkflow[] {
   const rewardWorkflows = [
     directSubmissionWorkflow,
     applicationRequiredWorkflow,

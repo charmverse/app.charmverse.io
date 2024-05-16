@@ -4,8 +4,12 @@ import { resolvePageTree } from '@charmverse/core/pages';
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { unsealData } from 'iron-session';
+import type { Node } from 'prosemirror-model';
+import { TextSelection } from 'prosemirror-state';
+import { findParentNode } from 'prosemirror-utils';
 import type { Socket } from 'socket.io';
 
+import { specRegistry } from 'components/common/CharmEditor/specRegistry';
 import { STATIC_PAGES } from 'lib/features/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
 import { createPage } from 'lib/pages/server/createPage';
@@ -22,6 +26,15 @@ import type { DocumentRoom } from './documentEvents/docRooms';
 import type { DocumentEventHandler } from './documentEvents/documentEvents';
 import type { ProsemirrorJSONStep } from './documentEvents/interfaces';
 import type { AbstractWebsocketBroadcaster } from './interfaces';
+
+function checkIsInsideTableCell(position: number, doc: Node) {
+  const selection = TextSelection.create(doc, position);
+  const predicate = (node: Node) => {
+    return node.type.name === specRegistry.schema.nodes.table_cell.name;
+  };
+  const parent = findParentNode(predicate)(selection);
+  return !!parent;
+}
 
 export class SpaceEventHandler {
   socketEvent = 'message';
@@ -762,6 +775,11 @@ export class SpaceEventHandler {
       const { documentRoom, participant, content, position: _nodePos } = pageDetails;
       const position = nodePos ?? _nodePos;
 
+      let isInsideTableCell;
+      if (position !== null) {
+        isInsideTableCell = checkIsInsideTableCell(position, getNodeFromJson(content));
+      }
+
       if (documentRoom && participant && position !== null) {
         await participant.handleDiff(
           {
@@ -770,7 +788,19 @@ export class SpaceEventHandler {
               {
                 stepType: 'replace',
                 from: position,
-                to: position + 1
+                to: position + 1,
+                slice: isInsideTableCell
+                  ? {
+                      content: [
+                        {
+                          type: 'paragraph',
+                          attrs: {
+                            track: []
+                          }
+                        }
+                      ]
+                    }
+                  : undefined
               }
             ],
             doc: documentRoom.doc.content,
@@ -791,7 +821,19 @@ export class SpaceEventHandler {
               {
                 from: position,
                 to: position + 1,
-                stepType: 'replace'
+                stepType: 'replace',
+                slice: isInsideTableCell
+                  ? {
+                      content: [
+                        {
+                          type: 'paragraph',
+                          attrs: {
+                            track: []
+                          }
+                        }
+                      ]
+                    }
+                  : undefined
               }
             ]
           });

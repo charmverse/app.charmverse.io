@@ -56,7 +56,7 @@ export const proposalDbProperties: {
     type: 'proposalStatus'
   }),
   proposalStep: ({ name, options = [] } = {}) => ({
-    id: uuid(),
+    id: PROPOSAL_STEP_BLOCK_ID,
     name: name || 'Proposal Step',
     options: options.map((title) => ({
       color: 'propColorGray',

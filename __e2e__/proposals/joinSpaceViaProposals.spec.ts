@@ -65,7 +65,7 @@ test('Create a proposal from a linked proposal template /member', async ({ page,
 
   await documentPage.getLinkedPage(template.id).click();
 
-  await proposalPage.waitForNewProposalPage(space.domain);
+  await proposalPage.waitForNewProposalPage();
 });
 
 test('Create a proposal from a linked proposal template / user from outside space', async ({
@@ -73,7 +73,9 @@ test('Create a proposal from a linked proposal template / user from outside spac
   proposalPage,
   documentPage
 }) => {
-  const { user: admin, space } = await generateUserAndSpace();
+  const { user: admin, space } = await generateUserAndSpace({
+    memberSpacePermissions: ['createProposals']
+  });
 
   await prisma.space.update({
     where: {
@@ -128,7 +130,7 @@ test('Create a proposal from a linked proposal template / user from outside spac
 
   await documentPage.getLinkedPage(template.id).click();
 
-  await proposalPage.waitForNewProposalPage(space.domain);
+  await proposalPage.waitForNewProposalPage();
 });
 
 test('Try to create a proposal from a linked proposal template / user from outside space / public templates disabled', async ({
@@ -202,7 +204,7 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
   documentPage,
   proposalPage
 }) => {
-  const { user: admin, space } = await generateUserAndSpace();
+  const { user: admin, space } = await generateUserAndSpace({ memberSpacePermissions: ['createProposals'] });
 
   await prisma.space.update({
     where: {
@@ -265,5 +267,5 @@ test('Try to create a proposal from a linked proposal template / new user', asyn
 
   await page.reload();
 
-  await proposalPage.waitForNewProposalPage(space.domain);
+  await proposalPage.waitForNewProposalPage();
 });

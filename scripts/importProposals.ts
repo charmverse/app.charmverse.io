@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { readFileSync, writeFileSync } from 'fs';
-import { FormFieldAnswer } from '@charmverse/core/prisma';
 import Papa from 'papaparse';
 import { Prisma, prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';

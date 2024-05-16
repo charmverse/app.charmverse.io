@@ -38,20 +38,23 @@ export type Result = 'pass' | 'fail';
 export function StepperResultIcon({
   result,
   isCurrent,
-  position
+  position,
+  showDash
 }: {
   isCurrent?: boolean;
   result: Result | null;
   position: number;
+  // Show dash if an intermediate step was skipped (when final step is on a step before the current one)
+  showDash?: boolean;
 }) {
   return (
     <StyledIconContainer result={result} isCurrent={isCurrent}>
       {result === 'pass' ? (
-        <CheckIcon fontSize='small' />
+        <CheckIcon fontSize='small' data-test={`evaluation-passed-icon-${position}`} />
       ) : result === 'fail' ? (
         <CloseIcon fontSize='small' />
       ) : (
-        <Typography fontWeight={500}>{position}</Typography>
+        <Typography fontWeight={500}>{showDash ? '-' : `${position}`}</Typography>
       )}
     </StyledIconContainer>
   );

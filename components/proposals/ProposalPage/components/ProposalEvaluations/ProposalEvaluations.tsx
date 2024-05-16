@@ -12,6 +12,7 @@ export type ProposalEvaluationsProps = {
   proposal?: EvaluationsReviewProps['proposal'];
   proposalInput?: ProposalSettingsProps['proposal'];
   onChangeEvaluation: ProposalSettingsProps['onChangeEvaluation'];
+  onChangeTemplate: ProposalSettingsProps['onChangeTemplate'];
   onChangeWorkflow: ProposalSettingsProps['onChangeWorkflow'];
   onChangeRewardSettings?: ProposalSettingsProps['onChangeRewardSettings'];
   onChangeSelectedCredentialTemplates: ProposalSettingsProps['onChangeSelectedCredentialTemplates'];
@@ -33,6 +34,7 @@ export function ProposalEvaluations({
   proposal,
   proposalInput,
   onChangeEvaluation,
+  onChangeTemplate,
   onChangeWorkflow,
   onChangeRewardSettings,
   refreshProposal,
@@ -50,15 +52,14 @@ export function ProposalEvaluations({
   const isAdmin = useIsAdmin();
 
   if (isUnpublishedProposal) {
-    const isNotNewProposal = !!proposal;
     return (
       <EvaluationsSettings
         proposal={proposalInput}
         readOnly={!!readOnlyProposalPermissions}
         templateId={templateId}
         onChangeEvaluation={onChangeEvaluation}
+        onChangeTemplate={onChangeTemplate}
         onChangeWorkflow={onChangeWorkflow}
-        requireWorkflowChangeConfirmation={isNotNewProposal}
         expanded={expanded}
         isTemplate={isProposalTemplate}
         onChangeRewardSettings={onChangeRewardSettings}

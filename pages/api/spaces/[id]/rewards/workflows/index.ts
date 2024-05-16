@@ -10,7 +10,7 @@ handler.get(getWorkflowsController);
 
 async function getWorkflowsController(req: NextApiRequest, res: NextApiResponse<RewardWorkflow[]>) {
   const spaceId = req.query.id as string;
-  const rewardWorkflows = getRewardWorkflows(spaceId);
+  const rewardWorkflows = getRewardWorkflows();
   return res.status(200).json(rewardWorkflows);
 }
 
