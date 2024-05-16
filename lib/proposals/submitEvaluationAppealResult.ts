@@ -34,37 +34,36 @@ export async function updateEvaluationResult({
   const totalFailed = existingEvaluationReviews.filter((r) => r.result === 'fail').length + (result === 'fail' ? 1 : 0);
   const finalResult = totalPassed > totalFailed ? 'pass' : 'fail';
 
-  if (finalResult !== 'pass') {
-    return;
-  }
-
   await prisma.proposalEvaluation.update({
     where: {
       id: evaluationId
     },
     data: {
-      result: 'pass',
+      result: finalResult,
       decidedBy,
       completedAt: new Date()
     }
   });
 
-  await createVoteIfNecessary({
-    createdBy: decidedBy,
-    proposalId
-  });
-  await issueOffchainProposalCredentialsIfNecessary({
-    event: 'proposal_approved',
-    proposalId
-  });
-
   await setPageUpdatedAt({ proposalId, userId: decidedBy });
+
   await publishProposalEvent({
     currentEvaluationId: evaluationId,
     proposalId,
     spaceId,
     userId: decidedBy
   });
+
+  if (finalResult === 'pass') {
+    await createVoteIfNecessary({
+      createdBy: decidedBy,
+      proposalId
+    });
+    await issueOffchainProposalCredentialsIfNecessary({
+      event: 'proposal_approved',
+      proposalId
+    });
+  }
 }
 
 export async function submitEvaluationAppealResult({

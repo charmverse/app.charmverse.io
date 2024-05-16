@@ -368,9 +368,7 @@ export function PassFailEvaluation({
   }
 
   async function onResetEvaluationAppealReview() {
-    resetEvaluationAppealReview({
-      evaluationId: evaluation.id
-    }).then(refreshProposal);
+    resetEvaluationAppealReview().then(refreshProposal);
   }
 
   function onResetEvaluationReview() {
@@ -430,7 +428,7 @@ export function PassFailEvaluation({
             isReviewer={evaluation.isReviewer}
             archived={archived}
             onSubmitEvaluationReview={onSubmitEvaluationAppealReview}
-            onResetEvaluationReview={onResetEvaluationAppealReview}
+            onResetEvaluationReview={evaluation.result === null ? onResetEvaluationAppealReview : undefined}
             isResettingEvaluationReview={isResettingEvaluationAppealReview}
             reviewerOptions={
               evaluation.appealReviewers?.map((reviewer) => ({
