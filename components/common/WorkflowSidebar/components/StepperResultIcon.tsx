@@ -6,13 +6,16 @@ const stepperSize = 25;
 
 const StyledIconContainer = styled.div<{
   isCurrent?: boolean;
+  isAppeal?: boolean;
   result: 'pass' | 'fail' | null;
-}>(({ theme, result, isCurrent }) => {
+}>(({ theme, result, isCurrent, isAppeal }) => {
   const currentColor = isCurrent
     ? result === 'pass'
       ? theme.palette.success.main
       : result === 'fail'
       ? theme.palette.error.main
+      : isAppeal
+      ? theme.palette.yellow.main
       : theme.palette.primary.main
     : theme.palette.gray.main;
 
@@ -23,7 +26,7 @@ const StyledIconContainer = styled.div<{
     background-color: ${isPastOrPresent ? currentColor : 'transparent'};
     border: 1px solid ${currentColor};
     box-sizing: border-box;
-    color: ${isCurrent ? 'white' : theme.palette.text.primary};
+    color: ${isCurrent ? (isAppeal ? theme.palette.yellow.contrastText : 'white') : theme.palette.text.primary};
     transition: background-color 150ms ease-in-out;
     justify-content: center;
     align-items: center;
@@ -39,8 +42,10 @@ export function StepperResultIcon({
   result,
   isCurrent,
   position,
-  showDash
+  showDash,
+  isAppeal
 }: {
+  isAppeal?: boolean;
   isCurrent?: boolean;
   result: Result | null;
   position: number;
@@ -48,7 +53,7 @@ export function StepperResultIcon({
   showDash?: boolean;
 }) {
   return (
-    <StyledIconContainer result={result} isCurrent={isCurrent}>
+    <StyledIconContainer isAppeal={isAppeal} result={result} isCurrent={isCurrent}>
       {result === 'pass' ? (
         <CheckIcon fontSize='small' data-test={`evaluation-passed-icon-${position}`} />
       ) : result === 'fail' ? (

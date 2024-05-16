@@ -221,6 +221,7 @@ export function EvaluationsReview({
                 ? evaluation.index > currentEvaluation.index && currentEvaluation.result === 'pass'
                 : false
             }
+            isAppeal={!!evaluation.appealedAt}
             actions={
               evaluation.type !== 'private_evaluation' && (
                 <EvaluationStepActions
