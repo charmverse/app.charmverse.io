@@ -185,7 +185,9 @@ export function useAppealProposalEvaluation({ evaluationId }: { evaluationId: st
 }
 
 export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
-  return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal/submit-result`);
+  return usePUT<Omit<ReviewEvaluationRequest, 'evaluationId' | 'decidedBy' | 'proposalId'>>(
+    `/api/proposals/evaluations/${evaluationId}/appeal/submit-result`
+  );
 }
 
 export function useResetEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {

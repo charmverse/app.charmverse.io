@@ -153,7 +153,7 @@ function PassFailEvaluationReview({
       )}
       <Card variant='outlined'>
         {requiredReviews !== 1 && evaluationReviews.length > 0 && (
-          <Stack pt={2} px={2} gap={2.5}>
+          <Stack p={2} gap={2.5}>
             {evaluationReviews.map((evaluationReview) => (
               <Stack key={evaluationReview.id} gap={1}>
                 <Stack direction='row' justifyContent='space-between' alignItems='center'>
@@ -358,7 +358,6 @@ export function PassFailEvaluation({
   ) {
     try {
       await submitEvaluationAppealReview({
-        evaluationId: evaluation.id,
         result,
         declineReasons: declineReason ? [declineReason] : []
       });
