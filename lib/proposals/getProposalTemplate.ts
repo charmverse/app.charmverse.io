@@ -34,6 +34,7 @@ export async function getProposalTemplate({ pageId }: { pageId: string }): Promi
         include: {
           permissions: true,
           reviewers: true,
+          appealReviewers: true,
           rubricCriteria: {
             orderBy: {
               index: 'asc'

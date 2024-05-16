@@ -1,5 +1,5 @@
 import type { ProposalEvaluation, ProposalSystemRole } from '@charmverse/core/prisma';
-import { Box, Typography, FormLabel, TextField, Divider, Stack, Switch } from '@mui/material';
+import { Box, Typography, FormLabel, TextField, Stack, Switch } from '@mui/material';
 import { useEffect } from 'react';
 
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -55,9 +55,12 @@ export function EvaluationStepSettings({
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
-  const readOnlyRequireReviews = readOnly || !!evaluationTemplate?.requiredReviews || !!evaluation.result;
-  const readOnlyAppealRequiredReviews = readOnly || !!evaluationTemplate?.appealRequiredReviews || !!evaluation.result;
-  const readOnlyAppealable = readOnly || !!evaluationTemplate?.appealable || !!evaluation.result;
+  const readOnlyRequireReviews = readOnly || (!isAdmin && !!evaluationTemplate?.requiredReviews) || !!evaluation.result;
+  const readOnlyAppealRequiredReviews =
+    readOnly || (!isAdmin && !!evaluationTemplate?.appealRequiredReviews) || !!evaluation.result;
+  const readOnlyAppealable =
+    readOnly || (!isAdmin && evaluationTemplate?.appealable !== undefined) || !!evaluation.result;
+
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
     id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
@@ -140,72 +143,65 @@ export function EvaluationStepSettings({
               value={requiredReviews}
             />
           </Box>
-          <Divider
-            sx={{
-              my: 2
-            }}
-          />
-          <Box>
-            <Stack direction='row' alignItems='center' justifyContent='space-between'>
-              <FormLabel>
+          <Stack direction='row' alignItems='center' justifyContent='space-between' mt={1}>
+            <FormLabel>
+              <Typography component='span' variant='subtitle1'>
+                Appealable
+              </Typography>
+            </FormLabel>
+            <Switch
+              checked={!!evaluation.appealable}
+              disabled={readOnlyAppealable}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onChange({
+                  appealable: checked,
+                  appealRequiredReviews: checked ? 1 : undefined,
+                  appealReviewers: checked ? [] : undefined
+                });
+              }}
+            />
+          </Stack>
+          {evaluation.appealable && (
+            <>
+              <FormLabel required={!!evaluation.appealable}>
                 <Typography component='span' variant='subtitle1'>
-                  Appealable
+                  {appealRequiredReviews && appealRequiredReviews !== 1
+                    ? `Appeal Reviewers (required ${appealRequiredReviews})`
+                    : 'Appeal Reviewers'}
                 </Typography>
               </FormLabel>
-              <Switch
-                checked={!!evaluation.appealable}
-                disabled={readOnlyAppealable}
-                onChange={(e) => {
-                  const checked = e.target.checked;
-                  onChange({
-                    appealable: checked,
-                    appealRequiredReviews: checked ? 1 : undefined,
-                    appealReviewers: checked ? [] : undefined
-                  });
-                }}
-              />
-            </Stack>
-            {evaluation.appealable && (
-              <>
-                <FormLabel required={!!evaluation.appealable}>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
+                <UserAndRoleSelect
+                  emptyPlaceholderContent='Select appeal user or role'
+                  value={appealReviewerOptions as SelectOption[]}
+                  readOnly={readOnlyAppealReviewers || !evaluation.appealable}
+                  systemRoles={[authorSystemRole, allMembersSystemRole]}
+                  variant='outlined'
+                  onChange={handleOnChangeAppealReviewers}
+                  required={!!evaluation.appealable}
+                />
+              </Box>
+              <Stack>
+                <FormLabel>
                   <Typography component='span' variant='subtitle1'>
-                    {appealRequiredReviews && appealRequiredReviews !== 1
-                      ? `Appeal Reviewers (required ${appealRequiredReviews})`
-                      : 'Appeal Reviewers'}
+                    Appeal required reviews
                   </Typography>
                 </FormLabel>
-                <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
-                  <UserAndRoleSelect
-                    emptyPlaceholderContent='Select appeal user or role'
-                    value={appealReviewerOptions as SelectOption[]}
-                    readOnly={readOnlyAppealReviewers || !evaluation.appealable}
-                    systemRoles={[authorSystemRole, allMembersSystemRole]}
-                    variant='outlined'
-                    onChange={handleOnChangeAppealReviewers}
-                    required={!!evaluation.appealable}
-                  />
-                </Box>
-                <Stack>
-                  <FormLabel>
-                    <Typography component='span' variant='subtitle1'>
-                      Appeal required reviews
-                    </Typography>
-                  </FormLabel>
-                  <TextField
-                    disabled={!evaluation.appealable || readOnlyAppealRequiredReviews}
-                    type='number'
-                    value={appealRequiredReviews}
-                    onChange={(e) => {
-                      onChange({
-                        appealRequiredReviews: Math.max(1, Number(e.target.value))
-                      });
-                    }}
-                    fullWidth
-                  />
-                </Stack>
-              </>
-            )}
-          </Box>
+                <TextField
+                  disabled={!evaluation.appealable || readOnlyAppealRequiredReviews}
+                  type='number'
+                  value={appealRequiredReviews}
+                  onChange={(e) => {
+                    onChange({
+                      appealRequiredReviews: Math.max(1, Number(e.target.value))
+                    });
+                  }}
+                  fullWidth
+                />
+              </Stack>
+            </>
+          )}
         </Box>
       )}
       {evaluation.type === 'rubric' && (

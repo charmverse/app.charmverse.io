@@ -91,6 +91,7 @@ export async function createProposal({
   const evaluationPermissionsToCreate: Prisma.ProposalEvaluationPermissionCreateManyInput[] = [];
 
   const reviewersInput: Prisma.ProposalReviewerCreateManyInput[] = [];
+  const appealReviewersInput: Prisma.ProposalAppealReviewerCreateManyInput[] = [];
 
   const project = projectId ? await getProjectById(projectId) : null;
 
@@ -124,7 +125,7 @@ export async function createProposal({
   }
 
   // retrieve permissions and apply evaluation ids to reviewers
-  evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers }, index) => {
+  evaluations.forEach(({ id: evaluationId, reviewers: evalReviewers, appealReviewers }, index) => {
     const permissions = workflow.evaluations[index]?.permissions;
     if (!permissions) {
       throw new Error(
@@ -146,6 +147,17 @@ export async function createProposal({
         evaluationId: evaluationIds[index]
       }))
     );
+    if (appealReviewers) {
+      appealReviewersInput.push(
+        ...appealReviewers.map((reviewer) => ({
+          roleId: reviewer.roleId,
+          systemRole: reviewer.systemRole,
+          userId: reviewer.userId,
+          proposalId,
+          evaluationId: evaluationIds[index]
+        }))
+      );
+    }
   });
 
   let proposalFormId = formId;
@@ -161,7 +173,7 @@ export async function createProposal({
   });
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, _reviewerCreation, _evaluationPermissions, page] = await prisma.$transaction([
+  const [proposal, , , , page] = await prisma.$transaction([
     prisma.proposal.create({
       data: {
         // Add page creator as the proposal's first author
@@ -185,7 +197,9 @@ export async function createProposal({
               type: evaluation.type,
               actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue,
               requiredReviews: evaluation.requiredReviews ?? 1,
-              finalStep: evaluation.finalStep
+              finalStep: evaluation.finalStep,
+              appealable: evaluation.appealable,
+              appealRequiredReviews: evaluation.appealRequiredReviews
             }))
           }
         },
@@ -208,6 +222,9 @@ export async function createProposal({
     }),
     prisma.proposalReviewer.createMany({
       data: reviewersInput
+    }),
+    prisma.proposalAppealReviewer.createMany({
+      data: appealReviewersInput
     }),
     prisma.proposalEvaluationPermission.createMany({
       data: pageProps?.type === 'proposal_template' ? [] : evaluationPermissionsToCreate
