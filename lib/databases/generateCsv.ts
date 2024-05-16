@@ -1,5 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { arrayUtils } from '@charmverse/core/utilities';
 import { sortBy } from 'lodash';
 
 import type { Formatters, PropertyContext } from 'components/common/DatabaseEditor/octoUtils';
@@ -19,6 +20,10 @@ import type { Board, IPropertyTemplate, PropertyType } from './board';
 import type { BoardView } from './boardView';
 import type { Card } from './card';
 import { Constants } from './constants';
+
+export const csvColumnSeparator = ',';
+export const csvCellEnclosure = '"';
+export const csvNewLine = '\r\n';
 
 export async function loadAndGenerateCsv({
   databaseId,
@@ -141,8 +146,8 @@ function generateCSV(
   let csvContent = '';
 
   rows.forEach((row) => {
-    const encodedRow = row.join(',');
-    csvContent += `${encodedRow}\r\n`;
+    const encodedRow = row.join(csvColumnSeparator);
+    csvContent += `${encodedRow}${csvNewLine}`;
   });
 
   let fileTitle = view.title;
@@ -172,7 +177,10 @@ function generateTableArray(
   cardMap: Record<string, { title: string }>
 ): { rows: string[][]; rowIds: string[] } {
   const rows: string[][] = [];
-  const visiblePropertyIds: string[] = viewToExport.fields.visiblePropertyIds;
+  const visiblePropertyIds: string[] = arrayUtils.uniqueValues([
+    ...viewToExport.fields.visiblePropertyIds,
+    '8a21b99e-4aed-4746-b680-b8bf3ab51e2e'
+  ]);
   const cardProperties =
     !visiblePropertyIds || visiblePropertyIds.length === 0
       ? (board.fields.cardProperties as IPropertyTemplate[])
@@ -234,7 +242,7 @@ function getCSVColumns({
 }) {
   const columns: string[] = [];
   if (!hasTitleProperty) {
-    columns.push(`"${encodeText(card.title)}"`);
+    columns.push(`${csvCellEnclosure}${encodeText(card.title)}${csvCellEnclosure}`);
   }
   visibleProperties.forEach((propertyTemplate: IPropertyTemplate) => {
     const propertyValue = card.fields.properties[propertyTemplate.id];
@@ -271,7 +279,7 @@ function getCSVColumns({
       columns.push(`${baseUrl}${encodeText(Array.isArray(displayValue) ? displayValue[0] : displayValue.toString())}`);
     } else {
       // Export as string
-      columns.push(`"${encodeText(displayValue as string)}"`);
+      columns.push(`${csvCellEnclosure}${encodeText(displayValue as string)}${csvCellEnclosure}`);
     }
   });
   return columns;

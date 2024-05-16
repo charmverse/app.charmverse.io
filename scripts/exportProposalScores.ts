@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils, stringUtils } from '@charmverse/core/utilities';
 import { BoardFields } from 'lib/databases/board';
+import { csvNewLine, csvColumnSeparator, csvCellEnclosure } from 'lib/databases/generateCsv';
 import { ProposalBoardBlock, ProposalPropertyField } from 'lib/proposals/blocks/interfaces';
 import { ProposalFields } from 'lib/proposals/interfaces';
 import { AggregateResults, aggregateResults } from 'lib/proposals/rubric/aggregateResults';
@@ -32,14 +33,11 @@ const exportedFormat: Record<ExportKeys, string> = {
 
 const exportedCustomProps: string[] = ['Mission', 'Type'];
 const exportedCustomFields: string[] = ['What is the size of your grant request?'];
-
-const separator = ',';
-const cellEnclosure = '"';
 const newLine = '\n';
 
 const headerRows = objectUtils.typedKeys(exportedFormat);
 
-async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
+export async function exportEvaluatedProposalScores({ domain, proposalIds }: { domain: string; proposalIds?: string[] }) {
   const customBlocks = await prisma.proposalBlock.findFirstOrThrow({
     where: {
       id: '__defaultBoard',
@@ -81,7 +79,9 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   });
   const formFieldIdsByName = groupBy(formFields, (field) => field.name);
 
-  const pageIds = await _getPageIdsFromDatabase();
+  console.log('Proposal IDS', !!proposalIds)
+
+  const pageIds = proposalIds ?? await _getPageIdsFromDatabase();
 
   const proposals = await prisma.proposal.findMany({
     // where: {
@@ -104,7 +104,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
         id: {
           in: pageIds
         }
-      }
+      },
     },
     include: {
       formAnswers: true,
@@ -210,20 +210,20 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       if (rowKey === 'average') {
         if (isNumber(rowValue)) {
           if (rowValue === Math.round(rowValue as number)) {
-            row.average = `${cellEnclosure}${(rowValue as number).toString()}${cellEnclosure}`;
+            row.average = `${csvCellEnclosure}${(rowValue as number).toString()}${csvCellEnclosure}`;
           } else {
-            row.average = `${cellEnclosure}${(rowValue as number).toFixed(1)}${cellEnclosure}`;
+            row.average = `${csvCellEnclosure}${(rowValue as number).toFixed(1)}${csvCellEnclosure}`;
           }
         } else {
-          row.average = `${cellEnclosure}${rowValue}${cellEnclosure}`;
+          row.average = `${csvCellEnclosure}${rowValue}${csvCellEnclosure}`;
         }
       } else if (rowKey === 'total') {
-        row.total = `${cellEnclosure}${row.total?.toString() ?? '-'}${cellEnclosure}`;
+        row.total = `${csvCellEnclosure}${row.total?.toString() ?? '-'}${csvCellEnclosure}`;
       } else {
-        row[rowKey] = `${cellEnclosure}${(rowValue as string)
-          .replace(new RegExp(cellEnclosure, 'g'), '')
-          .replace(new RegExp(separator, 'g'), '')
-          .replace(/;/g, ' ')}${cellEnclosure}`;
+        row[rowKey] = `${csvCellEnclosure}${(rowValue as string)
+          .replace(new RegExp(csvCellEnclosure, 'g'), '')
+          .replace(new RegExp(csvColumnSeparator, 'g'), '')
+          .replace(/;/g, ' ')}${csvCellEnclosure}`;
       }
     });
 
@@ -238,10 +238,10 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
         ? property.options.find((opt) => opt.id === rowValue)?.value ?? '-'
         : rowValue;
 
-      (row as any)[rowKey] = `${cellEnclosure}${(value as string)
-        .replace(new RegExp(cellEnclosure, 'g'), '')
-        .replace(new RegExp(separator, 'g'), '')
-        .replace(/;/g, ' ')}${cellEnclosure}`;
+      (row as any)[rowKey] = `${csvCellEnclosure}${(value as string)
+        .replace(new RegExp(csvCellEnclosure, 'g'), '')
+        .replace(new RegExp(csvColumnSeparator, 'g'), '')
+        .replace(/;/g, ' ')}${csvCellEnclosure}`;
     });
 
     exportedCustomFields.forEach((rowKey) => {
@@ -249,10 +249,10 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
       const match = p.formAnswers.find((answer) => fieldIds?.includes(answer.fieldId));
       if (match) {
         const valueStr = (match.value as any).contentText ?? match.value;
-        (row as any)[rowKey] = `${cellEnclosure}${valueStr
-          .replace(new RegExp(cellEnclosure, 'g'), '')
-          .replace(new RegExp(separator, 'g'), '')
-          .replace(/;/g, ' ')}${cellEnclosure}`;
+        (row as any)[rowKey] = `${csvCellEnclosure}${valueStr
+          .replace(new RegExp(csvCellEnclosure, 'g'), '')
+          .replace(new RegExp(csvColumnSeparator, 'g'), '')
+          .replace(/;/g, ' ')}${csvCellEnclosure}`;
       }
     });
 
@@ -267,7 +267,7 @@ async function exportEvaluatedProposalScores({ domain }: { domain: string }) {
   // await writeToSameFolder({data: JSON.stringify(allContent, null, 2), fileName: 'rawdata.json'})
 
   const textContent = allContent.reduce((acc, row) => {
-    return acc + row.join(separator) + newLine;
+    return acc + row.join(csvColumnSeparator) + csvNewLine;
   }, '');
 
   return textContent;
@@ -301,7 +301,7 @@ async function _getPageIdsFromDatabase() {
     .filter(isTruthy);
 }
 
-import { CardFields } from 'lib/databases/card';
-exportEvaluatedProposalScores({ domain: 'op-grants' }).then(async (csv) => {
-  await writeToSameFolder({ data: csv, fileName: 'exported.csv' });
-});
+// import { CardFields } from 'lib/databases/card';
+// exportEvaluatedProposalScores({ domain: 'op-grants' }).then(async (csv) => {
+//   await writeToSameFolder({ data: csv, fileName: 'exported.csv' });
+// });
