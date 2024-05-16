@@ -9,7 +9,19 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getCardNotifications({ id, userId }: QueryCondition): Promise<CardNotification[]> {
   const cardNotifications = await prisma.cardNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      card: {
+        deletedAt: null,
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        }
+      }
+    },
     select: {
       id: true,
       type: true,
