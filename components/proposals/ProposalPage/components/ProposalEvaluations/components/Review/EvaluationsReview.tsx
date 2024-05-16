@@ -251,6 +251,7 @@ export function EvaluationsReview({
               <PassFailEvaluation
                 archived={proposal?.archived ?? false}
                 key={evaluation.id}
+                authors={proposal.authors.map((a) => a.userId)}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}

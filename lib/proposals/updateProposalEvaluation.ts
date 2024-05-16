@@ -11,9 +11,9 @@ export type UpdateEvaluationRequest = {
   voteSettings?: VoteSettings | null;
   requiredReviews?: number;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
-  appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
-  appealable?: boolean;
-  appealRequiredReviews?: number;
+  appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
 };
 
 export async function updateProposalEvaluation({

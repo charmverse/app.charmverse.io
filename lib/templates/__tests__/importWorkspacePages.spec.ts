@@ -375,7 +375,11 @@ describe('importWorkspacePages - proposal content', () => {
           reviewers: [],
           rubricCriteria: [],
           actionLabels: null,
-          requiredReviews: 1
+          requiredReviews: 1,
+          appealable: null,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null
         },
         {
           completedAt: null,
@@ -392,6 +396,10 @@ describe('importWorkspacePages - proposal content', () => {
           proposalId: copiedProposal.id,
           actionLabels: null,
           requiredReviews: 1,
+          appealable: null,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,
@@ -537,7 +545,11 @@ describe('importWorkspacePages - proposal content', () => {
           reviewers: [],
           rubricCriteria: [],
           actionLabels: null,
-          requiredReviews: 1
+          requiredReviews: 1,
+          appealable: null,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null
         },
         {
           completedAt: null,
@@ -597,7 +609,11 @@ describe('importWorkspacePages - proposal content', () => {
               proposalId: copiedProposal.id,
               id: expect.any(String)
             })
-          ])
+          ]),
+          appealable: null,
+          appealedAt: null,
+          appealRequiredReviews: null,
+          finalStep: null
         }
       ]
     });
