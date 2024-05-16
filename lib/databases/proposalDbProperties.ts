@@ -7,7 +7,8 @@ import {
   AUTHORS_BLOCK_ID,
   CREATED_AT_ID,
   PROPOSAL_REVIEWERS_BLOCK_ID,
-  PROPOSAL_STATUS_BLOCK_ID
+  PROPOSAL_STATUS_BLOCK_ID,
+  PROPOSAL_STEP_BLOCK_ID
 } from 'lib/proposals/blocks/constants';
 import type {
   ProposalEvaluationResultExtended,
