@@ -176,7 +176,6 @@ export function EvaluationStepSettings({
                   emptyPlaceholderContent='Select appeal user or role'
                   value={appealReviewerOptions as SelectOption[]}
                   readOnly={readOnlyAppealReviewers || !evaluation.appealable}
-                  systemRoles={[authorSystemRole, allMembersSystemRole]}
                   variant='outlined'
                   onChange={handleOnChangeAppealReviewers}
                   required={!!evaluation.appealable}
