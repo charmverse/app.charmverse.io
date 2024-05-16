@@ -31,6 +31,9 @@ export type Props = {
     | 'requiredReviews'
     | 'reviews'
     | 'declineReasonOptions'
+    | 'appealable'
+    | 'appealRequiredReviews'
+    | 'appealReviewers'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;

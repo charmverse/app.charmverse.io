@@ -18,7 +18,8 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, reviewers, requiredReviews } = req.body as UpdateEvaluationRequest;
+  const { evaluationId, reviewers, requiredReviews, appealRequiredReviews, appealReviewers, appealable } =
+    req.body as UpdateEvaluationRequest;
 
   const proposal = await prisma.proposal.findUniqueOrThrow({
     where: {
@@ -80,7 +81,10 @@ async function updateEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     reviewers,
     actorId: userId,
     requiredReviews,
-    spaceId: proposal.spaceId
+    spaceId: proposal.spaceId,
+    appealable,
+    appealRequiredReviews,
+    appealReviewers
   });
 
   return res.status(200).end();

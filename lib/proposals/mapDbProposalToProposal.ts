@@ -8,7 +8,11 @@ import type {
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
-import type { ProposalEvaluation, ProposalEvaluationReview } from '@charmverse/core/prisma-client';
+import type {
+  ProposalAppealReviewer,
+  ProposalEvaluation,
+  ProposalEvaluationReview
+} from '@charmverse/core/prisma-client';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
@@ -43,6 +47,7 @@ export function mapDbProposalToProposal({
     FormFieldsIncludeType & {
       authors: ProposalAuthor[];
       evaluations: (ProposalEvaluation & {
+        appealReviewers: ProposalAppealReviewer[];
         reviewers: ProposalReviewer[];
         rubricAnswers: ProposalRubricCriteriaAnswer[];
         rubricCriteria: ProposalRubricCriteria[];
@@ -85,10 +90,11 @@ export function mapDbProposalToProposal({
     }
     return {
       ...evaluation,
+      appealReviewers: evaluation.appealReviewers || [],
       reviews,
       declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
       isReviewer: !!stepPermissions?.evaluate
-    } as unknown as PopulatedEvaluation;
+    } as PopulatedEvaluation;
   });
   const pageFields = page?.type === 'proposal_template' ? page : { sourceTemplateId: page?.sourceTemplateId };
 

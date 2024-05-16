@@ -11,6 +11,9 @@ export type UpdateEvaluationRequest = {
   voteSettings?: VoteSettings | null;
   requiredReviews?: number;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
+  appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
+  appealable?: boolean;
+  appealRequiredReviews?: number;
 };
 
 export async function updateProposalEvaluation({
@@ -19,6 +22,9 @@ export async function updateProposalEvaluation({
   evaluationId,
   voteSettings,
   reviewers,
+  appealRequiredReviews,
+  appealReviewers,
+  appealable,
   actorId,
   requiredReviews,
   currentEvaluationType
@@ -34,6 +40,21 @@ export async function updateProposalEvaluation({
       });
       await tx.proposalReviewer.createMany({
         data: reviewers.map((reviewer) => ({
+          evaluationId,
+          proposalId,
+          ...reviewer
+        }))
+      });
+    }
+    if (appealReviewers) {
+      await tx.proposalAppealReviewer.deleteMany({
+        where: {
+          evaluationId,
+          proposalId
+        }
+      });
+      await tx.proposalAppealReviewer.createMany({
+        data: appealReviewers.map((reviewer) => ({
           evaluationId,
           proposalId,
           ...reviewer
@@ -57,6 +78,26 @@ export async function updateProposalEvaluation({
         },
         data: {
           requiredReviews
+        }
+      });
+    }
+    if (appealable !== undefined) {
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          appealable
+        }
+      });
+    }
+    if (appealRequiredReviews) {
+      await tx.proposalEvaluation.update({
+        where: {
+          id: evaluationId
+        },
+        data: {
+          appealRequiredReviews
         }
       });
     }

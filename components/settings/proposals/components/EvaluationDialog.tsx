@@ -16,7 +16,6 @@ import {
   Stack,
   Switch,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
@@ -227,9 +226,7 @@ function EvaluationAppealSettings({
             checked={!!appealable}
             onChange={(e) => {
               const checked = e.target.checked;
-              if (!checked) {
-                setValue('appealRequiredReviews', undefined);
-              }
+              setValue('appealRequiredReviews', !checked ? undefined : 1);
               setValue('appealable', checked);
             }}
           />

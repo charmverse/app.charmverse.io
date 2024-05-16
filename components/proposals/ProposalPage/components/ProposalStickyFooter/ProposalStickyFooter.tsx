@@ -41,7 +41,6 @@ export function ProposalStickyFooter({
     }
   }
   const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
-
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,

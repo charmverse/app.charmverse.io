@@ -96,6 +96,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
       return {
         ...evaluation,
         index,
+        appealReviewers: evaluation.appealable ? [{ systemRole: 'author' as const }] : [],
         reviewers: evaluation.type === 'feedback' ? [{ systemRole: 'author' as const }] : [],
         rubricCriteria
       };
