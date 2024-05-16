@@ -76,7 +76,7 @@ function PassFailEvaluationReview({
     declineReason: string | null,
     result: NonNullable<PopulatedEvaluation['result']>
   ) => Promise<void>;
-  onResetEvaluationReview: () => void;
+  onResetEvaluationReview?: () => void;
   isResettingEvaluationReview: boolean;
   reviewerOptions: {
     group: string;
@@ -164,7 +164,7 @@ function PassFailEvaluationReview({
                     </Typography>
                   </Stack>
                   <Stack direction='row' gap={1.5} alignItems='center'>
-                    {evaluationReview.reviewerId === user?.id && !evaluationResult && (
+                    {onResetEvaluationReview && evaluationReview.reviewerId === user?.id && !evaluationResult && (
                       <Button
                         size='small'
                         color='secondary'
@@ -172,7 +172,7 @@ function PassFailEvaluationReview({
                         loading={isResettingEvaluationReview}
                         onClick={onResetEvaluationReview}
                       >
-                        Reset
+                        Undo
                       </Button>
                     )}
                     {evaluationReview.result === 'pass' ? (
@@ -392,7 +392,7 @@ export function PassFailEvaluation({
         isReviewer={evaluation.isReviewer}
         archived={archived}
         onSubmitEvaluationReview={onSubmitEvaluationReview}
-        onResetEvaluationReview={onResetEvaluationReview}
+        onResetEvaluationReview={evaluation.appealedAt ? undefined : onResetEvaluationReview}
         isResettingEvaluationReview={isResettingEvaluationReview}
         reviewerOptions={evaluation.reviewers.map((reviewer) => ({
           group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
