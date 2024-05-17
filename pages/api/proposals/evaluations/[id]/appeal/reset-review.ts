@@ -29,17 +29,16 @@ async function resetEvaluationAppealReviewEndpoint(req: NextApiRequest, res: Nex
       }
     }
   });
-
   const proposal = proposalEvaluation.proposal;
+
+  if (proposal.archived) {
+    throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
+  }
 
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposal.id,
     userId
   });
-
-  if (proposal.archived) {
-    throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
-  }
 
   if (!proposalPermissions.evaluate_appeal) {
     throw new ActionNotPermittedError(`You don't have permission to review this appeal.`);

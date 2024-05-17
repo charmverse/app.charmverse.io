@@ -24,6 +24,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
     },
     select: {
       id: true,
+      result: true,
       appealable: true,
       appealedAt: true,
       appealRequiredReviews: true,
@@ -54,11 +55,11 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
   });
 
   if (!proposalEvaluation.appealable) {
-    throw new ActionNotPermittedError('This evaluation is not appealable');
+    throw new ActionNotPermittedError('This evaluation is not appealable.');
   }
 
   if (!proposalEvaluation.appealedAt) {
-    throw new ActionNotPermittedError('Appeal has not been requested for this evaluation');
+    throw new ActionNotPermittedError('Appeal has not been requested for this evaluation.');
   }
 
   const proposalId = proposalEvaluation.proposal.id;
@@ -68,7 +69,11 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
   }
 
   if ((proposalEvaluation.appealRequiredReviews ?? 1) === proposalEvaluation.proposalEvaluationReviews.length) {
-    throw new ActionNotPermittedError('This evaluation appeal has already been reviewed');
+    throw new ActionNotPermittedError('This evaluation appeal has already been reviewed.');
+  }
+
+  if (proposalEvaluation.result) {
+    throw new ActionNotPermittedError('This evaluation has already been reviewed.');
   }
 
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
@@ -85,7 +90,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
   }
 
   if (existingEvaluationAppealReview) {
-    throw new ActionNotPermittedError('You have already reviewed this evaluation');
+    throw new ActionNotPermittedError('You have already reviewed this appeal.');
   }
 
   await submitEvaluationAppealResult({
