@@ -279,8 +279,12 @@ function EvaluationAdvancedSettingsAccordion({
   const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
   const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
   return (
-    <Box sx={{ mb: 1 }}>
-      <Accordion expanded={isAdvancedSettingsOpen} onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}>
+    <Box>
+      <Accordion
+        style={{ marginBottom: '20px' }}
+        expanded={isAdvancedSettingsOpen}
+        onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+      >
         <AccordionSummary expandIcon={<ExpandMore />}>
           <Typography>Advanced settings</Typography>
         </AccordionSummary>
