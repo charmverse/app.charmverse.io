@@ -1,7 +1,7 @@
 import { objectUtils } from '@charmverse/core/utilities';
 import { v4 as uuid } from 'uuid';
 
-import type { ProposalPropertyType, IPropertyTemplate } from 'lib/databases/board';
+import type { IPropertyTemplate, ProposalPropertyType } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
 import {
   AUTHORS_BLOCK_ID,

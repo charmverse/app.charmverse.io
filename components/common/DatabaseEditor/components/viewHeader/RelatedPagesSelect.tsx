@@ -1,13 +1,12 @@
-import { Autocomplete, Typography } from '@mui/material';
+import { Autocomplete, TextField, Stack } from '@mui/material';
 import { useMemo, useEffect } from 'react';
 
-import type { Card } from 'lib/databases/card';
-import { isTruthy } from 'lib/utils/types';
+import { PageIcon } from 'components/common/PageIcon';
+import PageTitle from 'components/common/PageLayout/components/PageTitle';
 
 import { makeSelectCardsFromBoard } from '../../store/cards';
 import { initialDatabaseLoad } from '../../store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { RelationPageListItemsContainer } from '../properties/PagesAutocomplete';
 
 type Props = {
   boardPageId?: string;
@@ -30,26 +29,34 @@ export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
   const options = cards.map((b) => b.id) || [];
 
   return (
-    <Autocomplete
+    <Autocomplete<string, true>
       size='small'
       multiple
       value={value}
-      onChange={(e, newValue) => onChange(newValue)}
+      onChange={(_e, newValue) => onChange(newValue)}
       options={options}
-      renderInput={(params) => {
-        const cardIds = Array.isArray(params.inputProps.value) ? params.inputProps.value : [];
-        return cardIds.length === 0 ? (
-          <Typography color='secondary' fontSize='small'>
-            Select a page
-          </Typography>
-        ) : (
-          <RelationPageListItemsContainer
-            cards={cardIds
-              .map((cardId) => {
-                return cards.find((card) => card.id === cardId) as Card | undefined;
-              })
-              .filter(isTruthy)}
-          />
+      noOptionsText='No cards found'
+      renderInput={(params) => <TextField {...params} placeholder='Select a page' />}
+      renderTags={(cardIds, getTagProps) => (
+        <Stack direction='row'>
+          {cardIds.map((cardId, index) => {
+            const card = cards.find((c) => c.id === cardId);
+            return (
+              <Stack direction='row' {...getTagProps({ index })} key={cardId}>
+                <PageIcon icon={card?.icon} isEditorEmpty={!card?.hasContent} pageType={card?.type} />
+                <PageTitle hasContent={!card?.title}>{card?.title || 'Untitled'}</PageTitle>
+              </Stack>
+            );
+          })}
+        </Stack>
+      )}
+      renderOption={(props, option) => {
+        const card = cards.find((c) => c.id === option);
+        return (
+          <li {...props}>
+            <PageIcon icon={card?.icon} isEditorEmpty={!card?.hasContent} pageType={card?.type} />
+            <PageTitle hasContent={!card?.title}>{card?.title || 'Untitled'}</PageTitle>
+          </li>
         );
       }}
     />

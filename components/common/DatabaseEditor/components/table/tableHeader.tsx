@@ -185,22 +185,21 @@ function TableHeader(props: Props): JSX.Element {
             }}
           />
         </Stack>
-        {template.id !== Constants.titleColumnId && (
-          <>
-            <MenuItem
-              {...bindTriggerProps}
-              onClick={() => {
-                props.setSelectedPropertyId?.(template.id);
-              }}
-            >
-              <ListItemIcon>
-                <TuneIcon fontSize='small' />
-              </ListItemIcon>
-              <Typography variant='subtitle1'>Edit property</Typography>
-            </MenuItem>
-            <Divider />
-          </>
-        )}
+        {template.id !== Constants.titleColumnId && [
+          <MenuItem
+            key={1}
+            {...bindTriggerProps}
+            onClick={() => {
+              props.setSelectedPropertyId?.(template.id);
+            }}
+          >
+            <ListItemIcon>
+              <TuneIcon fontSize='small' />
+            </ListItemIcon>
+            <Typography variant='subtitle1'>Edit property</Typography>
+          </MenuItem>,
+          <Divider key={2} />
+        ]}
         <MenuItem
           onClick={() => {
             changeViewSortOptions([{ propertyId: templateId, reversed: false }]);

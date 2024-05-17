@@ -27,6 +27,7 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { CardWithRelations } from 'lib/databases/card';
 import {
@@ -133,6 +134,9 @@ const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
+
+  const { getFeatureTitle } = useSpaceFeatures();
+
   const { formatDateTime, formatDate } = useDateFormatter();
   const { updateReward } = useRewards();
   const { showError } = useSnackbar();
@@ -352,10 +356,12 @@ function PropertyValueElement(props: Props) {
   // Proposals as datasource use proposalStatus column, whereas the actual proposals table uses STATUS_BLOCK_ID
   // We should migrate over the proposals as datasource blocks to the same format as proposals table
   else if (propertyTemplate.type === 'proposalStatus' || propertyTemplate.id === PROPOSAL_STATUS_BLOCK_ID) {
+    // View inside proposals table
     if (proposal) {
       return <ProposalStatusSelect proposal={proposal} readOnly={!isAdmin} displayType={displayType} />;
     }
 
+    // View inside database with proposals as source
     const evaluationTypeProperty = board.fields.cardProperties.find(
       (_cardProperty) => _cardProperty.type === 'proposalEvaluationType'
     );
@@ -365,6 +371,15 @@ function PropertyValueElement(props: Props) {
       step: evaluationType
     });
 
+    const statusLabel = EVALUATION_STATUS_LABELS[proposalEvaluationStatus];
+
+    const optionValue =
+      evaluationType === 'rewards'
+        ? `${getFeatureTitle('Rewards')} ${statusLabel}`
+        : evaluationType === 'credentials'
+        ? `Credentials ${statusLabel}`
+        : statusLabel;
+
     return (
       <TagSelect
         wrapColumn
@@ -373,7 +388,7 @@ function PropertyValueElement(props: Props) {
           {
             color: proposalStatusColors[proposalEvaluationStatus],
             id: proposalEvaluationStatus,
-            value: EVALUATION_STATUS_LABELS[proposalEvaluationStatus]
+            value: optionValue
           }
         ]}
         propertyValue={proposalEvaluationStatus}

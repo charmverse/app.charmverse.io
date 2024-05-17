@@ -7,7 +7,21 @@ import { notificationMetadataSelectStatement, queryCondition } from '../utils';
 
 export async function getBountyNotifications({ id, userId }: QueryCondition): Promise<BountyNotification[]> {
   const bountyNotifications = await prisma.bountyNotification.findMany({
-    where: queryCondition({ id, userId }),
+    where: {
+      ...queryCondition({ id, userId }),
+      bounty: {
+        space: {
+          spaceRoles: {
+            some: {
+              userId
+            }
+          }
+        },
+        page: {
+          deletedAt: null
+        }
+      }
+    },
     select: {
       id: true,
       type: true,
