@@ -4,6 +4,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { createVote, generateBounty } from 'testing/setupDatabase';
 
 import { goBackToStep } from '../goBackToStep';
+import { submitEvaluationAppealResult } from '../submitEvaluationAppealResult';
 import { submitEvaluationResult } from '../submitEvaluationResult';
 
 describe('goBackToStep()', () => {
@@ -109,7 +110,10 @@ describe('goBackToStep()', () => {
           result: 'pass',
           reviewers: [],
           permissions: [],
-          requiredReviews: 3
+          requiredReviews: 3,
+          appealable: true,
+          appealedAt: new Date(),
+          appealedBy: user.id
         }
       ]
     });
@@ -131,13 +135,22 @@ describe('goBackToStep()', () => {
       spaceId: space.id
     });
 
+    await submitEvaluationAppealResult({
+      decidedBy: user.id,
+      evaluation,
+      proposalId: proposal.id,
+      result: 'pass',
+      spaceId: space.id,
+      declineReasons: []
+    });
+
     const proposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
       where: {
         evaluationId: proposal.evaluations[1].id
       }
     });
 
-    expect(proposalEvaluationReviews.length).toBe(1);
+    expect(proposalEvaluationReviews.length).toBe(2);
 
     await goBackToStep({
       proposalId: proposal.id,
@@ -158,7 +171,15 @@ describe('goBackToStep()', () => {
       }
     });
     expect(updated.evaluations[0].result).toBe(null);
-    expect(updated.evaluations[1].result).toBe(null);
+    expect(updated.evaluations[1]).toMatchObject(
+      expect.objectContaining({
+        result: null,
+        decidedBy: null,
+        completedAt: null,
+        appealedAt: null
+      })
+    );
+
     const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
       where: {
         evaluationId: proposal.evaluations[1].id

@@ -68,8 +68,9 @@ export async function goBackToStep({
 
   const evaluationsToUpdate = proposal.evaluations.slice(evaluationIndex);
   const evaluationIds = evaluationsToUpdate.map((e) => e.id);
+  const evaluationsWithResult = evaluationsToUpdate.filter((e) => e.result);
 
-  if (evaluationsToUpdate.some((e) => e.type === 'vote')) {
+  if (evaluationsWithResult.some((e) => e.type === 'vote')) {
     throw new InvalidInputError('Cannot clear the results of a vote');
   }
 

@@ -22,6 +22,7 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     select: {
       appealable: true,
       appealedAt: true,
+      result: true,
       proposal: {
         select: {
           id: true,
@@ -58,6 +59,10 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
 
   if (!isAuthor) {
     throw new ActionNotPermittedError('Only authors can appeal evaluations');
+  }
+
+  if (proposalEvaluation.result !== 'fail') {
+    throw new ActionNotPermittedError('Only failed evaluations can be appealed');
   }
 
   if (!proposalEvaluation.appealable) {

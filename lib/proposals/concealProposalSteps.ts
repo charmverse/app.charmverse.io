@@ -1,5 +1,5 @@
 import { hasAccessToSpace } from '@charmverse/core/permissions';
-import type { ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma-client';
+import type { ProposalAppealReviewer, ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { privateEvaluationSteps } from '@charmverse/core/proposals';
 
@@ -10,6 +10,7 @@ import type { ProposalWithUsersAndRubric } from './interfaces';
 export type MinimalProposal = Pick<ProposalWithUsersAndRubric, 'spaceId' | 'workflowId' | 'id'> & {
   workflow?: { privateEvaluations: boolean | null };
   reviewers?: ProposalReviewer[];
+  appealReviewers?: ProposalAppealReviewer[];
 } & {
   evaluations: (Pick<ProposalWithUsersAndRubric['evaluations'][0], 'id' | 'type' | 'result' | 'index' | 'reviewers'> &
     Partial<ProposalWithUsersAndRubric['evaluations'][0]>)[];
