@@ -46,6 +46,7 @@ export type Props = {
     | 'type'
     | 'appealedAt'
     | 'appealedBy'
+    | 'declinedAt'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -422,7 +423,7 @@ export function PassFailEvaluation({
       requiredReviews={evaluation.requiredReviews}
       evaluationResult={evaluation.appealedAt ? 'fail' : evaluation.result}
       declineReasonOptions={evaluation.declineReasonOptions}
-      completedAt={evaluation.completedAt}
+      completedAt={evaluation.appealedAt ? evaluation.declinedAt : evaluation.completedAt}
       actionLabels={actionLabels}
     />
   );
@@ -446,6 +447,8 @@ export function PassFailEvaluation({
       requiredReviews={evaluation.appealRequiredReviews ?? 1}
       declineReasonOptions={evaluation.declineReasonOptions}
       actionLabels={actionLabels}
+      evaluationResult={evaluation.result}
+      completedAt={evaluation.result !== null ? evaluation.completedAt : undefined}
     />
   );
 
