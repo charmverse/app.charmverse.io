@@ -18,7 +18,7 @@ concurrency:
   group: ci-${{ github.event_name }}-${{ github.ref }}
 
 env:
-  SELECTED_PERMISSION_API_TAG: latest
+  SELECTED_PERMISSION_API_TAG: feat-appeal-workflow
 
 jobs:
   build-app:

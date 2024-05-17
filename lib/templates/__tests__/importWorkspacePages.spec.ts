@@ -376,7 +376,7 @@ describe('importWorkspacePages - proposal content', () => {
           rubricCriteria: [],
           actionLabels: null,
           requiredReviews: 1,
-          appealable: null,
+          appealable: false,
           appealedAt: null,
           appealRequiredReviews: null,
           finalStep: null,
@@ -398,7 +398,7 @@ describe('importWorkspacePages - proposal content', () => {
           proposalId: copiedProposal.id,
           actionLabels: null,
           requiredReviews: 1,
-          appealable: null,
+          appealable: false,
           appealedBy: null,
           declinedAt: null,
           appealedAt: null,
@@ -550,7 +550,7 @@ describe('importWorkspacePages - proposal content', () => {
           rubricCriteria: [],
           actionLabels: null,
           requiredReviews: 1,
-          appealable: null,
+          appealable: false,
           appealedAt: null,
           appealRequiredReviews: null,
           finalStep: null,
@@ -618,7 +618,7 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.any(String)
             })
           ]),
-          appealable: null,
+          appealable: false,
           appealedAt: null,
           appealRequiredReviews: null,
           finalStep: null
