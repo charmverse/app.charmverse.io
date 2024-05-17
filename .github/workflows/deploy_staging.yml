@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: 9124824673-34b83b5
+  SELECTED_PERMISSION_API_TAG: 9125235416-e58e39f
 
 concurrency:
   group: staging-${{ github.ref }}
