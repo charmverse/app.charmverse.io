@@ -279,23 +279,25 @@ function EvaluationAdvancedSettingsAccordion({
   const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
   const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
   return (
-    <Accordion expanded={isAdvancedSettingsOpen} onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}>
-      <AccordionSummary expandIcon={<ExpandMore />}>
-        <Typography>Advanced settings</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Stack gap={2}>
-          <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-          {formValues.type === 'pass_fail' && (
-            <>
-              <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-              <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-              <EvaluationAppealSettings formValues={formValues} setValue={setValue} />
-            </>
-          )}
-        </Stack>
-      </AccordionDetails>
-    </Accordion>
+    <Box sx={{ mb: 1 }}>
+      <Accordion expanded={isAdvancedSettingsOpen} onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}>
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography>Advanced settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack gap={2}>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && (
+              <>
+                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                <EvaluationAppealSettings formValues={formValues} setValue={setValue} />
+              </>
+            )}
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
+    </Box>
   );
 }
 
