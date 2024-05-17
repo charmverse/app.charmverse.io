@@ -284,7 +284,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
       onClick={onClickToEdit}
     >
       <Tooltip title={readOnlyMessage ?? null}>
-        <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} gap={0.5}>
+        <Box display='inline-flex' flexWrap={wrapColumn ? 'wrap' : 'nowrap'} rowGap={1}>
           {applicableValues.length === 0 ? (
             showEmptyPlaceholder && <EmptyPlaceholder>{emptyPlaceholderContent}</EmptyPlaceholder>
           ) : (
