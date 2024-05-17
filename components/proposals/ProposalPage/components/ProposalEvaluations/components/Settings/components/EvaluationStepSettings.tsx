@@ -160,7 +160,7 @@ export function EvaluationStepSettings({
             </FormLabel>
             <Switch
               checked={!!finalStep}
-              disabled={readOnlyFinalStep || !!evaluation.appealable}
+              disabled={readOnlyFinalStep}
               onChange={(e) => {
                 const checked = e.target.checked;
                 onChange({
@@ -180,7 +180,7 @@ export function EvaluationStepSettings({
             </FormLabel>
             <Switch
               checked={!!evaluation.appealable}
-              disabled={readOnlyAppealable || !!finalStep}
+              disabled={readOnlyAppealable}
               onChange={(e) => {
                 const checked = e.target.checked;
                 onChange({

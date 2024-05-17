@@ -224,7 +224,6 @@ function EvaluationAppealSettings({
           </Typography>
           <Switch
             checked={!!finalStep}
-            disabled={!!appealable}
             onChange={(e) => {
               const checked = e.target.checked;
               setValue('finalStep', checked);
@@ -242,7 +241,6 @@ function EvaluationAppealSettings({
           </Typography>
           <Switch
             checked={!!appealable}
-            disabled={!!finalStep}
             onChange={(e) => {
               const checked = e.target.checked;
               setValue('appealRequiredReviews', !checked ? null : 1);
@@ -252,18 +250,20 @@ function EvaluationAppealSettings({
           />
         </Stack>
       </Box>
-      <Box>
-        <FieldLabel>Appeal required reviews</FieldLabel>
-        <TextField
-          disabled={!appealable || !!finalStep}
-          type='number'
-          onChange={(e) => {
-            setValue('appealRequiredReviews', Math.max(1, Number(e.target.value)));
-          }}
-          fullWidth
-          value={appealRequiredReviews ?? ''}
-        />
-      </Box>
+      {appealable && (
+        <Box>
+          <FieldLabel>Appeal required reviews</FieldLabel>
+          <TextField
+            disabled={!appealable}
+            type='number'
+            onChange={(e) => {
+              setValue('appealRequiredReviews', Math.max(1, Number(e.target.value)));
+            }}
+            fullWidth
+            value={appealRequiredReviews ?? ''}
+          />
+        </Box>
+      )}
     </Stack>
   );
 }
