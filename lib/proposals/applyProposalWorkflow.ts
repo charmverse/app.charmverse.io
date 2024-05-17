@@ -88,7 +88,7 @@ export async function applyProposalWorkflow({
               data: evaluation.permissions
             }
           },
-          requiredReviews,
+          requiredReviews: requiredReviews ?? 1,
           appealReviewers: {
             createMany: {
               data: appealReviewers

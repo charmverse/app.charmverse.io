@@ -9,12 +9,12 @@ export type UpdateEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   voteSettings?: VoteSettings | null;
-  requiredReviews?: number;
+  requiredReviews?: number | null;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
   appealable?: boolean | null;
   appealRequiredReviews?: number | null;
-  finalStep?: boolean;
+  finalStep?: boolean | null;
 };
 
 export async function updateProposalEvaluation({

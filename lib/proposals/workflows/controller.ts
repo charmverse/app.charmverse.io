@@ -80,7 +80,7 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
             index,
-            requiredReviews: workflowEvaluation.requiredReviews
+            requiredReviews: workflowEvaluation.requiredReviews || 1
           }
         });
         processedIds.push(originalTemplateEvaluation.id);
@@ -92,7 +92,7 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
             index,
-            requiredReviews: workflowEvaluation.requiredReviews
+            requiredReviews: workflowEvaluation.requiredReviews || 1
           }
         });
       }

@@ -33,6 +33,7 @@ export type ProposalWithJoinedData = {
   status: ProposalStatus;
   evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result'> & {
     finalStep?: boolean | null;
+    appealedAt?: Date | null;
   })[];
   selectedCredentialTemplates: string[];
   authors: IssuableProposalCredentialAuthor[];

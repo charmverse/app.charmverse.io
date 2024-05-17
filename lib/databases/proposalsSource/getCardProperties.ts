@@ -41,7 +41,7 @@ type ProposalData = {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
     evaluations: (Pick<
       ProposalEvaluation,
-      'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep'
+      'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep' | 'appealedAt'
     > & {
       rubricAnswers: ProposalRubricCriteriaAnswer[];
       rubricCriteria: ProposalRubricCriteria[];
