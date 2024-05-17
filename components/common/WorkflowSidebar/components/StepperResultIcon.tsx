@@ -15,7 +15,7 @@ const StyledIconContainer = styled.div<{
       : result === 'fail'
       ? theme.palette.error.main
       : isAppealActive
-      ? theme.palette.yellow.main
+      ? theme.palette.warning.main
       : theme.palette.primary.main
     : theme.palette.gray.main;
 
@@ -26,7 +26,7 @@ const StyledIconContainer = styled.div<{
     background-color: ${isPastOrPresent ? currentColor : 'transparent'};
     border: 1px solid ${currentColor};
     box-sizing: border-box;
-    color: ${isCurrent ? (isAppealActive ? theme.palette.yellow.contrastText : 'white') : theme.palette.text.primary};
+    color: ${isCurrent ? (isAppealActive ? theme.palette.warning.contrastText : 'white') : theme.palette.text.primary};
     transition: background-color 150ms ease-in-out;
     justify-content: center;
     align-items: center;

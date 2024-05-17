@@ -67,8 +67,8 @@ export function EvaluationStepSettings({
   }));
   const appealReviewerOptions =
     evaluation.appealReviewers?.map((reviewer) => ({
-      group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
-      id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+      group: reviewer.roleId ? 'role' : 'user',
+      id: (reviewer.roleId ?? reviewer.userId) as string
     })) ?? [];
   const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
   const requiredReviews = evaluation.requiredReviews;
@@ -87,7 +87,6 @@ export function EvaluationStepSettings({
     onChange({
       appealReviewers: reviewers.map((r) => ({
         roleId: r.group === 'role' ? r.id : null,
-        systemRole: r.group === 'system_role' ? (r.id as ProposalSystemRole) : null,
         userId: r.group === 'user' ? r.id : null
       }))
     });

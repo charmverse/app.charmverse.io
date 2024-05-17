@@ -74,7 +74,8 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     },
     data: {
       appealedAt: new Date(),
-      result: null
+      result: null,
+      appealedBy: userId
     }
   });
 
