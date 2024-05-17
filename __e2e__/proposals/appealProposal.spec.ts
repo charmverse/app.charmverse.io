@@ -5,20 +5,21 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { expect, test } from '__e2e__/utils/test';
 
-test.describe.serial('Appeal proposal1 evaluation step', async () => {
+test.describe('Appeal proposal1 evaluation step', async () => {
   let space: Space;
   let admin: User;
   let proposalAuthor: User;
+  let appealReviewer: User;
   let proposal1: Proposal & { page: Page };
   let proposal2: Proposal & { page: Page };
   let proposal3: Proposal & { page: Page };
   let proposal4: Proposal & { page: Page };
   let proposal5: Proposal & { page: Page };
-  let proposal6: Proposal & { page: Page };
 
   test.beforeAll(async () => {
     ({ user: admin, space } = await generateUserAndSpace({ isAdmin: true }));
     proposalAuthor = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
+    appealReviewer = await testUtilsUser.generateSpaceUser({ spaceId: space.id, isAdmin: false });
 
     await prisma.spaceRole.updateMany({
       where: {
@@ -28,6 +29,16 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
         onboarded: true
       }
     });
+
+    await prisma.spaceRole.updateMany({
+      where: {
+        userId: appealReviewer.id
+      },
+      data: {
+        onboarded: true
+      }
+    });
+
     const args = {
       spaceId: space.id,
       userId: proposalAuthor.id,
@@ -43,7 +54,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
           reviewers: [{ group: 'user', id: admin.id }],
           appealable: true,
           appealRequiredReviews: 1,
-          appealReviewers: [{ group: 'user', id: admin.id }]
+          appealReviewers: [{ group: 'user', id: appealReviewer.id }]
         },
         {
           title: 'Rule validation check',
@@ -59,7 +70,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
           reviewers: [{ group: 'user', id: admin.id }],
           appealable: true,
           appealRequiredReviews: 1,
-          appealReviewers: [{ group: 'user', id: admin.id }]
+          appealReviewers: [{ group: 'user', id: appealReviewer.id }]
         }
       ]
     } as any;
@@ -68,7 +79,6 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     proposal3 = await testUtilsProposals.generateProposal(args);
     proposal4 = await testUtilsProposals.generateProposal(args);
     proposal5 = await testUtilsProposals.generateProposal(args);
-    proposal6 = await testUtilsProposals.generateProposal(args);
   });
 
   test('Appeal a declined evaluation step and appeal reviewer declines the same step', async ({
@@ -143,7 +153,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     const currentEvaluationAfterAppeal = getCurrentEvaluation(proposalEvaluationsAfterAppeal)!;
     expect(currentEvaluationAfterAppeal.id).toEqual(proposalEvaluationsAfterAppeal[0].id);
 
-    await loginBrowserUser({ browserPage: page, userId: admin.id });
+    await loginBrowserUser({ browserPage: page, userId: appealReviewer.id });
 
     await proposalPage.goToPage({ domain: space.domain, path: proposal1.page.path });
 
@@ -184,7 +194,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
 
     await proposalPage.page.waitForResponse('**/appeal');
 
-    await loginBrowserUser({ browserPage: page, userId: admin.id });
+    await loginBrowserUser({ browserPage: page, userId: appealReviewer.id });
 
     await proposalPage.goToPage({ domain: space.domain, path: proposal2.page.path });
 
@@ -328,7 +338,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     expect(currentEvaluationAfterAppeal.id).toEqual(proposalEvaluationsAfterAppeal[2].id);
     expect(currentEvaluationAfterAppeal.result).toEqual(null);
 
-    await loginBrowserUser({ browserPage: page, userId: admin.id });
+    await loginBrowserUser({ browserPage: page, userId: appealReviewer.id });
 
     await proposalPage.goToPage({ domain: space.domain, path: proposal5.page.path });
 
