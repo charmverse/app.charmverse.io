@@ -2,15 +2,18 @@
  * Below methods are the API reference links for the Docusign API
  */
 
+import { log } from '@charmverse/core/log';
 import type { DocumentToSign } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { GET, POST } from 'adapters/http';
+import { redisClient } from 'adapters/redis/redisClient';
 import { baseUrl } from 'config/constants';
 import { InvalidStateError } from 'lib/middleware';
 import { prettyPrint } from 'lib/utils/strings';
 
 import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
+import { docusignPeriodBetweenRequestsInSeconds } from './constants';
 
 type DocusignApiRequest = {
   authToken: string;
@@ -183,13 +186,26 @@ async function getEnvelope({
   accountId,
   envelopeId
 }: DocusignApiRequest & { accountId: string; envelopeId: string }): Promise<DocusignEnvelope> {
-  return GET<DocusignEnvelope>(
+  const envelope = await redisClient?.get(`docusign-envelope-${envelopeId}`);
+
+  if (envelope) {
+    log.info('Envelope found in cache');
+    return JSON.parse(envelope);
+  }
+
+  const envelopeFromDocusign = await GET<DocusignEnvelope>(
     `${apiBaseUrl}/restapi/v2.1/accounts/${accountId}/envelopes/${envelopeId}`,
     { include: 'recipients' },
     {
       headers: docusignUserOAuthTokenHeader({ accessToken: authToken })
     }
   );
+
+  await redisClient?.set(`docusign-envelope-${envelopeId}`, JSON.stringify(envelopeFromDocusign), {
+    EX: docusignPeriodBetweenRequestsInSeconds
+  });
+
+  return envelopeFromDocusign;
 }
 
 export async function listSpaceEnvelopes({ spaceId }: { spaceId: string }): Promise<DocusignEnvelope[]> {
@@ -211,57 +227,6 @@ export async function listSpaceEnvelopes({ spaceId }: { spaceId: string }): Prom
   );
 
   return envelopeData;
-}
-
-/**
- * This function cannot be used with the curent version since we are not creating envelopes from CharmVerse
- */
-async function createEnvelopeSigningLink({ envelopeId }: { envelopeId: string }): Promise<string> {
-  const envelopeInDb = await prisma.documentToSign.findFirstOrThrow({
-    where: {
-      docusignEnvelopeId: envelopeId
-    },
-    include: {
-      space: {
-        select: {
-          domain: true
-        }
-      }
-    }
-  });
-
-  const spaceCreds = await getSpaceDocusignCredentials({ spaceId: envelopeInDb.spaceId });
-
-  const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes/${envelopeId}/views/recipient`;
-
-  const docusignEnvelope = await getEnvelope({
-    accountId: spaceCreds.docusignAccountId,
-    apiBaseUrl: spaceCreds.docusignApiBaseUrl,
-    authToken: spaceCreds.accessToken,
-    envelopeId
-  });
-
-  prettyPrint({ docusignEnvelope });
-
-  const recipient = docusignEnvelope.recipients.signers.find((r) => r.roleName === 'signer');
-
-  if (!recipient) {
-    throw new InvalidStateError('No signer found for envelope');
-  }
-
-  const signerData = {
-    returnUrl: `${baseUrl}/${envelopeInDb.space.domain}/sign-docs`,
-    authenticationMethod: 'none',
-    email: recipient.email,
-    userName: recipient.name,
-    clientUserId: parseInt(recipient.recipientId)
-  };
-
-  const url = (await POST<{ url: string }>(apiUrl, signerData, {
-    headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
-  })) as { url: string };
-
-  return url.url;
 }
 
 export type DocusignEnvelopeId = {
@@ -332,6 +297,15 @@ export async function searchDocusignDocs({
 }: DocusignSearch & {
   spaceId: string;
 }): Promise<DocusignEnvelope[]> {
+  const searchResultsKey = `docusign-search-${JSON.stringify({ title, spaceId })}`;
+
+  const cachedResults = await redisClient?.get(`docusign-search-${searchResultsKey}`);
+
+  if (cachedResults) {
+    log.info('Returning cached search results');
+    return JSON.parse(cachedResults);
+  }
+
   const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
 
   const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes`;
@@ -343,6 +317,8 @@ export async function searchDocusignDocs({
       headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
     }
   );
+
+  await redisClient?.set(searchResultsKey, JSON.stringify(envelopes), { EX: 60 * 16 });
 
   return envelopes.envelopes;
 }

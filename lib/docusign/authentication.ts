@@ -2,6 +2,7 @@ import { InvalidInputError } from '@charmverse/core/errors';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
 import { GET, POST } from 'adapters/http';
 import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv } from 'config/constants';
@@ -182,22 +183,10 @@ export async function refreshAccessToken({
 
 export type PublicDocuSignProfile = Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'spaceId'>;
 
-export async function getSpaceDocusignCredentials({
-  spaceId
-}: {
-  spaceId: string;
-}): Promise<PublicDocuSignProfile & Pick<DocusignCredential, 'accessToken' | 'refreshToken' | 'docusignApiBaseUrl'>> {
+export async function getSpaceDocusignCredentials({ spaceId }: { spaceId: string }): Promise<DocusignCredential> {
   const credentials = await prisma.docusignCredential.findFirstOrThrow({
     where: {
       spaceId
-    },
-    select: {
-      accessToken: true,
-      refreshToken: true,
-      docusignAccountId: true,
-      docusignAccountName: true,
-      docusignApiBaseUrl: true,
-      spaceId: true
     }
   });
 

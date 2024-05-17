@@ -1,23 +1,122 @@
-import { prisma } from '@charmverse/core/dist/cjs/prisma-client';
+import type { DocusignCredential } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
-import { GET } from 'adapters/http';
-import { baseUrl } from 'config/constants';
+import { GET, POST } from 'adapters/http';
 
-export async function getDocusignWebhook({ docusignWebhookId }: { docusignWebhookId: string }): Promise<any> {
-  return GET<any>(`${baseUrl}/api/v1/docusign/webhooks/${docusignWebhookId}`);
+import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
+import type { RequiredDocusignCredentials } from './constants';
+
+// Change this to match the base url in prod
+const webhookBaseUrl = 'https://dbc5-80-129-171-110.ngrok-free.app';
+
+async function getDocusignWebhook({
+  docusignWebhookId,
+  docusignAccountId,
+  docusignAuthToken,
+  docusignBaseUrl
+}: {
+  docusignWebhookId: string;
+  docusignAccountId: string;
+  docusignAuthToken: string;
+  docusignBaseUrl: string;
+}): Promise<any> {
+  return GET<any>(
+    `${docusignBaseUrl}/restapi/v2.1/accounts/${docusignAccountId}/connect/${docusignWebhookId}`,
+    undefined,
+    {
+      headers: docusignUserOAuthTokenHeader({ accessToken: docusignAuthToken })
+    }
+  );
 }
 
-export async function connectSpaceToDocusign({ spaceId }: { spaceId: string }) {
-  const credentials = await prisma.docusignCredential.findFirstOrThrow({
-    where: {
-      spaceId
+/**
+ * Full structure of webhook events
+ * https://developers.docusign.com/platform/webhooks/connect/json-sim-event-model/
+ *
+ * Full config of the webhook
+ * https://developers.docusign.com/docs/esign-rest-api/reference/connect/connectconfigurations/create/
+ */
+export async function createSpaceDocusignWebhook({ spaceId }: { spaceId: string }): Promise<DocusignCredential> {
+  let credentials = await getSpaceDocusignCredentials({ spaceId });
+
+  if (!credentials.spaceDocusignApiKey) {
+    credentials = await prisma.docusignCredential.update({
+      where: {
+        id: credentials.id
+      },
+      data: {
+        spaceDocusignApiKey: uuid()
+      }
+    });
+  }
+
+  const webhookUrl = `${webhookBaseUrl}/api/v1/webhooks/docusign/${credentials.spaceDocusignApiKey}`;
+
+  const createdWebhook = await POST<any>(
+    `${credentials.docusignApiBaseUrl}/restapi/v2.1/accounts/${credentials.docusignAccountId}/connect`,
+    {
+      configurationType: 'custom',
+      urlToPublishTo: webhookUrl,
+      allUsers: true,
+      name: 'CharmVerse',
+      deliveryMode: 'SIM',
+      requiresAcknowledgement: 'true',
+      allowEnvelopePublish: 'true',
+      enableLog: 'true',
+      eventData: {
+        version: 'restv2.1'
+      },
+      includeData: ['recipients'],
+      events: ['envelope-sent', 'envelope-delivered', 'envelope-completed']
     },
-    select: {
-      id: true,
-      docusignAccountId: true,
-      accessToken: true
+    {
+      headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
+    }
+  );
+
+  return prisma.docusignCredential.update({
+    where: {
+      id: credentials.id
+    },
+    data: {
+      docusignWebhookId: createdWebhook.connectId
     }
   });
+}
 
-  const webhookUri = `${baseUrl}/api/v1/docusign/callback`;
+export async function ensureSpaceWebhookExists({
+  spaceId,
+  credentials
+}: {
+  spaceId: string;
+  credentials?: RequiredDocusignCredentials & Pick<DocusignCredential, 'docusignWebhookId' | 'id'>;
+}) {
+  credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId }));
+
+  if (credentials.docusignWebhookId) {
+    console.log('SEARCH WEBHOOK');
+    const webhook = await getDocusignWebhook({
+      docusignWebhookId: credentials.docusignWebhookId,
+      docusignAccountId: credentials.docusignAccountId,
+      docusignAuthToken: credentials.accessToken,
+      docusignBaseUrl: credentials.docusignApiBaseUrl
+    });
+
+    console.log('FOUND WEBHOOK', webhook);
+
+    if (!webhook?.configurations.length) {
+      await prisma.docusignCredential.update({
+        where: {
+          id: credentials.id
+        },
+        data: {
+          docusignWebhookId: null
+        }
+      });
+      await createSpaceDocusignWebhook({ spaceId });
+    }
+  } else {
+    await createSpaceDocusignWebhook({ spaceId });
+  }
 }

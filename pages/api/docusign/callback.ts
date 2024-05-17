@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { saveUserDocusignOAuthToken } from 'lib/docusign/authentication';
+import { createSpaceDocusignWebhook, ensureSpaceWebhookExists } from 'lib/docusign/connect';
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
@@ -16,6 +17,8 @@ async function docusignCallback(req: NextApiRequest, res: NextApiResponse) {
     spaceId: req.query.state as string,
     userId: req.session.user.id
   });
+
+  await ensureSpaceWebhookExists({ spaceId: credentials.spaceId, credentials });
 
   const space = await prisma.space.findUniqueOrThrow({
     where: {
