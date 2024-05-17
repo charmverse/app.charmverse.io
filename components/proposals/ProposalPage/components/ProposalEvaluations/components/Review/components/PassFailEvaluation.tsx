@@ -71,8 +71,10 @@ function PassFailEvaluationReview({
   declineReasonOptions,
   completedAt,
   actionLabels: _actionLabels,
-  confirmationMessage
+  confirmationMessage,
+  isAppealProcess
 }: {
+  isAppealProcess?: boolean;
   confirmationMessage?: string;
   hideReviewer?: boolean;
   isCurrent: boolean;
@@ -158,7 +160,7 @@ function PassFailEvaluationReview({
         </>
       )}
       <Card variant='outlined'>
-        {requiredReviews !== 1 && evaluationReviews.length > 0 && (
+        {evaluationReviews.length > 0 && (
           <Stack p={2} gap={2.5}>
             {evaluationReviews.map((evaluationReview) => (
               <Stack key={evaluationReview.id} gap={1}>
@@ -234,43 +236,19 @@ function PassFailEvaluationReview({
             </Box>
           </Box>
         )}
-        {!canReview && evaluationResult === null && evaluationReviews.length === 0 && (
-          <Stack
-            flexDirection='row'
-            gap={1}
-            alignItems='center'
-            justifyContent='center'
-            py={requiredReviews !== 1 ? 0 : 2}
-            pb={2}
-            px={2}
-          >
-            <Typography variant='body2'>Review process ongoing</Typography>
+        {!canReview && isCurrent && evaluationResult === null && evaluationReviews.length === 0 && (
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} pb={2} px={2}>
+            <Typography variant='body2'>{isAppealProcess ? 'Appeal' : 'Review'} process ongoing</Typography>
           </Stack>
         )}
         {evaluationResult === 'pass' && (
-          <Stack
-            flexDirection='row'
-            gap={1}
-            alignItems='center'
-            justifyContent='center'
-            py={requiredReviews !== 1 ? 0 : 2}
-            pb={2}
-            px={2}
-          >
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' pb={2} px={2}>
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
           </Stack>
         )}
         {evaluationResult === 'fail' && (
-          <Stack
-            flexDirection='row'
-            gap={1}
-            alignItems='center'
-            justifyContent='center'
-            py={requiredReviews !== 1 ? 0 : 2}
-            pb={2}
-            px={2}
-          >
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' pb={2} px={2}>
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
           </Stack>
@@ -456,6 +434,7 @@ export function PassFailEvaluation({
           id: (reviewer.roleId ?? reviewer.userId) as string
         })) ?? []
       }
+      isAppealProcess
       isSubmittingReview={isSubmittingEvaluationAppealReview}
       evaluationReviews={evaluation.reviews?.filter((review) => Boolean(review.appeal))}
       requiredReviews={evaluation.appealRequiredReviews ?? 1}

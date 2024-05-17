@@ -27,10 +27,11 @@ beforeAll(async () => {
 
 describe('Creates a page and proposal with relevant configuration', () => {
   it('Create a page and proposal accepting page content, reviewers, authors and source template ID as input', async () => {
-    const reviewerUser = await generateSpaceUser({
+    await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
     });
+
     const extraUser = await generateSpaceUser({
       isAdmin: false,
       spaceId: space.id
@@ -215,7 +216,12 @@ describe('Creates a page and proposal with relevant configuration', () => {
         type: item.type,
         index,
         permissions: undefined,
-        reviewers: [{ systemRole: 'space_member' }]
+        reviewers: [{ systemRole: 'space_member' }],
+        appealReviewers: [
+          {
+            userId: user.id
+          }
+        ]
       })) as ProposalEvaluationInput[]
     });
 
@@ -238,6 +244,13 @@ describe('Creates a page and proposal with relevant configuration', () => {
       }
     });
 
+    const proposalAppealReviewersCount = await prisma.proposalAppealReviewer.count({
+      where: {
+        userId: user.id,
+        evaluationId: proposalInDb.evaluations[1].id
+      }
+    });
+
     expect(proposalInDb.evaluations).toMatchObject(
       expect.arrayContaining(
         evaluationTemplate.map((item) => ({
@@ -248,8 +261,11 @@ describe('Creates a page and proposal with relevant configuration', () => {
         }))
       )
     );
+
+    expect(proposalAppealReviewersCount).toEqual(1);
   });
 });
+
 describe('Converting from post and proposal', () => {
   it('Marks the page as converted', async () => {
     const pageTitle = 'page title 124';

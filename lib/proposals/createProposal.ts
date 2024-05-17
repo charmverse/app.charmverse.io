@@ -1,7 +1,7 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { PageWithPermissions } from '@charmverse/core/pages';
 import type { Page, ProposalReviewer, ProposalStatus } from '@charmverse/core/prisma';
-import type { Prisma, ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type { Prisma, ProposalAppealReviewer, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { ProposalWorkflowTyped, WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import { arrayUtils } from '@charmverse/core/utilities';
@@ -41,7 +41,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
   appealable?: boolean | null;
   appealRequiredReviews?: WorkflowEvaluationJson['appealRequiredReviews'] | null;
-  appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
+  appealReviewers?: Partial<Pick<ProposalAppealReviewer, 'userId' | 'roleId'>>[] | null;
 };
 
 export type CreateProposalInput = {
@@ -151,7 +151,6 @@ export async function createProposal({
       appealReviewersInput.push(
         ...appealReviewers.map((reviewer) => ({
           roleId: reviewer.roleId,
-          systemRole: reviewer.systemRole,
           userId: reviewer.userId,
           proposalId,
           evaluationId: evaluationIds[index]
