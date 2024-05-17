@@ -5,16 +5,16 @@ import { v4 as uuid } from 'uuid';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
 import { randomETHWallet, randomETHWalletAddress } from 'lib/utils/blockchain';
 
-import { proposalApprovedVerb, proposalCreatedVerb } from '../constants';
+import { proposalApprovedVerb } from '../constants';
+import type {
+  IssuableProposalCredentialContent,
+  IssuableProposalCredentialSpace,
+  PartialIssuableProposalCredentialContent,
+  ProposalWithJoinedData
+} from '../findIssuableProposalCredentials';
 import {
   findSpaceIssuableProposalCredentials,
   generateCredentialInputsForProposal
-} from '../findIssuableProposalCredentials';
-import type {
-  ProposalWithJoinedData,
-  IssuableProposalCredentialContent,
-  PartialIssuableProposalCredentialContent,
-  IssuableProposalCredentialSpace
 } from '../findIssuableProposalCredentials';
 
 describe('findSpaceIssuableProposalCredentials', () => {

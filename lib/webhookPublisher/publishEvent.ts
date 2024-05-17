@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
+import { prettyPrint } from 'lib/utils/strings';
 import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 
@@ -169,16 +170,18 @@ export async function publishProposalEvent({ currentEvaluationId, proposalId, sp
     select: {
       index: true,
       id: true,
-      result: true
+      result: true,
+      finalStep: true
     }
   });
+  const finalEvaluation =
+    proposalEvaluations.find((proposalEvaluation) => proposalEvaluation.finalStep) ??
+    proposalEvaluations[proposalEvaluations.length - 1];
 
-  const lastEvaluation = proposalEvaluations[proposalEvaluations.length - 1];
-
-  if (lastEvaluation.id === currentEvaluationId && lastEvaluation.result) {
+  if (finalEvaluation.id === currentEvaluationId && finalEvaluation.result) {
     await publishProposalEventBase({
       proposalId,
-      scope: lastEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
+      scope: finalEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
       spaceId
     });
   }

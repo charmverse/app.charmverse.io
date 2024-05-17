@@ -6,14 +6,12 @@ import {
   AccordionSummary,
   Box,
   Chip,
-  FormLabel,
   IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
   Stack,
-  Switch,
   TextField,
   Tooltip,
   Typography
@@ -24,7 +22,6 @@ import { useState } from 'react';
 import { Button } from 'components/common/Button';
 import { VisibilityIcon } from 'components/common/Icons/VisibilityIcon';
 import MultiTabs from 'components/common/MultiTabs';
-import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { usePreventReload } from 'hooks/usePreventReload';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation';
@@ -296,6 +293,7 @@ export function ProposalWorkflowItem({
 
         <EvaluationDialog
           isFirstEvaluation={workflow.evaluations[0]?.id === activeEvaluation?.id}
+          isLastEvaluation={workflow.evaluations[workflow.evaluations.length - 1]?.id === activeEvaluation?.id}
           evaluation={activeEvaluation}
           onClose={closeEvaluationStep}
           onSave={updateEvaluationStep}

@@ -1,4 +1,3 @@
-import { log } from '@charmverse/core/log';
 import type {
   CredentialEventType,
   CredentialTemplate,
@@ -12,7 +11,6 @@ import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import { getFeatureTitle } from 'lib/features/getFeatureTitle';
 import { getPagePermalink } from 'lib/pages/getPagePermalink';
-import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { credentialEventLabels } from './constants';
@@ -33,7 +31,9 @@ export type IssuableProposalCredentialSpace = Pick<Space, 'id' | 'features' | 'u
 export type ProposalWithJoinedData = {
   id: string;
   status: ProposalStatus;
-  evaluations: Pick<ProposalEvaluation, 'id' | 'index' | 'result'>[];
+  evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result'> & {
+    finalStep?: boolean | null;
+  })[];
   selectedCredentialTemplates: string[];
   authors: IssuableProposalCredentialAuthor[];
   issuedCredentials: Pick<
@@ -167,7 +167,8 @@ function proposalCredentialInputFieldsSelect() {
         result: true,
         index: true,
         type: true,
-        title: true
+        title: true,
+        finalStep: true
       }
     },
     issuedCredentials: {

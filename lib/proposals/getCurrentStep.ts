@@ -11,6 +11,7 @@ export type ProposalStep = {
   id: string;
   index: number;
   requiredReviews: number;
+  finalStep: boolean | null;
 };
 
 export function getCurrentStep({
@@ -22,7 +23,10 @@ export function getCurrentStep({
   hasPendingCredentials
 }: {
   proposalStatus: ProposalStatus;
-  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews'>[];
+  evaluations: Pick<
+    ProposalEvaluation,
+    'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews' | 'finalStep'
+  >[];
   hasPublishedRewards: boolean;
   hasPendingRewards: boolean;
   credentialsEnabled: boolean;
@@ -32,7 +36,8 @@ export function getCurrentStep({
 
   const currentEvaluation = getCurrentEvaluation(evaluations);
 
-  const lastEvaluation = evaluations[evaluations.length - 1];
+  const lastEvaluation =
+    currentEvaluation && currentEvaluation.finalStep ? currentEvaluation : evaluations[evaluations.length - 1];
 
   if (proposalStatus === 'draft' || !currentEvaluation) {
     return getDraftStep();
@@ -49,7 +54,8 @@ export function getCurrentStep({
       id: 'credentials',
       // Add 1 with total evaluations so that draft step is also included
       index: evaluations.length + 1,
-      requiredReviews: 1
+      requiredReviews: 1,
+      finalStep: null
     };
   }
 
@@ -61,7 +67,8 @@ export function getCurrentStep({
       id: 'rewards',
       // Add 1 with total evaluations so that draft step is also included
       index: evaluations.length + (credentialsEnabled ? 2 : 1),
-      requiredReviews: 1
+      requiredReviews: 1,
+      finalStep: null
     };
   }
 
@@ -72,7 +79,8 @@ export function getCurrentStep({
     id: currentEvaluation.id,
     // Add 1 with total evaluations so that draft step is also included
     index: currentEvaluation.index + 1,
-    requiredReviews: currentEvaluation.requiredReviews
+    requiredReviews: currentEvaluation.requiredReviews,
+    finalStep: currentEvaluation.finalStep
   };
 }
 
@@ -83,6 +91,7 @@ export function getDraftStep(): ProposalStep {
     result: 'in_progress',
     id: 'draft',
     index: 0,
-    requiredReviews: 1
+    requiredReviews: 1,
+    finalStep: null
   };
 }

@@ -5,7 +5,9 @@ import type { ProposalNotificationType } from 'lib/notifications/interfaces';
 import type { Reward } from 'lib/rewards/interfaces';
 
 export type ProposalWithEvaluation = Pick<Proposal, 'status'> & {
-  evaluations: Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'>[];
+  evaluations: (Pick<ProposalEvaluation, 'index' | 'result' | 'type' | 'id'> & {
+    finalStep?: boolean | null;
+  })[];
   rewards: Pick<Reward, 'id'>[];
 };
 
@@ -27,7 +29,7 @@ export function getProposalAction({
     return null;
   }
 
-  if (currentEvaluation.index === proposal.evaluations.length - 1 && isAuthor) {
+  if ((currentEvaluation.index === proposal.evaluations.length - 1 || currentEvaluation.finalStep) && isAuthor) {
     if (currentEvaluation.result === 'pass') {
       return proposal.rewards.length > 0 ? 'reward_published' : 'proposal_passed';
     } else if (currentEvaluation.result === 'fail') {

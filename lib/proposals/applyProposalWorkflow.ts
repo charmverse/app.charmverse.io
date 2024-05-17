@@ -69,6 +69,7 @@ export async function applyProposalWorkflow({
           title: evaluation.title,
           type: evaluation.type,
           actionLabels: evaluation.actionLabels || undefined,
+          finalStep: evaluation.finalStep,
           voteSettings: (existingStep?.voteSettings as any) || undefined,
           reviewers: {
             createMany: {

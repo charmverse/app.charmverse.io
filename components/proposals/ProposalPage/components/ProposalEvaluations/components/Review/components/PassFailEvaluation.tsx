@@ -1,5 +1,5 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, Chip, Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
