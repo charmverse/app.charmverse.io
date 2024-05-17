@@ -212,21 +212,41 @@ function EvaluationAppealSettings({
   formValues: FormValues;
   setValue: UseFormSetValue<FormValues>;
 }) {
-  const { appealable, appealRequiredReviews } = formValues;
+  const { appealable, appealRequiredReviews, finalStep } = formValues;
   const { getFeatureTitle } = useSpaceFeatures();
   return (
     <Stack gap={1}>
       <Box>
+        <FieldLabel>Pass entire {getFeatureTitle('Proposal')}</FieldLabel>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography color='textSecondary' variant='body2'>
+            Passes {getFeatureTitle('proposal')} if evaluation succeeds; otherwise, proceeds to the next step.
+          </Typography>
+          <Switch
+            checked={!!finalStep}
+            disabled={!!appealable}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setValue('finalStep', checked);
+              setValue('appealRequiredReviews', undefined);
+              setValue('appealable', false);
+            }}
+          />
+        </Stack>
+      </Box>
+      <Box>
         <FieldLabel>Appealable</FieldLabel>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Typography color='textSecondary' variant='body2'>
-            {getFeatureTitle('Proposal')} authors can appeal the reviewers decision
+            {getFeatureTitle('Proposal')} authors can appeal the reviewer's decision. The appeal result is final.
           </Typography>
           <Switch
             checked={!!appealable}
+            disabled={!!finalStep}
             onChange={(e) => {
               const checked = e.target.checked;
               setValue('appealRequiredReviews', !checked ? undefined : 1);
+              setValue('finalStep', undefined);
               setValue('appealable', checked);
             }}
           />
@@ -235,7 +255,7 @@ function EvaluationAppealSettings({
       <Box>
         <FieldLabel>Appeal required reviews</FieldLabel>
         <TextField
-          disabled={!appealable}
+          disabled={!appealable || !!finalStep}
           type='number'
           onChange={(e) => {
             setValue('appealRequiredReviews', Math.max(1, Number(e.target.value)));
