@@ -217,9 +217,7 @@ export function EvaluationsReview({
             result={evaluation.result}
             title={evaluation.title}
             showDash={
-              currentEvaluation
-                ? evaluation.index > currentEvaluation.index && currentEvaluation.result === 'pass'
-                : false
+              currentEvaluation ? evaluation.index > currentEvaluation.index && !!currentEvaluation.result : false
             }
             isAppealActive={!!evaluation.appealedAt && evaluation.result === null}
             actions={

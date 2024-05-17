@@ -52,7 +52,7 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     throw error;
   }
 
-  if (proposal.page?.type === 'proposal_template' || proposal.page?.sourceTemplateId) {
+  if (proposal.page?.type === 'proposal_template') {
     throw new ActionNotPermittedError();
   }
 

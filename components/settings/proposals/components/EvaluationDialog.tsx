@@ -224,6 +224,7 @@ function EvaluationAppealSettings({
           </Typography>
           <Switch
             checked={!!finalStep}
+            disabled={!!appealable}
             onChange={(e) => {
               const checked = e.target.checked;
               setValue('finalStep', checked);
@@ -241,6 +242,7 @@ function EvaluationAppealSettings({
           </Typography>
           <Switch
             checked={!!appealable}
+            disabled={!!finalStep}
             onChange={(e) => {
               const checked = e.target.checked;
               setValue('appealRequiredReviews', !checked ? null : 1);

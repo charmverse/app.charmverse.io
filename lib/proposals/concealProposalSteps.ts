@@ -71,7 +71,17 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
         )
     );
 
-    if (isReviewer) {
+    const isAppealReviewer = proposal.evaluations.some(
+      (evaluation) =>
+        privateEvaluationSteps.includes(evaluation.type as ProposalEvaluationType) &&
+        evaluation.appealReviewers?.some(
+          (reviewer) =>
+            (!!reviewer.userId && reviewer.userId === userId) ||
+            (!!reviewer.roleId && applicableRoles?.includes(reviewer.roleId))
+        )
+    );
+
+    if (isReviewer || isAppealReviewer) {
       return proposal;
     }
   }

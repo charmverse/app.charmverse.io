@@ -93,7 +93,8 @@ export function mapDbProposalToProposal({
       appealReviewers: evaluation.appealReviewers || [],
       reviews,
       declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
-      isReviewer: !!stepPermissions?.evaluate
+      isReviewer: !!stepPermissions?.evaluate,
+      isAppealReviewer: !!stepPermissions?.evaluate_appeal
     } as PopulatedEvaluation;
   });
   const pageFields = page?.type === 'proposal_template' ? page : { sourceTemplateId: page?.sourceTemplateId };

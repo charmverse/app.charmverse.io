@@ -34,6 +34,7 @@ type Props = {
     | 'appealRequiredReviews'
     | 'appealReviewers'
     | 'appealable'
+    | 'finalStep'
   >;
   onChange: (criteria: Partial<ProposalEvaluationValues>) => void;
   readOnly: boolean;
@@ -65,7 +66,8 @@ export function EvaluationStepSettings({
     readOnly ||
     (!isAdmin && evaluationTemplate?.appealable !== undefined) ||
     !!evaluation.result;
-  const readOnlyFinalStep = isPublishedProposal || readOnly || !!evaluation.result;
+  const readOnlyFinalStep =
+    isPublishedProposal || readOnly || (!isAdmin && evaluationTemplate?.finalStep !== undefined) || !!evaluation.result;
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
@@ -158,7 +160,7 @@ export function EvaluationStepSettings({
             </FormLabel>
             <Switch
               checked={!!finalStep}
-              disabled={readOnlyFinalStep}
+              disabled={readOnlyFinalStep || !!evaluation.appealable}
               onChange={(e) => {
                 const checked = e.target.checked;
                 onChange({
@@ -178,7 +180,7 @@ export function EvaluationStepSettings({
             </FormLabel>
             <Switch
               checked={!!evaluation.appealable}
-              disabled={readOnlyAppealable}
+              disabled={readOnlyAppealable || !!finalStep}
               onChange={(e) => {
                 const checked = e.target.checked;
                 onChange({

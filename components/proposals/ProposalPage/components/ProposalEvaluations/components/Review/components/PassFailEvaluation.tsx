@@ -47,6 +47,7 @@ export type Props = {
     | 'appealedAt'
     | 'appealedBy'
     | 'declinedAt'
+    | 'isAppealReviewer'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -232,6 +233,19 @@ function PassFailEvaluationReview({
               </Button>
             </Box>
           </Box>
+        )}
+        {!canReview && evaluationResult === null && evaluationReviews.length === 0 && (
+          <Stack
+            flexDirection='row'
+            gap={1}
+            alignItems='center'
+            justifyContent='center'
+            py={requiredReviews !== 1 ? 0 : 2}
+            pb={2}
+            px={2}
+          >
+            <Typography variant='body2'>Review process ongoing</Typography>
+          </Stack>
         )}
         {evaluationResult === 'pass' && (
           <Stack
@@ -431,7 +445,7 @@ export function PassFailEvaluation({
   const appealReviewComponent = (
     <PassFailEvaluationReview
       isCurrent={isCurrent}
-      isReviewer={evaluation.isReviewer}
+      isReviewer={evaluation.isAppealReviewer}
       archived={archived}
       onSubmitEvaluationReview={onSubmitEvaluationAppealReview}
       onResetEvaluationReview={evaluation.result === null ? onResetEvaluationAppealReview : undefined}
@@ -482,15 +496,18 @@ export function PassFailEvaluation({
     <>
       {mainEvaluationReviewComponent}
       {canAppeal ? (
-        <Button
-          sx={{
-            my: 2
-          }}
-          onClick={onAppealProposalEvaluation}
-          loading={isAppealingProposalEvaluation}
-        >
-          Appeal
-        </Button>
+        <Stack width='100%' direction='row' justifyContent='flex-end'>
+          <Button
+            sx={{
+              width: 'fit-content',
+              my: 2
+            }}
+            onClick={onAppealProposalEvaluation}
+            loading={isAppealingProposalEvaluation}
+          >
+            Appeal
+          </Button>
+        </Stack>
       ) : null}
     </>
   );

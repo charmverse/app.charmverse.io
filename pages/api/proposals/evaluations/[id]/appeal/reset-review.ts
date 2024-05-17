@@ -41,8 +41,8 @@ async function resetEvaluationAppealReviewEndpoint(req: NextApiRequest, res: Nex
     throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
   }
 
-  if (!proposalPermissions.evaluate) {
-    throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
+  if (!proposalPermissions.evaluate_appeal) {
+    throw new ActionNotPermittedError(`You don't have permission to review this appeal.`);
   }
 
   if (!proposalEvaluation.appealedAt) {
@@ -53,24 +53,13 @@ async function resetEvaluationAppealReviewEndpoint(req: NextApiRequest, res: Nex
     throw new ActionNotPermittedError(`You cannot reset a review that has been completed.`);
   }
 
-  await prisma.$transaction([
-    prisma.proposalEvaluationReview.deleteMany({
-      where: {
-        evaluationId,
-        reviewerId: userId,
-        appeal: true
-      }
-    }),
-    prisma.proposalEvaluation.update({
-      where: {
-        id: evaluationId
-      },
-      data: {
-        result: null,
-        completedAt: null
-      }
-    })
-  ]);
+  await prisma.proposalEvaluationReview.deleteMany({
+    where: {
+      evaluationId,
+      reviewerId: userId,
+      appeal: true
+    }
+  });
 
   return res.status(200).end();
 }

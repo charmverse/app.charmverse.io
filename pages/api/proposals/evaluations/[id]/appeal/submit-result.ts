@@ -76,8 +76,8 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
     userId
   });
 
-  if (!proposalPermissions.evaluate) {
-    throw new ActionNotPermittedError(`You don't have permission to review this proposal.`);
+  if (!proposalPermissions.evaluate_appeal) {
+    throw new ActionNotPermittedError(`You don't have permission to review this appeal.`);
   }
 
   if (!result) {
