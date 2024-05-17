@@ -96,6 +96,11 @@ type BountyEventContext = {
       userId: string;
       applicationId: string;
     }
+  | {
+      scope: WebhookEventNames.RewardCredentialCreated;
+      userId: string;
+      applicationId: string;
+    }
 );
 
 export async function publishBountyEvent(context: BountyEventContext) {
@@ -125,7 +130,8 @@ export async function publishBountyEvent(context: BountyEventContext) {
 
     case WebhookEventNames.RewardApplicationRejected:
     case WebhookEventNames.RewardSubmissionApproved:
-    case WebhookEventNames.RewardApplicationPaymentCompleted: {
+    case WebhookEventNames.RewardApplicationPaymentCompleted:
+    case WebhookEventNames.RewardCredentialCreated: {
       const [application, user] = await Promise.all([
         getApplicationEntity(context.applicationId),
         getUserEntity(context.userId)
@@ -225,6 +231,12 @@ type ProposalEventBaseContext =
       proposalId: string;
       scope: WebhookEventNames.ProposalStatusChanged;
       currentEvaluationId: string;
+    }
+  | {
+      scope: WebhookEventNames.ProposalCredentialCreated;
+      proposalId: string;
+      spaceId: string;
+      userId: string;
     };
 
 export async function publishProposalEventBase(context: ProposalEventBaseContext) {
@@ -256,6 +268,15 @@ export async function publishProposalEventBase(context: ProposalEventBaseContext
         scope: context.scope,
         proposal,
         space
+      });
+    }
+    case WebhookEventNames.ProposalCredentialCreated: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user
       });
     }
     default: {

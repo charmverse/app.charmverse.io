@@ -8,7 +8,8 @@ export const bountyNotificationTypes = [
   'submission.approved',
   'application.payment_pending',
   'application.payment_completed',
-  'suggestion.created'
+  'suggestion.created',
+  'credential.created'
 ] as const;
 
 export const proposalNotificationTypes = [
@@ -20,5 +21,6 @@ export const proposalNotificationTypes = [
   'proposal_passed',
   'step_passed',
   'proposal_failed',
-  'proposal_appealed'
+  'proposal_appealed',
+  'credential_created'
 ] as const;

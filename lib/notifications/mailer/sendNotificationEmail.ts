@@ -31,7 +31,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getCardNotifications({ id });
+        const notifications = await getCardNotifications({ id, userId: user.id });
         if (notifications.length) {
           await sendEmail({
             notification: notifications[0],
@@ -55,7 +55,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getPostNotifications({ id });
+        const notifications = await getPostNotifications({ id, userId: user.id });
         if (notifications.length) {
           await sendEmail({
             notification: notifications[0],
@@ -79,7 +79,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getDocumentNotifications({ id });
+        const notifications = await getDocumentNotifications({ id, userId: user.id });
         if (notifications.length) {
           await sendEmail({
             notification: notifications[0],
@@ -103,7 +103,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getPollNotifications({ id });
+        const notifications = await getPollNotifications({ id, userId: user.id });
         if (notifications.length) {
           await sendEmail({
             notification: notifications[0],
@@ -127,7 +127,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getProposalNotifications({ id });
+        const notifications = await getProposalNotifications({ id, userId: user.id });
         if (notifications.length) {
           await sendEmail({
             notification: notifications[0],
@@ -151,7 +151,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
         select: notificationSelectFields
       });
       if (user.email && user.emailNotifications) {
-        const notifications = await getBountyNotifications({ id });
+        const notifications = await getBountyNotifications({ id, userId: user.id });
         if (notifications.length) {
           await sendEmail({
             notification: notifications[0],

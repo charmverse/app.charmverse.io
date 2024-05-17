@@ -1,6 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma';
 
-import type { OnChainAttestationInputWithMetadata } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
 export type UserEntity = {
@@ -119,6 +118,7 @@ export enum WebhookEventNames {
   RewardSubmissionApproved = 'reward.submission.approved',
   RewardApplicationPaymentCompleted = 'reward.payment.completed',
   RewardSuggestionCreated = 'reward.suggestion.created',
+  RewardCredentialCreated = 'reward.credential.created',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -128,6 +128,7 @@ export enum WebhookEventNames {
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
   ProposalAppealed = 'proposal.appealed',
+  ProposalCredentialCreated = 'proposal.credential_created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
   DocumentCommentCreated = 'document.comment.created',
@@ -208,6 +209,11 @@ export type WebhookEvent = WebhookEventSharedProps &
         user: UserEntity;
       }
     | {
+        scope: WebhookEventNames.ProposalCredentialCreated;
+        proposal: ProposalEntity;
+        user: UserEntity;
+      }
+    | {
         scope: WebhookEventNames.RewardCompleted;
         bounty: RewardEntity;
         user: UserEntity;
@@ -241,6 +247,12 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         scope: WebhookEventNames.RewardApplicationPaymentCompleted;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardCredentialCreated;
         bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;

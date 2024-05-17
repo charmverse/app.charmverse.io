@@ -151,6 +151,55 @@ export async function createProposalNotifications(webhookData: {
 
       break;
     }
+    case WebhookEventNames.ProposalCredentialCreated: {
+      const userId = webhookData.event.user.id;
+      const spaceId = webhookData.spaceId;
+      const proposalId = webhookData.event.proposal.id;
+
+      const proposal = await prisma.proposal.findUniqueOrThrow({
+        where: {
+          id: proposalId
+        }
+      });
+
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          notificationToggles: true
+        }
+      });
+
+      // check notification preferences
+      const notificationToggles = space.notificationToggles as NotificationToggles;
+      if (notificationToggles.proposals__credential_created === false) {
+        break;
+      }
+
+      const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
+        resourceId: proposalId,
+        userId
+      });
+
+      if (!proposalPermissions.view) {
+        break;
+      }
+
+      const { id } = await saveProposalNotification({
+        createdAt: webhookData.createdAt,
+        createdBy: proposal.createdBy,
+        proposalId,
+        spaceId,
+        userId,
+        type: 'credential_created',
+        evaluationId: null
+      });
+
+      ids.push(id);
+
+      break;
+    }
 
     case WebhookEventNames.ProposalAppealed: {
       const userId = webhookData.event.user.id;
