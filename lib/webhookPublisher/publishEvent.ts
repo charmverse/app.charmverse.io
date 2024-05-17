@@ -212,6 +212,7 @@ type ProposalEventBaseContext =
       scope: WebhookEventNames.ProposalCredentialCreated;
       proposalId: string;
       spaceId: string;
+      userId: string;
     };
 
 export async function publishProposalEventBase(context: ProposalEventBaseContext) {
@@ -229,12 +230,20 @@ export async function publishProposalEventBase(context: ProposalEventBaseContext
       });
     }
     case WebhookEventNames.ProposalPassed:
-    case WebhookEventNames.ProposalFailed:
-    case WebhookEventNames.ProposalCredentialCreated: {
+    case WebhookEventNames.ProposalFailed: {
       return publishWebhookEvent(context.spaceId, {
         scope: context.scope,
         proposal,
         space
+      });
+    }
+    case WebhookEventNames.ProposalCredentialCreated: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user
       });
     }
     default: {

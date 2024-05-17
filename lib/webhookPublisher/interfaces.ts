@@ -204,6 +204,7 @@ export type WebhookEvent = WebhookEventSharedProps &
     | {
         scope: WebhookEventNames.ProposalCredentialCreated;
         proposal: ProposalEntity;
+        user: UserEntity;
       }
     | {
         scope: WebhookEventNames.RewardCompleted;

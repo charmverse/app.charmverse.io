@@ -89,7 +89,8 @@ export async function saveIssuedCredential({
         await publishProposalEventBase({
           scope: WebhookEventNames.ProposalCredentialCreated,
           proposalId,
-          spaceId: proposal.spaceId
+          spaceId: proposal.spaceId,
+          userId
         });
       }
     } else if (rewardApplicationId) {
