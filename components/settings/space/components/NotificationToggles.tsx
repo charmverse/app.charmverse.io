@@ -27,7 +27,8 @@ const notificationTypes: Record<ConfigurableGroups, { title: string; types: Noti
       [
         { label: 'Submission approved (Applicants only)' },
         { label: 'Payment needed (Reviewers only)' },
-        { label: 'Payment completed (Applicants only)' }
+        { label: 'Payment completed (Applicants only)' },
+        { label: 'Issued Credentials' }
       ]
     ]
   },
@@ -38,7 +39,8 @@ const notificationTypes: Record<ConfigurableGroups, { title: string; types: Noti
         { label: 'Feedback ready (All members)', type: 'proposals__start_discussion' },
         { label: 'Review ready (Reviewers)', type: 'proposals__review_required' },
         { label: 'Review completed (Authors)', type: 'proposals__step_passed' },
-        { label: 'Rewards published (Authors)', type: 'proposals__reward_published' }
+        { label: 'Rewards published (Authors)', type: 'proposals__reward_published' },
+        { label: 'Issued Credentials', type: 'proposals__credential_created' }
       ],
       [
         { label: 'Vote ready (Authors and Voters)', type: 'proposals__vote' },
