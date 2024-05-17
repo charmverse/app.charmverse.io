@@ -40,7 +40,8 @@ export function createMockProposal(input: ProposalInput = {}): OptionalNullable<
       make_public: true,
       archive: true,
       unarchive: true,
-      move: true
+      move: true,
+      evaluate_appeal: true
     },
     ...input,
     evaluations: (input.evaluations || []).map((evaluation) => ({

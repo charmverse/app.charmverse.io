@@ -15,6 +15,7 @@ describe('concealProposalSteps', () => {
 
   let adminUser: User;
   let reviewerUser: User;
+  let appealReviewerUser: User;
   let author: User;
 
   let privateProposalWorkflow: ProposalWorkflow;
@@ -25,6 +26,7 @@ describe('concealProposalSteps', () => {
     ({ space, user: adminUser } = await testUtilsUser.generateUserAndSpace({ isAdmin: true }));
     author = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
     reviewerUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
+    appealReviewerUser = await testUtilsUser.generateSpaceUser({ spaceId: space.id });
 
     privateProposalWorkflow = await prisma.proposalWorkflow.create({
       data: {
@@ -66,6 +68,15 @@ describe('concealProposalSteps', () => {
           index: 2,
           reviewers: [
             { evaluationId: '', id: '', proposalId: '', roleId: null, systemRole: null, userId: reviewerUser.id }
+          ],
+          appealReviewers: [
+            {
+              userId: appealReviewerUser.id,
+              roleId: null,
+              id: '',
+              proposalId: '',
+              evaluationId: ''
+            }
           ]
         }
       ]
@@ -106,6 +117,14 @@ describe('concealProposalSteps', () => {
     const result = await concealProposalSteps({
       proposal: { ...proposalWithSteps },
       userId: reviewerUser.id
+    });
+    expect(result).toEqual(proposalWithSteps);
+  });
+
+  it('should return unchanged proposal for appeal reviewers', async () => {
+    const result = await concealProposalSteps({
+      proposal: { ...proposalWithSteps },
+      userId: appealReviewerUser.id
     });
     expect(result).toEqual(proposalWithSteps);
   });

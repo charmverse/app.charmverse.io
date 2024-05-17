@@ -86,7 +86,7 @@ export function useUpdateProposalEvaluation({ proposalId }: { proposalId: MaybeS
   return usePUT<Partial<Omit<UpdateEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/evaluation`);
 }
 
-export function useSubmitEvaluationResult({ proposalId }: { proposalId: MaybeString }) {
+export function useSubmitEvaluationReview({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<Partial<Omit<ReviewEvaluationRequest, 'proposalId'>>>(`/api/proposals/${proposalId}/submit-result`);
 }
 
@@ -174,8 +174,22 @@ export function useGetIssuableProposalCredentials({ proposalIds }: { proposalIds
   );
 }
 
-export function useResetProposalReview({ proposalId }: { proposalId: MaybeString }) {
+export function useResetEvaluationReview({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{
     evaluationId: string;
   }>(`/api/proposals/${proposalId}/reset-review`);
+}
+
+export function useAppealProposalEvaluation({ evaluationId }: { evaluationId: string }) {
+  return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal`);
+}
+
+export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
+  return usePUT<Omit<ReviewEvaluationRequest, 'evaluationId' | 'decidedBy' | 'proposalId'>>(
+    `/api/proposals/evaluations/${evaluationId}/appeal/submit-result`
+  );
+}
+
+export function useResetEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
+  return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal/reset-review`);
 }

@@ -18,8 +18,10 @@ export function ProposalStickyFooter({
   formAnswers,
   page,
   isStructuredProposal,
-  hasProjectField
+  hasProjectField,
+  refreshProposal
 }: {
+  refreshProposal?: VoidFunction;
   proposal: ProposalWithUsersAndRubric;
   formAnswers: FieldAnswerInput[];
   page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
@@ -36,12 +38,12 @@ export function ProposalStickyFooter({
   async function onClick() {
     try {
       await publishProposal();
+      refreshProposal?.();
     } catch (error) {
       showMessage((error as Error).message, 'error');
     }
   }
   const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
-
   const disabledTooltip = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,

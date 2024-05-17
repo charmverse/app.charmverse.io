@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
+import type { Prisma, ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interfaces';
@@ -9,8 +9,12 @@ export type UpdateEvaluationRequest = {
   proposalId: string;
   evaluationId: string;
   voteSettings?: VoteSettings | null;
-  requiredReviews?: number;
+  requiredReviews?: number | null;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
+  appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
+  finalStep?: boolean | null;
 };
 
 export async function updateProposalEvaluation({
@@ -19,9 +23,13 @@ export async function updateProposalEvaluation({
   evaluationId,
   voteSettings,
   reviewers,
+  appealRequiredReviews,
+  appealReviewers,
+  appealable,
   actorId,
   requiredReviews,
-  currentEvaluationType
+  currentEvaluationType,
+  finalStep
 }: UpdateEvaluationRequest & { currentEvaluationType?: ProposalEvaluationType; actorId: string; spaceId: string }) {
   await prisma.$transaction(async (tx) => {
     // update reviewers only when it is present in request payload
@@ -40,24 +48,46 @@ export async function updateProposalEvaluation({
         }))
       });
     }
-    if (voteSettings) {
-      await tx.proposalEvaluation.update({
+    if (appealReviewers) {
+      await tx.proposalAppealReviewer.deleteMany({
         where: {
-          id: evaluationId
-        },
-        data: {
-          voteSettings
+          evaluationId,
+          proposalId
         }
       });
+      await tx.proposalAppealReviewer.createMany({
+        data: appealReviewers.map((reviewer) => ({
+          evaluationId,
+          proposalId,
+          ...reviewer
+        }))
+      });
+    }
+
+    const updateData: Prisma.ProposalEvaluationUpdateInput = {};
+
+    if (voteSettings) {
+      updateData.voteSettings = voteSettings;
     }
     if (requiredReviews) {
+      updateData.requiredReviews = requiredReviews;
+    }
+    if (appealable !== undefined) {
+      updateData.appealable = appealable;
+    }
+    if (appealRequiredReviews) {
+      updateData.appealRequiredReviews = appealRequiredReviews;
+    }
+    if (finalStep !== undefined) {
+      updateData.finalStep = finalStep;
+    }
+
+    if (Object.keys(updateData).length > 0) {
       await tx.proposalEvaluation.update({
         where: {
           id: evaluationId
         },
-        data: {
-          requiredReviews
-        }
+        data: updateData
       });
     }
   });

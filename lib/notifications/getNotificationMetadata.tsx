@@ -207,6 +207,9 @@ function getProposalContent({
         `Feedback requested for a ${proposalFeatureTitle}`
       );
     }
+    case 'proposal_appealed': {
+      return `The ${proposalFeatureTitle} has been appealed and requires your review.`;
+    }
     case 'vote_passed': {
       return `The vote on ${notification.pageTitle} has passed. View results.`;
     }

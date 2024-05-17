@@ -151,8 +151,6 @@ export function ProposalStepSelectBase({
     currentEvaluationResult
   ]);
 
-  prettyPrint(proposal);
-
   return (
     <TagSelect
       displayType={displayType}

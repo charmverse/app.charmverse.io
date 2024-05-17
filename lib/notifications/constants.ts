@@ -21,5 +21,6 @@ export const proposalNotificationTypes = [
   'proposal_passed',
   'step_passed',
   'proposal_failed',
+  'proposal_appealed',
   'credential_created'
 ] as const;

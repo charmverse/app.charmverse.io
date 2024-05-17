@@ -41,6 +41,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
                 evaluations: {
                   include: {
                     reviewers: true,
+                    appealReviewers: true,
                     rubricCriteria: true
                   }
                 },
@@ -96,6 +97,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
       return {
         ...evaluation,
         index,
+        appealReviewers: evaluation.appealable ? [] : undefined,
         reviewers: evaluation.type === 'feedback' ? [{ systemRole: 'author' as const }] : [],
         rubricCriteria
       };

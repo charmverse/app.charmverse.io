@@ -109,6 +109,9 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
         ? `Rubric criteria is missing a label in the "${evaluation.title}" step`
         : false;
     case 'pass_fail':
+      if (evaluation.appealable && (!evaluation.appealReviewers || evaluation.appealReviewers?.length === 0)) {
+        return `Appeal reviewers are required for the "${evaluation.title}" step`;
+      }
       return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'vote':
       return evaluation.reviewers.length === 0

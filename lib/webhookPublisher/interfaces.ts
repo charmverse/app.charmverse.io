@@ -127,6 +127,7 @@ export enum WebhookEventNames {
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
+  ProposalAppealed = 'proposal.appealed',
   ProposalCredentialCreated = 'proposal.credential_created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
@@ -147,6 +148,7 @@ export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
   'proposal.passed',
   'proposal.failed',
   'proposal.suggestion_approved',
+  'proposal.appealed',
   'proposal.user_voted',
   'user.joined',
   'hello.world'
@@ -187,6 +189,11 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         scope: WebhookEventNames.ProposalSuggestionApproved;
+        proposal: ProposalEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalAppealed;
         proposal: ProposalEntity;
         user: UserEntity;
       }

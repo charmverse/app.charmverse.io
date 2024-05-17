@@ -41,7 +41,8 @@ export async function updateEvaluationResult({
     data: {
       result: finalResult,
       decidedBy,
-      completedAt: new Date()
+      completedAt: new Date(),
+      declinedAt: finalResult === 'fail' ? new Date() : undefined
     }
   });
 

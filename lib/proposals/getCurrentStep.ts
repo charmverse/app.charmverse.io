@@ -25,7 +25,7 @@ export function getCurrentStep({
   proposalStatus: ProposalStatus;
   evaluations: Pick<
     ProposalEvaluation,
-    'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews' | 'finalStep'
+    'index' | 'result' | 'title' | 'type' | 'id' | 'requiredReviews' | 'finalStep' | 'appealedAt'
   >[];
   hasPublishedRewards: boolean;
   hasPendingRewards: boolean;

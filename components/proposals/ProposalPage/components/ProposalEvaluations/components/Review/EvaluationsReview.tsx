@@ -217,10 +217,9 @@ export function EvaluationsReview({
             result={evaluation.result}
             title={evaluation.title}
             showDash={
-              currentEvaluation
-                ? evaluation.index > currentEvaluation.index && currentEvaluation.result === 'pass'
-                : false
+              currentEvaluation ? evaluation.index > currentEvaluation.index && !!currentEvaluation.result : false
             }
+            isAppealActive={!!evaluation.appealedAt && evaluation.result === null}
             actions={
               evaluation.type !== 'private_evaluation' && (
                 <EvaluationStepActions
@@ -251,6 +250,7 @@ export function EvaluationsReview({
               <PassFailEvaluation
                 archived={proposal?.archived ?? false}
                 key={evaluation.id}
+                authors={proposal.authors.map((a) => a.userId)}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
