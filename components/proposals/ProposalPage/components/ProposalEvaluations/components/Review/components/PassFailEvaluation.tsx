@@ -2,7 +2,7 @@ import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } fr
 import PanToolIcon from '@mui/icons-material/PanTool';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   useAppealProposalEvaluation,
@@ -348,6 +348,12 @@ export function PassFailEvaluation({
     evaluationId: evaluation.id
   });
 
+  useEffect(() => {
+    if (evaluation.appealedAt) {
+      setEvaluationTab(1);
+    }
+  }, [evaluation.appealedAt]);
+
   const { showMessage } = useSnackbar();
   const actionLabels = getActionButtonLabels(evaluation);
 
@@ -481,6 +487,7 @@ export function PassFailEvaluation({
               width: 'fit-content',
               my: 2
             }}
+            data-test='evaluation-appeal-button'
             onClick={onAppealProposalEvaluation}
             loading={isAppealingProposalEvaluation}
           >

@@ -172,7 +172,7 @@ export async function createProposal({
   });
 
   // Using a transaction to ensure both the proposal and page gets created together
-  const [proposal, , , , page] = await prisma.$transaction([
+  const [proposal, _reviewerCreation, _appealReviewer, _evaluationPermissions, page] = await prisma.$transaction([
     prisma.proposal.create({
       data: {
         // Add page creator as the proposal's first author
