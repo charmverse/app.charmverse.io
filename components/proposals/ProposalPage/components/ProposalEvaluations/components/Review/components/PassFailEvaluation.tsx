@@ -1,5 +1,5 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, Chip, Divider, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -13,6 +13,7 @@ import {
 import { Button } from 'components/common/Button';
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import Modal from 'components/common/Modal';
+import MultiTabs from 'components/common/MultiTabs';
 import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
@@ -309,6 +310,7 @@ export function PassFailEvaluation({
   archived,
   authors
 }: Props) {
+  const [evaluationTab, setEvaluationTab] = useState<number>(0);
   const { user } = useUser();
   const canAppeal =
     evaluation.appealable &&
@@ -381,29 +383,68 @@ export function PassFailEvaluation({
     appealProposalEvaluation().then(refreshProposal);
   }
 
-  return (
-    <>
-      <PassFailEvaluationReview
-        confirmationMessage={confirmationMessage}
-        hideReviewer={hideReviewer}
-        isCurrent={isCurrent}
-        isReviewer={evaluation.isReviewer}
-        archived={archived}
-        onSubmitEvaluationReview={onSubmitEvaluationReview}
-        onResetEvaluationReview={evaluation.appealedAt ? undefined : onResetEvaluationReview}
-        isResettingEvaluationReview={isResettingEvaluationReview}
-        reviewerOptions={evaluation.reviewers.map((reviewer) => ({
+  const mainEvaluationReviewComponent = (
+    <PassFailEvaluationReview
+      confirmationMessage={confirmationMessage}
+      hideReviewer={hideReviewer}
+      isCurrent={isCurrent}
+      isReviewer={evaluation.isReviewer}
+      archived={archived}
+      onSubmitEvaluationReview={onSubmitEvaluationReview}
+      onResetEvaluationReview={evaluation.appealedAt ? undefined : onResetEvaluationReview}
+      isResettingEvaluationReview={isResettingEvaluationReview}
+      reviewerOptions={evaluation.reviewers.map((reviewer) => ({
+        group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
+        id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+      }))}
+      isSubmittingReview={isSubmittingEvaluationReview}
+      evaluationReviews={evaluation.reviews?.filter((review) => !review.appeal)}
+      requiredReviews={evaluation.requiredReviews}
+      evaluationResult={evaluation.result}
+      declineReasonOptions={evaluation.declineReasonOptions}
+      completedAt={evaluation.completedAt}
+      actionLabels={actionLabels}
+    />
+  );
+
+  const appealReviewComponent = (
+    <PassFailEvaluationReview
+      isCurrent={isCurrent}
+      isReviewer={evaluation.isReviewer}
+      archived={archived}
+      onSubmitEvaluationReview={onSubmitEvaluationAppealReview}
+      onResetEvaluationReview={evaluation.result === null ? onResetEvaluationAppealReview : undefined}
+      isResettingEvaluationReview={isResettingEvaluationAppealReview}
+      reviewerOptions={
+        evaluation.appealReviewers?.map((reviewer) => ({
           group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
           id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
-        }))}
-        isSubmittingReview={isSubmittingEvaluationReview}
-        evaluationReviews={evaluation.reviews?.filter((review) => !review.appeal)}
-        requiredReviews={evaluation.requiredReviews}
-        evaluationResult={evaluation.result}
-        declineReasonOptions={evaluation.declineReasonOptions}
-        completedAt={evaluation.completedAt}
-        actionLabels={actionLabels}
-      />
+        })) ?? []
+      }
+      isSubmittingReview={isSubmittingEvaluationAppealReview}
+      evaluationReviews={evaluation.reviews?.filter((review) => Boolean(review.appeal))}
+      requiredReviews={evaluation.appealRequiredReviews ?? 1}
+      declineReasonOptions={evaluation.declineReasonOptions}
+      actionLabels={actionLabels}
+    />
+  );
+
+  if (evaluation.appealedAt) {
+    return (
+      <MultiTabs activeTab={evaluationTab} setActiveTab={setEvaluationTab} tabs={['Evaluation', 'Appeal']}>
+        {({ value }) => (
+          <Stack mt={2}>
+            {value === 'Evaluation' && mainEvaluationReviewComponent}
+            {value === 'Appeal' && appealReviewComponent}
+          </Stack>
+        )}
+      </MultiTabs>
+    );
+  }
+
+  return (
+    <>
+      {mainEvaluationReviewComponent}
       {canAppeal ? (
         <Button
           sx={{
@@ -415,35 +456,6 @@ export function PassFailEvaluation({
           Appeal
         </Button>
       ) : null}
-      {evaluation.appealedAt && (
-        <>
-          <Divider
-            sx={{
-              my: 2
-            }}
-          />
-          <Typography variant='h6'>Appeal</Typography>
-          <PassFailEvaluationReview
-            isCurrent={isCurrent}
-            isReviewer={evaluation.isReviewer}
-            archived={archived}
-            onSubmitEvaluationReview={onSubmitEvaluationAppealReview}
-            onResetEvaluationReview={evaluation.result === null ? onResetEvaluationAppealReview : undefined}
-            isResettingEvaluationReview={isResettingEvaluationAppealReview}
-            reviewerOptions={
-              evaluation.appealReviewers?.map((reviewer) => ({
-                group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
-                id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
-              })) ?? []
-            }
-            isSubmittingReview={isSubmittingEvaluationAppealReview}
-            evaluationReviews={evaluation.reviews?.filter((review) => Boolean(review.appeal))}
-            requiredReviews={evaluation.appealRequiredReviews ?? 1}
-            declineReasonOptions={evaluation.declineReasonOptions}
-            actionLabels={actionLabels}
-          />
-        </>
-      )}
     </>
   );
 }
