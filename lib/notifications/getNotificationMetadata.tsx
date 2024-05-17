@@ -230,7 +230,7 @@ function getProposalContent({
       return `Review required for a ${proposalFeatureTitle}`;
     }
     case 'credential_created': {
-      return `You have been issued a credential for a ${proposalFeatureTitle}`;
+      return `You have been issued a credential for a proposal`;
     }
     default: {
       return '';
