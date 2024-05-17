@@ -71,7 +71,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     proposal6 = await testUtilsProposals.generateProposal(args);
   });
 
-  test.skip('Appeal a declined evaluation step and appeal reviewer declines the same step', async ({
+  test('Appeal a declined evaluation step and appeal reviewer declines the same step', async ({
     page,
     proposalPage
   }) => {
@@ -167,10 +167,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     expect(currentEvaluationAfterFail.result).toEqual('fail');
   });
 
-  test.skip('Appeal a declined evaluation step and appeal reviewer passes the same step', async ({
-    page,
-    proposalPage
-  }) => {
+  test('Appeal a declined evaluation step and appeal reviewer passes the same step', async ({ page, proposalPage }) => {
     await loginBrowserUser({ browserPage: page, userId: admin.id });
 
     await proposalPage.goToPage({ domain: space.domain, path: proposal2.page.path });
@@ -209,7 +206,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     expect(currentEvaluationAfterPass.result).toEqual('pass');
   });
 
-  test.skip('Pass spam check step and pass 2nd evaluations step', async ({ page, proposalPage }) => {
+  test('Pass spam check step and pass 2nd evaluations step', async ({ page, proposalPage }) => {
     await loginBrowserUser({ browserPage: page, userId: admin.id });
 
     await proposalPage.goToPage({ domain: space.domain, path: proposal3.page.path });
@@ -238,7 +235,7 @@ test.describe.serial('Appeal proposal1 evaluation step', async () => {
     expect(currentEvaluationAfterPass.result).toEqual('pass');
   });
 
-  test.skip('Pass spam check step and fail 2nd evaluations step and pass 3rd step', async ({ page, proposalPage }) => {
+  test('Pass spam check step and fail 2nd evaluations step and pass 3rd step', async ({ page, proposalPage }) => {
     await loginBrowserUser({ browserPage: page, userId: admin.id });
 
     await proposalPage.goToPage({ domain: space.domain, path: proposal4.page.path });
