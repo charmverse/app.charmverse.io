@@ -1,4 +1,5 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
+import PanToolIcon from '@mui/icons-material/PanTool';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
@@ -17,6 +18,7 @@ import MultiTabs from 'components/common/MultiTabs';
 import UserDisplay from 'components/common/UserDisplay';
 import { allMembersSystemRole } from 'components/settings/proposals/components/EvaluationPermissions';
 import { useConfirmationModal } from 'hooks/useConfirmationModal';
+import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import { getActionButtonLabels } from 'lib/proposals/getActionButtonLabels';
@@ -43,6 +45,7 @@ export type Props = {
     | 'appealReviewers'
     | 'type'
     | 'appealedAt'
+    | 'appealedBy'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -230,13 +233,29 @@ function PassFailEvaluationReview({
           </Box>
         )}
         {evaluationResult === 'pass' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+          <Stack
+            flexDirection='row'
+            gap={1}
+            alignItems='center'
+            justifyContent='center'
+            py={requiredReviews !== 1 ? 0 : 2}
+            pb={2}
+            px={2}
+          >
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
           </Stack>
         )}
         {evaluationResult === 'fail' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+          <Stack
+            flexDirection='row'
+            gap={1}
+            alignItems='center'
+            justifyContent='center'
+            py={requiredReviews !== 1 ? 0 : 2}
+            pb={2}
+            px={2}
+          >
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
           </Stack>
@@ -312,6 +331,7 @@ export function PassFailEvaluation({
 }: Props) {
   const [evaluationTab, setEvaluationTab] = useState<number>(0);
   const { user } = useUser();
+  const { membersRecord } = useMembers();
   const canAppeal =
     evaluation.appealable &&
     !evaluation.appealedAt &&
@@ -400,7 +420,7 @@ export function PassFailEvaluation({
       isSubmittingReview={isSubmittingEvaluationReview}
       evaluationReviews={evaluation.reviews?.filter((review) => !review.appeal)}
       requiredReviews={evaluation.requiredReviews}
-      evaluationResult={evaluation.result}
+      evaluationResult={evaluation.appealedAt ? 'fail' : evaluation.result}
       declineReasonOptions={evaluation.declineReasonOptions}
       completedAt={evaluation.completedAt}
       actionLabels={actionLabels}
@@ -417,8 +437,8 @@ export function PassFailEvaluation({
       isResettingEvaluationReview={isResettingEvaluationAppealReview}
       reviewerOptions={
         evaluation.appealReviewers?.map((reviewer) => ({
-          group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
-          id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+          group: reviewer.roleId ? 'role' : 'user',
+          id: (reviewer.roleId ?? reviewer.userId) as string
         })) ?? []
       }
       isSubmittingReview={isSubmittingEvaluationAppealReview}
@@ -435,7 +455,20 @@ export function PassFailEvaluation({
         {({ value }) => (
           <Stack mt={2}>
             {value === 'Evaluation' && mainEvaluationReviewComponent}
-            {value === 'Appeal' && appealReviewComponent}
+            {value === 'Appeal' && (
+              <Stack>
+                <Card sx={{ mb: 2 }} variant='outlined'>
+                  <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
+                    <PanToolIcon color='warning' />
+                    <Typography variant='body2'>
+                      Appealed by {evaluation.appealedBy ? membersRecord[evaluation.appealedBy]?.username : 'member'}{' '}
+                      {getRelativeTimeInThePast(new Date(evaluation.appealedAt!.toString()))}
+                    </Typography>
+                  </Stack>
+                </Card>
+                {appealReviewComponent}
+              </Stack>
+            )}
           </Stack>
         )}
       </MultiTabs>
