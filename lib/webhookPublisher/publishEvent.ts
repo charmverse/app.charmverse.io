@@ -1,8 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { OnChainAttestationInputWithMetadata } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
-import { prettyPrint } from 'lib/utils/strings';
 import type { CardPropertyEntity } from 'lib/webhookPublisher/interfaces';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
 

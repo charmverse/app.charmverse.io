@@ -100,7 +100,8 @@ const pageSelectObject = {
           rubricCriteria: true,
           rubricAnswers: true,
           requiredReviews: true,
-          finalStep: true
+          finalStep: true,
+          appealedAt: true
         },
         orderBy: {
           index: 'asc'

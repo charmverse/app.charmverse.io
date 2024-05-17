@@ -43,7 +43,8 @@ export async function createProposalNotifications(webhookData: {
               result: true,
               type: true,
               id: true,
-              finalStep: true
+              finalStep: true,
+              appealedAt: true
             },
             orderBy: {
               index: 'asc'
@@ -186,7 +187,8 @@ export async function createProposalNotifications(webhookData: {
               type: true,
               id: true,
               finalStep: true,
-              appealReviewers: true
+              appealReviewers: true,
+              appealedAt: true
             },
             orderBy: {
               index: 'asc'

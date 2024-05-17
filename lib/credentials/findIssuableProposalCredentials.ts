@@ -168,7 +168,8 @@ function proposalCredentialInputFieldsSelect() {
         index: true,
         type: true,
         title: true,
-        finalStep: true
+        finalStep: true,
+        appealedAt: true
       }
     },
     issuedCredentials: {
