@@ -50,16 +50,22 @@ export function EvaluationStepSettings({
   const isAdmin = useIsAdmin();
   // reviewers are also readOnly when using a template with reviewers pre-selected
   const readOnlyReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.reviewers?.length);
-  const readOnlyAppealReviewers = readOnly || (!isAdmin && !!evaluationTemplate?.appealReviewers?.length);
+  const readOnlyAppealReviewers =
+    isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.appealReviewers?.length);
   // rubric criteria should also be editable by reviewers, and not if a template with rubric criteria was used
   const readOnlyRubricCriteria = readOnly || (!isAdmin && !!evaluationTemplate?.rubricCriteria.length);
   // vote settings are also readonly when using a template with vote settings pre-selected
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
-  const readOnlyRequireReviews = readOnly || (!isAdmin && !!evaluationTemplate?.requiredReviews) || !!evaluation.result;
+  const readOnlyRequireReviews =
+    isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.requiredReviews) || !!evaluation.result;
   const readOnlyAppealRequiredReviews =
-    readOnly || (!isAdmin && !!evaluationTemplate?.appealRequiredReviews) || !!evaluation.result;
+    isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.appealRequiredReviews) || !!evaluation.result;
   const readOnlyAppealable =
-    readOnly || (!isAdmin && evaluationTemplate?.appealable !== undefined) || !!evaluation.result;
+    isPublishedProposal ||
+    readOnly ||
+    (!isAdmin && evaluationTemplate?.appealable !== undefined) ||
+    !!evaluation.result;
+  const readOnlyFinalStep = isPublishedProposal || readOnly || !!evaluation.result;
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
@@ -73,6 +79,8 @@ export function EvaluationStepSettings({
   const isTokenVoting = evaluation.type === 'vote' && evaluation.voteSettings?.strategy === 'token';
   const requiredReviews = evaluation.requiredReviews;
   const appealRequiredReviews = evaluation.appealRequiredReviews;
+  const finalStep = evaluation.finalStep;
+
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
       reviewers: reviewers.map((r) => ({
@@ -145,6 +153,26 @@ export function EvaluationStepSettings({
           <Stack direction='row' alignItems='center' justifyContent='space-between' mt={1}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
+                Pass entire proposal
+              </Typography>
+            </FormLabel>
+            <Switch
+              checked={!!finalStep}
+              disabled={readOnlyFinalStep}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                onChange({
+                  finalStep: checked,
+                  appealable: false,
+                  appealRequiredReviews: null,
+                  appealReviewers: null
+                });
+              }}
+            />
+          </Stack>
+          <Stack direction='row' alignItems='center' justifyContent='space-between' mt={1}>
+            <FormLabel>
+              <Typography component='span' variant='subtitle1'>
                 Appealable
               </Typography>
             </FormLabel>
@@ -154,9 +182,10 @@ export function EvaluationStepSettings({
               onChange={(e) => {
                 const checked = e.target.checked;
                 onChange({
+                  finalStep: null,
                   appealable: checked,
-                  appealRequiredReviews: checked ? 1 : undefined,
-                  appealReviewers: checked ? [] : undefined
+                  appealRequiredReviews: checked ? 1 : null,
+                  appealReviewers: checked ? [] : null
                 });
               }}
             />

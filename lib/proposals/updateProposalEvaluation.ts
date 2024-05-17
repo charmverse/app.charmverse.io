@@ -1,4 +1,4 @@
-import type { ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
+import type { Prisma, ProposalEvaluationType, ProposalReviewer } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import type { VoteSettings } from './interfaces';
@@ -14,6 +14,7 @@ export type UpdateEvaluationRequest = {
   appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
   appealable?: boolean | null;
   appealRequiredReviews?: number | null;
+  finalStep?: boolean;
 };
 
 export async function updateProposalEvaluation({
@@ -27,7 +28,8 @@ export async function updateProposalEvaluation({
   appealable,
   actorId,
   requiredReviews,
-  currentEvaluationType
+  currentEvaluationType,
+  finalStep
 }: UpdateEvaluationRequest & { currentEvaluationType?: ProposalEvaluationType; actorId: string; spaceId: string }) {
   await prisma.$transaction(async (tx) => {
     // update reviewers only when it is present in request payload
@@ -61,44 +63,31 @@ export async function updateProposalEvaluation({
         }))
       });
     }
+
+    const updateData: Prisma.ProposalEvaluationUpdateInput = {};
+
     if (voteSettings) {
-      await tx.proposalEvaluation.update({
-        where: {
-          id: evaluationId
-        },
-        data: {
-          voteSettings
-        }
-      });
+      updateData.voteSettings = voteSettings;
     }
     if (requiredReviews) {
-      await tx.proposalEvaluation.update({
-        where: {
-          id: evaluationId
-        },
-        data: {
-          requiredReviews
-        }
-      });
+      updateData.requiredReviews = requiredReviews;
     }
     if (appealable !== undefined) {
-      await tx.proposalEvaluation.update({
-        where: {
-          id: evaluationId
-        },
-        data: {
-          appealable
-        }
-      });
+      updateData.appealable = appealable;
     }
     if (appealRequiredReviews) {
+      updateData.appealRequiredReviews = appealRequiredReviews;
+    }
+    if (finalStep !== undefined) {
+      updateData.finalStep = finalStep;
+    }
+
+    if (Object.keys(updateData).length > 0) {
       await tx.proposalEvaluation.update({
         where: {
           id: evaluationId
         },
-        data: {
-          appealRequiredReviews
-        }
+        data: updateData
       });
     }
   });

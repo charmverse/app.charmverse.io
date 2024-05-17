@@ -55,15 +55,15 @@ type FormValues = {
   } | null;
   requiredReviews?: number;
   declineReasons?: string[] | null;
-  finalStep?: boolean;
+  finalStep?: boolean | null;
   permissions: {
     operation: ProposalOperation;
     userId?: string | null;
     roleId?: string | null;
     systemRole?: ProposalSystemRole | null;
   }[];
-  appealable?: boolean;
-  appealRequiredReviews?: number;
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
 };
 
 function StepActionButtonLabel({
@@ -224,11 +224,10 @@ function EvaluationAppealSettings({
           </Typography>
           <Switch
             checked={!!finalStep}
-            disabled={!!appealable}
             onChange={(e) => {
               const checked = e.target.checked;
               setValue('finalStep', checked);
-              setValue('appealRequiredReviews', undefined);
+              setValue('appealRequiredReviews', null);
               setValue('appealable', false);
             }}
           />
@@ -242,11 +241,10 @@ function EvaluationAppealSettings({
           </Typography>
           <Switch
             checked={!!appealable}
-            disabled={!!finalStep}
             onChange={(e) => {
               const checked = e.target.checked;
-              setValue('appealRequiredReviews', !checked ? undefined : 1);
-              setValue('finalStep', undefined);
+              setValue('appealRequiredReviews', !checked ? null : 1);
+              setValue('finalStep', null);
               setValue('appealable', checked);
             }}
           />
