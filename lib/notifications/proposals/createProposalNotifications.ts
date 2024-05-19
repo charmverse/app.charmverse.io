@@ -238,6 +238,15 @@ export async function createProposalNotifications(webhookData: {
         }
       });
 
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          notificationToggles: true
+        }
+      });
+
       const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
       const isProposalDeleted = proposal.page?.deletedAt;
 
@@ -272,6 +281,11 @@ export async function createProposalNotifications(webhookData: {
           !isAppealReviewer &&
           privateEvaluationSteps.includes(currentEvaluation.type)
         ) {
+          continue;
+        }
+
+        const notificationToggles = space.notificationToggles as NotificationToggles;
+        if (notificationToggles.proposals__review_required === false) {
           continue;
         }
 
