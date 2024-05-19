@@ -77,39 +77,32 @@ function StepActionButtonLabel({
 }) {
   return customLabelEvaluationTypes.includes(type) ? (
     <Box className='octo-propertyrow'>
-      <FieldLabel>Action labels</FieldLabel>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
-        <Box width={150}>
-          <PropertyLabel readOnly>Pass</PropertyLabel>
-        </Box>
-        <TextField
-          placeholder='Pass'
-          onChange={(e) => {
-            setValue('actionLabels', {
-              ...actionLabels,
-              approve: e.target.value
-            });
-          }}
-          fullWidth
-          value={actionLabels?.approve}
-        />
-      </Stack>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Box width={150}>
-          <PropertyLabel readOnly>Decline</PropertyLabel>
-        </Box>
-        <TextField
-          placeholder='Decline'
-          onChange={(e) => {
-            setValue('actionLabels', {
-              ...actionLabels,
-              reject: e.target.value
-            });
-          }}
-          fullWidth
-          value={actionLabels?.reject}
-        />
-      </Stack>
+      <FieldLabel>Decision Labels</FieldLabel>
+      <TextField
+        placeholder='Pass'
+        onChange={(e) => {
+          setValue('actionLabels', {
+            ...actionLabels,
+            approve: e.target.value
+          });
+        }}
+        fullWidth
+        value={actionLabels?.approve}
+        sx={{
+          mb: 1
+        }}
+      />
+      <TextField
+        placeholder='Decline'
+        onChange={(e) => {
+          setValue('actionLabels', {
+            ...actionLabels,
+            reject: e.target.value
+          });
+        }}
+        fullWidth
+        value={actionLabels?.reject}
+      />
     </Box>
   ) : null;
 }
@@ -218,10 +211,10 @@ function EvaluationAppealSettings({
   return (
     <Stack gap={1}>
       <Box>
-        <FieldLabel>Pass entire {getFeatureTitle('Proposal')}</FieldLabel>
+        <FieldLabel>Priority Step</FieldLabel>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Typography color='textSecondary' variant='body2'>
-            Passes {getFeatureTitle('proposal')} if evaluation succeeds; otherwise, proceeds to the next step.
+            If this Step passes, the entire proposal passes
           </Typography>
           <Switch
             checked={!!finalStep}
@@ -235,7 +228,7 @@ function EvaluationAppealSettings({
         </Stack>
       </Box>
       <Box>
-        <FieldLabel>Appealable</FieldLabel>
+        <FieldLabel>Appeal</FieldLabel>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Typography color='textSecondary' variant='body2'>
             {proposalLabel} authors can appeal the reviewer's decision. The appeal result is final, and passes or fails

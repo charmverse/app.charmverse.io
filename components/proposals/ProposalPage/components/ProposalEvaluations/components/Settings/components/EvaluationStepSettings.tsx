@@ -133,7 +133,7 @@ export function EvaluationStepSettings({
       </Box>
       {evaluation.type === 'pass_fail' && (
         <Box className='octo-propertyrow'>
-          <Box>
+          <Box mb={2}>
             <FormLabel>
               <Typography component='span' variant='subtitle1'>
                 Required reviews
@@ -152,46 +152,16 @@ export function EvaluationStepSettings({
               value={requiredReviews}
             />
           </Box>
-          <Stack direction='row' alignItems='center' justifyContent='space-between' mt={1}>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Pass entire proposal
-              </Typography>
-            </FormLabel>
-            <Switch
-              checked={!!finalStep}
-              disabled={readOnlyFinalStep}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onChange({
-                  finalStep: checked,
-                  appealable: false,
-                  appealRequiredReviews: null,
-                  appealReviewers: null
-                });
-              }}
-            />
-          </Stack>
-          <Stack direction='row' alignItems='center' justifyContent='space-between' mt={1}>
-            <FormLabel>
-              <Typography component='span' variant='subtitle1'>
-                Appealable
-              </Typography>
-            </FormLabel>
-            <Switch
-              checked={!!evaluation.appealable}
-              disabled={readOnlyAppealable}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                onChange({
-                  finalStep: null,
-                  appealable: checked,
-                  appealRequiredReviews: checked ? 1 : null,
-                  appealReviewers: checked ? [] : null
-                });
-              }}
-            />
-          </Stack>
+          {!!finalStep && (
+            <Stack direction='row' alignItems='center' justifyContent='space-between'>
+              <FormLabel>
+                <Typography component='span' variant='subtitle1'>
+                  Priority Step
+                </Typography>
+              </FormLabel>
+              <Switch checked disabled />
+            </Stack>
+          )}
           {evaluation.appealable && (
             <>
               <FormLabel required={!!evaluation.appealable}>
@@ -201,7 +171,7 @@ export function EvaluationStepSettings({
                     : 'Appeal Reviewers'}
                 </Typography>
               </FormLabel>
-              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow' mb={2}>
+              <Box display='flex' height='fit-content' flex={1} className='octo-propertyrow'>
                 <UserAndRoleSelect
                   emptyPlaceholderContent='Select appeal user or role'
                   value={appealReviewerOptions as SelectOption[]}
@@ -211,24 +181,6 @@ export function EvaluationStepSettings({
                   required={!!evaluation.appealable}
                 />
               </Box>
-              <Stack>
-                <FormLabel>
-                  <Typography component='span' variant='subtitle1'>
-                    Appeal required reviews
-                  </Typography>
-                </FormLabel>
-                <TextField
-                  disabled={!evaluation.appealable || readOnlyAppealRequiredReviews}
-                  type='number'
-                  value={appealRequiredReviews}
-                  onChange={(e) => {
-                    onChange({
-                      appealRequiredReviews: Math.max(1, Number(e.target.value))
-                    });
-                  }}
-                  fullWidth
-                />
-              </Stack>
             </>
           )}
         </Box>
