@@ -12,6 +12,7 @@ export type ProposalStep = {
   index: number;
   requiredReviews: number;
   finalStep: boolean | null;
+  appealedAt?: Date | null;
 };
 
 export function getCurrentStep({
@@ -37,7 +38,9 @@ export function getCurrentStep({
   const currentEvaluation = getCurrentEvaluation(evaluations);
 
   const lastEvaluation =
-    currentEvaluation && currentEvaluation.finalStep ? currentEvaluation : evaluations[evaluations.length - 1];
+    currentEvaluation && (currentEvaluation.finalStep || currentEvaluation.appealedAt)
+      ? currentEvaluation
+      : evaluations[evaluations.length - 1];
 
   if (proposalStatus === 'draft' || !currentEvaluation) {
     return getDraftStep();
@@ -55,7 +58,8 @@ export function getCurrentStep({
       // Add 1 with total evaluations so that draft step is also included
       index: evaluations.length + 1,
       requiredReviews: 1,
-      finalStep: null
+      finalStep: null,
+      appealedAt: null
     };
   }
 
@@ -68,7 +72,8 @@ export function getCurrentStep({
       // Add 1 with total evaluations so that draft step is also included
       index: evaluations.length + (credentialsEnabled ? 2 : 1),
       requiredReviews: 1,
-      finalStep: null
+      finalStep: null,
+      appealedAt: null
     };
   }
 
@@ -80,7 +85,8 @@ export function getCurrentStep({
     // Add 1 with total evaluations so that draft step is also included
     index: currentEvaluation.index + 1,
     requiredReviews: currentEvaluation.requiredReviews,
-    finalStep: currentEvaluation.finalStep
+    finalStep: currentEvaluation.finalStep,
+    appealedAt: currentEvaluation.appealedAt
   };
 }
 
