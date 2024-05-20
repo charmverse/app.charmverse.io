@@ -261,6 +261,7 @@ test.describe.serial('Structured proposal template with project', () => {
     await proposalFormFieldPage.page.keyboard.type('Short text field');
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-from-structured-template*');
+    await proposalPage.page.waitForTimeout(500);
 
     const projectAfterUpdate = await prisma.project.findUniqueOrThrow({
       where: {
@@ -291,11 +292,7 @@ test.describe.serial('Structured proposal template with project', () => {
       content: 'new-email@gmail.com'
     });
 
-    const apiResponse = proposalPage.page.waitForResponse((response) => {
-      return response.request().method() === 'PUT' && response.url().endsWith('/form/answers');
-    });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'name', content: 'Updated Project Name' });
-    await apiResponse;
 
     // Assert that the project member values were auto updated
     const projectAfterUpdate2 = await prisma.project.findUniqueOrThrow({
@@ -365,7 +362,6 @@ test.describe.serial('Structured proposal template with project', () => {
     expect(proposalPage.publishNewProposalButton).toBeDisabled();
     await proposalFormFieldPage.fillProjectField({ fieldName: 'name', content: 'Demo Project' });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'walletAddress', content: projectWalletAddress });
-    // await proposalPage.page.pause();
     await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].name', content: 'John Doe' });
     await proposalFormFieldPage.fillProjectField({ fieldName: 'projectMembers[0].email', content: 'doe@gmail.com' });
 
@@ -374,7 +370,6 @@ test.describe.serial('Structured proposal template with project', () => {
 
     // wait or else adding a team member erases the previous updates
     await proposalPage.page.waitForTimeout(100);
-    // await proposalPage.page.pause();
 
     await proposalPage.projectTeamMembersSelect.click();
     // Add a new project member
@@ -398,8 +393,6 @@ test.describe.serial('Structured proposal template with project', () => {
 
     await proposalPage.publishNewProposalButton.click();
     await proposalPage.page.waitForURL('**/proposal-structured-template*');
-
-    await proposalPage.page.pause();
 
     const proposal = await prisma.proposal.findFirstOrThrow({
       where: {
