@@ -40,20 +40,18 @@ export function ProposalFormFieldAnswers({
 
   const fields = useMemo(
     () =>
-      !isLoading
-        ? formFields.map((formField) => {
-            const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
-              (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
-            );
-            return {
-              ...formField,
-              formFieldAnswer: proposalFormFieldAnswer,
-              value: proposalFormFieldAnswer?.value as FormFieldValue,
-              options: (formField.options ?? []) as SelectOptionType[]
-            };
-          })
-        : undefined,
-    [formFields, isLoading, proposalFormFieldAnswers]
+      formFields?.map((formField) => {
+        const proposalFormFieldAnswer = proposalFormFieldAnswers.find(
+          (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
+        );
+        return {
+          ...formField,
+          formFieldAnswer: proposalFormFieldAnswer,
+          value: proposalFormFieldAnswer?.value as FormFieldValue,
+          options: (formField.options ?? []) as SelectOptionType[]
+        };
+      }),
+    [formFields, proposalFormFieldAnswers]
   );
 
   const onSave = async (answers: { id: string; value: FormFieldValue }[]) => {
@@ -76,7 +74,7 @@ export function ProposalFormFieldAnswers({
     <FormFieldAnswers
       milestoneProps={milestoneProps}
       enableComments={enableComments}
-      formFields={fields}
+      formFields={isLoading ? undefined : fields}
       onSave={onSave}
       pageId={pageId}
       disabled={readOnly}
