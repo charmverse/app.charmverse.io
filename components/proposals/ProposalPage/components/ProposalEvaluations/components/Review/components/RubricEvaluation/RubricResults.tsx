@@ -24,7 +24,7 @@ import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import { isNumber } from 'lib/utils/numbers';
 
-import { PassFailEvaluation } from '../PassFailEvaluation';
+import { PassFailEvaluationContainer } from '../PassFailEvaluationContainer';
 
 type Props = {
   answers?: ProposalRubricCriteriaAnswerWithTypedResponse[];
@@ -236,7 +236,7 @@ export function RubricResults({
               Decision
             </Typography>
 
-            <PassFailEvaluation
+            <PassFailEvaluationContainer
               isCurrent={isCurrent}
               hideReviewer
               authors={authors}
