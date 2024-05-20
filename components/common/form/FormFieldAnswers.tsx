@@ -1,11 +1,11 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -49,6 +49,7 @@ type FormFieldAnswersProps = {
     }[]
   ) => void;
   onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
+  getValues?: () => Record<string, FormFieldValue>;
   values?: Record<string, FormFieldValue>;
   pageId?: string;
   isDraft?: boolean;
@@ -69,7 +70,7 @@ const StyledStack = styled(Stack)`
 export function FormFieldAnswers(
   props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange' | 'onProjectUpdate'>
 ) {
-  const { control, errors, onFormChange, values } = useFormFields({
+  const { control, errors, onFormChange, getValues } = useFormFields({
     fields: props.formFields
   });
 
@@ -79,7 +80,7 @@ export function FormFieldAnswers(
       control={control}
       errors={errors}
       onFormChange={onFormChange}
-      values={values}
+      getValues={getValues}
     />
   );
 }
@@ -87,12 +88,12 @@ export function FormFieldAnswers(
 export function FormFieldAnswersControlled({
   onSave,
   formFields,
-  values,
   disabled,
   enableComments,
   control,
   errors,
   onFormChange,
+  getValues,
   pageId,
   project,
   threads = {},
@@ -101,16 +102,13 @@ export function FormFieldAnswersControlled({
 }: FormFieldAnswersProps & {
   threads?: Record<string, ThreadWithComments | undefined>;
 }) {
-  const { mutate } = useGetProposalFormFieldAnswers({
-    proposalId
-  });
   const { user } = useUser();
   const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
-  const debouncedValues = useDebouncedValue(values, 300);
 
   const hasErrors = Object.keys(errors).length !== 0;
-  async function saveFormFieldAnswers() {
+
+  const saveFormFieldAnswers = useCallback(async () => {
     if (hasErrors) {
       showMessage('Your form contains errors and cannot be saved.', 'error');
       return;
@@ -119,13 +117,14 @@ export function FormFieldAnswersControlled({
     if (!onSave || disabled || !isFormDirty) return;
 
     try {
-      await onSave?.(Object.entries(values ?? {}).map(([id, value]) => ({ id, value })));
+      const _values = getValues?.();
+      await onSave?.(Object.entries(_values ?? {}).map(([id, value]) => ({ id, value })));
     } catch (e: any) {
       showMessage(e.message, 'error');
     } finally {
       setIsFormDirty(false);
     }
-  }
+  }, [disabled, isFormDirty]);
 
   const fieldAnswerIdThreadRecord: Record<string, ThreadWithComments[]> = useMemo(() => {
     if (!threads) {
@@ -156,12 +155,19 @@ export function FormFieldAnswersControlled({
     }, {} as Record<string, ThreadWithComments[]>);
   }, [threads]);
 
+  const debouncedFunc = useMemo(() => debounce(saveFormFieldAnswers, 300), [saveFormFieldAnswers]);
+
   useEffect(() => {
     // auto-save form fields if the form is dirty and there are no errors
-    if (debouncedValues) {
-      saveFormFieldAnswers();
+
+    if (isFormDirty) {
+      const _values = getValues?.();
+      if (_values) {
+        debouncedFunc();
+      }
     }
-  }, [debouncedValues]);
+    return () => debouncedFunc.cancel();
+  }, [isFormDirty]);
 
   return (
     <FormFieldAnswersContainer>
@@ -193,7 +199,6 @@ export function FormFieldAnswersControlled({
                             value: projectFormValues
                           }
                         ]);
-                        mutate();
                       }}
                       inputEndAdornment={
                         pageId &&

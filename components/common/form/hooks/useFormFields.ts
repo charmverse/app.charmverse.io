@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { isValidName } from 'ethers/lib/utils';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import type { FieldValues } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { isAddress } from 'viem';
@@ -26,18 +26,8 @@ export function useFormFields({
   fields?: FormFieldInput[];
   onSubmit?: (values: FieldValues) => void;
 }) {
-  const {
-    control,
-    formState: { isValid, errors, isDirty, isSubmitting },
-    watch,
-    setValue,
-    handleSubmit,
-    reset,
-    getValues
-  } = useForm({
-    mode: 'onChange',
-    defaultValues: getFormFieldMap(fields || []),
-    resolver: yupResolver(
+  const schema = useMemo(
+    () =>
       yup.object(
         (fields || []).reduce((acc, property) => {
           const isRequired = property.required;
@@ -158,20 +148,31 @@ export function useFormFields({
 
           return acc;
         }, {} as Record<string, any>)
-      )
-    )
+      ),
+    [!!fields]
+  );
+
+  const defaultValues = useMemo(() => getFormFieldMap(fields || []), [fields]);
+  const {
+    control,
+    formState: { isValid, errors, isDirty, isSubmitting },
+    watch,
+    setValue,
+    handleSubmit,
+    reset,
+    getValues
+  } = useForm({
+    mode: 'onChange',
+    defaultValues,
+    resolver: yupResolver(schema)
   });
 
   const values = watch();
 
   function onFormChange(updatedFields: { id: string; value: FormFieldValue }[]) {
-    updatedFields.forEach((updatedField) => {
-      setValue(updatedField.id, updatedField.value, {
-        shouldDirty: true,
-        shouldValidate: true,
-        shouldTouch: true
-      });
-    });
+    for (const updatedField of updatedFields) {
+      setValue(updatedField.id, updatedField.value);
+    }
   }
 
   useEffect(() => {
