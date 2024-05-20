@@ -80,6 +80,9 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
             index,
+            appealable: workflowEvaluation.appealable,
+            appealRequiredReviews: workflowEvaluation.appealRequiredReviews,
+            finalStep: workflowEvaluation.finalStep,
             requiredReviews: workflowEvaluation.requiredReviews || 1
           }
         });
@@ -92,6 +95,9 @@ export async function upsertWorkflowTemplate(workflow: ProposalWorkflowTyped) {
             title: workflowEvaluation.title,
             type: workflowEvaluation.type,
             index,
+            appealable: workflowEvaluation.appealable,
+            appealRequiredReviews: workflowEvaluation.appealRequiredReviews,
+            finalStep: workflowEvaluation.finalStep,
             requiredReviews: workflowEvaluation.requiredReviews || 1
           }
         });

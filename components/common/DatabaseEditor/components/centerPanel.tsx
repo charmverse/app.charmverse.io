@@ -205,13 +205,13 @@ function CenterPanel(props: Props) {
     () =>
       activeView
         ? getVisibleAndHiddenGroups(
-            _cards,
+            sortedCards,
             activeView.fields.visibleOptionIds,
             activeView.fields.hiddenOptionIds,
             groupByProperty
           )
         : { visible: [], hidden: [] },
-    [_cards, activeView, groupByProperty]
+    [sortedCards, activeView, groupByProperty]
   );
 
   const backgroundRef = React.createRef<HTMLDivElement>();

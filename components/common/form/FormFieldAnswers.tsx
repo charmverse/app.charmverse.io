@@ -1,7 +1,7 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
@@ -47,6 +47,7 @@ type FormFieldAnswersProps = {
     }[]
   ) => void;
   onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
+  getValues?: () => Record<string, FormFieldValue>;
   values?: Record<string, FormFieldValue>;
   pageId?: string;
   isDraft?: boolean;
