@@ -108,13 +108,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
     properties: {},
     enableRewards: true,
     ...(templateFields || {}),
-    pendingRewards: templateFields?.pendingRewards?.map((pendingReward) => ({
-      ...pendingReward,
-      reward: {
-        ...pendingReward.reward,
-        assignedSubmitters: authors
-      }
-    }))
+    pendingRewards: []
   };
 
   return createProposal({
