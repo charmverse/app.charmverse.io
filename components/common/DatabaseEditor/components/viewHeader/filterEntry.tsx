@@ -439,7 +439,7 @@ function FilterEntry(props: Props) {
 
   return (
     <Stack flexDirection='row' justifyContent='space-between' flex={1}>
-      <Stack gap={0.5} flexDirection='row'>
+      <Stack gap={0.5} flexDirection='row' width='100%'>
         <PopupState variant='popover' popupId='view-filter'>
           {(popupState) => (
             <>
