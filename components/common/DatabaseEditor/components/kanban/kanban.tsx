@@ -78,7 +78,7 @@ type Props = {
 };
 
 function Kanban(props: Props) {
-  const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups } = props;
+  const { board, activeView, cards, groupByProperty, visibleGroups, hiddenGroups, selectedCardIds } = props;
   const popupState = usePopupState({ variant: 'popper', popupId: 'new-group' });
   const propertyValues = groupByProperty?.options || [];
   Utils.log(`${propertyValues.length} propertyValues`);
@@ -132,7 +132,6 @@ function Kanban(props: Props) {
 
   const onDropToColumn = useCallback(
     async (option: IPropertyOption, card?: Card, dstOption?: IPropertyOption) => {
-      const { selectedCardIds } = props;
       const optionId = option ? option.id : undefined;
 
       let draggedCardIds = selectedCardIds;
@@ -191,7 +190,7 @@ function Kanban(props: Props) {
         );
       }
     },
-    [cards, visibleGroups, activeView, groupByProperty, props.selectedCardIds]
+    [cards, visibleGroups, activeView, groupByProperty, selectedCardIds]
   );
 
   const onDropToCard = useCallback(
@@ -218,7 +217,6 @@ function Kanban(props: Props) {
       }
 
       Utils.log(`onDropToCard: ${dstCard.title}`);
-      const { selectedCardIds } = props;
       const optionId = groupByProperty ? dstCard.fields.properties[groupByProperty.id] : null;
 
       const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
@@ -290,7 +288,7 @@ function Kanban(props: Props) {
         );
       });
     },
-    [cards, activeView, groupByProperty, props.selectedCardIds]
+    [cards, activeView, groupByProperty, selectedCardIds]
   );
 
   const [showCalculationsMenu, setShowCalculationsMenu] = useState<Map<string, boolean>>(new Map<string, boolean>());
