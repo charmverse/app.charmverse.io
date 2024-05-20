@@ -25,7 +25,7 @@ import { EditStepButton } from './components/EditStepButton';
 import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
-import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { PassFailEvaluationContainer } from './components/PassFailEvaluationContainer';
 import { PrivateEvaluation } from './components/PrivateEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { RewardReviewStep } from './components/RewardReviewStep';
@@ -247,7 +247,7 @@ export function EvaluationsReview({
               />
             )}
             {evaluation.type === 'pass_fail' && (
-              <PassFailEvaluation
+              <PassFailEvaluationContainer
                 archived={proposal?.archived ?? false}
                 key={evaluation.id}
                 authors={proposal.authors.map((a) => a.userId)}
