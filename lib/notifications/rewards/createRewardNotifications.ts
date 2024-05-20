@@ -255,7 +255,34 @@ export async function createRewardNotifications(webhookData: {
 
       break;
     }
+    case WebhookEventNames.RewardCredentialCreated: {
+      const applicationId = webhookData.event.application.id;
+      const bountyId = webhookData.event.bounty.id;
+      const spaceId = webhookData.spaceId;
+      const userId = webhookData.event.user.id;
 
+      const application = await prisma.application.findUniqueOrThrow({
+        where: {
+          id: applicationId
+        },
+        select: {
+          createdBy: true
+        }
+      });
+
+      const { id } = await saveRewardNotification({
+        bountyId,
+        createdAt: webhookData.createdAt,
+        createdBy: userId,
+        spaceId,
+        type: 'credential.created',
+        userId: application.createdBy,
+        applicationId
+      });
+      ids.push(id);
+
+      break;
+    }
     default:
       break;
   }

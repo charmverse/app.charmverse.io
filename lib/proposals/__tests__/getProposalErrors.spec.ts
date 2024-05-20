@@ -44,6 +44,26 @@ describe('getProposalErrors', () => {
     expect(errors).toContain('Rubric criteria is missing a label in the "Test" step');
   });
 
+  it(`Should return false when appealable pass_fail step is missing reviewers`, async () => {
+    const proposal = createMockProposal({
+      evaluations: [
+        {
+          type: 'pass_fail',
+          title: 'Test',
+          reviewers: [{ userId: 'someone' }] as any[],
+          appealable: true
+        }
+      ],
+      workflowId: 'test'
+    });
+    const input = getFunctionInput({
+      proposal
+    });
+    const errors = getProposalErrors(input);
+
+    expect(errors).toContain('Appeal reviewers are required for the "Test" step');
+  });
+
   it(`Should return false when token amount is missing`, async () => {
     const proposal = createMockProposal({
       fields: {

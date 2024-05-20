@@ -16,6 +16,8 @@ type Props = {
   onChange?: (e: any, expanded: boolean) => void;
   actions?: ReactNode;
   children?: ReactNode;
+  showDash?: boolean;
+  isAppealActive?: boolean;
 };
 
 const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters elevation={0} square {...props} />)(
@@ -49,13 +51,21 @@ export function EvaluationStepRow({
   index,
   title,
   children,
-  actions
+  actions,
+  showDash,
+  isAppealActive
 }: Props) {
   return (
     <Accordion expanded={expanded} onChange={onChange}>
       <AccordionSummary sx={{ px: 1 }}>
         <Box display='flex' alignItems='center' gap={1} width='100%'>
-          <StepperResultIcon result={result} isCurrent={isCurrent} position={index + 1} />
+          <StepperResultIcon
+            isAppealActive={isAppealActive}
+            result={result}
+            isCurrent={isCurrent}
+            showDash={showDash}
+            position={index + 1}
+          />
           {expandedContainer && (
             <>
               <Typography variant='h6' sx={{ flexGrow: 1 }}>

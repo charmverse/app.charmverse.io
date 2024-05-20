@@ -48,6 +48,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
           evaluations: {
             include: {
               reviewers: true,
+              appealReviewers: true,
               rubricCriteria: true
             },
             orderBy: {

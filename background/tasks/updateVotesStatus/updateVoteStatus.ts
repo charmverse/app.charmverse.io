@@ -1,7 +1,6 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
-import { isTruthy } from 'lib/utils/types';
 import { getVotesByState } from 'lib/votes/getVotesByState';
 import { VOTE_STATUS } from 'lib/votes/interfaces';
 import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
@@ -21,11 +20,6 @@ const updateVoteStatus = async () => {
   });
 
   const { passedVotes, rejectedVotes } = getVotesByState(votesPassedDeadline);
-
-  const proposalPageIds = votesPassedDeadline
-    .filter((v) => v.context === 'proposal')
-    .map((v) => v.pageId)
-    .filter(isTruthy);
 
   const evaluationsToUpdate = await prisma.proposalEvaluation.findMany({
     where: {

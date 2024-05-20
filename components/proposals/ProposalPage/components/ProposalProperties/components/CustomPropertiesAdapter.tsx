@@ -29,7 +29,15 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
 
   const proposal: ProposalWithUsersLite = {
     authors: [],
-    currentStep: { title: '', step: 'draft', id: '', index: 0, result: 'in_progress', requiredReviews: 1 },
+    currentStep: {
+      title: '',
+      step: 'draft',
+      id: '',
+      index: 0,
+      result: 'in_progress',
+      requiredReviews: 1,
+      finalStep: null
+    },
     reviewers: [],
     evaluations: [],
     id: '',
@@ -40,6 +48,8 @@ export function CustomPropertiesAdapter({ onChange, readOnly, readOnlyProperties
     createdBy: '',
     updatedAt: proposalForm?.createdAt || '',
     updatedBy: '',
+    workflowId: '',
+    spaceId: space?.id as string,
     ...proposalFromDb,
     fields: {
       ...proposalFromDb?.fields,

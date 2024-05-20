@@ -174,7 +174,7 @@ export const RPC: Record<string, IChainDetails> = {
       symbol: 'MATIC',
       decimals: 18,
       address: '0x0000000000000000000000000000000000000000',
-      logoURI: 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png?1624446912'
+      logoURI: 'https://assets.coingecko.com/coins/images/4713/standard/polygon.png?1698233745'
     },
     alchemyUrl: 'https://polygon-mainnet.g.alchemy.com',
     rpcUrls: ['https://polygon-rpc.com'],

@@ -70,8 +70,12 @@ export async function issueOffchainProposalCredentialsIfNecessary({
   if (!currentEvaluation) {
     return;
   } else if (
-    currentEvaluation.id !== baseProposal.evaluations[baseProposal.evaluations.length - 1].id ||
-    currentEvaluation.result !== 'pass'
+    !(
+      (currentEvaluation.finalStep ||
+        currentEvaluation.appealedAt ||
+        currentEvaluation.id === baseProposal.evaluations[baseProposal.evaluations.length - 1].id) &&
+      currentEvaluation.result === 'pass'
+    )
   ) {
     return;
   }

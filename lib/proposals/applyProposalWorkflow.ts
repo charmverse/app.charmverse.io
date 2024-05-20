@@ -25,6 +25,7 @@ export async function applyProposalWorkflow({
     },
     include: {
       reviewers: true,
+      appealReviewers: true,
       rubricCriteria: true
     }
   });
@@ -48,7 +49,7 @@ export async function applyProposalWorkflow({
     for (let index = 0; index < typedWorkflow.evaluations.length; index++) {
       const evaluation = typedWorkflow.evaluations[index];
       // try to retain existing reviewers and configuration
-      const existingStep = existingEvaluations.find((e) => e.title === evaluation.title);
+      const existingStep = existingEvaluations.find((e) => e.title === evaluation.title && e.type === evaluation.type);
 
       const rubricCriteria =
         evaluation.type === 'rubric'
@@ -62,20 +63,21 @@ export async function applyProposalWorkflow({
       // include author as default reviewer for feedback
       const defaultReviewers = evaluation.type === 'feedback' ? [{ proposalId, systemRole: 'author' as const }] : [];
       const reviewers = existingStep?.reviewers.map(({ evaluationId, ...reviewer }) => reviewer) || defaultReviewers;
+      const appealReviewers = existingStep?.appealReviewers.map(({ evaluationId, ...reviewer }) => reviewer) || [];
+      const requiredReviews = evaluation.requiredReviews;
+      const appealRequiredReviews = evaluation.appealRequiredReviews;
       await tx.proposalEvaluation.create({
         data: {
           proposalId,
           index,
           title: evaluation.title,
           type: evaluation.type,
-          actionLabels: evaluation.actionLabels || undefined,
           voteSettings: (existingStep?.voteSettings as any) || undefined,
           reviewers: {
             createMany: {
               data: reviewers
             }
           },
-          requiredReviews: evaluation.requiredReviews,
           rubricCriteria: {
             createMany: {
               data: rubricCriteria
@@ -85,7 +87,17 @@ export async function applyProposalWorkflow({
             createMany: {
               data: evaluation.permissions
             }
-          }
+          },
+          requiredReviews: requiredReviews ?? 1,
+          appealReviewers: {
+            createMany: {
+              data: appealReviewers
+            }
+          },
+          appealable: evaluation.appealable,
+          appealRequiredReviews,
+          actionLabels: evaluation.actionLabels || undefined,
+          finalStep: evaluation.finalStep
         }
       });
     }

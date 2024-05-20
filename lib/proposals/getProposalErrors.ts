@@ -6,6 +6,13 @@ import { isTruthy } from 'lib/utils/types';
 import type { CreateProposalInput, ProposalEvaluationInput } from './createProposal';
 import { validateProposalProject } from './validateProposalProject';
 
+export type ProposalToErrorCheck = Pick<
+  CreateProposalInput,
+  'authors' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'
+> & {
+  workflowId: string | null;
+};
+
 export function getProposalErrors({
   page,
   proposal,
@@ -18,9 +25,7 @@ export function getProposalErrors({
   page: Pick<CreateProposalInput['pageProps'], 'title' | 'type' | 'sourceTemplateId'> & {
     hasContent?: boolean;
   };
-  proposal: Pick<CreateProposalInput, 'authors' | 'formFields' | 'evaluations' | 'formAnswers' | 'fields'> & {
-    workflowId: string | null;
-  };
+  proposal: ProposalToErrorCheck;
   project?: ProjectWithMembers | null;
   contentType: 'structured' | 'free_form';
   isDraft: boolean;
@@ -104,6 +109,9 @@ export function getEvaluationFormError(evaluation: ProposalEvaluationInput): str
         ? `Rubric criteria is missing a label in the "${evaluation.title}" step`
         : false;
     case 'pass_fail':
+      if (evaluation.appealable && (!evaluation.appealReviewers || evaluation.appealReviewers?.length === 0)) {
+        return `Appeal reviewers are required for the "${evaluation.title}" step`;
+      }
       return evaluation.reviewers.length === 0 ? `Reviewers are required for the "${evaluation.title}" step` : false;
     case 'vote':
       return evaluation.reviewers.length === 0

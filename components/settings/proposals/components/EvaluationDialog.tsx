@@ -1,9 +1,12 @@
-import type { ProposalOperation } from '@charmverse/core/prisma';
-import { ProposalEvaluationType, ProposalSystemRole } from '@charmverse/core/prisma';
+import type { ProposalEvaluationType, ProposalOperation, ProposalSystemRole } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 import styled from '@emotion/styled';
+import { ExpandMore } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   IconButton,
   ListItemIcon,
@@ -11,26 +14,25 @@ import {
   MenuItem,
   Select,
   Stack,
+  Switch,
   TextField,
   Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import type { UseFormSetValue } from 'react-hook-form';
-import { useForm, Controller } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { v4 as uuid } from 'uuid';
-import * as yup from 'yup';
 
 import { Button } from 'components/common/Button';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels';
 
 import { evaluationIcons } from '../constants';
 
-import { proposalOperations, EvaluationPermissions } from './EvaluationPermissions';
-
-const evaluationTypes: ProposalEvaluationType[] = Object.keys(ProposalEvaluationType) as ProposalEvaluationType[];
+import { EvaluationPermissions } from './EvaluationPermissions';
 
 const StyledListItemText = styled(ListItemText)`
   display: flex;
@@ -43,32 +45,26 @@ const StyledListItemText = styled(ListItemText)`
 // This type is used for existing and new workflows (id is null until it is saved)
 export type EvaluationTemplateFormItem = Omit<WorkflowEvaluationJson, 'id'> & { id: string | null };
 
-export const schema = yup.object({
-  id: yup.string().required(),
-  title: yup.string().required(),
-  type: yup.mixed<ProposalEvaluationType>().oneOf(evaluationTypes).required(),
-  actionLabels: yup
-    .object({
-      approve: yup.string().optional(),
-      reject: yup.string().optional()
-    })
-    .nullable(),
-  requiredReviews: yup.number().optional(),
-  declineReasons: yup.array().of(yup.string().required()).nullable(),
-  permissions: yup
-    .array()
-    .of(
-      yup.object({
-        operation: yup.mixed<ProposalOperation>().oneOf(proposalOperations).required(),
-        userId: yup.string().nullable(),
-        roleId: yup.string().nullable(),
-        systemRole: yup.mixed<ProposalSystemRole>().oneOf(Object.values(ProposalSystemRole)).nullable()
-      })
-    )
-    .required()
-});
-
-type FormValues = yup.InferType<typeof schema>;
+type FormValues = {
+  id: string;
+  title: string;
+  type: ProposalEvaluationType;
+  actionLabels?: {
+    approve?: string;
+    reject?: string;
+  } | null;
+  requiredReviews?: number;
+  declineReasons?: string[] | null;
+  finalStep?: boolean | null;
+  permissions: {
+    operation: ProposalOperation;
+    userId?: string | null;
+    roleId?: string | null;
+    systemRole?: ProposalSystemRole | null;
+  }[];
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
+};
 
 function StepActionButtonLabel({
   type,
@@ -81,39 +77,32 @@ function StepActionButtonLabel({
 }) {
   return customLabelEvaluationTypes.includes(type) ? (
     <Box className='octo-propertyrow'>
-      <FieldLabel>Action labels</FieldLabel>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center' mb={1}>
-        <Box width={150}>
-          <PropertyLabel readOnly>Pass</PropertyLabel>
-        </Box>
-        <TextField
-          placeholder='Pass'
-          onChange={(e) => {
-            setValue('actionLabels', {
-              ...actionLabels,
-              approve: e.target.value
-            });
-          }}
-          fullWidth
-          value={actionLabels?.approve}
-        />
-      </Stack>
-      <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
-        <Box width={150}>
-          <PropertyLabel readOnly>Decline</PropertyLabel>
-        </Box>
-        <TextField
-          placeholder='Decline'
-          onChange={(e) => {
-            setValue('actionLabels', {
-              ...actionLabels,
-              reject: e.target.value
-            });
-          }}
-          fullWidth
-          value={actionLabels?.reject}
-        />
-      </Stack>
+      <FieldLabel>Decision Labels</FieldLabel>
+      <TextField
+        placeholder='Pass'
+        onChange={(e) => {
+          setValue('actionLabels', {
+            ...actionLabels,
+            approve: e.target.value
+          });
+        }}
+        fullWidth
+        value={actionLabels?.approve}
+        sx={{
+          mb: 1
+        }}
+      />
+      <TextField
+        placeholder='Decline'
+        onChange={(e) => {
+          setValue('actionLabels', {
+            ...actionLabels,
+            reject: e.target.value
+          });
+        }}
+        fullWidth
+        value={actionLabels?.reject}
+      />
     </Box>
   ) : null;
 }
@@ -161,7 +150,11 @@ function StepFailReasonSelect({
         </Button>
       </Stack>
       <Stack gap={0.5}>
-        {declineReasons.length === 0 && <Typography color='textSecondary'>No decline reasons added</Typography>}
+        {declineReasons.length === 0 && (
+          <Typography variant='body2' color='textSecondary'>
+            No decline reasons added
+          </Typography>
+        )}
         {declineReasons.map((reason) => (
           <Stack key={reason} direction='row' gap={1} justifyContent='space-between' alignItems='center'>
             <Typography variant='body2'>{reason}</Typography>
@@ -205,6 +198,108 @@ function StepRequiredReviews({
   );
 }
 
+function EvaluationAppealSettings({
+  setValue,
+  formValues
+}: {
+  formValues: FormValues;
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  const { appealable, appealRequiredReviews, finalStep } = formValues;
+  const { getFeatureTitle } = useSpaceFeatures();
+  const proposalLabel = getFeatureTitle('Proposal');
+  return (
+    <Stack gap={1}>
+      <Box>
+        <FieldLabel>Priority Step</FieldLabel>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography color='textSecondary' variant='body2'>
+            If this Step passes, the entire proposal passes
+          </Typography>
+          <Switch
+            checked={!!finalStep}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setValue('finalStep', checked);
+              setValue('appealRequiredReviews', null);
+              setValue('appealable', false);
+            }}
+          />
+        </Stack>
+      </Box>
+      <Box>
+        <FieldLabel>Appeal</FieldLabel>
+        <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
+          <Typography color='textSecondary' variant='body2'>
+            {proposalLabel} authors can appeal the reviewer's decision. The appeal result is final, and passes or fails
+            the {proposalLabel.toLowerCase()}.
+          </Typography>
+          <Switch
+            checked={!!appealable}
+            onChange={(e) => {
+              const checked = e.target.checked;
+              setValue('appealRequiredReviews', !checked ? null : 1);
+              setValue('finalStep', null);
+              setValue('appealable', checked);
+            }}
+          />
+        </Stack>
+      </Box>
+      {appealable && (
+        <Box>
+          <FieldLabel>Appeal required reviews</FieldLabel>
+          <TextField
+            disabled={!appealable}
+            type='number'
+            onChange={(e) => {
+              setValue('appealRequiredReviews', Math.max(1, Number(e.target.value)));
+            }}
+            fullWidth
+            value={appealRequiredReviews ?? ''}
+          />
+        </Box>
+      )}
+    </Stack>
+  );
+}
+
+function EvaluationAdvancedSettingsAccordion({
+  formValues,
+  setValue
+}: {
+  formValues: FormValues;
+  setValue: UseFormSetValue<FormValues>;
+}) {
+  const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
+  const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
+  const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
+  return (
+    <Box>
+      <Accordion
+        style={{ marginBottom: '20px' }}
+        expanded={isAdvancedSettingsOpen}
+        onChange={() => setIsAdvancedSettingsOpen(!isAdvancedSettingsOpen)}
+      >
+        <AccordionSummary expandIcon={<ExpandMore />}>
+          <Typography>Advanced settings</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Stack gap={2}>
+            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
+            {formValues.type === 'pass_fail' && (
+              <>
+                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
+                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
+                <EvaluationAppealSettings formValues={formValues} setValue={setValue} />
+              </>
+            )}
+          </Stack>
+        </AccordionDetails>
+      </Accordion>
+    </Box>
+  );
+}
+
 export function EvaluationDialog({
   evaluation,
   isFirstEvaluation,
@@ -241,7 +336,10 @@ export function EvaluationDialog({
       permissions: evaluation?.permissions ?? [],
       actionLabels: evaluation?.actionLabels,
       requiredReviews: evaluation?.requiredReviews ?? 1,
-      declineReasons: evaluation?.declineReasons ?? []
+      declineReasons: evaluation?.declineReasons ?? [],
+      finalStep: evaluation?.finalStep ?? false,
+      appealable: evaluation?.appealable ?? false,
+      appealRequiredReviews: evaluation?.appealRequiredReviews
     });
   }, [evaluation?.id]);
 
@@ -253,9 +351,6 @@ export function EvaluationDialog({
     });
     onClose();
   }
-
-  const actionLabels = formValues?.actionLabels as WorkflowEvaluationJson['actionLabels'];
-  const declineReasons = (formValues?.declineReasons as WorkflowEvaluationJson['declineReasons']) ?? [];
 
   return (
     <Dialog
@@ -305,17 +400,7 @@ export function EvaluationDialog({
             )}
           />
         </div>
-        {evaluation?.id && (
-          <>
-            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-            {formValues.type === 'pass_fail' && (
-              <>
-                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-              </>
-            )}
-          </>
-        )}
+        {evaluation?.id && <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />}
         {!evaluation?.id && (
           <>
             <div>
@@ -354,13 +439,7 @@ export function EvaluationDialog({
                 )}
               />
             </div>
-            <StepActionButtonLabel type={formValues.type} setValue={setValue} actionLabels={actionLabels} />
-            {formValues.type === 'pass_fail' && (
-              <>
-                <StepRequiredReviews requiredReviews={formValues.requiredReviews} setValue={setValue} />
-                <StepFailReasonSelect declineReasons={declineReasons} setValue={setValue} />
-              </>
-            )}
+
             <FieldLabel>Permissions</FieldLabel>
             <Stack flex={1} className='CardDetail content'>
               {evaluation && (
@@ -371,6 +450,7 @@ export function EvaluationDialog({
                 />
               )}
             </Stack>
+            <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
           </>
         )}
       </Stack>

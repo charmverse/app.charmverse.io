@@ -26,6 +26,7 @@ import { EvaluationStepActions } from './components/EvaluationStepActions';
 import { EvaluationStepSettingsModal } from './components/EvaluationStepSettingsModal';
 import { FeedbackEvaluation } from './components/FeedbackEvaluation';
 import { PassFailEvaluation } from './components/PassFailEvaluation';
+import { PrivateEvaluation } from './components/PrivateEvaluation';
 import { ProposalCredentials } from './components/ProposalCredentials/ProposalCredentials';
 import { RewardReviewStep } from './components/RewardReviewStep';
 import { RubricEvaluation } from './components/RubricEvaluation/RubricEvaluation';
@@ -215,17 +216,23 @@ export function EvaluationsReview({
             index={index + 1}
             result={evaluation.result}
             title={evaluation.title}
+            showDash={
+              currentEvaluation ? evaluation.index > currentEvaluation.index && !!currentEvaluation.result : false
+            }
+            isAppealActive={!!evaluation.appealedAt && evaluation.result === null}
             actions={
-              <EvaluationStepActions
-                archived={proposal?.archived ?? false}
-                isCurrentStep={isCurrent}
-                isPreviousStep={previousStepIndex === index + 1}
-                permissions={proposal?.permissions}
-                proposalId={proposal?.id}
-                refreshProposal={refreshProposal}
-                evaluation={evaluation}
-                openSettings={() => openSettings(evaluation)}
-              />
+              evaluation.type !== 'private_evaluation' && (
+                <EvaluationStepActions
+                  archived={proposal?.archived ?? false}
+                  isCurrentStep={isCurrent}
+                  isPreviousStep={previousStepIndex === index + 1}
+                  permissions={proposal?.permissions}
+                  proposalId={proposal?.id}
+                  refreshProposal={refreshProposal}
+                  evaluation={evaluation}
+                  openSettings={() => openSettings(evaluation)}
+                />
+              )
             }
           >
             {evaluation.type === 'feedback' && (
@@ -243,6 +250,7 @@ export function EvaluationsReview({
               <PassFailEvaluation
                 archived={proposal?.archived ?? false}
                 key={evaluation.id}
+                authors={proposal.authors.map((a) => a.userId)}
                 evaluation={evaluation}
                 proposalId={proposal?.id}
                 isCurrent={isCurrent}
@@ -267,6 +275,9 @@ export function EvaluationsReview({
                 evaluation={evaluation}
                 refreshProposal={refreshProposal}
               />
+            )}
+            {evaluation.type === 'private_evaluation' && (
+              <PrivateEvaluation key={evaluation.id} evaluation={evaluation} isCurrent={isCurrent} />
             )}
           </EvaluationStepRow>
         );

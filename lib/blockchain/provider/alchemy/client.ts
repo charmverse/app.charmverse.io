@@ -137,7 +137,10 @@ export async function getNFT({
   chainId: SupportedChainId;
 }) {
   const url = `${getAlchemyBaseUrl(chainId, 'nft', 'v3')}/getNFTMetadata`;
-  const res = await GET<AlchemyNft>(url, { contractAddress: address, tokenId });
+  let res = await GET<AlchemyNft>(url, { contractAddress: address, tokenId });
+  if (res.name === 'Failed to load NFT metadata') {
+    res = await GET<AlchemyNft>(url, { contractAddress: address, tokenId, refreshCache: true });
+  }
   const updateRes = await updateNFTResp(res);
   return mapNFTData(updateRes, null, chainId);
 }

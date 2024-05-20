@@ -39,7 +39,10 @@ type ProposalData = {
   };
   proposal: Pick<Proposal, 'fields' | 'formId' | 'id' | 'status' | 'selectedCredentialTemplates'> & {
     authors: ({ userId: string } & IssuableProposalCredentialAuthor)[];
-    evaluations: (Pick<ProposalEvaluation, 'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews'> & {
+    evaluations: (Pick<
+      ProposalEvaluation,
+      'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep' | 'appealedAt'
+    > & {
       rubricAnswers: ProposalRubricCriteriaAnswer[];
       rubricCriteria: ProposalRubricCriteria[];
     })[];
@@ -96,7 +99,9 @@ const pageSelectObject = {
           type: true,
           rubricCriteria: true,
           rubricAnswers: true,
-          requiredReviews: true
+          requiredReviews: true,
+          finalStep: true,
+          appealedAt: true
         },
         orderBy: {
           index: 'asc'

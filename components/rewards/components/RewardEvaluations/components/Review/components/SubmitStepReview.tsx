@@ -56,6 +56,7 @@ export function SubmitStepReview({ reward }: { reward: RewardWithUsers }) {
               type='role'
               readOnly
               variant='standard'
+              wrapColumn={true}
               value={(reward?.allowedSubmitterRoles ?? []).map((roleId) => ({ group: 'role', id: roleId }))}
               onChange={() => {}}
             />
@@ -73,7 +74,9 @@ export function SubmitStepReview({ reward }: { reward: RewardWithUsers }) {
       ) : (
         <Box>
           <FormLabel>
-            <Typography variant='subtitle1'>Assigned applicants</Typography>
+            <Typography variant='subtitle1' sx={{ mb: 1 }}>
+              Assigned applicants
+            </Typography>
           </FormLabel>
           <UserSelect
             memberIds={reward.assignedSubmitters ?? []}

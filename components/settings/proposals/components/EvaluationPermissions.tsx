@@ -11,6 +11,7 @@ import {
   type SystemRoleOptionPopulated
 } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { MembersIcon } from 'components/common/PageIcon';
+import type { ConcealableEvaluationType } from 'lib/proposals/interfaces';
 
 import { evaluationIcons } from '../constants';
 
@@ -130,12 +131,18 @@ export function EvaluationPermissionsRow({
         </Box>
 
         <Stack flex={1} className='CardDetail content'>
-          <EvaluationPermissions
-            isFirstEvaluation={isFirstEvaluation}
-            evaluation={evaluation}
-            onChange={onChange}
-            readOnly={readOnly}
-          />
+          {(evaluation.type as ConcealableEvaluationType) === 'private_evaluation' ? (
+            <Typography variant='body2' color='text.secondary'>
+              This evaluation is private and only visible to reviewers
+            </Typography>
+          ) : (
+            <EvaluationPermissions
+              isFirstEvaluation={isFirstEvaluation}
+              evaluation={evaluation}
+              onChange={onChange}
+              readOnly={readOnly}
+            />
+          )}
         </Stack>
       </Box>
     </Card>

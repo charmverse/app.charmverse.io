@@ -390,6 +390,9 @@ export async function generateBounty({
         approveSubmitters,
         maxSubmissions,
         selectedCredentialTemplates,
+        fields: {
+          workflowId: approveSubmitters ? 'application_required' : 'direct_submission'
+        },
         page: {
           create: {
             id: pageId,

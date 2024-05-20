@@ -1,3 +1,4 @@
+import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { uniqBy } from 'lodash';
@@ -6,7 +7,9 @@ import { trackUserAction } from 'lib/metrics/mixpanel/trackUserAction';
 import { InvalidStateError } from 'lib/middleware';
 import { getPageMetaList } from 'lib/pages/server/getPageMetaList';
 import type { ProposalFields } from 'lib/proposals/interfaces';
+import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { createReward } from 'lib/rewards/createReward';
+import { assignedWorkflow } from 'lib/rewards/getRewardWorkflows';
 import type { RewardReviewer } from 'lib/rewards/interfaces';
 import { InvalidInputError } from 'lib/utils/errors';
 import { isTruthy } from 'lib/utils/types';
@@ -29,7 +32,9 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
           index: true,
           result: true,
           id: true,
-          reviewers: true
+          reviewers: true,
+          finalStep: true,
+          appealedAt: true
         },
         orderBy: {
           index: 'asc'
@@ -68,6 +73,10 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
     // create reward
     const { createdPageId, reward: createdReward } = await createReward({
       ...reward,
+      fields: {
+        ...(reward.fields as RewardFields),
+        workflowId: assignedWorkflow.id
+      } as Prisma.JsonObject,
       reviewers: uniqBy(
         reviewers
           .map((reviewer) =>
