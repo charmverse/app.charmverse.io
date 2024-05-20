@@ -177,7 +177,8 @@ export async function publishProposalEvent({
       id: true,
       result: true,
       finalStep: true,
-      appealable: true
+      appealable: true,
+      appealedAt: true
     }
   });
 
@@ -191,7 +192,7 @@ export async function publishProposalEvent({
     });
   } else {
     const finalEvaluation =
-      proposalEvaluations.find((proposalEvaluation) => proposalEvaluation.finalStep) ??
+      proposalEvaluations.find((proposalEvaluation) => proposalEvaluation.finalStep || proposalEvaluation.appealedAt) ??
       proposalEvaluations[proposalEvaluations.length - 1];
 
     if (finalEvaluation.id === currentEvaluationId && finalEvaluation.result) {

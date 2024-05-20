@@ -30,7 +30,12 @@ export function getProposalAction({
     return null;
   }
 
-  if ((currentEvaluation.index === proposal.evaluations.length - 1 || currentEvaluation.finalStep) && isAuthor) {
+  if (
+    (currentEvaluation.index === proposal.evaluations.length - 1 ||
+      currentEvaluation.finalStep ||
+      currentEvaluation.appealedAt) &&
+    isAuthor
+  ) {
     if (currentEvaluation.result === 'pass') {
       return proposal.rewards.length > 0 ? 'reward_published' : 'proposal_passed';
     } else if (currentEvaluation.result === 'fail') {

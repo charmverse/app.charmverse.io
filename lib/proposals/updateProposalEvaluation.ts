@@ -12,8 +12,6 @@ export type UpdateEvaluationRequest = {
   requiredReviews?: number | null;
   reviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
   appealReviewers?: Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[] | null;
-  appealable?: boolean | null;
-  appealRequiredReviews?: number | null;
   finalStep?: boolean | null;
 };
 
@@ -23,9 +21,7 @@ export async function updateProposalEvaluation({
   evaluationId,
   voteSettings,
   reviewers,
-  appealRequiredReviews,
   appealReviewers,
-  appealable,
   actorId,
   requiredReviews,
   currentEvaluationType,
@@ -71,12 +67,6 @@ export async function updateProposalEvaluation({
     }
     if (requiredReviews) {
       updateData.requiredReviews = requiredReviews;
-    }
-    if (appealable !== undefined) {
-      updateData.appealable = appealable;
-    }
-    if (appealRequiredReviews) {
-      updateData.appealRequiredReviews = appealRequiredReviews;
     }
     if (finalStep !== undefined) {
       updateData.finalStep = finalStep;
