@@ -50,6 +50,7 @@ export function RelatedPagesSelect({ boardPageId, onChange, value }: Props) {
           })}
         </Stack>
       )}
+      sx={{ flex: 1 }}
       renderOption={(props, option) => {
         const card = cards.find((c) => c.id === option);
         return (
