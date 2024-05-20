@@ -1,4 +1,4 @@
-import type { ProposalEvaluationResult, ProposalEvaluationType } from '@charmverse/core/prisma';
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { issueOffchainProposalCredentialsIfNecessary } from 'lib/credentials/issueOffchainProposalCredentialsIfNecessary';
@@ -41,8 +41,7 @@ export async function updateEvaluationResult({
     data: {
       result: finalResult,
       decidedBy,
-      completedAt: new Date(),
-      declinedAt: finalResult === 'fail' ? new Date() : undefined
+      completedAt: new Date()
     }
   });
 
@@ -55,7 +54,6 @@ export async function updateEvaluationResult({
     userId: decidedBy
   });
 
-  // determine if we should create vote for the next stage
   if (finalResult === 'pass') {
     await createVoteIfNecessary({
       createdBy: decidedBy,
@@ -68,7 +66,7 @@ export async function updateEvaluationResult({
   }
 }
 
-export async function submitEvaluationResult({
+export async function submitEvaluationAppealResult({
   decidedBy,
   proposalId,
   result,
@@ -79,29 +77,26 @@ export async function submitEvaluationResult({
   spaceId: string;
   evaluation: {
     id: string;
-    type: ProposalEvaluationType;
-    title: string;
-    requiredReviews: number;
+    appealRequiredReviews: number | null;
     proposalEvaluationReviews: {
       result: ProposalEvaluationResult;
     }[];
   };
 }) {
   const evaluationId = evaluation.id;
-  const requiredReviews = evaluation.requiredReviews;
+  const requiredAppealReviews = evaluation.appealRequiredReviews ?? 1;
 
-  if (evaluation.type === 'pass_fail') {
-    await prisma.proposalEvaluationReview.create({
-      data: {
-        evaluationId,
-        result,
-        reviewerId: decidedBy,
-        declineReasons
-      }
-    });
-  }
+  await prisma.proposalEvaluationReview.create({
+    data: {
+      evaluationId,
+      result,
+      reviewerId: decidedBy,
+      declineReasons,
+      appeal: true
+    }
+  });
 
-  if (evaluation.proposalEvaluationReviews.length + 1 >= requiredReviews) {
+  if (evaluation.proposalEvaluationReviews.length + 1 >= requiredAppealReviews) {
     await updateEvaluationResult({
       decidedBy,
       proposalId,

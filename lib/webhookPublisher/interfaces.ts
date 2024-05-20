@@ -1,6 +1,5 @@
 import type { PageType } from '@charmverse/core/prisma';
 
-import type { OnChainAttestationInputWithMetadata } from 'lib/credentials/attestOnchain';
 import type { UserMentionMetadata } from 'lib/prosemirror/extractMentions';
 
 export type UserEntity = {
@@ -119,6 +118,7 @@ export enum WebhookEventNames {
   RewardSubmissionApproved = 'reward.submission.approved',
   RewardApplicationPaymentCompleted = 'reward.payment.completed',
   RewardSuggestionCreated = 'reward.suggestion.created',
+  RewardCredentialCreated = 'reward.credential.created',
   ForumCommentUpvoted = 'forum.comment.upvoted',
   ForumCommentDownvoted = 'forum.comment.downvoted',
   ForumPostCreated = 'forum.post.created',
@@ -127,6 +127,8 @@ export enum WebhookEventNames {
   ProposalSuggestionApproved = 'proposal.suggestion_approved',
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
+  ProposalAppealed = 'proposal.appealed',
+  ProposalCredentialCreated = 'proposal.credential_created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
   DocumentCommentCreated = 'document.comment.created',
@@ -146,6 +148,7 @@ export const whiteListedWebhookEvents: WebhookEventNames[number][] = [
   'proposal.passed',
   'proposal.failed',
   'proposal.suggestion_approved',
+  'proposal.appealed',
   'proposal.user_voted',
   'user.joined',
   'hello.world'
@@ -190,6 +193,11 @@ export type WebhookEvent = WebhookEventSharedProps &
         user: UserEntity;
       }
     | {
+        scope: WebhookEventNames.ProposalAppealed;
+        proposal: ProposalEntity;
+        user: UserEntity;
+      }
+    | {
         scope: WebhookEventNames.ProposalUserVoted;
         proposal: ProposalEntity;
         user: UserEntity;
@@ -198,6 +206,11 @@ export type WebhookEvent = WebhookEventSharedProps &
         scope: WebhookEventNames.ProposalStatusChanged;
         proposal: ProposalEntity;
         currentEvaluationId: string | null;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalCredentialCreated;
+        proposal: ProposalEntity;
         user: UserEntity;
       }
     | {
@@ -234,6 +247,12 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         scope: WebhookEventNames.RewardApplicationPaymentCompleted;
+        bounty: RewardEntity;
+        application: ApplicationEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.RewardCredentialCreated;
         bounty: RewardEntity;
         application: ApplicationEntity;
         user: UserEntity;

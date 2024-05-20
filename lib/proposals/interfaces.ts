@@ -10,7 +10,8 @@ import type {
   ProposalEvaluationResult,
   ProposalEvaluationType,
   Vote,
-  ProposalEvaluationReview
+  ProposalEvaluationReview,
+  ProposalAppealReviewer
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
@@ -63,9 +64,13 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   rubricCriteria: RubricCriteriaTyped[];
   permissions: ProposalEvaluationPermission[];
   reviewers: ProposalReviewer[];
+  appealReviewers?: ProposalAppealReviewer[] | null;
   voteSettings: VoteSettings | null;
   isReviewer?: boolean; // added by the webapp api
+  isAppealReviewer?: boolean; // added by the webapp api
   requiredReviews: number;
+  appealable?: boolean | null;
+  appealRequiredReviews?: number | null;
   declineReasonOptions: string[];
   reviews?: ProposalEvaluationReview[];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];

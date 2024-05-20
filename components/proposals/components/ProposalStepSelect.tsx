@@ -80,6 +80,7 @@ export function ProposalStepSelectBase({
   const currentEvaluationStepRequiredReviews = proposal.currentStep.requiredReviews;
   const isCurrentEvaluationFinalStep =
     proposal.currentStep.finalStep ||
+    proposal.currentStep.appealedAt ||
     proposal.currentEvaluationId === proposal.evaluations[proposal.evaluations.length - 1]?.id;
 
   const hasPublishedRewards = currentEvaluationStep === 'rewards' && currentEvaluationResult === 'pass';
@@ -150,8 +151,6 @@ export function ProposalStepSelectBase({
     currentEvaluationIndex,
     currentEvaluationResult
   ]);
-
-  prettyPrint(proposal);
 
   return (
     <TagSelect

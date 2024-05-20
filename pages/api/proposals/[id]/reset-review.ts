@@ -25,7 +25,9 @@ async function resetReviewEndpoint(req: NextApiRequest, res: NextApiResponse) {
     where: {
       id: evaluationId
     },
-    include: {
+    select: {
+      result: true,
+      appealedAt: true,
       proposal: {
         select: {
           workflowId: true,
@@ -48,10 +50,15 @@ async function resetReviewEndpoint(req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError(`You cannot reset a review for a completed step.`);
   }
 
+  if (evaluation.appealedAt) {
+    throw new ActionNotPermittedError(`You cannot reset a review for a step that has been appealed.`);
+  }
+
   await prisma.proposalEvaluationReview.deleteMany({
     where: {
       evaluationId,
-      reviewerId: userId
+      reviewerId: userId,
+      appeal: null
     }
   });
 

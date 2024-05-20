@@ -66,10 +66,9 @@ export async function goBackToStep({
     }
   }
 
-  const allEvaluationIds = proposal.evaluations.map((e) => e.id);
   const evaluationsToUpdate = proposal.evaluations.slice(evaluationIndex);
+  const evaluationIds = evaluationsToUpdate.map((e) => e.id);
   const evaluationsWithResult = evaluationsToUpdate.filter((e) => e.result);
-  const evaluationIds = evaluationsWithResult.map((e) => e.id);
 
   if (evaluationsWithResult.some((e) => e.type === 'vote')) {
     throw new InvalidInputError('Cannot clear the results of a vote');
@@ -79,22 +78,32 @@ export async function goBackToStep({
     evaluationId,
     backToDraft,
     proposalId,
-    stepsToClear: evaluationsWithResult.length
+    stepsToClear: evaluationIds.length
   });
 
-  await prisma.proposalEvaluation.updateMany({
-    where: {
-      id: {
-        in: evaluationIds
+  await prisma.$transaction([
+    prisma.proposalEvaluationReview.deleteMany({
+      where: {
+        evaluationId: {
+          in: evaluationIds
+        }
       }
-    },
-    data: {
-      result: null,
-      decidedBy: null,
-      completedAt: null,
-      voteId: null
-    }
-  });
+    }),
+    prisma.proposalEvaluation.updateMany({
+      where: {
+        id: {
+          in: evaluationIds
+        }
+      },
+      data: {
+        result: null,
+        decidedBy: null,
+        completedAt: null,
+        voteId: null,
+        appealedAt: null
+      }
+    })
+  ]);
 
   // clear out vote
   const votesToDelete = evaluationsToUpdate.map((e) => e.voteId).filter(isTruthy);
@@ -106,14 +115,6 @@ export async function goBackToStep({
     });
     log.info('Cleared vote tied to proposal', { proposalId, evaluationId });
   }
-
-  await prisma.proposalEvaluationReview.deleteMany({
-    where: {
-      evaluationId: {
-        in: allEvaluationIds
-      }
-    }
-  });
 
   if (backToDraft) {
     const result = await prisma.proposal.update({

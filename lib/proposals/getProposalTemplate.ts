@@ -16,7 +16,8 @@ const mockPermissions: ProposalPermissionFlags = {
   make_public: false,
   archive: false,
   unarchive: false,
-  move: false
+  move: false,
+  evaluate_appeal: false
 };
 
 export async function getProposalTemplate({ pageId }: { pageId: string }): Promise<ProposalWithUsersAndRubric> {
@@ -34,6 +35,7 @@ export async function getProposalTemplate({ pageId }: { pageId: string }): Promi
         include: {
           permissions: true,
           reviewers: true,
+          appealReviewers: true,
           rubricCriteria: {
             orderBy: {
               index: 'asc'

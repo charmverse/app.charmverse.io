@@ -33,7 +33,8 @@ export async function createRewardsForProposal({ proposalId, userId }: { userId:
           result: true,
           id: true,
           reviewers: true,
-          finalStep: true
+          finalStep: true,
+          appealedAt: true
         },
         orderBy: {
           index: 'asc'

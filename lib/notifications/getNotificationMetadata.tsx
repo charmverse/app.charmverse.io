@@ -153,13 +153,7 @@ function getRewardContent({
   const { createdBy, type } = notification;
   const username = authorUsername ?? createdBy?.username;
   switch (type) {
-    case 'application.created': {
-      return (
-        <span>
-          <strong>{username}</strong> applied for a {rewardTitle}
-        </span>
-      );
-    }
+    case 'application.created':
     case 'submission.created': {
       return (
         <span>
@@ -181,6 +175,9 @@ function getRewardContent({
     }
     case 'application.payment_completed': {
       return `You have been paid for a ${rewardTitle}`;
+    }
+    case 'credential.created': {
+      return `You have been issued a credential for a ${rewardTitle}`;
     }
     default: {
       return '';
@@ -210,6 +207,9 @@ function getProposalContent({
         `Feedback requested for a ${proposalFeatureTitle}`
       );
     }
+    case 'proposal_appealed': {
+      return `The ${proposalFeatureTitle} has been appealed and requires your review.`;
+    }
     case 'vote_passed': {
       return `The vote on ${notification.pageTitle} has passed. View results.`;
     }
@@ -231,6 +231,9 @@ function getProposalContent({
     }
     case 'review_required': {
       return `Review required for a ${proposalFeatureTitle}`;
+    }
+    case 'credential_created': {
+      return `You have been issued a credential for a proposal`;
     }
     default: {
       return '';
