@@ -26,24 +26,11 @@ export function useFormFields({
   fields?: FormFieldInput[];
   onSubmit?: (values: FieldValues) => void;
 }) {
-  const { control, setValue, handleSubmit, reset } = useForm({
+  const { control, getFieldState, handleSubmit, reset } = useForm({
     mode: 'onChange',
     defaultValues: getFormFieldMap(fields || []),
     resolver: getFormResolver(fields || [])
   });
-
-  const onFormChange = useCallback(
-    (updatedFields: { id: string; value: FormFieldValue }[]) => {
-      updatedFields.forEach((updatedField) => {
-        setValue(updatedField.id, updatedField.value, {
-          shouldDirty: true,
-          shouldValidate: true,
-          shouldTouch: true
-        });
-      });
-    },
-    [setValue]
-  );
 
   useEffect(() => {
     // set form values once fields are defined
@@ -57,7 +44,7 @@ export function useFormFields({
 
   return {
     control,
-    setValue,
+    getFieldState,
     onSubmit: () => {
       handleSubmit((_values) => {
         onSubmit?.(_values);
@@ -67,8 +54,7 @@ export function useFormFields({
           keepDirtyValues: false
         });
       })();
-    },
-    onFormChange
+    }
   };
 }
 

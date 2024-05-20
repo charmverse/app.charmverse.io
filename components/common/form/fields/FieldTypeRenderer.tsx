@@ -1,6 +1,7 @@
 import { Box, type SxProps } from '@mui/material';
 import { debounce } from 'lodash';
 import { forwardRef, useMemo } from 'react';
+import type { UseFormGetFieldState } from 'react-hook-form';
 
 import { NumberInputField } from 'components/common/form/fields/NumberInputField';
 import { SelectField } from 'components/common/form/fields/SelectField';
@@ -50,6 +51,7 @@ type Props = (Omit<TextProps, 'type'> | Omit<SelectProps, 'type'>) & {
   textInputConfig?: TextInputConfig;
   walletInputConfig?: WalletInputConfig;
   milestoneProps?: ProposalRewardsTableProps;
+  getFieldState?: UseFormGetFieldState<Record<string, FormFieldValue>>;
   formFieldId?: string;
   onChangeDebounced?: (updatedValue: { id: string; value: FormFieldValue }) => void;
 } & TextInputConfig;
@@ -65,6 +67,7 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
       onUpdateOption,
       onChangeDebounced: _onChangeDebounced,
       formFieldId,
+      getFieldState,
       ...fieldProps
     }: Props,
     ref
@@ -75,15 +78,20 @@ export const FieldTypeRenderer = forwardRef<HTMLDivElement, Props>(
     );
     const _onChange = fieldProps.onChange;
     if (_onChange) {
-      fieldProps.onChange = (e) => {
-        _onChange(e);
+      fieldProps.onChange = async (e) => {
+        // make sure to await so that validation has a chance to run
+        await _onChange(e);
         // currently only used by proposal forms
-        // do not save updates if field is invalid
-        if (formFieldId && onChangeDebounced && !fieldProps.error) {
-          onChangeDebounced({
-            id: formFieldId,
-            value: typeof e?.target?.value === 'string' ? e.target.value : e
-          });
+        if (formFieldId && onChangeDebounced && getFieldState) {
+          // do not save updates if field is invalid
+          // we call getFieldState instead of the error passed in from props because it is not updated yet
+          const fieldError = getFieldState(formFieldId).error;
+          if (!fieldError) {
+            onChangeDebounced({
+              id: formFieldId,
+              value: typeof e?.target?.value === 'string' ? e.target.value : e
+            });
+          }
         }
       };
     }

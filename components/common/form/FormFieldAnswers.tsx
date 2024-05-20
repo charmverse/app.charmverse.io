@@ -74,7 +74,7 @@ export function FormFieldAnswers({
   proposalId,
   milestoneProps
 }: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange' | 'onProjectUpdate'>) {
-  const { control, onFormChange } = useFormFields({
+  const { control, getFieldState } = useFormFields({
     fields: formFields
   });
   const { user } = useUser();
@@ -84,7 +84,7 @@ export function FormFieldAnswers({
     async (answer: { id: string; value: FormFieldValue }) => {
       if (onSave && !disabled) {
         try {
-          // await onSave([answer]);
+          await onSave([answer]);
         } catch (e: any) {
           showMessage(e.message, 'error');
         }
@@ -144,15 +144,9 @@ export function FormFieldAnswers({
                       proposalId={proposalId}
                       formFieldId={formField.id}
                       formFieldValue={field.value as { selectedMemberIds: string[] }}
+                      getFieldState={getFieldState}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
-                      onChange={(value) => {
-                        onFormChange([
-                          {
-                            id: formField.id,
-                            value
-                          }
-                        ]);
-                      }}
+                      onChange={field.onChange}
                       onChangeDebounced={saveFormFieldAnswers}
                       inputEndAdornment={
                         pageId &&
@@ -186,6 +180,7 @@ export function FormFieldAnswers({
                   <FieldTypeRenderer
                     {...field}
                     formFieldId={formField.id}
+                    getFieldState={getFieldState}
                     rows={undefined}
                     maxRows={10}
                     sx={{ mb: 2 }}
@@ -236,14 +231,7 @@ export function FormFieldAnswers({
                     error={error ? error?.message || 'invalid input' : ''}
                     required={formField.required}
                     data-test={`form-field-input-${formField.id}`}
-                    onChange={(e) => {
-                      onFormChange([
-                        {
-                          id: formField.id,
-                          value: typeof e?.target?.value === 'string' ? e.target.value : e
-                        }
-                      ]);
-                    }}
+                    onChange={field.onChange}
                     onChangeDebounced={saveFormFieldAnswers}
                   />
                 );
