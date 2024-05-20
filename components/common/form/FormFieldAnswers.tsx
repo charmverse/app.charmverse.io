@@ -2,11 +2,10 @@ import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import debounce from 'lodash/debounce';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 
-import { useGetProposalFormFieldAnswers } from 'charmClient/hooks/proposals';
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -109,7 +108,7 @@ export function FormFieldAnswersControlled({
 
   const hasErrors = Object.keys(errors).length !== 0;
 
-  async function saveFormFieldAnswers() {
+  const saveFormFieldAnswers = useCallback(async () => {
     if (hasErrors) {
       showMessage('Your form contains errors and cannot be saved.', 'error');
       return;
@@ -125,7 +124,7 @@ export function FormFieldAnswersControlled({
     } finally {
       setIsFormDirty(false);
     }
-  }
+  }, [disabled, isFormDirty]);
 
   const fieldAnswerIdThreadRecord: Record<string, ThreadWithComments[]> = useMemo(() => {
     if (!threads) {
@@ -156,17 +155,18 @@ export function FormFieldAnswersControlled({
     }, {} as Record<string, ThreadWithComments[]>);
   }, [threads]);
 
+  const debouncedFunc = useMemo(() => debounce(saveFormFieldAnswers, 300), [saveFormFieldAnswers]);
+
   useEffect(() => {
     // auto-save form fields if the form is dirty and there are no errors
-    const deboiuncedFunc = debounce(saveFormFieldAnswers, 300);
 
     if (isFormDirty) {
       const _values = getValues?.();
       if (_values) {
-        deboiuncedFunc();
+        debouncedFunc();
       }
     }
-    return () => deboiuncedFunc.cancel();
+    return () => debouncedFunc.cancel();
   }, [isFormDirty]);
 
   return (

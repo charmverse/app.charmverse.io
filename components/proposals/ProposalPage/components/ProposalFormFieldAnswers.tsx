@@ -74,7 +74,7 @@ export function ProposalFormFieldAnswers({
     <FormFieldAnswers
       milestoneProps={milestoneProps}
       enableComments={enableComments}
-      formFields={isLoading ? undefined : fields}
+      formFields={fields}
       onSave={onSave}
       pageId={pageId}
       disabled={readOnly}
