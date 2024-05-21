@@ -8,7 +8,7 @@ import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './aut
 import type { RequiredDocusignCredentials } from './constants';
 
 // Change this to match the base url in prod
-const webhookBaseUrl = 'https://dbc5-80-129-171-110.ngrok-free.app';
+const webhookBaseUrl = 'https://b7e6-185-166-84-140.ngrok-free.app';
 
 async function getDocusignWebhook({
   docusignWebhookId,
@@ -40,18 +40,18 @@ async function getDocusignWebhook({
 export async function createSpaceDocusignWebhook({ spaceId }: { spaceId: string }): Promise<DocusignCredential> {
   let credentials = await getSpaceDocusignCredentials({ spaceId });
 
-  if (!credentials.spaceDocusignApiKey) {
+  if (!credentials.webhookApiKey) {
     credentials = await prisma.docusignCredential.update({
       where: {
         id: credentials.id
       },
       data: {
-        spaceDocusignApiKey: uuid()
+        webhookApiKey: uuid()
       }
     });
   }
 
-  const webhookUrl = `${webhookBaseUrl}/api/v1/webhooks/docusign/${credentials.spaceDocusignApiKey}`;
+  const webhookUrl = `${webhookBaseUrl}/api/v1/webhooks/docusign/${credentials.webhookApiKey}`;
 
   const createdWebhook = await POST<any>(
     `${credentials.docusignApiBaseUrl}/restapi/v2.1/accounts/${credentials.docusignAccountId}/connect`,
@@ -95,15 +95,12 @@ export async function ensureSpaceWebhookExists({
   credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId }));
 
   if (credentials.docusignWebhookId) {
-    console.log('SEARCH WEBHOOK');
     const webhook = await getDocusignWebhook({
       docusignWebhookId: credentials.docusignWebhookId,
       docusignAccountId: credentials.docusignAccountId,
       docusignAuthToken: credentials.accessToken,
       docusignBaseUrl: credentials.docusignApiBaseUrl
     });
-
-    console.log('FOUND WEBHOOK', webhook);
 
     if (!webhook?.configurations.length) {
       await prisma.docusignCredential.update({

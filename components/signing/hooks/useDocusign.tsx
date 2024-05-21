@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { DELETE } from 'adapters/http';
 import {
   useGetDocusignProfile,
   useGetDocusignTemplates,
@@ -56,6 +57,11 @@ export function useDocusign() {
     setDocusignSearchTitle(search.title ?? '');
   }
 
+  async function disconnectDocusign() {
+    await DELETE('/api/docusign/disconnect', { spaceId: space?.id });
+    refreshDocusignProfile();
+  }
+
   const {
     data: docusignTemplates,
     mutate: refreshDocusignTemplates,
@@ -76,6 +82,7 @@ export function useDocusign() {
     requestSigningLink,
     isSearchingEnvelopes,
     envelopeSearchResults,
-    searchDocusign
+    searchDocusign,
+    disconnectDocusign
   };
 }

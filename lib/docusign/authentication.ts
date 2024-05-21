@@ -4,7 +4,7 @@ import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import { GET, POST } from 'adapters/http';
+import { DELETE, GET, POST } from 'adapters/http';
 import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv } from 'config/constants';
 
 type DocusignAccount = {
@@ -191,4 +191,24 @@ export async function getSpaceDocusignCredentials({ spaceId }: { spaceId: string
   });
 
   return credentials;
+}
+
+export async function disconnectDocusignAccount({ spaceId }: { spaceId: string }): Promise<void> {
+  const credentials = await getSpaceDocusignCredentials({ spaceId });
+
+  if (credentials.docusignWebhookId) {
+    await DELETE(
+      `${credentials.docusignApiBaseUrl}/restapi/v2.1/accounts/${credentials.docusignAccountId}/connect/${credentials.docusignWebhookId}`,
+      undefined,
+      {
+        headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
+      }
+    );
+  }
+
+  await prisma.docusignCredential.delete({
+    where: {
+      spaceId
+    }
+  });
 }
