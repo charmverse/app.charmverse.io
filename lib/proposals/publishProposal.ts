@@ -1,12 +1,16 @@
 import type { Prisma } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
+import { permissionsApiClient } from 'lib/permissions/api/client';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
-import type { ProposalFields } from 'lib/proposals/interfaces';
+import type { PopulatedEvaluation, ProposalFields } from 'lib/proposals/interfaces';
+import { prettyPrint } from 'lib/utils/strings';
 import { relay } from 'lib/websockets/relay';
 
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { getVoteEvaluationStepsWithBlockNumber } from './getVoteEvaluationStepsWithBlockNumber';
+import type { DetailedProposalEvaluation } from './mapDbProposalToProposal';
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
 export async function publishProposal({ proposalId, userId }: { proposalId: string; userId: string }) {
@@ -43,7 +47,24 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
           }
         }
       },
-      evaluations: true
+      evaluations: {
+        orderBy: {
+          index: 'asc'
+        },
+        include: {
+          permissions: true,
+          reviewers: true,
+          appealReviewers: true,
+          rubricCriteria: {
+            orderBy: {
+              index: 'asc'
+            }
+          },
+          rubricAnswers: true,
+          draftRubricAnswers: true,
+          vote: true
+        }
+      }
     }
   });
 
@@ -77,12 +98,41 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
     result.space.credentialTemplates.some((spaceTemplate) => spaceTemplate.id === template)
   );
 
+  const permissionsByStep = await permissionsApiClient.proposals.computeAllProposalEvaluationPermissions({
+    resourceId: proposalId,
+    userId
+  });
+
+  const workflow = result.workflowId
+    ? await prisma.proposalWorkflow.findFirst({
+        where: {
+          id: result.workflowId
+        },
+        select: {
+          evaluations: true
+        }
+      })
+    : null;
+
   relay.broadcast(
     {
       type: 'proposals_updated',
       payload: [
         {
           id: proposalId,
+          evaluations: (result.evaluations as DetailedProposalEvaluation[]).map((evaluation) => {
+            const workflowEvaluation = (workflow?.evaluations as WorkflowEvaluationJson[]).find(
+              (e) => e.title === evaluation.title && e.type === evaluation.type
+            );
+            const stepPermissions = permissionsByStep?.[evaluation.id];
+            return {
+              ...evaluation,
+              appealReviewers: evaluation.appealReviewers || [],
+              declineReasonOptions: workflowEvaluation?.declineReasons ?? [],
+              isReviewer: !!stepPermissions?.evaluate,
+              isAppealReviewer: !!stepPermissions?.evaluate_appeal
+            };
+          }) as PopulatedEvaluation[],
           currentStep: getCurrentStep({
             evaluations: result.evaluations,
             hasPendingRewards: ((result.fields as ProposalFields)?.pendingRewards ?? []).length > 0,

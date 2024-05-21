@@ -8,6 +8,7 @@ import type { Server, Socket } from 'socket.io';
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import type { FailedImportsError } from 'lib/notion/interfaces';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
+import type { PopulatedEvaluation } from 'lib/proposals/interfaces';
 import type { RewardBlockWithTypedFields } from 'lib/rewards/blocks/interfaces';
 import type { ExtendedVote, VoteTask } from 'lib/votes/interfaces';
 
@@ -196,7 +197,9 @@ type PagesRestored = {
 
 type ProposalsUpdated = {
   type: 'proposals_updated';
-  payload: Resource<Partial<Pick<ProposalWithUsersLite, 'archived' | 'currentStep'>>>[];
+  payload: Resource<
+    Partial<Pick<ProposalWithUsersLite, 'archived' | 'currentStep'> & { evaluations: PopulatedEvaluation[] }>
+  >[];
 };
 
 export type ClientMessage =

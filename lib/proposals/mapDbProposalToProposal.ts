@@ -32,6 +32,14 @@ type FormFieldsIncludeType = {
   } | null;
 };
 
+export type DetailedProposalEvaluation = ProposalEvaluation & {
+  appealReviewers: ProposalAppealReviewer[];
+  reviewers: ProposalReviewer[];
+  rubricAnswers: ProposalRubricCriteriaAnswer[];
+  rubricCriteria: ProposalRubricCriteria[];
+  draftRubricAnswers: ProposalRubricCriteriaAnswer[];
+};
+
 export function mapDbProposalToProposal({
   proposal,
   permissions,
@@ -46,13 +54,7 @@ export function mapDbProposalToProposal({
   proposal: Proposal &
     FormFieldsIncludeType & {
       authors: ProposalAuthor[];
-      evaluations: (ProposalEvaluation & {
-        appealReviewers: ProposalAppealReviewer[];
-        reviewers: ProposalReviewer[];
-        rubricAnswers: ProposalRubricCriteriaAnswer[];
-        rubricCriteria: ProposalRubricCriteria[];
-        draftRubricAnswers: ProposalRubricCriteriaAnswer[];
-      })[];
+      evaluations: DetailedProposalEvaluation[];
       page: Partial<Pick<Page, 'sourceTemplateId' | 'content' | 'contentText' | 'type'>> | null;
       rewards: { id: string }[];
       project?: ProjectWithMembers | null;
