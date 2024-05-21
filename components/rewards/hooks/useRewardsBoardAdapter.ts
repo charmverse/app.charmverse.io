@@ -268,12 +268,15 @@ function mapApplicationToCard({
     [REWARD_APPLICANTS_COUNT]: null
   };
 
+  const isApplication =
+    application.status === 'applied' || application.status === 'inProgress' || application.status === 'rejected';
+
   const authorName = members?.[application.createdBy]?.username;
   const card: Card = {
     id: application.id || '',
     spaceId,
     parentId: rewardId,
-    title: `Application ${authorName ? `from ${authorName}` : ''}`,
+    title: `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',

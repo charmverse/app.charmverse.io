@@ -115,7 +115,6 @@ function TableRow(props: Props) {
     setIsExpanded,
     isExpanded,
     indentTitle,
-    disableDragAndDrop,
     isNested,
     subRowsEmptyValueContent,
     isChecked,
