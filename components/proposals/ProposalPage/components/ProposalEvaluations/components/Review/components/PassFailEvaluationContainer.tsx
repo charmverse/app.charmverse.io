@@ -44,6 +44,7 @@ type Props = {
     | 'appealedBy'
     | 'declinedAt'
     | 'isAppealReviewer'
+    | 'appealReviews'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -154,7 +155,7 @@ export function PassFailEvaluationContainer({
       id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
     })),
     isSubmittingReview: isSubmittingEvaluationReview,
-    evaluationReviews: evaluation.reviews?.filter((review) => !review.appeal),
+    evaluationReviews: evaluation.reviews,
     requiredReviews: evaluation.requiredReviews,
     evaluationResult: evaluation.appealedAt ? 'fail' : evaluation.result,
     declineReasonOptions: evaluation.declineReasonOptions,
@@ -182,13 +183,14 @@ export function PassFailEvaluationContainer({
                 <PassFailEvaluation
                   {...passFailProps}
                   isAppealProcess
+                  onResetEvaluationReview={onResetEvaluationAppealReview}
                   isReviewer={evaluation.isAppealReviewer}
                   onSubmitEvaluationReview={onSubmitEvaluationAppealReview}
                   isSubmittingReview={isSubmittingEvaluationAppealReview}
                   isResettingEvaluationReview={isResettingEvaluationAppealReview}
                   completedAt={evaluation.result !== null ? evaluation.completedAt : undefined}
                   evaluationResult={evaluation.result}
-                  evaluationReviews={evaluation.reviews?.filter((review) => Boolean(review.appeal))}
+                  evaluationReviews={evaluation.appealReviews}
                   requiredReviews={evaluation.appealRequiredReviews ?? 1}
                 />
               </Stack>

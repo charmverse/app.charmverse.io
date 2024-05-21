@@ -123,7 +123,8 @@ describe('goBackToStep()', () => {
         id: proposal.evaluations[1].id
       },
       include: {
-        proposalEvaluationReviews: true
+        proposalEvaluationReviews: true,
+        proposalEvaluationAppealReviews: true
       }
     });
 
@@ -144,13 +145,20 @@ describe('goBackToStep()', () => {
       declineReasons: []
     });
 
-    const proposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+    const proposalEvaluationReviews = await prisma.proposalEvaluationReview.count({
       where: {
         evaluationId: proposal.evaluations[1].id
       }
     });
 
-    expect(proposalEvaluationReviews.length).toBe(2);
+    const proposalEvaluationAppealReviews = await prisma.proposalEvaluationAppealReview.count({
+      where: {
+        evaluationId: proposal.evaluations[1].id
+      }
+    });
+
+    expect(proposalEvaluationReviews).toBe(1);
+    expect(proposalEvaluationAppealReviews).toBe(1);
 
     await goBackToStep({
       proposalId: proposal.id,
@@ -180,12 +188,18 @@ describe('goBackToStep()', () => {
       })
     );
 
-    const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.findMany({
+    const updatedProposalEvaluationReviews = await prisma.proposalEvaluationReview.count({
       where: {
         evaluationId: proposal.evaluations[1].id
       }
     });
-    expect(updatedProposalEvaluationReviews.length).toBe(0);
+    const updatedProposalEvaluationAppealReviews = await prisma.proposalEvaluationAppealReview.count({
+      where: {
+        evaluationId: proposal.evaluations[1].id
+      }
+    });
+    expect(updatedProposalEvaluationReviews).toBe(0);
+    expect(updatedProposalEvaluationAppealReviews).toBe(0);
   });
 
   it('Should delete previous evaluation reviews when moving back to draft state', async () => {

@@ -39,7 +39,8 @@ describe('submitEvaluationAppealResult()', () => {
         proposalId
       },
       include: {
-        proposalEvaluationReviews: true
+        proposalEvaluationReviews: true,
+        proposalEvaluationAppealReviews: true
       }
     });
 
@@ -69,10 +70,9 @@ describe('submitEvaluationAppealResult()', () => {
       spaceId: space.id
     });
 
-    const proposalEvaluationReview = await prisma.proposalEvaluationReview.findFirst({
+    const proposalEvaluationAppealReview = await prisma.proposalEvaluationAppealReview.findFirst({
       where: {
         evaluationId: evaluation.id,
-        appeal: true,
         result: 'pass'
       }
     });
@@ -85,6 +85,6 @@ describe('submitEvaluationAppealResult()', () => {
 
     expect(evaluationAfterAppeal.result).toBe('pass');
     expect(evaluationAfterAppeal.decidedBy).toBe(user.id);
-    expect(proposalEvaluationReview).toBeTruthy();
+    expect(proposalEvaluationAppealReview).toBeTruthy();
   });
 });

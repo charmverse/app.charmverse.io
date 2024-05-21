@@ -52,11 +52,10 @@ async function resetEvaluationAppealReviewEndpoint(req: NextApiRequest, res: Nex
     throw new ActionNotPermittedError(`You cannot reset a review that has been completed.`);
   }
 
-  await prisma.proposalEvaluationReview.deleteMany({
+  await prisma.proposalEvaluationAppealReview.deleteMany({
     where: {
       evaluationId,
-      reviewerId: userId,
-      appeal: true
+      reviewerId: userId
     }
   });
 

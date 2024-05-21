@@ -1,3 +1,4 @@
+import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -32,7 +33,13 @@ export type PassFailEvaluationProps = {
     id: string;
   }[];
   isSubmittingReview: boolean;
-  evaluationReviews: PopulatedEvaluation['reviews'];
+  evaluationReviews?: {
+    id: string;
+    reviewerId: string;
+    declineReasons: string[];
+    result: ProposalEvaluationResult;
+    completedAt: Date;
+  }[];
   requiredReviews: number;
   evaluationResult?: PopulatedEvaluation['result'];
   declineReasonOptions: string[];
@@ -123,43 +130,45 @@ export function PassFailEvaluation({
       <Card variant='outlined'>
         {evaluationReviews.length > 0 && (
           <Stack p={2} gap={2.5}>
-            {evaluationReviews.map((evaluationReview) => (
-              <Stack key={evaluationReview.id} gap={1}>
-                <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                  <Stack direction='row' gap={1} alignItems='center'>
-                    <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
-                    <Typography variant='subtitle1'>
-                      {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
-                    </Typography>
+            {evaluationReviews.map((evaluationReview) => {
+              return (
+                <Stack key={evaluationReview.id} gap={1}>
+                  <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                    <Stack direction='row' gap={1} alignItems='center'>
+                      <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
+                      <Typography variant='subtitle1'>
+                        {getRelativeTimeInThePast(new Date(evaluationReview.completedAt))}
+                      </Typography>
+                    </Stack>
+                    <Stack direction='row' gap={1.5} alignItems='center'>
+                      {onResetEvaluationReview && evaluationReview.reviewerId === user?.id && !evaluationResult && (
+                        <Button
+                          size='small'
+                          color='secondary'
+                          variant='outlined'
+                          loading={isResettingEvaluationReview}
+                          onClick={onResetEvaluationReview}
+                        >
+                          Undo
+                        </Button>
+                      )}
+                      {evaluationReview.result === 'pass' ? (
+                        <ApprovedIcon fontSize='small' color='success' />
+                      ) : (
+                        <RejectedIcon fontSize='small' color='error' />
+                      )}
+                    </Stack>
                   </Stack>
-                  <Stack direction='row' gap={1.5} alignItems='center'>
-                    {onResetEvaluationReview && evaluationReview.reviewerId === user?.id && !evaluationResult && (
-                      <Button
-                        size='small'
-                        color='secondary'
-                        variant='outlined'
-                        loading={isResettingEvaluationReview}
-                        onClick={onResetEvaluationReview}
-                      >
-                        Undo
-                      </Button>
-                    )}
-                    {evaluationReview.result === 'pass' ? (
-                      <ApprovedIcon fontSize='small' color='success' />
-                    ) : (
-                      <RejectedIcon fontSize='small' color='error' />
-                    )}
-                  </Stack>
+                  {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
+                    <Stack flexDirection='row' gap={1.5}>
+                      {evaluationReview.declineReasons.map((reason) => (
+                        <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
+                      ))}
+                    </Stack>
+                  ) : null}
                 </Stack>
-                {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
-                  <Stack flexDirection='row' gap={1.5}>
-                    {evaluationReview.declineReasons.map((reason) => (
-                      <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
-                    ))}
-                  </Stack>
-                ) : null}
-              </Stack>
-            ))}
+              );
+            })}
           </Stack>
         )}
         {canReview && (
