@@ -1,9 +1,8 @@
-import { log } from '@charmverse/core/dist/cjs/lib/log';
 import { InvalidInputError } from '@charmverse/core/errors';
+import { log } from '@charmverse/core/log';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
-import { v4 as uuid } from 'uuid';
 
 import { DELETE, GET, POST } from 'adapters/http';
 import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv, isStagingEnv } from 'config/constants';
