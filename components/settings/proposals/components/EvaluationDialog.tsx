@@ -322,6 +322,8 @@ export function EvaluationDialog({
 
   const formValues = watch();
 
+  const hideEvaluationAdvancedSettings = evaluation?.type === 'sign_documents' || formValues.type === 'sign_documents';
+
   function updatePermissions({ permissions }: EvaluationTemplateFormItem) {
     setValue('permissions', permissions);
   }
@@ -398,7 +400,9 @@ export function EvaluationDialog({
             )}
           />
         </div>
-        {evaluation?.id && <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />}
+        {evaluation?.id && !hideEvaluationAdvancedSettings && (
+          <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
+        )}
         {!evaluation?.id && (
           <>
             <div>
@@ -457,7 +461,9 @@ export function EvaluationDialog({
                 />
               )}
             </Stack>
-            <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
+            {!hideEvaluationAdvancedSettings && (
+              <EvaluationAdvancedSettingsAccordion formValues={formValues} setValue={setValue} />
+            )}
           </>
         )}
       </Stack>
