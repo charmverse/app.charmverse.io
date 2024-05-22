@@ -83,7 +83,7 @@ export function RewardAmount({
           <TokenBadge tokenAmount={rewardAmount} chainId={chainId} tokenAddress={rewardToken} />
         ) : (
           <>
-            <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+            <TokenLogo src={tokenInfo.canonicalLogo} />
             {truncatedAmount && (
               <Typography component='span' variant='body2' data-test='reward-amount' {...typographyProps}>
                 {truncatedAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}

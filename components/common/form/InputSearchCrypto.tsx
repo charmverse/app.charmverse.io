@@ -147,7 +147,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
               data-test={`select-crypto-${option}`}
             >
               <ListItemIcon>
-                <TokenLogo height={18} src={tokenInfo.canonicalLogo} />
+                <TokenLogo src={tokenInfo.canonicalLogo} sx={{ ml: '-4px' }} />
               </ListItemIcon>
               <ListItemText>
                 <Stack flexDirection='row' gap={1}>
@@ -185,9 +185,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
                 ...params.InputProps,
                 ...(variant === 'standard' && { disableUnderline: true }),
                 placeholder,
-                startAdornment: tokenInfo ? (
-                  <TokenLogo height={18} src={tokenInfo.canonicalLogo} sx={{ ml: 0.5 }} />
-                ) : null
+                startAdornment: tokenInfo ? <TokenLogo src={tokenInfo.canonicalLogo} sx={{ ml: 0.5 }} /> : null
               }}
             />
           );

@@ -36,7 +36,7 @@ export function RewardTokenInfo({ chainId, symbolOrAddress, rewardAmount }: Prop
           alignItems: 'center'
         }}
       >
-        <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+        <TokenLogo src={tokenInfo.canonicalLogo} />
       </Box>
 
       <Typography component='span' variant='subtitle1' fontWeight='normal'>

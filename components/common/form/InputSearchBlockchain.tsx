@@ -100,7 +100,7 @@ export function Chain({ info, ...props }: { info: Pick<IChainDetails, 'chainName
   return (
     <MenuItem {...props}>
       <ListItemIcon>
-        <BlockchainLogo src={info.iconUrl} />
+        <BlockchainLogo src={info.iconUrl} sx={{ ml: '-4px' }} />
       </ListItemIcon>
       <ListItemText>{info.chainName}</ListItemText>
     </MenuItem>

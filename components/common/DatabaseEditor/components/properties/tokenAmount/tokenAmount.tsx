@@ -26,11 +26,7 @@ export function TokenAmount({ amount, chainId, symbolOrAddress }: Props): JSX.El
   }, [chainId, methods, symbolOrAddress]);
   return (
     <Stack direction='row' alignItems='center' height='100%' gap={1} className='octo-propertyvalue readonly'>
-      {tokenInfo?.canonicalLogo && (
-        <Box width={20}>
-          <TokenLogo height={20} src={tokenInfo?.canonicalLogo} />
-        </Box>
-      )}
+      {tokenInfo?.canonicalLogo && <TokenLogo src={tokenInfo?.canonicalLogo} />}
       {amount}
     </Stack>
   );

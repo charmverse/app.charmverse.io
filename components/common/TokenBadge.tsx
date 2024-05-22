@@ -35,7 +35,7 @@ export function TokenBadge({
 
   return (
     <Stack flexDirection='row' gap={0.75} alignItems='center'>
-      <TokenLogo src={tokenInfo.canonicalLogo} height={20} />
+      <TokenLogo src={tokenInfo.canonicalLogo} />
       <Box component='span'>{tokenAmount}</Box>
       <Box component='span'>{tokenInfo.tokenSymbol}</Box>
       <Box component='span'>on {chain.chainName}</Box>
