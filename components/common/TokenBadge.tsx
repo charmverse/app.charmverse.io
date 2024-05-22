@@ -4,7 +4,7 @@ import { getChainById } from 'connectors/chains';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
-import TokenLogo from './TokenLogo';
+import { TokenLogo } from './Icons/TokenLogo';
 
 export function TokenBadge({
   tokenAddress,

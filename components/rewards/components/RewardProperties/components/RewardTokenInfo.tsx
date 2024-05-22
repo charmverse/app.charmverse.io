@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
-import TokenLogo from 'components/common/TokenLogo';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 

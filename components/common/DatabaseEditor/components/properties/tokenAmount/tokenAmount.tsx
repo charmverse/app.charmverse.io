@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 import { Box, Stack } from '@mui/material';
 import { useMemo } from 'react';
 
-import TokenLogo from 'components/common/TokenLogo';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 

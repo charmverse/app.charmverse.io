@@ -8,8 +8,8 @@ import { getChainById } from 'connectors/chains';
 import millify from 'millify';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { TokenBadge } from 'components/common/TokenBadge';
-import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { fancyTrim } from 'lib/utils/strings';
