@@ -1,5 +1,5 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
+import { Box, Card, Divider, FormLabel, Stack, Typography } from '@mui/material';
 
 import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
@@ -89,15 +89,18 @@ export function SignDocuments({
       </Box>
       {(isAuthor || isReviewer) && (
         <Card variant='outlined' sx={{ p: 2, gap: 2 }}>
-          <Box display='flex' width='100%' justifyContent='space-between' alignItems='center'>
+          <Stack width='100%'>
             {documentsToSign?.map((doc) => (
-              <DocumentRow
-                key={doc.id}
-                documentWithSigners={doc}
-                onRemoveDoc={isReviewer ? () => handleRemoveDocument(doc.docusignEnvelopeId) : undefined}
-              />
+              <>
+                <DocumentRow
+                  key={doc.id}
+                  documentWithSigners={doc}
+                  onRemoveDoc={isReviewer ? () => handleRemoveDocument(doc.docusignEnvelopeId) : undefined}
+                />
+                <Divider sx={{ my: 2 }} />
+              </>
             ))}
-          </Box>
+          </Stack>
 
           {isReviewer && (
             <Box display='flex' width='100%' justifyContent='space-between' alignItems='center'>
