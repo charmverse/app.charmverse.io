@@ -142,5 +142,5 @@ export function useRewardsBoardMutator() {
 
     // restore default mutator updaters on unmount
     return () => mutator.setCustomMutatorUpdaters(null);
-  });
+  }, []);
 }

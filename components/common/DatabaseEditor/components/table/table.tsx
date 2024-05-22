@@ -35,7 +35,7 @@ type Props = {
   groupByProperty?: IPropertyTemplate;
   readOnly: boolean;
   cardIdToFocusOnRender: string;
-  showCard: (cardId: string | null, parentId?: string) => void;
+  showCard: (cardId: string | null) => void;
   addCard: (groupByOptionId?: string) => Promise<void> | void;
   onCardClicked: (e: React.MouseEvent, card: Card) => void;
   onDeleteCard?: (cardId: string) => Promise<void>;
@@ -209,37 +209,39 @@ function Table(props: Props): JSX.Element {
     [activeView, visibleGroups]
   );
 
-  const changeCardGroupProperty = async (srcCard: Card, groupID: string) => {
-    const { selectedCardIds } = props;
-    const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
-    const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
-    const cardsById = cards.reduce<{ [key: string]: Card }>((acc, card) => {
-      acc[card.id] = card;
-      return acc;
-    }, {});
-    const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
+  const setLocalSort = localViewSettings?.setLocalSort;
+  const selectedCardIds = props.selectedCardIds;
 
-    const awaits = [];
-    for (const draggedCard of draggedCards) {
-      Utils.log(`draggedCard: ${draggedCard.title}, column: ${draggedCard.fields.properties}`);
-      Utils.log(`droppedColumn:  ${groupID}`);
-      const oldOptionId = draggedCard.fields.properties[groupByProperty!.id];
-      Utils.log(`ondrop. oldValue: ${oldOptionId}`);
+  const changeCardGroupProperty = useCallback(
+    async (srcCard: Card, groupID: string) => {
+      const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
+      const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
+      const cardsById = cards.reduce<{ [key: string]: Card }>((acc, card) => {
+        acc[card.id] = card;
+        return acc;
+      }, {});
+      const draggedCards: Card[] = draggedCardIds.map((o: string) => cardsById[o]);
 
-      if (groupID !== oldOptionId) {
-        awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, groupID, description));
+      const awaits = [];
+      for (const draggedCard of draggedCards) {
+        Utils.log(`draggedCard: ${draggedCard.title}, column: ${draggedCard.fields.properties}`);
+        Utils.log(`droppedColumn:  ${groupID}`);
+        const oldOptionId = draggedCard.fields.properties[groupByProperty!.id];
+        Utils.log(`ondrop. oldValue: ${oldOptionId}`);
+
+        if (groupID !== oldOptionId) {
+          awaits.push(mutator.changePropertyValue(draggedCard, groupByProperty!.id, groupID, description));
+        }
       }
-    }
 
-    if (awaits.length) {
       await Promise.all(awaits);
-    }
-  };
+    },
+    [cards, selectedCardIds, groupByProperty]
+  );
 
   const onDropToGroup = useCallback(
     async (srcCard: Card, groupID: string, dstCardID: string) => {
       Utils.log(`onDropToGroup: ${srcCard.title}`);
-      const { selectedCardIds } = props;
       const draggedCardIds = Array.from(new Set(selectedCardIds).add(srcCard.id));
       const description = draggedCardIds.length > 1 ? `drag ${draggedCardIds.length} cards` : 'drag card';
       const hasSort = activeView.fields.sortOptions?.length !== 0;
@@ -259,9 +261,9 @@ function Table(props: Props): JSX.Element {
           message: 'Would you like to remove sorting?'
         });
 
-        if (confirmed && localViewSettings) {
+        if (confirmed && setLocalSort) {
           await mutator.changeViewSortOptions(activeView.id, activeView.fields.sortOptions, []);
-          localViewSettings.setLocalSort(null);
+          setLocalSort(null);
           if (activeView.fields.groupById !== undefined && groupByProperty) {
             await changeCardGroupProperty(srcCard, groupID);
           }
@@ -302,14 +304,17 @@ function Table(props: Props): JSX.Element {
         );
       });
     },
-    [cards, props.selectedCardIds, groupByProperty]
+    [activeView, cards, selectedCardIds, setLocalSort, changeCardGroupProperty, showConfirmation, groupByProperty]
   );
 
-  const onDropToCard = async (srcCard: Card, dstCard: Card) => {
-    Utils.log(`onDropToCard: ${dstCard.title}`);
-    await onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
-    resetState();
-  };
+  const onDropToCard = useCallback(
+    async (srcCard: Card, dstCard: Card) => {
+      Utils.log(`onDropToCard: ${dstCard.title}`);
+      await onDropToGroup(srcCard, dstCard.fields.properties[activeView.fields.groupById!] as string, dstCard.id);
+      resetState();
+    },
+    [activeView.fields.groupById, onDropToGroup, resetState]
+  );
 
   const propertyNameChanged = useCallback(
     async (option: IPropertyOption, text: string): Promise<void> => {
@@ -317,8 +322,6 @@ function Table(props: Props): JSX.Element {
     },
     [board, groupByProperty]
   );
-
-  const selectionContextValue = useMemo(() => areaSelection, [areaSelection]);
 
   return (
     <div className='Table' ref={drop}>
@@ -339,7 +342,7 @@ function Table(props: Props): JSX.Element {
         />
 
         {/* Table rows */}
-        <SelectionContext.Provider value={selectionContextValue}>
+        <SelectionContext.Provider value={areaSelection}>
           <TableRowsContainer ref={selectContainerRef}>
             {activeView.fields.groupById &&
               visibleGroups.map((group) => {

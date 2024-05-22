@@ -672,7 +672,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                    showCard={(cardId) => showCard(cardId)}
+                    showCard={showCard}
                     addCard={kanbanAddCard}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}

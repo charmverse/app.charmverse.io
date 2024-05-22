@@ -1,7 +1,7 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Box, Typography } from '@mui/material';
 import type { Dispatch, ReactElement, SetStateAction } from 'react';
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 
 import charmClient from 'charmClient';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
@@ -40,6 +40,7 @@ type Props = {
 
 function TableRows(props: Props): JSX.Element {
   const {
+    addCard,
     board,
     cards: allCards,
     activeView,
@@ -65,28 +66,32 @@ function TableRows(props: Props): JSX.Element {
     []
   );
 
-  const setIsExpanded = ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
-    setCollapsedCardIds((prev) => {
-      return expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId];
-    });
-  };
+  const setIsExpanded = useCallback(
+    ({ cardId, expanded }: { expanded: boolean; cardId: string }) => {
+      setCollapsedCardIds((prev) => {
+        return expanded ? prev?.filter((id) => id !== cardId) ?? [] : [...(prev ?? []), cardId];
+      });
+    },
+    [setCollapsedCardIds]
+  );
 
-  const saveTitle = React.useCallback(async (saveType: string, cardId: string, title: string, oldTitle: string) => {
-    // ignore if title is unchanged
-    if (title === oldTitle) {
-      return;
-    }
-    await charmClient.pages.updatePage({ id: cardId, title });
-
-    if (saveType === 'onEnter') {
-      const card = cardsInView.find((c) => c.id === cardId);
-      if (card && cardsInView.length > 0 && cardsInView[cardsInView.length - 1] === card) {
-        props.addCard(
-          activeView.fields.groupById ? (card.fields.properties[activeView.fields.groupById!] as string) : ''
-        );
+  const saveTitle = React.useCallback(
+    async (saveType: string, cardId: string, title: string, oldTitle: string) => {
+      // ignore if title is unchanged
+      if (title === oldTitle) {
+        return;
       }
-    }
-  }, []);
+      await charmClient.pages.updatePage({ id: cardId, title });
+
+      if (saveType === 'onEnter') {
+        const card = cardsInView.find((c) => c.id === cardId);
+        if (card && cardsInView.length > 0 && cardsInView[cardsInView.length - 1] === card) {
+          addCard(activeView.fields.groupById ? (card.fields.properties[activeView.fields.groupById!] as string) : '');
+        }
+      }
+    },
+    [activeView.fields.groupById, cardsInView, addCard]
+  );
 
   const isExpanded = (cardId: string) => {
     return collapsedCardIds === null
