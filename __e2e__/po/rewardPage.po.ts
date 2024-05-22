@@ -135,6 +135,10 @@ export class RewardPage extends GlobalPage {
     this.createBountyButton = page.locator('data-test=create-suggest-bounty');
   }
 
+  async gotoRewardPage({ spaceDomain }: { spaceDomain: string }) {
+    await this.page.goto(`${baseUrl}/${spaceDomain}/rewards`);
+  }
+
   async openApplication({ spaceDomain, applicationId }: { spaceDomain: string; applicationId: string }) {
     await this.page.goto(`${baseUrl}/${spaceDomain}/rewards/applications/${applicationId}`);
   }
