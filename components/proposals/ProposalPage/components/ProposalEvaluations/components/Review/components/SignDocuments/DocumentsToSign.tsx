@@ -1,14 +1,15 @@
 import type { DocumentSigner } from '@charmverse/core/prisma';
-import { CardContent, Stack, Typography } from '@mui/material';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { Box, CardContent, Stack, Tooltip, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 
 import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 
 export function DocumentSignerRow({ signer }: { signer: DocumentSigner }) {
   return (
-    <div>
-      {signer.name} - {signer.email}
-    </div>
+    <Tooltip title={signer.email}>
+      <Typography>{signer.name}</Typography>
+    </Tooltip>
   );
 }
 
@@ -17,15 +18,17 @@ export function DocumentRow({
   onRemoveDoc
 }: {
   documentWithSigners: DocumentWithSigners;
-  onRemoveDoc: VoidFunction;
+  onRemoveDoc?: VoidFunction;
 }) {
   return (
-    <Stack>
-      <Typography variant='h6'>{documentWithSigners.title}</Typography>
-      <Typography variant='body2' color='textSecondary'>
-        Some notes about the document
-        <div onClick={onRemoveDoc}>REMOVE DOC</div>
-      </Typography>
+    <Stack gap={2}>
+      <Box display='flex' width='100%' justifyContent='space-between'>
+        <Typography variant='body1' fontWeight='bold'>
+          {documentWithSigners.title}
+        </Typography>
+
+        {onRemoveDoc && <DeleteOutlineOutlinedIcon onClick={onRemoveDoc} />}
+      </Box>
       {documentWithSigners.signers.map((signer) => (
         <DocumentSignerRow key={signer.id} signer={signer} />
       ))}

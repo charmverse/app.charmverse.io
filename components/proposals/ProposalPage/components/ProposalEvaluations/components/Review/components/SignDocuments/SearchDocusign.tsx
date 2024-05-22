@@ -27,11 +27,11 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
   return (
     <Grid container gap={2}>
       <Grid item>
-        <FormLabel>Search Docusign</FormLabel>
+        <FormLabel>Search documents to add</FormLabel>
         <TextField
           variant='outlined'
           fullWidth
-          placeholder='Enter document title'
+          placeholder='Enter document title in Docusign'
           onChange={(ev) => searchDocusign({ proposalId, title: ev.target.value })}
         />
       </Grid>

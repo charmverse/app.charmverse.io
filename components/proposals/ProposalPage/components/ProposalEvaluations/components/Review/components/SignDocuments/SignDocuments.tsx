@@ -88,17 +88,19 @@ export function SignDocuments({
         />
       </Box>
       {(isAuthor || isReviewer) && (
-        <Card variant='outlined'>
-          {documentsToSign?.map((doc) => (
-            <DocumentRow
-              key={doc.id}
-              documentWithSigners={doc}
-              onRemoveDoc={() => handleRemoveDocument(doc.docusignEnvelopeId)}
-            />
-          ))}
+        <Card variant='outlined' sx={{ p: 2, gap: 2 }}>
+          <Box display='flex' width='100%' justifyContent='space-between' alignItems='center'>
+            {documentsToSign?.map((doc) => (
+              <DocumentRow
+                key={doc.id}
+                documentWithSigners={doc}
+                onRemoveDoc={isReviewer ? () => handleRemoveDocument(doc.docusignEnvelopeId) : undefined}
+              />
+            ))}
+          </Box>
 
           {isReviewer && (
-            <Box display='flex' width='100%' justifyContent='space-between' alignItems='center' p={2}>
+            <Box display='flex' width='100%' justifyContent='space-between' alignItems='center'>
               <SearchDocusign
                 selectedEnvelopeIds={documentsToSign?.map((doc) => doc.docusignEnvelopeId)}
                 onSelectEnvelope={({ envelope }) => handleAddDocument(envelope.envelopeId)}
