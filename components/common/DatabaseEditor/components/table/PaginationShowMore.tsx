@@ -1,17 +1,8 @@
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { Box, Typography } from '@mui/material';
-import type { Dispatch, ReactElement, SetStateAction } from 'react';
-import React, { useCallback, useState } from 'react';
 
-import charmClient from 'charmClient';
 import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
-import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
-import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { usePaginatedData } from 'hooks/usePaginatedData';
-import { DEFAULT_PAGE_SIZE } from 'hooks/usePaginatedData';
-import type { Board } from 'lib/databases/board';
-import type { BoardView } from 'lib/databases/boardView';
-import type { Card, CardWithRelations } from 'lib/databases/card';
 
 type PaginationProps = ReturnType<typeof usePaginatedData>;
 
