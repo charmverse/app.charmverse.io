@@ -27,11 +27,7 @@ import {
   APPLICANT_STATUS_BLOCK_ID
 } from './constants';
 
-export const defaultRewardViews = [
-  DEFAULT_TABLE_VIEW_BLOCK_ID,
-  DEFAULT_BOARD_VIEW_BLOCK_ID,
-  DEFAULT_CALENDAR_VIEW_BLOCK_ID
-];
+export const defaultRewardViews = [DEFAULT_TABLE_VIEW_BLOCK_ID, DEFAULT_BOARD_VIEW_BLOCK_ID];
 
 export const supportedRewardViewTypes: IViewType[] = ['calendar', 'board', 'table'];
 
