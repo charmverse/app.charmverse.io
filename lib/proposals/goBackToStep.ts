@@ -89,6 +89,13 @@ export async function goBackToStep({
         }
       }
     }),
+    prisma.proposalEvaluationAppealReview.deleteMany({
+      where: {
+        evaluationId: {
+          in: evaluationIds
+        }
+      }
+    }),
     prisma.proposalEvaluation.updateMany({
       where: {
         id: {

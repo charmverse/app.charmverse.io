@@ -82,7 +82,7 @@ export async function submitEvaluationResult({
     type: ProposalEvaluationType;
     title: string;
     requiredReviews: number;
-    proposalEvaluationReviews: {
+    reviews: {
       result: ProposalEvaluationResult;
     }[];
   };
@@ -101,14 +101,14 @@ export async function submitEvaluationResult({
     });
   }
 
-  if (evaluation.proposalEvaluationReviews.length + 1 >= requiredReviews) {
+  if (evaluation.reviews.length + 1 >= requiredReviews) {
     await updateEvaluationResult({
       decidedBy,
       proposalId,
       evaluationId,
       result,
       spaceId,
-      existingEvaluationReviews: evaluation.proposalEvaluationReviews
+      existingEvaluationReviews: evaluation.reviews
     });
   }
 }

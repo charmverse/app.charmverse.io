@@ -30,7 +30,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
       id: evaluationId
     },
     include: {
-      proposalEvaluationReviews: {
+      reviews: {
         select: {
           result: true,
           reviewerId: true
@@ -63,7 +63,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     return res.status(200).end();
   }
 
-  const hasCurrentReviewerReviewed = evaluation.proposalEvaluationReviews.some((r) => r.reviewerId === userId);
+  const hasCurrentReviewerReviewed = evaluation.reviews.some((r) => r.reviewerId === userId);
   if (hasCurrentReviewerReviewed) {
     throw new ActionNotPermittedError('You have already reviewed this evaluation');
   }

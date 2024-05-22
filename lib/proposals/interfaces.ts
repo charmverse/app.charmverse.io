@@ -11,7 +11,8 @@ import type {
   ProposalEvaluationType,
   Vote,
   ProposalEvaluationReview,
-  ProposalAppealReviewer
+  ProposalAppealReviewer,
+  ProposalEvaluationAppealReview
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
@@ -66,6 +67,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   appealRequiredReviews?: number | null;
   declineReasonOptions: string[];
   reviews?: ProposalEvaluationReview[];
+  appealReviews?: ProposalEvaluationAppealReview[];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
   type: ConcealableEvaluationType;
 };
