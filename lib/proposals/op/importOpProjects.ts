@@ -1,5 +1,11 @@
+import { uuid } from '@bangle.dev/utils';
+import type { User } from '@charmverse/core/prisma-client';
+import { prisma } from '@charmverse/core/prisma-client';
+
 import * as http from 'adapters/http';
-import { prettyPrint } from 'lib/utils/strings';
+import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
+
+import { createProposal } from '../createProposal';
 
 export type OPProjectData = {
   avatarUrl: string;
@@ -82,6 +88,65 @@ export async function importOpProjects() {
     const nextOffset = response.metadata.nextOffset;
     response = await http.GET<GetRoundProjectsResponse>(baseUrl, { limit, offset: nextOffset }, { headers });
     projects.push(...response.projects);
+  }
+
+  const spaceId = '';
+  const workflowId = '';
+
+  for (const project of projects) {
+    const authorIds: string[] = [];
+    const farcasterIds = project.team.map((member) => member.farcasterId);
+    for (const farcasterId of farcasterIds) {
+      const farcasterProfile = await getFarcasterProfile({ username: farcasterId });
+      const connectedAddresses = farcasterProfile?.connectedAddresses;
+      let charmverseUserWithAddress: User | null = null;
+
+      if (connectedAddresses && connectedAddresses.length) {
+        charmverseUserWithAddress = await prisma.user.findFirst({
+          where: {
+            wallets: {
+              some: {
+                address: {
+                  in: connectedAddresses
+                }
+              }
+            }
+          }
+        });
+      }
+
+      if (charmverseUserWithAddress) {
+        authorIds.push(charmverseUserWithAddress.id);
+      } else {
+        const user = await prisma.user.create({
+          data: {
+            username: farcasterId,
+            path: uuid(),
+            claimed: false,
+            identityType: 'Farcaster',
+            spaceRoles: {
+              create: [
+                {
+                  spaceId
+                }
+              ]
+            }
+          }
+        });
+        authorIds.push(user.id);
+      }
+    }
+
+    await createProposal({
+      authors: authorIds,
+      evaluations: [],
+      pageProps: {
+        title: project.name
+      },
+      spaceId,
+      userId: authorIds[0],
+      workflowId
+    });
   }
 }
 

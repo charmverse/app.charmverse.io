@@ -19,7 +19,15 @@ export type FarcasterProfile = {
 
 const profileApiUrl = 'https://searchcaster.xyz/api/profiles';
 
-export async function getFarcasterProfile({ wallets = [], fid }: { fid?: number; wallets?: string[] }) {
+export async function getFarcasterProfile({
+  username,
+  wallets = [],
+  fid
+}: {
+  username?: string;
+  fid?: number;
+  wallets?: string[];
+}) {
   let _farcasterProfile: FarcasterProfile | null = null;
   for (const wallet of wallets) {
     [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
@@ -43,9 +51,19 @@ export async function getFarcasterProfile({ wallets = [], fid }: { fid?: number;
     }
   }
 
-  if (fid) {
+  if (fid && !_farcasterProfile) {
     [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
       `${profileApiUrl}?fid=${fid}`,
+      {},
+      {
+        credentials: 'omit'
+      }
+    );
+  }
+
+  if (username && !_farcasterProfile) {
+    [_farcasterProfile] = await http.GET<FarcasterProfile[]>(
+      `${profileApiUrl}?username=${username}`,
       {},
       {
         credentials: 'omit'
