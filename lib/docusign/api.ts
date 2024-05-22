@@ -9,7 +9,7 @@ import { GET, POST } from 'adapters/http';
 import { redisClient } from 'adapters/redis/redisClient';
 import { baseUrl } from 'config/constants';
 import { InvalidStateError } from 'lib/middleware';
-import { prettyPrint } from 'lib/utils/strings';
+import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
 
 import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 import type { RequiredDocusignCredentials } from './constants';
@@ -198,7 +198,11 @@ export type DocusignEnvelopeLinkRequest = DocusignEnvelopeId & { spaceId: string
 /**
  * @external https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopeviews/createrecipient/
  */
-export async function requestEnvelopeSigningLink({ docusignEnvelopeId, spaceId }: DocusignEnvelopeLinkRequest) {
+export async function requestEnvelopeSigningLink({
+  docusignEnvelopeId,
+  spaceId,
+  signerEmail
+}: DocusignEnvelopeLinkRequest) {
   const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
 
   const docusignEnvelope = await getEnvelope({
@@ -206,11 +210,7 @@ export async function requestEnvelopeSigningLink({ docusignEnvelopeId, spaceId }
     credentials: spaceCreds
   });
 
-  const senderId = docusignEnvelope.sender.userId;
-
-  const recipient = docusignEnvelope.recipients.signers.find((r) => r.userId === senderId);
-
-  prettyPrint({ recipients: docusignEnvelope.recipients.signers, senderId, found: recipient });
+  const recipient = docusignEnvelope.recipients.signers.find((r) => lowerCaseEqual(r.email, signerEmail));
 
   if (!recipient) {
     throw new InvalidStateError('No signer found for envelope');
@@ -222,15 +222,13 @@ export async function requestEnvelopeSigningLink({ docusignEnvelopeId, spaceId }
   });
 
   const signerData = {
-    returnUrl: `${baseUrl}/${spaceDomain}/sign-docs`,
+    returnUrl: `${baseUrl}/${spaceDomain}`,
     authenticationMethod: 'none',
     // userId: recipient.userId,
     recipientId: recipient.recipientId,
     userName: recipient.name,
     email: recipient.email
   };
-
-  prettyPrint({ signerData, spaceCreds, docusignEnvelopeId });
 
   const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes/${docusignEnvelopeId}/views/recipient`;
 

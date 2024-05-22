@@ -1,4 +1,4 @@
-import type { DocusignEnvelope, DocusignTemplate } from 'lib/docusign/api';
+import type { DocusignEnvelope, DocusignEnvelopeLinkRequest, DocusignTemplate } from 'lib/docusign/api';
 import type { PublicDocuSignProfile } from 'lib/docusign/authentication';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
@@ -21,9 +21,7 @@ export function useGetSearchSpaceDocusignEnvelopes(query: DocusignSearchRequest 
 }
 
 export function usePostRequestDocusignLink() {
-  return usePOST<{ envelopeId: string; spaceId: string; signerEmail: string }, { url: string }>(
-    `/api/docusign/signature-link`
-  );
+  return usePOST<DocusignEnvelopeLinkRequest, { url: string }>(`/api/docusign/signature-link`);
 }
 
 // More stable APIs

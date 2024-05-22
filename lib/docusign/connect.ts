@@ -3,7 +3,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { GET, POST } from 'adapters/http';
-import { baseUrl } from 'config/constants';
 
 import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 import type { RequiredDocusignCredentials } from './constants';
@@ -70,7 +69,7 @@ export async function createSpaceDocusignWebhook({ spaceId }: { spaceId: string 
         version: 'restv2.1'
       },
       includeData: ['recipients'],
-      events: ['envelope-sent', 'envelope-delivered', 'envelope-completed']
+      events: ['envelope-completed', 'recipient-completed']
     },
     {
       headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })

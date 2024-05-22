@@ -10,7 +10,7 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireSpaceMembership({ adminOnly: false, location: 'body', spaceIdKey: 'spaceId' }))
-  .use(requireKeys(['envelopeId', 'signerEmail'], 'body'))
+  .use(requireKeys(['docusignEnvelopeId', 'signerEmail'], 'body'))
   .post(signingLinkController);
 
 async function signingLinkController(req: NextApiRequest, res: NextApiResponse) {

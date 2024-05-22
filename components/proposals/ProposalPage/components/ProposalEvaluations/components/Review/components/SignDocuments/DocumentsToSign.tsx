@@ -1,18 +1,14 @@
 import type { DocumentSigner } from '@charmverse/core/prisma';
-import {
-  ThumbUpOutlined as ApprovedIcon,
-  ThumbDownOutlined as RejectedIcon,
-  Check as CheckIcon,
-  Close as CloseIcon
-} from '@mui/icons-material';
+import { Check as CheckIcon } from '@mui/icons-material';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { Box, CardContent, Grid, Stack, Tooltip, Typography } from '@mui/material';
-import Card from '@mui/material/Card';
+import { Box, Grid, Stack, Tooltip, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 
 import { Button } from 'components/common/Button';
 import IconButton from 'components/common/DatabaseEditor/widgets/buttons/iconButton';
 import { useDocusign } from 'components/signing/hooks/useDocusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
+import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
 import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 import { getFormattedDateTime } from 'lib/utils/dates';
@@ -21,8 +17,24 @@ import { lowerCaseEqual } from 'lib/utils/strings';
 export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSigner; envelopeId: string }) {
   const { user } = useUser();
   const { space } = useCurrentSpace();
+  const router = useRouter();
+
+  const { showMessage } = useSnackbar();
 
   const { requestSigningLink } = useDocusign();
+
+  async function handleSignature() {
+    try {
+      const { url } = await requestSigningLink({
+        docusignEnvelopeId: envelopeId,
+        signerEmail: signer.email,
+        spaceId: space?.id as string
+      });
+      router.push(url);
+    } catch (err: any) {
+      showMessage(err.message ?? 'Failed to generate link for signing', 'error');
+    }
+  }
 
   const userIsSigner =
     user?.verifiedEmails.some((verifiedEmail) => lowerCaseEqual(verifiedEmail.email, signer.email)) ||
@@ -44,13 +56,7 @@ export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSign
         )}
 
         {!signer.completedAt && (
-          <Button
-            onClick={() => requestSigningLink({ envelopeId, signerEmail: signer.email, spaceId: space?.id as string })}
-            color='primary'
-            size='small'
-            variant='outlined'
-            disabled={!userIsSigner}
-          >
+          <Button onClick={handleSignature} color='primary' size='small' variant='outlined' disabled={!userIsSigner}>
             Sign
           </Button>
         )}
