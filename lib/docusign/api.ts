@@ -75,6 +75,7 @@ type DocusignRecipient = {
   roleName: string;
   status: string;
   completedCount: string;
+  signedDateTime: string;
   sentDateTime: string;
   deliveryMethod: string;
   recipientType: string;
@@ -192,13 +193,12 @@ export type DocusignEnvelopeId = {
   docusignEnvelopeId: string;
 };
 
+export type DocusignEnvelopeLinkRequest = DocusignEnvelopeId & { spaceId: string; signerEmail: string };
+
 /**
  * @external https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopeviews/createrecipient/
  */
-export async function requestEnvelopeSigningLink({
-  docusignEnvelopeId,
-  spaceId
-}: DocusignEnvelopeId & { spaceId: string }) {
+export async function requestEnvelopeSigningLink({ docusignEnvelopeId, spaceId }: DocusignEnvelopeLinkRequest) {
   const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
 
   const docusignEnvelope = await getEnvelope({

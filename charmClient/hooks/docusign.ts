@@ -5,7 +5,7 @@ import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 import { useGET, usePOST, type MaybeString } from './helpers';
 
 export function useGetDocusignProfile({ spaceId }: { spaceId: MaybeString }) {
-  return useGET<PublicDocuSignProfile>(spaceId ? '/api/docusign/profile' : null, { spaceId });
+  return useGET<PublicDocuSignProfile | null>(spaceId ? '/api/docusign/profile' : null, { spaceId });
 }
 
 export function useGetDocusignTemplates({ spaceId }: { spaceId: MaybeString }) {
@@ -21,7 +21,9 @@ export function useGetSearchSpaceDocusignEnvelopes(query: DocusignSearchRequest 
 }
 
 export function usePostRequestDocusignLink() {
-  return usePOST<{ envelopeId: string; spaceId: string }, { url: string }>(`/api/docusign/signature-link`);
+  return usePOST<{ envelopeId: string; spaceId: string; signerEmail: string }, { url: string }>(
+    `/api/docusign/signature-link`
+  );
 }
 
 // More stable APIs

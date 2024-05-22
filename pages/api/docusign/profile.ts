@@ -12,7 +12,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, location: 'query', spaceIdKey: 'spaceId' }))
   .get(docusignProfile);
 
-async function docusignProfile(req: NextApiRequest, res: NextApiResponse<PublicDocuSignProfile>) {
+async function docusignProfile(req: NextApiRequest, res: NextApiResponse<PublicDocuSignProfile | null>) {
   const credentials = await getSpaceDocusignCredentials({
     spaceId: req.query.spaceId as string
   });

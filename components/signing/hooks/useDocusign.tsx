@@ -1,6 +1,7 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 
-import { DELETE, POST } from 'adapters/http';
+import { DELETE, GET, POST } from 'adapters/http';
 import {
   useGetDocusignProfile,
   useGetDocusignTemplates,
@@ -14,23 +15,15 @@ import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { EvaluationDocumentToSign } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
-/**
- * https://developers.docusign.com/platform/auth/reference/scopes/
- */
-const scopes = ['impersonation', 'extended', 'signature', 'cors'];
-
 export function useDocusign() {
   const { space } = useCurrentSpace();
-  function docusignOauthUrl() {
-    const redirectUri = encodeURIComponent(
-      `${getCallbackDomain(typeof window === 'undefined' ? '' : window.location.hostname)}/api/docusign/callback`
-    );
 
-    const oauthUri = `${docusignOauthBaseUri}/oauth/auth?response_type=code&scope=${scopes.join(
-      encodeURIComponent(' ')
-    )}&client_id=${docusignClientId}&redirect_uri=${redirectUri}&state=${space?.id}`;
+  const router = useRouter();
 
-    return oauthUri;
+  async function connectDocusignAccount() {
+    const redirectUri = await GET('/api/docusign/request-oauth-url', { spaceId: space?.id });
+
+    router.push(redirectUri.url);
   }
 
   const { data: docusignProfile, mutate: refreshDocusignProfile } = useGetDocusignProfile({ spaceId: space?.id });
@@ -54,7 +47,7 @@ export function useDocusign() {
 
   async function disconnectDocusign() {
     await DELETE('/api/docusign/disconnect', { spaceId: space?.id });
-    refreshDocusignProfile();
+    refreshDocusignProfile(null);
   }
 
   const {
@@ -72,7 +65,7 @@ export function useDocusign() {
   }
 
   return {
-    docusignOauthUrl,
+    connectDocusignAccount,
     docusignProfile,
     refreshDocusignProfile,
     docusignTemplates: docusignTemplates?.envelopeTemplates,

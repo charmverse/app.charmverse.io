@@ -9,8 +9,8 @@ import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './aut
 import type { RequiredDocusignCredentials } from './constants';
 
 // Change this to match the base url in prod
-// const webhookBaseUrl = 'https://b7e6-185-166-84-140.ngrok-free.app';
-const webhookBaseUrl = baseUrl;
+const webhookBaseUrl = 'https://b7e6-185-166-84-140.ngrok-free.app';
+// const webhookBaseUrl = baseUrl;
 
 async function getDocusignWebhook({
   docusignWebhookId,

@@ -45,6 +45,52 @@ export async function addEnvelopeToEvaluation({
 
   const signersFromDocusign = docusignEnvelope.recipients.signers;
 
+  const completedUserEmails = signersFromDocusign
+    .filter((signer) => !!signer.signedDateTime)
+    .map((signer) => signer.email.toLowerCase());
+
+  const usersWhoFinishedSigning = await prisma.user.findMany({
+    where: {
+      OR: [
+        {
+          googleAccounts: {
+            some: {
+              email: {
+                in: completedUserEmails
+              }
+            }
+          }
+        },
+        {
+          verifiedEmails: {
+            some: {
+              email: {
+                in: completedUserEmails
+              }
+            }
+          }
+        }
+      ]
+    },
+    select: {
+      id: true,
+      verifiedEmails: {
+        where: {
+          email: {
+            in: completedUserEmails
+          }
+        }
+      },
+      googleAccounts: {
+        where: {
+          email: {
+            in: completedUserEmails
+          }
+        }
+      }
+    }
+  });
+
   const documentFromDb = await prisma.documentToSign.findFirst({
     where: {
       evaluationId,
@@ -71,7 +117,9 @@ export async function addEnvelopeToEvaluation({
 
       // Add new signers
       for (const signer of signersFromDocusign) {
-        if (!documentFromDb.signers.find((s) => lowerCaseEqual(s.email, signer.email))) {
+        const signerInDb = documentFromDb.signers.find((s) => lowerCaseEqual(s.email, signer.email));
+
+        if (!signerInDb) {
           await tx.documentSigner.create({
             data: {
               email: signer.email.toLowerCase(),
@@ -79,18 +127,49 @@ export async function addEnvelopeToEvaluation({
               documentToSign: { connect: { id: documentFromDb.id } }
             }
           });
+        } else if (signerInDb && signer.signedDateTime && !signerInDb.completedAt) {
+          const existingUser = usersWhoFinishedSigning.find(
+            (u) =>
+              u.googleAccounts.some((acc) => lowerCaseEqual(acc.email, signer.email.toLowerCase())) ||
+              u.verifiedEmails.some((acc) => lowerCaseEqual(acc.email, signer.email.toLowerCase()))
+          )?.id;
+
+          await tx.documentSigner.update({
+            where: {
+              id: signerInDb.id
+            },
+            data: {
+              completedAt: new Date(signer.signedDateTime),
+              completedByUser: existingUser ? { connect: { id: existingUser } } : undefined
+            }
+          });
         }
       }
     });
 
-    return prisma.documentToSign.findUniqueOrThrow({
-      where: {
-        id: documentFromDb.id
-      },
-      include: {
-        signers: true
-      }
-    });
+    if (docusignEnvelope.status === 'completed') {
+      return prisma.documentToSign.update({
+        where: {
+          id: documentFromDb.id
+        },
+        data: {
+          status: 'completed'
+        },
+        include: {
+          signers: true
+        }
+      });
+    } else {
+      return prisma.documentToSign.findUniqueOrThrow({
+        where: {
+          id: documentFromDb.id
+        },
+        include: {
+          signers: true
+        }
+      });
+    }
+    // Reach logic branch if document is not in the database
   } else {
     return prisma.documentToSign.create({
       data: {
@@ -102,7 +181,17 @@ export async function addEnvelopeToEvaluation({
         space: { connect: { id: evaluation.proposal.spaceId } },
         signers: {
           createMany: {
-            data: signersFromDocusign.map((signer) => ({ email: signer.email.toLowerCase(), name: signer.name }))
+            data: signersFromDocusign.map((signer) => ({
+              email: signer.email.toLowerCase(),
+              name: signer.name,
+              completedAt: signer.signedDateTime ? new Date(signer.signedDateTime) : null,
+              completedBy:
+                usersWhoFinishedSigning.find(
+                  (u) =>
+                    u.googleAccounts.some((acc) => lowerCaseEqual(acc.email, signer.email.toLowerCase())) ||
+                    u.verifiedEmails.some((acc) => lowerCaseEqual(acc.email, signer.email.toLowerCase()))
+                )?.id || null
+            }))
           }
         }
       },

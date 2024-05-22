@@ -10,13 +10,19 @@ import { Box, CardContent, Grid, Stack, Tooltip, Typography } from '@mui/materia
 import Card from '@mui/material/Card';
 
 import { Button } from 'components/common/Button';
+import IconButton from 'components/common/DatabaseEditor/widgets/buttons/iconButton';
+import { useDocusign } from 'components/signing/hooks/useDocusign';
+import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useUser } from 'hooks/useUser';
 import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 import { getFormattedDateTime } from 'lib/utils/dates';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
-export function DocumentSignerRow({ signer }: { signer: DocumentSigner }) {
+export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSigner; envelopeId: string }) {
   const { user } = useUser();
+  const { space } = useCurrentSpace();
+
+  const { requestSigningLink } = useDocusign();
 
   const userIsSigner =
     user?.verifiedEmails.some((verifiedEmail) => lowerCaseEqual(verifiedEmail.email, signer.email)) ||
@@ -31,12 +37,20 @@ export function DocumentSignerRow({ signer }: { signer: DocumentSigner }) {
       <Grid item xs={3} display='flex' flexDirection='row' justifyContent='flex-end' alignItems='center'>
         {signer.completedAt && (
           <Tooltip title={`Signature time: ${getFormattedDateTime(signer.completedAt)}`}>
-            <CheckIcon color='success' />
+            <Typography variant='caption' display='flex' alignItems='center'>
+              Signed <CheckIcon sx={{ ml: 1 }} color='success' />
+            </Typography>
           </Tooltip>
         )}
 
-        {!signer.completedAt && !!userIsSigner && (
-          <Button color='primary' size='small'>
+        {!signer.completedAt && (
+          <Button
+            onClick={() => requestSigningLink({ envelopeId, signerEmail: signer.email, spaceId: space?.id as string })}
+            color='primary'
+            size='small'
+            variant='outlined'
+            disabled={!userIsSigner}
+          >
             Sign
           </Button>
         )}
@@ -61,12 +75,15 @@ export function DocumentRow({
 
         {onRemoveDoc && (
           <Tooltip title='Remove this document from the list of documents to sign'>
-            <DeleteOutlineOutlinedIcon sx={{ mt: 0.2 }} fontSize='small' color='error' onClick={onRemoveDoc} />
+            <IconButton
+              onClick={onRemoveDoc}
+              icon={<DeleteOutlineOutlinedIcon sx={{ mt: 0.2 }} fontSize='small' color='error' />}
+            />
           </Tooltip>
         )}
       </Box>
       {documentWithSigners.signers.map((signer) => (
-        <DocumentSignerRow key={signer.id} signer={signer} />
+        <DocumentSignerRow key={signer.id} signer={signer} envelopeId={documentWithSigners.docusignEnvelopeId} />
       ))}
     </Stack>
   );
