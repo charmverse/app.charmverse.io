@@ -11,7 +11,8 @@ import type {
   ProposalEvaluationType,
   Vote,
   ProposalEvaluationReview,
-  ProposalAppealReviewer
+  ProposalAppealReviewer,
+  ProposalEvaluationAppealReview
 } from '@charmverse/core/prisma';
 import type { WorkflowEvaluationJson } from '@charmverse/core/proposals';
 
@@ -25,14 +26,7 @@ import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { DocumentWithSigners } from './documentsToSign/getProposalDocumentsToSign';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
 
-export type ProposalEvaluationStatus =
-  | 'in_progress'
-  | 'complete'
-  | 'passed'
-  | 'declined'
-  | 'unpublished'
-  | 'published'
-  | 'archived';
+export type ProposalEvaluationStatus = 'in_progress' | 'passed' | 'declined' | 'unpublished' | 'archived';
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'credentials' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
@@ -74,6 +68,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   appealRequiredReviews?: number | null;
   declineReasonOptions: string[];
   reviews?: ProposalEvaluationReview[];
+  appealReviews?: ProposalEvaluationAppealReview[];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
   type: ConcealableEvaluationType;
   documentsToSign?: DocumentWithSigners[];

@@ -205,13 +205,13 @@ function CenterPanel(props: Props) {
     () =>
       activeView
         ? getVisibleAndHiddenGroups(
-            _cards,
+            sortedCards,
             activeView.fields.visibleOptionIds,
             activeView.fields.hiddenOptionIds,
             groupByProperty
           )
         : { visible: [], hidden: [] },
-    [_cards, activeView, groupByProperty]
+    [sortedCards, activeView, groupByProperty]
   );
 
   const backgroundRef = React.createRef<HTMLDivElement>();
@@ -672,7 +672,7 @@ function CenterPanel(props: Props) {
                     selectedCardIds={state.selectedCardIds}
                     readOnly={props.readOnly}
                     cardIdToFocusOnRender={state.cardIdToFocusOnRender}
-                    showCard={(cardId) => showCard(cardId)}
+                    showCard={showCard}
                     addCard={kanbanAddCard}
                     onCardClicked={cardClicked}
                     disableAddingCards={disableAddingNewCards}

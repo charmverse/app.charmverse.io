@@ -44,7 +44,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string, parentId?: string) => void;
+  showCard: (cardId: string) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -115,7 +115,6 @@ function TableRow(props: Props) {
     setIsExpanded,
     isExpanded,
     indentTitle,
-    disableDragAndDrop,
     isNested,
     subRowsEmptyValueContent,
     isChecked,
@@ -334,7 +333,7 @@ function TableRow(props: Props) {
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>
-                  <Button onClick={() => props.showCard(card.id || '', card.parentId)}>
+                  <Button onClick={() => props.showCard(card.id)}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>
                 </div>

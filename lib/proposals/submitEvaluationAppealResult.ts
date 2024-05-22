@@ -78,7 +78,7 @@ export async function submitEvaluationAppealResult({
   evaluation: {
     id: string;
     appealRequiredReviews: number | null;
-    proposalEvaluationReviews: {
+    appealReviews: {
       result: ProposalEvaluationResult;
     }[];
   };
@@ -86,24 +86,23 @@ export async function submitEvaluationAppealResult({
   const evaluationId = evaluation.id;
   const requiredAppealReviews = evaluation.appealRequiredReviews ?? 1;
 
-  await prisma.proposalEvaluationReview.create({
+  await prisma.proposalEvaluationAppealReview.create({
     data: {
       evaluationId,
       result,
       reviewerId: decidedBy,
-      declineReasons,
-      appeal: true
+      declineReasons
     }
   });
 
-  if (evaluation.proposalEvaluationReviews.length + 1 >= requiredAppealReviews) {
+  if (evaluation.appealReviews.length + 1 >= requiredAppealReviews) {
     await updateEvaluationResult({
       decidedBy,
       proposalId,
       evaluationId,
       result,
       spaceId,
-      existingEvaluationReviews: evaluation.proposalEvaluationReviews
+      existingEvaluationReviews: evaluation.appealReviews
     });
   }
 }

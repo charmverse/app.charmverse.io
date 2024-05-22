@@ -18,21 +18,17 @@ import type {
 import type { BrandColor } from 'theme/colors';
 
 export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
-  complete: 'Complete',
   declined: 'Declined',
   in_progress: 'In Progress',
   passed: 'Passed',
-  published: 'Published',
   unpublished: 'Unpublished',
   archived: 'Archived'
 };
 
 export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
-  complete: 'green',
   declined: 'red',
   in_progress: 'yellow',
   passed: 'green',
-  published: 'green',
   unpublished: 'gray',
   archived: 'gray'
 };
@@ -119,11 +115,9 @@ export const proposalDbProperties: {
 };
 
 export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
-  complete: 'Complete',
   declined: 'Decline',
   in_progress: 'In Progress',
   passed: 'Pass',
-  published: 'Publish',
   unpublished: 'Unpublish',
   archived: 'Archive'
 };

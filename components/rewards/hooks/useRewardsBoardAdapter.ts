@@ -107,7 +107,7 @@ export function useRewardsBoardAdapter() {
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
-    if (activeView.fields.filter && board) {
+    if (filter && board) {
       const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards).map((c) => c.id);
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
@@ -118,7 +118,8 @@ export function useRewardsBoardAdapter() {
 
     return sortedCardPages;
   }, [
-    activeView,
+    activeView.fields.sortOptions,
+    activeView?.fields.filter,
     board,
     getRewardPage,
     localViewSettings?.localFilters,
@@ -268,12 +269,15 @@ function mapApplicationToCard({
     [REWARD_APPLICANTS_COUNT]: null
   };
 
+  const isApplication =
+    application.status === 'applied' || application.status === 'inProgress' || application.status === 'rejected';
+
   const authorName = members?.[application.createdBy]?.username;
   const card: Card = {
     id: application.id || '',
     spaceId,
     parentId: rewardId,
-    title: `Application ${authorName ? `from ${authorName}` : ''}`,
+    title: `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',

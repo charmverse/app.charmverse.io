@@ -141,11 +141,10 @@ describe('POST /api/proposals/evaluations/[id]/appeal/reset-review - Reset revie
       .set('Cookie', userCookie);
     expect(response.statusCode).toBe(200);
 
-    const review = await prisma.proposalEvaluationReview.findFirst({
+    const review = await prisma.proposalEvaluationAppealReview.findFirst({
       where: {
         evaluationId,
-        reviewerId: admin.id,
-        appeal: true
+        reviewerId: admin.id
       }
     });
 
