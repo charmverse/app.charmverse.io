@@ -375,12 +375,7 @@ function PropertyValueElement(props: Props) {
 
     const statusLabel = EVALUATION_STATUS_LABELS[proposalEvaluationStatus];
 
-    const optionValue =
-      evaluationType === 'rewards'
-        ? `${getFeatureTitle('Rewards')} ${statusLabel}`
-        : evaluationType === 'credentials'
-        ? `Credentials ${statusLabel}`
-        : statusLabel;
+    const optionValue = statusLabel;
 
     return (
       <TagSelect

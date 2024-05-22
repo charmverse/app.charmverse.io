@@ -207,7 +207,6 @@ function EvaluationAppealSettings({
 }) {
   const { appealable, appealRequiredReviews, finalStep } = formValues;
   const { getFeatureTitle } = useSpaceFeatures();
-  const proposalLabel = getFeatureTitle('Proposal');
   return (
     <Stack gap={1}>
       <Box>
@@ -231,8 +230,7 @@ function EvaluationAppealSettings({
         <FieldLabel>Appeal</FieldLabel>
         <Stack flexDirection='row' justifyContent='space-between' alignItems='center'>
           <Typography color='textSecondary' variant='body2'>
-            {proposalLabel} authors can appeal the reviewer's decision. The appeal result is final, and passes or fails
-            the {proposalLabel.toLowerCase()}.
+            Authors can appeal the decision. The results of the appeal are final.
           </Typography>
           <Switch
             checked={!!appealable}

@@ -28,11 +28,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
       appealable: true,
       appealedAt: true,
       appealRequiredReviews: true,
-      proposalEvaluationReviews: {
-        where: {
-          appeal: true
-        }
-      },
+      appealReviews: true,
       proposal: {
         select: {
           archived: true,
@@ -43,11 +39,10 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
     }
   });
 
-  const existingEvaluationAppealReview = await prisma.proposalEvaluationReview.findFirst({
+  const existingEvaluationAppealReview = await prisma.proposalEvaluationAppealReview.findFirst({
     where: {
       evaluationId,
-      reviewerId: userId,
-      appeal: true
+      reviewerId: userId
     },
     select: {
       result: true
@@ -68,7 +63,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
     throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
   }
 
-  if ((proposalEvaluation.appealRequiredReviews ?? 1) === proposalEvaluation.proposalEvaluationReviews.length) {
+  if ((proposalEvaluation.appealRequiredReviews ?? 1) === proposalEvaluation.appealReviews.length) {
     throw new ActionNotPermittedError('This evaluation appeal has already been reviewed.');
   }
 

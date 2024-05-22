@@ -108,7 +108,7 @@ export function useRewardsBoardAdapter() {
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
-    if (activeView.fields.filter && board) {
+    if (filter && board) {
       const filteredCardsIds = CardFilter.applyFilterGroup(filter, board.fields.cardProperties, cards).map((c) => c.id);
 
       cards = cards.filter((cp) => filteredCardsIds.includes(cp.id));
@@ -125,7 +125,8 @@ export function useRewardsBoardAdapter() {
 
     return activeView.fields.sourceType === 'reward_applications' ? _applications : sortedCardPages;
   }, [
-    activeView,
+    activeView.fields.sortOptions,
+    activeView?.fields.filter,
     board,
     getRewardPage,
     localViewSettings?.localFilters,

@@ -99,8 +99,17 @@ export async function getProposal({
     }
   });
 
+  const proposalEvaluationAppealReviews = await prisma.proposalEvaluationAppealReview.findMany({
+    where: {
+      evaluationId: {
+        in: evaluationIds
+      }
+    }
+  });
+
   return mapDbProposalToProposal({
     proposalEvaluationReviews,
+    proposalEvaluationAppealReviews,
     workflow: workflow
       ? {
           evaluations: workflow.evaluations as WorkflowEvaluationJson[]

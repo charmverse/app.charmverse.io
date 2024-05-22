@@ -12,7 +12,7 @@ export function getProposalEvaluationStatus({
   } else if (step === 'draft') {
     return 'unpublished';
   } else if (step === 'feedback') {
-    return result === 'in_progress' ? 'in_progress' : 'complete';
+    return result === 'in_progress' ? 'in_progress' : 'passed';
   } else if (step === 'pass_fail' || step === 'rubric' || step === 'vote') {
     if (result === 'in_progress') {
       return 'in_progress';
@@ -22,7 +22,7 @@ export function getProposalEvaluationStatus({
       return 'passed';
     }
   } else if (step === 'rewards' || step === 'credentials') {
-    return result === 'in_progress' ? 'unpublished' : 'published';
+    return result === 'in_progress' ? 'unpublished' : 'passed';
   }
 
   return 'in_progress';

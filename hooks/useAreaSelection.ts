@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import type { RefObject } from 'react';
-import { createContext, useCallback, useEffect, useRef, useState } from 'react';
+import { createContext, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type Coordinates = {
   x: number;
@@ -125,7 +125,7 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
     initialStartY.current = 0;
   }, []);
 
-  const resetState = () => {
+  const resetState = useCallback(() => {
     setDrawArea({
       start: undefined,
       end: undefined
@@ -138,7 +138,7 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
     if (boxElement.current && container.current?.contains(boxElement.current)) {
       container.current.removeChild(boxElement.current);
     }
-  };
+  }, [setDrawArea, setSelection, setMouseDown]);
 
   useEffect(() => {
     const containerElement = container.current;
@@ -178,13 +178,14 @@ export function useAreaSelection({ readOnly = false, innerContainer }: UseAreaSe
     }
   }, [mouseDown, container, boxElement]);
 
-  return {
-    selection,
-    setSelection,
-    boxElement,
-    setDrawArea,
-    resetState
-  };
+  return useMemo(
+    () => ({
+      selection,
+      setSelection,
+      resetState
+    }),
+    [selection, setSelection, resetState]
+  );
 }
 
 export function useSelected(elementRef: RefObject<HTMLElement>, selection: DOMRect | null) {
@@ -229,8 +230,8 @@ function drawSelectionBox(boxElement: HTMLElement, start: Coordinates, end: Coor
 
 export const SelectionContext = createContext<{
   selection: DOMRect | null;
-  setSelection: React.Dispatch<React.SetStateAction<DOMRect | null>>;
+  // setSelection: React.Dispatch<React.SetStateAction<DOMRect | null>>;
 }>({
-  selection: null,
-  setSelection: () => {}
+  selection: null
+  // setSelection: () => {}
 });
