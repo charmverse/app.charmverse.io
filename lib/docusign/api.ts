@@ -80,8 +80,14 @@ type DocusignRecipient = {
   recipientType: string;
 };
 
+/**
+ * @docs https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopes/get/#schema_200_envelope_envelope_status
+ */
+type DocuSignEnvelopeStatus = 'completed' | 'created' | 'declined' | 'delivered' | 'sent' | 'signed' | 'voided';
+
 export type DocusignEnvelope = {
-  status: string;
+  // See these docs for status values
+  status: DocuSignEnvelopeStatus;
   documentsUri: string;
   recipientsUri: string;
   attachmentsUri: string;

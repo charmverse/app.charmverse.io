@@ -1,69 +1,64 @@
-import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { ActionNotPermittedError, onError, onNoMatch, requireUser } from 'lib/middleware';
-import { permissionsApiClient } from 'lib/permissions/api/client';
+import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
+import {
+  addEnvelopeToEvaluation,
+  type EvaluationDocumentToSign
+} from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
+import { checkUserHasEditLegalDocumentAccess } from 'lib/proposals/documentsToSign/checkUserHasEditLegalDocumentAccess';
+import { removeEnvelopeFromEvaluation } from 'lib/proposals/documentsToSign/removeEnvelopeFromEvaluation';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
 handler
   .use(requireUser)
-  .get(getProposalDocumentsHandler)
+  .use(requireKeys<EvaluationDocumentToSign>(['envelopeId']))
   .post(addProposalDocumentHandler)
   .delete(removeProposalDocumentHandler);
 
-async function getProposalDocumentsHandler(req: NextApiRequest, res: NextApiResponse) {
-  const { evaluationId } = req.query;
+async function addProposalDocumentHandler(req: NextApiRequest, res: NextApiResponse) {
+  const evaluationId = req.query.id as string;
+  const envelopeId = req.body.envelopeId;
 
-  const evaluation = await prisma.proposalEvaluation.findFirstOrThrow({
-    where: {
-      id: evaluationId as string
-    },
-    select: {
-      proposalId: true,
-      proposal: {
-        select: {
-          authors: {
-            select: {
-              userId: true
-            }
-          }
-        }
-      }
-    }
+  const hasAccess = await checkUserHasEditLegalDocumentAccess({
+    userId: req.session.user.id,
+    evaluationId: req.query.id as string
   });
 
-  const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
-    resourceId: evaluation.proposalId,
-    userId: req.session.user.id
-  });
-
-  // Only people with evaluate permission, or authors, can view the document details
-  if (
-    !proposalPermissions.evaluate &&
-    !evaluation.proposal.authors.some((author) => author.userId === req.session.user.id)
-  ) {
-    throw new ActionNotPermittedError('You do not have permission to view documents for this proposal');
+  if (!hasAccess) {
+    throw new ActionNotPermittedError('You do not have permission to add document to sign to this proposal');
   }
 
-  const documents = await prisma.documentToSign.findMany({
-    where: {
-      evaluationId: req.query.id as string
-    }
+  await addEnvelopeToEvaluation({
+    envelopeId,
+    evaluationId
   });
-  return res.status(200).json(documents);
-}
 
-async function addProposalDocumentHandler(req: NextApiRequest, res: NextApiResponse) {
   // TODO: Add your logic for adding a proposal document here
-  return res.status(200).json({ message: 'Proposal document added successfully' });
+  return res.status(200).end();
 }
 
 async function removeProposalDocumentHandler(req: NextApiRequest, res: NextApiResponse) {
-  // TODO: Add your logic for removing a proposal document here
-  return res.status(200).json({ message: 'Proposal document removed successfully' });
+  const evaluationId = req.query.id as string;
+  const envelopeId = req.query.envelopeId as string;
+
+  const hasAccess = await checkUserHasEditLegalDocumentAccess({
+    userId: req.session.user.id,
+    evaluationId
+  });
+
+  if (!hasAccess) {
+    throw new ActionNotPermittedError('You do not have permission to add document to sign to this proposal');
+  }
+
+  await removeEnvelopeFromEvaluation({
+    envelopeId,
+    evaluationId
+  });
+
+  return res.status(200).end();
 }
 
 export default withSessionRoute(handler);

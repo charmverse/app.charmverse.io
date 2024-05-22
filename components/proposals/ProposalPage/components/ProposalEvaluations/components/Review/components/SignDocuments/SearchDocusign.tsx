@@ -15,14 +15,14 @@ function DocusignSearchResult({ onClick, title }: { onClick: () => void; title: 
 
 type Props = {
   onSelectEnvelope: (input: { envelope: DocusignEnvelope }) => void;
-  selectedEnvelopeIds: string[];
+  selectedEnvelopeIds?: string[];
   proposalId: string;
 };
 
 export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposalId }: Props) {
   const { searchDocusign, envelopeSearchResults } = useDocusign();
 
-  const options = envelopeSearchResults?.filter((e) => !selectedEnvelopeIds.includes(e.envelopeId));
+  const options = envelopeSearchResults?.filter((e) => !selectedEnvelopeIds?.includes(e.envelopeId));
 
   return (
     <Grid container gap={2}>

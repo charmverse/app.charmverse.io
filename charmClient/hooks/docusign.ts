@@ -28,3 +28,7 @@ export function usePostRequestDocusignLink() {
 export function useGetDocumentsToSign({ proposalId }: { proposalId: string }) {
   return useGET<PublicDocuSignProfile>('/api/proposals/profile');
 }
+
+export function useAddDocumentToSign({ envelopeId }: { envelopeId: string; evaluationId: string }) {
+  return useGET<PublicDocuSignProfile>('/api/proposals/profile');
+}

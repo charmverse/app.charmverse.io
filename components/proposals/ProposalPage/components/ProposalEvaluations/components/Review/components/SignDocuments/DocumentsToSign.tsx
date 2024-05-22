@@ -1,8 +1,8 @@
 import type { DocumentSigner } from '@charmverse/core/prisma';
-import { CardContent, Typography } from '@mui/material';
+import { CardContent, Stack, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 
-import type { ProposalDocumentWithEnvelope } from 'lib/proposals/getDocuments';
+import type { DocumentWithSigners } from 'lib/proposals/documentsToSign/getProposalDocumentsToSign';
 
 export function DocumentSignerRow({ signer }: { signer: DocumentSigner }) {
   return (
@@ -12,18 +12,23 @@ export function DocumentSignerRow({ signer }: { signer: DocumentSigner }) {
   );
 }
 
-export function DocumentRow({ docToSign }: { docToSign: ProposalDocumentWithEnvelope }) {
-  <Card>
-    <CardContent>
-      <Typography variant='h6'>{docToSign.envelope.emailSubject}</Typography>
+export function DocumentRow({
+  documentWithSigners,
+  onRemoveDoc
+}: {
+  documentWithSigners: DocumentWithSigners;
+  onRemoveDoc: VoidFunction;
+}) {
+  return (
+    <Stack>
+      <Typography variant='h6'>{documentWithSigners.title}</Typography>
       <Typography variant='body2' color='textSecondary'>
         Some notes about the document
+        <div onClick={onRemoveDoc}>REMOVE DOC</div>
       </Typography>
-      <Typography variant='body2' color='textSecondary'>
-        {docToSign.document.signers.map((signer) => (
-          <DocumentSignerRow key={signer.id} signer={signer} />
-        ))}
-      </Typography>
-    </CardContent>
-  </Card>;
+      {documentWithSigners.signers.map((signer) => (
+        <DocumentSignerRow key={signer.id} signer={signer} />
+      ))}
+    </Stack>
+  );
 }

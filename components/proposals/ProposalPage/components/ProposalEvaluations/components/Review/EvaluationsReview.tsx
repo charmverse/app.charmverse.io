@@ -292,6 +292,7 @@ export function EvaluationsReview({
                 isReviewer={evaluation.isReviewer || isAdmin}
                 isAuthor={proposal.authors.some((a) => a.userId === user?.id)}
                 evaluation={evaluation}
+                documentsToSign={evaluation.documentsToSign}
               />
             )}
             {evaluation.type === 'private_evaluation' && (

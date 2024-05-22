@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { DELETE } from 'adapters/http';
+import { DELETE, POST } from 'adapters/http';
 import {
   useGetDocusignProfile,
   useGetDocusignTemplates,
@@ -11,6 +11,7 @@ import {
 import { docusignClientId, docusignOauthBaseUri } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
+import type { EvaluationDocumentToSign } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
 /**
@@ -62,6 +63,14 @@ export function useDocusign() {
     error: templateLoadingError
   } = useGetDocusignTemplates({ spaceId: space?.id });
 
+  async function addDocumentToEvaluation({ envelopeId, evaluationId }: EvaluationDocumentToSign) {
+    await POST(`/api/proposals/evaluations/${evaluationId}/documents`, { envelopeId });
+  }
+
+  async function removeDocumentFromEvaluation({ envelopeId, evaluationId }: EvaluationDocumentToSign) {
+    await DELETE(`/api/proposals/evaluations/${evaluationId}/documents`, { envelopeId });
+  }
+
   return {
     docusignOauthUrl,
     docusignProfile,
@@ -75,6 +84,8 @@ export function useDocusign() {
     isSearchingEnvelopes,
     envelopeSearchResults,
     searchDocusign,
-    disconnectDocusign
+    disconnectDocusign,
+    addDocumentToEvaluation,
+    removeDocumentFromEvaluation
   };
 }

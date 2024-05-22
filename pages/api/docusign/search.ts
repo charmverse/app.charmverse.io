@@ -5,7 +5,7 @@ import nc from 'next-connect';
 import type { DocusignEnvelope, DocusignSearchParams } from 'lib/docusign/api';
 import { searchDocusignDocs } from 'lib/docusign/api';
 import { ActionNotPermittedError, onError, onNoMatch, requireKeys, requireUser } from 'lib/middleware';
-import { checkUserHasDocumentAccess } from 'lib/proposals/checkUserHasDocumentAccess';
+import { checkUserHasEditLegalDocumentAccess } from 'lib/proposals/documentsToSign/checkUserHasEditLegalDocumentAccess';
 import { withSessionRoute } from 'lib/session/withSession';
 
 export type DocusignSearchRequest = DocusignSearchParams & {
@@ -22,7 +22,7 @@ handler
 async function searchDocusign(req: NextApiRequest, res: NextApiResponse<DocusignEnvelope[]>) {
   const proposalId = req.query.proposalId as string;
 
-  const hasDocumentAccess = await checkUserHasDocumentAccess({
+  const hasDocumentAccess = await checkUserHasEditLegalDocumentAccess({
     proposalId,
     userId: req.session.user.id
   });
