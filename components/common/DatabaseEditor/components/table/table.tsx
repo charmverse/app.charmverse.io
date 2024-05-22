@@ -21,6 +21,7 @@ import { updateView } from '../../store/views';
 import { Utils } from '../../utils';
 
 import CalculationRow from './calculation/calculationRow';
+import { PaginatedRows } from './PaginatedRows';
 import TableGroup from './tableGroup';
 import TableHeaders from './tableHeaders';
 import TableRows from './tableRows';
@@ -344,9 +345,9 @@ function Table(props: Props): JSX.Element {
         {/* Table rows */}
         <SelectionContext.Provider value={areaSelection}>
           <TableRowsContainer ref={selectContainerRef}>
-            {activeView.fields.groupById &&
-              visibleGroups.map((group) => {
-                return (
+            {activeView.fields.groupById && (
+              <PaginatedRows rows={visibleGroups}>
+                {(group) => (
                   <TableGroup
                     key={group.id}
                     board={board}
@@ -373,8 +374,9 @@ function Table(props: Props): JSX.Element {
                     checkedIds={checkedIds}
                     setCheckedIds={setCheckedIds}
                   />
-                );
-              })}
+                )}
+              </PaginatedRows>
+            )}
 
             {/* No Grouping, Rows, one per card */}
             {!activeView.fields.groupById && (
