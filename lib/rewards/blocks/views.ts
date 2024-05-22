@@ -23,7 +23,8 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_APPLICANTS_COUNT
+  REWARD_APPLICANTS_COUNT,
+  APPLICANT_STATUS_BLOCK_ID
 } from './constants';
 
 export const defaultRewardViews = [
@@ -61,15 +62,22 @@ export function generateDefaultCalendarView({
   return view;
 }
 
-export function generateDefaultBoardView({ spaceId }: { spaceId?: string }) {
-  const view = createBoardView();
-  view.title = '';
+export function generateDefaultBoardView({
+  spaceId,
+  block
+}: {
+  spaceId?: string;
+  block?: Pick<FBBlock, 'fields'> & Partial<Pick<FBBlock, 'title'>>;
+}) {
+  const view = createBoardView(block);
+  view.title = block?.title ?? '';
   view.fields.viewType = 'board';
   view.id = DEFAULT_BOARD_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
   view.rootId = spaceId || uuid();
   view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT, REWARD_APPLICANTS_COUNT];
   view.fields.cardOrder = [];
+  view.fields.groupById = view.fields.groupById || REWARD_STATUS_BLOCK_ID;
 
   return view;
 }
@@ -94,7 +102,8 @@ export function generateDefaultTableView({ spaceId }: { spaceId?: string }) {
     [REWARD_AMOUNT]: 150,
     [REWARD_CHAIN]: 150,
     [REWARD_CUSTOM_VALUE]: 150,
-    [REWARD_APPLICANTS_COUNT]: 150
+    [REWARD_APPLICANTS_COUNT]: 150,
+    [APPLICANT_STATUS_BLOCK_ID]: 150
   };
 
   // Wrap title comumn by default

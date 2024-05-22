@@ -1,9 +1,9 @@
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { blockToPrisma } from 'lib/databases/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 
+import { APPLICANT_STATUS_BLOCK_ID } from './constants';
 import { upsertBlock } from './upsertBlock';
 import {
   defaultRewardViews,
@@ -65,20 +65,17 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
     createOnly: true
   });
 
-  // board view
+  // board view for applicants
   await upsertBlock({
     spaceId,
     userId: updateUserId,
-    data: generateDefaultBoardView({ spaceId }),
-    // do not override view if it exists already
-    createOnly: true
-  });
-
-  // // calendar view
-  await upsertBlock({
-    spaceId,
-    userId: updateUserId,
-    data: generateDefaultCalendarView({ spaceId }),
+    data: generateDefaultBoardView({
+      spaceId,
+      block: {
+        fields: { sourceType: 'reward_applications', groupById: APPLICANT_STATUS_BLOCK_ID },
+        title: 'Applications'
+      }
+    }),
     // do not override view if it exists already
     createOnly: true
   });

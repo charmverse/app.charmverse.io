@@ -76,7 +76,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   dynamicOptions?: boolean; // do not rely on a static list of options
 };
 
-export type DataSourceType = 'board_page' | 'google_form' | 'proposals';
+export type DataSourceType = 'board_page' | 'google_form' | 'proposals' | 'reward_applications';
 
 export type GoogleFormSourceData = {
   credentialId: string;
@@ -95,7 +95,7 @@ export type BoardFields = {
   columnCalculations: Record<string, string>;
   viewIds: string[];
   // Currently only for boards of type proposal - TODO: use DataSourceType
-  sourceType?: 'proposals';
+  sourceType?: Extract<DataSourceType, 'proposals' | 'reward_applications'>;
   // Currently unused. We will migrate Google Data here in a subsequent PR
   sourceData?: GoogleFormSourceData;
 };

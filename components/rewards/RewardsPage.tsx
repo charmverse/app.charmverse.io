@@ -44,7 +44,7 @@ import { createBoard } from 'lib/databases/board';
 import type { Card } from 'lib/databases/card';
 import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
-import { DUE_DATE_ID } from 'lib/rewards/blocks/constants';
+import { APPLICANT_STATUS_BLOCK_ID, DUE_DATE_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
 import { RewardsHeaderRowsMenu } from './components/RewardsHeaderRowsMenu';
@@ -85,11 +85,20 @@ export function RewardsPage({ title }: { title: string }) {
     let _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === activeView?.fields.groupById);
 
     if ((!_groupByProperty || _groupByProperty?.type !== 'select') && activeView?.fields.viewType === 'board') {
-      _groupByProperty = activeBoard?.fields.cardProperties.find((o: any) => o.type === 'select');
+      if (activeView.fields.sourceType === 'reward_applications') {
+        _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === APPLICANT_STATUS_BLOCK_ID);
+      } else {
+        _groupByProperty = activeBoard?.fields.cardProperties.find((o) => o.id === REWARD_STATUS_BLOCK_ID);
+      }
     }
 
     return _groupByProperty;
-  }, [activeBoard?.fields.cardProperties, activeView?.fields.groupById, activeView?.fields.viewType]);
+  }, [
+    activeBoard?.fields.cardProperties,
+    activeView?.fields.groupById,
+    activeView?.fields.viewType,
+    activeView.fields.sourceType
+  ]);
 
   const { visible: visibleGroups, hidden: hiddenGroups } = useMemo(
     () =>
@@ -105,7 +114,6 @@ export function RewardsPage({ title }: { title: string }) {
   );
 
   useRewardsBoardMutator();
-
   const openPageIn = activeView?.fields.openPageIn ?? 'center_peek';
   const withDisplayBy = activeView?.fields.viewType === 'calendar';
 
@@ -396,7 +404,7 @@ export function RewardsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     addCard={async () => {}}
-                    onCardClicked={(e, card) => showRewardOrApplication(card.id)}
+                    onCardClicked={(_e, card) => showRewardOrApplication(card.id, card?.parentId)}
                     showCard={showRewardOrApplication}
                     disableAddingCards
                     readOnlyTitle

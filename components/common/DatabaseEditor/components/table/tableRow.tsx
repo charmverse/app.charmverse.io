@@ -20,7 +20,7 @@ import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card, CardWithRelations } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import { APPLICANT_STATUS_BLOCK_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utils/browser';
 import { mergeRefs } from 'lib/utils/react';
 
@@ -115,7 +115,6 @@ function TableRow(props: Props) {
     setIsExpanded,
     isExpanded,
     indentTitle,
-    disableDragAndDrop,
     isNested,
     subRowsEmptyValueContent,
     isChecked,
@@ -317,11 +316,16 @@ function TableRow(props: Props) {
                     ))}
 
                   {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
-                  {card.customIconType === 'applicationStatus' && card.fields.properties[REWARD_STATUS_BLOCK_ID] && (
-                    <RewardApplicationStatusIcon
-                      status={card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus}
-                    />
-                  )}
+                  {card.customIconType === 'applicationStatus' &&
+                    (card.fields.properties[REWARD_STATUS_BLOCK_ID] ||
+                      card.fields.properties[APPLICANT_STATUS_BLOCK_ID]) && (
+                      <RewardApplicationStatusIcon
+                        status={
+                          (card.fields.properties[REWARD_STATUS_BLOCK_ID] ||
+                            card.fields.properties[APPLICANT_STATUS_BLOCK_ID]) as ApplicationStatus
+                        }
+                      />
+                    )}
                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
                       isStructuredProposal={card.isStructuredProposal}

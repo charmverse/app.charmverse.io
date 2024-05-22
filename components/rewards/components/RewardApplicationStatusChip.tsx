@@ -3,10 +3,10 @@ import styled from '@emotion/styled';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import FilledPageIcon from '@mui/icons-material/DescriptionOutlined';
 import DoDisturbOutlinedIcon from '@mui/icons-material/DoDisturbOutlined';
 import ModeStandbyIcon from '@mui/icons-material/ModeStandby';
 import PaidIcon from '@mui/icons-material/Paid';
-import RuleIcon from '@mui/icons-material/Rule';
 import type { SvgIconTypeMap, SxProps } from '@mui/material';
 import type { ChipProps } from '@mui/material/Chip';
 import Chip from '@mui/material/Chip';
@@ -36,7 +36,7 @@ export const REWARD_APPLICATION_STATUS_COLORS: Record<ApplicationStatus, BrandCo
   paid: 'green',
   complete: 'blue',
   processing: 'purple',
-  review: 'orange'
+  review: 'yellow'
 };
 
 const StyledRewardApplicationStatusChip = styled(Chip)<{ status: ApplicationStatus }>`
@@ -65,7 +65,7 @@ const REWARD_APPLICATION_STATUS_ICONS: Record<
   rejected: DoDisturbOutlinedIcon,
   submission_rejected: DoDisturbOutlinedIcon,
   inProgress: AssignmentIndIcon,
-  review: RuleIcon,
+  review: FilledPageIcon,
   complete: CheckCircleOutlineIcon,
   processing: AccessTimeOutlinedIcon,
   paid: PaidIcon,

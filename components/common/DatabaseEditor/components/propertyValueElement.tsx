@@ -49,7 +49,8 @@ import {
   REWARD_PROPOSAL_LINK,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_TOKEN
+  REWARD_TOKEN,
+  APPLICANT_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
@@ -234,11 +235,12 @@ function PropertyValueElement(props: Props) {
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
       />
     );
-  } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID) {
+  } else if (propertyTemplate.id === REWARD_STATUS_BLOCK_ID || propertyTemplate.id === APPLICANT_STATUS_BLOCK_ID) {
     if (REWARD_APPLICATION_STATUS_LABELS[propertyValue as ApplicationStatus]) {
       propertyValueElement = <RewardApplicationStatusChip status={propertyValue as ApplicationStatus} />;
+    } else {
+      propertyValueElement = <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
     }
-    propertyValueElement = <RewardStatusChip status={propertyValue as RewardStatus} showIcon={false} />;
   } else if (propertyTemplate.id === REWARD_PROPOSAL_LINK) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
