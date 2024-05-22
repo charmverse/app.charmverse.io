@@ -6,14 +6,12 @@ import {
   useGetDocusignTemplates,
   useGetSearchSpaceDocusignEnvelopes,
   useGetSpaceDocusignEnvelopes,
-  usePostCreateEnvelope,
   usePostRequestDocusignLink
 } from 'charmClient/hooks/docusign';
-import { useGET } from 'charmClient/hooks/helpers';
 import { docusignClientId, docusignOauthBaseUri } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import type { DocusignSearch } from 'lib/docusign/api';
 import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
+import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
 /**
  * https://developers.docusign.com/platform/auth/reference/scopes/
@@ -36,11 +34,9 @@ export function useDocusign() {
 
   const { data: docusignProfile, mutate: refreshDocusignProfile } = useGetDocusignProfile({ spaceId: space?.id });
 
-  const { trigger: triggerCreateEnvelope, data: createdEnvelope } = usePostCreateEnvelope();
-
   const { trigger: requestSigningLink } = usePostRequestDocusignLink();
 
-  const [docusignSearchTitle, setDocusignSearchTitle] = useState('');
+  const [docusignQuery, setDocusignQuery] = useState<DocusignSearchRequest | null>(null);
 
   const { data: envelopes, mutate: refreshEnvelopes } = useGetSpaceDocusignEnvelopes({ spaceId: space?.id });
 
@@ -48,13 +44,11 @@ export function useDocusign() {
     data: envelopeSearchResults,
     mutate: refreshEnvelopeSearchResults,
     isLoading: isSearchingEnvelopes
-  } = useGetSearchSpaceDocusignEnvelopes({
-    spaceId: space?.id,
-    title: docusignSearchTitle
-  });
+  } = useGetSearchSpaceDocusignEnvelopes(docusignQuery);
 
-  function searchDocusign(search: DocusignSearch) {
-    setDocusignSearchTitle(search.title ?? '');
+  function searchDocusign(query: DocusignSearchRequest) {
+    setDocusignQuery(query);
+    refreshEnvelopeSearchResults();
   }
 
   async function disconnectDocusign() {
@@ -75,8 +69,6 @@ export function useDocusign() {
     docusignTemplates: docusignTemplates?.envelopeTemplates,
     refreshDocusignTemplates,
     templateLoadingError,
-    triggerCreateEnvelope,
-    createdEnvelope,
     envelopes,
     refreshEnvelopes,
     requestSigningLink,

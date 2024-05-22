@@ -137,7 +137,7 @@ export async function saveUserDocusignOAuthToken({
   }
 }
 
-export async function refreshAccessToken({
+export async function refreshDocusignAccessToken({
   refreshToken
 }: {
   refreshToken: string;

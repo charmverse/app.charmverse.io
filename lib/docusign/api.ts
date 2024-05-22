@@ -3,7 +3,6 @@
  */
 
 import { log } from '@charmverse/core/log';
-import type { DocumentToSign } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { GET, POST } from 'adapters/http';
@@ -13,6 +12,7 @@ import { InvalidStateError } from 'lib/middleware';
 import { prettyPrint } from 'lib/utils/strings';
 
 import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
+import type { RequiredDocusignCredentials } from './constants';
 import { docusignPeriodBetweenRequestsInSeconds } from './constants';
 
 type DocusignApiRequest = {
@@ -58,52 +58,6 @@ export function getDocusignTemplates({ apiBaseUrl, authToken, accountId }: Docus
   return GET<DocusignTemplate[]>(`${apiBaseUrl}/restapi/v2.1/accounts/${accountId}/templates`, undefined, {
     headers: docusignUserOAuthTokenHeader({ accessToken: authToken })
   });
-}
-
-type DocumentSigner = {
-  email: string;
-  name: string;
-  roleName?: string;
-};
-
-export type DocusignEnvelopeToCreate = {
-  templateId: string;
-  signers: DocumentSigner[];
-};
-
-export type CreatedEnvelope = {
-  envelopeId: string;
-  uri: string;
-  statusDateTime: string;
-  status: 'created';
-};
-
-/**
- * This function cannot be used with the curent version since we are not creating envelopes from CharmVerse
- */
-export async function createEnvelope({
-  apiBaseUrl,
-  accountId,
-  authToken,
-  templateId,
-  signers,
-  spaceId
-}: DocusignApiRequest & DocusignEnvelopeToCreate & { accountId: string; spaceId: string }): Promise<CreatedEnvelope> {
-  const apiUrl = `${apiBaseUrl}/restapi/v2.1/accounts/${accountId}/envelopes`;
-  const result = (await POST(
-    apiUrl,
-    { templateId, templateRoles: signers, status: 'sent' },
-    { headers: docusignUserOAuthTokenHeader({ accessToken: authToken }) }
-  )) as CreatedEnvelope;
-
-  await prisma.documentToSign.create({
-    data: {
-      docusignEnvelopeId: result.envelopeId,
-      space: { connect: { id: spaceId } }
-    }
-  });
-
-  return result as any;
 }
 
 type DocusignRecipient = {
@@ -180,12 +134,13 @@ export type DocusignEnvelope = {
   recipients: { signers: DocusignRecipient[] };
 };
 
-async function getEnvelope({
-  apiBaseUrl,
-  authToken,
-  accountId,
+export async function getEnvelope({
+  credentials,
   envelopeId
-}: DocusignApiRequest & { accountId: string; envelopeId: string }): Promise<DocusignEnvelope> {
+}: {
+  envelopeId: string;
+  credentials: RequiredDocusignCredentials;
+}): Promise<DocusignEnvelope> {
   const envelope = await redisClient?.get(`docusign-envelope-${envelopeId}`);
 
   if (envelope) {
@@ -194,10 +149,10 @@ async function getEnvelope({
   }
 
   const envelopeFromDocusign = await GET<DocusignEnvelope>(
-    `${apiBaseUrl}/restapi/v2.1/accounts/${accountId}/envelopes/${envelopeId}`,
+    `${credentials.docusignApiBaseUrl}/restapi/v2.1/accounts/${credentials.docusignAccountId}/envelopes/${envelopeId}`,
     { include: 'recipients' },
     {
-      headers: docusignUserOAuthTokenHeader({ accessToken: authToken })
+      headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
     }
   );
 
@@ -219,9 +174,7 @@ export async function listSpaceEnvelopes({ spaceId }: { spaceId: string }): Prom
     envelopes.map((e) =>
       getEnvelope({
         envelopeId: e.docusignEnvelopeId,
-        accountId: creds.docusignAccountId,
-        apiBaseUrl: creds.docusignApiBaseUrl,
-        authToken: creds.accessToken
+        credentials: creds
       })
     )
   );
@@ -243,10 +196,8 @@ export async function requestEnvelopeSigningLink({
   const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
 
   const docusignEnvelope = await getEnvelope({
-    accountId: spaceCreds.docusignAccountId,
-    apiBaseUrl: spaceCreds.docusignApiBaseUrl,
-    authToken: spaceCreds.accessToken,
-    envelopeId: docusignEnvelopeId
+    envelopeId: docusignEnvelopeId,
+    credentials: spaceCreds
   });
 
   const senderId = docusignEnvelope.sender.userId;
@@ -284,7 +235,7 @@ export async function requestEnvelopeSigningLink({
   return url.url;
 }
 
-export type DocusignSearch = {
+export type DocusignSearchParams = {
   title?: string;
 };
 
@@ -292,12 +243,13 @@ export type DocusignSearch = {
  * https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopes/liststatuschanges/
  */
 export async function searchDocusignDocs({
-  title,
+  query,
   spaceId
-}: DocusignSearch & {
+}: {
+  query: DocusignSearchParams;
   spaceId: string;
 }): Promise<DocusignEnvelope[]> {
-  const searchResultsKey = `docusign-search-${JSON.stringify({ title, spaceId })}`;
+  const searchResultsKey = `docusign-search-${JSON.stringify({ ...query, spaceId })}`;
 
   const cachedResults = await redisClient?.get(`docusign-search-${searchResultsKey}`);
 
@@ -312,7 +264,7 @@ export async function searchDocusignDocs({
 
   const envelopes = await GET<{ envelopes: DocusignEnvelope[] }>(
     apiUrl,
-    { search_text: title, from_date: new Date('2021-01-01').toISOString() },
+    { search_text: query.title, from_date: new Date('2021-01-01').toISOString() },
     {
       headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
     }

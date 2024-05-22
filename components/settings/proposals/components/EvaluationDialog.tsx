@@ -423,6 +423,15 @@ export function EvaluationDialog({
                         <StyledListItemText primary='Pass/Decline' secondary='Thumbs up/Thumbs down, binary choice' />
                       </Box>
                     </MenuItem>
+                    <MenuItem value='sign_documents'>
+                      <Box display='flex' alignItems='center' width='100%'>
+                        <ListItemIcon>{evaluationIcons.sign_documents()}</ListItemIcon>
+                        <StyledListItemText
+                          primary='Sign Documents'
+                          secondary='Collect signatures from grant recipients'
+                        />
+                      </Box>
+                    </MenuItem>
                     <MenuItem value='rubric'>
                       <Box display='flex' alignItems='center' width='100%'>
                         <ListItemIcon>{evaluationIcons.rubric()}</ListItemIcon>
