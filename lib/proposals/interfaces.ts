@@ -24,14 +24,7 @@ import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 import type { ProposalPropertiesField } from './blocks/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse, RubricCriteriaTyped } from './rubric/interfaces';
 
-export type ProposalEvaluationStatus =
-  | 'in_progress'
-  | 'complete'
-  | 'passed'
-  | 'declined'
-  | 'unpublished'
-  | 'published'
-  | 'archived';
+export type ProposalEvaluationStatus = 'in_progress' | 'passed' | 'declined' | 'unpublished' | 'archived';
 export type ProposalEvaluationStep = ProposalEvaluationType | 'rewards' | 'credentials' | 'draft';
 export type ProposalEvaluationResultExtended = ProposalEvaluationResult | 'in_progress';
 
