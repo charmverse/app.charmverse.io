@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/dist/cjs/lib/log';
 import { InvalidInputError } from '@charmverse/core/errors';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
@@ -5,7 +6,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { DELETE, GET, POST } from 'adapters/http';
-import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv } from 'config/constants';
+import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv, isStagingEnv } from 'config/constants';
 
 type DocusignAccount = {
   account_id: string;
@@ -25,7 +26,7 @@ type DocusignUserProfile = {
 };
 
 const demoAccountId = process.env.DEMO_DOCUSIGN_ACCOUNT_ID as string;
-const demoBaseUrl = process.env.DEMO_DOCUSIGN_BASE_URL as string;
+const demoBaseUrl = 'https://demo.docusign.net';
 
 function docusignIntegrationAuthHeader() {
   return {
@@ -60,7 +61,8 @@ async function getUserDocusignAccountInfo({
       };
     })
     .catch((err) => {
-      if (isDevEnv) {
+      log.error('Failed to fetch user Docusign profile', err);
+      if (isDevEnv || isStagingEnv) {
         return { docusignAccountId: demoAccountId, docusignApiBaseUrl: demoBaseUrl, docusignAccountName: 'CharmVerse' };
       }
       throw new InvalidInputError('Failed to fetch user profile');
