@@ -78,7 +78,7 @@ export async function submitEvaluationAppealResult({
   evaluation: {
     id: string;
     appealRequiredReviews: number | null;
-    proposalEvaluationAppealReviews: {
+    appealReviews: {
       result: ProposalEvaluationResult;
     }[];
   };
@@ -95,14 +95,14 @@ export async function submitEvaluationAppealResult({
     }
   });
 
-  if (evaluation.proposalEvaluationAppealReviews.length + 1 >= requiredAppealReviews) {
+  if (evaluation.appealReviews.length + 1 >= requiredAppealReviews) {
     await updateEvaluationResult({
       decidedBy,
       proposalId,
       evaluationId,
       result,
       spaceId,
-      existingEvaluationReviews: evaluation.proposalEvaluationAppealReviews
+      existingEvaluationReviews: evaluation.appealReviews
     });
   }
 }

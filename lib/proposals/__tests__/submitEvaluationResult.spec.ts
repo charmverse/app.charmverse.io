@@ -34,7 +34,7 @@ describe('submitEvaluationResult()', () => {
         proposalId
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 
@@ -101,7 +101,7 @@ describe('submitEvaluationResult()', () => {
         proposalId
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 
@@ -120,7 +120,7 @@ describe('submitEvaluationResult()', () => {
         id: evaluation.id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 
@@ -139,7 +139,7 @@ describe('submitEvaluationResult()', () => {
         id: evaluation.id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 
@@ -217,7 +217,7 @@ describe('submitEvaluationResult()', () => {
         proposalId
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 
@@ -236,7 +236,7 @@ describe('submitEvaluationResult()', () => {
         id: evaluation.id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 
@@ -255,7 +255,7 @@ describe('submitEvaluationResult()', () => {
         id: evaluation.id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 

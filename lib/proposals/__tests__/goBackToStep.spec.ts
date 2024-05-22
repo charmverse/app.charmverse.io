@@ -123,8 +123,8 @@ describe('goBackToStep()', () => {
         id: proposal.evaluations[1].id
       },
       include: {
-        proposalEvaluationReviews: true,
-        proposalEvaluationAppealReviews: true
+        reviews: true,
+        appealReviews: true
       }
     });
 
@@ -226,7 +226,7 @@ describe('goBackToStep()', () => {
         id: proposal.evaluations[0].id
       },
       include: {
-        proposalEvaluationReviews: true
+        reviews: true
       }
     });
 

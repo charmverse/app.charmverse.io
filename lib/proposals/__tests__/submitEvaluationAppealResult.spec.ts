@@ -39,8 +39,8 @@ describe('submitEvaluationAppealResult()', () => {
         proposalId
       },
       include: {
-        proposalEvaluationReviews: true,
-        proposalEvaluationAppealReviews: true
+        reviews: true,
+        appealReviews: true
       }
     });
 

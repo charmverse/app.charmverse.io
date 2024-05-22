@@ -28,7 +28,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
       appealable: true,
       appealedAt: true,
       appealRequiredReviews: true,
-      proposalEvaluationAppealReviews: true,
+      appealReviews: true,
       proposal: {
         select: {
           archived: true,
@@ -63,7 +63,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
     throw new ActionNotPermittedError(`You cannot move an archived proposal to a different step.`);
   }
 
-  if ((proposalEvaluation.appealRequiredReviews ?? 1) === proposalEvaluation.proposalEvaluationAppealReviews.length) {
+  if ((proposalEvaluation.appealRequiredReviews ?? 1) === proposalEvaluation.appealReviews.length) {
     throw new ActionNotPermittedError('This evaluation appeal has already been reviewed.');
   }
 
