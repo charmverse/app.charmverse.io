@@ -125,10 +125,12 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
-              <Box data-test='add-custom-token' component='li' {...props} onClick={ERC20PopupState.open}>
-                <AddIcon color='secondary' sx={{ mr: '5px' }} />
+              <MenuItem data-test='add-custom-token' {...props} onClick={ERC20PopupState.open}>
+                <ListItemIcon>
+                  <AddIcon color='secondary' sx={{ mr: '5px' }} />
+                </ListItemIcon>
                 <Typography variant='body2'>Add a custom token</Typography>
-              </Box>
+              </MenuItem>
             );
           }
           const chain = showChain && typeof option === 'object' ? getChainById(option.chainId) : null;
