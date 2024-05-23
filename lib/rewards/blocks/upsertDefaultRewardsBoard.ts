@@ -5,12 +5,7 @@ import { DEFAULT_BOARD_BLOCK_ID } from 'lib/databases/customBlocks/constants';
 
 import { APPLICANT_STATUS_BLOCK_ID } from './constants';
 import { upsertBlock } from './upsertBlock';
-import {
-  defaultRewardViews,
-  generateDefaultBoardView,
-  generateDefaultCalendarView,
-  generateDefaultTableView
-} from './views';
+import { defaultRewardViews, generateDefaultBoardView, generateDefaultTableView } from './views';
 
 export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: string; userId?: string }) {
   let updateUserId = userId;
@@ -60,7 +55,13 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
   await upsertBlock({
     spaceId,
     userId: updateUserId,
-    data: generateDefaultTableView({ spaceId }),
+    data: generateDefaultTableView({
+      spaceId,
+      block: {
+        fields: {},
+        title: 'Rewards'
+      }
+    }),
     // do not override view if it exists already
     createOnly: true
   });
@@ -73,7 +74,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
       spaceId,
       block: {
         fields: { sourceType: 'reward_applications', groupById: APPLICANT_STATUS_BLOCK_ID },
-        title: 'Applications'
+        title: 'Submissions'
       }
     }),
     // do not override view if it exists already

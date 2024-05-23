@@ -78,9 +78,15 @@ export function generateDefaultBoardView({
   return view;
 }
 
-export function generateDefaultTableView({ spaceId }: { spaceId?: string }) {
-  const view = createBoardView();
-  view.title = '';
+export function generateDefaultTableView({
+  spaceId,
+  block
+}: {
+  spaceId?: string;
+  block?: Pick<FBBlock, 'fields'> & Partial<Pick<FBBlock, 'title'>>;
+}) {
+  const view = createBoardView(block);
+  view.title = block?.title ?? '';
   view.fields.viewType = 'table';
   view.id = DEFAULT_TABLE_VIEW_BLOCK_ID;
   view.parentId = DEFAULT_BOARD_BLOCK_ID;
