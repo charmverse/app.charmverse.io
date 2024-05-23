@@ -45,7 +45,7 @@ import type { Card } from 'lib/databases/card';
 import { viewTypeToBlockId } from 'lib/databases/customBlocks/constants';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 import { APPLICANT_STATUS_BLOCK_ID, DUE_DATE_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
-import { defaultRewardViews, supportedRewardViewTypes } from 'lib/rewards/blocks/views';
+import { supportedRewardViewTypes } from 'lib/rewards/blocks/views';
 
 import { RewardsHeaderRowsMenu } from './components/RewardsHeaderRowsMenu';
 import { useRewards } from './hooks/useRewards';
@@ -293,7 +293,6 @@ export function RewardsPage({ title }: { title: string }) {
                   activeView={activeView}
                   disableUpdatingUrl
                   maxTabsShown={3}
-                  readOnlyViewIds={defaultRewardViews}
                   supportedViewTypes={supportedRewardViewTypes}
                 />
                 {isAdmin && !!views.length && views.length <= 3 && (
