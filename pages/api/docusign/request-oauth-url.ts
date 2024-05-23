@@ -21,15 +21,6 @@ const scopes = ['impersonation', 'extended', 'signature', 'cors'];
 async function requestDocusignOAuthUrl(req: NextApiRequest, res: NextApiResponse) {
   const spaceId = req.query.spaceId as string;
 
-  const redirectSpace = await prisma.space.findUniqueOrThrow({
-    where: {
-      id: spaceId
-    },
-    select: {
-      domain: true
-    }
-  });
-
   const sealedSpaceId = await sealData(spaceId, { password: authSecret as string, ttl: 60 * 60 });
 
   const oauthUri = `${docusignOauthBaseUri}/oauth/auth?response_type=code&scope=${scopes.join(
