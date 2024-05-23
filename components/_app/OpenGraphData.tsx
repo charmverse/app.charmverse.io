@@ -4,7 +4,7 @@ export type OpenGraphProps = {
   title?: string;
   description?: string;
   image?: string;
-  canonicalUrl: string;
+  canonicalUrl?: string;
 };
 
 export function OpenGraphData({ description, title, image, canonicalUrl }: OpenGraphProps) {
