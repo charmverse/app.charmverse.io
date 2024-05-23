@@ -3,5 +3,8 @@ User-agent: *
 Allow: /
 # Block crawlers from space invites
 Disallow: /invite/*
+# Block crawlers from Auth redirects
+Disallow: /api/discord/*
+Disallow: /api/auth/*
 # Block crawlers from Swagger UI because it seems to be also picking up our API endpoints for crawling somehow (eg proposals/%7BproposalIdOrPath%7D/compute-permissions)
 Disallow: /api-docs
