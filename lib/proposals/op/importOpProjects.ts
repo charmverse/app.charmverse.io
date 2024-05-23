@@ -144,6 +144,14 @@ export async function importOpProjects() {
       }
     }
 
+    await prisma.spaceRole.createMany({
+      data: authorIds.map((authorId) => ({
+        isAdmin: false,
+        spaceId,
+        userId: authorId
+      }))
+    });
+
     const { proposal } = await createDraftProposal({
       contentType: 'free_form',
       createdBy: authorIds[0],
