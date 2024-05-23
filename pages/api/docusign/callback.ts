@@ -1,14 +1,11 @@
-import { InvalidInputError } from '@charmverse/core/errors';
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
-import { stringUtils } from '@charmverse/core/utilities';
-import { unsealData } from 'iron-session';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { authSecret } from 'config/constants';
-import { saveUserDocusignOAuthToken } from 'lib/docusign/authentication';
+import { decodeDocusignState, saveUserDocusignOAuthToken } from 'lib/docusign/authentication';
 import { ensureSpaceWebhookExists } from 'lib/docusign/connect';
-import { onError, onNoMatch } from 'lib/middleware';
+import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
@@ -18,16 +15,21 @@ handler.get(docusignCallback);
 async function docusignCallback(req: NextApiRequest, res: NextApiResponse) {
   const sealedSpaceId = req.query.state as string;
 
-  const spaceId = await unsealData<string>(sealedSpaceId, { password: authSecret as string });
+  const state = await decodeDocusignState(sealedSpaceId);
 
-  if (!stringUtils.isUUID(spaceId)) {
-    throw new InvalidInputError('Could not decrypt spaceId in docusign callback');
+  const { spaceRole } = await hasAccessToSpace({
+    spaceId: state.spaceId,
+    userId: state.userId
+  });
+
+  if (!spaceRole?.isAdmin) {
+    throw new ActionNotPermittedError('Only admins can connect Docusign');
   }
 
   const credentials = await saveUserDocusignOAuthToken({
     code: req.query.code as string,
-    spaceId,
-    userId: req.session.user.id
+    spaceId: state.spaceId,
+    userId: state.userId
   });
 
   await ensureSpaceWebhookExists({ spaceId: credentials.spaceId, credentials });

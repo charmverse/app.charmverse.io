@@ -3,9 +3,18 @@ import { log } from '@charmverse/core/log';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
+import { sealData, unsealData } from 'iron-session';
 
 import { DELETE, GET, POST } from 'adapters/http';
-import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv, isStagingEnv } from 'config/constants';
+import {
+  authSecret,
+  docusignClientId,
+  docusignClientSecret,
+  docusignOauthBaseUri,
+  isDevEnv,
+  isStagingEnv
+} from 'config/constants';
 
 type DocusignAccount = {
   account_id: string;
@@ -212,4 +221,29 @@ export async function disconnectDocusignAccount({ spaceId }: { spaceId: string }
       spaceId
     }
   });
+}
+
+type DocusignOAuthState = {
+  userId: string;
+  spaceId: string;
+};
+
+export async function encodeDocusignState(input: DocusignOAuthState): Promise<string> {
+  if (!stringUtils.isUUID(input.spaceId) || !stringUtils.isUUID(input.userId)) {
+    throw new InvalidInputError('Invalid spaceId or userId');
+  }
+
+  const sealedSpaceAndUserId = await sealData(input, { password: authSecret as string, ttl: 60 * 60 });
+
+  return sealedSpaceAndUserId;
+}
+
+export async function decodeDocusignState(input: string): Promise<DocusignOAuthState> {
+  const data = (await unsealData(input, { password: authSecret as string })) as DocusignOAuthState;
+
+  if (!stringUtils.isUUID(data.spaceId) || !stringUtils.isUUID(data.userId)) {
+    throw new InvalidInputError('Invalid spaceId or userId found in docusign data');
+  }
+
+  return data;
 }
