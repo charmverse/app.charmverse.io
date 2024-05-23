@@ -171,20 +171,21 @@ export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, re
             }
           }
         });
-
-        await tx.documentToSign.update({
-          where: {
-            id: documentInDb.id
-          },
-          data: {
-            completedAt: new Date(),
-            status: 'completed'
-          }
-        });
       }
 
+      await tx.documentToSign.update({
+        where: {
+          id: documentInDb.id
+        },
+        data: {
+          completedAt: new Date(),
+          status: 'completed'
+        }
+      });
+
       await passDocumentEvaluationStepIfNecessary({
-        evaluationId: documentInDb.evaluationId
+        evaluationId: documentInDb.evaluationId,
+        tx
       });
     });
   }
