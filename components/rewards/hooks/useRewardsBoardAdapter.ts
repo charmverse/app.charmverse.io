@@ -86,7 +86,7 @@ export function useRewardsBoardAdapter() {
   }, [views, activeViewId, space?.id]);
 
   const sortedCards = useMemo(() => {
-    let cards = (rewards || [])
+    let cards: CardWithRelations[] = (rewards || [])
       .map((reward) => {
         const page = getRewardPage(reward.id);
         if (!page || !space) return null;
@@ -100,11 +100,22 @@ export function useRewardsBoardAdapter() {
           }),
           reward: {
             id: reward.id,
-            rewardType: reward.rewardType
+            rewardType: reward.rewardType,
+            applications: reward.applications.map((app) => ({ createdBy: app.createdBy }))
           }
-        } as CardWithRelations;
+        };
       })
       .filter(isTruthy);
+
+    const _applications = cards
+      .map((card) => {
+        return card.subPages || [];
+      })
+      .flat();
+
+    if (activeView.fields.sourceType === 'reward_applications') {
+      cards = _applications;
+    }
 
     const filter = localViewSettings?.localFilters || activeView?.fields.filter;
     // filter cards by active view filter
@@ -116,12 +127,6 @@ export function useRewardsBoardAdapter() {
     const sortedCardPages = board
       ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
       : [];
-
-    const _applications = cards
-      .map((card) => {
-        return card.subPages || [];
-      })
-      .flat();
 
     return activeView.fields.sourceType === 'reward_applications' ? _applications : sortedCardPages;
   }, [
