@@ -2,10 +2,11 @@
  * Below methods are the API reference links for the Docusign API
  */
 
+import { InvalidInputError } from '@charmverse/core/errors';
 import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { GET, POST } from 'adapters/http';
+import { GET, POST, PUT } from 'adapters/http';
 import { redisClient } from 'adapters/redis/redisClient';
 import { baseUrl } from 'config/constants';
 import { InvalidStateError } from 'lib/middleware';
@@ -79,6 +80,7 @@ type DocusignRecipient = {
   sentDateTime: string;
   deliveryMethod: string;
   recipientType: string;
+  clientUserId?: string;
 };
 
 /**
@@ -216,6 +218,10 @@ export async function requestEnvelopeSigningLink({
     throw new InvalidStateError('No signer found for envelope');
   }
 
+  if (!recipient.clientUserId) {
+    throw new InvalidStateError('clientUserId is required for recipient');
+  }
+
   const { domain: spaceDomain } = await prisma.space.findUniqueOrThrow({
     where: { id: spaceId },
     select: { domain: true }
@@ -225,9 +231,10 @@ export async function requestEnvelopeSigningLink({
     returnUrl: `${baseUrl}/${spaceDomain}`,
     authenticationMethod: 'none',
     // userId: recipient.userId,
-    recipientId: recipient.recipientId,
+    recipientId: recipient.recipientIdGuid,
     userName: recipient.name,
-    email: recipient.email
+    email: recipient.email,
+    clientUserId: recipient.clientUserId
   };
 
   const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes/${docusignEnvelopeId}/views/recipient`;
@@ -277,4 +284,36 @@ export async function searchDocusignDocs({
   await redisClient?.set(searchResultsKey, JSON.stringify(envelopes), { EX: 60 * 16 });
 
   return envelopes.envelopes;
+}
+
+export async function updateRecipients({
+  envelopeId,
+  spaceId,
+  recipients,
+  credentials
+}: {
+  envelopeId: string;
+  spaceId?: string;
+  recipients: DocusignRecipient[];
+  credentials?: RequiredDocusignCredentials;
+}) {
+  if (!spaceId && !credentials) {
+    throw new InvalidInputError('spaceId or credentials are required');
+  }
+
+  credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId: spaceId as string }));
+
+  const apiUrl = `${credentials.docusignApiBaseUrl}/restapi/v2.1/accounts/${credentials.docusignAccountId}/envelopes/${envelopeId}/recipients`;
+
+  const response = await PUT(
+    apiUrl,
+    { signers: recipients },
+    {
+      headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
+    }
+  );
+
+  prettyPrint({ updatedEnvelope: response });
+
+  return response;
 }

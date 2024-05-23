@@ -1,8 +1,10 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import { prisma } from '@charmverse/core/prisma-client';
+import { v4 as uuid } from 'uuid';
 
-import { getEnvelope } from 'lib/docusign/api';
+import { getEnvelope, updateRecipients } from 'lib/docusign/api';
 import { getSpaceDocusignCredentials } from 'lib/docusign/authentication';
+import { userByEmailOrGoogleAccountQuery } from 'lib/users/getUser';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
 import type { DocumentWithSigners } from './getProposalDocumentsToSign';
@@ -45,33 +47,18 @@ export async function addEnvelopeToEvaluation({
 
   const signersFromDocusign = docusignEnvelope.recipients.signers;
 
+  await updateRecipients({
+    envelopeId,
+    credentials: docusignCredentials,
+    recipients: signersFromDocusign.map((signer) => ({ ...signer, clientUserId: signer.clientUserId ?? uuid() }))
+  });
+
   const completedUserEmails = signersFromDocusign
     .filter((signer) => !!signer.signedDateTime)
-    .map((signer) => signer.email.toLowerCase());
+    .map((signer) => signer.email);
 
   const usersWhoFinishedSigning = await prisma.user.findMany({
-    where: {
-      OR: [
-        {
-          googleAccounts: {
-            some: {
-              email: {
-                in: completedUserEmails
-              }
-            }
-          }
-        },
-        {
-          verifiedEmails: {
-            some: {
-              email: {
-                in: completedUserEmails
-              }
-            }
-          }
-        }
-      ]
-    },
+    where: userByEmailOrGoogleAccountQuery(completedUserEmails),
     select: {
       id: true,
       verifiedEmails: {

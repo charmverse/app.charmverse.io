@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { refreshDocusignAccessToken } from 'lib/docusign/authentication';
 
 export async function refreshDocusignOAuthTask() {
-  log.debug('Running Credential indexing cron job');
+  log.debug('Running Docusign credential refresh cron job');
 
   const docusignCredentials = await prisma.docusignCredential.findMany({
     select: {
