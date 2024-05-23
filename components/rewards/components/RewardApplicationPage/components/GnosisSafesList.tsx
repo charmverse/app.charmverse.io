@@ -4,7 +4,7 @@ import { MenuItem } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 
 import charmClient from 'charmClient';
-import TokenLogo from 'components/common/TokenLogo';
+import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useGnosisSafes } from 'hooks/useGnosisSafes';
 import type { GnosisProposeTransactionResult } from 'hooks/useMultiGnosisPayment';
 import { useMultiGnosisPayment } from 'hooks/useMultiGnosisPayment';
@@ -132,7 +132,7 @@ export function GnosisSafesList({
     <>
       <MenuItem disabled={disabled} dense sx={{ pointerEvents: 'none', color: 'secondary.main', gap: 1 }}>
         <span style={{ margin: 'auto' }}>Gnosis wallet</span>
-        <TokenLogo height={16} src={chainInfo?.iconUrl as string} sx={{ margin: 'auto' }} />
+        <BlockchainLogo height={16} src={chainInfo?.iconUrl as string} sx={{ margin: 'auto' }} />
       </MenuItem>
       {existingSafesData
         .filter((s) => !s.isHidden && _chainIdToUse === s.chainId)

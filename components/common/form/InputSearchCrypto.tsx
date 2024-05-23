@@ -1,7 +1,7 @@
 import type { PaymentMethod } from '@charmverse/core/prisma';
 import AddIcon from '@mui/icons-material/Add';
 import type { AutocompleteProps, SxProps, Theme } from '@mui/material';
-import { Autocomplete, Box, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, MenuItem, ListItemText, ListItemIcon, Stack, TextField, Typography } from '@mui/material';
 import type { CryptoCurrency } from 'connectors/chains';
 import { CryptoCurrencies, getChainById } from 'connectors/chains';
 import uniq from 'lodash/uniq';
@@ -9,8 +9,8 @@ import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import CustomERCTokenForm from 'components/common/form/CustomERCTokenForm';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import Modal from 'components/common/Modal';
-import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
@@ -125,10 +125,12 @@ export function InputSearchCrypto<Value extends CryptoValue>({
         renderOption={(props, option) => {
           if (option === ADD_NEW_CUSTOM) {
             return (
-              <Box data-test='add-custom-token' component='li' {...props} onClick={ERC20PopupState.open}>
-                <AddIcon color='secondary' sx={{ mr: '5px' }} />
+              <MenuItem data-test='add-custom-token' {...props} onClick={ERC20PopupState.open}>
+                <ListItemIcon>
+                  <AddIcon color='secondary' sx={{ mr: '5px' }} />
+                </ListItemIcon>
                 <Typography variant='body2'>Add a custom token</Typography>
-              </Box>
+              </MenuItem>
             );
           }
           const chain = showChain && typeof option === 'object' ? getChainById(option.chainId) : null;
@@ -138,36 +140,34 @@ export function InputSearchCrypto<Value extends CryptoValue>({
           });
 
           return (
-            <Stack
+            <MenuItem
               {...props}
               component='li'
               sx={{ '& > img': { flexShrink: 0 }, display: 'flex' }}
               data-test={`select-crypto-${option}`}
             >
-              <Stack alignItems='center' flexDirection='row' gap={1} alignSelf='flex-start'>
-                <Box display='inline-block' width={20}>
-                  <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
-                </Box>
-                <Stack>
-                  <Stack flexDirection='row' gap={1}>
-                    <Box component='span'>{tokenInfo.tokenSymbol}</Box>
-                    <Box component='span'>{tokenInfo.tokenName}</Box>
-                  </Stack>
-                  {chain ? (
-                    <Typography
-                      variant='subtitle2'
-                      fontWeight='bold'
-                      component='span'
-                      sx={{
-                        alignSelf: 'flex-start'
-                      }}
-                    >
-                      {chain.chainName}
-                    </Typography>
-                  ) : null}
+              <ListItemIcon>
+                <TokenLogo src={tokenInfo.canonicalLogo} sx={{ ml: '-4px' }} />
+              </ListItemIcon>
+              <ListItemText>
+                <Stack flexDirection='row' gap={1}>
+                  <Box component='span'>{tokenInfo.tokenSymbol}</Box>
+                  <Box component='span'>{tokenInfo.tokenName}</Box>
                 </Stack>
-              </Stack>
-            </Stack>
+                {chain ? (
+                  <Typography
+                    variant='subtitle2'
+                    fontWeight='bold'
+                    component='span'
+                    sx={{
+                      alignSelf: 'flex-start'
+                    }}
+                  >
+                    {chain.chainName}
+                  </Typography>
+                ) : null}
+              </ListItemText>
+            </MenuItem>
           );
         }}
         renderInput={(params) => {
@@ -185,7 +185,7 @@ export function InputSearchCrypto<Value extends CryptoValue>({
                 ...params.InputProps,
                 ...(variant === 'standard' && { disableUnderline: true }),
                 placeholder,
-                startAdornment: tokenInfo ? <TokenLogo height={20} src={tokenInfo.canonicalLogo} /> : null
+                startAdornment: tokenInfo ? <TokenLogo src={tokenInfo.canonicalLogo} sx={{ ml: 0.5 }} /> : null
               }}
             />
           );
