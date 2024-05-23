@@ -10,6 +10,7 @@ describe('isValidDomainName', () => {
 
   it('should validate subdomain names', () => {
     expect(isValidDomainName('asd.google.com')).toBe(true);
+    expect(isValidDomainName('asd.new-google.com')).toBe(true);
     expect(isValidDomainName('app.chamrverse.io')).toBe(true);
     expect(isValidDomainName('qq.example.xyz')).toBe(true);
     expect(isValidDomainName('qwe.qq.example.xyz')).toBe(true);
@@ -31,5 +32,7 @@ describe('isValidDomainName', () => {
   it('should not validate domain with incorrect characters', () => {
     expect(isValidDomainName('google.com/')).toBe(false);
     expect(isValidDomainName('google@.com')).toBe(false);
+    expect(isValidDomainName('google-.com')).toBe(false);
+    expect(isValidDomainName('-google.com')).toBe(false);
   });
 });
