@@ -5,7 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import * as http from 'adapters/http';
 import { getFarcasterProfile } from 'lib/farcaster/getFarcasterProfile';
 
-import { createProposal } from '../createProposal';
+import { createDraftProposal } from '../createDraftProposal';
+import { publishProposal } from '../publishProposal';
 
 export type OPProjectData = {
   avatarUrl: string;
@@ -91,7 +92,7 @@ export async function importOpProjects() {
   }
 
   const spaceId = '';
-  const workflowId = '';
+  const templateId = '';
 
   for (const project of projects) {
     const authorIds: string[] = [];
@@ -113,39 +114,48 @@ export async function importOpProjects() {
             }
           }
         });
+
+        if (!charmverseUserWithAddress) {
+          charmverseUserWithAddress = await prisma.user.create({
+            data: {
+              username: farcasterId,
+              path: uuid(),
+              claimed: false,
+              identityType: 'Farcaster',
+              wallets: {
+                create: connectedAddresses.map((address) => ({
+                  address
+                }))
+              },
+              spaceRoles: {
+                create: [
+                  {
+                    spaceId
+                  }
+                ]
+              }
+            }
+          });
+        }
       }
 
       if (charmverseUserWithAddress) {
         authorIds.push(charmverseUserWithAddress.id);
-      } else {
-        const user = await prisma.user.create({
-          data: {
-            username: farcasterId,
-            path: uuid(),
-            claimed: false,
-            identityType: 'Farcaster',
-            spaceRoles: {
-              create: [
-                {
-                  spaceId
-                }
-              ]
-            }
-          }
-        });
-        authorIds.push(user.id);
       }
     }
 
-    await createProposal({
-      authors: authorIds,
-      evaluations: [],
-      pageProps: {
-        title: project.name
-      },
+    const { proposal } = await createDraftProposal({
+      contentType: 'free_form',
+      createdBy: authorIds[0],
       spaceId,
-      userId: authorIds[0],
-      workflowId
+      pageType: 'proposal',
+      templateId,
+      authors: authorIds
+    });
+
+    await publishProposal({
+      proposalId: proposal.id,
+      userId: authorIds[0]
     });
   }
 }
