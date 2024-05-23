@@ -12,7 +12,7 @@ import { useUser } from 'hooks/useUser';
 import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { AppBar } from './components/AppBar';
 import { BlocksExceededBanner } from './components/BlocksExceededBanner';
-import CurrentPageFavicon from './components/CurrentPageFavicon';
+import { CurrentPageFavicon } from './components/CurrentPageFavicon';
 import { Header, HeaderSpacer } from './components/Header/Header';
 import { LayoutProviders } from './components/LayoutProviders';
 import PageContainer from './components/PageContainer';

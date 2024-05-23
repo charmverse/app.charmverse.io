@@ -34,6 +34,7 @@ export const googleWebClientConfig = {
 };
 
 export const charmverseDiscordInvite = 'https://discord.gg/ACYCzBGC2M';
+export const userManualUrl = 'https://tiny.charmverse.io/user-manual';
 // Google config with sensitive scopes (to eventually replace the primary config)
 export const googleOAuthClientIdSensitive =
   process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || env('GOOGLE_OAUTH_CLIENT_ID_SENSITIVE');
