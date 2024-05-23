@@ -167,7 +167,6 @@ export function CredentialSelect({
                 ...params.InputProps,
                 disableUnderline: true,
                 placeholder: selectedCredentialTemplates?.length ? '' : '+ Select a credential'
-                // startAdornment: tokenInfo ? <TokenLogo height={20} src={tokenInfo.canonicalLogo} /> : null
               }}
             />
           );

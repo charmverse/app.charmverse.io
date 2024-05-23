@@ -4,7 +4,7 @@ import { getChainById } from 'connectors/chains';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
-import TokenLogo from './TokenLogo';
+import { TokenLogo } from './Icons/TokenLogo';
 
 export function TokenBadge({
   tokenAddress,
@@ -35,7 +35,7 @@ export function TokenBadge({
 
   return (
     <Stack flexDirection='row' gap={0.75} alignItems='center'>
-      <TokenLogo src={tokenInfo.canonicalLogo} height={20} />
+      <TokenLogo src={tokenInfo.canonicalLogo} />
       <Box component='span'>{tokenAmount}</Box>
       <Box component='span'>{tokenInfo.tokenSymbol}</Box>
       <Box component='span'>on {chain.chainName}</Box>

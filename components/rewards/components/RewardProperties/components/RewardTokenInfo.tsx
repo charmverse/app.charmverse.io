@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import { getChainById } from 'connectors/chains';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
-import TokenLogo from 'components/common/TokenLogo';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 
@@ -36,7 +36,7 @@ export function RewardTokenInfo({ chainId, symbolOrAddress, rewardAmount }: Prop
           alignItems: 'center'
         }}
       >
-        <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+        <TokenLogo src={tokenInfo.canonicalLogo} />
       </Box>
 
       <Typography component='span' variant='subtitle1' fontWeight='normal'>

@@ -1,12 +1,11 @@
 import type { BoxProps, SxProps, Theme } from '@mui/material';
+import { Box, ListItemIcon, ListItemText, Autocomplete, MenuItem, TextField } from '@mui/material/';
 import type { AutocompleteProps } from '@mui/material/Autocomplete';
-import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import type { IChainDetails } from 'connectors/chains';
 import { getChainList, getChainById } from 'connectors/chains';
 import { useEffect, useState, useMemo } from 'react';
 
+import { BlockchainLogo } from 'components/common/Icons/BlockchainLogo';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { isTruthy } from 'lib/utils/types';
 
@@ -86,7 +85,7 @@ export function InputSearchBlockchain({
           InputProps={{
             ...params.InputProps,
             placeholder: 'Select a chain',
-            startAdornment: !hideInputIcon && value && <IconLogo src={value?.iconUrl} ml={1} />
+            startAdornment: !hideInputIcon && value && <BlockchainLogo src={value?.iconUrl} sx={{ ml: 0.5 }} />
           }}
         />
       )}
@@ -97,19 +96,13 @@ export function InputSearchBlockchain({
   );
 }
 
-function IconLogo({ src, ...props }: { src?: string } & BoxProps) {
-  return (
-    <Box width='1em' height='1em' display='flex' justifyContent='center' {...props}>
-      <img src={src} style={{ height: '1em', marginRight: '0.5em' }} />
-    </Box>
-  );
-}
-
 export function Chain({ info, ...props }: { info: Pick<IChainDetails, 'chainName' | 'iconUrl'> }) {
   return (
-    <Box component='li' sx={{ display: 'flex', gap: 1, alignItems: 'center' }} {...props}>
-      <IconLogo src={info.iconUrl} />
-      <Box component='span'>{info.chainName}</Box>
-    </Box>
+    <MenuItem {...props}>
+      <ListItemIcon>
+        <BlockchainLogo src={info.iconUrl} sx={{ ml: '-4px' }} />
+      </ListItemIcon>
+      <ListItemText>{info.chainName}</ListItemText>
+    </MenuItem>
   );
 }
