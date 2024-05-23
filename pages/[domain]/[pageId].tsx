@@ -93,6 +93,11 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         page.space.paidTier === 'free' ||
         (page.type === 'proposal' && page.space.publicProposals)
       ) {
+        const canonicalUrl = getPagePath({
+          hostName: ctx.req.headers.host,
+          path: page.path,
+          spaceDomain: domain
+        });
         return {
           props: {
             openGraphData: {
