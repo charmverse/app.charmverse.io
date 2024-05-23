@@ -7,8 +7,7 @@ export type OpenGraphProps = {
 };
 
 export function OpenGraphData({ description, title, image }: OpenGraphProps) {
-  const displayedDescription =
-    description || 'web3 operations platform handling docs, tasks, rewards, proposals, and votes.';
+  const displayedDescription = description;
 
   const displayedTitle = title || 'CharmVerse';
 
