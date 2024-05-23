@@ -1,11 +1,23 @@
-import { usePageIdFromPath } from 'hooks/usePageFromPath';
-import { usePages } from 'hooks/usePages';
+import { useEffect, useState } from 'react';
+
+import { usePageFromPath } from 'hooks/usePageFromPath';
 
 import Favicon from './Favicon';
 
-export default function CurrentPageFavicon() {
-  const currentPageId = usePageIdFromPath();
-  const { pages } = usePages();
-  const currentPage = currentPageId ? pages[currentPageId] : undefined;
+export function CurrentPageFaviconBrowserComponent() {
+  const currentPage = usePageFromPath();
   return <Favicon pageIcon={currentPage?.icon} />;
+}
+
+// wrap the component so that it is not run until it is mounted
+export function CurrentPageFavicon() {
+  const [isComponentMounted, setIsComponentMounted] = useState(false);
+
+  useEffect(() => setIsComponentMounted(true), []);
+
+  if (!isComponentMounted) {
+    return null;
+  }
+
+  return <CurrentPageFaviconBrowserComponent />;
 }

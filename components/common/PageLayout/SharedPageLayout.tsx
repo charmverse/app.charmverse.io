@@ -16,7 +16,7 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 
 import { AppBar } from './components/AppBar';
-import CurrentPageFavicon from './components/CurrentPageFavicon';
+import { CurrentPageFavicon } from './components/CurrentPageFavicon';
 import { PageTitleWithBreadcrumbs } from './components/Header/components/PageTitleWithBreadcrumbs';
 import { HeaderSpacer, StyledToolbar, ToggleSidebarIcon } from './components/Header/Header';
 import { LayoutProviders } from './components/LayoutProviders';
