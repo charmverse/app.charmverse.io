@@ -81,6 +81,7 @@ export function RewardPropertiesForm({
         <Stack
           direction='row'
           gap={1}
+          data-test='reward-properties-details'
           alignItems='center'
           sx={{ cursor: 'pointer' }}
           onClick={() => setIsExpanded((v) => !v)}

@@ -46,7 +46,7 @@ export class DocumentPage extends GlobalPage {
 
   public cardDetailProperties: Locator;
 
-  public addCardPropertyButton: Locator;
+  public addCustomPropertyButton: Locator;
 
   public saveNewPage: Locator;
 
@@ -81,7 +81,7 @@ export class DocumentPage extends GlobalPage {
     this.openAsPageButton = this.rootSelector.locator('data-test=open-as-page');
     this.joinSpaceButton = this.rootSelector.locator('data-test=public-bounty-space-action');
     this.cardDetailProperties = this.rootSelector.locator('data-test=card-detail-properties');
-    this.addCardPropertyButton = this.rootSelector.locator('data-test=add-custom-property');
+    this.addCustomPropertyButton = this.rootSelector.locator('data-test=add-custom-property');
     this.saveNewPage = this.rootSelector.locator('data-test=save-new-page-button');
     this.closeSidebar = this.rootSelector.locator('data-test=close-sidebar-button');
     this.charmverseInlineCommentIcon = this.rootSelector.locator('data-test=charmverse-inline-comment-icon');
