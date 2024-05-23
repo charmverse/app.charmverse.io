@@ -17,7 +17,7 @@ export function OpenGraphData({ description, title, image }: OpenGraphProps) {
     <>
       <meta name='theme-color' content={blueColor} />
       <link rel='icon' href='/favicon.png' />
-      <meta name='description' content={displayedDescription} />
+      {displayedDescription && <meta name='description' content={displayedDescription} />}
       <meta property='og:title' content={displayedTitle} />
       <meta property='og:image' content={displayedImage} />
 
