@@ -34,14 +34,14 @@ const applicantStatusOptions: {
   color: keyof (typeof Constants)['menuColors'];
 }[] = [
   { id: 'applied', value: 'Applied', color: 'propColorDefault' },
+  { id: 'review', value: 'Review', color: 'propColorYellow' },
   { id: 'complete', value: 'Approved', color: 'propColorBlue' },
   { id: 'paid', value: 'Paid', color: 'propColorGreen' },
   { id: 'submission_rejected', value: 'Submission Rejected', color: 'propColorRed' },
   { id: 'rejected', value: 'Rejected', color: 'propColorRed' },
   { id: 'cancelled', value: 'Cancelled', color: 'propColorRed' },
   { id: 'inProgress', value: 'In Progress', color: 'propColorTeal' },
-  { id: 'processing', value: 'Processing', color: 'propColorTeal' },
-  { id: 'review', value: 'Review', color: 'propColorYellow' }
+  { id: 'processing', value: 'Processing', color: 'propColorTeal' }
 ];
 
 const rewardDbProperties = {
