@@ -9,6 +9,7 @@ import type { RawPlugins } from 'components/common/CharmEditor/components/@bangl
 import * as codeBlock from './components/@bangle.dev/base-components/code-block';
 import { plugins as imagePlugins } from './components/@bangle.dev/base-components/image';
 import { plugins as bookmarkPlugins } from './components/bookmark/bookmarkPlugins';
+import * as button from './components/button/button.plugins';
 import * as callout from './components/callout/callout';
 import { userDataPlugin } from './components/charm/charm.plugins';
 import * as columnLayout from './components/columnLayout/columnLayout.plugins';
@@ -208,6 +209,7 @@ export function charmEditorPlugins({
     tablePlugins,
     disclosure.plugins(),
     nft.plugins(),
+    button.plugins(),
     tweet.plugins(),
     trailingNode.plugins(),
     iframe.plugins(),

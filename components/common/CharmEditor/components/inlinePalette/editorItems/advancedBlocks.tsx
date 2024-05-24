@@ -1,6 +1,7 @@
 import { rafCommandExec, findParentNodeOfType } from '@bangle.dev/utils';
 import { FormatListBulleted } from '@mui/icons-material';
 import CodeIcon from '@mui/icons-material/Code';
+import SmartButtonIcon from '@mui/icons-material/SmartButton';
 import ViewColumnIcon from '@mui/icons-material/ViewColumn';
 import { setBlockType } from 'prosemirror-commands';
 import { Fragment } from 'prosemirror-model';
@@ -68,6 +69,36 @@ export function items({ view: currentView, enableVoting }: AdvancedItemsProps): 
 
   const editorItems: PaletteItemTypeNoGroup[] = [
     ...(hasColumnParent ? [] : [createColumnPaletteItem(2), createColumnPaletteItem(3)]),
+    {
+      uid: 'button',
+      title: 'Button',
+      icon: (
+        <SmartButtonIcon
+          sx={{
+            fontSize: iconSize
+          }}
+        />
+      ),
+      description: 'Insert a button in the line below',
+      editorExecuteCommand: ({ palettePluginKey }) => {
+        return (state, dispatch, view) => {
+          if (view) {
+            rafCommandExec(view, (_state, _dispatch) => {
+              // let the node view know to show the tooltip by default
+              const tooltipMark = _state.schema.mark('tooltip-marker');
+              const node = _state.schema.nodes.button.create({}, null, [tooltipMark]);
+
+              if (_dispatch && isAtBeginningOfLine(_state)) {
+                _dispatch(_state.tr.replaceSelectionWith(node, false));
+                return true;
+              }
+              return insertNode(_state, _dispatch, node);
+            });
+          }
+          return replaceSuggestionMarkWith(palettePluginKey, '')(state, dispatch, view);
+        };
+      }
+    },
     {
       uid: 'code',
       title: 'Code',
