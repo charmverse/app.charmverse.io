@@ -1,13 +1,10 @@
 import type { User } from '@charmverse/core/prisma';
-import type { PageComment, Space } from '@charmverse/core/prisma-client';
+import type { Space } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
 import { expect, test } from '__e2e__/testWithFixtures';
-import { v4 as uuid } from 'uuid';
 
 import { baseUrl } from 'config/constants';
-import type { IPropertyTemplate } from 'lib/databases/board';
-import { generateSchemasForAllSupportedFieldTypes } from 'testing/publicApi/schemas';
 import { generateBoard } from 'testing/setupDatabase';
 
 import { loginBrowserUser } from '../utils/mocks';
@@ -74,7 +71,7 @@ test.describe.serial('Edit database select properties', async () => {
 
     await expect(dialogDocumentPage.openAsPageButton).toBeVisible();
 
-    await dialogDocumentPage.addCardPropertyButton.click();
+    await dialogDocumentPage.addCustomPropertyButton.click();
 
     await databasePage.getPropertyTypeOptionLocator({ type: 'person' }).click();
 

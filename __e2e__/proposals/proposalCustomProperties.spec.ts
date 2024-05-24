@@ -95,7 +95,7 @@ test.describe.serial('Proposal custom properties', () => {
     // Move into configuring the actual evaluation
     await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
 
-    await proposalPage.addCardPropertyButton.click();
+    await proposalPage.addCustomPropertyButton.click();
 
     await databasePage.getPropertyTypeOptionLocator({ type: 'text' }).click();
 
@@ -213,7 +213,7 @@ test.describe.serial('Proposal custom properties', () => {
     await expect(proposalPage.workflowSelect).toHaveText(workflow.title);
 
     // members cannot see the option to add a custom property
-    await expect(proposalPage.addCardPropertyButton).not.toBeVisible();
+    await expect(proposalPage.addCustomPropertyButton).not.toBeVisible();
 
     const textInput = databasePage.getCardDetailsTextInput();
 
