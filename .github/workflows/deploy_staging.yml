@@ -5,7 +5,7 @@ on:
     types: [labeled, opened, synchronize]
 
 env:
-  SELECTED_PERMISSION_API_TAG: docusign
+  SELECTED_PERMISSION_API_TAG: latest
 
 concurrency:
   group: staging-${{ github.ref }}
