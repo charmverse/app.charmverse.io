@@ -128,7 +128,7 @@ export function useRewardsBoardAdapter() {
       ? sortCards(cards, board, activeView, membersRecord, {}, localViewSettings?.localSort)
       : [];
 
-    return activeView.fields.sourceType === 'reward_applications' ? _applications : sortedCardPages;
+    return sortedCardPages;
   }, [
     activeView.fields.sortOptions,
     activeView?.fields.filter,

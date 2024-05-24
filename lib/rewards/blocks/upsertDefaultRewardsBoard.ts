@@ -51,7 +51,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
     }
   });
 
-  // table view
+  // table view for rewards
   await upsertBlock({
     spaceId,
     userId: updateUserId,

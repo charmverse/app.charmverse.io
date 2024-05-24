@@ -17,8 +17,10 @@ import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOpt
  */
 type Props = {
   rootBoard: Board;
+  view: BoardView;
   views: BoardView[];
   showView: (viewId: string) => void;
+  isReward?: boolean;
 };
 
 export function CreateLinkedView(props: Props) {

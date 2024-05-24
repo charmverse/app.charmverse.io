@@ -13,6 +13,7 @@ import type { ICharmEditorOutput } from 'components/common/CharmEditor/CharmEdit
 import CharmEditor from 'components/common/CharmEditor/CharmEditor';
 import AddViewMenu from 'components/common/DatabaseEditor/components/addViewMenu';
 import { getVisibleAndHiddenGroups } from 'components/common/DatabaseEditor/components/centerPanel';
+import { CreateLinkedView } from 'components/common/DatabaseEditor/components/createLinkedView';
 import Kanban from 'components/common/DatabaseEditor/components/kanban/kanban';
 import Table from 'components/common/DatabaseEditor/components/table/table';
 import { ViewFilterControl } from 'components/common/DatabaseEditor/components/ViewFilterControl';
@@ -295,7 +296,7 @@ export function RewardsPage({ title }: { title: string }) {
                   maxTabsShown={3}
                   supportedViewTypes={supportedRewardViewTypes}
                 />
-                {isAdmin && !!views.length && views.length <= 3 && (
+                {isAdmin && views.length <= 3 && (
                   <Stack mb='-5px'>
                     <AddViewMenu
                       board={activeBoard}
@@ -347,7 +348,17 @@ export function RewardsPage({ title }: { title: string }) {
       ) : (
         <Box className={`container-container ${showSidebar ? 'sidebar-visible' : ''}`}>
           <Stack>
-            {rewards && rewards?.length > 0 ? (
+            {!activeView?.fields?.sourceType && activeView.fields.viewType === 'board' ? (
+              <Box width='100%'>
+                <CreateLinkedView
+                  rootBoard={activeBoard}
+                  views={views}
+                  showView={showView}
+                  isReward
+                  view={activeView}
+                />
+              </Box>
+            ) : rewards && rewards?.length > 0 ? (
               <Box width='100%'>
                 {activeView.fields.viewType === 'table' && (
                   <Table
@@ -436,12 +447,12 @@ export function RewardsPage({ title }: { title: string }) {
                 closeSidebar={() => setShowSidebar(false)}
                 hideLayoutOptions
                 hideLayoutSelectOptions={undefined}
-                hideSourceOptions
                 groupByProperty={groupByProperty}
                 page={undefined}
                 pageId={undefined}
                 showView={() => {}}
                 supportedViewTypes={supportedRewardViewTypes}
+                isReward
               />
             )}
           </Stack>
