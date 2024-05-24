@@ -105,10 +105,13 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
   const {
     register,
     handleSubmit,
+    watch,
     formState: { isValid }
   } = useForm<NodeAttrs>({
     defaultValues
   });
+
+  const requestMethod = watch('method');
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -132,6 +135,25 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
             <MenuItem value='POST'>POST</MenuItem>
           </Select>
         </Box>
+        {requestMethod === 'POST' && (
+          <Box display='flex' justifyContent='space-between' alignItems='center'>
+            <InputLabel>Request Body (optional)</InputLabel>
+            <TextField
+              {...register('body', {
+                required: true,
+                validate: (value) => {
+                  try {
+                    JSON.parse(value);
+                    return true;
+                  } catch (e) {
+                    return false;
+                  }
+                }
+              })}
+              placeholder='{ "hello": "world" }'
+            />
+          </Box>
+        )}
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <InputLabel>Alignment</InputLabel>
           <Select<NodeAttrs['align']>
