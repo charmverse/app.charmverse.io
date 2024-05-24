@@ -164,6 +164,7 @@ export type CustomNotificationType = 'orange-dao';
 export type CustomNotification =
   | (NotificationBase & {
       group: 'custom';
+      pageTitle: string;
     }) & {
       type: 'orange-dao';
       content: {

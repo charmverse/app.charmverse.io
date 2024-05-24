@@ -314,6 +314,14 @@ export function getNotificationMetadata({
         };
       }
 
+      case 'custom': {
+        return {
+          content: <div>You have been invited to join Orange DAO. Click here.</div>,
+          href,
+          pageTitle: notification.pageTitle
+        };
+      }
+
       default: {
         log.warn('Unrecognized notification type', { notification });
         return {

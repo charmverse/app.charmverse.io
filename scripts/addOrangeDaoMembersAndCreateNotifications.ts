@@ -4,6 +4,7 @@ import _ from 'lodash';
 export async function addMembersAndCreateNotifications() {
   const spaceId = '';
   const pageId = '';
+  const spaceDomains = ['cyber', 'taiko', 'kyoto', 'cartesi', 'safe'];
   const spaceAdminRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
       spaceId,
@@ -14,7 +15,6 @@ export async function addMembersAndCreateNotifications() {
     }
   })
   const spaceAdminId = spaceAdminRole.userId;
-  const spaceDomains = ['cyber', 'taiko', 'kyoto', 'cartesi', 'safe'];
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       space: {
