@@ -36,12 +36,12 @@ const applicantStatusOptions: {
   { id: 'applied', value: 'Applied', color: 'propColorDefault' },
   { id: 'review', value: 'Review', color: 'propColorYellow' },
   { id: 'complete', value: 'Approved', color: 'propColorBlue' },
+  { id: 'inProgress', value: 'In Progress', color: 'propColorTeal' },
+  { id: 'cancelled', value: 'Cancelled', color: 'propColorRed' },
+  { id: 'processing', value: 'Processing', color: 'propColorTeal' },
   { id: 'paid', value: 'Paid', color: 'propColorGreen' },
   { id: 'submission_rejected', value: 'Submission Rejected', color: 'propColorRed' },
-  { id: 'rejected', value: 'Rejected', color: 'propColorRed' },
-  { id: 'cancelled', value: 'Cancelled', color: 'propColorRed' },
-  { id: 'inProgress', value: 'In Progress', color: 'propColorTeal' },
-  { id: 'processing', value: 'Processing', color: 'propColorTeal' }
+  { id: 'rejected', value: 'Rejected', color: 'propColorRed' }
 ];
 
 const rewardDbProperties = {

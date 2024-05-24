@@ -1,5 +1,6 @@
 import type { ApiPageKey } from '@charmverse/core/prisma';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -15,6 +16,7 @@ import mutator from 'components/common/DatabaseEditor/mutator';
 import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
+import { PageIcon } from 'components/common/PageIcon';
 import { webhookEndpoint } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
@@ -120,7 +122,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     const oldBlocks = [activeView];
     const newBoard = createBoardView(activeView);
     newBoard.fields.sourceType = _sourceType;
-    mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
+    mutator.updateBlocks([newBoard], oldBlocks, 'Update rewards board source type');
   };
 
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
@@ -237,7 +239,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             )}
             {allowedSourceOptions.includes('rewards') && (
               <SourceType data-test='source-new-rewards' onClick={() => handleUpdateSource('rewards')}>
-                <AddCircleIcon style={{ fontSize: 24 }} />
+                <PageIcon pageType='rewards' style={{ fontSize: 24 }} />
                 Rewards
               </SourceType>
             )}
@@ -246,7 +248,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
                 data-test='source-new-reward-applications'
                 onClick={() => handleUpdateSource('reward_applications')}
               >
-                <AddCircleIcon style={{ fontSize: 24 }} />
+                <DescriptionOutlinedIcon style={{ fontSize: 24 }} />
                 Submissions
               </SourceType>
             )}
