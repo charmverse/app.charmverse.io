@@ -65,7 +65,7 @@ cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
 // Refresh docusign credentials every 6 hours
-cron.schedule('0 /6 * * *', refreshDocusignOAuthTask);
+cron.schedule('0 */6 * * *', refreshDocusignOAuthTask);
 
 const port = process.env.PORT || 4000;
 
