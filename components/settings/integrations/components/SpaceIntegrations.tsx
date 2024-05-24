@@ -20,7 +20,7 @@ export function SpaceIntegrations({ space }: { space: Space }) {
       <BotoSettings isAdmin={isAdmin} />
       <GithubSettings isAdmin={isAdmin} spaceId={space.id} spaceDomain={space.domain} />
       <KYCSettings isAdmin={isAdmin} space={space} />
-      <DocumentSettings isAdmin={isAdmin} space={space} />
+      <DocumentSettings isAdmin={isAdmin} />
     </Stack>
   );
 }
