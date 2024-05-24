@@ -1,4 +1,5 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
+import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -46,6 +47,17 @@ export type PassFailEvaluationProps = {
   completedAt?: Date | null;
   actionLabels?: PopulatedEvaluation['actionLabels'];
 };
+
+const ResultCopyStack = styled(Stack)<{ addPaddingTop?: boolean }>`
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacing(1)};
+  align-items: center;
+  justify-content: center;
+  padding-bottom: ${({ theme }) => theme.spacing(2)};
+  padding-left: ${({ theme }) => theme.spacing(2)};
+  padding-right: ${({ theme }) => theme.spacing(2)};
+  padding-top: ${({ addPaddingTop, theme }) => (addPaddingTop ? theme.spacing(2) : 0)};
+`;
 
 export function PassFailEvaluation({
   isCurrent,
@@ -207,21 +219,21 @@ export function PassFailEvaluation({
           </Box>
         )}
         {!canReview && isCurrent && evaluationResult === null && evaluationReviews.length === 0 && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} pb={2} px={2}>
+          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' py={2} px={2}>
             <Typography variant='body2'>{isAppealProcess ? 'Appeal' : 'Review'} process ongoing</Typography>
           </Stack>
         )}
         {evaluationResult === 'pass' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' pb={2} px={2}>
+          <ResultCopyStack addPaddingTop={evaluationReviews.length === 0}>
             <ApprovedIcon color='success' />
             <Typography variant='body2'>Approved {completedDate}</Typography>
-          </Stack>
+          </ResultCopyStack>
         )}
         {evaluationResult === 'fail' && (
-          <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' pb={2} px={2}>
+          <ResultCopyStack addPaddingTop={evaluationReviews.length === 0}>
             <RejectedIcon color='error' />
             <Typography variant='body2'>Declined {completedDate}</Typography>
-          </Stack>
+          </ResultCopyStack>
         )}
       </Card>
       <Modal
