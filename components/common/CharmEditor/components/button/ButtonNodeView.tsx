@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Select, InputLabel, MenuItem, TextField } from '@mui/material';
+import { Box, Grid, Select, InputLabel, MenuItem, TextField } from '@mui/material';
 import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiNftLine } from 'react-icons/ri';
@@ -106,9 +106,10 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
     register,
     handleSubmit,
     watch,
-    formState: { isValid }
+    formState: { errors, isValid }
   } = useForm<NodeAttrs>({
-    defaultValues
+    defaultValues,
+    mode: 'onChange'
   });
 
   const requestMethod = watch('method');
@@ -120,6 +121,7 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           <InputLabel>Action URL</InputLabel>
           <TextField
             fullWidth
+            error={!!errors.url}
             {...register('url', { required: true, validate: { matchPattern: (v) => /^http/.test(v) } })}
             placeholder='https://api.com/endpoint'
           />
@@ -136,23 +138,29 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           </Select>
         </Box>
         {requestMethod === 'POST' && (
-          <Box display='flex' justifyContent='space-between' alignItems='center'>
-            <InputLabel>Request Body (optional)</InputLabel>
-            <TextField
-              {...register('body', {
-                required: true,
-                validate: (value) => {
-                  try {
-                    JSON.parse(value);
-                    return true;
-                  } catch (e) {
-                    return false;
+          <Grid container>
+            <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+              <InputLabel>Request Body (optional)</InputLabel>
+            </Grid>
+            <Grid item xs>
+              <TextField
+                fullWidth
+                error={!!errors.body}
+                {...register('body', {
+                  validate: (value) => {
+                    if (!value) return true;
+                    try {
+                      JSON.parse(value);
+                      return true;
+                    } catch (e) {
+                      return false;
+                    }
                   }
-                }
-              })}
-              placeholder='{ "hello": "world" }'
-            />
-          </Box>
+                })}
+                placeholder='{ "hello": "world" }'
+              />
+            </Grid>
+          </Grid>
         )}
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <InputLabel>Alignment</InputLabel>
@@ -167,7 +175,7 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           </Select>
         </Box>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <InputLabel>Size</InputLabel>
+          <InputLabel>Button size</InputLabel>
           <Select<NodeAttrs['size']>
             sx={{ width: '50%' }}
             defaultValue={defaultValues.size}
@@ -178,14 +186,22 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
             <MenuItem value='large'>Large</MenuItem>
           </Select>
         </Box>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <InputLabel>Button label</InputLabel>
-          <TextField {...register('label', { required: true })} placeholder='Submit' />
-        </Box>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <InputLabel>Success message (optional)</InputLabel>
-          <TextField {...register('successMessage')} placeholder='Success!' />
-        </Box>
+        <Grid container>
+          <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+            <InputLabel>Button label</InputLabel>
+          </Grid>
+          <Grid item xs>
+            <TextField {...register('label', { required: true })} placeholder='Submit' />
+          </Grid>
+        </Grid>
+        <Grid container>
+          <Grid item xs sx={{ display: 'flex', alignItems: 'center' }}>
+            <InputLabel>Success message (optional)</InputLabel>
+          </Grid>
+          <Grid item xs>
+            <TextField {...register('successMessage')} placeholder='Success!' />
+          </Grid>
+        </Grid>
         <Button disabled={!isValid} fullWidth type='submit'>
           Save
         </Button>
