@@ -42,10 +42,19 @@ export function POST<T>(
     headers = {},
     noHeaders,
     skipStringifying,
-    credentials = 'include'
-  }: { credentials?: RequestCredentials; headers?: any; noHeaders?: boolean; skipStringifying?: boolean } = {}
+    credentials = 'include',
+    query
+  }: {
+    credentials?: RequestCredentials;
+    headers?: any;
+    noHeaders?: boolean;
+    skipStringifying?: boolean;
+    query?: any;
+  } = {}
 ): Promise<T> {
-  return fetch<T>(requestURL, {
+  const urlWithQuery = query ? _appendQuery(requestURL, query || {}) : requestURL;
+
+  return fetch<T>(urlWithQuery, {
     body: !skipStringifying ? JSON.stringify(data) : (data as string),
     method: 'POST',
     headers: noHeaders
