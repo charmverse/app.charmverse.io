@@ -73,7 +73,6 @@ export function generateDefaultBoardView({
   view.rootId = spaceId || uuid();
   view.fields.visiblePropertyIds = [Constants.titleColumnId, REWARD_AMOUNT, REWARD_APPLICANTS_COUNT];
   view.fields.cardOrder = [];
-  view.fields.groupById = view.fields.groupById || REWARD_STATUS_BLOCK_ID;
 
   return view;
 }

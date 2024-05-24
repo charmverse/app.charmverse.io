@@ -116,15 +116,10 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     if (!activeView || activeView.fields.viewType !== 'board') {
       return;
     }
-    const groupById =
-      _sourceType === 'reward_applications' && activeView.fields.viewType === 'board'
-        ? APPLICANT_STATUS_BLOCK_ID
-        : REWARD_STATUS_BLOCK_ID;
 
     const oldBlocks = [activeView];
     const newBoard = createBoardView(activeView);
     newBoard.fields.sourceType = _sourceType;
-    newBoard.fields.groupById = groupById;
     mutator.updateBlocks([newBoard], oldBlocks, 'Change description');
   };
 

@@ -73,7 +73,7 @@ export async function upsertDefaultRewardsBoard({ spaceId, userId }: { spaceId: 
     data: generateDefaultBoardView({
       spaceId,
       block: {
-        fields: { sourceType: 'reward_applications', groupById: APPLICANT_STATUS_BLOCK_ID },
+        fields: { sourceType: 'reward_applications' },
         title: 'Submissions'
       }
     }),
