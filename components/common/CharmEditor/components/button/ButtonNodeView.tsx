@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { Box, Card, InputLabel, TextField } from '@mui/material';
+import { Box, Select, InputLabel, MenuItem, TextField } from '@mui/material';
 import { useState, useMemo, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { RiNftLine } from 'react-icons/ri';
@@ -101,7 +101,7 @@ function ButtonView(props: NodeAttrs) {
   );
 }
 
-function ButtonForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; onSubmit: (values: NodeAttrs) => void }) {
+function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onSubmit: (values: NodeAttrs) => void }) {
   const {
     register,
     handleSubmit,
@@ -123,19 +123,42 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues?: NodeAttrs; on
         </div>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <InputLabel>Request method</InputLabel>
-          <TextField {...register('method', { required: true })} placeholder='GET' />
+          <Select<NodeAttrs['method']>
+            sx={{ width: '50%' }}
+            defaultValue={defaultValues.method}
+            {...register('method', { required: true })}
+          >
+            <MenuItem value='GET'>GET</MenuItem>
+            <MenuItem value='POST'>POST</MenuItem>
+          </Select>
+        </Box>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <InputLabel>Alignment</InputLabel>
+          <Select<NodeAttrs['align']>
+            sx={{ width: '50%' }}
+            defaultValue={defaultValues.align}
+            {...register('align', { required: true })}
+          >
+            <MenuItem value='left'>Left</MenuItem>
+            <MenuItem value='center'>Center</MenuItem>
+            <MenuItem value='right'>Right</MenuItem>
+          </Select>
+        </Box>
+        <Box display='flex' justifyContent='space-between' alignItems='center'>
+          <InputLabel>Size</InputLabel>
+          <Select<NodeAttrs['size']>
+            sx={{ width: '50%' }}
+            defaultValue={defaultValues.size}
+            {...register('align', { required: true })}
+          >
+            <MenuItem value='small'>Small</MenuItem>
+            <MenuItem value='medium'>Medium</MenuItem>
+            <MenuItem value='large'>Large</MenuItem>
+          </Select>
         </Box>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <InputLabel>Button label</InputLabel>
           <TextField {...register('label', { required: true })} placeholder='Submit' />
-        </Box>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <InputLabel>Alignment</InputLabel>
-          <TextField {...register('align', { required: true })} placeholder='left' />
-        </Box>
-        <Box display='flex' justifyContent='space-between' alignItems='center'>
-          <InputLabel>Size</InputLabel>
-          <TextField {...register('size', { required: true })} placeholder='medium' />
         </Box>
         <Box display='flex' justifyContent='space-between' alignItems='center'>
           <InputLabel>Success message (optional)</InputLabel>
