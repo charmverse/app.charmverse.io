@@ -229,9 +229,7 @@ export function EvaluationPermissions<T extends EvaluationTemplateFormItem | Wor
 
       {/* show evaluation action which is uneditable */}
       <Box className='octo-propertyrow' display='flex' alignItems='center !important'>
-        <PropertyLabel readOnly>
-          {evaluation.type === 'sign_documents' ? 'Prepare Documents' : 'Move Forward'}
-        </PropertyLabel>
+        <PropertyLabel readOnly>Move Forward</PropertyLabel>
         <UserAndRoleSelect
           readOnly
           wrapColumn
