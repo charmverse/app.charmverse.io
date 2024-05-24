@@ -1,6 +1,7 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import { objectUtils, stringUtils } from '@charmverse/core/utilities';
 import { BoardFields } from 'lib/databases/board';
+import { CardFields } from 'lib/databases/card';
 import { ProposalBoardBlock, ProposalPropertyField } from 'lib/proposals/blocks/interfaces';
 import { ProposalFields } from 'lib/proposals/interfaces';
 import { AggregateResults, aggregateResults } from 'lib/proposals/rubric/aggregateResults';
@@ -301,7 +302,6 @@ async function _getPageIdsFromDatabase() {
     .filter(isTruthy);
 }
 
-import { CardFields } from 'lib/databases/card';
 exportEvaluatedProposalScores({ domain: 'op-grants' }).then(async (csv) => {
   await writeToSameFolder({ data: csv, fileName: 'exported.csv' });
 });

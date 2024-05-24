@@ -2,7 +2,7 @@ import type { Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { sessionUserRelations } from 'lib/session/config';
-import { MissingDataError } from 'lib/utils/errors';
+import { InvalidInputError, MissingDataError } from 'lib/utils/errors';
 import type { LoggedInUser } from 'models';
 
 export async function getUserProfile(
@@ -38,4 +38,39 @@ export async function getUserProfile(
   }
 
   return profile;
+}
+
+export function userByEmailOrGoogleAccountQuery(emails: string | string[]) {
+  if (!emails) {
+    throw new InvalidInputError('Emails are required');
+  }
+
+  if (emails instanceof Array === false) {
+    emails = [emails];
+  }
+
+  const cleanEmails = emails.map((email) => email.trim().toLowerCase());
+
+  return {
+    OR: [
+      {
+        verifiedEmails: {
+          some: {
+            email: {
+              in: cleanEmails
+            }
+          }
+        }
+      },
+      {
+        googleAccounts: {
+          some: {
+            email: {
+              in: cleanEmails
+            }
+          }
+        }
+      }
+    ]
+  };
 }
