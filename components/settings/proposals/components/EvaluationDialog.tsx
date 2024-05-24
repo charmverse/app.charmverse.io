@@ -27,6 +27,7 @@ import { Button } from 'components/common/Button';
 import { PropertyLabel } from 'components/common/DatabaseEditor/components/properties/PropertyLabel';
 import { Dialog } from 'components/common/Dialog/Dialog';
 import FieldLabel from 'components/common/form/FieldLabel';
+import { useIsCharmverseSpace } from 'hooks/useIsCharmverseSpace';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { customLabelEvaluationTypes } from 'lib/proposals/getActionButtonLabels';
 
@@ -318,6 +319,8 @@ export function EvaluationDialog({
     formState: { isValid }
   } = useForm<FormValues>({});
 
+  const showSignDocuments = useIsCharmverseSpace();
+
   const dialogTitle = evaluation?.id ? 'Edit evaluation' : evaluation ? 'New evaluation step' : '';
 
   const formValues = watch();
@@ -425,15 +428,17 @@ export function EvaluationDialog({
                         <StyledListItemText primary='Pass/Decline' secondary='Thumbs up/Thumbs down, binary choice' />
                       </Box>
                     </MenuItem>
-                    <MenuItem value='sign_documents'>
-                      <Box display='flex' alignItems='center' width='100%'>
-                        <ListItemIcon>{evaluationIcons.sign_documents()}</ListItemIcon>
-                        <StyledListItemText
-                          primary='Sign Documents'
-                          secondary='Collect signatures from grant recipients'
-                        />
-                      </Box>
-                    </MenuItem>
+                    {showSignDocuments && (
+                      <MenuItem value='sign_documents'>
+                        <Box display='flex' alignItems='center' width='100%'>
+                          <ListItemIcon>{evaluationIcons.sign_documents()}</ListItemIcon>
+                          <StyledListItemText
+                            primary='Sign Documents'
+                            secondary='Collect signatures from grant recipients'
+                          />
+                        </Box>
+                      </MenuItem>
+                    )}
                     <MenuItem value='rubric'>
                       <Box display='flex' alignItems='center' width='100%'>
                         <ListItemIcon>{evaluationIcons.rubric()}</ListItemIcon>

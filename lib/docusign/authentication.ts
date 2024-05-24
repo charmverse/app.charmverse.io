@@ -15,6 +15,7 @@ import {
   isDevEnv,
   isStagingEnv
 } from 'config/constants';
+import { isCharmVerseSpace } from 'lib/featureFlag/isCharmVerseSpace';
 
 type DocusignAccount = {
   account_id: string;
@@ -52,9 +53,11 @@ export function docusignUserOAuthTokenHeader({ accessToken }: { accessToken: str
  * Provides baseUri and accountId for the user's Docusign account
  */
 async function getUserDocusignAccountInfo({
-  accessToken
+  accessToken,
+  spaceId
 }: {
   accessToken: string;
+  spaceId: string;
 }): Promise<Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'docusignApiBaseUrl'>> {
   const profileUri = `${docusignOauthBaseUri}/oauth/userinfo`;
 
@@ -68,10 +71,24 @@ async function getUserDocusignAccountInfo({
         docusignAccountName: userProfile.accounts[0].account_name
       };
     })
-    .catch((err) => {
+    .catch(async (err) => {
       log.error('Failed to fetch user Docusign profile', err);
-      if (isDevEnv || isStagingEnv) {
-        return { docusignAccountId: demoAccountId, docusignApiBaseUrl: demoBaseUrl, docusignAccountName: 'CharmVerse' };
+
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          domain: true
+        }
+      });
+
+      if (isDevEnv || isStagingEnv || isCharmVerseSpace({ space })) {
+        return {
+          docusignAccountId: demoAccountId,
+          docusignApiBaseUrl: demoBaseUrl,
+          docusignAccountName: 'CharmVerse'
+        };
       }
       throw new InvalidInputError('Failed to fetch user profile');
     });
@@ -111,7 +128,7 @@ export async function saveUserDocusignOAuthToken({
     }
   });
 
-  const profile = await getUserDocusignAccountInfo({ accessToken: token.access_token });
+  const profile = await getUserDocusignAccountInfo({ accessToken: token.access_token, spaceId });
 
   const existingCredentials = await prisma.docusignCredential.findFirst({
     where: {
