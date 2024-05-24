@@ -17,7 +17,7 @@ import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOpt
  */
 type Props = {
   rootBoard: Board;
-  view: BoardView;
+  view?: BoardView;
   views: BoardView[];
   showView: (viewId: string) => void;
   isReward?: boolean;
