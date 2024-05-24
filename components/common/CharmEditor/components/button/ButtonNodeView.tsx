@@ -179,7 +179,7 @@ function ButtonForm({ defaultValues, onSubmit }: { defaultValues: NodeAttrs; onS
           <Select<NodeAttrs['size']>
             sx={{ width: '50%' }}
             defaultValue={defaultValues.size}
-            {...register('align', { required: true })}
+            {...register('size', { required: true })}
           >
             <MenuItem value='small'>Small</MenuItem>
             <MenuItem value='medium'>Medium</MenuItem>
