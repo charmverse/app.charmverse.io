@@ -15,28 +15,41 @@ export async function addMembersAndCreateNotifications() {
     }
   })
   const spaceAdminId = spaceAdminRole.userId;
-  const spaceRoles = await prisma.spaceRole.findMany({
-    where: {
-      space: {
-        domain: {
-          in: spaceDomains
-        }
-      }
-    },
-    select: {
-      userId: true,
-      spaceId: true
-    }
-  })
-
   const spaceUserIdsRecord: Record<string, string[]> = {};
-  spaceRoles.forEach((role) => {
-    if (spaceUserIdsRecord[role.spaceId]) {
-      spaceUserIdsRecord[role.spaceId].push(role.userId)
-    } else {
-      spaceUserIdsRecord[role.spaceId] = [role.userId]
-    }
-  })
+
+  for (const spaceDomain of spaceDomains) {
+    const spaceRoles = await prisma.spaceRole.findMany({
+      where: {
+        space: {
+          domain: spaceDomain
+        },
+        user: {
+          proposalsAuthored: {
+            some: {
+              proposal: {
+                status: "published",
+                space: {
+                  domain: spaceDomain
+                }
+              }
+            }
+          }
+        }
+      },
+      select: {
+        userId: true,
+        spaceId: true
+      }
+    })
+
+    spaceRoles.forEach((role) => {
+      if (spaceUserIdsRecord[role.spaceId]) {
+        spaceUserIdsRecord[role.spaceId].push(role.userId)
+      } else {
+        spaceUserIdsRecord[role.spaceId] = [role.userId]
+      }
+    })
+  }
 
   const totalMembers = Object.values(spaceUserIdsRecord).reduce((acc, curr) => acc + curr.length, 0)
   const sample = 200;
