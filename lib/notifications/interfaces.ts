@@ -84,7 +84,7 @@ export interface NotificationBase {
   createdBy: NotificationActor;
   read: boolean;
   archived: boolean;
-  group: 'card' | 'document' | 'post' | 'proposal' | 'vote' | 'bounty' | 'custom';
+  group: 'card' | 'document' | 'post' | 'proposal' | 'vote' | 'bounty';
 }
 
 export type CardNotification = NotificationBase & {
@@ -159,18 +159,6 @@ export type ProposalNotification = NotificationBase & {
     | null;
 };
 
-export type CustomNotificationType = 'orange-dao';
-
-export type CustomNotification =
-  | (NotificationBase & {
-      group: 'custom';
-    }) & {
-      type: 'orange-dao';
-      content: {
-        pageId: string;
-      };
-    };
-
 export type VoteNotificationType = 'new_vote';
 
 export type VoteNotification = NotificationBase & {
@@ -224,8 +212,7 @@ export type NotificationType =
   | DocumentNotificationType
   | PostNotificationType
   | ProposalNotificationType
-  | VoteNotificationType
-  | CustomNotificationType;
+  | VoteNotificationType;
 
 export type Notification =
   | DocumentNotification
@@ -233,5 +220,4 @@ export type Notification =
   | PostNotification
   | ProposalNotification
   | VoteNotification
-  | BountyNotification
-  | CustomNotification;
+  | BountyNotification;

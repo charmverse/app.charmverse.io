@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 export async function addMembersAndCreateNotifications() {
   const spaceId = '';
-  const pageId = '';
   const spaceAdminRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
       spaceId,
@@ -64,9 +63,6 @@ export async function addMembersAndCreateNotifications() {
             spaceId,
             createdBy: spaceAdminId,
           },
-        },
-        content: {
-          pageId,
         },
         type: "orange-dao"
       }

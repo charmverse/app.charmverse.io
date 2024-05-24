@@ -5,7 +5,6 @@ import { onError, onNoMatch, requireUser } from 'lib/middleware';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
 import { getPostNotifications } from 'lib/notifications/forum/getForumNotifications';
-import { getCustomNotifications } from 'lib/notifications/getCustomNotifications';
 import type { Notification } from 'lib/notifications/interfaces';
 import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
 import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
@@ -26,8 +25,7 @@ async function getNotifications(req: NextApiRequest, res: NextApiResponse<Notifi
       getPollNotifications({ userId }),
       getProposalNotifications({ userId }),
       getBountyNotifications({ userId }),
-      getPostNotifications({ userId }),
-      getCustomNotifications({ userId })
+      getPostNotifications({ userId })
     ])
   ).flat();
 
