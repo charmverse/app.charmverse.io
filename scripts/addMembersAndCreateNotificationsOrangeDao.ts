@@ -28,35 +28,34 @@ export async function addMembersAndCreateNotifications() {
     }
   })
 
-  const spaceRolesRecord: Record<string, string[]> = {};
+  const spaceUserIdsRecord: Record<string, string[]> = {};
   spaceRoles.forEach((role) => {
-    if (spaceRolesRecord[role.spaceId]) {
-      spaceRolesRecord[role.spaceId].push(role.userId)
+    if (spaceUserIdsRecord[role.spaceId]) {
+      spaceUserIdsRecord[role.spaceId].push(role.userId)
     } else {
-      spaceRolesRecord[role.spaceId] = [role.userId]
+      spaceUserIdsRecord[role.spaceId] = [role.userId]
     }
   })
 
-  const totalMembers = Object.values(spaceRolesRecord).reduce((acc, curr) => acc + curr.length, 0)
+  const totalMembers = Object.values(spaceUserIdsRecord).reduce((acc, curr) => acc + curr.length, 0)
   const sample = 200;
-  const sampledMembers: string[] = [];
-  for (const spaceId in spaceRolesRecord) {
-    const spaceMembers = spaceRolesRecord[spaceId];
-    const spaceProportion = spaceMembers.length / totalMembers;
+  const sampledUserIds: Set<string> = new Set();
+  Object.values(spaceUserIdsRecord).forEach((spaceUserIds) => {
+    const spaceProportion = spaceUserIds.length / totalMembers;
     const spaceSampleSize = Math.round(sample * spaceProportion);
-    const sampledSpaceMembers = _.sampleSize(spaceMembers, spaceSampleSize);
-    sampledMembers.push(...sampledSpaceMembers);
-  }
+    const spaceSampledUserIds = _.sampleSize(spaceUserIds.filter(spaceUserId => sampledUserIds.has(spaceUserId)), spaceSampleSize);
+    spaceSampledUserIds.forEach((userId) => sampledUserIds.add(userId))
+  })
 
   await prisma.spaceRole.createMany({
-    data: sampledMembers.map((userId) => ({
+    data: Array.from(sampledUserIds).map((userId) => ({
       userId,
       spaceId
     }))
   })
 
   await Promise.all(
-    sampledMembers.map(userId => prisma.customNotification.create({
+    Array.from(sampledUserIds).map(userId => prisma.customNotification.create({
       data: {
         notificationMetadata: {
           create: {
