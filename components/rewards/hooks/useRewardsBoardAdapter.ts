@@ -150,6 +150,24 @@ export function useRewardsBoardAdapter() {
   };
 }
 
+type RewardProps =
+  | Pick<BoardReward, 'fields' | 'id'>
+  | Pick<
+      RewardWithUsers,
+      | 'applications'
+      | 'fields'
+      | 'id'
+      | 'assignedSubmitters'
+      | 'dueDate'
+      | 'maxSubmissions'
+      | 'reviewers'
+      | 'rewardAmount'
+      | 'rewardToken'
+      | 'customReward'
+      | 'status'
+      | 'sourceProposalPage'
+    >;
+
 // build mock card from reward and page data
 export function mapRewardToCard({
   reward,
@@ -157,23 +175,7 @@ export function mapRewardToCard({
   spaceId,
   members
 }: {
-  reward:
-    | Pick<BoardReward, 'fields' | 'id'>
-    | Pick<
-        RewardWithUsers,
-        | 'applications'
-        | 'fields'
-        | 'id'
-        | 'assignedSubmitters'
-        | 'dueDate'
-        | 'maxSubmissions'
-        | 'reviewers'
-        | 'rewardAmount'
-        | 'rewardToken'
-        | 'customReward'
-        | 'status'
-        | 'sourceProposalPage'
-      >;
+  reward: RewardProps;
   rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
   members?: Record<string, Member>;
@@ -245,7 +247,7 @@ export function mapRewardToCard({
             .map((application) =>
               mapApplicationToCard({
                 application,
-                rewardId: reward.id,
+                reward,
                 spaceId,
                 members
               })
@@ -259,27 +261,55 @@ export function mapRewardToCard({
 // build mock card from reward and page data
 function mapApplicationToCard({
   application,
-  rewardId,
+  reward,
   spaceId,
   members
 }: {
   application: ApplicationMeta;
-  rewardId: string;
+  reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
 }) {
   const applicationFields = { properties: {} };
+  const assignedSubmitters =
+    reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
+  const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
+  const validApplications =
+    reward && 'applications' in reward
+      ? members
+        ? reward.applications.filter((_application) => members[_application.createdBy])
+        : reward.applications
+      : [];
+  const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
+  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
+
   applicationFields.properties = {
     ...applicationFields.properties,
     // add default field values on the fly
-    [REWARDS_AVAILABLE_BLOCK_ID]: null,
+    [REWARDS_AVAILABLE_BLOCK_ID]: isAssignedReward
+      ? 1
+      : reward && 'maxSubmissions' in reward && typeof reward.maxSubmissions === 'number' && reward.maxSubmissions > 0
+      ? (
+          countRemainingSubmissionSlots({
+            applications: validApplications,
+            limit: reward.maxSubmissions
+          }) as number
+        )?.toString()
+      : '',
     [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
-    [REWARD_STATUS_BLOCK_ID]: '',
+    [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [APPLICANT_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
-    [DUE_DATE_ID]: null,
-    [REWARD_REVIEWERS_BLOCK_ID]: [],
-    [REWARD_APPLICANTS_COUNT]: null
+    [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
+    [REWARD_REVIEWERS_BLOCK_ID]: (reward && 'reviewers' in reward && reward.reviewers) || [],
+    [REWARD_APPLICANTS_COUNT]: isAssignedReward ? 1 : validApplications.length.toString(),
+    [CREATED_AT_ID]:
+      reward && 'createdAt' in reward && reward.createdAt ? new Date(reward.createdAt as string).getTime() : '',
+    [REWARD_AMOUNT]: (reward && 'rewardAmount' in reward && reward.rewardAmount) || '',
+    [REWARD_CHAIN]: (reward && 'chainId' in reward && reward.chainId?.toString()) || '',
+    [REWARD_CUSTOM_VALUE]: (reward && 'customReward' in reward && reward.customReward) || '',
+    [REWARD_TOKEN]: (reward && 'rewardToken' in reward && reward.rewardToken) || '',
+    [REWARD_PROPOSAL_LINK]: proposalLinkValue
   };
 
   const isApplication =
@@ -289,7 +319,7 @@ function mapApplicationToCard({
   const card: Card = {
     id: application.id || '',
     spaceId,
-    parentId: rewardId,
+    parentId: reward.id,
     title: `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
     rootId: spaceId,
     type: 'card' as const,
