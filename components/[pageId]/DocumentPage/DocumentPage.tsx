@@ -314,7 +314,7 @@ function DocumentPageComponent({
               <ProposalBanner type='page' proposalId={page.convertedProposalId} />
             </AlertContainer>
           )}
-          {board?.fields.sourceType === 'proposals' && (
+          {(board?.fields.sourceType === 'proposals' || board?.fields.sourceType === 'rewards') && (
             <AlertContainer>
               <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
             </AlertContainer>

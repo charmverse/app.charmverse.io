@@ -17,7 +17,7 @@ import { ViewSourceOptions } from './viewSidebar/viewSourceOptions/viewSourceOpt
  */
 type Props = {
   rootBoard: Board;
-  view?: BoardView;
+  view?: BoardView; // Used for Rewards, when creating/updating a new view
   views: BoardView[];
   showView: (viewId: string) => void;
   isReward?: boolean;

@@ -114,7 +114,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.createProposalSource(arg)
   );
 
-  const handleUpdateSource = async (_sourceType: Extract<DataSourceType, 'rewards' | 'reward_applications'>) => {
+  const handleRewardSource = async (_sourceType: Extract<DataSourceType, 'rewards' | 'reward_applications'>) => {
     if (!activeView || activeView.fields.viewType !== 'board') {
       return;
     }
@@ -238,7 +238,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               </SourceType>
             )}
             {allowedSourceOptions.includes('rewards') && (
-              <SourceType data-test='source-new-rewards' onClick={() => handleUpdateSource('rewards')}>
+              <SourceType data-test='source-new-rewards' onClick={() => handleRewardSource('rewards')}>
                 <PageIcon pageType='rewards' style={{ fontSize: 24 }} />
                 Rewards
               </SourceType>
@@ -246,7 +246,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             {allowedSourceOptions.includes('reward_applications') && (
               <SourceType
                 data-test='source-new-reward-applications'
-                onClick={() => handleUpdateSource('reward_applications')}
+                onClick={() => handleRewardSource('reward_applications')}
               >
                 <DescriptionOutlinedIcon style={{ fontSize: 24 }} />
                 Submissions
