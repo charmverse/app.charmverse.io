@@ -10,11 +10,30 @@ type SpaceUserMetadata = {
   avatar: string | null
 }
 
+const pagePath = 'orange-dao-fellowship-14103747230207953';
+const spaceDomains = ['cyber', 'taiko', 'kyoto', 'cartesi', 'safe'];
+
 export async function addMembersAndCreateNotifications() {
-  const spaceId = '';
-  const pageId = '';
-  const spaceDomains = ['cyber', 'taiko', 'kyoto', 'cartesi', 'safe'];
-  const [spaceAdminRole, page] = await Promise.all([prisma.spaceRole.findFirstOrThrow({
+  const page = await prisma.page.findFirstOrThrow({
+    where: {
+      path: pagePath
+    },
+    select: {
+      id: true,
+      title: true,
+      path: true,
+      space: {
+        select: {
+          id: true
+        }
+      }
+    }
+  })
+
+  const spaceId = page.space.id;
+  const pageId = page.id;
+
+  const spaceAdminRole = await prisma.spaceRole.findFirstOrThrow({
     where: {
       spaceId,
       isAdmin: true
@@ -28,15 +47,7 @@ export async function addMembersAndCreateNotifications() {
       },
       userId: true
     }
-  }), prisma.page.findUniqueOrThrow({
-    where: {
-      id: pageId
-    },
-    select: {
-      title: true,
-      path: true
-    }
-  })])
+  })
 
   const space = spaceAdminRole.space;
   const spaceAdminId = spaceAdminRole.userId;
