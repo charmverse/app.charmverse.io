@@ -83,8 +83,32 @@ export function OrangeDAOInviteTemplate({
           }}
         >
           <Column style={{ width: 50 }} />
-          <Button href={link}>View</Button>
+          <Button href={link}>Apply</Button>
           <Column style={{ width: 50 }} />
+        </Row>
+        <Row>
+          <Column>
+            <Text
+              style={{
+                margin: `6px 0px`
+              }}
+              variant='caption'
+            >
+              <span>What is the OrangeDAO Fellowship?</span>
+            </Text>
+            <Text
+              style={{
+                margin: `6px 0px`
+              }}
+              variant='caption'
+            >
+              <span>
+                A 10 to 12-week program designed to support and accelerate early-stage Web3 startups. It includes
+                intensive sprints, mentorship, fundraising support, and culminates in a Demo Day for pitching to
+                investors. Startups can receive a $100,000 uncapped investment through a SAFE.
+              </span>
+            </Text>
+          </Column>
         </Row>
       </Section>
       <Hr />
