@@ -316,7 +316,12 @@ export function getNotificationMetadata({
 
       case 'custom': {
         return {
-          content: <div>You have been invited to join Orange DAO. Click here.</div>,
+          content: (
+            <div>
+              Are you interested in Grants & Fellowships? You can apply for an Orange DAO Fellowship in one click with
+              your CharmVerse profile.
+            </div>
+          ),
           href,
           pageTitle: notification.pageTitle
         };
