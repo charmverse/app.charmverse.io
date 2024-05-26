@@ -27,7 +27,7 @@ export function OrangeDAOInviteTemplate({
     timeStyle: 'short'
   });
 
-  const link = `${baseUrl}/${spaceDomain}${pagePath}`;
+  const link = `${baseUrl}/${spaceDomain}/${pagePath}`;
   return (
     <EmailWrapper title='OrangeDAO fellowship invites you' preview='OrangeDAO fellowship invites you'>
       <Section
