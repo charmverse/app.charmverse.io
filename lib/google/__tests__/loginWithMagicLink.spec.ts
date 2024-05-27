@@ -48,7 +48,7 @@ describe('loginWithMagicLink', () => {
     );
   });
 
-  it('should return the user if they already have a verified email to the user account if they only have a Google Account', async () => {
+  it('should return the user if they already have a verified email to the user account', async () => {
     const loginRequest: MagicLinkLoginRequest = {
       magicLink: {
         // The mocked implementation returns the access token as the email
@@ -104,6 +104,43 @@ describe('loginWithMagicLink', () => {
     expect(loginResult.user).toMatchObject(
       expect.objectContaining<Partial<LoggedInUser>>({
         ...user,
+        verifiedEmails: [
+          {
+            email: loginRequest.magicLink.accessToken,
+            name: loginRequest.magicLink.accessToken
+          }
+        ]
+      })
+    );
+  });
+
+  it('should return the user if they already have a notification email to the user account if they only have a Google Account', async () => {
+    const email = `test-${uuid()}@example.com`;
+    const user = await testUtilsUser.generateUser();
+
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        email
+      }
+    });
+
+    const loginRequest: MagicLinkLoginRequest = {
+      magicLink: {
+        // The mocked implementation returns the access token as the email
+        accessToken: email,
+        avatarUrl
+      }
+    };
+
+    const loginResult = await loginWithMagicLink(loginRequest);
+
+    expect(loginResult.isNew).toBe(false);
+    expect(loginResult.user).toMatchObject(
+      expect.objectContaining<Partial<LoggedInUser>>({
+        id: user.id,
         verifiedEmails: [
           {
             email: loginRequest.magicLink.accessToken,
