@@ -1,15 +1,17 @@
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import { Divider, FormLabel, Grid, TextField } from '@mui/material';
-import Box from '@mui/material/Box';
+import { FormLabel, Grid, ListItemIcon, ListItemText, Menu, MenuItem, TextField } from '@mui/material';
 
 import { useDocusign } from 'components/signing/hooks/useDocusign';
 import type { DocusignEnvelope } from 'lib/docusign/api';
 
 function DocusignSearchResult({ onClick, title }: { onClick: () => void; title: string }) {
   return (
-    <Box onClick={onClick} display='flex'>
-      <DescriptionOutlinedIcon /> {title}
-    </Box>
+    <MenuItem onClick={onClick}>
+      <ListItemIcon>
+        <DescriptionOutlinedIcon />
+      </ListItemIcon>
+      <ListItemText>{title}</ListItemText>
+    </MenuItem>
   );
 }
 
@@ -36,12 +38,16 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
         />
       </Grid>
 
-      <Grid container item gap={1}>
-        {options?.map((e) => (
-          <Grid item key={e.envelopeId}>
-            <DocusignSearchResult title={e.emailSubject} onClick={() => onSelectEnvelope({ envelope: e })} />
-          </Grid>
-        ))}
+      <Grid item gap={1}>
+        <Menu open>
+          {options?.map((e) => (
+            <DocusignSearchResult
+              key={e.envelopeId}
+              title={e.emailSubject}
+              onClick={() => onSelectEnvelope({ envelope: e })}
+            />
+          ))}
+        </Menu>
       </Grid>
     </Grid>
   );
