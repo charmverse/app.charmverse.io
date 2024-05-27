@@ -320,7 +320,7 @@ function mapApplicationToCard({
     id: application.id || '',
     spaceId,
     parentId: reward.id,
-    title: `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
+    title: reward.page.title,
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',
