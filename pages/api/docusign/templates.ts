@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { DocusignTemplate } from 'lib/docusign/api';
 import { getDocusignTemplates } from 'lib/docusign/api';
 import type { PublicDocuSignProfile } from 'lib/docusign/authentication';
 import { getSpaceDocusignCredentials } from 'lib/docusign/authentication';
@@ -13,7 +14,7 @@ handler
   .use(requireSpaceMembership({ adminOnly: false, location: 'query', spaceIdKey: 'spaceId' }))
   .get(docusignTemplates);
 
-async function docusignTemplates(req: NextApiRequest, res: NextApiResponse<PublicDocuSignProfile>) {
+async function docusignTemplates(req: NextApiRequest, res: NextApiResponse<DocusignTemplate[]>) {
   const credentials = await getSpaceDocusignCredentials({
     spaceId: req.query.spaceId as string
   });
@@ -26,7 +27,7 @@ async function docusignTemplates(req: NextApiRequest, res: NextApiResponse<Publi
     authToken: credentials.accessToken
   });
 
-  return res.status(200).json(templates as any);
+  return res.status(200).json(templates);
 }
 
 export default withSessionRoute(handler);

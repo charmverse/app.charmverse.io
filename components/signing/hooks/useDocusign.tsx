@@ -9,10 +9,7 @@ import {
   useGetSpaceDocusignEnvelopes,
   usePostRequestDocusignLink
 } from 'charmClient/hooks/docusign';
-import { docusignClientId, docusignOauthBaseUri } from 'config/constants';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
-import { useSnackbar } from 'hooks/useSnackbar';
-import { getCallbackDomain } from 'lib/oauth/getCallbackDomain';
 import type { EvaluationDocumentToSign } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
 import type { DocusignSearchRequest } from 'pages/api/docusign/search';
 
@@ -24,7 +21,7 @@ export function useDocusign() {
   async function connectDocusignAccount() {
     const redirectUri = await GET('/api/docusign/request-oauth-url', { spaceId: space?.id });
 
-    router.push(redirectUri.url);
+    window.location.href = redirectUri.url;
   }
 
   const { data: docusignProfile, mutate: refreshDocusignProfile } = useGetDocusignProfile({ spaceId: space?.id });

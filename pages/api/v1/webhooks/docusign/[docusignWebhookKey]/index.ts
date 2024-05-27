@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/dist/cjs/lib/log';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -13,43 +14,37 @@ const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 handler.post(docusignEventHandler);
 
 // Base type
-interface DocusignWebhookEvent {
-  event: string;
+type DocusignWebhookEvent<E extends string, T> = {
+  event: E;
   uri: string;
   retryCount: number | string;
   configurationId: number | string;
   apiVersion: string;
   generatedDateTime: string;
-  data: {
-    accountId: string;
-    envelopeId: string;
-    userId: string;
-  };
-}
+  data: T;
+};
 
 // EnvelopeCompletedEvent extends DocusignWebhookEvent
-interface EnvelopeCompletedEvent extends DocusignWebhookEvent {
-  event: 'envelope-completed';
-  data: {
+type EnvelopeCompletedEvent = DocusignWebhookEvent<
+  'envelope-completed',
+  {
     accountId: string;
     envelopeId: string;
     userId: string;
     envelopeSummary: string;
-  };
-}
+  }
+>;
 
 // RecipientCompletedEvent extends DocusignWebhookEvent
-interface RecipientCompletedEvent extends DocusignWebhookEvent {
-  event: 'recipient-completed';
-  retryCount: number;
-  configurationId: number;
-  data: {
+type RecipientCompletedEvent = DocusignWebhookEvent<
+  'recipient-completed',
+  {
     accountId: string;
     envelopeId: string;
     userId: string;
     recipientId: string;
-  };
-}
+  }
+>;
 
 export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, res: NextApiResponse) {
   const event = req.body as RecipientCompletedEvent | EnvelopeCompletedEvent;
@@ -67,8 +62,15 @@ export async function docusignEventHandler(req: NextApiRequestWithApiPageKey, re
   });
 
   if (!spaceCredentials) {
+    log.info('Received docusign webhook request with unknown key');
     return res.status(200).end();
   }
+
+  log.info('Received docusign webhook request', {
+    spaceId: spaceCredentials.spaceId,
+    event: event.event,
+    docusignEnvelopeId: event.data.envelopeId
+  });
 
   const documentInDb = await prisma.documentToSign.findFirst({
     where: {
