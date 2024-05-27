@@ -1,6 +1,5 @@
 import { ProposalEvaluationType } from '@charmverse/core/prisma';
 import { FeedbackOutlined, HowToVoteOutlined } from '@mui/icons-material';
-import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import EditNoteOutlinedIcon from '@mui/icons-material/EditNoteOutlined';
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import BountyIcon from '@mui/icons-material/RequestPageOutlined';
