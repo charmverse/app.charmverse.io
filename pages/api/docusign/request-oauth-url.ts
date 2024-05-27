@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import { baseUrl, docusignClientId, docusignOauthBaseUri } from 'config/constants';
-import { encodeDocusignState } from 'lib/docusign/authentication';
+import { encodeDocusignState } from 'lib/docusign/encodeAndDecodeDocusignState';
 import { onError, onNoMatch, requireSpaceMembership } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 

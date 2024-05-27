@@ -3,8 +3,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
-import { decodeDocusignState, saveUserDocusignOAuthToken } from 'lib/docusign/authentication';
+import { saveUserDocusignOAuthToken } from 'lib/docusign/authentication';
 import { ensureSpaceWebhookExists } from 'lib/docusign/connect';
+import { decodeDocusignState } from 'lib/docusign/encodeAndDecodeDocusignState';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 
