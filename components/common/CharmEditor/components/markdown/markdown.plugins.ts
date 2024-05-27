@@ -3,7 +3,6 @@ import { DOMParser, Fragment, Slice } from 'prosemirror-model';
 import { Plugin } from 'prosemirror-state';
 import type { EditorView } from 'prosemirror-view';
 
-import { insertNode } from 'components/common/CharmEditor/utils';
 import { charmParser } from 'lib/prosemirror/markdown/parseMarkdown';
 
 const md = markdownit({
@@ -56,15 +55,32 @@ export function plugins() {
             return false;
           }
           const text = event.clipboardData.getData('text/plain');
-          const node = charmParser.parse(text);
-          if (node) {
-            // create a slice from the child nodes, instead of inserting the node, which has type === 'doc' which causes extra new lines
-            const slice = new Slice(Fragment.from(node.content), 0, 0);
-            view.dispatch(
-              view.state.tr.replaceSelection(slice).scrollIntoView().setMeta('paste', true).setMeta('uiEvent', 'paste')
-            );
+
+          // Check if the current selection is inside a code block
+          const { $from } = view.state.selection;
+          const insideCodeBlock = $from.parent.type.name === 'codeBlock';
+          if (insideCodeBlock) {
+            // If inside a code block, insert the plain text directly
+            const tr = view.state.tr.insertText(text);
+            view.dispatch(tr);
             return true;
+          } else {
+            // If not inside a code block, parse the text as Markdown
+            const node = charmParser.parse(text);
+            if (node) {
+              // create a slice from the child nodes, instead of inserting the node, which has type === 'doc' which causes extra new lines
+              const slice = new Slice(Fragment.from(node.content), 0, 0);
+              view.dispatch(
+                view.state.tr
+                  .replaceSelection(slice)
+                  .scrollIntoView()
+                  .setMeta('paste', true)
+                  .setMeta('uiEvent', 'paste')
+              );
+              return true;
+            }
           }
+
           return false;
         }
       }
