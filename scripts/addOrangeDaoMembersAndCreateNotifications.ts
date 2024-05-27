@@ -10,13 +10,22 @@ type SpaceUserMetadata = {
   avatar: string | null
 }
 
-const pagePath = 'orange-dao-fellowship-14103747230207953';
-const spaceDomains = ['cyber', 'taiko', 'kyoto', 'cartesi', 'safe'];
+// const pagePath = 'orange-dao-fellowship-14103747230207953';
+// const spaceDomains = ['cyber', 'taiko', 'kyoto', 'cartesi', 'safe'];
+// const sample = 200
 
-export async function addMembersAndCreateNotifications() {
+export async function addOrangeDaoMembersAndCreateNotifications({
+  spaceDomains,
+  homePagePath,
+  sample
+}: {
+  homePagePath: string
+  spaceDomains: string[],
+  sample: number
+}) {
   const page = await prisma.page.findFirstOrThrow({
     where: {
-      path: pagePath
+      path: homePagePath
     },
     select: {
       id: true,
@@ -104,17 +113,17 @@ export async function addMembersAndCreateNotifications() {
     })
   }
 
-  const totalMembers = Object.values(spaceUsersRecord).reduce((acc, curr) => acc + curr.length, 0)
-  const sample = 200;
+  const totalMembers = new Set(Object.values(spaceUsersRecord).map((spaceUsers) => spaceUsers.map(spaceUser => spaceUser.userId).flat()).flat()).size
   const sampledUsers: Record<string, SpaceUserMetadata> = {};;
   Object.values(spaceUsersRecord).forEach((spaceUsers) => {
     const spaceProportion = spaceUsers.length / totalMembers;
     const spaceSampleSize = Math.round(sample * spaceProportion);
-    const spaceSampledUsers = _.sampleSize(spaceUsers.filter(spaceUser => sampledUsers[spaceUser.userId]), spaceSampleSize);
+    const spaceSampledUsers = _.sampleSize(spaceUsers.filter(spaceUser => !sampledUsers[spaceUser.userId]), spaceSampleSize);
     spaceSampledUsers.forEach((spaceUser) => {
       sampledUsers[spaceUser.userId] = spaceUser
     })
   })
+  
   let completed = 0;
   for (const sampledUser of Object.values(sampledUsers)) {
     try {
@@ -163,12 +172,12 @@ export async function addMembersAndCreateNotifications() {
         html: template.html
       });
     } catch (error) {
-      console.error(`Failed to add member ${sampledUser.username}`)
+      console.error(`Failed to add member ${sampledUser.username}`, {
+        error
+      })
     } finally {
       completed += 1;
       console.log(`Completed ${completed} of ${Object.values(sampledUsers).length}`)
     }
   }
 }
-
-addMembersAndCreateNotifications()
