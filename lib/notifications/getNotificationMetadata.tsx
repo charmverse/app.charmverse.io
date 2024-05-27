@@ -314,6 +314,19 @@ export function getNotificationMetadata({
         };
       }
 
+      case 'custom': {
+        return {
+          content: (
+            <div>
+              Are you interested in Grants & Fellowships? You can apply for an Orange DAO Fellowship in one click with
+              your CharmVerse profile.
+            </div>
+          ),
+          href,
+          pageTitle: notification.pageTitle
+        };
+      }
+
       default: {
         log.warn('Unrecognized notification type', { notification });
         return {
