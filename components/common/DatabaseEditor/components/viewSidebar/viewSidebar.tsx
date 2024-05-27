@@ -38,6 +38,7 @@ interface Props {
   selectedPropertyId: string | null;
   setSelectedPropertyId: Dispatch<SetStateAction<string | null>>;
   sidebarView?: SidebarView;
+  isReward?: boolean;
 }
 
 function getDefaultView(hasBoardView: boolean): SidebarView {
@@ -144,6 +145,7 @@ function ViewSidebar(props: Props) {
               closeSourceOptions={goToSidebarHome}
               closeSidebar={onClose}
               showView={props.showView}
+              isReward={props.isReward}
             />
           )}
         </StyledSidebar>

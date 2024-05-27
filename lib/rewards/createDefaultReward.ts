@@ -14,7 +14,8 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_STATUS_BLOCK_ID,
   REWARD_TOKEN,
-  REWARDER_BLOCK_ID
+  REWARDER_BLOCK_ID,
+  APPLICANT_STATUS_BLOCK_ID
 } from './blocks/constants';
 import { createReward } from './createReward';
 
@@ -51,6 +52,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
         [REWARD_CHAIN]: '',
         [REWARD_CUSTOM_VALUE]: 'Meet CharmVerse',
         [REWARD_STATUS_BLOCK_ID]: '',
+        [APPLICANT_STATUS_BLOCK_ID]: '',
         [REWARD_TOKEN]: '',
         [REWARDER_BLOCK_ID]: '',
         [Constants.titleColumnId]: 'Getting Started'
@@ -114,6 +116,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
         [REWARD_CHAIN]: '',
         [REWARD_CUSTOM_VALUE]: '',
         [REWARD_STATUS_BLOCK_ID]: '',
+        [APPLICANT_STATUS_BLOCK_ID]: '',
         [REWARD_TOKEN]: '',
         [REWARDER_BLOCK_ID]: '',
         [Constants.titleColumnId]: 'Default milestone template'
