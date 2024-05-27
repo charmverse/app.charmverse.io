@@ -122,7 +122,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     const oldBlocks = [activeView];
     const newBoard = createBoardView(activeView);
     newBoard.fields.sourceType = _sourceType;
-    mutator.updateBlocks([newBoard], oldBlocks, 'Update rewards board source type');
+    await mutator.updateBlocks([newBoard], oldBlocks, 'Update rewards board source type');
   };
 
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
