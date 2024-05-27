@@ -14,7 +14,6 @@ import { task as processCollablandWebhookMessages } from './tasks/processCollabl
 import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
 import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
-import { refreshDocusignOAuthTask } from './tasks/refreshDocusignOAuthTask';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -63,9 +62,6 @@ cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 // Create external eas credentials for Gitcoin and Questbook every day at midnight
 cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
-
-// Refresh docusign credentials every 6 hours
-cron.schedule('0 /6 * * *', refreshDocusignOAuthTask);
 
 const port = process.env.PORT || 4000;
 

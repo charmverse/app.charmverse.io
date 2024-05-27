@@ -125,11 +125,7 @@ export function EvaluationStepSettings({
           emptyPlaceholderContent='Select user or role'
           value={reviewerOptions as SelectOption[]}
           readOnly={readOnlyReviewers || isTokenVoting}
-          systemRoles={
-            evaluation.type === 'sign_documents'
-              ? []
-              : [authorSystemRole, isTokenVoting ? tokenHoldersSystemRole : allMembersSystemRole]
-          }
+          systemRoles={[authorSystemRole, isTokenVoting ? tokenHoldersSystemRole : allMembersSystemRole]}
           variant='outlined'
           onChange={handleOnChangeReviewers}
           required
