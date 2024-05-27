@@ -10,7 +10,7 @@ function DocusignSearchResult({ onClick, title }: { onClick: () => void; title: 
       <ListItemIcon>
         <DescriptionOutlinedIcon />
       </ListItemIcon>
-      <ListItemText>{title}</ListItemText>
+      <ListItemText sx={{ textWrap: 'wrap' }}>{title}</ListItemText>
     </MenuItem>
   );
 }
@@ -39,15 +39,13 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
       </Grid>
 
       <Grid item gap={1}>
-        <Menu open>
-          {options?.map((e) => (
-            <DocusignSearchResult
-              key={e.envelopeId}
-              title={e.emailSubject}
-              onClick={() => onSelectEnvelope({ envelope: e })}
-            />
-          ))}
-        </Menu>
+        {options?.map((e) => (
+          <DocusignSearchResult
+            key={e.envelopeId}
+            title={e.emailSubject}
+            onClick={() => onSelectEnvelope({ envelope: e })}
+          />
+        ))}
       </Grid>
     </Grid>
   );
