@@ -33,15 +33,16 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
     [proposal?.form?.formFields, answers]
   );
 
-  const projectField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
-  const projectAnswer = answers?.find((answer) => answer.fieldId === projectField?.id)?.value as
-    | { projectId: string; selectedMemberIds: string[] }
-    | undefined;
-
+  // get Answers form
   const { control, getFieldState } = useFormFields({
     fields: formFields
   });
 
+  // get project form
+  const projectField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
+  const projectAnswer = answers?.find((answer) => answer.fieldId === projectField?.id)?.value as
+    | { projectId: string; selectedMemberIds: string[] }
+    | undefined;
   const projectForm = useProjectForm({
     initialProjectValues: proposal?.project,
     projectId: proposal?.projectId,

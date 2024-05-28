@@ -246,21 +246,19 @@ function getFormResolver(fields: FormFieldInput[]) {
 }
 
 export function getInitialFormFieldValue(prop: { type: FieldType; value?: FormFieldValue }) {
-  const value =
-    prop.type === 'multiselect' || prop.type === 'person'
-      ? // Convert to array if not already as yup expects array
-        Array.isArray(prop.value)
-        ? prop.value
-        : []
-      : prop.type === 'long_text'
-      ? // convert to content and contentText for prosemirror document
-        prop.value || {
-          content: emptyDocument,
-          contentText: ''
-        }
-      : prop.value || '';
-
-  return value;
+  switch (prop.type) {
+    case 'multiselect':
+      return Array.isArray(prop.value) ? prop.value : [];
+    case 'person':
+      return Array.isArray(prop.value) ? prop.value : [];
+    case 'long_text':
+      return prop.value || { content: emptyDocument, contentText: '' };
+    case 'project_profile': {
+      return prop.value || { projectId: '', selectedMemberIds: [] };
+    }
+    default:
+      return prop.value || '';
+  }
 }
 
 function getFormFieldMap(fields: FormFieldInput[]) {

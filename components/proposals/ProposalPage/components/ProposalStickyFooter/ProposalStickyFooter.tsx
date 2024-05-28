@@ -1,7 +1,7 @@
 import type { PageType } from '@charmverse/core/prisma';
 import { Box } from '@mui/material';
 import type { Control } from 'react-hook-form';
-import { useFormContext, useFormState } from 'react-hook-form';
+import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 
 import { usePublishProposal } from 'charmClient/hooks/proposals';
 import { StickyFooterContainer } from 'components/[pageId]/DocumentPage/components/StickyFooterContainer';
@@ -28,7 +28,7 @@ export function ProposalStickyFooter({
   const projectForm = useFormContext<ProjectAndMembersPayload>();
   const projectFormValues = projectForm.watch() as ProjectWithMembers;
   const { isValid: isFormAnswersValid } = useFormState({ control: formAnswersControl });
-
+  const answerFormValues = useWatch({ control: formAnswersControl });
   const { showMessage } = useSnackbar();
   const { space } = useCurrentSpace();
   const { trigger: publishProposal, isMutating } = usePublishProposal({ proposalId: proposal.id });
@@ -47,6 +47,7 @@ export function ProposalStickyFooter({
     page.type === 'proposal_template'
       ? proposal.form?.formFields
       : proposal.form?.formFields?.filter((field) => field.type === 'project_profile');
+  const projectProfileAnswer = projectProfileField ? answerFormValues[projectProfileField.id] : null;
   const errors = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
@@ -61,7 +62,7 @@ export function ProposalStickyFooter({
     proposal: {
       ...proposal,
       // form field answers are validated using react-hook-from, except for project profile
-      formAnswers: [],
+      formAnswers: projectProfileAnswer ? [{ fieldId: projectProfileField!.id, value: projectProfileAnswer }] : [],
       formFields,
       authors: proposal.authors.map((a) => a.userId)
     } as ProposalToErrorCheck,
