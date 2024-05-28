@@ -6,7 +6,6 @@ import request from 'supertest';
 import { v4 as uuid } from 'uuid';
 
 import type { CreateProposalInput } from 'lib/proposals/createProposal';
-import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { assignRole } from 'lib/roles';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
