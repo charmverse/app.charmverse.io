@@ -57,7 +57,9 @@ export function ProposalStickyFooter({
     proposal: {
       ...proposal,
       formAnswers: [],
-      formFields: [], // proposal.form?.formFields || undefined,
+      // form fields are validated using react-hook-from, except for project profile
+      formFields: proposal.form?.formFields?.filter((field) => field.type === 'project_profile'),
+      // formFields: [], // proposal.form?.formFields || undefined,
       authors: proposal.authors.map((a) => a.userId)
     } as ProposalToErrorCheck,
     requireTemplates: !!space?.requireProposalTemplate
