@@ -4,6 +4,7 @@ import { testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
 
 import type { LoggedInUser } from 'models';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import type { DecodedIdToken } from '../firebaseApp';
 import type { MagicLinkLoginRequest } from '../loginWithMagicLink';
@@ -116,15 +117,8 @@ describe('loginWithMagicLink', () => {
 
   it('should return the user if they already have a notification email to the user account if they only have a Google Account', async () => {
     const email = `test-${uuid()}@example.com`;
-    const user = await testUtilsUser.generateUser();
-
-    await prisma.user.update({
-      where: {
-        id: user.id
-      },
-      data: {
-        email
-      }
+    const { user } = await generateUserAndSpace({
+      user: { email }
     });
 
     const loginRequest: MagicLinkLoginRequest = {

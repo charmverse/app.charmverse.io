@@ -113,16 +113,15 @@ function UserOnboardingDialog({
   hasEmptyRequiredProperties?: boolean;
   setIsOnboardingModalOpen: (isOpen: boolean) => void;
 }) {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { requiredPropertiesWithoutValue } = useRequiredMemberProperties({
     userId: currentUser.id
   });
   const {
     control: memberPropertiesControl,
-    errors: memberPropertiesErrors,
     isValid: isMemberPropertiesValid,
     onFormChange: onMemberPropertiesChange,
     isDirty: isMemberPropertiesDirty,
-    isSubmitting: isMemberPropertiesSubmitting,
     onSubmit: onSubmitMemberProperties
   } = useRequiredMemberPropertiesForm({
     userId: currentUser.id
@@ -134,7 +133,6 @@ function UserOnboardingDialog({
     values: userDetailsValues,
     onFormChange: onUserDetailsChange,
     isDirty: isUserDetailsDirty,
-    isSubmitting: isUserDetailsSubmitting,
     onSubmit: onSubmitUserDetails
   } = useRequiredUserDetailsForm({
     userId: currentUser.id
@@ -150,9 +148,13 @@ function UserOnboardingDialog({
       completeOnboarding?.();
       return;
     }
-
-    await onSubmitMemberProperties();
-    await onSubmitUserDetails();
+    setIsSubmitting(true);
+    try {
+      await onSubmitMemberProperties();
+      await onSubmitUserDetails();
+    } finally {
+      setIsSubmitting(false);
+    }
     completeOnboarding?.();
   }
 
@@ -203,7 +205,7 @@ function UserOnboardingDialog({
             disableElevation
             size='large'
             onClick={saveForm}
-            loading={isUserDetailsSubmitting || isMemberPropertiesSubmitting}
+            loading={isSubmitting}
             disabled={isSaveButtonDisabled}
             disabledTooltip={!isFormDirty ? 'No changes to save' : 'Please fill out all required fields'}
           >
@@ -232,7 +234,6 @@ function UserOnboardingDialog({
           <Legend mt={4}>Member details</Legend>
           <MemberPropertiesForm
             control={memberPropertiesControl}
-            errors={memberPropertiesErrors}
             refreshPropertyValues={refreshPropertyValues}
             onChange={(values) =>
               onMemberPropertiesChange(

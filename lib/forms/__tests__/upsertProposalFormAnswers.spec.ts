@@ -265,7 +265,7 @@ describe('upsertFormAnswers', () => {
     await expect(
       upsertProposalFormAnswers({
         proposalId: proposal.id,
-        answers: [{ fieldId: fieldsInput[0].id, value: '123' }]
+        answers: [{ fieldId: fieldsInput[0].id, value: '' }]
       })
     ).rejects.toBeInstanceOf(InvalidInputError);
 
