@@ -59,6 +59,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
   if (isOver) {
     className += ' dragover';
   }
+  const isExpandedGroup = activeView.fields.collapsedOptionIds.indexOf(group.id || 'undefined') < 0;
 
   return (
     <div ref={drop} className={className} key={group.option?.id || group.value}>
@@ -66,6 +67,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
         group={group}
         board={board}
         activeView={activeView}
+        isExpandedGroup={isExpandedGroup}
         groupByProperty={groupByProperty}
         hideGroup={props.hideGroup}
         addCard={props.addCard}
