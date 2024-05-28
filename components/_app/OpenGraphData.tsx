@@ -4,9 +4,10 @@ export type OpenGraphProps = {
   title?: string;
   description?: string;
   image?: string;
+  canonicalUrl?: string;
 };
 
-export function OpenGraphData({ description, title, image }: OpenGraphProps) {
+export function OpenGraphData({ description, title, image, canonicalUrl }: OpenGraphProps) {
   const displayedDescription = description;
 
   const displayedTitle = title || 'CharmVerse';
@@ -18,6 +19,7 @@ export function OpenGraphData({ description, title, image }: OpenGraphProps) {
       <meta name='theme-color' content={blueColor} />
       <link rel='icon' href='/favicon.png' />
       {displayedDescription && <meta name='description' content={displayedDescription} />}
+      {canonicalUrl && <link rel='canonical' href={canonicalUrl} />}
       <meta property='og:title' content={displayedTitle} />
       <meta property='og:image' content={displayedImage} />
 

@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
-import { Box, Menu, ListItemText, ListItemIcon, MenuItem, Tooltip } from '@mui/material';
+import { Menu, ListItemText, ListItemIcon, MenuItem, Tooltip } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
-import { Button } from 'components/common/Button';
-
-export const StyledMenuItem = styled(MenuItem)<{
+export const StyledMenuItem = styled(MenuItem, {
+  shouldForwardProp: (prop) => prop !== 'lastChild' && prop !== 'firstChild'
+})<{
   firstChild?: boolean;
   lastChild?: boolean;
 }>(

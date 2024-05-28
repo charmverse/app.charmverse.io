@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
 import { DisabledAccountError } from 'lib/utils/errors';
-import { generateUserAndSpaceWithApiToken } from 'testing/setupDatabase';
+import { generateUserAndSpace } from 'testing/setupDatabase';
 
 import { loginWithGoogle } from '../loginWithGoogle';
 
@@ -58,7 +58,7 @@ describe('loginWithGoogle', () => {
   });
 
   it('should fail if the user is marked as deleted', async () => {
-    const { user, space } = await generateUserAndSpaceWithApiToken();
+    const { user, space } = await generateUserAndSpace();
 
     const testEmail = `test-${v4()}@example.com`;
 
@@ -94,7 +94,7 @@ describe('loginWithGoogle', () => {
   });
 
   it('should pass login if the user has an existing verified email', async () => {
-    const { user } = await generateUserAndSpaceWithApiToken();
+    const { user } = await generateUserAndSpace();
 
     const testEmail = `test-${v4()}@example.com`;
 
@@ -118,5 +118,19 @@ describe('loginWithGoogle', () => {
     });
 
     expect(existingUser.id).toEqual(user.id);
+  });
+
+  it('should return the user if they already have a notification email to the user account if they only have a Google Account', async () => {
+    const email = `test-${Math.random()}@example.com`;
+    const { user } = await generateUserAndSpace({
+      user: { email }
+    });
+
+    const loginResult = await loginWithGoogle({
+      accessToken: email
+    });
+    expect(loginResult.id).toBe(user.id);
+    expect(loginResult.googleAccounts).toHaveLength(1);
+    expect(loginResult.googleAccounts[0].email).toEqual(email);
   });
 });

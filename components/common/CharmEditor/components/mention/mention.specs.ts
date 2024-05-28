@@ -1,4 +1,4 @@
-import type { DOMOutputSpec } from 'prosemirror-model';
+import type { DOMOutputSpec, Node } from 'prosemirror-model';
 
 import type { Member } from 'lib/members/interfaces';
 
@@ -43,9 +43,28 @@ export function mentionSpecs(): RawSpecs {
         group: 'inline',
         draggable: false,
         atom: true,
-        parseDOM: [{ tag: 'span.charm-mention-value' }],
-        toDOM: (): DOMOutputSpec => {
-          return ['span', { class: 'charm-mention-value' }];
+        parseDOM: [
+          {
+            tag: 'span.charm-mention-value',
+            getAttrs: (dom: any) => {
+              return {
+                type: dom.getAttribute('data-type'),
+                value: dom.getAttribute('data-value'),
+                id: dom.getAttribute('data-id')
+              };
+            }
+          }
+        ],
+        toDOM: (node: Node): DOMOutputSpec => {
+          return [
+            'span',
+            {
+              class: 'charm-mention-value',
+              'data-type': node.attrs.type,
+              'data-value': node.attrs.value,
+              'data-id': node.attrs.id
+            }
+          ];
         }
       },
       markdown: {

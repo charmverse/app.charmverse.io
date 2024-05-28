@@ -27,6 +27,7 @@ import { setUrlWithoutRerender } from 'lib/utils/browser';
 import { BangleEditor as ReactBangleEditor } from './components/@bangle.dev/react/ReactEditor';
 import { useEditorState } from './components/@bangle.dev/react/useEditorState';
 import { BookmarkNodeView } from './components/bookmark/BookmarkNodeView';
+import { ButtonNodeView } from './components/button/ButtonNodeView';
 import Callout from './components/callout/components/Callout';
 import { CryptoPriceNodeView } from './components/cryptoPrice/CryptoPriceNodeView';
 import { EmojiPopup } from './components/emojiSuggest/EmojiPopup';
@@ -505,6 +506,9 @@ function CharmEditor({
           }
           case 'bookmark': {
             return <BookmarkNodeView {...allProps} />;
+          }
+          case 'button': {
+            return <ButtonNodeView {...allProps} />;
           }
           case 'poll': {
             return <PollNodeView {...allProps} />;

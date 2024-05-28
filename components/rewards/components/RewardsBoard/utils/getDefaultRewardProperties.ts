@@ -1,4 +1,4 @@
-import type { BountyStatus } from '@charmverse/core/prisma-client';
+import type { ApplicationStatus, BountyStatus } from '@charmverse/core/prisma-client';
 
 import type { IPropertyTemplate } from 'lib/databases/board';
 import type { Constants } from 'lib/databases/constants';
@@ -15,7 +15,8 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_TOKEN,
   REWARD_APPLICANTS_COUNT,
-  REWARD_PROPOSAL_LINK
+  REWARD_PROPOSAL_LINK,
+  APPLICANT_STATUS_BLOCK_ID
 } from 'lib/rewards/blocks/constants';
 
 // define properties that will apply to all source fields
@@ -27,12 +28,35 @@ const rewardStatusOptions: { id: BountyStatus; value: string; color: keyof (type
   { id: 'paid', value: 'Paid', color: 'propColorGreen' }
 ];
 
+const applicantStatusOptions: {
+  id: ApplicationStatus;
+  value: string;
+  color: keyof (typeof Constants)['menuColors'];
+}[] = [
+  { id: 'applied', value: 'Applied', color: 'propColorDefault' },
+  { id: 'review', value: 'Review', color: 'propColorYellow' },
+  { id: 'complete', value: 'Approved', color: 'propColorBlue' },
+  { id: 'inProgress', value: 'In Progress', color: 'propColorTeal' },
+  { id: 'cancelled', value: 'Cancelled', color: 'propColorRed' },
+  { id: 'processing', value: 'Processing', color: 'propColorTeal' },
+  { id: 'paid', value: 'Paid', color: 'propColorGreen' },
+  { id: 'submission_rejected', value: 'Submission Rejected', color: 'propColorRed' },
+  { id: 'rejected', value: 'Rejected', color: 'propColorRed' }
+];
+
 const rewardDbProperties = {
   rewardStatus: (): IPropertyTemplate => ({
     ...defaultOptions,
     id: REWARD_STATUS_BLOCK_ID,
     name: 'Status',
     options: rewardStatusOptions,
+    type: 'select'
+  }),
+  rewardApplicantStatus: (): IPropertyTemplate => ({
+    ...defaultOptions,
+    id: APPLICANT_STATUS_BLOCK_ID,
+    name: 'Applicant Status',
+    options: applicantStatusOptions,
     type: 'select'
   }),
   rewardApplicants: (): IPropertyTemplate => ({
@@ -116,6 +140,7 @@ export function getDefaultRewardProperties({
     rewardDbProperties.rewardReviewers(),
     rewardDbProperties.rewardAvailableCount(),
     rewardDbProperties.rewardStatus(),
+    rewardDbProperties.rewardApplicantStatus(),
     rewardDbProperties.rewardAmount(),
     rewardDbProperties.rewardChain(),
     rewardDbProperties.rewardCustomValue(),

@@ -9,6 +9,7 @@ import { getNotificationMetadata } from 'lib/notifications/getNotificationMetada
 import type { Notification } from 'lib/notifications/interfaces';
 
 import { PendingNotification } from './templates/NotificationTemplate';
+import { OrangeDAOInviteTemplate } from './templates/OrangeDAOInviteTemplate';
 import type { PageInviteEmailProps } from './templates/PageInviteEmail';
 import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
 
@@ -18,7 +19,7 @@ export function getPendingNotificationEmail({
   user
 }: {
   notification: Notification;
-  user: Pick<User, 'id' | 'username' | 'id' | 'avatar'>;
+  user: Pick<User, 'username' | 'id' | 'avatar'>;
   spaceFeatures: FeatureJson[];
 }) {
   const html = render(PendingNotification({ notification, user, spaceFeatures }));
@@ -27,6 +28,36 @@ export function getPendingNotificationEmail({
     typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));
 
   return { html, subject };
+}
+
+export function getOrangeDaoSpaceInviteEmail({
+  pagePath,
+  pageTitle,
+  spaceDomain,
+  user,
+  spaceName
+}: {
+  spaceName: string;
+  pageTitle: string;
+  pagePath: string;
+  spaceDomain: string;
+  user: Pick<User, 'username' | 'id' | 'avatar'>;
+}) {
+  const html = render(
+    OrangeDAOInviteTemplate({
+      pagePath,
+      pageTitle,
+      spaceDomain,
+      user,
+      spaceName
+    })
+  );
+  const subject = 'OrangeDAO fellowship invites you';
+
+  return {
+    html,
+    subject
+  };
 }
 
 export function getPageInviteEmail(props: PageInviteEmailProps) {
