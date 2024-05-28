@@ -247,6 +247,7 @@ export function mapRewardToCard({
             .map((application) =>
               mapApplicationToCard({
                 application,
+                pageTitle: rewardPage.title,
                 reward,
                 spaceId,
                 members
@@ -261,11 +262,13 @@ export function mapRewardToCard({
 // build mock card from reward and page data
 function mapApplicationToCard({
   application,
+  pageTitle,
   reward,
   spaceId,
   members
 }: {
   application: ApplicationMeta;
+  pageTitle?: string;
   reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
@@ -320,7 +323,7 @@ function mapApplicationToCard({
     id: application.id || '',
     spaceId,
     parentId: reward.id,
-    title: `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
+    title: pageTitle || 'Untitled',
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',
