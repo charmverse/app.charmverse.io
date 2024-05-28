@@ -102,7 +102,7 @@ test('should match snapshot, hide group', async () => {
 
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
-      isExpandedGroup={false}
+      isExpandedGroup={true}
       board={board}
       activeView={collapsedOptionsView}
       group={boardTreeGroup}
