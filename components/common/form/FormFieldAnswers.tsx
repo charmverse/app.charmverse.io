@@ -2,8 +2,8 @@ import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
 import { useCallback, useMemo } from 'react';
-import type { Control, FieldErrors } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
+import type { Control, UseFormGetFieldState } from 'react-hook-form';
 
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -23,7 +23,6 @@ import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
-import { useFormFields } from './hooks/useFormFields';
 
 const FormFieldAnswersContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
@@ -38,14 +37,15 @@ type FormFieldAnswersProps = {
   })[];
   disabled?: boolean;
   enableComments: boolean;
-  errors: FieldErrors<Record<string, FormFieldValue>>;
+  // errors: FieldErrors<Record<string, FormFieldValue>>;
+  getFieldState: UseFormGetFieldState<Record<string, FormFieldValue>>;
   control: Control<Record<string, FormFieldValue>, any>;
-  onFormChange: (
-    updatedFields: {
-      id: string;
-      value: FormFieldValue;
-    }[]
-  ) => void;
+  // onFormChange: (
+  //   updatedFields: {
+  //     id: string;
+  //     value: FormFieldValue;
+  //   }[]
+  // ) => void;
   onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
   getValues?: () => Record<string, FormFieldValue>;
   values?: Record<string, FormFieldValue>;
@@ -64,20 +64,20 @@ const StyledStack = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
   position: relative;
 `;
+
 export function FormFieldAnswers({
   onSave,
   formFields,
   disabled,
   enableComments,
+  getFieldState,
+  control,
   pageId,
   project,
   threads = {},
   proposalId,
   milestoneProps
-}: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange' | 'onProjectUpdate'>) {
-  const { control, getFieldState } = useFormFields({
-    fields: formFields
-  });
+}: FormFieldAnswersProps) {
   const { user } = useUser();
   const { showMessage } = useSnackbar();
 
@@ -122,7 +122,6 @@ export function FormFieldAnswers({
       };
     }, {} as Record<string, ThreadWithComments[]>);
   }, [threads]);
-
   return (
     <FormFieldAnswersContainer>
       {formFields?.map((formField) => {
