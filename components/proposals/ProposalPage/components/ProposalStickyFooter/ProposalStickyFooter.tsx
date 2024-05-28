@@ -43,6 +43,10 @@ export function ProposalStickyFooter({
 
   const projectProfileField = proposal?.form?.formFields?.find((field) => field.type === 'project_profile');
   const milestoneFormInput = proposal.form?.formFields?.find((field) => field.type === 'milestone');
+  const formFields =
+    page.type === 'proposal_template'
+      ? proposal.form?.formFields
+      : proposal.form?.formFields?.filter((field) => field.type === 'project_profile');
   const errors = getProposalErrors({
     page: {
       sourceTemplateId: page.sourceTemplateId,
@@ -56,10 +60,9 @@ export function ProposalStickyFooter({
     contentType: isStructuredProposal ? 'structured' : 'free_form',
     proposal: {
       ...proposal,
+      // form field answers are validated using react-hook-from, except for project profile
       formAnswers: [],
-      // form fields are validated using react-hook-from, except for project profile
-      formFields: proposal.form?.formFields?.filter((field) => field.type === 'project_profile'),
-      // formFields: [], // proposal.form?.formFields || undefined,
+      formFields,
       authors: proposal.authors.map((a) => a.userId)
     } as ProposalToErrorCheck,
     requireTemplates: !!space?.requireProposalTemplate
