@@ -40,7 +40,7 @@ export function useFormFields({
         keepDirtyValues: false
       });
     }
-  }, [!!fields, reset]);
+  }, [fields, reset]);
 
   return {
     control,
