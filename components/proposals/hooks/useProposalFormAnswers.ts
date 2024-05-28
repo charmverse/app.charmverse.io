@@ -4,21 +4,23 @@ import { useGetProposalFormFieldAnswers, useUpdateProposalFormFieldAnswers } fro
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import { useFormFields } from 'components/common/form/hooks/useFormFields';
 import { useProjectForm } from 'components/proposals/hooks/useProjectForm';
+import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import type { FormFieldValue } from 'lib/forms/interfaces';
 import { createDefaultProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 
 export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUsersAndRubric }) {
-  const { data: answers, isLoading: isLoadingAnswers } = useGetProposalFormFieldAnswers({
+  const { data: answers } = useGetProposalFormFieldAnswers({
     proposalId: proposal?.id
   });
   const { trigger } = useUpdateProposalFormFieldAnswers({ proposalId: proposal?.id });
 
   const formFields = useMemo(
     () =>
+      answers &&
       proposal?.form?.formFields?.map((formField) => {
-        const proposalFormFieldAnswer = answers?.find(
+        const proposalFormFieldAnswer = answers.find(
           (_proposalFormFieldAnswer) => _proposalFormFieldAnswer.fieldId === formField.id
         );
         return {
@@ -63,5 +65,16 @@ export function useProposalFormAnswers({ proposal }: { proposal?: ProposalWithUs
     [trigger, answers]
   );
 
-  return { control, formFields, onSave, getFieldState, isLoadingAnswers, projectForm };
+  // isLoadingAnswers is based on whether formFields has been populatd with answers yet or not
+  // add a debounce delay so the state inside useFormFields has time to set the values or elsle empty fields will appear for a brief second
+  const isLoadingAnswers = useDebouncedValue(!formFields, 1);
+
+  return {
+    control,
+    formFields,
+    onSave,
+    getFieldState,
+    isLoadingAnswers,
+    projectForm
+  };
 }

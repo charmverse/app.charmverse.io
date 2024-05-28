@@ -45,6 +45,7 @@ export function useFormFields({
   return {
     control,
     getFieldState,
+    reset,
     onSubmit: () => {
       handleSubmit((_values) => {
         onSubmit?.(_values);
