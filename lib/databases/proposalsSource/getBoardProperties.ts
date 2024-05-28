@@ -28,11 +28,11 @@ type EvaluationStep = {
 export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
-  evaluationSteps,
+  evaluationSteps = [],
   proposalCustomProperties = []
 }: {
   proposalCustomProperties?: IPropertyTemplate[];
-  evaluationSteps: EvaluationStep[];
+  evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
   formFields?: FormFieldInput[];
 }) {

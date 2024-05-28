@@ -76,7 +76,13 @@ describe('getBoardProperties', () => {
 
   it('Should return universal properties for rubric steps', () => {
     const properties = getBoardProperties({
-      rubricStepTitles: ['Rubric Evaluation']
+      evaluationSteps: [
+        {
+          title: 'Rubric Evaluation',
+          type: 'rubric',
+          rubricCriteria: []
+        }
+      ]
     });
     expect(properties.some((r) => r.type === 'proposalEvaluatedBy')).toBeTruthy();
     expect(properties.some((r) => r.type === 'proposalEvaluationTotal')).toBeTruthy();
@@ -85,14 +91,26 @@ describe('getBoardProperties', () => {
 
   it('Should retain the id of an existing property when matching by type', () => {
     const properties = getBoardProperties({
-      rubricStepTitles: ['Rubric Evaluation']
+      evaluationSteps: [
+        {
+          title: 'Rubric Evaluation',
+          type: 'rubric',
+          rubricCriteria: []
+        }
+      ]
     });
     const property = properties.find((r) => r.type === 'proposalEvaluatedBy');
     expect(property?.id).toBeTruthy();
     const originalId = property?.id;
     const newProperties = getBoardProperties({
       currentCardProperties: properties,
-      rubricStepTitles: ['Rubric Evaluation']
+      evaluationSteps: [
+        {
+          title: 'Rubric Evaluation',
+          type: 'rubric',
+          rubricCriteria: []
+        }
+      ]
     });
     const updatedProperty = newProperties.find((r) => r.type === 'proposalEvaluatedBy');
     expect(updatedProperty?.id).toEqual(originalId);
