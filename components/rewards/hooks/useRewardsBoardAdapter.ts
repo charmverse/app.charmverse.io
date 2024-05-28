@@ -96,7 +96,8 @@ export function useRewardsBoardAdapter() {
             reward,
             spaceId: space.id,
             rewardPage: page,
-            members: membersRecord
+            members: membersRecord,
+            isSubmissionSource: activeView.fields.sourceType === 'reward_applications'
           }),
           reward: {
             id: reward.id,
@@ -173,12 +174,14 @@ export function mapRewardToCard({
   reward,
   rewardPage,
   spaceId,
-  members
+  members,
+  isSubmissionSource
 }: {
   reward: RewardProps;
   rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
   members?: Record<string, Member>;
+  isSubmissionSource?: boolean;
 }): CardWithRelations {
   const rewardFields = (reward.fields || { properties: {} }) as RewardFields;
   const validApplications =
@@ -250,7 +253,8 @@ export function mapRewardToCard({
                 pageTitle: rewardPage.title,
                 reward,
                 spaceId,
-                members
+                members,
+                isSubmissionSource
               })
             )
         : undefined
@@ -265,13 +269,15 @@ function mapApplicationToCard({
   pageTitle,
   reward,
   spaceId,
-  members
+  members,
+  isSubmissionSource
 }: {
   application: ApplicationMeta;
   pageTitle?: string;
   reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
+  isSubmissionSource?: boolean;
 }) {
   const applicationFields = { properties: {} };
   const assignedSubmitters =
@@ -323,7 +329,9 @@ function mapApplicationToCard({
     id: application.id || '',
     spaceId,
     parentId: reward.id,
-    title: pageTitle || 'Untitled',
+    title: isSubmissionSource
+      ? pageTitle || 'Untitled'
+      : `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',

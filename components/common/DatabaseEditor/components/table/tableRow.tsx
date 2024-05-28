@@ -56,7 +56,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   readOnlyTitle?: boolean;
-  isGroupCollapsed: boolean;
+  isGroupCollapsed?: boolean;
   isExpanded?: boolean | null;
   setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;
   indentTitle?: number;
