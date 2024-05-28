@@ -120,6 +120,7 @@
     "@fullcalendar/daygrid": "^6.1.9",
     "@fullcalendar/interaction": "^6.1.9",
     "@fullcalendar/react": "^6.1.9",
+    "@google-cloud/bigquery": "^7.7.0",
     "@googleapis/drive": "^4.0.1",
     "@googleapis/forms": "^2.0.0",
     "@guildxyz/sdk": "^2.4.0",

@@ -39,6 +39,7 @@ export const userManualUrl = 'https://tiny.charmverse.io/user-manual';
 export const googleOAuthClientIdSensitive =
   process.env.GOOGLE_OAUTH_CLIENT_ID_SENSITIVE || env('GOOGLE_OAUTH_CLIENT_ID_SENSITIVE');
 export const googleOAuthClientSecretSensitive = process.env.GOOGLE_OAUTH_CLIENT_SECRET_SENSITIVE;
+export const googleServiceAccountEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
 
 // Permissions API
 export const permissionsApiUrl = process.env.PERMISSIONS_API_URL ?? 'http://127.0.0.1:3001';
