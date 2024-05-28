@@ -184,6 +184,29 @@ function PropertyValueElement(props: Props) {
 
   const latestUpdated = new Date(updatedAt).getTime() > new Date(card.updatedAt).getTime() ? 'page' : 'card';
 
+  const commonProps = {
+    className: 'octo-propertyvalue',
+    placeholderText: emptyDisplayValue || showUnlimited,
+    readOnly,
+    value: value.toString(),
+    autoExpand: true,
+    onChange: setValue,
+    displayType,
+    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
+    onSave: async () => {
+      try {
+        await mutator.changePropertyValue(card, propertyTemplate.id, value);
+      } catch (error) {
+        showError(error);
+      }
+    },
+    onCancel: () => setValue(propertyValue || ''),
+    validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
+    spellCheck: propertyTemplate.type === 'text',
+    wrapColumn: props.wrapColumn ?? false,
+    columnRef: props.columnRef
+  };
+
   useEffect(() => {
     if (serverValue === value) {
       setValue(props.card.fields.properties[props.propertyTemplate.id] || '');
@@ -245,13 +268,7 @@ function PropertyValueElement(props: Props) {
     if (!Array.isArray(propertyValue) || !propertyValue.length || !propertyValue[0]) {
       return null;
     }
-    propertyValueElement = (
-      <Box sx={{ a: { color: 'inherit' } }}>
-        <Link href={getAbsolutePath(propertyValue[1] as string, domain)}>
-          <BreadcrumbPageTitle sx={{ maxWidth: 160 }}>{propertyValue[0]}</BreadcrumbPageTitle>
-        </Link>
-      </Box>
-    );
+    propertyValueElement = <URLProperty {...commonProps} value={propertyValue} validator={() => true} readOnly />;
   } else if (propertyTemplate.type === 'proposalReviewerNotes') {
     propertyValueElement = <ProposalNotesLink pageId={props.card.id} />;
   } else if (propertyTemplate.type === 'tokenAmount' || propertyTemplate.type === 'tokenChain') {
@@ -669,29 +686,6 @@ function PropertyValueElement(props: Props) {
       />
     );
   }
-
-  const commonProps = {
-    className: 'octo-propertyvalue',
-    placeholderText: emptyDisplayValue || showUnlimited,
-    readOnly,
-    value: value.toString(),
-    autoExpand: true,
-    onChange: setValue,
-    displayType,
-    multiline: displayType === 'details' ? true : props.wrapColumn ?? false,
-    onSave: async () => {
-      try {
-        await mutator.changePropertyValue(card, propertyTemplate.id, value);
-      } catch (error) {
-        showError(error);
-      }
-    },
-    onCancel: () => setValue(propertyValue || ''),
-    validator: (newValue: string) => validatePropertyValue(propertyTemplate.type, newValue),
-    spellCheck: propertyTemplate.type === 'text',
-    wrapColumn: props.wrapColumn ?? false,
-    columnRef: props.columnRef
-  };
 
   if (editableFields.includes(propertyTemplate.type)) {
     if (propertyTemplate.type === 'url') {

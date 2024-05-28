@@ -37,6 +37,7 @@ import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardReviewer, RewardWithUsers } from 'lib/rewards/interfaces';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string; fields: RewardFields };
@@ -95,6 +96,7 @@ export function useRewardsBoardAdapter() {
           ...mapRewardToCard({
             reward,
             spaceId: space.id,
+            spaceDomain: space.domain,
             rewardPage: page,
             members: membersRecord,
             isSubmissionSource: activeView.fields.sourceType === 'reward_applications'
@@ -174,12 +176,14 @@ export function mapRewardToCard({
   reward,
   rewardPage,
   spaceId,
+  spaceDomain,
   members,
   isSubmissionSource
 }: {
   reward: RewardProps;
   rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
+  spaceDomain: string;
   members?: Record<string, Member>;
   isSubmissionSource?: boolean;
 }): CardWithRelations {
@@ -192,7 +196,9 @@ export function mapRewardToCard({
       : [];
 
   const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
-  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
+    : '';
   const assignedSubmitters =
     reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
   const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
@@ -253,6 +259,7 @@ export function mapRewardToCard({
                 pageTitle: rewardPage.title,
                 reward,
                 spaceId,
+                spaceDomain,
                 members,
                 isSubmissionSource
               })
@@ -269,6 +276,7 @@ function mapApplicationToCard({
   pageTitle,
   reward,
   spaceId,
+  spaceDomain,
   members,
   isSubmissionSource
 }: {
@@ -277,6 +285,7 @@ function mapApplicationToCard({
   reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
+  spaceDomain: string;
   isSubmissionSource?: boolean;
 }) {
   const applicationFields = { properties: {} };
@@ -290,7 +299,9 @@ function mapApplicationToCard({
         : reward.applications
       : [];
   const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
-  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
+    : '';
 
   applicationFields.properties = {
     ...applicationFields.properties,

@@ -37,6 +37,7 @@ const boardTreeGroup = {
 test('should match snapshot, no groups', async () => {
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
+      isExpandedGroup={false}
       board={board}
       activeView={view}
       group={boardTreeNoGroup}
@@ -60,6 +61,7 @@ test('should match snapshot, no groups', async () => {
 test('should match snapshot with Group', async () => {
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
+      isExpandedGroup={false}
       board={board}
       activeView={view}
       group={boardTreeGroup}
@@ -77,6 +79,7 @@ test('should match snapshot with Group', async () => {
 test('should match snapshot on read only', async () => {
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
+      isExpandedGroup={false}
       board={board}
       activeView={view}
       group={boardTreeGroup}
@@ -99,6 +102,7 @@ test('should match snapshot, hide group', async () => {
 
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
+      isExpandedGroup={false}
       board={board}
       activeView={collapsedOptionsView}
       group={boardTreeGroup}
@@ -126,6 +130,7 @@ test('should match snapshot, add new', async () => {
 
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
+      isExpandedGroup={false}
       board={board}
       activeView={view}
       group={boardTreeGroup}
@@ -151,6 +156,7 @@ test('should match snapshot, edit title', async () => {
   const component = wrapDNDIntl(
     <TableGroupHeaderRowElement
       board={board}
+      isExpandedGroup={false}
       activeView={view}
       group={boardTreeGroup}
       readOnly={false}
