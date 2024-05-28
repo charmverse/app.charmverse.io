@@ -725,6 +725,7 @@ function PropertyValueElement(props: Props) {
     if (typeof displayValue !== 'string' && typeof displayValue !== 'undefined' && !Array.isArray(displayValue)) {
       log.error('displayValue for card property is not a string', { displayValue, template: props.propertyTemplate });
     }
+
     propertyValueElement = (
       <div className={clsx('octo-propertyvalue', { readonly: readOnly })}>
         {displayValueStr || (showEmptyPlaceholder && <EmptyPlaceholder>{emptyDisplayValue}</EmptyPlaceholder>)}

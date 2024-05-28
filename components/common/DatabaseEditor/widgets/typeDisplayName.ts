@@ -47,6 +47,11 @@ export function typeDisplayName(intl: IntlShape, type: PropertyType): string {
         id: 'PropertyType.ProposalEvaluationAverage',
         defaultMessage: 'Proposal Evaluation Average'
       });
+    case 'proposalRubricCriteriaTotal':
+      return intl.formatMessage({
+        id: 'PropertyType.ProposalRubricCriteriaTotal',
+        defaultMessage: 'Proposal Rubric Criteria Total'
+      });
     case 'proposalEvaluationTotal':
       return intl.formatMessage({
         id: 'PropertyType.ProposalEvaluationTotal',

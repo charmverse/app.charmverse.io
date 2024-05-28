@@ -5,6 +5,7 @@ import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { prettyPrint } from 'lib/utils/strings';
 
 import { getBoardProperties } from './getBoardProperties';
 
@@ -35,12 +36,21 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
       },
       select: {
         type: true,
-        title: true
+        title: true,
+        rubricCriteria: {
+          select: {
+            title: true,
+            answers: {
+              select: {
+                response: true
+              }
+            }
+          }
+        }
       },
       orderBy: {
         index: 'asc'
-      },
-      distinct: ['title']
+      }
     }),
     prisma.form.findMany({
       where: {
@@ -87,22 +97,12 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     .sort((a, b) => (a.proposal[0]?.page?.createdAt.getTime() ?? 0) - (b.proposal[0]?.page?.createdAt.getTime() ?? 0))
     .flatMap((p) => p.formFields.map((field) => ({ ...field, options: field.options as FormFieldInput['options'] })));
 
-  const evaluationStepTitles: Set<string> = new Set();
-  const rubricStepTitles: Set<string> = new Set();
-  evaluationSteps.forEach((e) => {
-    evaluationStepTitles.add(e.title);
-    if (e.type === 'rubric') {
-      rubricStepTitles.add(e.title);
-    }
-  });
-
   const proposalCustomProperties = (proposalBoardBlock?.fields.cardProperties ?? []) as IPropertyTemplate[];
   const boardProperties = getBoardProperties({
-    evaluationStepTitles: Array.from(evaluationStepTitles),
+    evaluationSteps,
     formFields,
     proposalCustomProperties,
-    currentCardProperties: boardFields.cardProperties,
-    rubricStepTitles: Array.from(rubricStepTitles)
+    currentCardProperties: boardFields.cardProperties
   });
 
   return prisma.block.update({

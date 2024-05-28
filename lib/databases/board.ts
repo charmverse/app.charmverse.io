@@ -13,6 +13,7 @@ export const proposalPropertyTypesList = [
   'proposalStatus',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
+  'proposalRubricCriteriaTotal',
   'proposalEvaluationAverage',
   'proposalAuthor',
   'proposalReviewer',
