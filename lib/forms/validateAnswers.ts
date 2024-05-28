@@ -6,8 +6,12 @@ export function validateAnswers(
   answers: FieldAnswerInput[],
   formFields: { required: boolean; id: string; type: FormFieldType }[]
 ) {
+  const answerFieldIds = answers.map((a) => a.fieldId);
   return formFields
-    .filter((formField) => formField.type !== 'milestone' && formField.type !== 'label')
+    .filter(
+      (formField) =>
+        formField.type !== 'milestone' && formField.type !== 'label' && answerFieldIds.includes(formField.id)
+    )
     .every(
       (f) =>
         !f.required ||
