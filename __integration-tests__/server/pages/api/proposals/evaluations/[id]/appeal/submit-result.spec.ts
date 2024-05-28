@@ -129,12 +129,11 @@ describe('PUT /api/proposals/evaluations/[id]/appeal/submit-result - Submit appe
   });
 
   it('should throw error if the appeal evaluations is equal to the required reviews', async () => {
-    await prisma.proposalEvaluationReview.create({
+    await prisma.proposalEvaluationAppealReview.create({
       data: {
         evaluationId,
         reviewerId: admin.id,
-        result: 'pass',
-        appeal: true
+        result: 'pass'
       }
     });
 
@@ -146,11 +145,10 @@ describe('PUT /api/proposals/evaluations/[id]/appeal/submit-result - Submit appe
     expect(response.statusCode).toBe(401);
     expect(response.body.message).toBe('This evaluation appeal has already been reviewed.');
 
-    await prisma.proposalEvaluationReview.deleteMany({
+    await prisma.proposalEvaluationAppealReview.deleteMany({
       where: {
         evaluationId,
-        reviewerId: admin.id,
-        appeal: true
+        reviewerId: admin.id
       }
     });
   });
@@ -195,12 +193,11 @@ describe('PUT /api/proposals/evaluations/[id]/appeal/submit-result - Submit appe
       }
     });
 
-    await prisma.proposalEvaluationReview.create({
+    await prisma.proposalEvaluationAppealReview.create({
       data: {
         evaluationId,
         reviewerId: admin.id,
-        result: 'pass',
-        appeal: true
+        result: 'pass'
       }
     });
 
@@ -212,11 +209,10 @@ describe('PUT /api/proposals/evaluations/[id]/appeal/submit-result - Submit appe
     expect(response.statusCode).toBe(401);
     expect(response.body.message).toBe('You have already reviewed this appeal.');
 
-    await prisma.proposalEvaluationReview.deleteMany({
+    await prisma.proposalEvaluationAppealReview.deleteMany({
       where: {
         evaluationId,
-        reviewerId: admin.id,
-        appeal: true
+        reviewerId: admin.id
       }
     });
 

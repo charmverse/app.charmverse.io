@@ -7,7 +7,7 @@ import { EvaluationStepRow } from 'components/common/WorkflowSidebar/components/
 import { WorkflowSelect } from 'components/common/WorkflowSidebar/components/WorkflowSelect';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { RewardFields } from 'lib/rewards/blocks/interfaces';
-import type { RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
+import { type RewardWorkflow } from 'lib/rewards/getRewardWorkflows';
 import { inferRewardWorkflow } from 'lib/rewards/inferRewardWorkflow';
 import type { UpdateableRewardFields } from 'lib/rewards/updateRewardSettings';
 
@@ -41,12 +41,12 @@ export function EvaluationsSettings({
   const { data: rewardTemplate } = useGetRewardTemplate(templateId);
   const workflow = rewardInput?.fields && inferRewardWorkflow(workflowOptions, rewardInput.fields as RewardFields);
   const transformedWorkflow = useMemo(() => {
-    // Make sure to remove credential step if a new reward is created without any credential templates
+    // Make sure to remove credential step if a new reward is created using a credential less template
     if (!workflow) {
       return undefined;
     }
 
-    if (isUnpublishedReward && (rewardInput?.selectedCredentialTemplates ?? []).length === 0) {
+    if (isUnpublishedReward && (rewardInput?.selectedCredentialTemplates ?? []).length === 0 && templateId) {
       return {
         ...workflow,
         evaluations: workflow.evaluations.filter((evaluation) => evaluation.type !== 'credential')
@@ -54,7 +54,7 @@ export function EvaluationsSettings({
     }
 
     return workflow;
-  }, [workflow, rewardInput, isUnpublishedReward]);
+  }, [workflow, rewardInput, isUnpublishedReward, templateId]);
 
   return (
     <LoadingComponent isLoading={!rewardInput} data-test='evaluation-settings-sidebar'>

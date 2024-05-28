@@ -11,10 +11,6 @@ class MyDocument extends Document {
         <Head>
           <meta name='theme-color' content={blueColor} />
           <link rel='icon' href='/favicon.png' />
-          <meta
-            name='description'
-            content='web3 operations platform handling docs, tasks, rewards, proposals, and votes.'
-          />
           <script src='/__ENV.js' />
         </Head>
         <body>

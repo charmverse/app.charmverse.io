@@ -18,21 +18,17 @@ import type {
 import type { BrandColor } from 'theme/colors';
 
 export const EVALUATION_STATUS_LABELS: Record<ProposalEvaluationStatus, string> = {
-  complete: 'Complete',
   declined: 'Declined',
   in_progress: 'In Progress',
   passed: 'Passed',
-  published: 'Published',
   unpublished: 'Unpublished',
   archived: 'Archived'
 };
 
 export const proposalStatusColors: Record<ProposalEvaluationStatus, BrandColor> = {
-  complete: 'green',
   declined: 'red',
   in_progress: 'yellow',
   passed: 'green',
-  published: 'green',
   unpublished: 'gray',
   archived: 'gray'
 };
@@ -119,11 +115,9 @@ export const proposalDbProperties: {
 };
 
 export const EVALUATION_STATUS_VERB_LABELS: Record<ProposalEvaluationStatus, string> = {
-  complete: 'Complete',
   declined: 'Decline',
   in_progress: 'In Progress',
   passed: 'Pass',
-  published: 'Publish',
   unpublished: 'Unpublish',
   archived: 'Archive'
 };
@@ -135,7 +129,8 @@ export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
   rubric: 'Rubric',
   vote: 'Vote',
   rewards: 'Rewards',
-  credentials: 'Credentials'
+  credentials: 'Credentials',
+  sign_documents: 'Sign Documents'
 };
 
 export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (typeof Constants)['menuColors']> = {
@@ -145,7 +140,8 @@ export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (type
   vote: 'propColorGray',
   draft: 'propColorGray',
   rewards: 'propColorGray',
-  credentials: 'propColorGray'
+  credentials: 'propColorGray',
+  sign_documents: 'propColorGray'
 };
 
 export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, string> = {

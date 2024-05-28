@@ -1,12 +1,11 @@
 import type { Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { login } from '__e2e__/utils/session';
 
 import { baseUrl } from 'config/constants';
 import { generateUserAndSpaceKyc } from 'testing/utils/kyc';
-
-import { expect, test } from '../utils/test';
 
 test.describe.serial('Review reward applications', () => {
   let space: Space;
@@ -23,7 +22,9 @@ test.describe.serial('Review reward applications', () => {
 
   test('Create a draft reward template, change workflow to application required and publish template', async ({
     page,
-    rewardPage
+    rewardPage,
+    documentPage,
+    databasePage
   }) => {
     await login({ page, userId: adminUser.id });
 
@@ -37,8 +38,17 @@ test.describe.serial('Review reward applications', () => {
     await expect(rewardPage.documentTitleInput).toBeVisible();
     await rewardPage.documentTitleInput.fill('Draft Reward Template');
 
+    await documentPage.addCustomPropertyButton.click();
+    await databasePage.getPropertyTypeOptionLocator({ type: 'text' }).click();
+    await rewardPage.page.locator('[data-test="card-detail-properties"]').getByPlaceholder('Empty').fill('Text');
+
     await rewardPage.draftRewardButton.click();
     await rewardPage.page.waitForURL(`**/${space.domain}/draft-reward-template-**`);
+
+    await rewardPage.page.locator('data-test=reward-properties-details').click();
+    expect(
+      await rewardPage.page.locator('[data-test="card-detail-properties"]').getByPlaceholder('Empty').textContent()
+    ).toBe('Text');
 
     await rewardPage.workflowSelect.click();
     await rewardPage.page.locator(`data-test=select-option-application_required`).click();
@@ -72,6 +82,11 @@ test.describe.serial('Review reward applications', () => {
 
     await rewardPage.documentTitleInput.fill('Reward 1');
     await rewardPage.publishRewardButton.click();
+
+    await rewardPage.page.locator('data-test=reward-properties-details').click();
+    expect(
+      await rewardPage.page.locator('[data-test="card-detail-properties"]').getByPlaceholder('Empty').textContent()
+    ).toBe('Text');
 
     await rewardPage.newWorkButton.click();
     await rewardPage.writeApplicationInput('My application');

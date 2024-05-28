@@ -57,8 +57,7 @@ async function resetReviewEndpoint(req: NextApiRequest, res: NextApiResponse) {
   await prisma.proposalEvaluationReview.deleteMany({
     where: {
       evaluationId,
-      reviewerId: userId,
-      appeal: null
+      reviewerId: userId
     }
   });
 

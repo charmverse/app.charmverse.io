@@ -288,6 +288,15 @@ const templates = {
       user,
       spaceFeatures: []
     });
+  },
+  'Notify the user about OrangeDAO invite notifications': () => {
+    return emails.getOrangeDaoSpaceInviteEmail({
+      pagePath: 'orange-dao',
+      pageTitle: 'OrangeDAO fellowship',
+      spaceDomain: 'orange-dao',
+      spaceName: 'OrangeDAO',
+      user
+    });
   }
 };
 

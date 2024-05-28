@@ -43,7 +43,7 @@ export type BoardView = UIBlockWithDetails & {
   fields: BoardViewFields;
 };
 
-function createBoardView(block?: UIBlockWithDetails): BoardView {
+function createBoardView(block?: Pick<UIBlockWithDetails, 'fields'>): BoardView {
   const fields: BoardViewFields = {
     viewType: block?.fields.viewType || 'board',
     groupById: block?.fields.groupById,

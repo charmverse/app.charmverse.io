@@ -314,7 +314,7 @@ function DocumentPageComponent({
               <ProposalBanner type='page' proposalId={page.convertedProposalId} />
             </AlertContainer>
           )}
-          {board?.fields.sourceType && (
+          {(board?.fields.sourceType === 'proposals' || board?.fields.sourceType === 'rewards') && (
             <AlertContainer>
               <SyncedPageBanner pageId={page.syncWithPageId} source={board.fields.sourceType} />
             </AlertContainer>
@@ -574,7 +574,6 @@ function DocumentPageComponent({
         {(page.type === 'proposal' || page.type === 'proposal_template') && proposal?.status === 'draft' && (
           <ProposalStickyFooter
             page={page}
-            refreshProposal={refreshProposal}
             hasProjectField={!!projectProfileField}
             proposal={proposal}
             formAnswers={proposalFormFieldAnswers}

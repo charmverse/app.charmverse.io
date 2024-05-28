@@ -342,7 +342,7 @@ function FilterPropertyValue({
     return (
       <Select<string>
         displayEmpty
-        value={filter.values[0]}
+        value={filter.values[0] || ''}
         renderValue={(selected) => {
           const foundOption = property.options?.find((o) => o.id === selected);
           return foundOption ? (
@@ -369,7 +369,7 @@ function FilterPropertyValue({
         ) : (
           property.options.map((option) => {
             return (
-              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
+              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)} value={option.id}>
                 <Chip
                   size='small'
                   label={

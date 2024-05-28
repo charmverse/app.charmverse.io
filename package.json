@@ -95,7 +95,7 @@
     "@bangle.dev/utils": "^0.31.6",
     "@beam-australia/react-env": "^3.1.1",
     "@ceramicnetwork/http-client": "^5.6.0",
-    "@charmverse/core": "^0.51.0",
+    "@charmverse/core": "^0.54.0",
     "@column-resizer/core": "^1.0.2",
     "@composedb/devtools": "^0.7.1",
     "@composedb/devtools-node": "^0.7.1",
@@ -378,6 +378,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "lint-staged": "^12.3.2",
     "msw": "^2.2.14",
+    "node-mocks-http": "^1.14.1",
     "ora": "^8.0.1",
     "patch-package": "^8.0.0",
     "playwright": "^1.42.1",
@@ -407,7 +408,8 @@
     "react-dom": "^18.2.0",
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
-    "viem": "^2.8.13"
+    "viem": "^2.8.13",
+    "next": "^14.1.1"
   },
   "msw": {
     "workerDirectory": "public"

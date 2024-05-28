@@ -18,10 +18,8 @@ export function ProposalStickyFooter({
   formAnswers,
   page,
   isStructuredProposal,
-  hasProjectField,
-  refreshProposal
+  hasProjectField
 }: {
-  refreshProposal?: VoidFunction;
   proposal: ProposalWithUsersAndRubric;
   formAnswers: FieldAnswerInput[];
   page: { title: string; hasContent?: boolean; sourceTemplateId: string | null; type: PageType };
@@ -38,7 +36,6 @@ export function ProposalStickyFooter({
   async function onClick() {
     try {
       await publishProposal();
-      refreshProposal?.();
     } catch (error) {
       showMessage((error as Error).message, 'error');
     }
