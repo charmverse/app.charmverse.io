@@ -253,7 +253,8 @@ export function PassFailEvaluationContainer({
             <Stack gap={1}>
               <TextField
                 fullWidth
-                placeholder='Enter your reason for appeal'
+                data-test='appeal-reason-input'
+                placeholder='Enter your reason for appealing'
                 required
                 value={appealReason ?? ''}
                 onChange={(e) => setAppealReason(e.target.value)}
@@ -262,6 +263,7 @@ export function PassFailEvaluationContainer({
                 sx={{
                   width: 'fit-content'
                 }}
+                data-test='appeal-reason-submit-button'
                 disabled={!appealReason}
                 onClick={onAppealProposalEvaluation}
               >
