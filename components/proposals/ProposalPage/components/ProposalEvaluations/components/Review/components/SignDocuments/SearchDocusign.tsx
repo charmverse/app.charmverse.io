@@ -19,15 +19,15 @@ function DocusignSearchResult({
   signerEmails: string[];
 }) {
   return (
-    <MenuItem onClick={onClick} sx={{ width: '100%' }}>
-      <Stack gap={1} width='100%'>
+    <MenuItem onClick={onClick}>
+      <Stack gap={1}>
         <Box display='flex'>
           <ListItemIcon>
             <DescriptionOutlinedIcon />
           </ListItemIcon>
           <ListItemText sx={{ textWrap: 'wrap' }}>{title}</ListItemText>
         </Box>
-        <Box display='flex' justifyContent='space-between' gap={1} sx={{ overflowX: 'scroll', width: '100%' }}>
+        <Box display='flex' gap={1} flexWrap='wrap'>
           {signerEmails.map((email) => (
             <Chip size='small' key={email} label={email} />
           ))}
@@ -79,7 +79,7 @@ export function SearchDocusign({ onSelectEnvelope, selectedEnvelopeIds, proposal
         />
       </Grid>
 
-      <Grid item gap={1}>
+      <Grid item gap={1} width='100%'>
         {options?.map((e) => (
           <>
             <DocusignSearchResult
