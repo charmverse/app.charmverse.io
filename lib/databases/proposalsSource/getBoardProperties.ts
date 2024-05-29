@@ -20,7 +20,6 @@ type EvaluationStep = {
   type: ProposalEvaluationType;
   rubricCriteria: {
     title: string;
-    answers: { response: Prisma.JsonValue }[];
   }[];
 };
 
@@ -81,27 +80,21 @@ function applyRubricEvaluationQuestionProperties(
   boardProperties: IPropertyTemplate[],
   evaluationSteps: EvaluationStep[]
 ) {
-  const rubricStepScore: Record<string, number> = {};
-
+  const rubricCriteriaTitles: Set<string> = new Set();
   evaluationSteps.forEach((evaluationStep) => {
     if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
-        rubricStepScore[rubricCriteria.title] = 0;
-
-        rubricCriteria.answers.forEach((answer) => {
-          const response = answer.response as { score: number };
-          rubricStepScore[rubricCriteria.title] += response.score;
-        });
+        rubricCriteriaTitles.add(rubricCriteria.title);
       });
     }
   });
 
-  Object.entries(rubricStepScore).forEach(([rubricStepTitle, score]) => {
+  rubricCriteriaTitles.forEach((rubricCriteriaTitle) => {
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalRubricCriteriaTotal',
-      name: rubricStepTitle,
-      description: `Total score for ${rubricStepTitle}`,
+      name: rubricCriteriaTitle,
+      description: `Total score for ${rubricCriteriaTitle}`,
       readOnly: true,
       readOnlyValues: true,
       private: false

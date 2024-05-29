@@ -40,6 +40,56 @@ describe('getBoardProperties', () => {
     );
   });
 
+  it('Should return custom properties from rubric criteria', () => {
+    const properties = getBoardProperties({
+      evaluationSteps: [
+        {
+          rubricCriteria: [
+            {
+              title: 'Rubric Criteria 1'
+            },
+            {
+              title: 'Rubric Criteria 2'
+            }
+          ],
+          title: 'Rubric Evaluation 1',
+          type: 'rubric'
+        },
+        {
+          rubricCriteria: [
+            {
+              title: 'Rubric Criteria 1'
+            },
+            {
+              title: 'Rubric Criteria 2.1'
+            }
+          ],
+          title: 'Rubric Evaluation 2',
+          type: 'rubric'
+        },
+        {
+          rubricCriteria: [],
+          title: 'Feedback',
+          type: 'feedback'
+        }
+      ]
+    });
+
+    const rubricCriteria1Property = properties.find(
+      (r) => r.name === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaTotal'
+    );
+    const rubricCriteria2Property = properties.find(
+      (r) => r.name === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaTotal'
+    );
+    const rubricCriteria21Property = properties.find(
+      (r) => r.name === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaTotal'
+    );
+
+    expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria2Property).toBeTruthy();
+    expect(rubricCriteria21Property).toBeTruthy();
+  });
+
   // in case we change our mind about defaults, since all these fields are readonly
   it('Should override previous configuration of custom properties', () => {
     const customProperty: IPropertyTemplate = {
