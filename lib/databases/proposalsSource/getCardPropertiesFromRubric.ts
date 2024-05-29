@@ -34,7 +34,7 @@ export function getCardPropertiesFromRubric({
         return acc;
       }, 0);
 
-    rubricStepScore[criteria.title] = totalScore;
+    rubricStepScore[criteria.title] = (rubricStepScore[criteria.title] ?? 0) + totalScore;
   });
 
   templates.forEach((template) => {
