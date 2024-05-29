@@ -39,7 +39,7 @@ export function getCardPropertiesFromRubric({
 
   templates.forEach((template) => {
     if (template.type === 'proposalRubricCriteriaTotal') {
-      properties[template.id] = rubricStepScore[template.name];
+      properties[template.id] = ((properties[template.id] as number) ?? 0) + (rubricStepScore[template.name] ?? 0);
     }
   });
 
