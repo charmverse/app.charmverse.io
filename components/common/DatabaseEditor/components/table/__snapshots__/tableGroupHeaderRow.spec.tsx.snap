@@ -7,7 +7,7 @@ exports[`should match snapshot on read only 1`] = `
   >
     <div>
       <div
-        class="octo-group-header-cell expanded"
+        class="octo-group-header-cell"
         draggable="true"
         style="opacity: 1;"
       >
@@ -27,12 +27,12 @@ exports[`should match snapshot on read only 1`] = `
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
-                data-testid="ArrowDropDownIcon"
+                data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="m7 10 5 5 5-5z"
+                  d="m10 17 5-5-5-5z"
                 />
               </svg>
             </button>
@@ -78,7 +78,7 @@ exports[`should match snapshot with Group 1`] = `
   >
     <div>
       <div
-        class="octo-group-header-cell expanded"
+        class="octo-group-header-cell"
         draggable="true"
         style="opacity: 1;"
       >
@@ -98,12 +98,12 @@ exports[`should match snapshot with Group 1`] = `
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
-                data-testid="ArrowDropDownIcon"
+                data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="m7 10 5 5 5-5z"
+                  d="m10 17 5-5-5-5z"
                 />
               </svg>
             </button>
@@ -197,7 +197,7 @@ exports[`should match snapshot, add new 1`] = `
   >
     <div>
       <div
-        class="octo-group-header-cell expanded"
+        class="octo-group-header-cell"
         draggable="true"
         style="opacity: 1;"
       >
@@ -217,12 +217,12 @@ exports[`should match snapshot, add new 1`] = `
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
-                data-testid="ArrowDropDownIcon"
+                data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="m7 10 5 5 5-5z"
+                  d="m10 17 5-5-5-5z"
                 />
               </svg>
             </button>
@@ -316,7 +316,7 @@ exports[`should match snapshot, edit title 1`] = `
   >
     <div>
       <div
-        class="octo-group-header-cell expanded"
+        class="octo-group-header-cell"
         draggable="true"
         style="opacity: 1;"
       >
@@ -336,12 +336,12 @@ exports[`should match snapshot, edit title 1`] = `
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
-                data-testid="ArrowDropDownIcon"
+                data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="m7 10 5 5 5-5z"
+                  d="m10 17 5-5-5-5z"
                 />
               </svg>
             </button>
@@ -554,7 +554,7 @@ exports[`should match snapshot, no groups 1`] = `
   >
     <div>
       <div
-        class="octo-group-header-cell expanded"
+        class="octo-group-header-cell"
         draggable="true"
         style="opacity: 1;"
       >
@@ -574,12 +574,12 @@ exports[`should match snapshot, no groups 1`] = `
               <svg
                 aria-hidden="true"
                 class="MuiSvgIcon-root MuiSvgIcon-fontSizeMedium css-hvmj5c-MuiSvgIcon-root"
-                data-testid="ArrowDropDownIcon"
+                data-testid="ArrowRightIcon"
                 focusable="false"
                 viewBox="0 0 24 24"
               >
                 <path
-                  d="m7 10 5 5 5-5z"
+                  d="m10 17 5-5-5-5z"
                 />
               </svg>
             </button>

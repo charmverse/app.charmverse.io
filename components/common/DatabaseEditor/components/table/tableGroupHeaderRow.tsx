@@ -39,6 +39,7 @@ type Props = {
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
   onDrop: (srcOption: BoardGroup, dstOption?: BoardGroup) => void;
   disableAddingCards?: boolean;
+  isExpandedGroup: boolean;
   readOnlyTitle?: boolean;
 };
 const TableGroupHeaderRow = memo((props: Props): JSX.Element => {
@@ -67,7 +68,7 @@ const TableGroupHeaderRow = memo((props: Props): JSX.Element => {
   if (isOver) {
     className += ' dragover';
   }
-  const isExpanded = activeView.fields.collapsedOptionIds.indexOf(group.id || 'undefined') < 0;
+  const isExpanded = props.isExpandedGroup;
   if (isExpanded) {
     className += ' expanded';
   }
