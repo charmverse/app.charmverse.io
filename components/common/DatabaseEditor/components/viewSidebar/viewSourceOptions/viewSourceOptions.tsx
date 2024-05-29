@@ -27,6 +27,7 @@ import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
 import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
 import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
+import type { SelectedVariables } from './components/ProposalSourcePropertiesSelectModal';
 import { ProposalSourcePropertiesSelectModal } from './components/ProposalSourcePropertiesSelectModal';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';
@@ -137,9 +138,9 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     }
   }
 
-  async function handleProposalSource() {
+  async function handleProposalSource(selectedVariables: SelectedVariables) {
     if (rootDatabaseId) {
-      await onCreateDatabase?.({ sourceType: 'proposals' });
+      await onCreateDatabase?.({ sourceType: 'proposals', selectedVariables });
       await createProposalSource({ pageId: rootDatabaseId });
       dispatch(initialDatabaseLoad({ pageId: rootDatabaseId }));
     }
@@ -287,11 +288,11 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
       {proposalSourcePropertiesSelectPopupState.isOpen && (
         <ProposalSourcePropertiesSelectModal
           onClose={proposalSourcePropertiesSelectPopupState.close}
-          onApply={() => {
+          onApply={(selectedVariables) => {
             if (!isCreatingProposals.current) {
               isCreatingProposals.current = true;
               selectSourceType('proposals');
-              handleProposalSource();
+              handleProposalSource(selectedVariables);
             }
           }}
         />

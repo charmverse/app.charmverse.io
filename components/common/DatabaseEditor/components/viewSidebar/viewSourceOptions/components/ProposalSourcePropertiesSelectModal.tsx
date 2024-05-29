@@ -5,27 +5,27 @@ import { Button } from 'components/common/Button';
 import Modal from 'components/common/Modal';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
+export type SelectedVariables = {
+  projectMember: string[];
+  project: string[];
+};
+
 export function ProposalSourcePropertiesSelectModal({
   onClose,
   onApply
 }: {
-  onApply: (selectProperties: string[]) => void;
+  onApply: (selectedVariables: SelectedVariables) => void;
   onClose: VoidFunction;
 }) {
-  const [selectedProjectProfileProperties, setSelectedProjectProfileProperties] = useState<{
-    projectMemberProperties: string[];
-    projectProperties: string[];
-  }>({
-    projectMemberProperties: [],
-    projectProperties: []
+  const [selectedVariables, setSelectedVariables] = useState<SelectedVariables>({
+    projectMember: [],
+    project: []
   });
 
-  const isProjectMemberPropertiesChecked =
-    selectedProjectProfileProperties.projectMemberProperties.length === projectMemberFieldProperties.length;
+  const isProjectMemberChecked = selectedVariables.projectMember.length === projectMemberFieldProperties.length;
 
   const isAllProjectProfilePropertiesSelected =
-    selectedProjectProfileProperties.projectProperties.length === projectFieldProperties.length &&
-    isProjectMemberPropertiesChecked;
+    selectedVariables.project.length === projectFieldProperties.length && isProjectMemberChecked;
 
   return (
     <Modal size='large' open onClose={onClose} title='Select Proposal Source Properties'>
@@ -52,19 +52,17 @@ export function ProposalSourcePropertiesSelectModal({
                   size='small'
                   checked={isAllProjectProfilePropertiesSelected}
                   onChange={() => {
-                    setSelectedProjectProfileProperties(
+                    setSelectedVariables(
                       isAllProjectProfilePropertiesSelected
                         ? {
-                            projectMemberProperties: [],
-                            projectProperties: []
+                            projectMember: [],
+                            project: []
                           }
                         : {
-                            projectMemberProperties: projectMemberFieldProperties.map(
+                            projectMember: projectMemberFieldProperties.map(
                               (propertyFieldProperty) => propertyFieldProperty.field
                             ),
-                            projectProperties: projectFieldProperties.map(
-                              (propertyFieldProperty) => propertyFieldProperty.field
-                            )
+                            project: projectFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field)
                           }
                     );
                   }}
@@ -75,16 +73,14 @@ export function ProposalSourcePropertiesSelectModal({
                 {projectFieldProperties.map((propertyFieldProperty) => (
                   <Stack
                     onClick={() => {
-                      const isChecked = selectedProjectProfileProperties.projectProperties.includes(
-                        propertyFieldProperty.field
-                      );
-                      setSelectedProjectProfileProperties({
-                        projectProperties: isChecked
-                          ? selectedProjectProfileProperties.projectProperties.filter(
+                      const isChecked = selectedVariables.project.includes(propertyFieldProperty.field);
+                      setSelectedVariables({
+                        project: isChecked
+                          ? selectedVariables.project.filter(
                               (selectedProperty) => selectedProperty !== propertyFieldProperty.field
                             )
-                          : [...selectedProjectProfileProperties.projectProperties, propertyFieldProperty.field],
-                        projectMemberProperties: selectedProjectProfileProperties.projectMemberProperties
+                          : [...selectedVariables.project, propertyFieldProperty.field],
+                        projectMember: selectedVariables.projectMember
                       });
                     }}
                     alignItems='center'
@@ -94,10 +90,7 @@ export function ProposalSourcePropertiesSelectModal({
                     }}
                     key={propertyFieldProperty.field}
                   >
-                    <Checkbox
-                      size='small'
-                      checked={selectedProjectProfileProperties.projectProperties.includes(propertyFieldProperty.field)}
-                    />
+                    <Checkbox size='small' checked={selectedVariables.project.includes(propertyFieldProperty.field)} />
                     <Typography variant='subtitle1'>{propertyFieldProperty.columnTitle}</Typography>
                   </Stack>
                 ))}
@@ -108,34 +101,29 @@ export function ProposalSourcePropertiesSelectModal({
                     cursor: 'pointer'
                   }}
                   onClick={() => {
-                    setSelectedProjectProfileProperties({
-                      projectProperties: selectedProjectProfileProperties.projectProperties,
-                      projectMemberProperties: isProjectMemberPropertiesChecked
+                    setSelectedVariables({
+                      project: selectedVariables.project,
+                      projectMember: isProjectMemberChecked
                         ? []
                         : projectMemberFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field)
                     });
                   }}
                 >
-                  <Checkbox size='small' checked={isProjectMemberPropertiesChecked} />
+                  <Checkbox size='small' checked={isProjectMemberChecked} />
                   <Typography fontWeight='bold'>Project Member</Typography>
                 </Stack>
                 <Stack gap={0} ml={2}>
                   {projectMemberFieldProperties.map((projectMemberFieldProperty) => (
                     <Stack
                       onClick={() => {
-                        const isChecked = selectedProjectProfileProperties.projectMemberProperties.includes(
-                          projectMemberFieldProperty.field
-                        );
-                        setSelectedProjectProfileProperties({
-                          projectProperties: selectedProjectProfileProperties.projectProperties,
-                          projectMemberProperties: isChecked
-                            ? selectedProjectProfileProperties.projectMemberProperties.filter(
+                        const isChecked = selectedVariables.projectMember.includes(projectMemberFieldProperty.field);
+                        setSelectedVariables({
+                          project: selectedVariables.project,
+                          projectMember: isChecked
+                            ? selectedVariables.projectMember.filter(
                                 (selectedProperty) => selectedProperty !== projectMemberFieldProperty.field
                               )
-                            : [
-                                ...selectedProjectProfileProperties.projectMemberProperties,
-                                projectMemberFieldProperty.field
-                              ]
+                            : [...selectedVariables.projectMember, projectMemberFieldProperty.field]
                         });
                       }}
                       alignItems='center'
@@ -147,9 +135,7 @@ export function ProposalSourcePropertiesSelectModal({
                     >
                       <Checkbox
                         size='small'
-                        checked={selectedProjectProfileProperties.projectMemberProperties.includes(
-                          projectMemberFieldProperty.field
-                        )}
+                        checked={selectedVariables.projectMember.includes(projectMemberFieldProperty.field)}
                       />
                       <Typography variant='subtitle1'>{projectMemberFieldProperty.label}</Typography>
                     </Stack>
@@ -162,7 +148,7 @@ export function ProposalSourcePropertiesSelectModal({
         <Stack direction='row' justifyContent='flex-end'>
           <Button
             onClick={() => {
-              onApply([]);
+              onApply(selectedVariables);
             }}
           >
             Apply

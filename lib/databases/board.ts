@@ -1,5 +1,6 @@
 import { v4 } from 'uuid';
 
+import type { SelectedVariables } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourcePropertiesSelectModal';
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -89,6 +90,7 @@ export type GoogleFormSourceData = {
 
 export type BoardFields = {
   icon: string;
+  selectedVariables?: SelectedVariables;
   description: PageContent;
   showDescription?: boolean;
   isTemplate?: boolean;
