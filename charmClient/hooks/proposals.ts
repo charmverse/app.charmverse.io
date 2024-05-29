@@ -183,7 +183,7 @@ export function useResetEvaluationReview({ proposalId }: { proposalId: MaybeStri
 }
 
 export function useAppealProposalEvaluation({ evaluationId }: { evaluationId: string }) {
-  return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal`);
+  return usePUT<{ appealReason: string }>(`/api/proposals/evaluations/${evaluationId}/appeal`);
 }
 
 export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
