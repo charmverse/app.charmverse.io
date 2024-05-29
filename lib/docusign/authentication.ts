@@ -3,6 +3,7 @@ import { log } from '@charmverse/core/log';
 import { hasAccessToSpace } from '@charmverse/core/permissions';
 import type { DocusignCredential } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import { stringUtils } from '@charmverse/core/utilities';
 
 import { DELETE, GET, POST } from 'adapters/http';
 import { docusignClientId, docusignClientSecret, docusignOauthBaseUri, isDevEnv, isStagingEnv } from 'config/constants';
@@ -202,6 +203,10 @@ export async function refreshDocusignAccessToken({
 export type PublicDocuSignProfile = Pick<DocusignCredential, 'docusignAccountId' | 'docusignAccountName' | 'spaceId'>;
 
 export async function getSpaceDocusignCredentials({ spaceId }: { spaceId: string }): Promise<DocusignCredential> {
+  if (!stringUtils.isUUID(spaceId)) {
+    throw new InvalidInputError(`Invalid spaceId: ${spaceId}`);
+  }
+
   const credentials = await prisma.docusignCredential.findFirstOrThrow({
     where: {
       spaceId

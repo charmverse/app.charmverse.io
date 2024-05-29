@@ -3,13 +3,14 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import { GET, POST } from 'adapters/http';
+import { baseUrl } from 'config/constants';
 
 import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 import type { RequiredDocusignCredentials } from './constants';
 
 // Change this to match the base url in prod
-const webhookBaseUrl = 'https://b7e6-185-166-84-140.ngrok-free.app';
-// const webhookBaseUrl = baseUrl;
+// const webhookBaseUrl = 'https://3954-2003-f1-c726-abc8-5de7-ecff-54f1-5f98.ngrok-free.app';
+const webhookBaseUrl = baseUrl;
 
 async function getDocusignWebhook({
   docusignWebhookId,
@@ -22,7 +23,7 @@ async function getDocusignWebhook({
   docusignAuthToken: string;
   docusignBaseUrl: string;
 }): Promise<any> {
-  return GET<any>(
+  return GET<{ configurations: any[] }>(
     `${docusignBaseUrl}/restapi/v2.1/accounts/${docusignAccountId}/connect/${docusignWebhookId}`,
     undefined,
     {

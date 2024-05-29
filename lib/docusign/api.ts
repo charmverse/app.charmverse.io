@@ -10,7 +10,7 @@ import { GET, POST, PUT } from 'adapters/http';
 import { redisClient } from 'adapters/redis/redisClient';
 import { baseUrl } from 'config/constants';
 import { InvalidStateError } from 'lib/middleware';
-import { lowerCaseEqual, prettyPrint } from 'lib/utils/strings';
+import { lowerCaseEqual } from 'lib/utils/strings';
 
 import { docusignUserOAuthTokenHeader, getSpaceDocusignCredentials } from './authentication';
 import type { RequiredDocusignCredentials } from './constants';
@@ -61,7 +61,7 @@ export function getDocusignTemplates({ apiBaseUrl, authToken, accountId }: Docus
   });
 }
 
-type DocusignRecipient = {
+export type DocusignRecipient = {
   creationReason: string;
   isBulkRecipient: boolean;
   recipientSuppliesTabs: boolean;
@@ -76,6 +76,7 @@ type DocusignRecipient = {
   roleName: string;
   status: string;
   completedCount: string;
+  embeddedRecipientStartURL?: string;
   signedDateTime: string;
   sentDateTime: string;
   deliveryMethod: string;
@@ -143,6 +144,10 @@ export type DocusignEnvelope = {
   recipients: { signers: DocusignRecipient[] };
 };
 
+export function getDocusignEnvelopeCacheKey(envelopeId: string) {
+  return `docusign-envelope-${envelopeId}`;
+}
+
 export async function getEnvelope({
   credentials,
   envelopeId
@@ -150,7 +155,7 @@ export async function getEnvelope({
   envelopeId: string;
   credentials: RequiredDocusignCredentials;
 }): Promise<DocusignEnvelope> {
-  const envelope = await redisClient?.get(`docusign-envelope-${envelopeId}`);
+  const envelope = await redisClient?.get(getDocusignEnvelopeCacheKey(envelopeId));
 
   if (envelope) {
     log.info('Envelope found in cache');
@@ -275,7 +280,7 @@ export async function searchDocusignDocs({
 
   const envelopes = await GET<{ envelopes: DocusignEnvelope[] }>(
     apiUrl,
-    { search_text: query.title, from_date: new Date('2021-01-01').toISOString() },
+    { search_text: query.title, from_date: new Date('2021-01-01').toISOString(), include: 'recipients' },
     {
       headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
     }
@@ -312,8 +317,6 @@ export async function updateRecipients({
       headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
     }
   );
-
-  prettyPrint({ updatedEnvelope: response });
 
   return response;
 }

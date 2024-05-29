@@ -4,6 +4,7 @@ import { v4 as uuid } from 'uuid';
 
 import { getEnvelope, updateRecipients } from 'lib/docusign/api';
 import { getSpaceDocusignCredentials } from 'lib/docusign/authentication';
+import { enableHybridSigning } from 'lib/docusign/enableHybridSigning';
 import { userByEmailOrGoogleAccountQuery } from 'lib/users/getUser';
 import { lowerCaseEqual } from 'lib/utils/strings';
 
@@ -47,10 +48,9 @@ export async function addEnvelopeToEvaluation({
 
   const signersFromDocusign = docusignEnvelope.recipients.signers;
 
-  await updateRecipients({
+  await enableHybridSigning({
     envelopeId,
-    credentials: docusignCredentials,
-    recipients: signersFromDocusign.map((signer) => ({ ...signer, clientUserId: signer.clientUserId ?? uuid() }))
+    credentials: docusignCredentials
   });
 
   const completedUserEmails = signersFromDocusign
