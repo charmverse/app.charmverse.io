@@ -86,6 +86,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalEvaluationTotal'
   }),
+  proposalRubricCriteriaTotal: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Total',
+    options: [],
+    type: 'proposalRubricCriteriaTotal'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',

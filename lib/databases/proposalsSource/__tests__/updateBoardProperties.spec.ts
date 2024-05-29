@@ -138,6 +138,96 @@ describe('updateBoardProperties()', () => {
     expect(evaluationAverageProp).toBeDefined();
   });
 
+  it('should create unique proposalRubricCriteriaTotal properties for all unique rubric criteria in the space based on title', async () => {
+    const { user: spaceUser, space: spaceWithRubrics } = await testUtilsUser.generateUserAndSpace();
+
+    const rootId = uuid();
+
+    const proposal = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationInputs: [
+        {
+          evaluationType: 'feedback',
+          permissions: [],
+          reviewers: [],
+          title: 'Feedback'
+        },
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [],
+          title: 'Rubric 1',
+          rubricCriteria: [
+            {
+              title: 'Criteria 1'
+            },
+            {
+              title: 'Criteria 2'
+            }
+          ]
+        },
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [],
+          title: 'Rubric 2',
+          rubricCriteria: [
+            {
+              title: 'Criteria 1'
+            },
+            {
+              title: 'Criteria 2.1'
+            }
+          ]
+        }
+      ]
+    });
+
+    const databaseBlock = await prisma.block.create({
+      data: {
+        parentId: rootId,
+        rootId,
+        id: rootId,
+        schema: -1,
+        title: 'Example',
+        type: 'board',
+        updatedBy: user.id,
+        fields: {
+          sourceType: 'proposals'
+        },
+        space: { connect: { id: spaceWithRubrics.id } },
+        user: { connect: { id: spaceUser.id } }
+      }
+    });
+
+    await updateBoardProperties({
+      boardId: rootId
+    });
+
+    const updatedBlock = await prisma.block.findUnique({
+      where: {
+        id: rootId
+      }
+    });
+
+    const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
+    // Check status
+    const rubricCriteria1Property = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.name === 'Criteria 1'
+    );
+    const rubricCriteria2Property = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.name === 'Criteria 2'
+    );
+    const rubricCriteria21Property = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.name === 'Criteria 2.1'
+    );
+
+    expect(rubricCriteria1Property).toBeDefined();
+    expect(rubricCriteria2Property).toBeDefined();
+    expect(rubricCriteria21Property).toBeDefined();
+  });
+
   it('should leave existing property IDs and options unchanged', async () => {
     const rootId = uuid();
 

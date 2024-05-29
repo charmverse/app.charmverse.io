@@ -1,3 +1,4 @@
+import type { Prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -14,20 +15,35 @@ export const excludedFieldTypes = ['project_profile', 'label'];
 // define properties that will apply to all source fields
 const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 
+type EvaluationStep = {
+  title: string;
+  type: ProposalEvaluationType;
+  rubricCriteria: {
+    title: string;
+  }[];
+};
+
 // apply proposal-related properties to the board
 export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
-  evaluationStepTitles = [],
-  proposalCustomProperties = [],
-  rubricStepTitles = []
+  evaluationSteps = [],
+  proposalCustomProperties = []
 }: {
-  rubricStepTitles?: string[];
   proposalCustomProperties?: IPropertyTemplate[];
-  evaluationStepTitles?: string[];
+  evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
   formFields?: FormFieldInput[];
 }) {
+  const evaluationStepTitles: Set<string> = new Set();
+  const rubricStepTitles: Set<string> = new Set();
+  evaluationSteps.forEach((e) => {
+    evaluationStepTitles.add(e.title);
+    if (e.type === 'rubric') {
+      rubricStepTitles.add(e.title);
+    }
+  });
+
   const boardProperties = [...currentCardProperties];
 
   // standard proposal properties
@@ -38,11 +54,13 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
   applyToPropertiesByType(
     boardProperties,
-    proposalDbProperties.proposalStep({ options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'] })
+    proposalDbProperties.proposalStep({
+      options: ['Draft', ...Array.from(evaluationStepTitles), 'Rewards', 'Credentials']
+    })
   );
 
   // properties per each evaluation step
-  applyProposalEvaluationProperties(boardProperties, rubricStepTitles);
+  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles));
 
   // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
@@ -52,7 +70,36 @@ export function getBoardProperties({
   // properties related to form proposals
   applyFormFieldProperties(boardProperties, formFields);
 
+  // properties for each unique questions on rubric evaluation step
+  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
+
   return boardProperties;
+}
+
+function applyRubricEvaluationQuestionProperties(
+  boardProperties: IPropertyTemplate[],
+  evaluationSteps: EvaluationStep[]
+) {
+  const rubricCriteriaTitles: Set<string> = new Set();
+  evaluationSteps.forEach((evaluationStep) => {
+    if (evaluationStep.type === 'rubric') {
+      evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
+        rubricCriteriaTitles.add(rubricCriteria.title);
+      });
+    }
+  });
+
+  rubricCriteriaTitles.forEach((rubricCriteriaTitle) => {
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalRubricCriteriaTotal',
+      name: rubricCriteriaTitle,
+      description: `Total score for ${rubricCriteriaTitle}`,
+      readOnly: true,
+      readOnlyValues: true,
+      private: false
+    });
+  });
 }
 
 function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
@@ -229,5 +276,7 @@ export function getPropertyName(property: IPropertyTemplate) {
     ? `${property.name} (Evaluation average)`
     : property.type === 'proposalEvaluationTotal'
     ? `${property.name} (Evaluation total)`
+    : property.type === 'proposalRubricCriteriaTotal'
+    ? `${property.name} (Total score)`
     : undefined;
 }
