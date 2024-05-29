@@ -21,13 +21,13 @@ import { webhookEndpoint } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
 import { createBoardView, type BoardView } from 'lib/databases/boardView';
-import { APPLICANT_STATUS_BLOCK_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 
 import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
 import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
 import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
+import { ProposalSourcePropertiesSelectModal } from './components/ProposalSourcePropertiesSelectModal';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';
 
@@ -56,6 +56,9 @@ type ViewSourceOptionsProps = {
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const { view: activeView, views, rootBoard, title, closeSourceOptions, closeSidebar, showView, isReward } = props;
+  const proposalSourcePropertiesSelectPopupState = usePopupState({
+    variant: 'dialog'
+  });
 
   const dispatch = useAppDispatch();
   const { onCreateDatabase, onCsvImport, onSelectLinkedDatabase, onSelectSourceGoogleForm } = useSourceOptions({
@@ -178,17 +181,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SourceType
                 data-test='source-proposals'
                 active={activeSourceType === 'proposals'}
-                onClick={
-                  isLoadingProposalSource
-                    ? undefined
-                    : () => {
-                        if (!isCreatingProposals.current) {
-                          isCreatingProposals.current = true;
-                          selectSourceType('proposals');
-                          handleProposalSource();
-                        }
-                      }
-                }
+                onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesSelectPopupState.open}
               >
                 <TaskOutlinedIcon fontSize='small' />
                 Charmverse Proposals
@@ -291,6 +284,18 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           typeformPopup.close();
         }}
       />
+      {proposalSourcePropertiesSelectPopupState.isOpen && (
+        <ProposalSourcePropertiesSelectModal
+          onClose={proposalSourcePropertiesSelectPopupState.close}
+          onApply={() => {
+            if (!isCreatingProposals.current) {
+              isCreatingProposals.current = true;
+              selectSourceType('proposals');
+              handleProposalSource();
+            }
+          }}
+        />
+      )}
     </>
   );
 }
