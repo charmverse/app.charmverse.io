@@ -64,7 +64,7 @@ export function SidebarLink({
 }: {
   active: boolean;
   href?: string;
-  icon: any;
+  icon?: any;
   label: string;
   target?: string;
   onClick?: (e: MouseEvent<any>) => void;
