@@ -11,31 +11,206 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useSmallScreen } from 'hooks/useMediaScreens';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
-export type SelectedVariables = {
+export type SelectedProperties = {
   projectMember: string[];
   project: string[];
   templates: {
     id: string;
+    formFields: string[];
   }[];
 };
 
+type SelectedGroup =
+  | {
+      group: 'project_profile';
+    }
+  | {
+      group: 'templates';
+      templateId: string;
+    };
+
 const projectMemberFields = projectMemberFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);
 const projectFields = projectFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);
+
+function ProjectProfilePropertiesReadOnlyList({ selectedProperties }: { selectedProperties: SelectedProperties }) {
+  const { selectedProjectFields, selectedProjectMemberFields } = useMemo(() => {
+    return {
+      selectedProjectFields: projectFieldProperties.filter((propertyFieldProperty) =>
+        selectedProperties.project.includes(propertyFieldProperty.field)
+      ),
+      selectedProjectMemberFields: projectMemberFieldProperties.filter((propertyFieldProperty) =>
+        selectedProperties.projectMember.includes(propertyFieldProperty.field)
+      )
+    };
+  }, [selectedProperties]);
+
+  if (selectedProjectFields.length === 0 && selectedProjectMemberFields.length === 0) {
+    return null;
+  }
+
+  return (
+    <Stack mt={1} pl={2}>
+      <Typography fontWeight='bold' mb={0.5} variant='subtitle1'>
+        Project Profile
+      </Typography>
+      <Stack gap={0.5} ml={2}>
+        {selectedProjectFields.map((propertyFieldProperty) => (
+          <Typography variant='subtitle2' key={propertyFieldProperty.field}>
+            {propertyFieldProperty.columnTitle}
+          </Typography>
+        ))}
+        {selectedProjectMemberFields.length === 0 ? null : (
+          <>
+            <Typography fontWeight='bold' variant='subtitle1'>
+              Project Member
+            </Typography>
+            <Stack gap={0.5} ml={2}>
+              {selectedProjectMemberFields.map((projectMemberFieldProperty) => (
+                <Typography variant='subtitle2' key={projectMemberFieldProperty.field}>
+                  {projectMemberFieldProperty.label}
+                </Typography>
+              ))}
+            </Stack>
+          </>
+        )}
+      </Stack>
+    </Stack>
+  );
+}
+
+function ProjectProfilePropertiesList({
+  selectedProperties,
+  setSelectedProperties
+}: {
+  setSelectedProperties: (selectedProperties: SelectedProperties) => void;
+  selectedProperties: SelectedProperties;
+}) {
+  const isAllProjectMemberPropertiesSelected =
+    selectedProperties.projectMember.length === projectMemberFieldProperties.length;
+
+  const isAllProjectPropertiesSelected =
+    selectedProperties.project.length === projectFieldProperties.length && isAllProjectMemberPropertiesSelected;
+
+  return (
+    <Stack>
+      <Stack direction='row' alignItems='center'>
+        <Checkbox
+          size='small'
+          checked={isAllProjectPropertiesSelected}
+          onChange={() => {
+            setSelectedProperties(
+              isAllProjectPropertiesSelected
+                ? {
+                    projectMember: [],
+                    project: [],
+                    templates: []
+                  }
+                : {
+                    projectMember: [...projectMemberFields],
+                    project: [...projectFields],
+                    templates: selectedProperties.templates
+                  }
+            );
+          }}
+        />
+        <Typography fontWeight='bold'>Project Profile</Typography>
+      </Stack>
+      <Stack gap={0} ml={2}>
+        {projectFieldProperties.map((propertyFieldProperty) => (
+          <Stack
+            onClick={() => {
+              const isChecked = selectedProperties.project.includes(propertyFieldProperty.field);
+              setSelectedProperties({
+                ...selectedProperties,
+                project: isChecked
+                  ? selectedProperties.project.filter(
+                      (selectedProperty) => selectedProperty !== propertyFieldProperty.field
+                    )
+                  : [...selectedProperties.project, propertyFieldProperty.field]
+              });
+            }}
+            alignItems='center'
+            direction='row'
+            sx={{
+              cursor: 'pointer'
+            }}
+            key={propertyFieldProperty.field}
+          >
+            <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
+            <Typography variant='subtitle1'>{propertyFieldProperty.columnTitle}</Typography>
+          </Stack>
+        ))}
+        <Stack
+          direction='row'
+          alignItems='center'
+          sx={{
+            cursor: 'pointer'
+          }}
+          onClick={() => {
+            setSelectedProperties({
+              ...selectedProperties,
+              projectMember: isAllProjectMemberPropertiesSelected ? [] : [...projectMemberFields]
+            });
+          }}
+        >
+          <Checkbox size='small' checked={isAllProjectMemberPropertiesSelected} />
+          <Typography fontWeight='bold'>Project Member</Typography>
+        </Stack>
+        <Stack gap={0} ml={2}>
+          {projectMemberFieldProperties.map((projectMemberFieldProperty) => (
+            <Stack
+              onClick={() => {
+                const isChecked = selectedProperties.projectMember.includes(projectMemberFieldProperty.field);
+                setSelectedProperties({
+                  ...selectedProperties,
+                  projectMember: isChecked
+                    ? selectedProperties.projectMember.filter(
+                        (selectedProperty) => selectedProperty !== projectMemberFieldProperty.field
+                      )
+                    : [...selectedProperties.projectMember, projectMemberFieldProperty.field]
+                });
+              }}
+              alignItems='center'
+              direction='row'
+              sx={{
+                cursor: 'pointer'
+              }}
+              key={projectMemberFieldProperty.field}
+            >
+              <Checkbox
+                size='small'
+                checked={selectedProperties.projectMember.includes(projectMemberFieldProperty.field)}
+              />
+              <Typography variant='subtitle1'>{projectMemberFieldProperty.label}</Typography>
+            </Stack>
+          ))}
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+}
 
 export function ProposalSourcePropertiesSelectModal({
   onClose,
   onApply
 }: {
-  onApply: (selectedVariables: SelectedVariables) => void;
+  onApply: (selectedProperties: SelectedProperties) => void;
   onClose: VoidFunction;
 }) {
-  const [selectedVariables, setSelectedVariables] = useState<SelectedVariables>({
+  const [selectedProperties, setSelectedProperties] = useState<SelectedProperties>({
     projectMember: [],
     project: [],
     templates: []
   });
+  const [selectedGroup, setSelectedGroup] = useState<SelectedGroup>({
+    group: 'project_profile'
+  });
+  const noPropertiesSelected =
+    selectedProperties.project.length === 0 &&
+    selectedProperties.projectMember.length === 0 &&
+    selectedProperties.templates.length === 0;
 
-  const { isLoadingTemplates, proposalTemplates } = useProposalTemplates();
+  const { proposalTemplates } = useProposalTemplates();
 
   const proposalTemplatePages = useMemo(() => {
     return (proposalTemplates || [])
@@ -49,11 +224,6 @@ export function ProposalSourcePropertiesSelectModal({
   }, [proposalTemplates]);
 
   const isMobile = useSmallScreen();
-
-  const isProjectMemberChecked = selectedVariables.projectMember.length === projectMemberFieldProperties.length;
-
-  const isAllProjectProfilePropertiesSelected =
-    selectedVariables.project.length === projectFieldProperties.length && isProjectMemberChecked;
 
   return (
     <Dialog
@@ -76,10 +246,7 @@ export function ProposalSourcePropertiesSelectModal({
         <Stack
           gap={1}
           sx={{
-            width: {
-              xs: '100%',
-              sm: '30%'
-            },
+            width: '30%',
             pt: 3,
             backgroundColor: (theme) => theme.palette.sidebar.background
           }}
@@ -88,10 +255,8 @@ export function ProposalSourcePropertiesSelectModal({
           <MenuItem
             dense
             onClick={() => {
-              setSelectedVariables({
-                projectMember: [...projectMemberFields],
-                project: [...projectFields],
-                templates: selectedVariables.templates
+              setSelectedGroup({
+                group: 'project_profile'
               });
             }}
             sx={{ mb: 1 }}
@@ -103,7 +268,16 @@ export function ProposalSourcePropertiesSelectModal({
           </MenuItem>
           <SectionName>Templates</SectionName>
           {proposalTemplatePages.map((template) => (
-            <MenuItem key={template.id} dense>
+            <MenuItem
+              key={template.id}
+              dense
+              onClick={() => {
+                setSelectedGroup({
+                  group: 'templates',
+                  templateId: template.id
+                });
+              }}
+            >
               <ListItemIcon>
                 {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
               </ListItemIcon>
@@ -117,101 +291,38 @@ export function ProposalSourcePropertiesSelectModal({
           )}
         </Stack>
         <Stack gap={1} p={2} overflow='auto' height='90vh' width='100%'>
-          <Typography variant='h6'>Selected Variables</Typography>
-          <Stack>
-            <Stack direction='row' alignItems='center'>
-              <Checkbox
-                size='small'
-                checked={isAllProjectProfilePropertiesSelected}
-                onChange={() => {
-                  setSelectedVariables(
-                    isAllProjectProfilePropertiesSelected
-                      ? {
-                          projectMember: [],
-                          project: [],
-                          templates: []
-                        }
-                      : {
-                          projectMember: [...projectMemberFields],
-                          project: [...projectFields],
-                          templates: selectedVariables.templates
-                        }
-                  );
-                }}
+          {selectedGroup?.group === 'project_profile' ? (
+            <>
+              <Typography variant='h6'>Project profile properties</Typography>
+              <ProjectProfilePropertiesList
+                selectedProperties={selectedProperties}
+                setSelectedProperties={setSelectedProperties}
               />
-              <Typography fontWeight='bold'>Project Profile</Typography>
-            </Stack>
-            <Stack gap={0} ml={2}>
-              {projectFieldProperties.map((propertyFieldProperty) => (
-                <Stack
-                  onClick={() => {
-                    const isChecked = selectedVariables.project.includes(propertyFieldProperty.field);
-                    setSelectedVariables({
-                      ...selectedVariables,
-                      project: isChecked
-                        ? selectedVariables.project.filter(
-                            (selectedProperty) => selectedProperty !== propertyFieldProperty.field
-                          )
-                        : [...selectedVariables.project, propertyFieldProperty.field]
-                    });
-                  }}
-                  alignItems='center'
-                  direction='row'
-                  sx={{
-                    cursor: 'pointer'
-                  }}
-                  key={propertyFieldProperty.field}
-                >
-                  <Checkbox size='small' checked={selectedVariables.project.includes(propertyFieldProperty.field)} />
-                  <Typography variant='subtitle1'>{propertyFieldProperty.columnTitle}</Typography>
-                </Stack>
-              ))}
-              <Stack
-                direction='row'
-                alignItems='center'
-                sx={{
-                  cursor: 'pointer'
-                }}
-                onClick={() => {
-                  setSelectedVariables({
-                    ...selectedVariables,
-                    projectMember: isProjectMemberChecked ? [] : [...projectMemberFields]
-                  });
-                }}
-              >
-                <Checkbox size='small' checked={isProjectMemberChecked} />
-                <Typography fontWeight='bold'>Project Member</Typography>
-              </Stack>
-              <Stack gap={0} ml={2}>
-                {projectMemberFieldProperties.map((projectMemberFieldProperty) => (
-                  <Stack
-                    onClick={() => {
-                      const isChecked = selectedVariables.projectMember.includes(projectMemberFieldProperty.field);
-                      setSelectedVariables({
-                        ...selectedVariables,
-                        projectMember: isChecked
-                          ? selectedVariables.projectMember.filter(
-                              (selectedProperty) => selectedProperty !== projectMemberFieldProperty.field
-                            )
-                          : [...selectedVariables.projectMember, projectMemberFieldProperty.field]
-                      });
-                    }}
-                    alignItems='center'
-                    direction='row'
-                    sx={{
-                      cursor: 'pointer'
-                    }}
-                    key={projectMemberFieldProperty.field}
-                  >
-                    <Checkbox
-                      size='small'
-                      checked={selectedVariables.projectMember.includes(projectMemberFieldProperty.field)}
-                    />
-                    <Typography variant='subtitle1'>{projectMemberFieldProperty.label}</Typography>
-                  </Stack>
-                ))}
-              </Stack>
-            </Stack>
+            </>
+          ) : null}
+        </Stack>
+        <Stack
+          gap={1}
+          sx={{
+            width: '40%',
+            pt: 3,
+            height: '90vh',
+            backgroundColor: (theme) => theme.palette.sidebar.background
+          }}
+        >
+          <Stack
+            sx={{
+              overflow: 'auto',
+              height: '80vh'
+            }}
+          >
+            <SectionName>Selected Properties</SectionName>
+            <ProjectProfilePropertiesReadOnlyList selectedProperties={selectedProperties} />
+            {noPropertiesSelected && (
+              <Typography pl={2} variant='caption'>
+                No properties selected
+              </Typography>
+            )}
           </Stack>
           <Button
             sx={{
@@ -220,7 +331,7 @@ export function ProposalSourcePropertiesSelectModal({
               right: 16
             }}
             onClick={() => {
-              onApply(selectedVariables);
+              onApply(selectedProperties);
             }}
           >
             Apply
