@@ -1,12 +1,16 @@
+import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type {
   FormFieldAnswer,
   IssuedCredential,
+  Prisma,
   Proposal,
   ProposalEvaluation,
+  ProposalReviewer,
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type {
   IssuableProposalCredentialAuthor,
@@ -17,6 +21,7 @@ import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuabl
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
+import { isUUID } from 'lib/utils/strings';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -43,6 +48,7 @@ type ProposalData = {
       ProposalEvaluation,
       'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep' | 'appealedAt'
     > & {
+      reviewers: ProposalReviewer[];
       rubricAnswers: ProposalRubricCriteriaAnswer[];
       rubricCriteria: ProposalRubricCriteria[];
     })[];
@@ -101,7 +107,8 @@ const pageSelectObject = {
           rubricAnswers: true,
           requiredReviews: true,
           finalStep: true,
-          appealedAt: true
+          appealedAt: true,
+          reviewers: true
         },
         orderBy: {
           index: 'asc'
@@ -114,7 +121,7 @@ const pageSelectObject = {
       }
     }
   }
-} as const;
+} satisfies Prisma.PageSelect;
 
 export async function getCardPropertiesFromProposals({
   cardProperties,
@@ -256,6 +263,20 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
       });
     }
   });
+
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+  const proposalReviewersProperty = cardProperties.find((prop) => prop.type === 'proposalReviewer');
+  if (proposalReviewersProperty && currentEvaluation && isUUID(currentEvaluation.id)) {
+    // TODO: Should we fix the type everywhere to allow CardPropertyValue to be of TargetPermissionGroup?
+    properties[proposalReviewersProperty.id] =
+      (currentEvaluation?.reviewers.map(
+        (r) =>
+          ({
+            group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
+            id: r.userId ?? r.roleId ?? r.systemRole
+          } as TargetPermissionGroup<'user' | 'role'>)
+      ) as any) ?? [];
+  }
 
   const formFieldProperties = getCardPropertiesFromForm({
     cardProperties,

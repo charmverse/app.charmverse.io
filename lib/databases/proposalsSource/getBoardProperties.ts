@@ -1,4 +1,4 @@
-import type { Prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -52,6 +52,10 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
+  applyToPropertiesByType(boardProperties, {
+    ...proposalDbProperties.proposalReviewer(),
+    name: 'Proposal Reviewers'
+  });
   applyToPropertiesByType(
     boardProperties,
     proposalDbProperties.proposalStep({

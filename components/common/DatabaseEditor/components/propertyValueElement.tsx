@@ -1,7 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { ApplicationStatus, ProposalSystemRole } from '@charmverse/core/prisma';
 import PersonIcon from '@mui/icons-material/Person';
-import { Box, Link, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import clsx from 'clsx';
 import { useRouter } from 'next/router';
@@ -13,7 +13,6 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
-import { BreadcrumbPageTitle } from 'components/common/PageLayout/components/Header/components/PageTitleWithBreadcrumbs';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import {
@@ -27,7 +26,6 @@ import { allMembersSystemRole, authorSystemRole } from 'components/settings/prop
 import { useDateFormatter } from 'hooks/useDateFormatter';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSnackbar } from 'hooks/useSnackbar';
-import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { Board, IPropertyTemplate, PropertyType } from 'lib/databases/board';
 import type { CardWithRelations } from 'lib/databases/card';
 import {
@@ -39,6 +37,7 @@ import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import {
+  APPLICANT_STATUS_BLOCK_ID,
   DUE_DATE_ID,
   REWARDS_APPLICANTS_BLOCK_ID,
   REWARDS_AVAILABLE_BLOCK_ID,
@@ -49,8 +48,7 @@ import {
   REWARD_PROPOSAL_LINK,
   REWARD_REVIEWERS_BLOCK_ID,
   REWARD_STATUS_BLOCK_ID,
-  REWARD_TOKEN,
-  APPLICANT_STATUS_BLOCK_ID
+  REWARD_TOKEN
 } from 'lib/rewards/blocks/constants';
 import { getRewardType } from 'lib/rewards/getRewardType';
 import type { RewardReviewer, RewardStatus } from 'lib/rewards/interfaces';
@@ -135,8 +133,6 @@ const editableFields: PropertyType[] = ['text', 'number', 'email', 'url', 'phone
 function PropertyValueElement(props: Props) {
   const [value, setValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
   const [serverValue, setServerValue] = useState(props.card.fields.properties[props.propertyTemplate.id] || '');
-
-  const { getFeatureTitle } = useSpaceFeatures();
 
   const { formatDateTime, formatDate } = useDateFormatter();
   const { updateReward } = useRewards();
