@@ -27,8 +27,8 @@ import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
 import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
 import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
-import type { SelectedVariables } from './components/ProposalSourcePropertiesSelectModal';
-import { ProposalSourcePropertiesSelectModal } from './components/ProposalSourcePropertiesSelectModal';
+import type { SelectedProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import { ProposalSourcePropertiesDialog } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';
 
@@ -138,9 +138,9 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     }
   }
 
-  async function handleProposalSource(selectedVariables: SelectedVariables) {
+  async function handleProposalSource(selectedProperties: SelectedProperties) {
     if (rootDatabaseId) {
-      await onCreateDatabase?.({ sourceType: 'proposals', selectedVariables });
+      await onCreateDatabase?.({ sourceType: 'proposals', selectedProperties });
       await createProposalSource({ pageId: rootDatabaseId });
       dispatch(initialDatabaseLoad({ pageId: rootDatabaseId }));
     }
@@ -286,13 +286,13 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
         }}
       />
       {proposalSourcePropertiesSelectPopupState.isOpen && (
-        <ProposalSourcePropertiesSelectModal
+        <ProposalSourcePropertiesDialog
           onClose={proposalSourcePropertiesSelectPopupState.close}
-          onApply={(selectedVariables) => {
+          onApply={(selectedProperties) => {
             if (!isCreatingProposals.current) {
               isCreatingProposals.current = true;
               selectSourceType('proposals');
-              handleProposalSource(selectedVariables);
+              handleProposalSource(selectedProperties);
             }
           }}
         />

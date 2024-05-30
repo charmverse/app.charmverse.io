@@ -22,7 +22,7 @@ import { initialDatabaseLoad } from '../../../store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getViews } from '../../../store/views';
 
-import type { SelectedVariables } from './components/ProposalSourcePropertiesSelectModal';
+import type { SelectedProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 
 export const allowedSourceDatabasePageTypes = ['board', 'inline_board'];
 type Props = {
@@ -163,13 +163,13 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
 
   async function onCreateDatabase({
     sourceType,
-    selectedVariables
-  }: { selectedVariables?: SelectedVariables; sourceType?: BoardFields['sourceType'] } = {}) {
+    selectedProperties
+  }: { selectedProperties?: SelectedProperties; sourceType?: BoardFields['sourceType'] } = {}) {
     if (!rootBoard.pageType?.match('board')) {
       throw new Error(`No board page type exists: ${rootBoard.pageType}`);
     }
 
-    const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType, selectedVariables } };
+    const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType, selectedProperties } };
     await mutator.updateBlock(boardBlockUpdate, rootBoard, 'Update board datasource');
     const { view } = await createNewDataSource({
       board: boardBlockUpdate,
