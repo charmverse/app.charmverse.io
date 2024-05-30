@@ -56,7 +56,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   readOnlyTitle?: boolean;
-  isGroupCollapsed?: boolean;
+  isExpandedGroup?: boolean;
   isExpanded?: boolean | null;
   setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;
   indentTitle?: number;
@@ -193,7 +193,7 @@ function TableRow(props: Props) {
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
 
-  if (props.isGroupCollapsed) {
+  if (!props.isExpandedGroup) {
     className += ' hidden';
   }
 
@@ -387,42 +387,23 @@ function TableRow(props: Props) {
 
 function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean; subPages?: Card[] }) {
   const isGrouped = Boolean(props.activeView.fields.groupById);
-
-  // inherit the group collapse state from parent rows
-  let isGroupCollapsed = !!props.isGroupCollapsed;
-  if (isGrouped) {
-    const groupID = props.activeView.fields.groupById || '';
-    // look up property id if we grouped by column type (eg proposalUrl)
-    const groupTemplate = props.board.fields.cardProperties.find((prop) => prop.type === groupID);
-    const groupValue =
-      (groupTemplate
-        ? props.card.fields.properties[groupTemplate.id]
-        : (props.card.fields.properties[groupID] as string)) || 'undefined';
-    const groupValueStr =
-      typeof groupValue === 'string' ? groupValue : Array.isArray(groupValue) ? groupValue[0] : null;
-    if (groupValueStr !== null && props.activeView.fields.collapsedOptionIds.indexOf(groupValueStr) > -1) {
-      isGroupCollapsed = true;
-    }
-  }
-
   return (
     <>
       <TableRow
         {...props}
         subRowsEmptyValueContent={props.isNested ? props.subRowsEmptyValueContent : undefined}
         isExpanded={props.isExpanded}
-        isGroupCollapsed={isGroupCollapsed}
+        isExpandedGroup={props.isExpandedGroup}
         setIsExpanded={subPages ? props.setIsExpanded : undefined}
       />
       {props.isExpanded &&
-        !isGroupCollapsed &&
+        (!isGrouped || props.isExpandedGroup === true) &&
         (!subPages || subPages?.length === 0
           ? props.emptySubPagesPlaceholder
           : subPages?.map((subPage) => (
               <ExpandableTableRow
                 key={subPage.id}
                 {...props}
-                isGroupCollapsed={isGroupCollapsed}
                 pageTitle={subPage.title}
                 pageUpdatedAt={new Date(subPage.updatedAt).toISOString()}
                 card={subPage}

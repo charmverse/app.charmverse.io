@@ -35,6 +35,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   disableDragAndDrop?: boolean;
+  isExpandedGroup?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
@@ -131,6 +132,7 @@ function TableRows(props: Props): JSX.Element {
           setIsExpanded={setIsExpanded}
           setCheckedIds={setCheckedIds}
           isChecked={checkedIds.includes(card.id)}
+          isExpandedGroup={props.isExpandedGroup}
           disableDragAndDrop={disableDragAndDrop}
           emptySubPagesPlaceholder={
             card.reward ? (

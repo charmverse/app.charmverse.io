@@ -344,7 +344,6 @@ describe('exportSpaceData', () => {
               columnWrappedIds: [],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: ['__status', '__evaluationType', '__authors', '__reviewers']
@@ -408,7 +407,6 @@ describe('exportSpaceData', () => {
               columnWrappedIds: ['__title'],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: [

@@ -23,7 +23,6 @@ export type BoardViewFields = {
   visiblePropertyIds: string[];
   visibleOptionIds: string[];
   hiddenOptionIds: string[];
-  collapsedOptionIds: string[];
   filter: FilterGroup;
   cardOrder: string[];
   columnWidths: Record<string, number>;
@@ -52,7 +51,6 @@ function createBoardView(block?: Pick<UIBlockWithDetails, 'fields'>): BoardView 
     visiblePropertyIds: block?.fields.visiblePropertyIds?.slice() || [],
     visibleOptionIds: block?.fields.visibleOptionIds?.slice() || [],
     hiddenOptionIds: block?.fields.hiddenOptionIds?.slice() || [],
-    collapsedOptionIds: block?.fields.collapsedOptionIds?.slice() || [],
     filter: createFilterGroup(block?.fields.filter),
     cardOrder: block?.fields.cardOrder?.slice() || [],
     columnWidths: { ...(block?.fields.columnWidths || {}) },
