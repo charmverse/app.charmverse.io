@@ -110,65 +110,69 @@ function applyFormFieldProperties(
   formFields: FormFieldInput[],
   selectedProperties?: SelectedProperties
 ) {
-  formFields.forEach((formField) => {
-    let boardPropertyType: IPropertyTemplate['type'] | null = null;
-    let boardPropertyOptions: IPropertyTemplate['options'] = [];
+  const selectedFormFieldProperties = selectedProperties?.templates.map((template) => template.formFields).flat() ?? [];
 
-    switch (formField.type) {
-      case 'short_text':
-      case 'wallet':
-      case 'long_text': {
-        boardPropertyType = 'text';
-        break;
-      }
-      case 'multiselect': {
-        boardPropertyType = 'multiSelect';
-        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
-          color: option.color,
-          id: option.id,
-          value: option.name
-        }));
-        break;
-      }
-      case 'select': {
-        boardPropertyType = 'select';
-        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
-          color: option.color,
-          id: option.id,
-          value: option.name
-        }));
-        break;
-      }
-      case 'project_profile': {
-        applyProjectProfileProperties(
-          boardProperties,
-          formField.fieldConfig as ProjectAndMembersFieldConfig,
-          selectedProperties
-        );
-        break;
-      }
-      default: {
-        if (!excludedFieldTypes.includes(formField.type)) {
-          boardPropertyType = formField.type as IPropertyTemplate['type'];
+  formFields
+    .filter((formField) => formField.type === 'project_profile' || selectedFormFieldProperties.includes(formField.id))
+    .forEach((formField) => {
+      let boardPropertyType: IPropertyTemplate['type'] | null = null;
+      let boardPropertyOptions: IPropertyTemplate['options'] = [];
+
+      switch (formField.type) {
+        case 'short_text':
+        case 'wallet':
+        case 'long_text': {
+          boardPropertyType = 'text';
+          break;
+        }
+        case 'multiselect': {
+          boardPropertyType = 'multiSelect';
+          boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+            color: option.color,
+            id: option.id,
+            value: option.name
+          }));
+          break;
+        }
+        case 'select': {
+          boardPropertyType = 'select';
+          boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+            color: option.color,
+            id: option.id,
+            value: option.name
+          }));
+          break;
+        }
+        case 'project_profile': {
+          applyProjectProfileProperties(
+            boardProperties,
+            formField.fieldConfig as ProjectAndMembersFieldConfig,
+            selectedProperties
+          );
+          break;
+        }
+        default: {
+          if (!excludedFieldTypes.includes(formField.type)) {
+            boardPropertyType = formField.type as IPropertyTemplate['type'];
+          }
         }
       }
-    }
-    if (boardPropertyType) {
-      const fieldProperty = {
-        id: uuid(),
-        name: formField.name,
-        options: boardPropertyOptions,
-        description: (formField.description as { content: PageContent; contentText: string })?.contentText,
-        type: boardPropertyType,
-        formFieldId: formField.id,
-        readOnly: true,
-        readOnlyValues: true,
-        private: formField.private
-      };
+      if (boardPropertyType) {
+        const fieldProperty = {
+          id: uuid(),
+          name: formField.name,
+          options: boardPropertyOptions,
+          description: (formField.description as { content: PageContent; contentText: string })?.contentText,
+          type: boardPropertyType,
+          formFieldId: formField.id,
+          readOnly: true,
+          readOnlyValues: true,
+          private: formField.private
+        };
 
-      applyFormFieldToProperties(boardProperties, fieldProperty);
-    }
-  });
+        applyFormFieldToProperties(boardProperties, fieldProperty);
+      }
+    });
 }
 
 // field config ref: lib/projects/constants.ts

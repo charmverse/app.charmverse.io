@@ -21,7 +21,10 @@ export function TemplatePropertiesList({
       rubricEvaluations: proposalTemplate
         ? proposalTemplate.evaluations.filter((evaluation) => evaluation.type === 'rubric')
         : [],
-      formFields: proposalTemplate?.formFields ?? []
+      formFields:
+        proposalTemplate?.formFields?.filter(
+          (formField) => formField.type !== 'project_profile' && formField.type !== 'label'
+        ) ?? []
     };
   }, [proposalTemplates, templatePageId]);
 
@@ -222,22 +225,36 @@ export function TemplatePropertiesList({
                     size='small'
                     checked={isFormFieldSelected}
                     onChange={() => {
-                      setSelectedProperties({
-                        ...selectedProperties,
-                        templates: selectedProperties.templates
-                          .map((template) => {
-                            if (template.pageId === templatePageId) {
-                              return {
-                                ...template,
-                                formFields: isFormFieldSelected
-                                  ? template.formFields.filter((fieldId) => fieldId !== formField.id)
-                                  : [...template.formFields, formField.id]
-                              };
+                      if (!selectedTemplate) {
+                        setSelectedProperties({
+                          ...selectedProperties,
+                          templates: [
+                            ...selectedProperties.templates,
+                            {
+                              formFields: [formField.id],
+                              pageId: templatePageId,
+                              rubricEvaluations: []
                             }
-                            return template;
-                          })
-                          .filter((template) => template.rubricEvaluations.length || template.formFields.length)
-                      });
+                          ]
+                        });
+                      } else {
+                        setSelectedProperties({
+                          ...selectedProperties,
+                          templates: selectedProperties.templates
+                            .map((template) => {
+                              if (template.pageId === templatePageId) {
+                                return {
+                                  ...template,
+                                  formFields: isFormFieldSelected
+                                    ? template.formFields.filter((fieldId) => fieldId !== formField.id)
+                                    : [...template.formFields, formField.id]
+                                };
+                              }
+                              return template;
+                            })
+                            .filter((template) => template.rubricEvaluations.length || template.formFields.length)
+                        });
+                      }
                     }}
                   />
                   <Typography>{formField.name}</Typography>
