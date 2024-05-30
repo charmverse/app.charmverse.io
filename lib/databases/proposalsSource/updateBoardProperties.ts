@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
-import { DEFAULT_BOARD_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { getBoardProperties } from './getBoardProperties';
 
@@ -135,10 +135,11 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     currentCardProperties: boardFields.cardProperties
   });
 
-  const proposalReviewersProperty = boardProperties.find((property) => property.type === 'proposalReviewer');
+  const proposalReviewersProperty = boardProperties.find(
+    (property) => property.type === 'multiSelect' && property.name === 'Proposal Reviewers'
+  );
 
   if (proposalReviewersProperty) {
-    proposalReviewersProperty.type = 'multiSelect';
     proposalReviewersProperty.options = [
       ...spaceMembers.map((member) => ({
         id: member.user.id,
