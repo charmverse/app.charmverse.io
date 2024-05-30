@@ -52,14 +52,9 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
-  const proposalReviewersProperty = boardProperties.find(
-    (property) => property.type === 'multiSelect' && property.name === 'Proposal Reviewers'
-  );
   applyToPropertiesByType(boardProperties, {
     ...proposalDbProperties.proposalReviewer(),
-    type: 'multiSelect',
-    name: 'Proposal Reviewers',
-    id: proposalReviewersProperty?.id ?? v4()
+    name: 'Proposal Reviewers'
   });
   applyToPropertiesByType(
     boardProperties,

@@ -92,12 +92,16 @@ class CardFilter {
     }
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
     const valueArray = (Array.isArray(value) ? value : value ? [value] : []).map(
-      (v: string | number | Record<'id', string>) => {
+      (v: string | number | { id?: string; userId?: string }) => {
+        // In some cases we get an object with userId as value
+        if (typeof v === 'object' && 'userId' in v) {
+          return v.userId as string;
+        }
+
         // In some cases we get an object with an id as value
         if (typeof v === 'object' && 'id' in v) {
           return v.id as string;
         }
-
         return v.toString();
       }
     );
