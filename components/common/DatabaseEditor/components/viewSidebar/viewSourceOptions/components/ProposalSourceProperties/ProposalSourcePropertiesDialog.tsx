@@ -1,17 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import {
-  Box,
-  Checkbox,
-  Dialog,
-  IconButton,
-  ListItemIcon,
-  ListItemText,
-  MenuItem,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Box, Dialog, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { FaBriefcase } from 'react-icons/fa';
 
@@ -21,7 +11,7 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadOnlyList } from './ProjectProfilePropertiesList';
-import { TemplatePropertiesList } from './TemplatePropertiesList';
+import { TemplatePropertiesList, TemplatePropertiesReadonlyList } from './TemplatePropertiesList';
 
 export type SelectedProperties = {
   projectMember: string[];
@@ -68,7 +58,10 @@ export function ProposalSourcePropertiesDialog({
   const noPropertiesSelected =
     selectedProperties.project.length === 0 &&
     selectedProperties.projectMember.length === 0 &&
-    selectedProperties.templates.length === 0;
+    (selectedProperties.templates.length === 0 ||
+      selectedProperties.templates.every(
+        (template) => template.rubricEvaluations.length === 0 && template.formFields.length === 0
+      ));
 
   const { proposalTemplates } = useProposalTemplates();
 
@@ -197,10 +190,11 @@ export function ProposalSourcePropertiesDialog({
             }}
           >
             <SectionName>Selected Properties</SectionName>
-            <Box mt={1} pl={2}>
+            <Stack p={2}>
               <ProjectProfilePropertiesReadOnlyList selectedProperties={selectedProperties} />
+              <TemplatePropertiesReadonlyList selectedProperties={selectedProperties} />
               {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
-            </Box>
+            </Stack>
           </Stack>
           <Button
             sx={{

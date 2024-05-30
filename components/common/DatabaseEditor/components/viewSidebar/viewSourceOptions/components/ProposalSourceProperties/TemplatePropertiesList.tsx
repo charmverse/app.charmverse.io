@@ -1,7 +1,8 @@
-import { Stack, Checkbox, Typography } from '@mui/material';
+import { Stack, Checkbox, Typography, Divider } from '@mui/material';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
+import { isTruthy } from 'lib/utils/types';
 
 import type { SelectedProperties } from './ProposalSourcePropertiesDialog';
 
@@ -56,29 +57,53 @@ export function TemplatePropertiesList({
     } else {
       setSelectedProperties({
         ...selectedProperties,
-        templates: selectedProperties.templates.map((template) => {
-          if (template.pageId === templatePageId) {
-            return {
-              ...template,
-              rubricEvaluations: template.rubricEvaluations.map((evaluation) => {
-                if (evaluation.id === evaluationId) {
-                  return {
-                    ...evaluation,
-                    ...updatedProperties
-                  };
-                }
-                return evaluation;
-              })
-            };
-          }
-          return template;
-        })
+        templates: selectedProperties.templates
+          .map((template) => {
+            if (template.pageId === templatePageId) {
+              const updatedRubricEvaluations = template.rubricEvaluations
+                .map((evaluation) => {
+                  if (evaluation.id === evaluationId) {
+                    const newValue = {
+                      ...evaluation,
+                      ...updatedProperties
+                    };
+
+                    // If all properties are false, remove the evaluation
+                    if (
+                      newValue.average === false &&
+                      newValue.total === false &&
+                      newValue.reviewers === false &&
+                      newValue.criteriasTotal === false
+                    ) {
+                      return null;
+                    }
+
+                    return {
+                      ...evaluation,
+                      ...updatedProperties
+                    };
+                  }
+                  return evaluation;
+                })
+                .filter(isTruthy);
+
+              if (updatedRubricEvaluations.length === 0) {
+                return null;
+              }
+              return {
+                ...template,
+                rubricEvaluations: updatedRubricEvaluations
+              };
+            }
+            return template;
+          })
+          .filter(isTruthy)
       });
     }
   }
 
   return (
-    <Stack>
+    <Stack gap={1}>
       {rubricEvaluations.map((rubricEvaluation) => {
         const _rubricEvaluation = selectedTemplate?.rubricEvaluations.find(
           (evaluation) => evaluation.id === rubricEvaluation.id
@@ -103,7 +128,7 @@ export function TemplatePropertiesList({
                         if (template.pageId === templatePageId) {
                           return {
                             ...template,
-                            rubricEvaluations: rubricEvaluations.filter(
+                            rubricEvaluations: template.rubricEvaluations.filter(
                               (evaluation) => evaluation.id !== rubricEvaluation.id
                             )
                           };
@@ -171,5 +196,66 @@ export function TemplatePropertiesList({
         );
       })}
     </Stack>
+  );
+}
+
+export function TemplatePropertiesReadonlyList({ selectedProperties }: { selectedProperties: SelectedProperties }) {
+  const { proposalTemplates } = useProposalTemplates();
+
+  if (
+    selectedProperties.templates.length === 0 ||
+    selectedProperties.templates.every(
+      (template) => template.rubricEvaluations.length === 0 && template.formFields.length === 0
+    )
+  ) {
+    return null;
+  }
+
+  return (
+    <>
+      <Stack gap={1}>
+        {selectedProperties.templates.map((template) => {
+          const selectedTemplate = proposalTemplates?.find((proposal) => proposal.pageId === template.pageId);
+
+          if (!selectedTemplate) {
+            return null;
+          }
+
+          return (
+            <Stack gap={1} key={template.pageId}>
+              <Typography fontWeight='bold' variant='subtitle1'>
+                {selectedTemplate.title}
+              </Typography>
+              {template.rubricEvaluations.map((rubricEvaluation) => {
+                const _rubricEvaluation = selectedTemplate.evaluations.find(
+                  (evaluation) => evaluation.id === rubricEvaluation.id
+                );
+                if (!_rubricEvaluation) {
+                  return null;
+                }
+                return (
+                  <Stack key={rubricEvaluation.id}>
+                    <Typography fontWeight='bold' variant='subtitle2'>
+                      {_rubricEvaluation.title}
+                    </Typography>
+                    <Stack gap={0.5} ml={2} mt={0.5}>
+                      {rubricEvaluation.average && <Typography variant='subtitle2'>Average</Typography>}
+                      {rubricEvaluation.total && <Typography variant='subtitle2'>Total</Typography>}
+                      {rubricEvaluation.reviewers && <Typography variant='subtitle2'>Reviewers</Typography>}
+                      {rubricEvaluation.criteriasTotal && <Typography variant='subtitle2'>Criterias total</Typography>}
+                    </Stack>
+                  </Stack>
+                );
+              })}
+            </Stack>
+          );
+        })}
+      </Stack>
+      <Divider
+        sx={{
+          my: 2
+        }}
+      />
+    </>
   );
 }

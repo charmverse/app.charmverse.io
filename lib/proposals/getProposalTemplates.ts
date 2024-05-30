@@ -49,6 +49,9 @@ export async function getProposalTemplates({
           formId: true,
           status: true,
           evaluations: {
+            orderBy: {
+              index: 'asc'
+            },
             select: {
               id: true,
               type: true,

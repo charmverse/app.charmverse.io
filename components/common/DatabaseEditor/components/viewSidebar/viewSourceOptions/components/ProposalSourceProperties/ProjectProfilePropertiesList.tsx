@@ -1,4 +1,4 @@
-import { Checkbox, Stack, Typography } from '@mui/material';
+import { Checkbox, Divider, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
@@ -167,6 +167,11 @@ export function ProjectProfilePropertiesReadOnlyList({
           </>
         )}
       </Stack>
+      <Divider
+        sx={{
+          my: 2
+        }}
+      />
     </Stack>
   );
 }
