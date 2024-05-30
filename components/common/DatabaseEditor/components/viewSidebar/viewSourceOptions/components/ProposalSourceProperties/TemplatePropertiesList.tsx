@@ -73,7 +73,7 @@ export function TemplatePropertiesList({
                       newValue.average === false &&
                       newValue.total === false &&
                       newValue.reviewers === false &&
-                      newValue.criteriasTotal === false
+                      newValue.criteriaTotal === false
                     ) {
                       return null;
                     }
@@ -112,7 +112,7 @@ export function TemplatePropertiesList({
           _rubricEvaluation?.average &&
           _rubricEvaluation?.total &&
           _rubricEvaluation?.reviewers &&
-          _rubricEvaluation?.criteriasTotal;
+          _rubricEvaluation?.criteriaTotal;
 
         return (
           <Stack key={rubricEvaluation.id}>
@@ -141,7 +141,7 @@ export function TemplatePropertiesList({
                       average: true,
                       total: true,
                       reviewers: true,
-                      criteriasTotal: true
+                      criteriaTotal: true
                     });
                   }
                 }}
@@ -182,14 +182,14 @@ export function TemplatePropertiesList({
               <Stack direction='row' alignItems='center'>
                 <Checkbox
                   size='small'
-                  checked={!!_rubricEvaluation?.criteriasTotal}
+                  checked={!!_rubricEvaluation?.criteriaTotal}
                   onChange={() => {
                     updateTemplateProperties(rubricEvaluation.id, {
-                      criteriasTotal: !_rubricEvaluation?.criteriasTotal
+                      criteriaTotal: !_rubricEvaluation?.criteriaTotal
                     });
                   }}
                 />
-                <Typography>Criterias total</Typography>
+                <Typography>Criteria total</Typography>
               </Stack>
             </Stack>
           </Stack>
@@ -242,7 +242,7 @@ export function TemplatePropertiesReadonlyList({ selectedProperties }: { selecte
                       {rubricEvaluation.average && <Typography variant='subtitle2'>Average</Typography>}
                       {rubricEvaluation.total && <Typography variant='subtitle2'>Total</Typography>}
                       {rubricEvaluation.reviewers && <Typography variant='subtitle2'>Reviewers</Typography>}
-                      {rubricEvaluation.criteriasTotal && <Typography variant='subtitle2'>Criterias total</Typography>}
+                      {rubricEvaluation.criteriaTotal && <Typography variant='subtitle2'>Criteria total</Typography>}
                     </Stack>
                   </Stack>
                 );

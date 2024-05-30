@@ -24,7 +24,7 @@ export type SelectedProperties = {
       average?: boolean;
       total?: boolean;
       reviewers?: boolean;
-      criteriasTotal?: boolean;
+      criteriaTotal?: boolean;
     }[];
     formFields: string[];
   }[];
