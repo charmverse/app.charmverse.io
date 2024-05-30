@@ -5,7 +5,6 @@ import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
 import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { getBoardProperties } from './getBoardProperties';
 
@@ -31,7 +30,10 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     prisma.proposalEvaluation.findMany({
       where: {
         proposal: {
-          spaceId: boardBlock.spaceId
+          spaceId: boardBlock.spaceId,
+          page: {
+            deletedAt: null
+          }
         }
       },
       select: {
@@ -57,7 +59,8 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
         proposal: {
           some: {
             page: {
-              type: 'proposal'
+              type: 'proposal',
+              deletedAt: null
             },
             spaceId: boardBlock.spaceId
           }
