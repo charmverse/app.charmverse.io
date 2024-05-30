@@ -17,11 +17,11 @@ import type {
   ProposalWithJoinedData
 } from 'lib/credentials/findIssuableProposalCredentials';
 import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { isUUID } from 'lib/utils/strings';
-import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -196,7 +196,7 @@ export async function getCardPropertiesFromProposal({
 function getCardProperties({ page, proposal, cardProperties, space }: ProposalData): ProposalCardData {
   const proposalProps = getCardPropertyTemplates({ cardProperties });
 
-  let properties: Record<string, CardPropertyValue> = {};
+  let properties: Record<string, ProposalPropertyValue> = {};
 
   if (proposalProps.proposalUrl) {
     properties[proposalProps.proposalUrl.id] = page.path;
@@ -265,13 +265,9 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  // TODO: This is not a reliable way to get the proposal reviewers column since other multiSelect properties can have the same name
-  const proposalReviewersProperty = cardProperties.find(
-    (prop) => prop.type === 'multiSelect' && prop.name === 'Proposal Reviewers'
-  );
-  if (proposalReviewersProperty && currentEvaluation && isUUID(currentEvaluation.id)) {
-    properties[proposalReviewersProperty.id] =
-      currentEvaluation?.reviewers.map((r) => r.userId ?? r.roleId).filter(isTruthy) ?? [];
+
+  if (currentEvaluation) {
+    properties[PROPOSAL_REVIEWERS_BLOCK_ID] = currentEvaluation?.reviewers ?? [];
   }
 
   const formFieldProperties = getCardPropertiesFromForm({

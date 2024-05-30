@@ -13,6 +13,7 @@ import { mutate } from 'swr';
 import charmClient from 'charmClient';
 import { useSyncRelationPropertyValue } from 'charmClient/hooks/blocks';
 import { useUpdateProposalEvaluation } from 'charmClient/hooks/proposals';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { ProposalStatusSelect } from 'components/proposals/components/ProposalStatusSelect';
 import { ProposalStepSelect } from 'components/proposals/components/ProposalStepSelect';
 import {
@@ -34,6 +35,7 @@ import {
   proposalStatusColors
 } from 'lib/databases/proposalDbProperties';
 import { PROPOSAL_STATUS_BLOCK_ID, PROPOSAL_STEP_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import type { ProposalReviewerProperty } from 'lib/proposals/blocks/interfaces';
 import { getProposalEvaluationStatus } from 'lib/proposals/getProposalEvaluationStatus';
 import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'lib/proposals/interfaces';
 import {
@@ -169,7 +171,6 @@ function PropertyValueElement(props: Props) {
       dateTime: formatDateTime
     }
   });
-
   const emptyDisplayValue = showEmptyPlaceholder
     ? intl.formatMessage({ id: 'PropertyValueElement.empty', defaultMessage: 'Empty' })
     : '';
@@ -230,7 +231,49 @@ function PropertyValueElement(props: Props) {
         }}
       />
     );
-  } else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+  } else if (propertyTemplate.type === 'proposalReviewer') {
+    const reviewerOptions: SelectOption[] = (propertyValue as unknown as ProposalReviewerProperty).map((reviewer) => ({
+      group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
+      id: (reviewer.roleId ?? reviewer.userId ?? reviewer.systemRole) as string
+    }));
+    propertyValueElement = (
+      <UserAndRoleSelect
+        readOnly={
+          !proposal ||
+          readOnly ||
+          (displayType !== 'details' && displayType !== 'table') ||
+          proposal.currentStep?.step === 'draft' ||
+          !!proposal.sourceTemplateId
+        }
+        required
+        systemRoles={[allMembersSystemRole, authorSystemRole]}
+        onChange={async (reviewers) => {
+          const evaluationId = proposal?.currentEvaluationId;
+          if (evaluationId) {
+            try {
+              await trigger({
+                reviewers: reviewers.map((reviewer) => ({
+                  roleId: reviewer.group === 'role' ? reviewer.id : null,
+                  systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
+                  userId: reviewer.group === 'user' ? reviewer.id : null
+                })),
+                evaluationId
+              });
+              await mutate(`/api/spaces/${card.spaceId}/proposals`);
+            } catch (err) {
+              showError(err, 'Failed to update proposal reviewers');
+            }
+          }
+        }}
+        value={reviewerOptions}
+        showEmptyPlaceholder={showEmptyPlaceholder}
+        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
+        displayType={displayType}
+      />
+    );
+  }
+  // TODO: use same component as proposalReviewer type?
+  else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
     const reviewers = (card.fields.properties[REWARD_REVIEWERS_BLOCK_ID] as unknown as RewardReviewer[]) ?? [];
     propertyValueElement = (
       <UserAndRoleSelect
@@ -551,43 +594,6 @@ function PropertyValueElement(props: Props) {
         }}
         wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
         showEmptyPlaceholder={showEmptyPlaceholder}
-      />
-    );
-  } else if (propertyTemplate.type === 'proposalReviewer') {
-    propertyValueElement = (
-      <UserAndRoleSelect
-        readOnly={
-          !proposal ||
-          readOnly ||
-          (displayType !== 'details' && displayType !== 'table') ||
-          proposal.currentStep?.step === 'draft' ||
-          !!proposal.sourceTemplateId
-        }
-        required
-        data-test='selected-reviewers'
-        systemRoles={[allMembersSystemRole, authorSystemRole]}
-        onChange={async (reviewers) => {
-          const evaluationId = proposal?.currentEvaluationId;
-          if (evaluationId) {
-            try {
-              await trigger({
-                reviewers: reviewers.map((reviewer) => ({
-                  roleId: reviewer.group === 'role' ? reviewer.id : null,
-                  systemRole: reviewer.group === 'system_role' ? (reviewer.id as ProposalSystemRole) : null,
-                  userId: reviewer.group === 'user' ? reviewer.id : null
-                })),
-                evaluationId
-              });
-              await mutate(`/api/spaces/${card.spaceId}/proposals`);
-            } catch (err) {
-              showError(err, 'Failed to update proposal reviewers');
-            }
-          }
-        }}
-        value={propertyValue as any}
-        showEmptyPlaceholder={showEmptyPlaceholder}
-        wrapColumn={displayType !== 'table' ? true : props.wrapColumn}
-        displayType={displayType}
       />
     );
   } else if (propertyTemplate.type === 'proposalAuthor') {
