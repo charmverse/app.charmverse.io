@@ -4,10 +4,8 @@ import { useState } from 'react';
 import { DELETE, GET, POST } from 'adapters/http';
 import {
   useGetDocusignProfile,
-  useGetDocusignTemplates,
   useGetSearchSpaceDocusignEnvelopes,
-  useGetSpaceDocusignEnvelopes,
-  usePostRequestDocusignLink
+  useGetSpaceDocusignEnvelopes
 } from 'charmClient/hooks/docusign';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import type { EvaluationDocumentToSign } from 'lib/proposals/documentsToSign/addEnvelopeToEvaluation';
@@ -26,7 +24,7 @@ export function useDocusign() {
 
   const { data: docusignProfile, mutate: refreshDocusignProfile } = useGetDocusignProfile({ spaceId: space?.id });
 
-  const { trigger: requestSigningLink } = usePostRequestDocusignLink();
+  // const { trigger: requestSigningLink } = usePostRequestDocusignLink();
 
   const [docusignQuery, setDocusignQuery] = useState<DocusignSearchRequest | null>(null);
 
@@ -48,11 +46,11 @@ export function useDocusign() {
     refreshDocusignProfile(null);
   }
 
-  const {
-    data: docusignTemplates,
-    mutate: refreshDocusignTemplates,
-    error: templateLoadingError
-  } = useGetDocusignTemplates({ spaceId: space?.id });
+  // const {
+  //   data: docusignTemplates,
+  //   mutate: refreshDocusignTemplates,
+  //   error: templateLoadingError
+  // } = useGetDocusignTemplates({ spaceId: space?.id });
 
   async function addDocumentToEvaluation({ envelopeId, evaluationId }: EvaluationDocumentToSign) {
     await POST(`/api/proposals/evaluations/${evaluationId}/documents`, { envelopeId });
@@ -66,12 +64,8 @@ export function useDocusign() {
     connectDocusignAccount,
     docusignProfile,
     refreshDocusignProfile,
-    docusignTemplates: docusignTemplates?.envelopeTemplates,
-    refreshDocusignTemplates,
-    templateLoadingError,
     envelopes,
     refreshEnvelopes,
-    requestSigningLink,
     isSearchingEnvelopes,
     envelopeSearchResults,
     searchDocusign,

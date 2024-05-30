@@ -21,46 +21,6 @@ type DocusignApiRequest = {
   apiBaseUrl: string;
 };
 
-export type DocusignTemplate = {
-  templateId: string;
-  uri: string;
-  name: string;
-  shared: boolean;
-  passwordProtected: boolean;
-  description: string;
-  created: string;
-  lastModified: string;
-  lastUsed: string;
-  owner: {
-    userName: string;
-    userId: string;
-    email: string;
-  };
-  pageCount: number;
-  folderId: string;
-  folderName: string;
-  folderIds: string[];
-  autoMatch: boolean;
-  autoMatchSpecifiedByUser: boolean;
-  emailSubject: string;
-  emailBlurb: string;
-  signingLocation: string;
-  authoritativeCopy: boolean;
-  enforceSignerVisibility: boolean;
-  enableWetSign: boolean;
-  allowMarkup: boolean;
-  allowReassign: boolean;
-  disableResponsiveDocument: boolean;
-  anySigner: any; // 'any' type can be replaced with more specific type if known
-  envelopeLocation: any; // 'any' type can be replaced with more specific type if known
-};
-
-export function getDocusignTemplates({ apiBaseUrl, authToken, accountId }: DocusignApiRequest & { accountId: string }) {
-  return GET<DocusignTemplate[]>(`${apiBaseUrl}/restapi/v2.1/accounts/${accountId}/templates`, undefined, {
-    headers: docusignUserOAuthTokenHeader({ accessToken: authToken })
-  });
-}
-
 export type DocusignRecipient = {
   creationReason: string;
   isBulkRecipient: boolean;
@@ -196,61 +156,6 @@ export async function listSpaceEnvelopes({ spaceId }: { spaceId: string }): Prom
   return envelopeData;
 }
 
-export type DocusignEnvelopeId = {
-  docusignEnvelopeId: string;
-};
-
-export type DocusignEnvelopeLinkRequest = DocusignEnvelopeId & { spaceId: string; signerEmail: string };
-
-/**
- * @external https://developers.docusign.com/docs/esign-rest-api/reference/envelopes/envelopeviews/createrecipient/
- */
-export async function requestEnvelopeSigningLink({
-  docusignEnvelopeId,
-  spaceId,
-  signerEmail
-}: DocusignEnvelopeLinkRequest) {
-  const spaceCreds = await getSpaceDocusignCredentials({ spaceId });
-
-  const docusignEnvelope = await getEnvelope({
-    envelopeId: docusignEnvelopeId,
-    credentials: spaceCreds
-  });
-
-  const recipient = docusignEnvelope.recipients.signers.find((r) => lowerCaseEqual(r.email, signerEmail));
-
-  if (!recipient) {
-    throw new InvalidStateError('No signer found for envelope');
-  }
-
-  if (!recipient.clientUserId) {
-    throw new InvalidStateError('clientUserId is required for recipient');
-  }
-
-  const { domain: spaceDomain } = await prisma.space.findUniqueOrThrow({
-    where: { id: spaceId },
-    select: { domain: true }
-  });
-
-  const signerData = {
-    returnUrl: `${baseUrl}/${spaceDomain}`,
-    authenticationMethod: 'none',
-    // userId: recipient.userId,
-    recipientId: recipient.recipientIdGuid,
-    userName: recipient.name,
-    email: recipient.email,
-    clientUserId: recipient.clientUserId
-  };
-
-  const apiUrl = `${spaceCreds.docusignApiBaseUrl}/restapi/v2.1/accounts/${spaceCreds.docusignAccountId}/envelopes/${docusignEnvelopeId}/views/recipient`;
-
-  const url = (await POST<{ url: string }>(apiUrl, signerData, {
-    headers: docusignUserOAuthTokenHeader({ accessToken: spaceCreds.accessToken })
-  })) as { url: string };
-
-  return url.url;
-}
-
 export type DocusignSearchParams = {
   title?: string;
 };
@@ -289,34 +194,4 @@ export async function searchDocusignDocs({
   await redisClient?.set(searchResultsKey, JSON.stringify(envelopes), { EX: 60 * 16 });
 
   return envelopes.envelopes;
-}
-
-export async function updateRecipients({
-  envelopeId,
-  spaceId,
-  recipients,
-  credentials
-}: {
-  envelopeId: string;
-  spaceId?: string;
-  recipients: DocusignRecipient[];
-  credentials?: RequiredDocusignCredentials;
-}) {
-  if (!spaceId && !credentials) {
-    throw new InvalidInputError('spaceId or credentials are required');
-  }
-
-  credentials = credentials ?? (await getSpaceDocusignCredentials({ spaceId: spaceId as string }));
-
-  const apiUrl = `${credentials.docusignApiBaseUrl}/restapi/v2.1/accounts/${credentials.docusignAccountId}/envelopes/${envelopeId}/recipients`;
-
-  const response = await PUT(
-    apiUrl,
-    { signers: recipients },
-    {
-      headers: docusignUserOAuthTokenHeader({ accessToken: credentials.accessToken })
-    }
-  );
-
-  return response;
 }

@@ -19,34 +19,17 @@ export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSign
   const { space } = useCurrentSpace();
   const router = useRouter();
 
-  const { showMessage } = useSnackbar();
-
-  const { requestSigningLink } = useDocusign();
-
-  async function handleSignature() {
-    try {
-      const { url } = await requestSigningLink({
-        docusignEnvelopeId: envelopeId,
-        signerEmail: signer.email,
-        spaceId: space?.id as string
-      });
-      router.push(url);
-    } catch (err: any) {
-      showMessage(err.message ?? 'Failed to generate link for signing', 'error');
-    }
-  }
-
   const userIsSigner =
     user?.verifiedEmails.some((verifiedEmail) => lowerCaseEqual(verifiedEmail.email, signer.email)) ||
     user?.googleAccounts.some((googleAccount) => lowerCaseEqual(googleAccount.email, signer.email));
 
   return (
     <Grid container>
-      <Grid item xs={9}>
+      <Grid item xs={8}>
         <Typography>{signer.name}</Typography>
         <Typography variant='caption'>{signer.email}</Typography>
       </Grid>
-      <Grid item xs={3} display='flex' flexDirection='row' justifyContent='flex-end' alignItems='center'>
+      <Grid item xs={4} display='flex' flexDirection='row' justifyContent='flex-end' alignItems='center'>
         {signer.completedAt && (
           <Tooltip title={`Signature time: ${getFormattedDateTime(signer.completedAt)}`}>
             <Typography variant='caption' display='flex' alignItems='center'>
@@ -56,9 +39,7 @@ export function DocumentSignerRow({ signer, envelopeId }: { signer: DocumentSign
         )}
 
         {!signer.completedAt && (
-          <Button onClick={handleSignature} color='primary' size='small' variant='outlined' disabled={!userIsSigner}>
-            Sign
-          </Button>
+          <Typography variant='caption'>{userIsSigner ? 'Check your email' : 'Awaiting signature'}</Typography>
         )}
       </Grid>
     </Grid>
