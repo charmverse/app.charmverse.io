@@ -1,6 +1,7 @@
-import type { Prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
+import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
@@ -28,8 +29,10 @@ export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
   evaluationSteps = [],
-  proposalCustomProperties = []
+  proposalCustomProperties = [],
+  selectedProperties
 }: {
+  selectedProperties?: SelectedProperties;
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
@@ -68,7 +71,7 @@ export function getBoardProperties({
   });
 
   // properties related to form proposals
-  applyFormFieldProperties(boardProperties, formFields);
+  applyFormFieldProperties(boardProperties, formFields, selectedProperties);
 
   // properties for each unique questions on rubric evaluation step
   applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
@@ -102,7 +105,11 @@ function applyRubricEvaluationQuestionProperties(
   });
 }
 
-function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
+function applyFormFieldProperties(
+  boardProperties: IPropertyTemplate[],
+  formFields: FormFieldInput[],
+  selectedProperties?: SelectedProperties
+) {
   formFields.forEach((formField) => {
     let boardPropertyType: IPropertyTemplate['type'] | null = null;
     let boardPropertyOptions: IPropertyTemplate['options'] = [];
@@ -133,7 +140,11 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         break;
       }
       case 'project_profile': {
-        applyProjectProfileProperties(boardProperties, formField.fieldConfig as ProjectAndMembersFieldConfig);
+        applyProjectProfileProperties(
+          boardProperties,
+          formField.fieldConfig as ProjectAndMembersFieldConfig,
+          selectedProperties
+        );
         break;
       }
       default: {
@@ -163,11 +174,12 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
 // field config ref: lib/projects/constants.ts
 function applyProjectProfileProperties(
   boardProperties: IPropertyTemplate[],
-  fieldConfig: ProjectAndMembersFieldConfig
+  fieldConfig: ProjectAndMembersFieldConfig,
+  selectedProperties?: SelectedProperties
 ) {
   projectFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
-    if (config.show) {
+    if (config.show && (selectedProperties?.project.includes(field.field) ?? true)) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,
@@ -178,7 +190,10 @@ function applyProjectProfileProperties(
   });
   projectMemberFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
-    if (getFieldConfig(fieldConfig[field.field]).show) {
+    if (
+      getFieldConfig(fieldConfig[field.field]).show &&
+      (selectedProperties?.projectMember.includes(field.field) ?? true)
+    ) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,

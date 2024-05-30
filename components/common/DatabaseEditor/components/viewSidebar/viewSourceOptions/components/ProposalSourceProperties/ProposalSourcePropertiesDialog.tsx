@@ -1,7 +1,7 @@
 import CloseIcon from '@mui/icons-material/Close';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Box, Dialog, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
+import { Dialog, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import { FaBriefcase } from 'react-icons/fa';
 

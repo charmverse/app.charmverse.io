@@ -161,15 +161,12 @@ export function useSourceOptions({ rootBoard, showView, activeView }: Props) {
     }
   }
 
-  async function onCreateDatabase({
-    sourceType,
-    selectedProperties
-  }: { selectedProperties?: SelectedProperties; sourceType?: BoardFields['sourceType'] } = {}) {
+  async function onCreateDatabase({ sourceType }: { sourceType?: BoardFields['sourceType'] } = {}) {
     if (!rootBoard.pageType?.match('board')) {
       throw new Error(`No board page type exists: ${rootBoard.pageType}`);
     }
 
-    const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType, selectedProperties } };
+    const boardBlockUpdate: Board = { ...rootBoard, fields: { ...rootBoard.fields, sourceType } };
     await mutator.updateBlock(boardBlockUpdate, rootBoard, 'Update board datasource');
     const { view } = await createNewDataSource({
       board: boardBlockUpdate,

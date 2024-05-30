@@ -3,6 +3,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
+import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { prismaToBlock } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
@@ -22,6 +23,7 @@ handler
 async function createProposalSource(req: NextApiRequest, res: NextApiResponse) {
   const pageId = req.query.id as string;
   const userId = req.session.user.id;
+  const { selectedProperties } = req.body as { selectedProperties: SelectedProperties };
 
   const boardPage = await prisma.page.findUnique({
     where: {
@@ -48,7 +50,7 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse) {
     throw new ActionNotPermittedError('You do not have permission to update this page');
   }
 
-  const boardBlock = await updateBoardProperties({ boardId: pageId });
+  const boardBlock = await updateBoardProperties({ boardId: pageId, selectedProperties });
   const board = prismaToBlock(boardBlock) as Board;
   const views = await updateViews({ board });
 

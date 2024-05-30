@@ -115,7 +115,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
   const { trigger: createProposalSource, isMutating: isLoadingProposalSource } = useSWRMutation(
     `/api/pages/${rootDatabaseId}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.createProposalSource(arg)
+    (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProperties } }>) =>
+      charmClient.createProposalSource(arg)
   );
 
   const handleRewardSource = async (_sourceType: Extract<DataSourceType, 'rewards' | 'reward_applications'>) => {
@@ -140,8 +141,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
   async function handleProposalSource(selectedProperties: SelectedProperties) {
     if (rootDatabaseId) {
-      await onCreateDatabase?.({ sourceType: 'proposals', selectedProperties });
-      await createProposalSource({ pageId: rootDatabaseId });
+      await onCreateDatabase?.({ sourceType: 'proposals' });
+      await createProposalSource({ pageId: rootDatabaseId, selectedProperties });
       dispatch(initialDatabaseLoad({ pageId: rootDatabaseId }));
     }
   }
