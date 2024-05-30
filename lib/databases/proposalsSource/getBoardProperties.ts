@@ -63,7 +63,7 @@ export function getBoardProperties({
   );
 
   // properties per each evaluation step
-  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles));
+  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles), selectedProperties);
 
   // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
@@ -74,18 +74,23 @@ export function getBoardProperties({
   applyFormFieldProperties(boardProperties, formFields, selectedProperties);
 
   // properties for each unique questions on rubric evaluation step
-  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
+  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps, selectedProperties);
 
   return boardProperties;
 }
 
 function applyRubricEvaluationQuestionProperties(
   boardProperties: IPropertyTemplate[],
-  evaluationSteps: EvaluationStep[]
+  evaluationSteps: EvaluationStep[],
+  selectedProperties?: SelectedProperties
 ) {
   const rubricCriteriaTitles: Set<string> = new Set();
   evaluationSteps.forEach((evaluationStep) => {
-    if (evaluationStep.type === 'rubric') {
+    if (
+      evaluationStep.type === 'rubric' &&
+      selectedProperties?.rubricEvaluations.find((rubricEvaluation) => rubricEvaluation.title === evaluationStep.title)
+        ?.criteriaTotal
+    ) {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
         rubricCriteriaTitles.add(rubricCriteria.title);
       });
@@ -110,10 +115,10 @@ function applyFormFieldProperties(
   formFields: FormFieldInput[],
   selectedProperties?: SelectedProperties
 ) {
-  const selectedFormFieldProperties = selectedProperties?.templates.map((template) => template.formFields).flat() ?? [];
-
   formFields
-    .filter((formField) => formField.type === 'project_profile' || selectedFormFieldProperties.includes(formField.id))
+    .filter(
+      (formField) => formField.type === 'project_profile' || selectedProperties?.formFields.includes(formField.id)
+    )
     .forEach((formField) => {
       let boardPropertyType: IPropertyTemplate['type'] | null = null;
       let boardPropertyOptions: IPropertyTemplate['options'] = [];
@@ -209,23 +214,41 @@ function applyProjectProfileProperties(
   });
 }
 
-function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
+function applyProposalEvaluationProperties(
+  boardProperties: IPropertyTemplate[],
+  rubricStepTitles: string[],
+  selectedProperties?: SelectedProperties
+) {
   for (const rubricStepTitle of rubricStepTitles) {
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluatedBy',
-      name: rubricStepTitle
-    });
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluationTotal',
-      name: rubricStepTitle
-    });
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalEvaluationAverage',
-      name: rubricStepTitle
-    });
+    const selectedRubricEvaluation = selectedProperties?.rubricEvaluations.find(
+      (rubricEvaluation) => rubricEvaluation.title === rubricStepTitle
+    );
+
+    if (selectedRubricEvaluation) {
+      if (selectedRubricEvaluation.reviewers) {
+        applyToPropertiesByTypeAndName(boardProperties, {
+          id: uuid(),
+          type: 'proposalEvaluatedBy',
+          name: rubricStepTitle
+        });
+      }
+
+      if (selectedRubricEvaluation.total) {
+        applyToPropertiesByTypeAndName(boardProperties, {
+          id: uuid(),
+          type: 'proposalEvaluationTotal',
+          name: rubricStepTitle
+        });
+      }
+
+      if (selectedRubricEvaluation.average) {
+        applyToPropertiesByTypeAndName(boardProperties, {
+          id: uuid(),
+          type: 'proposalEvaluationAverage',
+          name: rubricStepTitle
+        });
+      }
+    }
   }
 }
 

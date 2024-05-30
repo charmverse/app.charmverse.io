@@ -93,7 +93,7 @@ export function FormFieldPropertiesReadonlyList({ selectedProperties }: { select
             template.formFields &&
             template.formFields.filter(
               (formField) => formField.type !== 'project_profile' && formField.type !== 'label'
-            ).length > 0
+            ).length
           );
         })
         .map((template) => {
@@ -103,7 +103,8 @@ export function FormFieldPropertiesReadonlyList({ selectedProperties }: { select
               ? template.formFields.filter((formField) => selectedProperties.formFields.includes(formField.id))
               : []
           };
-        }) ?? []
+        })
+        .filter((template) => template.formFields.length) ?? []
     );
   }, [proposalTemplates, selectedProperties]);
 
