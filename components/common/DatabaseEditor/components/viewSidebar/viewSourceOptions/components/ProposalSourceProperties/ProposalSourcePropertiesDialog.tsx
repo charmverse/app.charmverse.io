@@ -19,16 +19,23 @@ import { Button } from 'components/common/Button';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSmallScreen } from 'hooks/useMediaScreens';
-import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadOnlyList } from './ProjectProfilePropertiesList';
+import { TemplatePropertiesList } from './TemplatePropertiesList';
 
 export type SelectedProperties = {
   projectMember: string[];
   project: string[];
   customProperties: string[];
   templates: {
-    id: string;
+    pageId: string;
+    rubricEvaluations: {
+      id: string;
+      average?: boolean;
+      total?: boolean;
+      reviewers?: boolean;
+      criteriasTotal?: boolean;
+    }[];
     formFields: string[];
   }[];
 };
@@ -39,26 +46,8 @@ type SelectedGroup =
     }
   | {
       group: 'templates';
-      templateId: string;
+      pageId: string;
     };
-
-function TemplatePropertiesList({
-  selectedProperties,
-  setSelectedProperties,
-  templateId
-}: {
-  selectedProperties: SelectedProperties;
-  setSelectedProperties: (selectedProperties: SelectedProperties) => void;
-  templateId: string;
-}) {
-  return (
-    <Stack>
-      <Stack direction='row' alignItems='center'>
-        <Checkbox />
-      </Stack>
-    </Stack>
-  );
-}
 
 export function ProposalSourcePropertiesDialog({
   onClose,
@@ -87,7 +76,7 @@ export function ProposalSourcePropertiesDialog({
     return (proposalTemplates || [])
       .filter((proposal) => !proposal.archived && !proposal.draft)
       .map((proposal) => ({
-        id: proposal.pageId,
+        pageId: proposal.pageId,
         title: proposal.title,
         proposalId: proposal.proposalId,
         isStructuredProposal: proposal.contentType === 'structured'
@@ -140,12 +129,23 @@ export function ProposalSourcePropertiesDialog({
           <SectionName>Templates</SectionName>
           {proposalTemplatePages.map((template) => (
             <MenuItem
-              key={template.id}
+              key={template.pageId}
               dense
               onClick={() => {
+                setSelectedProperties({
+                  ...selectedProperties,
+                  templates: [
+                    ...selectedProperties.templates,
+                    {
+                      pageId: template.pageId,
+                      rubricEvaluations: [],
+                      formFields: []
+                    }
+                  ]
+                });
                 setSelectedGroup({
                   group: 'templates',
-                  templateId: template.id
+                  pageId: template.pageId
                 });
               }}
             >
@@ -161,7 +161,7 @@ export function ProposalSourcePropertiesDialog({
             </Typography>
           )}
         </Stack>
-        <Stack p={2} overflow='auto' height='90vh' width='100%'>
+        <Stack gap={1} p={2} overflow='auto' height='90vh' width='100%'>
           {selectedGroup?.group === 'project_profile' && (
             <>
               <Typography variant='h6'>Project profile properties</Typography>
@@ -177,7 +177,7 @@ export function ProposalSourcePropertiesDialog({
               <TemplatePropertiesList
                 selectedProperties={selectedProperties}
                 setSelectedProperties={setSelectedProperties}
-                templateId={selectedGroup.templateId}
+                templatePageId={selectedGroup.pageId}
               />
             </>
           )}
