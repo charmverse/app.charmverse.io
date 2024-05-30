@@ -136,7 +136,8 @@ export async function createReward({
 
   reviewers?.forEach((reviewer) => {
     rewardPermissions.push({
-      ...reviewer,
+      userId: reviewer.userId,
+      roleId: reviewer.roleId,
       permissionLevel: 'reviewer'
     });
   });

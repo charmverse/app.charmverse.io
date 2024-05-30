@@ -56,7 +56,7 @@ describe('setRewardUsers', () => {
       }
     });
 
-    expect(result.reviewers).toEqual(reviewers);
+    expect(result.reviewers).toEqual(reviewers.map((r) => expect.objectContaining(r)));
   });
 
   it('should successfully set both allowed submitter roles and reviewers for a reward', async () => {
@@ -70,7 +70,7 @@ describe('setRewardUsers', () => {
     });
 
     expect(result.allowedSubmitterRoles).toEqual([role1.id, role2.id]);
-    expect(result.reviewers).toEqual(reviewers);
+    expect(result.reviewers).toEqual([expect.objectContaining({ userId: user.id })]);
   });
 
   it('should throw InvalidInputError for non-UUID rewardId', async () => {

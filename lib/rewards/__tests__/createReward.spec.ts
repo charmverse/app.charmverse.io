@@ -64,7 +64,7 @@ describe('createReward', () => {
       dueDate: expect.any(Date),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
-      reviewers: expect.arrayContaining(reviewers),
+      reviewers: expect.arrayContaining(reviewers.map((r) => expect.objectContaining(r))),
       allowedSubmitterRoles: [submitterRole.id],
       assignedSubmitters: null,
       selectedCredentialTemplates: [credentialTemplateId]
@@ -95,7 +95,6 @@ describe('createReward', () => {
     };
 
     const { reward } = await createReward(rewardData);
-
     expect(reward).toMatchObject({
       chainId: 2,
       rewardAmount: 100,
@@ -106,7 +105,7 @@ describe('createReward', () => {
       dueDate: expect.any(Date),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
-      reviewers: expect.arrayContaining(reviewers),
+      reviewers: expect.arrayContaining(reviewers.map((r) => expect.objectContaining(r))),
       allowedSubmitterRoles: null,
       assignedSubmitters: [user.id]
     });
