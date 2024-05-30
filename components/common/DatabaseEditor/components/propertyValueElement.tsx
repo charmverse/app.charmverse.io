@@ -742,7 +742,19 @@ function PropertyValueElement(props: Props) {
 
   if (props.showTooltip) {
     return (
-      <Tooltip title={props.propertyTemplate.name}>
+      <Tooltip
+        title={
+          props.propertyTemplate.tooltip ? (
+            <div>
+              {props.propertyTemplate.name}
+              <br />
+              {props.propertyTemplate.tooltip}
+            </div>
+          ) : (
+            props.propertyTemplate.name
+          )
+        }
+      >
         <div style={{ width: '100%' }}>{propertyValueElement}</div>
       </Tooltip>
     );

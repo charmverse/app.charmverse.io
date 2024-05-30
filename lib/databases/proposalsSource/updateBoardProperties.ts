@@ -42,11 +42,7 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
         rubricCriteria: {
           select: {
             title: true,
-            answers: {
-              select: {
-                response: true
-              }
-            }
+            description: true
           }
         }
       },

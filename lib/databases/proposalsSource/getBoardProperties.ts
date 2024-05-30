@@ -1,4 +1,4 @@
-import type { Prisma, ProposalEvaluationType } from '@charmverse/core/prisma-client';
+import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
@@ -20,6 +20,7 @@ type EvaluationStep = {
   type: ProposalEvaluationType;
   rubricCriteria: {
     title: string;
+    description?: string | null;
   }[];
 };
 
@@ -80,21 +81,23 @@ function applyRubricEvaluationQuestionProperties(
   boardProperties: IPropertyTemplate[],
   evaluationSteps: EvaluationStep[]
 ) {
-  const rubricCriteriaTitles: Set<string> = new Set();
+  const rubricCriteriaTitleTooltipRecord: Record<string, string> = {};
   evaluationSteps.forEach((evaluationStep) => {
     if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
-        rubricCriteriaTitles.add(rubricCriteria.title);
+        if (!rubricCriteriaTitleTooltipRecord[rubricCriteria.title]) {
+          rubricCriteriaTitleTooltipRecord[rubricCriteria.title] = rubricCriteria.description || '';
+        }
       });
     }
   });
 
-  rubricCriteriaTitles.forEach((rubricCriteriaTitle) => {
+  Object.entries(rubricCriteriaTitleTooltipRecord).forEach(([rubricCriteriaTitle, rubricCriteriaTooltip]) => {
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalRubricCriteriaTotal',
       name: rubricCriteriaTitle,
-      description: `Total score for ${rubricCriteriaTitle}`,
+      tooltip: rubricCriteriaTooltip,
       readOnly: true,
       readOnlyValues: true,
       private: false
