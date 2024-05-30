@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type {
   FormFieldAnswer,
   IssuedCredential,
@@ -18,10 +17,12 @@ import type {
   ProposalWithJoinedData
 } from 'lib/credentials/findIssuableProposalCredentials';
 import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
-import { isUUID } from 'lib/utils/strings';
+import { isUUID, prettyPrint } from 'lib/utils/strings';
+import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -265,17 +266,12 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
-  const proposalReviewersProperty = cardProperties.find((prop) => prop.type === 'proposalReviewer');
+  const proposalReviewersProperty = cardProperties.find(
+    (prop) => prop.type === 'multiSelect' && prop.name === 'Proposal Reviewers'
+  );
   if (proposalReviewersProperty && currentEvaluation && isUUID(currentEvaluation.id)) {
-    // TODO: Should we fix the type everywhere to allow CardPropertyValue to be of TargetPermissionGroup?
     properties[proposalReviewersProperty.id] =
-      (currentEvaluation?.reviewers.map(
-        (r) =>
-          ({
-            group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
-            id: r.userId ?? r.roleId ?? r.systemRole
-          } as TargetPermissionGroup<'user' | 'role'>)
-      ) as any) ?? [];
+      currentEvaluation?.reviewers.map((r) => r.userId ?? r.roleId).filter(isTruthy) ?? [];
   }
 
   const formFieldProperties = getCardPropertiesFromForm({
@@ -304,6 +300,7 @@ export function getCardPropertyTemplates({ cardProperties }: { cardProperties: I
     proposalEvaluationType: cardProperties.find((prop) => prop.type === 'proposalEvaluationType'),
     proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
     proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
-    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl')
+    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
+    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer')
   };
 }

@@ -4,7 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
-import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import { DEFAULT_BOARD_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { getBoardProperties } from './getBoardProperties';
 
@@ -12,10 +12,15 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
+    },
+    select: {
+      spaceId: true,
+      fields: true,
+      id: true
     }
   });
 
-  const [proposalBoardBlock, evaluationSteps, forms] = await Promise.all([
+  const [proposalBoardBlock, evaluationSteps, forms, roles, spaceMembers] = await Promise.all([
     prisma.proposalBlock.findUnique({
       where: {
         id_spaceId: {
@@ -88,6 +93,28 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
           }
         }
       }
+    }),
+    prisma.role.findMany({
+      where: {
+        spaceId: boardBlock.spaceId
+      },
+      select: {
+        name: true,
+        id: true
+      }
+    }),
+    prisma.spaceRole.findMany({
+      where: {
+        spaceId: boardBlock.spaceId
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            username: true
+          }
+        }
+      }
     })
   ]);
 
@@ -107,6 +134,24 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     proposalCustomProperties,
     currentCardProperties: boardFields.cardProperties
   });
+
+  const proposalReviewersProperty = boardProperties.find((property) => property.type === 'proposalReviewer');
+
+  if (proposalReviewersProperty) {
+    proposalReviewersProperty.type = 'multiSelect';
+    proposalReviewersProperty.options = [
+      ...spaceMembers.map((member) => ({
+        id: member.user.id,
+        value: member.user.username,
+        color: 'propColorGray'
+      })),
+      ...roles.map((role) => ({
+        id: role.id,
+        value: role.name,
+        color: 'propColorGray'
+      }))
+    ];
+  }
 
   return prisma.block.update({
     where: {
