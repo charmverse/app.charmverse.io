@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "npx tsx ./main.ts",
+    "start": "npx tsx --watch ./main.ts",
     "test": "test"
   }
 }
