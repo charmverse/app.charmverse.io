@@ -9,6 +9,7 @@ import { SectionName } from 'components/common/PageLayout/components/Sidebar/com
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
+import { FormFieldPropertiesList, FormFieldPropertiesReadonlyList } from './FormFieldPropertiesList';
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadOnlyList } from './ProjectProfilePropertiesList';
 import {
   RubricEvaluationPropertiesList,
@@ -183,6 +184,16 @@ export function ProposalSourcePropertiesDialog({
               />
             </>
           )}
+          {selectedGroup.group === 'formFields' && (
+            <>
+              <Typography variant='h6'>Form field properties</Typography>
+              <FormFieldPropertiesList
+                templatePageId={selectedGroup.pageId}
+                selectedProperties={selectedProperties}
+                setSelectedProperties={setSelectedProperties}
+              />
+            </>
+          )}
         </Stack>
         <Stack
           sx={{
@@ -202,6 +213,7 @@ export function ProposalSourcePropertiesDialog({
             <Stack p={2}>
               <ProjectProfilePropertiesReadOnlyList selectedProperties={selectedProperties} />
               <RubricEvaluationPropertiesReadonlyList selectedProperties={selectedProperties} />
+              <FormFieldPropertiesReadonlyList selectedProperties={selectedProperties} />
               {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
             </Stack>
           </Stack>
