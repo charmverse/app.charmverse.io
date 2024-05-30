@@ -46,7 +46,8 @@ describe('getBoardProperties', () => {
         {
           rubricCriteria: [
             {
-              title: 'Rubric Criteria 1'
+              title: 'Rubric Criteria 1',
+              description: 'Rubric Criteria 1 Description'
             },
             {
               title: 'Rubric Criteria 2'
@@ -58,7 +59,8 @@ describe('getBoardProperties', () => {
         {
           rubricCriteria: [
             {
-              title: 'Rubric Criteria 1'
+              title: 'Rubric Criteria 1',
+              description: 'Rubric Criteria 1 new Description'
             },
             {
               title: 'Rubric Criteria 2.1'
@@ -86,7 +88,9 @@ describe('getBoardProperties', () => {
     );
 
     expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria1Property?.tooltip).toEqual('Rubric Criteria 1 Description');
     expect(rubricCriteria2Property).toBeTruthy();
+    expect(rubricCriteria2Property?.tooltip).toBe('');
     expect(rubricCriteria21Property).toBeTruthy();
   });
 
