@@ -76,7 +76,9 @@
     "build:storybook": "npx storybook build",
     "upgrade:storybook": "npx storybook@latest upgrade",
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
-    "builder-network": "npm run dev --workspace=apps/builder-network"
+    "builder-network": "npm run dev --workspace=apps/builder-network",
+    "builder-api": "npm run start --workspace=apps/builder-api",
+    "builder-all": "npm run builder-api & npm run builder-app"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -178,6 +180,7 @@
     "@synaps-io/verify-sdk": "^4.0.45",
     "@tanstack/react-query": "^5.28.9",
     "@typeform/api-client": "^2.3.1",
+    "@types/koa-router": "^7.4.8",
     "@uauth/js": "^2.4.0",
     "@wagmi/connectors": "^4.1.18",
     "@wagmi/core": "^2.6.9",
@@ -211,7 +214,8 @@
     "jszip": "^3.10.1",
     "key-did-provider-ed25519": "^3.0.2",
     "key-did-resolver": "^3.0.0",
-    "koa": "^2.13.4",
+    "koa": "^2.15.3",
+    "koa-router": "^12.0.1",
     "lodash": "^4.17.21",
     "luxon": "^3.4.4",
     "mailgun.js": "^10.2.1",
@@ -332,7 +336,7 @@
     "@types/google.accounts": "^0.0.4",
     "@types/html-to-text": "^8.1.0",
     "@types/jest": "^29.5",
-    "@types/koa": "^2.13.4",
+    "@types/koa": "^2.15.0",
     "@types/koa__router": "^8.0.11",
     "@types/luxon": "^2.0.9",
     "@types/markdown-it": "^12.2.3",

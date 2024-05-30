@@ -1,0 +1,9 @@
+{
+  "name": "builder-api",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx tsx ./main.ts",
+    "test": "test"
+  }
+}
