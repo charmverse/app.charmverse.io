@@ -267,7 +267,9 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
 
   if (currentEvaluation) {
-    properties[PROPOSAL_REVIEWERS_BLOCK_ID] = currentEvaluation?.reviewers ?? [];
+    properties[PROPOSAL_REVIEWERS_BLOCK_ID] = (currentEvaluation?.reviewers ?? []).map(
+      ({ userId, roleId, systemRole }) => ({ userId, roleId, systemRole })
+    );
   }
 
   const formFieldProperties = getCardPropertiesFromForm({

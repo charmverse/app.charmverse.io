@@ -171,7 +171,10 @@ export function mapProposalToCard({
     [AUTHORS_BLOCK_ID]: (proposal && 'authors' in proposal && proposal.authors?.map((a) => a.userId)) || '',
     [PROPOSAL_STEP_BLOCK_ID]: proposal.currentStep?.title ?? 'Draft',
     [PROPOSAL_EVALUATION_TYPE_ID]: proposal.currentStep?.step ?? 'draft',
-    [PROPOSAL_REVIEWERS_BLOCK_ID]: proposal && 'reviewers' in proposal ? proposal.reviewers : []
+    [PROPOSAL_REVIEWERS_BLOCK_ID]:
+      proposal && 'reviewers' in proposal
+        ? proposal.reviewers.map(({ userId, roleId, systemRole }) => ({ userId, roleId, systemRole }))
+        : []
   };
   const card: Card<ProposalPropertyValue> = {
     id: proposal.id,
