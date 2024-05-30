@@ -53,6 +53,10 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
+  applyToPropertiesByType(boardProperties, {
+    ...proposalDbProperties.proposalReviewer(),
+    name: 'Proposal Reviewers'
+  });
   applyToPropertiesByType(
     boardProperties,
     proposalDbProperties.proposalStep({

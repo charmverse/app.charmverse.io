@@ -1,3 +1,4 @@
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
 
@@ -11,12 +12,12 @@ export function getCardPropertiesFromRubric({
   rubricCriteria,
   step
 }: {
-  properties: Record<string, CardPropertyValue>;
+  properties: Record<string, ProposalPropertyValue>;
   templates: IPropertyTemplate[];
   rubricCriteria: { id: string; title: string }[];
   rubricAnswers: AnswerData[];
   step: { id: string; title: string };
-}): Record<string, CardPropertyValue> {
+}): Record<string, ProposalPropertyValue> {
   const { allScores, reviewersResults } = aggregateResults({
     answers: rubricAnswers.filter((a) => a.evaluationId === step.id),
     criteria: rubricCriteria.filter((c) => c.id !== step.id)

@@ -1,12 +1,15 @@
 import type {
   FormFieldAnswer,
   IssuedCredential,
+  Prisma,
   Proposal,
   ProposalEvaluation,
+  ProposalReviewer,
   ProposalRubricCriteria,
   ProposalRubricCriteriaAnswer
 } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
+import { getCurrentEvaluation } from '@charmverse/core/proposals';
 
 import type {
   IssuableProposalCredentialAuthor,
@@ -14,6 +17,8 @@ import type {
   ProposalWithJoinedData
 } from 'lib/credentials/findIssuableProposalCredentials';
 import { generateCredentialInputsForProposal } from 'lib/credentials/findIssuableProposalCredentials';
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
@@ -43,6 +48,7 @@ type ProposalData = {
       ProposalEvaluation,
       'id' | 'index' | 'result' | 'title' | 'type' | 'requiredReviews' | 'finalStep' | 'appealedAt'
     > & {
+      reviewers: ProposalReviewer[];
       rubricAnswers: ProposalRubricCriteriaAnswer[];
       rubricCriteria: ProposalRubricCriteria[];
     })[];
@@ -101,7 +107,8 @@ const pageSelectObject = {
           rubricAnswers: true,
           requiredReviews: true,
           finalStep: true,
-          appealedAt: true
+          appealedAt: true,
+          reviewers: true
         },
         orderBy: {
           index: 'asc'
@@ -114,7 +121,7 @@ const pageSelectObject = {
       }
     }
   }
-} as const;
+} satisfies Prisma.PageSelect;
 
 export async function getCardPropertiesFromProposals({
   cardProperties,
@@ -189,7 +196,7 @@ export async function getCardPropertiesFromProposal({
 function getCardProperties({ page, proposal, cardProperties, space }: ProposalData): ProposalCardData {
   const proposalProps = getCardPropertyTemplates({ cardProperties });
 
-  let properties: Record<string, CardPropertyValue> = {};
+  let properties: Record<string, ProposalPropertyValue> = {};
 
   if (proposalProps.proposalUrl) {
     properties[proposalProps.proposalUrl.id] = page.path;
@@ -257,6 +264,14 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     }
   });
 
+  const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
+
+  if (currentEvaluation) {
+    properties[PROPOSAL_REVIEWERS_BLOCK_ID] = (currentEvaluation?.reviewers ?? []).map(
+      ({ userId, roleId, systemRole }) => ({ userId, roleId, systemRole })
+    );
+  }
+
   const formFieldProperties = getCardPropertiesFromForm({
     cardProperties,
     formAnswers: proposal.formAnswers as FormAnswerData[]
@@ -283,6 +298,7 @@ export function getCardPropertyTemplates({ cardProperties }: { cardProperties: I
     proposalEvaluationType: cardProperties.find((prop) => prop.type === 'proposalEvaluationType'),
     proposalStatus: cardProperties.find((prop) => prop.type === 'proposalStatus'),
     proposalStep: cardProperties.find((prop) => prop.type === 'proposalStep'),
-    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl')
+    proposalUrl: cardProperties.find((prop) => prop.type === 'proposalUrl'),
+    proposalReviewer: cardProperties.find((prop) => prop.type === 'proposalReviewer')
   };
 }

@@ -12,6 +12,11 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
+    },
+    select: {
+      spaceId: true,
+      fields: true,
+      id: true
     }
   });
 
