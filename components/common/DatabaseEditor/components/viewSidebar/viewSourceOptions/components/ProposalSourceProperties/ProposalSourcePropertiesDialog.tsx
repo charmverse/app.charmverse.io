@@ -3,7 +3,6 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import { Dialog, IconButton, ListItemIcon, ListItemText, MenuItem, Stack, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
-import { FaBriefcase } from 'react-icons/fa';
 
 import { Button } from 'components/common/Button';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
@@ -11,32 +10,35 @@ import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemp
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadOnlyList } from './ProjectProfilePropertiesList';
-import { TemplatePropertiesList, TemplatePropertiesReadonlyList } from './TemplatePropertiesList';
+import {
+  RubricEvaluationPropertiesList,
+  RubricEvaluationPropertiesReadonlyList
+} from './RubricEvaluationPropertiesList';
 
 export type SelectedProperties = {
   projectMember: string[];
   project: string[];
   customProperties: string[];
-  templates: {
-    pageId: string;
-    rubricEvaluations: {
-      id: string;
-      average?: boolean;
-      total?: boolean;
-      reviewers?: boolean;
-      criteriaTotal?: boolean;
-    }[];
-    formFields: string[];
+  rubricEvaluations: {
+    title: string;
+    average?: boolean;
+    total?: boolean;
+    reviewers?: boolean;
+    criteriaTotal?: boolean;
   }[];
+  formFields: string[];
 };
 
 type SelectedGroup =
   | {
-      group: 'project_profile';
+      group: 'projectProfile';
     }
   | {
-      group: 'templates';
+      group: 'formFields';
       pageId: string;
+    }
+  | {
+      group: 'rubricEvaluations';
     };
 
 export function ProposalSourcePropertiesDialog({
@@ -49,25 +51,33 @@ export function ProposalSourcePropertiesDialog({
   const [selectedProperties, setSelectedProperties] = useState<SelectedProperties>({
     projectMember: [],
     project: [],
-    templates: [],
+    formFields: [],
+    rubricEvaluations: [],
     customProperties: []
   });
   const [selectedGroup, setSelectedGroup] = useState<SelectedGroup>({
-    group: 'project_profile'
+    group: 'projectProfile'
   });
+
   const noPropertiesSelected =
     selectedProperties.project.length === 0 &&
     selectedProperties.projectMember.length === 0 &&
-    (selectedProperties.templates.length === 0 ||
-      selectedProperties.templates.every(
-        (template) => template.rubricEvaluations.length === 0 && template.formFields.length === 0
-      ));
+    selectedProperties.formFields.length === 0 &&
+    selectedProperties.customProperties.length === 0 &&
+    selectedProperties.rubricEvaluations.length === 0;
 
   const { proposalTemplates } = useProposalTemplates();
 
   const proposalTemplatePages = useMemo(() => {
     return (proposalTemplates || [])
-      .filter((proposal) => !proposal.archived && !proposal.draft)
+      .filter(
+        (proposal) =>
+          !proposal.archived &&
+          !proposal.draft &&
+          proposal.formFields &&
+          proposal.formFields.filter((formField) => formField.type !== 'project_profile' && formField.type !== 'label')
+            .length > 0
+      )
       .map((proposal) => ({
         pageId: proposal.pageId,
         title: proposal.title,
@@ -105,20 +115,28 @@ export function ProposalSourcePropertiesDialog({
           }}
         >
           <SectionName>Groups</SectionName>
-          <MenuItem
-            dense
-            onClick={() => {
-              setSelectedGroup({
-                group: 'project_profile'
-              });
-            }}
-            sx={{ mb: 1 }}
-          >
-            <ListItemIcon>
-              <FaBriefcase size={20} />
-            </ListItemIcon>
-            <ListItemText>Project Profile</ListItemText>
-          </MenuItem>
+          <Stack>
+            <MenuItem
+              dense
+              onClick={() => {
+                setSelectedGroup({
+                  group: 'projectProfile'
+                });
+              }}
+            >
+              <ListItemText>Project Profile</ListItemText>
+            </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setSelectedGroup({
+                  group: 'rubricEvaluations'
+                });
+              }}
+            >
+              <ListItemText>Rubric Evaluations</ListItemText>
+            </MenuItem>
+          </Stack>
           <SectionName>Templates</SectionName>
           <Stack>
             {proposalTemplatePages.length ? (
@@ -128,7 +146,7 @@ export function ProposalSourcePropertiesDialog({
                   dense
                   onClick={() => {
                     setSelectedGroup({
-                      group: 'templates',
+                      group: 'formFields',
                       pageId: template.pageId
                     });
                   }}
@@ -147,7 +165,7 @@ export function ProposalSourcePropertiesDialog({
           </Stack>
         </Stack>
         <Stack gap={1} p={2} overflow='auto' height='90vh' width='100%'>
-          {selectedGroup?.group === 'project_profile' && (
+          {selectedGroup?.group === 'projectProfile' && (
             <>
               <Typography variant='h6'>Project profile properties</Typography>
               <ProjectProfilePropertiesList
@@ -156,13 +174,12 @@ export function ProposalSourcePropertiesDialog({
               />
             </>
           )}
-          {selectedGroup.group === 'templates' && (
+          {selectedGroup.group === 'rubricEvaluations' && (
             <>
-              <Typography variant='h6'>Template properties</Typography>
-              <TemplatePropertiesList
+              <Typography variant='h6'>Rubric evaluations properties</Typography>
+              <RubricEvaluationPropertiesList
                 selectedProperties={selectedProperties}
                 setSelectedProperties={setSelectedProperties}
-                templatePageId={selectedGroup.pageId}
               />
             </>
           )}
@@ -184,7 +201,7 @@ export function ProposalSourcePropertiesDialog({
             <SectionName>Selected Properties</SectionName>
             <Stack p={2}>
               <ProjectProfilePropertiesReadOnlyList selectedProperties={selectedProperties} />
-              <TemplatePropertiesReadonlyList selectedProperties={selectedProperties} />
+              <RubricEvaluationPropertiesReadonlyList selectedProperties={selectedProperties} />
               {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
             </Stack>
           </Stack>

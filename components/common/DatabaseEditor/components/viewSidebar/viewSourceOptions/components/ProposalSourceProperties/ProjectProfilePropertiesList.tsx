@@ -33,7 +33,8 @@ export function ProjectProfilePropertiesList({
                 ? {
                     projectMember: [],
                     project: [],
-                    templates: [],
+                    formFields: [],
+                    rubricEvaluations: [],
                     customProperties: []
                   }
                 : {
@@ -146,7 +147,7 @@ export function ProjectProfilePropertiesReadOnlyList({
       <Typography fontWeight='bold' mb={0.5} variant='subtitle1'>
         Project Profile
       </Typography>
-      <Stack gap={0.5} ml={2}>
+      <Stack gap={0.5}>
         {selectedProjectFields.map((propertyFieldProperty) => (
           <Typography variant='subtitle2' key={propertyFieldProperty.field}>
             {propertyFieldProperty.columnTitle}
