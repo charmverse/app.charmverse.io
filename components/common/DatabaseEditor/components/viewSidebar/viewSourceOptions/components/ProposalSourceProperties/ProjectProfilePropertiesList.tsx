@@ -68,7 +68,7 @@ export function ProjectProfilePropertiesList({
             key={propertyFieldProperty.field}
           >
             <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
-            <Typography variant='subtitle1'>{propertyFieldProperty.columnTitle}</Typography>
+            <Typography>{propertyFieldProperty.columnTitle}</Typography>
           </Stack>
         ))}
         <Stack
@@ -112,7 +112,7 @@ export function ProjectProfilePropertiesList({
                 size='small'
                 checked={selectedProperties.projectMember.includes(projectMemberFieldProperty.field)}
               />
-              <Typography variant='subtitle1'>{projectMemberFieldProperty.label}</Typography>
+              <Typography>{projectMemberFieldProperty.label}</Typography>
             </Stack>
           ))}
         </Stack>

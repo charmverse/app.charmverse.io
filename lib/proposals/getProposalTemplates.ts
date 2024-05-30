@@ -1,6 +1,6 @@
 import { InvalidInputError } from '@charmverse/core/errors';
 import type { SpaceResourcesRequest } from '@charmverse/core/permissions';
-import type { ProposalEvaluation } from '@charmverse/core/prisma-client';
+import type { FormField, ProposalEvaluation } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { stringUtils } from '@charmverse/core/utilities';
 
@@ -14,6 +14,7 @@ export type ProposalTemplateMeta = {
   archived?: boolean;
   draft?: boolean;
   evaluations: Pick<ProposalEvaluation, 'id' | 'type' | 'title'>[];
+  formFields?: Pick<FormField, 'id' | 'type' | 'name'>[];
 };
 
 export async function getProposalTemplates({
@@ -48,6 +49,20 @@ export async function getProposalTemplates({
           archived: true,
           formId: true,
           status: true,
+          form: {
+            select: {
+              formFields: {
+                orderBy: {
+                  index: 'asc'
+                },
+                select: {
+                  type: true,
+                  id: true,
+                  name: true
+                }
+              }
+            }
+          },
           evaluations: {
             orderBy: {
               index: 'asc'
@@ -70,7 +85,8 @@ export async function getProposalTemplates({
     title: page.title,
     archived: page.proposal?.archived || undefined,
     draft: page.proposal?.status === 'draft',
-    evaluations: page.proposal?.evaluations ?? []
+    evaluations: page.proposal?.evaluations ?? [],
+    formFields: page.proposal?.form?.formFields ?? []
   }));
 
   if (!isAdmin) {

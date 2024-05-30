@@ -115,44 +115,36 @@ export function ProposalSourcePropertiesDialog({
             sx={{ mb: 1 }}
           >
             <ListItemIcon>
-              <FaBriefcase fontSize='small' />
+              <FaBriefcase size={20} />
             </ListItemIcon>
             <ListItemText>Project Profile</ListItemText>
           </MenuItem>
           <SectionName>Templates</SectionName>
-          {proposalTemplatePages.map((template) => (
-            <MenuItem
-              key={template.pageId}
-              dense
-              onClick={() => {
-                setSelectedProperties({
-                  ...selectedProperties,
-                  templates: [
-                    ...selectedProperties.templates,
-                    {
-                      pageId: template.pageId,
-                      rubricEvaluations: [],
-                      formFields: []
-                    }
-                  ]
-                });
-                setSelectedGroup({
-                  group: 'templates',
-                  pageId: template.pageId
-                });
-              }}
-            >
-              <ListItemIcon>
-                {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
-              </ListItemIcon>
-              <ListItemText>{template.title || 'Untitled'}</ListItemText>
-            </MenuItem>
-          ))}
-          {proposalTemplatePages.length === 0 && (
-            <Typography pl={2} variant='caption'>
-              No proposal templates
-            </Typography>
-          )}
+          <Stack>
+            {proposalTemplatePages.length ? (
+              proposalTemplatePages.map((template) => (
+                <MenuItem
+                  key={template.pageId}
+                  dense
+                  onClick={() => {
+                    setSelectedGroup({
+                      group: 'templates',
+                      pageId: template.pageId
+                    });
+                  }}
+                >
+                  <ListItemIcon>
+                    {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
+                  </ListItemIcon>
+                  <ListItemText>{template.title || 'Untitled'}</ListItemText>
+                </MenuItem>
+              ))
+            ) : (
+              <Typography pl={2} variant='caption'>
+                No proposal templates
+              </Typography>
+            )}
+          </Stack>
         </Stack>
         <Stack gap={1} p={2} overflow='auto' height='90vh' width='100%'>
           {selectedGroup?.group === 'project_profile' && (

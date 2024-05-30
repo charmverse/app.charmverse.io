@@ -2,7 +2,6 @@ import { Stack, Checkbox, Typography, Divider } from '@mui/material';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
-import { isTruthy } from 'lib/utils/types';
 
 import type { SelectedProperties } from './ProposalSourcePropertiesDialog';
 
@@ -16,14 +15,13 @@ export function TemplatePropertiesList({
   templatePageId: string;
 }) {
   const { proposalTemplates } = useProposalTemplates();
-
   const { formFields, rubricEvaluations } = useMemo(() => {
     const proposalTemplate = proposalTemplates?.find((template) => template.pageId === templatePageId);
     return {
-      formFields: [],
       rubricEvaluations: proposalTemplate
         ? proposalTemplate.evaluations.filter((evaluation) => evaluation.type === 'rubric')
-        : []
+        : [],
+      formFields: proposalTemplate?.formFields ?? []
     };
   }, [proposalTemplates, templatePageId]);
 
@@ -33,72 +31,64 @@ export function TemplatePropertiesList({
 
   const selectedTemplate = selectedProperties.templates.find((template) => template.pageId === templatePageId);
 
-  function updateTemplateProperties(evaluationId: string, updatedProperties: { [key: string]: boolean }) {
-    const selectedEvaluation = selectedTemplate?.rubricEvaluations.find((evaluation) => evaluation.id === evaluationId);
-    if (!selectedEvaluation) {
+  function updateRubricEvaluationProperties(evaluationId: string, updatedProperties: { [key: string]: boolean }) {
+    if (!selectedTemplate) {
       setSelectedProperties({
         ...selectedProperties,
-        templates: selectedProperties.templates.map((template) => {
-          if (template.pageId === templatePageId) {
-            return {
-              ...template,
-              rubricEvaluations: [
-                ...template.rubricEvaluations,
-                {
-                  id: evaluationId,
-                  ...updatedProperties
-                }
-              ]
-            };
+        templates: [
+          ...selectedProperties.templates,
+          {
+            formFields: [],
+            pageId: templatePageId,
+            rubricEvaluations: [
+              {
+                id: evaluationId,
+                ...updatedProperties
+              }
+            ]
           }
-          return template;
-        })
+        ]
       });
     } else {
-      setSelectedProperties({
+      const updatedSelectedProperties = {
         ...selectedProperties,
         templates: selectedProperties.templates
           .map((template) => {
             if (template.pageId === templatePageId) {
-              const updatedRubricEvaluations = template.rubricEvaluations
-                .map((evaluation) => {
-                  if (evaluation.id === evaluationId) {
-                    const newValue = {
-                      ...evaluation,
-                      ...updatedProperties
-                    };
-
-                    // If all properties are false, remove the evaluation
-                    if (
-                      newValue.average === false &&
-                      newValue.total === false &&
-                      newValue.reviewers === false &&
-                      newValue.criteriaTotal === false
-                    ) {
-                      return null;
-                    }
-
-                    return {
-                      ...evaluation,
-                      ...updatedProperties
-                    };
-                  }
-                  return evaluation;
-                })
-                .filter(isTruthy);
-
-              if (updatedRubricEvaluations.length === 0) {
-                return null;
-              }
+              const selectedEvaluation = template.rubricEvaluations.find(
+                (evaluation) => evaluation.id === evaluationId
+              );
               return {
                 ...template,
-                rubricEvaluations: updatedRubricEvaluations
+                rubricEvaluations: (selectedEvaluation
+                  ? template.rubricEvaluations.map((evaluation) => {
+                      if (evaluation.id === evaluationId) {
+                        return {
+                          ...evaluation,
+                          ...updatedProperties
+                        };
+                      }
+                      return evaluation;
+                    })
+                  : [
+                      ...template.rubricEvaluations,
+                      {
+                        id: evaluationId,
+                        ...updatedProperties
+                      }
+                    ]
+                ).filter((evaluation) => {
+                  const isAllPropertiesFalsy =
+                    !evaluation.average && !evaluation.total && !evaluation.reviewers && !evaluation.criteriaTotal;
+                  return !isAllPropertiesFalsy;
+                })
               };
             }
             return template;
           })
-          .filter(isTruthy)
-      });
+          .filter((template) => template.rubricEvaluations.length || template.formFields.length)
+      };
+      setSelectedProperties(updatedSelectedProperties);
     }
   }
 
@@ -124,20 +114,22 @@ export function TemplatePropertiesList({
                   if (isAllPropertiesSelected) {
                     setSelectedProperties({
                       ...selectedProperties,
-                      templates: selectedProperties.templates.map((template) => {
-                        if (template.pageId === templatePageId) {
-                          return {
-                            ...template,
-                            rubricEvaluations: template.rubricEvaluations.filter(
-                              (evaluation) => evaluation.id !== rubricEvaluation.id
-                            )
-                          };
-                        }
-                        return template;
-                      })
+                      templates: selectedProperties.templates
+                        .map((template) => {
+                          if (template.pageId === templatePageId) {
+                            return {
+                              ...template,
+                              rubricEvaluations: template.rubricEvaluations.filter(
+                                (evaluation) => evaluation.id !== rubricEvaluation.id
+                              )
+                            };
+                          }
+                          return template;
+                        })
+                        .filter((template) => template.rubricEvaluations.length || template.formFields.length)
                     });
                   } else {
-                    updateTemplateProperties(rubricEvaluation.id, {
+                    updateRubricEvaluationProperties(rubricEvaluation.id, {
                       average: true,
                       total: true,
                       reviewers: true,
@@ -154,7 +146,7 @@ export function TemplatePropertiesList({
                   size='small'
                   checked={!!_rubricEvaluation?.average}
                   onChange={() => {
-                    updateTemplateProperties(rubricEvaluation.id, { average: !_rubricEvaluation?.average });
+                    updateRubricEvaluationProperties(rubricEvaluation.id, { average: !_rubricEvaluation?.average });
                   }}
                 />
                 <Typography>Average</Typography>
@@ -164,7 +156,7 @@ export function TemplatePropertiesList({
                   size='small'
                   checked={!!_rubricEvaluation?.total}
                   onChange={() => {
-                    updateTemplateProperties(rubricEvaluation.id, { total: !_rubricEvaluation?.total });
+                    updateRubricEvaluationProperties(rubricEvaluation.id, { total: !_rubricEvaluation?.total });
                   }}
                 />
                 <Typography>Total</Typography>
@@ -174,7 +166,7 @@ export function TemplatePropertiesList({
                   size='small'
                   checked={!!_rubricEvaluation?.reviewers}
                   onChange={() => {
-                    updateTemplateProperties(rubricEvaluation.id, { reviewers: !_rubricEvaluation?.reviewers });
+                    updateRubricEvaluationProperties(rubricEvaluation.id, { reviewers: !_rubricEvaluation?.reviewers });
                   }}
                 />
                 <Typography>Reviewers</Typography>
@@ -184,7 +176,7 @@ export function TemplatePropertiesList({
                   size='small'
                   checked={!!_rubricEvaluation?.criteriaTotal}
                   onChange={() => {
-                    updateTemplateProperties(rubricEvaluation.id, {
+                    updateRubricEvaluationProperties(rubricEvaluation.id, {
                       criteriaTotal: !_rubricEvaluation?.criteriaTotal
                     });
                   }}
@@ -195,13 +187,72 @@ export function TemplatePropertiesList({
           </Stack>
         );
       })}
+      {formFields.length ? (
+        <Stack>
+          <Stack direction='row' alignItems='center'>
+            <Checkbox
+              size='small'
+              checked={selectedTemplate?.formFields.length === formFields.length}
+              onChange={() => {
+                setSelectedProperties({
+                  ...selectedProperties,
+                  templates: selectedProperties.templates
+                    .map((template) => {
+                      if (template.pageId === templatePageId) {
+                        return {
+                          ...template,
+                          formFields:
+                            template.formFields.length === formFields.length ? [] : formFields.map((field) => field.id)
+                        };
+                      }
+                      return template;
+                    })
+                    .filter((template) => template.rubricEvaluations.length || template.formFields.length)
+                });
+              }}
+            />
+            <Typography fontWeight='bold'>Form fields</Typography>
+          </Stack>
+          <Stack ml={2}>
+            {formFields.map((formField) => {
+              const isFormFieldSelected = !!selectedTemplate?.formFields.some((fieldId) => fieldId === formField.id);
+              return (
+                <Stack direction='row' alignItems='center' key={formField.id}>
+                  <Checkbox
+                    size='small'
+                    checked={isFormFieldSelected}
+                    onChange={() => {
+                      setSelectedProperties({
+                        ...selectedProperties,
+                        templates: selectedProperties.templates
+                          .map((template) => {
+                            if (template.pageId === templatePageId) {
+                              return {
+                                ...template,
+                                formFields: isFormFieldSelected
+                                  ? template.formFields.filter((fieldId) => fieldId !== formField.id)
+                                  : [...template.formFields, formField.id]
+                              };
+                            }
+                            return template;
+                          })
+                          .filter((template) => template.rubricEvaluations.length || template.formFields.length)
+                      });
+                    }}
+                  />
+                  <Typography>{formField.name}</Typography>
+                </Stack>
+              );
+            })}
+          </Stack>
+        </Stack>
+      ) : null}
     </Stack>
   );
 }
 
 export function TemplatePropertiesReadonlyList({ selectedProperties }: { selectedProperties: SelectedProperties }) {
   const { proposalTemplates } = useProposalTemplates();
-
   if (
     selectedProperties.templates.length === 0 ||
     selectedProperties.templates.every(
@@ -226,31 +277,60 @@ export function TemplatePropertiesReadonlyList({ selectedProperties }: { selecte
               <Typography fontWeight='bold' variant='subtitle1'>
                 {selectedTemplate.title}
               </Typography>
-              {template.rubricEvaluations.map((rubricEvaluation) => {
-                const _rubricEvaluation = selectedTemplate.evaluations.find(
-                  (evaluation) => evaluation.id === rubricEvaluation.id
-                );
-                if (!_rubricEvaluation) {
-                  return null;
-                }
-                return (
-                  <Stack key={rubricEvaluation.id}>
-                    <Typography fontWeight='bold' variant='subtitle2'>
-                      {_rubricEvaluation.title}
-                    </Typography>
-                    <Stack gap={0.5} ml={2} mt={0.5}>
-                      {rubricEvaluation.average && <Typography variant='subtitle2'>Average</Typography>}
-                      {rubricEvaluation.total && <Typography variant='subtitle2'>Total</Typography>}
-                      {rubricEvaluation.reviewers && <Typography variant='subtitle2'>Reviewers</Typography>}
-                      {rubricEvaluation.criteriaTotal && <Typography variant='subtitle2'>Criteria total</Typography>}
+              {template.rubricEvaluations.length ? (
+                <Stack gap={1}>
+                  {template.rubricEvaluations.map((rubricEvaluation) => {
+                    const _rubricEvaluation = selectedTemplate.evaluations.find(
+                      (evaluation) => evaluation.id === rubricEvaluation.id
+                    );
+                    if (!_rubricEvaluation) {
+                      return null;
+                    }
+                    return (
+                      <Stack key={rubricEvaluation.id}>
+                        <Typography fontWeight='bold' variant='subtitle2'>
+                          {_rubricEvaluation.title}
+                        </Typography>
+                        <Stack gap={0.5} ml={2} mt={0.5}>
+                          {rubricEvaluation.average && <Typography variant='subtitle2'>Average</Typography>}
+                          {rubricEvaluation.total && <Typography variant='subtitle2'>Total</Typography>}
+                          {rubricEvaluation.reviewers && <Typography variant='subtitle2'>Reviewers</Typography>}
+                          {rubricEvaluation.criteriaTotal && (
+                            <Typography variant='subtitle2'>Criteria total</Typography>
+                          )}
+                        </Stack>
+                      </Stack>
+                    );
+                  })}
+                </Stack>
+              ) : null}
+              {template.formFields.length ? (
+                <Stack>
+                  <Typography fontWeight='bold' variant='subtitle2'>
+                    Form fields
+                  </Typography>
+                  <Stack ml={2}>
+                    <Stack key={template.pageId} gap={0.5} mt={0.5}>
+                      {template.formFields.map((formFieldId) => {
+                        const formField = selectedTemplate.formFields?.find((field) => field.id === formFieldId);
+                        if (!formField) {
+                          return null;
+                        }
+                        return (
+                          <Typography key={formFieldId} variant='subtitle2'>
+                            {formField?.name}
+                          </Typography>
+                        );
+                      })}
                     </Stack>
                   </Stack>
-                );
-              })}
+                </Stack>
+              ) : null}
             </Stack>
           );
         })}
       </Stack>
+
       <Divider
         sx={{
           my: 2
