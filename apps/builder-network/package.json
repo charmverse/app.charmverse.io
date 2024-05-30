@@ -1,0 +1,11 @@
+{
+  "name": "builder-network",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx next dev",
+    "build": "npx next build",
+    "start": "npx next start",
+    "lint": "npx next lint"
+  }
+}

@@ -4,6 +4,9 @@
   "browserslist": [
     "defaults"
   ],
+  "workspaces": [
+    "apps/*"
+  ],
   "scripts": {
     "testgen": "python scripts/testgen/make_tests.py",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
@@ -72,7 +75,8 @@
     "update-core": "npm install @charmverse/core",
     "build:storybook": "npx storybook build",
     "upgrade:storybook": "npx storybook@latest upgrade",
-    "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes"
+    "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
+    "builder-network": "npm run dev --workspace=apps/builder-network"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

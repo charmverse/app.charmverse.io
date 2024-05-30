@@ -37,6 +37,7 @@
       "hooks/*": ["./hooks/*"],
       "abis/*": ["./abis/*"],
       "pages/*": ["./pages/*"],
+      "shared/*": ["./shared/*"],
       "public/*": ["./public/*"],
       "theme/*": ["./theme/*"],
       "testing/*": ["./testing/*"],

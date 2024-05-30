@@ -1,3 +1,5 @@
+'use client';
+
 import { Global } from '@emotion/react';
 import type { PaletteMode } from '@mui/material';
 import { CssBaseline } from '@mui/material';
