@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
@@ -19,8 +18,8 @@ import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { PopupFieldWrapper } from './PopupFieldWrapper';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-export type RoleOption = TargetPermissionGroup<'role'>;
-type MemberOption = TargetPermissionGroup<'user'>;
+type RoleOption = { group: 'role'; id: string };
+type MemberOption = { group: 'user'; id: string };
 type SystemRoleOption<T extends string = string> = { group: 'system_role'; id: T };
 export type SelectOption = RoleOption | MemberOption | SystemRoleOption;
 type RoleOptionPopulated = ListSpaceRolesResponse & RoleOption;

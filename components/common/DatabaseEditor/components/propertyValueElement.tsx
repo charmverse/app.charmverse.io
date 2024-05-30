@@ -274,7 +274,10 @@ function PropertyValueElement(props: Props) {
   }
   // TODO: use same component as proposalReviewer type?
   else if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
-    const reviewers = (card.fields.properties[REWARD_REVIEWERS_BLOCK_ID] as unknown as RewardReviewer[]) ?? [];
+    const reviewers: SelectOption[] = (propertyValue as unknown as RewardReviewer[]).map((reviewer) => ({
+      group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',
+      id: (reviewer.roleId ?? reviewer.userId) as string
+    }));
     propertyValueElement = (
       <UserAndRoleSelect
         displayType={displayType}
@@ -283,13 +286,14 @@ function PropertyValueElement(props: Props) {
           if (!reward) {
             return;
           }
-          const reviewerOptions = options.filter(
-            (option) => option.group === 'role' || option.group === 'user'
-          ) as RewardReviewer[];
+          const reviewerOptions = options.filter((option) => option.group === 'role' || option.group === 'user');
           updateReward({
             rewardId: reward.id,
             updateContent: {
-              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+              reviewers: reviewerOptions.map((reviewer) => ({
+                roleId: reviewer.group === 'role' ? reviewer.id : null,
+                userId: reviewer.group === 'user' ? reviewer.id : null
+              }))
             }
           });
         }}

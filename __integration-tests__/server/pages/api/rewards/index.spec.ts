@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma, type Space, type User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import request from 'supertest';
@@ -134,7 +133,7 @@ describe('POST /api/rewards - createRewardController', () => {
   });
 
   it('should create a reward and return it with a status code 201 when the user has the permission', async () => {
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [{ id: user.id, group: 'user' }];
+    const reviewers = [{ userId: user.id }];
     const submitterRole = await testUtilsMembers.generateRole({ createdBy: user.id, spaceId: space.id });
 
     const rewardData: RewardCreationData = {

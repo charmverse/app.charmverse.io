@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { PagePermission, Role, Space, User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsPages, testUtilsUser } from '@charmverse/core/test';
@@ -31,10 +30,7 @@ beforeAll(async () => {
 
 describe('createReward', () => {
   it('should successfully create a reward with all parameters from UpdateableRewardFields including reviewers and allowedSubmitterRoles', async () => {
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
-      { id: user.id, group: 'user' },
-      { id: reviewerRole.id, group: 'role' }
-    ];
+    const reviewers = [{ userId: user.id }, { roleId: reviewerRole.id }];
 
     const credentialTemplateId = uuid();
 
@@ -76,10 +72,7 @@ describe('createReward', () => {
   });
 
   it('should successfully create assigned reward based on assignedSubmitters', async () => {
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
-      { id: user.id, group: 'user' },
-      { id: reviewerRole.id, group: 'role' }
-    ];
+    const reviewers = [{ userId: user.id }, { roleId: reviewerRole.id }];
 
     const rewardData: RewardCreationData = {
       spaceId: space.id,
@@ -147,10 +140,7 @@ describe('createReward', () => {
       dueDate: new Date(),
       customReward: 'Special Badge',
       fields: { fieldName: 'sampleField', type: 'text' },
-      reviewers: [
-        { id: user.id, group: 'user' },
-        { id: reviewerRole.id, group: 'role' }
-      ],
+      reviewers: [{ userId: user.id }, { roleId: reviewerRole.id }],
       allowedSubmitterRoles: [submitterRole.id]
     };
 
@@ -185,10 +175,7 @@ describe('createReward', () => {
       pageProps: {
         title: 'Reward Page'
       },
-      reviewers: [
-        { id: user.id, group: 'user' },
-        { id: reviewerRole.id, group: 'role' }
-      ],
+      reviewers: [{ userId: user.id }, { roleId: reviewerRole.id }],
       allowedSubmitterRoles: [submitterRole.id]
     };
 
@@ -246,7 +233,7 @@ describe('createReward', () => {
       pageProps: {
         title: 'Reward Page'
       },
-      reviewers: [{ id: user.id, group: 'user' }]
+      reviewers: [{ userId: user.id }]
     };
 
     const { reward } = await createReward(rewardData);
