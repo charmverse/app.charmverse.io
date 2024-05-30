@@ -101,7 +101,6 @@ function TableRows(props: Props): JSX.Element {
       ? !collapsedCardIds?.includes(cardId)
       : !!props.expandSubRowsOnLoad;
   };
-
   return (
     <>
       {cardsInView.map((card) => (

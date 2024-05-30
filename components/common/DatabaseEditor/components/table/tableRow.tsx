@@ -193,7 +193,7 @@ function TableRow(props: Props) {
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
 
-  if (!props.isExpandedGroup) {
+  if (isGrouped && !props.isExpandedGroup) {
     className += ' hidden';
   }
 
