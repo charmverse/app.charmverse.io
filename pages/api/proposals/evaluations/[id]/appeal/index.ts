@@ -14,6 +14,7 @@ handler.put(appealEvaluationEndpoint);
 async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const evaluationId = req.query.id as string;
   const userId = req.session.user.id;
+  const appealReason = req.body.appealReason as string;
 
   const proposalEvaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
     where: {
@@ -81,6 +82,7 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
       appealedAt: new Date(),
       result: null,
       appealedBy: userId,
+      appealReason,
       completedAt: null
     }
   });

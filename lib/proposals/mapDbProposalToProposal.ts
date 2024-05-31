@@ -92,6 +92,7 @@ export function mapDbProposalToProposal({
       evaluation.draftRubricAnswers = [];
       evaluation.rubricAnswers = [];
     }
+
     return {
       ...evaluation,
       appealReviewers: evaluation.appealReviewers || [],

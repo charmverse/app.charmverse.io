@@ -31,10 +31,14 @@ export function usePOST<T, U = unknown>(path: string) {
   });
 }
 
-export function usePUT<T, U = unknown>(path: string) {
-  return useSWRMutation<U, Error, string, T>(path, (url: string, { arg }: { arg: any }) => {
-    return http.PUT<U>(url, arg);
-  });
+export function usePUT<T, U = unknown>(path: string, options?: { revalidate?: boolean }) {
+  return useSWRMutation<U, Error, string, T>(
+    path,
+    (url: string, { arg }: { arg: any }) => {
+      return http.PUT<U>(url, arg);
+    },
+    options
+  );
 }
 
 // To be used when you need to trigger a get request on demand

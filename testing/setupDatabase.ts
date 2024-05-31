@@ -31,8 +31,7 @@ import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
-import type { BountyPermissions } from 'lib/permissions/bounties';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from 'lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
@@ -302,6 +301,18 @@ export async function generateUserAndSpace({
     space: spaceRoles[0].space
   };
 }
+// TODO: can probably simplify the following functions
+
+// Groups that can be assigned to various reward actions
+type BountyReviewer = Extract<AssignablePermissionGroupsWithPublic, 'role' | 'user'>;
+type BountySubmitter = Extract<AssignablePermissionGroupsWithPublic, 'space' | 'role'>;
+
+// The set of all permissions for an individual reward
+export type BountyPermissions = {
+  reviewer: TargetPermissionGroup<BountyReviewer>[];
+  creator: TargetPermissionGroup[];
+  submitter: TargetPermissionGroup<BountySubmitter>[];
+};
 
 /**
  * @customPageId used for different reward and page ids to test edge cases where these ended up different

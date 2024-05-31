@@ -56,6 +56,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   readOnlyTitle?: boolean;
+  isExpandedGroup?: boolean;
   isExpanded?: boolean | null;
   setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;
   indentTitle?: number;
@@ -192,18 +193,8 @@ function TableRow(props: Props) {
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
 
-  if (isGrouped) {
-    const groupID = activeView.fields.groupById || '';
-    // look up property id if we grouped by column type (eg proposalUrl)
-    const groupTemplate = board.fields.cardProperties.find((prop) => prop.type === groupID);
-    const groupValue =
-      (groupTemplate ? card.fields.properties[groupTemplate.id] : (card.fields.properties[groupID] as string)) ||
-      'undefined';
-    const groupValueStr =
-      typeof groupValue === 'string' ? groupValue : Array.isArray(groupValue) ? groupValue[0] : null;
-    if (groupValueStr !== null && activeView.fields.collapsedOptionIds.indexOf(groupValueStr) > -1) {
-      className += ' hidden';
-    }
+  if (isGrouped && !props.isExpandedGroup) {
+    className += ' hidden';
   }
 
   const wrapColumn = activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId);
@@ -395,15 +386,18 @@ function TableRow(props: Props) {
 }
 
 function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean; subPages?: Card[] }) {
+  const isGrouped = Boolean(props.activeView.fields.groupById);
   return (
     <>
       <TableRow
         {...props}
         subRowsEmptyValueContent={props.isNested ? props.subRowsEmptyValueContent : undefined}
         isExpanded={props.isExpanded}
+        isExpandedGroup={props.isExpandedGroup}
         setIsExpanded={subPages ? props.setIsExpanded : undefined}
       />
       {props.isExpanded &&
+        (!isGrouped || props.isExpandedGroup === true) &&
         (!subPages || subPages?.length === 0
           ? props.emptySubPagesPlaceholder
           : subPages?.map((subPage) => (

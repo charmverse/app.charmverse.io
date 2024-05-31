@@ -133,9 +133,11 @@ export function useGetProposalFormFieldAnswers({ proposalId }: { proposalId: May
   return useGET<FieldAnswerInput[]>(proposalId ? `/api/proposals/${proposalId}/form/answers` : null);
 }
 
-export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: string }) {
+export function useUpdateProposalFormFieldAnswers({ proposalId }: { proposalId: MaybeString }) {
   return usePUT<{ answers: FieldAnswerInput[] }, ProposalRubricCriteriaAnswerWithTypedResponse[]>(
-    `/api/proposals/${proposalId}/form/answers`
+    `/api/proposals/${proposalId}/form/answers`,
+    // dont revalidate the request to retrieve answers on update
+    { revalidate: false }
   );
 }
 
@@ -181,7 +183,7 @@ export function useResetEvaluationReview({ proposalId }: { proposalId: MaybeStri
 }
 
 export function useAppealProposalEvaluation({ evaluationId }: { evaluationId: string }) {
-  return usePUT(`/api/proposals/evaluations/${evaluationId}/appeal`);
+  return usePUT<{ appealReason: string }>(`/api/proposals/evaluations/${evaluationId}/appeal`);
 }
 
 export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {

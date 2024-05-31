@@ -136,8 +136,8 @@ export async function createRewardFromIssue({
       assignedSubmitters.push(p.userId);
     } else if (p.permissionLevel === 'reviewer') {
       reviewers.push({
-        group: p.userId ? 'user' : 'role',
-        id: (p.userId ?? p.roleId) as string
+        userId: p.userId,
+        roleId: p.roleId
       });
     } else if (p.permissionLevel === 'submitter' && p.roleId) {
       allowedSubmitterRoles.push(p.roleId);
@@ -166,8 +166,7 @@ export async function createRewardFromIssue({
         ? reviewers
         : [
             {
-              group: 'user',
-              id: rewardsRepo.rewardAuthorId
+              userId: rewardsRepo.rewardAuthorId
             }
           ],
     githubIssueUrl: issueUrl,

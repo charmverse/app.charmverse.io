@@ -94,7 +94,6 @@ export async function concealProposalSteps<T extends MinimalProposal = MinimalPr
     const currentStep = proposal.evaluations[i];
 
     const isConcealableEvaluation = privateEvaluationSteps.includes(currentStep.type as ProposalEvaluationType);
-
     if (!isConcealableEvaluation) {
       stepsWithCollapsedEvaluations.push(currentStep);
     } else if (previousStep?.type !== 'private_evaluation') {

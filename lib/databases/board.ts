@@ -13,6 +13,7 @@ export const proposalPropertyTypesList = [
   'proposalStatus',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
+  'proposalRubricCriteriaTotal',
   'proposalEvaluationAverage',
   'proposalAuthor',
   'proposalReviewer',
@@ -68,6 +69,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   type: T;
   options: IPropertyOption[];
   description?: string;
+  tooltip?: string;
   formFieldId?: string;
   private?: boolean; // used for answers to form fields in proposal-as-a-source
   relationData?: RelationPropertyData;

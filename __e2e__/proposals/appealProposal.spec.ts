@@ -5,7 +5,7 @@ import { testUtilsProposals, testUtilsUser } from '@charmverse/core/test';
 import { generateUserAndSpace, loginBrowserUser } from '__e2e__/utils/mocks';
 import { expect, test } from '__e2e__/utils/test';
 
-test.describe('Appeal proposal1 evaluation step', async () => {
+test.describe('Appeal proposal evaluation step', async () => {
   let space: Space;
   let admin: User;
   let proposalAuthor: User;
@@ -109,6 +109,9 @@ test.describe('Appeal proposal1 evaluation step', async () => {
     const proposalEvaluations = await prisma.proposalEvaluation.findMany({
       where: {
         proposalId: proposal1.id
+      },
+      orderBy: {
+        index: 'asc'
       }
     });
 
@@ -123,6 +126,10 @@ test.describe('Appeal proposal1 evaluation step', async () => {
     await proposalPage.goToPage({ domain: space.domain, path: proposal1.page.path });
 
     await proposalPage.page.locator('data-test=evaluation-appeal-button').nth(0).click();
+
+    await proposalPage.page.locator('data-test=appeal-reason-input >> input').fill('I disagree with the evaluation');
+
+    await proposalPage.page.locator('data-test=appeal-reason-submit-button').click();
 
     await proposalPage.page.waitForResponse('**/appeal');
 
@@ -143,6 +150,9 @@ test.describe('Appeal proposal1 evaluation step', async () => {
     const proposalEvaluationsAfterAppeal = await prisma.proposalEvaluation.findMany({
       where: {
         proposalId: proposal1.id
+      },
+      orderBy: {
+        index: 'asc'
       }
     });
 
@@ -191,6 +201,10 @@ test.describe('Appeal proposal1 evaluation step', async () => {
     await proposalPage.goToPage({ domain: space.domain, path: proposal2.page.path });
 
     await proposalPage.page.locator('data-test=evaluation-appeal-button').nth(0).click();
+
+    await proposalPage.page.locator('data-test=appeal-reason-input >> input').fill('I disagree with the evaluation');
+
+    await proposalPage.page.locator('data-test=appeal-reason-submit-button').click();
 
     await proposalPage.page.waitForResponse('**/appeal');
 
@@ -322,6 +336,10 @@ test.describe('Appeal proposal1 evaluation step', async () => {
     await proposalPage.goToPage({ domain: space.domain, path: proposal5.page.path });
 
     await proposalPage.page.locator('data-test=evaluation-appeal-button').nth(0).click();
+
+    await proposalPage.page.locator('data-test=appeal-reason-input >> input').fill('I disagree with the evaluation');
+
+    await proposalPage.page.locator('data-test=appeal-reason-submit-button').click();
 
     await proposalPage.page.waitForResponse('**/appeal');
 

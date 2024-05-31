@@ -177,7 +177,6 @@ describe('importSpaceSettings', () => {
               columnWrappedIds: [],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: ['__category', '__status', '__evaluationType', '__authors', '__reviewers']
@@ -241,7 +240,6 @@ describe('importSpaceSettings', () => {
               columnWrappedIds: ['__title'],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: [
@@ -459,7 +457,6 @@ describe('importSpaceSettings', () => {
             columnWrappedIds: [],
             visibleOptionIds: [],
             defaultTemplateId: '',
-            collapsedOptionIds: [],
             columnCalculations: {},
             kanbanCalculations: {},
             visiblePropertyIds: [
@@ -520,7 +517,6 @@ describe('importSpaceSettings', () => {
             columnWrappedIds: ['__title'],
             visibleOptionIds: [],
             defaultTemplateId: '',
-            collapsedOptionIds: [],
             columnCalculations: {},
             kanbanCalculations: {},
             visiblePropertyIds: [
