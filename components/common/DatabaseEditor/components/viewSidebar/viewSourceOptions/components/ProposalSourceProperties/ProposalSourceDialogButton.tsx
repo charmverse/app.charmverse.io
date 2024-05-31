@@ -10,13 +10,13 @@ import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/comp
 import type { Board } from 'lib/databases/board';
 import { createSelectedPropertiesStateFromBoardProperties } from 'lib/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
 
-import type { SelectedProperties } from './ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { ProposalSourcePropertiesDialog } from './ProposalSourcePropertiesDialog';
 
 export function ProposalSourceDialogButton({ board }: { board: Board }) {
   const { trigger: createProposalSource, isMutating: isLoadingProposalSource } = useSWRMutation(
     `/api/pages/${board.id}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProperties } }>) =>
+    (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProposalProperties } }>) =>
       charmClient.createProposalSource(arg)
   );
   const { boardCustomProperties } = useProposalsBoardAdapter();
@@ -43,7 +43,7 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
         }}
         loading={isLoadingProposalSource}
       >
-        Edit properties
+        Select Proposal Properties
       </Button>
       {proposalSourcePropertiesPopupState.isOpen && (
         <ProposalSourcePropertiesDialog

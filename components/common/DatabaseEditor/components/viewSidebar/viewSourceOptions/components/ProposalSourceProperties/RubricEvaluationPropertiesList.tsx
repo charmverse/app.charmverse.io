@@ -3,14 +3,14 @@ import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
-import type { SelectedProperties } from './ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function RubricEvaluationPropertiesList({
   selectedProperties,
   setSelectedProperties
 }: {
-  selectedProperties: SelectedProperties;
-  setSelectedProperties: (selectedProperties: SelectedProperties) => void;
+  selectedProperties: SelectedProposalProperties;
+  setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
 }) {
   const { proposalTemplates } = useProposalTemplates();
   const rubricEvaluationTitles = useMemo(() => {
@@ -162,7 +162,7 @@ export function RubricEvaluationPropertiesList({
 export function RubricEvaluationPropertiesReadonlyList({
   selectedProperties
 }: {
-  selectedProperties: SelectedProperties;
+  selectedProperties: SelectedProposalProperties;
 }) {
   if (selectedProperties.rubricEvaluations.length === 0) {
     return null;

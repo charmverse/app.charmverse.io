@@ -1,6 +1,6 @@
 import { v4 } from 'uuid';
 
-import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { UIBlockWithDetails } from 'lib/databases/block';
 import { createBlock } from 'lib/databases/block';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -92,7 +92,7 @@ export type GoogleFormSourceData = {
 
 export type BoardFields = {
   icon: string;
-  selectedProperties?: SelectedProperties;
+  selectedProperties?: SelectedProposalProperties;
   description: PageContent;
   showDescription?: boolean;
   isTemplate?: boolean;

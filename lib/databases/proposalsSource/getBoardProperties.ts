@@ -1,10 +1,10 @@
 import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
-import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
-import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
+import { defaultProposalPropertyTypes, proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
@@ -33,7 +33,7 @@ export function getBoardProperties({
   proposalCustomProperties = [],
   selectedProperties
 }: {
-  selectedProperties: SelectedProperties;
+  selectedProperties: SelectedProposalProperties;
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
@@ -85,7 +85,7 @@ export function getBoardProperties({
   const selectedProjectProperties = selectedProperties.project;
   const selectedProjectMemberProperties = selectedProperties.projectMember;
   const selectedCustomProperties = selectedProperties.customProperties;
-  const proposalCustomPropertiesId = proposalCustomProperties.map((p) => p.id);
+  const proposalCustomPropertyIds = proposalCustomProperties.map((p) => p.id);
 
   return boardProperties.filter((p) => {
     if (p.formFieldId && !selectedFormFields.includes(p.formFieldId)) {
@@ -93,13 +93,14 @@ export function getBoardProperties({
     }
 
     const matchedProjectFieldProperty = projectFieldProperties.find((field) => field.columnPropertyId === p.id);
-    const matchedProjectMemberFieldProperty = projectMemberFieldProperties.find(
-      (field) => field.columnPropertyId === p.id
-    );
 
     if (matchedProjectFieldProperty && !selectedProjectProperties.includes(matchedProjectFieldProperty.field)) {
       return false;
     }
+
+    const matchedProjectMemberFieldProperty = projectMemberFieldProperties.find(
+      (field) => field.columnPropertyId === p.id
+    );
 
     if (
       matchedProjectMemberFieldProperty &&
@@ -108,7 +109,13 @@ export function getBoardProperties({
       return false;
     }
 
-    if (proposalCustomPropertiesId.includes(p.id) && !selectedCustomProperties.includes(p.id)) {
+    if (proposalCustomPropertyIds.includes(p.id) && !selectedCustomProperties.includes(p.id)) {
+      return false;
+    }
+
+    const isDefaultProposalProperty = defaultProposalPropertyTypes.includes(p.type);
+
+    if (isDefaultProposalProperty && !selectedProperties.defaults.includes(p.type)) {
       return false;
     }
 
@@ -264,7 +271,7 @@ function applyProjectProfileProperties(
 function applyProposalEvaluationProperties(
   boardProperties: IPropertyTemplate[],
   rubricStepTitles: string[],
-  selectedProperties?: SelectedProperties
+  selectedProperties?: SelectedProposalProperties
 ) {
   for (const rubricStepTitle of rubricStepTitles) {
     const selectedRubricEvaluation = selectedProperties?.rubricEvaluations.find(

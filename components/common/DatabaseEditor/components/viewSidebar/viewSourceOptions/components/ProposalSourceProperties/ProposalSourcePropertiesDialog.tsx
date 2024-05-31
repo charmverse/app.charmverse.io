@@ -8,16 +8,18 @@ import { Button } from 'components/common/Button';
 import { SectionName } from 'components/common/PageLayout/components/Sidebar/components/SectionName';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSmallScreen } from 'hooks/useMediaScreens';
+import { defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 
 import { CustomPropertiesList, CustomPropertiesReadonlyList } from './CustomPropertiesList';
 import { FormFieldPropertiesList, FormFieldPropertiesReadonlyList } from './FormFieldPropertiesList';
 import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadonlyList } from './ProjectProfilePropertiesList';
+import { ProposalDefaultPropertiesList, ProposalDefaultPropertiesReadonlyList } from './ProposalDefaultPropertiesList';
 import {
   RubricEvaluationPropertiesList,
   RubricEvaluationPropertiesReadonlyList
 } from './RubricEvaluationPropertiesList';
 
-export type SelectedProperties = {
+export type SelectedProposalProperties = {
   projectMember: string[];
   project: string[];
   customProperties: string[];
@@ -28,6 +30,7 @@ export type SelectedProperties = {
     reviewers?: boolean;
     criteriaTotal?: boolean;
   }[];
+  defaults: string[];
   formFields: string[];
 };
 
@@ -44,6 +47,9 @@ type SelectedGroup =
     }
   | {
       group: 'customProperties';
+    }
+  | {
+      group: 'proposalDefaults';
     };
 
 export function ProposalSourcePropertiesDialog({
@@ -51,14 +57,15 @@ export function ProposalSourcePropertiesDialog({
   onApply,
   initialSelectedProperties
 }: {
-  initialSelectedProperties?: Partial<SelectedProperties>;
-  onApply: (selectedProperties: SelectedProperties) => Promise<void>;
+  initialSelectedProperties?: Partial<SelectedProposalProperties>;
+  onApply: (selectedProperties: SelectedProposalProperties) => Promise<void>;
   onClose: VoidFunction;
 }) {
   const [isApplying, setIsApplying] = useState(false);
-  const [selectedProperties, setSelectedProperties] = useState<SelectedProperties>({
+  const [selectedProperties, setSelectedProperties] = useState<SelectedProposalProperties>({
     projectMember: [],
     project: [],
+    defaults: [...defaultProposalPropertyTypes],
     formFields: [],
     rubricEvaluations: [],
     customProperties: [],
@@ -73,7 +80,8 @@ export function ProposalSourcePropertiesDialog({
     selectedProperties.projectMember.length === 0 &&
     selectedProperties.formFields.length === 0 &&
     selectedProperties.customProperties.length === 0 &&
-    selectedProperties.rubricEvaluations.length === 0;
+    selectedProperties.rubricEvaluations.length === 0 &&
+    selectedProperties.defaults.length === 0;
 
   const { proposalTemplates } = useProposalTemplates();
 
@@ -119,12 +127,23 @@ export function ProposalSourcePropertiesDialog({
           gap={1}
           sx={{
             width: '40%',
+            maxWidth: 300,
             pt: 3,
             backgroundColor: (theme) => theme.palette.sidebar.background
           }}
         >
           <SectionName>Groups</SectionName>
           <Stack>
+            <MenuItem
+              dense
+              onClick={() => {
+                setSelectedGroup({
+                  group: 'proposalDefaults'
+                });
+              }}
+            >
+              <ListItemText>Proposal defaults</ListItemText>
+            </MenuItem>
             <MenuItem
               dense
               onClick={() => {
@@ -221,6 +240,15 @@ export function ProposalSourcePropertiesDialog({
               />
             </>
           )}
+          {selectedGroup.group === 'proposalDefaults' && (
+            <>
+              <Typography variant='h6'>Proposal defaults</Typography>
+              <ProposalDefaultPropertiesList
+                selectedProperties={selectedProperties}
+                setSelectedProperties={setSelectedProperties}
+              />
+            </>
+          )}
         </Stack>
         <Stack
           sx={{
@@ -242,6 +270,7 @@ export function ProposalSourcePropertiesDialog({
               <RubricEvaluationPropertiesReadonlyList selectedProperties={selectedProperties} />
               <FormFieldPropertiesReadonlyList selectedProperties={selectedProperties} />
               <CustomPropertiesReadonlyList selectedProperties={selectedProperties} />
+              <ProposalDefaultPropertiesReadonlyList selectedProperties={selectedProperties} />
               {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
             </Stack>
           </Stack>
@@ -258,6 +287,8 @@ export function ProposalSourcePropertiesDialog({
               });
             }}
             loading={isApplying}
+            disabled={noPropertiesSelected}
+            disabledTooltip='Please select at least one property'
           >
             Apply
           </Button>

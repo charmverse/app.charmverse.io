@@ -1,8 +1,9 @@
-import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import { isTruthy } from 'lib/utils/types';
 
 import type { Board } from '../board';
+import { defaultProposalPropertyTypes } from '../proposalDbProperties';
 
 export function createSelectedPropertiesStateFromBoardProperties({
   cardProperties,
@@ -19,8 +20,9 @@ export function createSelectedPropertiesStateFromBoardProperties({
     .filter((property) => propertyIds.includes(property.columnPropertyId))
     .map((property) => property.field);
   const formFieldIds = cardProperties.map((field) => field.formFieldId).filter(isTruthy);
-  const rubricEvaluationsPropertiesRecord: Record<string, SelectedProperties['rubricEvaluations'][number]> = {};
+  const rubricEvaluationsPropertiesRecord: Record<string, SelectedProposalProperties['rubricEvaluations'][number]> = {};
   const customPropertyIds = proposalCustomProperties.map((field) => field.id);
+  const defaultProposalProperties: string[] = [];
   const customProperties: string[] = [];
   cardProperties.forEach((field) => {
     if (
@@ -47,14 +49,17 @@ export function createSelectedPropertiesStateFromBoardProperties({
       }
     } else if (customPropertyIds.includes(field.id)) {
       customProperties.push(field.id);
+    } else if (defaultProposalPropertyTypes.includes(field.type)) {
+      defaultProposalProperties.push(field.type);
     }
   });
 
   return {
+    defaults: defaultProposalProperties,
     customProperties,
     project: projectProperties,
     projectMember: projectMemberProperties,
     formFields: formFieldIds,
     rubricEvaluations: Object.values(rubricEvaluationsPropertiesRecord)
-  } as SelectedProperties;
+  } as SelectedProposalProperties;
 }

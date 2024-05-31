@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
-import type { SelectedProperties } from './ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 const projectMemberFields = projectMemberFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);
 const projectFields = projectFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);
@@ -12,8 +12,8 @@ export function ProjectProfilePropertiesList({
   selectedProperties,
   setSelectedProperties
 }: {
-  setSelectedProperties: (selectedProperties: SelectedProperties) => void;
-  selectedProperties: SelectedProperties;
+  setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
+  selectedProperties: SelectedProposalProperties;
 }) {
   const isAllProjectMemberPropertiesSelected =
     selectedProperties.projectMember.length === projectMemberFieldProperties.length;
@@ -125,7 +125,7 @@ export function ProjectProfilePropertiesList({
 export function ProjectProfilePropertiesReadonlyList({
   selectedProperties
 }: {
-  selectedProperties: SelectedProperties;
+  selectedProperties: SelectedProposalProperties;
 }) {
   const { selectedProjectFields, selectedProjectMemberFields } = useMemo(() => {
     return {

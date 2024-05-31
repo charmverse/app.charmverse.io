@@ -12,7 +12,7 @@ import type {
 import type { FiatCurrency, IPairQuote } from 'connectors/chains';
 
 import * as http from 'adapters/http';
-import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { blockToFBBlock, fbBlockToBlock, fixBlocks } from 'components/common/DatabaseEditor/utils/blockUtils';
 import type { ExtendedPoap } from 'lib/blockchain/interfaces';
 import type { BlockWithDetails, BlockPatch, UIBlockWithDetails as FBBlock } from 'lib/databases/block';
@@ -324,7 +324,13 @@ class CharmClient {
     return http.POST(`/api/pages/${pageId}/restrict-permissions`, {});
   }
 
-  createProposalSource({ selectedProperties, pageId }: { selectedProperties: SelectedProperties; pageId: string }) {
+  createProposalSource({
+    selectedProperties,
+    pageId
+  }: {
+    selectedProperties: SelectedProposalProperties;
+    pageId: string;
+  }) {
     return http.POST<void>(`/api/pages/${pageId}/proposal-source`, { selectedProperties });
   }
 

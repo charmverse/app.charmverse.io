@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
-import type { SelectedProperties } from './ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function FormFieldPropertiesList({
   selectedProperties,
@@ -11,8 +11,8 @@ export function FormFieldPropertiesList({
   templatePageId
 }: {
   templatePageId: string;
-  selectedProperties: SelectedProperties;
-  setSelectedProperties: (selectedProperties: SelectedProperties) => void;
+  selectedProperties: SelectedProposalProperties;
+  setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
 }) {
   const { proposalTemplates } = useProposalTemplates();
   const formFields = useMemo(() => {
@@ -81,7 +81,11 @@ export function FormFieldPropertiesList({
   );
 }
 
-export function FormFieldPropertiesReadonlyList({ selectedProperties }: { selectedProperties: SelectedProperties }) {
+export function FormFieldPropertiesReadonlyList({
+  selectedProperties
+}: {
+  selectedProperties: SelectedProposalProperties;
+}) {
   const { proposalTemplates } = useProposalTemplates();
   const proposalTemplateFormFields = useMemo(() => {
     return (

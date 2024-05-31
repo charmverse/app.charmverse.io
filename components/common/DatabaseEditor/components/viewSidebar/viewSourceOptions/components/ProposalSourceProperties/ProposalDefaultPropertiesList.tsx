@@ -1,24 +1,17 @@
 import { Checkbox, Stack, Typography } from '@mui/material';
 
-import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import { defaultProposalProperties, defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
-export function CustomPropertiesList({
+export function ProposalDefaultPropertiesList({
   selectedProperties,
   setSelectedProperties
 }: {
   selectedProperties: SelectedProposalProperties;
   setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
 }) {
-  const { boardCustomProperties } = useProposalsBoardAdapter();
-  const isAllChecked =
-    boardCustomProperties.fields.cardProperties.length === selectedProperties.customProperties.length;
-
-  if (boardCustomProperties.fields.cardProperties.length === 0) {
-    return <Typography>No custom properties available</Typography>;
-  }
-
+  const isAllChecked = defaultProposalPropertyTypes.length === selectedProperties.defaults.length;
   return (
     <Stack>
       <Stack direction='row' alignItems='center'>
@@ -28,12 +21,12 @@ export function CustomPropertiesList({
             if (isAllChecked) {
               setSelectedProperties({
                 ...selectedProperties,
-                customProperties: []
+                defaults: []
               });
             } else {
               setSelectedProperties({
                 ...selectedProperties,
-                customProperties: boardCustomProperties.fields.cardProperties.map((p) => p.id)
+                defaults: [...defaultProposalPropertyTypes]
               });
             }
           }}
@@ -42,8 +35,8 @@ export function CustomPropertiesList({
         <Typography fontWeight='bold'>Select All</Typography>
       </Stack>
       <Stack>
-        {boardCustomProperties.fields.cardProperties.map((property) => {
-          const isSelected = selectedProperties.customProperties.includes(property.id);
+        {defaultProposalProperties.map((property) => {
+          const isSelected = selectedProperties.defaults.includes(property.type);
           return (
             <Stack key={property.id} direction='row' alignItems='center'>
               <Checkbox
@@ -53,12 +46,12 @@ export function CustomPropertiesList({
                   if (isSelected) {
                     setSelectedProperties({
                       ...selectedProperties,
-                      customProperties: selectedProperties.customProperties.filter((p) => p !== property.id)
+                      defaults: selectedProperties.defaults.filter((p) => p !== property.type)
                     });
                   } else {
                     setSelectedProperties({
                       ...selectedProperties,
-                      customProperties: [...selectedProperties.customProperties, property.id]
+                      defaults: [...selectedProperties.defaults, property.type]
                     });
                   }
                 }}
@@ -72,28 +65,26 @@ export function CustomPropertiesList({
   );
 }
 
-export function CustomPropertiesReadonlyList({
+export function ProposalDefaultPropertiesReadonlyList({
   selectedProperties
 }: {
   selectedProperties: SelectedProposalProperties;
 }) {
-  const { boardCustomProperties } = useProposalsBoardAdapter();
-
-  if (selectedProperties.customProperties.length === 0) {
+  if (selectedProperties.defaults.length === 0) {
     return null;
   }
 
-  const selectedCustomProperties = boardCustomProperties.fields.cardProperties.filter((property) =>
-    selectedProperties.customProperties.includes(property.id)
+  const selectedDefaultProperties = defaultProposalProperties.filter((property) =>
+    selectedProperties.defaults.includes(property.type)
   );
 
   return (
     <Stack>
       <Typography fontWeight='bold' variant='subtitle1'>
-        Custom Properties
+        Default Properties
       </Typography>
       <Stack gap={0.5} mt={0.5}>
-        {selectedCustomProperties.map((property) => {
+        {selectedDefaultProperties.map((property) => {
           return (
             <Typography variant='subtitle2' key={property.id}>
               {property.name}

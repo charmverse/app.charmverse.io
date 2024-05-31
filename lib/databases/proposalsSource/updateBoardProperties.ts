@@ -1,7 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import type { SelectedProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
@@ -13,7 +13,7 @@ export async function updateBoardProperties({
   boardId,
   selectedProperties
 }: {
-  selectedProperties: SelectedProperties;
+  selectedProperties: SelectedProposalProperties;
   boardId: string;
 }): Promise<Block> {
   const boardBlock = await prisma.block.findUniqueOrThrow({

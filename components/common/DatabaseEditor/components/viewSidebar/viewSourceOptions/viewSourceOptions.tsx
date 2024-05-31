@@ -27,7 +27,7 @@ import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
 import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
 import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
-import type { SelectedProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import type { SelectedProposalProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { ProposalSourcePropertiesDialog } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';
@@ -115,7 +115,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
   const { trigger: createProposalSource, isMutating: isLoadingProposalSource } = useSWRMutation(
     `/api/pages/${rootDatabaseId}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProperties } }>) =>
+    (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProposalProperties } }>) =>
       charmClient.createProposalSource(arg)
   );
 
@@ -139,7 +139,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     }
   }
 
-  async function handleProposalSource(selectedProperties: SelectedProperties) {
+  async function handleProposalSource(selectedProperties: SelectedProposalProperties) {
     if (rootDatabaseId) {
       await onCreateDatabase?.({ sourceType: 'proposals' });
       await createProposalSource({ pageId: rootDatabaseId, selectedProperties });

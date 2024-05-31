@@ -71,7 +71,7 @@ export async function getBlocksAndRefresh(board: BlockWithDetails, blocks: Block
   const updatedBoard = await updateBoardProperties({
     boardId: board.id,
     selectedProperties: createSelectedPropertiesStateFromBoardProperties({
-      cardProperties: board.fields.cardProperties,
+      cardProperties: board.fields.cardProperties ?? [],
       proposalCustomProperties
     })
   });
