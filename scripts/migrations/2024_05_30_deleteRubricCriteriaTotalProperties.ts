@@ -10,6 +10,7 @@ export async function deleteRubricCriteriaTotalProperties() {
       }
     },
     select: {
+      spaceId: true,
       id: true,
       fields: true
     }
@@ -24,6 +25,37 @@ export async function deleteRubricCriteriaTotalProperties() {
       const cardProperties = fields.cardProperties ?? [];
       const rubricCriteriaTotalProperties = cardProperties.filter((cardProperty) => cardProperty.type === 'proposalRubricCriteriaTotal');
       if (rubricCriteriaTotalProperties.length) {
+        const criteriaTitles = rubricCriteriaTotalProperties.map((cardProperty) => cardProperty.name);
+        const rubricCriterias = await prisma.proposalRubricCriteria.findMany({
+          where: {
+            title: {
+              in: criteriaTitles
+            },
+            proposal: {
+              spaceId: proposalSourceBoard.spaceId
+            }
+          },
+          select: {
+            title: true,
+            evaluation: {
+              select: {
+                title: true
+              }
+            }
+          }
+        })
+
+        const rubricCriteriaEvaluationTitleRecord: Record<string, string> = {};
+        rubricCriterias.forEach((rubricCriteria) => {
+          rubricCriteriaEvaluationTitleRecord[rubricCriteria.title] = rubricCriteria.evaluation.title;
+        });
+
+        cardProperties.forEach((cardProperty) => {
+          if (cardProperty.type === "proposalRubricCriteriaTotal") {
+            cardProperty.evaluationTitle = rubricCriteriaEvaluationTitleRecord[cardProperty.name];
+          }
+        })
+
         await prisma.block.update({
           where: {
             id: proposalSourceBoard.id
@@ -31,7 +63,7 @@ export async function deleteRubricCriteriaTotalProperties() {
           data: {
             fields: {
               ...fields,
-              cardProperties: cardProperties.filter((cardProperty) => cardProperty.type !== 'proposalRubricCriteriaTotal')
+              cardProperties
             } as unknown as Prisma.JsonObject
           }
         });
