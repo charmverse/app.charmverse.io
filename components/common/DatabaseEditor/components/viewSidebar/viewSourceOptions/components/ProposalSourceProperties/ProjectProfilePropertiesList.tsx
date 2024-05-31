@@ -33,6 +33,7 @@ export function ProjectProfilePropertiesList({
                 ? {
                     projectMember: [],
                     project: [],
+                    defaults: [],
                     formFields: [],
                     rubricEvaluations: [],
                     customProperties: []
@@ -48,30 +49,32 @@ export function ProjectProfilePropertiesList({
         <Typography fontWeight='bold'>Project Profile</Typography>
       </Stack>
       <Stack ml={2}>
-        {projectFieldProperties.map((propertyFieldProperty) => (
-          <Stack
-            onClick={() => {
-              const isChecked = selectedProperties.project.includes(propertyFieldProperty.field);
-              setSelectedProperties({
-                ...selectedProperties,
-                project: isChecked
-                  ? selectedProperties.project.filter(
-                      (selectedProperty) => selectedProperty !== propertyFieldProperty.field
-                    )
-                  : [...selectedProperties.project, propertyFieldProperty.field]
-              });
-            }}
-            alignItems='center'
-            direction='row'
-            sx={{
-              cursor: 'pointer'
-            }}
-            key={propertyFieldProperty.field}
-          >
-            <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
-            <Typography>{propertyFieldProperty.columnTitle}</Typography>
-          </Stack>
-        ))}
+        {[...projectFieldProperties, ...projectFieldProperties, ...projectFieldProperties].map(
+          (propertyFieldProperty) => (
+            <Stack
+              onClick={() => {
+                const isChecked = selectedProperties.project.includes(propertyFieldProperty.field);
+                setSelectedProperties({
+                  ...selectedProperties,
+                  project: isChecked
+                    ? selectedProperties.project.filter(
+                        (selectedProperty) => selectedProperty !== propertyFieldProperty.field
+                      )
+                    : [...selectedProperties.project, propertyFieldProperty.field]
+                });
+              }}
+              alignItems='center'
+              direction='row'
+              sx={{
+                cursor: 'pointer'
+              }}
+              key={propertyFieldProperty.field}
+            >
+              <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
+              <Typography>{propertyFieldProperty.columnTitle}</Typography>
+            </Stack>
+          )
+        )}
         <Stack
           direction='row'
           alignItems='center'
