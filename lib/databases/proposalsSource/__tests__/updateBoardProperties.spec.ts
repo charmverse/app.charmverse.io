@@ -143,7 +143,7 @@ describe('updateBoardProperties()', () => {
 
     const rootId = uuid();
 
-    const proposal = await testUtilsProposals.generateProposal({
+    await testUtilsProposals.generateProposal({
       spaceId: spaceWithRubrics.id,
       userId: spaceUser.id,
       evaluationInputs: [
@@ -184,7 +184,34 @@ describe('updateBoardProperties()', () => {
       ]
     });
 
-    const databaseBlock = await prisma.block.create({
+    const proposal2 = await testUtilsProposals.generateProposal({
+      spaceId: spaceWithRubrics.id,
+      userId: spaceUser.id,
+      evaluationInputs: [
+        {
+          evaluationType: 'rubric',
+          permissions: [],
+          reviewers: [],
+          title: 'Rubric 2',
+          rubricCriteria: [
+            {
+              title: 'Criteria 3'
+            }
+          ]
+        }
+      ]
+    });
+
+    await prisma.page.updateMany({
+      where: {
+        proposalId: proposal2.id
+      },
+      data: {
+        deletedAt: new Date()
+      }
+    });
+
+    await prisma.block.create({
       data: {
         parentId: rootId,
         rootId,

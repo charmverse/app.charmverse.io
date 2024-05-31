@@ -319,7 +319,20 @@ function TableHeader(props: Props): JSX.Element {
             }
           })}
         </div>
-        <Tooltip disableInteractive title={name}>
+        <Tooltip
+          disableInteractive
+          title={
+            template.tooltip ? (
+              <div>
+                {name}
+                <br />
+                {template.tooltip}
+              </div>
+            ) : (
+              name
+            )
+          }
+        >
           <Typography
             component='span'
             variant='subtitle1'

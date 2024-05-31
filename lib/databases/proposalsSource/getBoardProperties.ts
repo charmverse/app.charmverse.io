@@ -21,6 +21,7 @@ type EvaluationStep = {
   type: ProposalEvaluationType;
   rubricCriteria: {
     title: string;
+    description?: string | null;
   }[];
 };
 
@@ -55,6 +56,10 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
+  applyToPropertiesByType(boardProperties, {
+    ...proposalDbProperties.proposalReviewer(),
+    name: 'Proposal Reviewers'
+  });
   applyToPropertiesByType(
     boardProperties,
     proposalDbProperties.proposalStep({
@@ -120,35 +125,46 @@ export function getBoardProperties({
 
     return true;
   });
-
-  return boardProperties;
 }
 
 function applyRubricEvaluationQuestionProperties(
   boardProperties: IPropertyTemplate[],
   evaluationSteps: EvaluationStep[]
 ) {
-  const rubricCriteriaEvaluationTitlesRecord: Record<string, string> = {};
+  const rubricCriteriaEvaluationTitlesRecord: Record<
+    string,
+    {
+      evaluationTitle: string;
+      rubricCriteriaDescription: string;
+    }
+  > = {};
   evaluationSteps.forEach((evaluationStep) => {
     if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
-        rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title] = evaluationStep.title;
+        if (!rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title]) {
+          rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title] = {
+            evaluationTitle: evaluationStep.title,
+            rubricCriteriaDescription: rubricCriteria.description || ''
+          };
+        }
       });
     }
   });
 
-  Object.entries(rubricCriteriaEvaluationTitlesRecord).forEach(([rubricCriteriaTitle, evaluationTitle]) => {
-    applyToPropertiesByTypeAndName(boardProperties, {
-      id: uuid(),
-      type: 'proposalRubricCriteriaTotal',
-      name: rubricCriteriaTitle,
-      description: `Total score for ${rubricCriteriaTitle}`,
-      readOnly: true,
-      readOnlyValues: true,
-      evaluationTitle,
-      private: false
-    });
-  });
+  Object.entries(rubricCriteriaEvaluationTitlesRecord).forEach(
+    ([rubricCriteriaTitle, { evaluationTitle, rubricCriteriaDescription }]) => {
+      applyToPropertiesByTypeAndName(boardProperties, {
+        id: uuid(),
+        type: 'proposalRubricCriteriaTotal',
+        name: rubricCriteriaTitle,
+        tooltip: rubricCriteriaDescription,
+        readOnly: true,
+        readOnlyValues: true,
+        evaluationTitle,
+        private: false
+      });
+    }
+  );
 }
 
 function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {

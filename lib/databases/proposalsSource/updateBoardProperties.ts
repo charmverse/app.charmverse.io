@@ -19,6 +19,11 @@ export async function updateBoardProperties({
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
+    },
+    select: {
+      spaceId: true,
+      fields: true,
+      id: true
     }
   });
 
@@ -37,7 +42,10 @@ export async function updateBoardProperties({
     prisma.proposalEvaluation.findMany({
       where: {
         proposal: {
-          spaceId: boardBlock.spaceId
+          spaceId: boardBlock.spaceId,
+          page: {
+            deletedAt: null
+          }
         }
       },
       select: {
@@ -46,11 +54,7 @@ export async function updateBoardProperties({
         rubricCriteria: {
           select: {
             title: true,
-            answers: {
-              select: {
-                response: true
-              }
-            }
+            description: true
           }
         }
       },
@@ -63,7 +67,8 @@ export async function updateBoardProperties({
         proposal: {
           some: {
             page: {
-              type: 'proposal'
+              type: 'proposal',
+              deletedAt: null
             },
             spaceId: boardBlock.spaceId
           }

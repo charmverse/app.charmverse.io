@@ -37,6 +37,7 @@ import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
 import type { ApplicationMeta, RewardReviewer, RewardWithUsers } from 'lib/rewards/interfaces';
+import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 
 export type BoardReward = { id?: string; fields: RewardFields };
@@ -95,8 +96,10 @@ export function useRewardsBoardAdapter() {
           ...mapRewardToCard({
             reward,
             spaceId: space.id,
+            spaceDomain: space.domain,
             rewardPage: page,
-            members: membersRecord
+            members: membersRecord,
+            isSubmissionSource: activeView.fields.sourceType === 'reward_applications'
           }),
           reward: {
             id: reward.id,
@@ -173,12 +176,16 @@ export function mapRewardToCard({
   reward,
   rewardPage,
   spaceId,
-  members
+  spaceDomain,
+  members,
+  isSubmissionSource
 }: {
   reward: RewardProps;
   rewardPage?: Pick<PageMeta, 'id' | 'createdAt' | 'createdBy' | 'title' | 'path' | 'updatedBy' | 'updatedAt'>;
   spaceId: string;
+  spaceDomain: string;
   members?: Record<string, Member>;
+  isSubmissionSource?: boolean;
 }): CardWithRelations {
   const rewardFields = (reward.fields || { properties: {} }) as RewardFields;
   const validApplications =
@@ -189,7 +196,9 @@ export function mapRewardToCard({
       : [];
 
   const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
-  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
+    : '';
   const assignedSubmitters =
     reward && 'assignedSubmitters' in reward && reward.assignedSubmitters ? reward.assignedSubmitters : null;
   const isAssignedReward = !!assignedSubmitters && assignedSubmitters.length > 0;
@@ -247,9 +256,12 @@ export function mapRewardToCard({
             .map((application) =>
               mapApplicationToCard({
                 application,
+                pageTitle: rewardPage.title,
                 reward,
                 spaceId,
-                members
+                spaceDomain,
+                members,
+                isSubmissionSource
               })
             )
         : undefined
@@ -261,14 +273,20 @@ export function mapRewardToCard({
 // build mock card from reward and page data
 function mapApplicationToCard({
   application,
+  pageTitle,
   reward,
   spaceId,
-  members
+  spaceDomain,
+  members,
+  isSubmissionSource
 }: {
   application: ApplicationMeta;
+  pageTitle?: string;
   reward: RewardProps;
   members?: Record<string, Member>;
   spaceId: string;
+  spaceDomain: string;
+  isSubmissionSource?: boolean;
 }) {
   const applicationFields = { properties: {} };
   const assignedSubmitters =
@@ -281,7 +299,9 @@ function mapApplicationToCard({
         : reward.applications
       : [];
   const sourceProposalPage = (reward as RewardWithUsers).sourceProposalPage;
-  const proposalLinkValue = sourceProposalPage ? [sourceProposalPage.title, `/${sourceProposalPage.id}`] : '';
+  const proposalLinkValue = sourceProposalPage
+    ? [getAbsolutePath(`/${sourceProposalPage.id}`, spaceDomain), sourceProposalPage.title]
+    : '';
 
   applicationFields.properties = {
     ...applicationFields.properties,
@@ -320,7 +340,9 @@ function mapApplicationToCard({
     id: application.id || '',
     spaceId,
     parentId: reward.id,
-    title: `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
+    title: isSubmissionSource
+      ? pageTitle || 'Untitled'
+      : `${isApplication ? 'Application' : 'Submission'} ${authorName ? `from ${authorName}` : ''}`,
     rootId: spaceId,
     type: 'card' as const,
     customIconType: 'applicationStatus',
