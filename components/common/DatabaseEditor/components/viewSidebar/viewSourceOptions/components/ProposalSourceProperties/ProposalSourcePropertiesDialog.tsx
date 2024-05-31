@@ -192,7 +192,13 @@ export function ProposalSourcePropertiesDialog({
                   <ListItemIcon>
                     {template.isStructuredProposal ? <WidgetsOutlinedIcon /> : <DescriptionOutlinedIcon />}
                   </ListItemIcon>
-                  <ListItemText>{template.title || 'Untitled'}</ListItemText>
+                  <ListItemText
+                    sx={{
+                      'white-space': 'break-spaces'
+                    }}
+                  >
+                    {template.title || 'Untitled'}
+                  </ListItemText>
                 </MenuItem>
               ))
             ) : (

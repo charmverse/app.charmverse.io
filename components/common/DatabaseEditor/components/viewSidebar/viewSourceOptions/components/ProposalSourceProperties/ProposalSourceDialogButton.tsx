@@ -39,11 +39,13 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
         color='secondary'
         onClick={proposalSourcePropertiesPopupState.open}
         sx={{
-          m: 2
+          m: 2,
+          mt: 1
         }}
+        size='small'
         loading={isLoadingProposalSource}
       >
-        Select Proposal Properties
+        Select proposal properties
       </Button>
       {proposalSourcePropertiesPopupState.isOpen && (
         <ProposalSourcePropertiesDialog
