@@ -57,7 +57,7 @@ type ViewSourceOptionsProps = {
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const { view: activeView, views, rootBoard, title, closeSourceOptions, closeSidebar, showView, isReward } = props;
-  const proposalSourcePropertiesSelectPopupState = usePopupState({
+  const proposalSourcePropertiesPopupState = usePopupState({
     variant: 'dialog'
   });
 
@@ -183,7 +183,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SourceType
                 data-test='source-proposals'
                 active={activeSourceType === 'proposals'}
-                onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesSelectPopupState.open}
+                onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesPopupState.open}
               >
                 <TaskOutlinedIcon fontSize='small' />
                 Charmverse Proposals
@@ -286,9 +286,9 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           typeformPopup.close();
         }}
       />
-      {proposalSourcePropertiesSelectPopupState.isOpen && (
+      {proposalSourcePropertiesPopupState.isOpen && (
         <ProposalSourcePropertiesDialog
-          onClose={proposalSourcePropertiesSelectPopupState.close}
+          onClose={proposalSourcePropertiesPopupState.close}
           onApply={(selectedProperties) => {
             if (!isCreatingProposals.current) {
               isCreatingProposals.current = true;

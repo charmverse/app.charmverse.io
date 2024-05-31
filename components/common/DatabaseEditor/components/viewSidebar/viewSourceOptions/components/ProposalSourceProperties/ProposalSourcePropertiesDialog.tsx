@@ -44,8 +44,10 @@ type SelectedGroup =
 
 export function ProposalSourcePropertiesDialog({
   onClose,
-  onApply
+  onApply,
+  initialSelectedProperties
 }: {
+  initialSelectedProperties?: Partial<SelectedProperties>;
   onApply: (selectedProperties: SelectedProperties) => void;
   onClose: VoidFunction;
 }) {
@@ -54,7 +56,8 @@ export function ProposalSourcePropertiesDialog({
     project: [],
     formFields: [],
     rubricEvaluations: [],
-    customProperties: []
+    customProperties: [],
+    ...initialSelectedProperties
   });
   const [selectedGroup, setSelectedGroup] = useState<SelectedGroup>({
     group: 'projectProfile'

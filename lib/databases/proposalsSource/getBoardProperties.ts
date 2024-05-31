@@ -84,7 +84,7 @@ function applyRubricEvaluationQuestionProperties(
   evaluationSteps: EvaluationStep[],
   selectedProperties?: SelectedProperties
 ) {
-  const rubricCriteriaTitles: Set<string> = new Set();
+  const rubricCriteriaEvaluationTitlesRecord: Record<string, string> = {};
   evaluationSteps.forEach((evaluationStep) => {
     if (
       evaluationStep.type === 'rubric' &&
@@ -92,12 +92,12 @@ function applyRubricEvaluationQuestionProperties(
         ?.criteriaTotal
     ) {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
-        rubricCriteriaTitles.add(rubricCriteria.title);
+        rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title] = evaluationStep.title;
       });
     }
   });
 
-  rubricCriteriaTitles.forEach((rubricCriteriaTitle) => {
+  Object.entries(rubricCriteriaEvaluationTitlesRecord).forEach(([rubricCriteriaTitle, evaluationTitle]) => {
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalRubricCriteriaTotal',
@@ -105,6 +105,7 @@ function applyRubricEvaluationQuestionProperties(
       description: `Total score for ${rubricCriteriaTitle}`,
       readOnly: true,
       readOnlyValues: true,
+      evaluationTitle,
       private: false
     });
   });

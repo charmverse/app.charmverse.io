@@ -76,6 +76,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   readOnly?: boolean; // whether this property cannot be deleted or renamed by users
   readOnlyValues?: boolean; // whether the values of this property are synced and uneditable
   dynamicOptions?: boolean; // do not rely on a static list of options
+  evaluationTitle?: string; // store the title of the evaluation to group rubric criteria score properties together
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals' | 'reward_applications' | 'rewards';
