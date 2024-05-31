@@ -122,7 +122,7 @@ export function ProposalSourcePropertiesDialog({
       open
       onClose={onClose}
     >
-      <Stack gap={1} direction='row'>
+      <Stack direction='row'>
         <Stack
           gap={1}
           sx={{

@@ -48,7 +48,7 @@ export function getBoardProperties({
     }
   });
 
-  const boardProperties = [...currentCardProperties];
+  let boardProperties = [...currentCardProperties];
 
   // standard proposal properties
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalReviewerNotes());
@@ -87,7 +87,7 @@ export function getBoardProperties({
   const selectedCustomProperties = selectedProperties.customProperties;
   const proposalCustomPropertyIds = proposalCustomProperties.map((p) => p.id);
 
-  return boardProperties.filter((p) => {
+  boardProperties = boardProperties.filter((p) => {
     if (p.formFieldId && !selectedFormFields.includes(p.formFieldId)) {
       return false;
     }
@@ -119,25 +119,34 @@ export function getBoardProperties({
       return false;
     }
 
-    const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
-    if (rubricEvaluation && !rubricEvaluation.average && p.type === 'proposalEvaluationAverage') {
-      return false;
-    }
+    if (
+      p.type === 'proposalEvaluationAverage' ||
+      p.type === 'proposalEvaluationTotal' ||
+      p.type === 'proposalEvaluatedBy'
+    ) {
+      const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.name);
+      if ((!rubricEvaluation || !rubricEvaluation.average) && p.type === 'proposalEvaluationAverage') {
+        return false;
+      }
 
-    if (rubricEvaluation && !rubricEvaluation.total && p.type === 'proposalEvaluationTotal') {
-      return false;
-    }
+      if ((!rubricEvaluation || !rubricEvaluation.total) && p.type === 'proposalEvaluationTotal') {
+        return false;
+      }
 
-    if (rubricEvaluation && !rubricEvaluation.reviewers && p.type === 'proposalEvaluatedBy') {
-      return false;
-    }
-
-    if ((!rubricEvaluation || !rubricEvaluation.criteriaTotal) && p.type === 'proposalRubricCriteriaTotal') {
-      return false;
+      if ((!rubricEvaluation || !rubricEvaluation.reviewers) && p.type === 'proposalEvaluatedBy') {
+        return false;
+      }
+    } else if (p.type === 'proposalRubricCriteriaTotal') {
+      const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
+      if (!rubricEvaluation || !rubricEvaluation.criteriaTotal) {
+        return false;
+      }
     }
 
     return true;
   });
+
+  return boardProperties;
 }
 
 function applyRubricEvaluationQuestionProperties(
@@ -268,41 +277,25 @@ function applyProjectProfileProperties(
   });
 }
 
-function applyProposalEvaluationProperties(
-  boardProperties: IPropertyTemplate[],
-  rubricStepTitles: string[],
-  selectedProperties?: SelectedProposalProperties
-) {
+function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[], rubricStepTitles: string[]) {
   for (const rubricStepTitle of rubricStepTitles) {
-    const selectedRubricEvaluation = selectedProperties?.rubricEvaluations.find(
-      (rubricEvaluation) => rubricEvaluation.title === rubricStepTitle
-    );
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluatedBy',
+      name: rubricStepTitle
+    });
 
-    if (selectedRubricEvaluation) {
-      if (selectedRubricEvaluation.reviewers) {
-        applyToPropertiesByTypeAndName(boardProperties, {
-          id: uuid(),
-          type: 'proposalEvaluatedBy',
-          name: rubricStepTitle
-        });
-      }
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationTotal',
+      name: rubricStepTitle
+    });
 
-      if (selectedRubricEvaluation.total) {
-        applyToPropertiesByTypeAndName(boardProperties, {
-          id: uuid(),
-          type: 'proposalEvaluationTotal',
-          name: rubricStepTitle
-        });
-      }
-
-      if (selectedRubricEvaluation.average) {
-        applyToPropertiesByTypeAndName(boardProperties, {
-          id: uuid(),
-          type: 'proposalEvaluationAverage',
-          name: rubricStepTitle
-        });
-      }
-    }
+    applyToPropertiesByTypeAndName(boardProperties, {
+      id: uuid(),
+      type: 'proposalEvaluationAverage',
+      name: rubricStepTitle
+    });
   }
 }
 
