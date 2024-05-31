@@ -1,18 +1,18 @@
 'use client';
 
-// import { GET } from '@charmverse/core/http';
 import Image from 'next/image';
+import { useState } from 'react';
+
+import { GET } from 'adapters/http';
 
 import styles from './page.module.css';
 
 export default function Home() {
-  // const [number, setNumber] = useState<number | null>(null);
+  const [number, setNumber] = useState<number | null>(null);
 
   async function showRandomNumber() {
-    console.log('Clicked');
-    // const response = await GET<{ number: number }>('/api/random-number');
-    // console.log(response);
-    // setNumber(response.number);
+    const response = await GET<{ number: number }>('/api/random-number');
+    setNumber(response.number);
   }
 
   return (
@@ -21,8 +21,8 @@ export default function Home() {
       <div className={styles.center}>
         <div className='button' onClick={() => showRandomNumber()}>
           Show Random Number
+          {number !== null && <p>Random Number: {number}</p>}
         </div>
-        {/* {number !== null && <p>Random Number: {number}</p>} */}
       </div>
     </div>
   );
