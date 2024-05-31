@@ -34,7 +34,6 @@ class CardFilter {
     if (filterGroup.filters.length < 1) {
       return true; // No filters = always met
     }
-
     if (filterGroup.operation === 'or') {
       for (const filter of filters) {
         if (isAFilterGroupInstance(filter)) {
@@ -92,15 +91,15 @@ class CardFilter {
     }
     const filterValue = filter.values[0]?.toString()?.toLowerCase() ?? '';
     const valueArray = (Array.isArray(value) ? value : value ? [value] : []).map(
-      (v: string | number | { id?: string; userId?: string }) => {
-        // In some cases we get an object with userId as value
-        if (typeof v === 'object' && 'userId' in v) {
-          return v.userId as string;
+      (v: string | number | { id?: string; userId?: string; roleId?: string }) => {
+        if (typeof v === 'object' && v.roleId) {
+          return v.roleId;
         }
-
-        // In some cases we get an object with an id as value
-        if (typeof v === 'object' && 'id' in v) {
-          return v.id as string;
+        if (typeof v === 'object' && v.userId) {
+          return v.userId;
+        }
+        if (typeof v === 'object' && v.id) {
+          return v.id;
         }
         return v.toString();
       }
@@ -193,7 +192,7 @@ class CardFilter {
             Utils.assertFailure(`Invalid filter condition: ${filter.condition} for type ${filterPropertyDataType}`);
           }
         }
-      } else if (filterPropertyDataType === 'multi_select') {
+      } else if (filterPropertyDataType === 'multi_select' || filterPropertyDataType === 'user_roles') {
         const condition = filter.condition as (typeof MultiSelectDataTypeConditions)[number];
         switch (condition) {
           case 'contains':

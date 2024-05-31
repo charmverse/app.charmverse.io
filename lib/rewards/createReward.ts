@@ -1,4 +1,4 @@
-import type { BountyPermissionLevel, Page, Prisma } from '@charmverse/core/prisma';
+import type { Page, Prisma } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -135,18 +135,11 @@ export async function createReward({
   }
 
   reviewers?.forEach((reviewer) => {
-    const permissionLevel: BountyPermissionLevel = 'reviewer';
-    if (reviewer.group === 'role') {
-      rewardPermissions.push({
-        permissionLevel,
-        roleId: reviewer.id
-      });
-    } else if (reviewer.group === 'user') {
-      rewardPermissions.push({
-        permissionLevel,
-        userId: reviewer.id
-      });
-    }
+    rewardPermissions.push({
+      userId: reviewer.userId,
+      roleId: reviewer.roleId,
+      permissionLevel: 'reviewer'
+    });
   });
 
   let createdPageId: string | undefined;

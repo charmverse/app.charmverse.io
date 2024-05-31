@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo } from 'react';
 

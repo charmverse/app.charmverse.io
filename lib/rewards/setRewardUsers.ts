@@ -71,8 +71,8 @@ export async function setRewardUsers({
           data: users.reviewers.map((reviewer) => ({
             bountyId: rewardId,
             permissionLevel: 'reviewer',
-            roleId: reviewer.group === 'role' ? reviewer.id : undefined,
-            userId: reviewer.group === 'user' ? reviewer.id : undefined
+            roleId: reviewer.roleId,
+            userId: reviewer.userId
           }))
         });
       }

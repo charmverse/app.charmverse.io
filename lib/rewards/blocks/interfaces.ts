@@ -4,9 +4,8 @@ import type { BlockWithDetails } from 'lib/databases/block';
 import type { Board, IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
 import type { CardPropertyValue } from 'lib/databases/card';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
 
-import type { ApplicationMeta } from '../interfaces';
+import type { ApplicationMeta, RewardReviewer } from '../interfaces';
 
 export type RewardBoardFields = {
   cardProperties: IPropertyTemplate[];
@@ -26,7 +25,7 @@ export type RewardsBoardFFBlock = Omit<Board, 'fields' | 'type'> & {
 // TODO: Add other block types i.e. view.
 export type RewardBlockWithTypedFields = RewardsBoardBlock | BlockWithDetails;
 
-export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | TargetPermissionGroup<'user' | 'role'>[];
+export type RewardPropertyValue = CardPropertyValue | ApplicationMeta[] | RewardReviewer[];
 
 export type RewardPropertiesField = Record<string, RewardPropertyValue>;
 
