@@ -6,8 +6,8 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FormFieldInput } from 'lib/forms/interfaces';
-import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
@@ -32,7 +32,7 @@ export function getBoardProperties({
   proposalCustomProperties = [],
   selectedProperties
 }: {
-  selectedProperties?: SelectedProperties;
+  selectedProperties: SelectedProperties;
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
@@ -63,7 +63,7 @@ export function getBoardProperties({
   );
 
   // properties per each evaluation step
-  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles), selectedProperties);
+  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles));
 
   // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
@@ -71,26 +71,66 @@ export function getBoardProperties({
   });
 
   // properties related to form proposals
-  applyFormFieldProperties(boardProperties, formFields, selectedProperties);
+  applyFormFieldProperties(boardProperties, formFields);
 
   // properties for each unique questions on rubric evaluation step
-  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps, selectedProperties);
+  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
+
+  const selectedFormFields = selectedProperties.formFields;
+  const projectProperties = selectedProperties.project;
+  const projectMemberProperties = selectedProperties.projectMember;
+
+  return boardProperties.filter((p) => {
+    if (p.formFieldId && !selectedFormFields.includes(p.formFieldId)) {
+      return false;
+    }
+
+    const matchedProjectFieldProperty = projectFieldProperties.find((field) => field.columnPropertyId === p.id);
+    const matchedProjectMemberFieldProperty = projectMemberFieldProperties.find(
+      (field) => field.columnPropertyId === p.id
+    );
+
+    if (matchedProjectFieldProperty && !projectProperties.includes(matchedProjectFieldProperty.field)) {
+      return false;
+    }
+
+    if (
+      matchedProjectMemberFieldProperty &&
+      !projectMemberProperties.includes(matchedProjectMemberFieldProperty.field)
+    ) {
+      return false;
+    }
+
+    const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
+    if (rubricEvaluation && !rubricEvaluation.average && p.type === 'proposalEvaluationAverage') {
+      return false;
+    }
+
+    if (rubricEvaluation && !rubricEvaluation.total && p.type === 'proposalEvaluationTotal') {
+      return false;
+    }
+
+    if (rubricEvaluation && !rubricEvaluation.reviewers && p.type === 'proposalEvaluatedBy') {
+      return false;
+    }
+
+    if (rubricEvaluation && !rubricEvaluation.criteriaTotal && p.type === 'proposalRubricCriteriaTotal') {
+      return false;
+    }
+
+    return true;
+  });
 
   return boardProperties;
 }
 
 function applyRubricEvaluationQuestionProperties(
   boardProperties: IPropertyTemplate[],
-  evaluationSteps: EvaluationStep[],
-  selectedProperties?: SelectedProperties
+  evaluationSteps: EvaluationStep[]
 ) {
   const rubricCriteriaEvaluationTitlesRecord: Record<string, string> = {};
   evaluationSteps.forEach((evaluationStep) => {
-    if (
-      evaluationStep.type === 'rubric' &&
-      selectedProperties?.rubricEvaluations.find((rubricEvaluation) => rubricEvaluation.title === evaluationStep.title)
-        ?.criteriaTotal
-    ) {
+    if (evaluationStep.type === 'rubric') {
       evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
         rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title] = evaluationStep.title;
       });
@@ -111,85 +151,72 @@ function applyRubricEvaluationQuestionProperties(
   });
 }
 
-function applyFormFieldProperties(
-  boardProperties: IPropertyTemplate[],
-  formFields: FormFieldInput[],
-  selectedProperties?: SelectedProperties
-) {
-  formFields
-    .filter(
-      (formField) => formField.type === 'project_profile' || selectedProperties?.formFields.includes(formField.id)
-    )
-    .forEach((formField) => {
-      let boardPropertyType: IPropertyTemplate['type'] | null = null;
-      let boardPropertyOptions: IPropertyTemplate['options'] = [];
+function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
+  formFields.forEach((formField) => {
+    let boardPropertyType: IPropertyTemplate['type'] | null = null;
+    let boardPropertyOptions: IPropertyTemplate['options'] = [];
 
-      switch (formField.type) {
-        case 'short_text':
-        case 'wallet':
-        case 'long_text': {
-          boardPropertyType = 'text';
-          break;
-        }
-        case 'multiselect': {
-          boardPropertyType = 'multiSelect';
-          boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
-            color: option.color,
-            id: option.id,
-            value: option.name
-          }));
-          break;
-        }
-        case 'select': {
-          boardPropertyType = 'select';
-          boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
-            color: option.color,
-            id: option.id,
-            value: option.name
-          }));
-          break;
-        }
-        case 'project_profile': {
-          applyProjectProfileProperties(
-            boardProperties,
-            formField.fieldConfig as ProjectAndMembersFieldConfig,
-            selectedProperties
-          );
-          break;
-        }
-        default: {
-          if (!excludedFieldTypes.includes(formField.type)) {
-            boardPropertyType = formField.type as IPropertyTemplate['type'];
-          }
+    switch (formField.type) {
+      case 'short_text':
+      case 'wallet':
+      case 'long_text': {
+        boardPropertyType = 'text';
+        break;
+      }
+      case 'multiselect': {
+        boardPropertyType = 'multiSelect';
+        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+          color: option.color,
+          id: option.id,
+          value: option.name
+        }));
+        break;
+      }
+      case 'select': {
+        boardPropertyType = 'select';
+        boardPropertyOptions = ((formField.options ?? []) as SelectOptionType[]).map((option) => ({
+          color: option.color,
+          id: option.id,
+          value: option.name
+        }));
+        break;
+      }
+      case 'project_profile': {
+        applyProjectProfileProperties(boardProperties, formField.fieldConfig as ProjectAndMembersFieldConfig);
+        break;
+      }
+      default: {
+        if (!excludedFieldTypes.includes(formField.type)) {
+          boardPropertyType = formField.type as IPropertyTemplate['type'];
         }
       }
-      if (boardPropertyType) {
-        const fieldProperty = {
-          id: uuid(),
-          name: formField.name,
-          options: boardPropertyOptions,
-          description: (formField.description as { content: PageContent; contentText: string })?.contentText,
-          type: boardPropertyType,
-          formFieldId: formField.id,
-          readOnly: true,
-          readOnlyValues: true,
-          private: formField.private
-        };
+    }
+    if (boardPropertyType) {
+      const fieldProperty = {
+        id: uuid(),
+        name: formField.name,
+        options: boardPropertyOptions,
+        description: (formField.description as { content: PageContent; contentText: string })?.contentText,
+        type: boardPropertyType,
+        formFieldId: formField.id,
+        readOnly: true,
+        readOnlyValues: true,
+        private: formField.private
+      };
 
-        applyFormFieldToProperties(boardProperties, fieldProperty);
-      }
-    });
+      applyFormFieldToProperties(boardProperties, fieldProperty);
+    }
+  });
 }
 
 // field config ref: lib/projects/constants.ts
 function applyProjectProfileProperties(
   boardProperties: IPropertyTemplate[],
-  fieldConfig: ProjectAndMembersFieldConfig,
-  selectedProperties?: SelectedProperties
+  fieldConfig: ProjectAndMembersFieldConfig
 ) {
   projectFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
-    if (config.show && (selectedProperties?.project.includes(field.field) ?? true)) {
+    if (config.show) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,
@@ -200,10 +227,7 @@ function applyProjectProfileProperties(
   });
   projectMemberFieldProperties.forEach((field) => {
     const config = getFieldConfig(fieldConfig[field.field]);
-    if (
-      getFieldConfig(fieldConfig[field.field]).show &&
-      (selectedProperties?.projectMember.includes(field.field) ?? true)
-    ) {
+    if (getFieldConfig(fieldConfig[field.field]).show) {
       applyToPropertiesById(boardProperties, {
         id: field.columnPropertyId,
         name: field.columnTitle,

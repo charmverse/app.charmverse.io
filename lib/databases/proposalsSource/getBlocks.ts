@@ -7,6 +7,7 @@ import { permissionsApiClient } from 'lib/permissions/api/client';
 
 import { applyPropertiesToCardsAndFilter } from './applyPropertiesToCards';
 import { createMissingCards } from './createMissingCards';
+import { createSelectedPropertiesStateFromBoardProperties } from './createSelectedPropertiesFromBoardProperties';
 import { getCardPropertiesFromProposals } from './getCardProperties';
 import { updateBoardProperties } from './updateBoardProperties';
 
@@ -52,7 +53,12 @@ export async function getBlocks(
 // Does the same as above but refreshes the board properties and creates missing cards
 export async function getBlocksAndRefresh(board: BlockWithDetails, blocks: BlockWithDetails[]) {
   // Update board and view blocks before computing proposal cards
-  const updatedBoard = await updateBoardProperties({ boardId: board.id });
+  const updatedBoard = await updateBoardProperties({
+    boardId: board.id,
+    selectedProperties: createSelectedPropertiesStateFromBoardProperties({
+      cardProperties: board.fields.cardProperties
+    })
+  });
 
   const space: IssuableProposalCredentialSpace = await prisma.space.findUniqueOrThrow({
     where: {
