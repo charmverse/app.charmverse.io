@@ -22,7 +22,7 @@ export function LoginPageView() {
   const isLoggedIn = !!user;
 
   useEffect(() => {
-    setTitleState('Welcome');
+    setTitleState(''); // use default title
     if (discordCookie) {
       deleteCookie(AUTH_CODE_COOKIE);
     }
