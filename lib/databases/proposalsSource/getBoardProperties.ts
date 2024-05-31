@@ -82,8 +82,10 @@ export function getBoardProperties({
   applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
 
   const selectedFormFields = selectedProperties.formFields;
-  const projectProperties = selectedProperties.project;
-  const projectMemberProperties = selectedProperties.projectMember;
+  const selectedProjectProperties = selectedProperties.project;
+  const selectedProjectMemberProperties = selectedProperties.projectMember;
+  const selectedCustomProperties = selectedProperties.customProperties;
+  const proposalCustomPropertiesId = proposalCustomProperties.map((p) => p.id);
 
   return boardProperties.filter((p) => {
     if (p.formFieldId && !selectedFormFields.includes(p.formFieldId)) {
@@ -95,13 +97,13 @@ export function getBoardProperties({
       (field) => field.columnPropertyId === p.id
     );
 
-    if (matchedProjectFieldProperty && !projectProperties.includes(matchedProjectFieldProperty.field)) {
+    if (matchedProjectFieldProperty && !selectedProjectProperties.includes(matchedProjectFieldProperty.field)) {
       return false;
     }
 
     if (
       matchedProjectMemberFieldProperty &&
-      !projectMemberProperties.includes(matchedProjectMemberFieldProperty.field)
+      !selectedProjectMemberProperties.includes(matchedProjectMemberFieldProperty.field)
     ) {
       return false;
     }
@@ -120,6 +122,10 @@ export function getBoardProperties({
     }
 
     if (rubricEvaluation && !rubricEvaluation.criteriaTotal && p.type === 'proposalRubricCriteriaTotal') {
+      return false;
+    }
+
+    if (proposalCustomPropertiesId.includes(p.id) && !selectedCustomProperties.includes(p.id)) {
       return false;
     }
 

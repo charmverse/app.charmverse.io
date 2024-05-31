@@ -5,8 +5,10 @@ import { isTruthy } from 'lib/utils/types';
 import type { Board } from '../board';
 
 export function createSelectedPropertiesStateFromBoardProperties({
-  cardProperties
+  cardProperties,
+  proposalCustomProperties
 }: {
+  proposalCustomProperties: Board['fields']['cardProperties'];
   cardProperties: Board['fields']['cardProperties'];
 }) {
   const propertyIds = cardProperties.map((field) => field.id);
@@ -18,6 +20,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
     .map((property) => property.field);
   const formFieldIds = cardProperties.map((field) => field.formFieldId).filter(isTruthy);
   const rubricEvaluationsPropertiesRecord: Record<string, SelectedProperties['rubricEvaluations'][number]> = {};
+  const customPropertyIds = proposalCustomProperties.map((field) => field.id);
+  const customProperties: string[] = [];
   cardProperties.forEach((field) => {
     if (
       field.type === 'proposalEvaluationAverage' ||
@@ -41,11 +45,13 @@ export function createSelectedPropertiesStateFromBoardProperties({
       } else if (field.type === 'proposalRubricCriteriaTotal') {
         rubricEvaluationsPropertiesRecord[fieldKey].criteriaTotal = true;
       }
+    } else if (customPropertyIds.includes(field.id)) {
+      customProperties.push(field.id);
     }
   });
 
   return {
-    customProperties: [],
+    customProperties,
     project: projectProperties,
     projectMember: projectMemberProperties,
     formFields: formFieldIds,

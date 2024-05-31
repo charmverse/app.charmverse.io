@@ -9,8 +9,9 @@ import { SectionName } from 'components/common/PageLayout/components/Sidebar/com
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 import { useSmallScreen } from 'hooks/useMediaScreens';
 
+import { CustomPropertiesList, CustomPropertiesReadonlyList } from './CustomPropertiesList';
 import { FormFieldPropertiesList, FormFieldPropertiesReadonlyList } from './FormFieldPropertiesList';
-import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadOnlyList } from './ProjectProfilePropertiesList';
+import { ProjectProfilePropertiesList, ProjectProfilePropertiesReadonlyList } from './ProjectProfilePropertiesList';
 import {
   RubricEvaluationPropertiesList,
   RubricEvaluationPropertiesReadonlyList
@@ -40,6 +41,9 @@ type SelectedGroup =
     }
   | {
       group: 'rubricEvaluations';
+    }
+  | {
+      group: 'customProperties';
     };
 
 export function ProposalSourcePropertiesDialog({
@@ -140,6 +144,16 @@ export function ProposalSourcePropertiesDialog({
             >
               <ListItemText>Rubric Evaluations</ListItemText>
             </MenuItem>
+            <MenuItem
+              dense
+              onClick={() => {
+                setSelectedGroup({
+                  group: 'customProperties'
+                });
+              }}
+            >
+              <ListItemText>Custom Properties</ListItemText>
+            </MenuItem>
           </Stack>
           <SectionName>Templates</SectionName>
           <Stack>
@@ -197,6 +211,15 @@ export function ProposalSourcePropertiesDialog({
               />
             </>
           )}
+          {selectedGroup.group === 'customProperties' && (
+            <>
+              <Typography variant='h6'>Custom properties</Typography>
+              <CustomPropertiesList
+                selectedProperties={selectedProperties}
+                setSelectedProperties={setSelectedProperties}
+              />
+            </>
+          )}
         </Stack>
         <Stack
           sx={{
@@ -214,9 +237,10 @@ export function ProposalSourcePropertiesDialog({
           >
             <SectionName>Selected Properties</SectionName>
             <Stack p={2}>
-              <ProjectProfilePropertiesReadOnlyList selectedProperties={selectedProperties} />
+              <ProjectProfilePropertiesReadonlyList selectedProperties={selectedProperties} />
               <RubricEvaluationPropertiesReadonlyList selectedProperties={selectedProperties} />
               <FormFieldPropertiesReadonlyList selectedProperties={selectedProperties} />
+              <CustomPropertiesReadonlyList selectedProperties={selectedProperties} />
               {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
             </Stack>
           </Stack>

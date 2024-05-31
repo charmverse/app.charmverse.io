@@ -4,6 +4,7 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { Board } from 'lib/databases/board';
 import { createSelectedPropertiesStateFromBoardProperties } from 'lib/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
 
@@ -16,15 +17,17 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
     (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProperties } }>) =>
       charmClient.createProposalSource(arg)
   );
+  const { boardCustomProperties } = useProposalsBoardAdapter();
 
   const proposalSourcePropertiesPopupState = usePopupState({
     variant: 'dialog'
   });
   const proposalSourceSelectedProperties = useMemo(() => {
     return createSelectedPropertiesStateFromBoardProperties({
-      cardProperties: board.fields.cardProperties
+      cardProperties: board.fields.cardProperties,
+      proposalCustomProperties: boardCustomProperties.fields.cardProperties
     });
-  }, [board.fields.cardProperties]);
+  }, [board.fields.cardProperties, boardCustomProperties.fields.cardProperties]);
 
   return (
     <>

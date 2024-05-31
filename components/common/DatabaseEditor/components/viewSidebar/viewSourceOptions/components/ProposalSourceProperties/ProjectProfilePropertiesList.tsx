@@ -122,7 +122,7 @@ export function ProjectProfilePropertiesList({
   );
 }
 
-export function ProjectProfilePropertiesReadOnlyList({
+export function ProjectProfilePropertiesReadonlyList({
   selectedProperties
 }: {
   selectedProperties: SelectedProperties;
