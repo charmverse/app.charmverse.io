@@ -4,6 +4,8 @@ import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
 import { Button } from 'components/common/Button';
+import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
+import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 import type { Board } from 'lib/databases/board';
 import { createSelectedPropertiesStateFromBoardProperties } from 'lib/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
@@ -18,6 +20,7 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
       charmClient.createProposalSource(arg)
   );
   const { boardCustomProperties } = useProposalsBoardAdapter();
+  const dispatch = useAppDispatch();
 
   const proposalSourcePropertiesPopupState = usePopupState({
     variant: 'dialog'
@@ -45,11 +48,13 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
       {proposalSourcePropertiesPopupState.isOpen && (
         <ProposalSourcePropertiesDialog
           onClose={proposalSourcePropertiesPopupState.close}
-          onApply={(selectedProperties) => {
-            createProposalSource({
+          onApply={async (selectedProperties) => {
+            await createProposalSource({
               pageId: board.id,
               selectedProperties
-            }).then(proposalSourcePropertiesPopupState.close);
+            });
+            await dispatch(initialDatabaseLoad({ pageId: board.id }));
+            proposalSourcePropertiesPopupState.close();
           }}
           initialSelectedProperties={proposalSourceSelectedProperties}
         />

@@ -52,9 +52,10 @@ export function ProposalSourcePropertiesDialog({
   initialSelectedProperties
 }: {
   initialSelectedProperties?: Partial<SelectedProperties>;
-  onApply: (selectedProperties: SelectedProperties) => void;
+  onApply: (selectedProperties: SelectedProperties) => Promise<void>;
   onClose: VoidFunction;
 }) {
+  const [isApplying, setIsApplying] = useState(false);
   const [selectedProperties, setSelectedProperties] = useState<SelectedProperties>({
     projectMember: [],
     project: [],
@@ -251,8 +252,12 @@ export function ProposalSourcePropertiesDialog({
               right: 16
             }}
             onClick={() => {
-              onApply(selectedProperties);
+              setIsApplying(true);
+              onApply(selectedProperties).finally(() => {
+                setIsApplying(false);
+              });
             }}
+            loading={isApplying}
           >
             Apply
           </Button>

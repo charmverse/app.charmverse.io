@@ -289,7 +289,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
       {proposalSourcePropertiesPopupState.isOpen && (
         <ProposalSourcePropertiesDialog
           onClose={proposalSourcePropertiesPopupState.close}
-          onApply={(selectedProperties) => {
+          onApply={async (selectedProperties) => {
             if (!isCreatingProposals.current) {
               isCreatingProposals.current = true;
               selectSourceType('proposals');
