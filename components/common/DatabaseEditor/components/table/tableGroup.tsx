@@ -3,6 +3,7 @@ import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 
+import { useLocalStorage } from 'hooks/useLocalStorage';
 import type { Board, IPropertyOption, IPropertyTemplate, BoardGroup } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
@@ -10,7 +11,7 @@ import type { Card } from 'lib/databases/card';
 import TableGroupHeaderRow from './tableGroupHeaderRow';
 import TableRows from './tableRows';
 
-type Props = {
+export type Props = {
   board: Board;
   activeView: BoardView;
   groupByProperty?: IPropertyTemplate;
@@ -19,7 +20,6 @@ type Props = {
   columnRefs: Map<string, React.RefObject<HTMLDivElement>>;
   selectedCardIds: string[];
   cardIdToFocusOnRender: string;
-  hideGroup: (groupByOptionId: string) => void;
   addCard: (groupByOptionId?: string) => Promise<void> | void;
   showCard: (cardId: string) => void;
   propertyNameChanged: (option: IPropertyOption, text: string) => Promise<void>;
@@ -34,6 +34,8 @@ type Props = {
   subRowsEmptyValueContent?: ReactElement | string;
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
+  isExpandedGroup?: boolean; // it is undefined until we have loaded local storage
+  toggleGroup: (groupId: string) => void;
 };
 
 const TableGroup = React.memo((props: Props): JSX.Element => {
@@ -59,7 +61,6 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
   if (isOver) {
     className += ' dragover';
   }
-  const isExpandedGroup = activeView.fields.collapsedOptionIds.indexOf(group.id || 'undefined') < 0;
 
   return (
     <div ref={drop} className={className} key={group.option?.id || group.value}>
@@ -67,9 +68,9 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
         group={group}
         board={board}
         activeView={activeView}
-        isExpandedGroup={isExpandedGroup}
+        isExpandedGroup={props.isExpandedGroup}
         groupByProperty={groupByProperty}
-        hideGroup={props.hideGroup}
+        hideGroup={props.toggleGroup}
         addCard={props.addCard}
         readOnly={props.readOnly}
         propertyNameChanged={props.propertyNameChanged}
@@ -93,6 +94,7 @@ const TableGroup = React.memo((props: Props): JSX.Element => {
           showCard={props.showCard}
           resizingColumn=''
           offset={0}
+          isExpandedGroup={props.isExpandedGroup}
           addCard={props.addCard}
           onCardClicked={props.onCardClicked}
           onDrop={props.onDropToCard}
