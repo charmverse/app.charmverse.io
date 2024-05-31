@@ -108,6 +108,10 @@ export function getBoardProperties({
       return false;
     }
 
+    if (proposalCustomPropertiesId.includes(p.id) && !selectedCustomProperties.includes(p.id)) {
+      return false;
+    }
+
     const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
     if (rubricEvaluation && !rubricEvaluation.average && p.type === 'proposalEvaluationAverage') {
       return false;
@@ -121,11 +125,7 @@ export function getBoardProperties({
       return false;
     }
 
-    if (rubricEvaluation && !rubricEvaluation.criteriaTotal && p.type === 'proposalRubricCriteriaTotal') {
-      return false;
-    }
-
-    if (proposalCustomPropertiesId.includes(p.id) && !selectedCustomProperties.includes(p.id)) {
+    if ((!rubricEvaluation || !rubricEvaluation.criteriaTotal) && p.type === 'proposalRubricCriteriaTotal') {
       return false;
     }
 
