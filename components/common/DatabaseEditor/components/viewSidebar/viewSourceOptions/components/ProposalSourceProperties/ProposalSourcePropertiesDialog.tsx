@@ -93,7 +93,7 @@ function ProposalSourcePropertiesGroup({
             });
           }}
         >
-          <ListItemText>Proposal defaults</ListItemText>
+          <ListItemText>Proposal Defaults</ListItemText>
         </MenuItem>
         <MenuItem
           dense
@@ -177,6 +177,15 @@ function ProposalSourcePropertiesSelector({
 }) {
   return (
     <>
+      {selectedGroup.group === 'proposalDefaults' && (
+        <>
+          <Typography variant='h6'>Proposal Defaults</Typography>
+          <ProposalDefaultPropertiesList
+            selectedProperties={selectedProperties}
+            setSelectedProperties={setSelectedProperties}
+          />
+        </>
+      )}
       {selectedGroup?.group === 'projectProfile' && (
         <>
           <Typography variant='h6'>Project profile properties</Typography>
@@ -195,26 +204,17 @@ function ProposalSourcePropertiesSelector({
           />
         </>
       )}
-      {selectedGroup.group === 'formFields' && (
-        <>
-          <Typography variant='h6'>Form field properties</Typography>
-          <FormFieldPropertiesList
-            templatePageId={selectedGroup.pageId}
-            selectedProperties={selectedProperties}
-            setSelectedProperties={setSelectedProperties}
-          />
-        </>
-      )}
       {selectedGroup.group === 'customProperties' && (
         <>
           <Typography variant='h6'>Custom properties</Typography>
           <CustomPropertiesList selectedProperties={selectedProperties} setSelectedProperties={setSelectedProperties} />
         </>
       )}
-      {selectedGroup.group === 'proposalDefaults' && (
+      {selectedGroup.group === 'formFields' && (
         <>
-          <Typography variant='h6'>Proposal defaults</Typography>
-          <ProposalDefaultPropertiesList
+          <Typography variant='h6'>Form field properties</Typography>
+          <FormFieldPropertiesList
+            templatePageId={selectedGroup.pageId}
             selectedProperties={selectedProperties}
             setSelectedProperties={setSelectedProperties}
           />
@@ -251,11 +251,11 @@ function ProposalSourcePropertiesList({
       >
         <SectionName>Selected Properties</SectionName>
         <Stack p={2}>
+          <ProposalDefaultPropertiesReadonlyList selectedProperties={selectedProperties} />
           <ProjectProfilePropertiesReadonlyList selectedProperties={selectedProperties} />
           <RubricEvaluationPropertiesReadonlyList selectedProperties={selectedProperties} />
-          <FormFieldPropertiesReadonlyList selectedProperties={selectedProperties} />
           <CustomPropertiesReadonlyList selectedProperties={selectedProperties} />
-          <ProposalDefaultPropertiesReadonlyList selectedProperties={selectedProperties} />
+          <FormFieldPropertiesReadonlyList selectedProperties={selectedProperties} />
           {noPropertiesSelected && <Typography variant='caption'>No properties selected</Typography>}
         </Stack>
       </Stack>

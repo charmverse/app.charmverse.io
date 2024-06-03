@@ -155,7 +155,10 @@ export function RubricEvaluationPropertiesReadonlyList({
   }
 
   return (
-    <>
+    <Stack gap={1}>
+      <Typography fontWeight='bold' variant='body2'>
+        Rubric Evaluations
+      </Typography>
       <Stack gap={2}>
         {selectedProperties.rubricEvaluations.map((rubricEvaluation) => {
           const items: string[] = [];
@@ -190,6 +193,6 @@ export function RubricEvaluationPropertiesReadonlyList({
           my: 2
         }}
       />
-    </>
+    </Stack>
   );
 }

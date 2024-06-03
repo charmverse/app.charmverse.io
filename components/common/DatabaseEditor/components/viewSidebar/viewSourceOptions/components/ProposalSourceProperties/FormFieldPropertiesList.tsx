@@ -111,17 +111,22 @@ export function FormFieldPropertiesReadonlyList({
 
   return (
     <>
-      <Stack gap={2}>
-        {proposalTemplateFormFields.map((proposalTemplateFormField) => {
-          return (
-            <SelectedPropertiesList
-              items={proposalTemplateFormField.formFields.map((formField) => formField.name)}
-              title={proposalTemplateFormField.title}
-              key={proposalTemplateFormField.title}
-              hideDivider
-            />
-          );
-        })}
+      <Stack gap={1}>
+        <Typography fontWeight='bold' variant='body2'>
+          Form Fields
+        </Typography>
+        <Stack gap={2}>
+          {proposalTemplateFormFields.map((proposalTemplateFormField) => {
+            return (
+              <SelectedPropertiesList
+                items={proposalTemplateFormField.formFields.map((formField) => formField.name)}
+                title={proposalTemplateFormField.title}
+                key={proposalTemplateFormField.title}
+                hideDivider
+              />
+            );
+          })}
+        </Stack>
       </Stack>
       <Divider
         sx={{
