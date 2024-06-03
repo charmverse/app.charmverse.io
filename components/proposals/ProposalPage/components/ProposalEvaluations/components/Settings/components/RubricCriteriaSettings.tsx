@@ -19,7 +19,7 @@ type Props = {
   readOnly?: boolean;
   showDeleteConfirmation?: boolean;
   value: RangeProposalCriteria[];
-  onChange: (criteria: RangeProposalCriteria[]) => Promise<void>;
+  onChange: (criteria: RangeProposalCriteria[]) => void;
   answers: ProposalRubricCriteriaAnswer[];
 };
 
@@ -88,7 +88,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     onChange(updatedList);
   }
 
-  async function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
+  function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
     if (readOnly) {
       return;
     }
@@ -98,7 +98,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
       Object.assign(criteria, updates);
       setCriteriaList([...newCriteriaList]);
       if (newCriteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
-        await onChange(newCriteriaList);
+        onChange(newCriteriaList);
       }
     }
   }
