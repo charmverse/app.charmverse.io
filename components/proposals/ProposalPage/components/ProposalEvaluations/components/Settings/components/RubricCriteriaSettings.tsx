@@ -2,6 +2,7 @@ import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-clien
 import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
+import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'react';
 
 import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
@@ -18,7 +19,7 @@ type Props = {
   readOnly?: boolean;
   showDeleteConfirmation?: boolean;
   value: RangeProposalCriteria[];
-  onChange: (criteria: RangeProposalCriteria[]) => void;
+  onChange: (criteria: RangeProposalCriteria[]) => Promise<void>;
   answers: ProposalRubricCriteriaAnswer[];
 };
 
@@ -87,19 +88,22 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     onChange(updatedList);
   }
 
-  function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
+  async function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
     if (readOnly) {
       return;
     }
-    const criteria = criteriaList.find((c) => c.id === id);
+    const newCriteriaList = [...criteriaList];
+    const criteria = newCriteriaList.find((c) => c.id === id);
     if (criteria) {
       Object.assign(criteria, updates);
-      setCriteriaList([...criteriaList]);
-      if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
-        onChange(criteriaList);
+      setCriteriaList([...newCriteriaList]);
+      if (newCriteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
+        await onChange(newCriteriaList);
       }
     }
   }
+
+  const debouncedSetCriteriaProperty = debounce(setCriteriaProperty, 300);
 
   useEffect(() => {
     setCriteriaList(value);
@@ -147,10 +151,10 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                 sx={{ flexGrow: 1 }}
                 multiline
                 fullWidth
-                onChange={(e) => setCriteriaProperty(criteria.id, { title: e.target.value })}
+                onChange={(e) => debouncedSetCriteriaProperty(criteria.id, { title: e.target.value })}
                 placeholder='Add a label...'
                 disabled={readOnly}
-                defaultValue={criteria.title}
+                defaultValue={criteria.title || ''}
                 data-test='edit-rubric-criteria-label'
               />
               {!readOnly && (
@@ -168,7 +172,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
               multiline
               fullWidth
               data-test='edit-rubric-criteria-description'
-              onChange={(e) => setCriteriaProperty(criteria.id, { description: e.target.value })}
+              onChange={(e) => debouncedSetCriteriaProperty(criteria.id, { description: e.target.value })}
               placeholder='Add a description...'
               disabled={readOnly}
               sx={{ flexGrow: 1, width: '100%' }}
@@ -181,7 +185,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                     inputProps={{ type: 'number' }}
                     data-test='edit-rubric-criteria-min-score'
                     onChange={(e) => {
-                      setCriteriaProperty(criteria.id, {
+                      debouncedSetCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, min: getNumberFromString(e.target.value) }
                       });
                     }}
@@ -208,7 +212,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                     }}
                     data-test='edit-rubric-criteria-max-score'
                     onChange={(e) => {
-                      setCriteriaProperty(criteria.id, {
+                      debouncedSetCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, max: getNumberFromString(e.target.value) }
                       });
                     }}

@@ -197,7 +197,7 @@ export function EvaluationStepSettings({
               readOnly={readOnlyRubricCriteria}
               showDeleteConfirmation={!!isPublishedProposal}
               value={evaluation.rubricCriteria as RangeProposalCriteria[]}
-              onChange={(rubricCriteria) =>
+              onChange={async (rubricCriteria) =>
                 onChange({
                   rubricCriteria: rubricCriteria as ProposalEvaluationInput['rubricCriteria']
                 })
