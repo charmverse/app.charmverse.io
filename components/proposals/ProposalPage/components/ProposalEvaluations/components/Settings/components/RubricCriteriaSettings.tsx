@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import debounce from 'lodash/debounce';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
@@ -104,10 +104,6 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
   }
 
   const debouncedSetCriteriaProperty = debounce(setCriteriaProperty, 300);
-
-  useEffect(() => {
-    setCriteriaList(value);
-  }, [value]);
 
   function handleClickDelete(criteriaId: string) {
     if (showDeleteConfirmation) {
