@@ -266,6 +266,7 @@ function ProposalSourcePropertiesList({
         }}
         loading={isApplying}
         disabled={noPropertiesSelected}
+        data-test='apply-proposal-source-properties'
         disabledTooltip='Please select at least one property'
       >
         Apply
