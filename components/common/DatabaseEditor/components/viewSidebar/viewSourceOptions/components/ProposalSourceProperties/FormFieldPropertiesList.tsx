@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 export function FormFieldPropertiesList({
   selectedProperties,
@@ -121,20 +122,12 @@ export function FormFieldPropertiesReadonlyList({
       <Stack gap={2}>
         {proposalTemplateFormFields.map((proposalTemplateFormField) => {
           return (
-            <Stack key={proposalTemplateFormField.title}>
-              <Typography fontWeight='bold' variant='subtitle1'>
-                {proposalTemplateFormField.title}
-              </Typography>
-              <Stack mt={0.5} gap={0.5}>
-                {proposalTemplateFormField.formFields.map((formField) => {
-                  return (
-                    <Typography variant='subtitle2' key={formField.id}>
-                      {formField.name}
-                    </Typography>
-                  );
-                })}
-              </Stack>
-            </Stack>
+            <SelectedPropertiesList
+              items={proposalTemplateFormField.formFields.map((formField) => formField.name)}
+              title={proposalTemplateFormField.title}
+              key={proposalTemplateFormField.title}
+              hideDivider
+            />
           );
         })}
       </Stack>

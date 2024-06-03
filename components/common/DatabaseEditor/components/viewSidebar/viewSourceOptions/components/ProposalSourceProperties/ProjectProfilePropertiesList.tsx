@@ -1,9 +1,10 @@
-import { Checkbox, Divider, Stack, Typography } from '@mui/material';
+import { Checkbox, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 const projectMemberFields = projectMemberFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);
 const projectFields = projectFieldProperties.map((propertyFieldProperty) => propertyFieldProperty.field);
@@ -49,32 +50,30 @@ export function ProjectProfilePropertiesList({
         <Typography fontWeight='bold'>Project Profile</Typography>
       </Stack>
       <Stack ml={2}>
-        {[...projectFieldProperties, ...projectFieldProperties, ...projectFieldProperties].map(
-          (propertyFieldProperty) => (
-            <Stack
-              onClick={() => {
-                const isChecked = selectedProperties.project.includes(propertyFieldProperty.field);
-                setSelectedProperties({
-                  ...selectedProperties,
-                  project: isChecked
-                    ? selectedProperties.project.filter(
-                        (selectedProperty) => selectedProperty !== propertyFieldProperty.field
-                      )
-                    : [...selectedProperties.project, propertyFieldProperty.field]
-                });
-              }}
-              alignItems='center'
-              direction='row'
-              sx={{
-                cursor: 'pointer'
-              }}
-              key={propertyFieldProperty.field}
-            >
-              <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
-              <Typography>{propertyFieldProperty.columnTitle}</Typography>
-            </Stack>
-          )
-        )}
+        {projectFieldProperties.map((propertyFieldProperty) => (
+          <Stack
+            onClick={() => {
+              const isChecked = selectedProperties.project.includes(propertyFieldProperty.field);
+              setSelectedProperties({
+                ...selectedProperties,
+                project: isChecked
+                  ? selectedProperties.project.filter(
+                      (selectedProperty) => selectedProperty !== propertyFieldProperty.field
+                    )
+                  : [...selectedProperties.project, propertyFieldProperty.field]
+              });
+            }}
+            alignItems='center'
+            direction='row'
+            sx={{
+              cursor: 'pointer'
+            }}
+            key={propertyFieldProperty.field}
+          >
+            <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
+            <Typography>{propertyFieldProperty.columnTitle}</Typography>
+          </Stack>
+        ))}
         <Stack
           direction='row'
           alignItems='center'
@@ -146,36 +145,16 @@ export function ProjectProfilePropertiesReadonlyList({
   }
 
   return (
-    <Stack>
-      <Typography fontWeight='bold' mb={0.5} variant='subtitle1'>
-        Project Profile
-      </Typography>
-      <Stack gap={0.5}>
-        {selectedProjectFields.map((propertyFieldProperty) => (
-          <Typography variant='subtitle2' key={propertyFieldProperty.field}>
-            {propertyFieldProperty.columnTitle}
-          </Typography>
-        ))}
-        {selectedProjectMemberFields.length === 0 ? null : (
-          <>
-            <Typography fontWeight='bold' variant='subtitle1'>
-              Project Member
-            </Typography>
-            <Stack gap={0.5} ml={2}>
-              {selectedProjectMemberFields.map((projectMemberFieldProperty) => (
-                <Typography variant='subtitle2' key={projectMemberFieldProperty.field}>
-                  {projectMemberFieldProperty.label}
-                </Typography>
-              ))}
-            </Stack>
-          </>
-        )}
-      </Stack>
-      <Divider
-        sx={{
-          my: 2
-        }}
-      />
-    </Stack>
+    <SelectedPropertiesList
+      items={selectedProjectFields.map((propertyFieldProperty) => propertyFieldProperty.columnTitle)}
+      title='Project Profile'
+    >
+      {selectedProjectMemberFields.length === 0 ? null : (
+        <SelectedPropertiesList
+          items={selectedProjectMemberFields.map((projectMemberFieldProperty) => projectMemberFieldProperty.label)}
+          title='Project Member'
+        />
+      )}
+    </SelectedPropertiesList>
   );
 }

@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 export function RubricEvaluationPropertiesList({
   selectedProperties,
@@ -172,22 +173,33 @@ export function RubricEvaluationPropertiesReadonlyList({
     <>
       <Stack gap={2}>
         {selectedProperties.rubricEvaluations.map((rubricEvaluation) => {
+          const items: string[] = [];
+          if (rubricEvaluation.average) {
+            items.push('Average');
+          }
+          if (rubricEvaluation.total) {
+            items.push('Total');
+          }
+          if (rubricEvaluation.reviewers) {
+            items.push('Reviewers');
+          }
+          if (rubricEvaluation.criteriaTotal) {
+            items.push('Criteria total');
+          }
+
+          if (items.length === 0) {
+            return null;
+          }
           return (
-            <Stack key={rubricEvaluation.title}>
-              <Typography fontWeight='bold' variant='subtitle1'>
-                {rubricEvaluation.title}
-              </Typography>
-              <Stack gap={0.5} mt={0.5}>
-                {rubricEvaluation.average && <Typography variant='subtitle2'>Average</Typography>}
-                {rubricEvaluation.total && <Typography variant='subtitle2'>Total</Typography>}
-                {rubricEvaluation.reviewers && <Typography variant='subtitle2'>Reviewers</Typography>}
-                {rubricEvaluation.criteriaTotal && <Typography variant='subtitle2'>Criteria total</Typography>}
-              </Stack>
-            </Stack>
+            <SelectedPropertiesList
+              key={rubricEvaluation.title}
+              items={items}
+              title={rubricEvaluation.title}
+              hideDivider
+            />
           );
         })}
       </Stack>
-
       <Divider
         sx={{
           my: 2

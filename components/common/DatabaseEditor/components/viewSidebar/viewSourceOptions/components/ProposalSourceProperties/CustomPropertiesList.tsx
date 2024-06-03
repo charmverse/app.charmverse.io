@@ -1,4 +1,4 @@
-import { Checkbox, Stack, Typography } from '@mui/material';
+import { Checkbox, Divider, Stack, Typography } from '@mui/material';
 
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 
@@ -89,18 +89,23 @@ export function CustomPropertiesReadonlyList({
 
   return (
     <Stack>
-      <Typography fontWeight='bold' variant='subtitle1'>
+      <Typography fontWeight='bold' variant='body2'>
         Custom Properties
       </Typography>
       <Stack gap={0.5} mt={0.5}>
         {selectedCustomProperties.map((property) => {
           return (
-            <Typography variant='subtitle2' key={property.id}>
+            <Typography fontWeight={500} color='secondary' variant='subtitle1' key={property.id}>
               {property.name}
             </Typography>
           );
         })}
       </Stack>
+      <Divider
+        sx={{
+          my: 2
+        }}
+      />
     </Stack>
   );
 }

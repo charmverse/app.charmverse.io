@@ -3,6 +3,7 @@ import { Checkbox, Stack, Typography } from '@mui/material';
 import { defaultProposalProperties, defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
+import { SelectedPropertiesList } from './SelectedPropertiesList';
 
 export function ProposalDefaultPropertiesList({
   selectedProperties,
@@ -79,19 +80,9 @@ export function ProposalDefaultPropertiesReadonlyList({
   );
 
   return (
-    <Stack>
-      <Typography fontWeight='bold' variant='subtitle1'>
-        Default Properties
-      </Typography>
-      <Stack gap={0.5} mt={0.5}>
-        {selectedDefaultProperties.map((property) => {
-          return (
-            <Typography variant='subtitle2' key={property.id}>
-              {property.name}
-            </Typography>
-          );
-        })}
-      </Stack>
-    </Stack>
+    <SelectedPropertiesList
+      title='Default Properties'
+      items={selectedDefaultProperties.map((property) => property.name)}
+    />
   );
 }
