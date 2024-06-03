@@ -54,9 +54,11 @@ type SelectedGroup =
     };
 
 function ProposalSourcePropertiesGroup({
-  setSelectedGroup
+  setSelectedGroup,
+  selectedGroup
 }: {
   setSelectedGroup: (selectedGroup: SelectedGroup) => void;
+  selectedGroup: SelectedGroup;
 }) {
   const { proposalTemplates } = useProposalTemplates();
 
@@ -84,6 +86,7 @@ function ProposalSourcePropertiesGroup({
       <Stack>
         <MenuItem
           dense
+          selected={selectedGroup.group === 'proposalDefaults'}
           onClick={() => {
             setSelectedGroup({
               group: 'proposalDefaults'
@@ -94,6 +97,7 @@ function ProposalSourcePropertiesGroup({
         </MenuItem>
         <MenuItem
           dense
+          selected={selectedGroup.group === 'projectProfile'}
           onClick={() => {
             setSelectedGroup({
               group: 'projectProfile'
@@ -104,6 +108,7 @@ function ProposalSourcePropertiesGroup({
         </MenuItem>
         <MenuItem
           dense
+          selected={selectedGroup.group === 'rubricEvaluations'}
           onClick={() => {
             setSelectedGroup({
               group: 'rubricEvaluations'
@@ -114,6 +119,7 @@ function ProposalSourcePropertiesGroup({
         </MenuItem>
         <MenuItem
           dense
+          selected={selectedGroup.group === 'customProperties'}
           onClick={() => {
             setSelectedGroup({
               group: 'customProperties'
@@ -130,6 +136,7 @@ function ProposalSourcePropertiesGroup({
             <MenuItem
               key={template.pageId}
               dense
+              selected={selectedGroup.group === 'formFields' && selectedGroup.pageId === template.pageId}
               onClick={() => {
                 setSelectedGroup({
                   group: 'formFields',
@@ -294,7 +301,7 @@ export function ProposalSourcePropertiesDialog({
     ...initialSelectedProperties
   });
   const [selectedGroup, setSelectedGroup] = useState<SelectedGroup>({
-    group: 'projectProfile'
+    group: 'proposalDefaults'
   });
 
   const isMobile = useSmallScreen();
@@ -309,7 +316,7 @@ export function ProposalSourcePropertiesDialog({
                 [
                   'Groups',
                   <Stack key='groups' gap={1} height='90vh' overflow='auto'>
-                    <ProposalSourcePropertiesGroup setSelectedGroup={setSelectedGroup} />
+                    <ProposalSourcePropertiesGroup setSelectedGroup={setSelectedGroup} selectedGroup={selectedGroup} />
                   </Stack>
                 ],
                 [
@@ -373,7 +380,7 @@ export function ProposalSourcePropertiesDialog({
             backgroundColor: (theme) => theme.palette.sidebar.background
           }}
         >
-          <ProposalSourcePropertiesGroup setSelectedGroup={setSelectedGroup} />
+          <ProposalSourcePropertiesGroup selectedGroup={selectedGroup} setSelectedGroup={setSelectedGroup} />
         </Stack>
         <Stack gap={1} p={2} overflow='auto' height='90vh' width='100%'>
           <ProposalSourcePropertiesSelector
