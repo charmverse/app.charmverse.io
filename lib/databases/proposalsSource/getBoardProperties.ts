@@ -33,7 +33,7 @@ export function getBoardProperties({
   proposalCustomProperties = [],
   selectedProperties
 }: {
-  selectedProperties: SelectedProposalProperties;
+  selectedProperties?: SelectedProposalProperties;
   proposalCustomProperties?: IPropertyTemplate[];
   evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
@@ -48,7 +48,7 @@ export function getBoardProperties({
     }
   });
 
-  let boardProperties = [...currentCardProperties];
+  const boardProperties = [...currentCardProperties];
 
   // standard proposal properties
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalReviewerNotes());
@@ -81,13 +81,17 @@ export function getBoardProperties({
   // properties for each unique questions on rubric evaluation step
   applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
 
+  if (!selectedProperties) {
+    return boardProperties;
+  }
+
   const selectedFormFields = selectedProperties.formFields;
   const selectedProjectProperties = selectedProperties.project;
   const selectedProjectMemberProperties = selectedProperties.projectMember;
   const selectedCustomProperties = selectedProperties.customProperties;
   const proposalCustomPropertyIds = proposalCustomProperties.map((p) => p.id);
 
-  boardProperties = boardProperties.filter((p) => {
+  return boardProperties.filter((p) => {
     if (p.formFieldId && !selectedFormFields.includes(p.formFieldId)) {
       return false;
     }
@@ -115,7 +119,10 @@ export function getBoardProperties({
 
     const isDefaultProposalProperty = defaultProposalPropertyTypes.includes(p.type);
 
-    if (isDefaultProposalProperty && !selectedProperties.defaults.includes(p.type)) {
+    if (
+      isDefaultProposalProperty &&
+      !selectedProperties.defaults.includes(p.type as SelectedProposalProperties['defaults'][number])
+    ) {
       return false;
     }
 
@@ -145,8 +152,6 @@ export function getBoardProperties({
 
     return true;
   });
-
-  return boardProperties;
 }
 
 function applyRubricEvaluationQuestionProperties(

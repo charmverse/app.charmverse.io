@@ -13,7 +13,7 @@ export async function updateBoardProperties({
   boardId,
   selectedProperties
 }: {
-  selectedProperties: SelectedProposalProperties;
+  selectedProperties?: SelectedProposalProperties;
   boardId: string;
 }): Promise<Block> {
   const boardBlock = await prisma.block.findUniqueOrThrow({
