@@ -4,11 +4,13 @@ import { v4 as uuid } from 'uuid';
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
-import { defaultProposalPropertyTypes, proposalDbProperties } from 'lib/databases/proposalDbProperties';
+import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import { filterBoardProperties } from './filterBoardProperties';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label'];
@@ -85,72 +87,10 @@ export function getBoardProperties({
     return boardProperties;
   }
 
-  const selectedFormFields = selectedProperties.formFields;
-  const selectedProjectProperties = selectedProperties.project;
-  const selectedProjectMemberProperties = selectedProperties.projectMember;
-  const selectedCustomProperties = selectedProperties.customProperties;
-  const proposalCustomPropertyIds = proposalCustomProperties.map((p) => p.id);
-
-  return boardProperties.filter((p) => {
-    if (p.formFieldId && !selectedFormFields.includes(p.formFieldId)) {
-      return false;
-    }
-
-    const matchedProjectFieldProperty = projectFieldProperties.find((field) => field.columnPropertyId === p.id);
-
-    if (matchedProjectFieldProperty && !selectedProjectProperties.includes(matchedProjectFieldProperty.field)) {
-      return false;
-    }
-
-    const matchedProjectMemberFieldProperty = projectMemberFieldProperties.find(
-      (field) => field.columnPropertyId === p.id
-    );
-
-    if (
-      matchedProjectMemberFieldProperty &&
-      !selectedProjectMemberProperties.includes(matchedProjectMemberFieldProperty.field)
-    ) {
-      return false;
-    }
-
-    if (proposalCustomPropertyIds.includes(p.id) && !selectedCustomProperties.includes(p.id)) {
-      return false;
-    }
-
-    const isDefaultProposalProperty = defaultProposalPropertyTypes.includes(p.type);
-
-    if (
-      isDefaultProposalProperty &&
-      !selectedProperties.defaults.includes(p.type as SelectedProposalProperties['defaults'][number])
-    ) {
-      return false;
-    }
-
-    if (
-      p.type === 'proposalEvaluationAverage' ||
-      p.type === 'proposalEvaluationTotal' ||
-      p.type === 'proposalEvaluatedBy'
-    ) {
-      const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.name);
-      if ((!rubricEvaluation || !rubricEvaluation.average) && p.type === 'proposalEvaluationAverage') {
-        return false;
-      }
-
-      if ((!rubricEvaluation || !rubricEvaluation.total) && p.type === 'proposalEvaluationTotal') {
-        return false;
-      }
-
-      if ((!rubricEvaluation || !rubricEvaluation.reviewers) && p.type === 'proposalEvaluatedBy') {
-        return false;
-      }
-    } else if (p.type === 'proposalRubricCriteriaTotal') {
-      const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
-      if (!rubricEvaluation || !rubricEvaluation.criteriaTotal) {
-        return false;
-      }
-    }
-
-    return true;
+  return filterBoardProperties({
+    boardProperties,
+    proposalCustomProperties,
+    selectedProperties
   });
 }
 
