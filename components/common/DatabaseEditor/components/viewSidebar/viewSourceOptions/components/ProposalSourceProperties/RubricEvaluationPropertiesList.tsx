@@ -1,8 +1,9 @@
-import { Checkbox, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
+import { PropertySelector } from './PropertiesListSelector';
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
@@ -83,75 +84,59 @@ export function RubricEvaluationPropertiesList({
 
         return (
           <Stack key={rubricEvaluationTitle}>
-            <Stack direction='row' alignItems='center'>
-              <Checkbox
-                size='small'
-                checked={!!isAllPropertiesSelected}
-                onChange={() => {
-                  if (isAllPropertiesSelected) {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      rubricEvaluations: selectedProperties.rubricEvaluations.filter(
-                        (evaluation) => evaluation.title !== rubricEvaluationTitle
-                      )
-                    });
-                  } else {
-                    updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                      average: true,
-                      total: true,
-                      reviewers: true,
-                      criteriaTotal: true
-                    });
-                  }
-                }}
-              />
-              <Typography fontWeight='bold'>{rubricEvaluationTitle}</Typography>
-            </Stack>
+            <PropertySelector
+              isChecked={!!isAllPropertiesSelected}
+              onClick={() => {
+                if (isAllPropertiesSelected) {
+                  setSelectedProperties({
+                    ...selectedProperties,
+                    rubricEvaluations: selectedProperties.rubricEvaluations.filter(
+                      (evaluation) => evaluation.title !== rubricEvaluationTitle
+                    )
+                  });
+                } else {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    average: true,
+                    total: true,
+                    reviewers: true,
+                    criteriaTotal: true
+                  });
+                }
+              }}
+              label={rubricEvaluationTitle}
+              bold
+            />
             <Stack ml={2}>
-              <Stack direction='row' alignItems='center'>
-                <Checkbox
-                  size='small'
-                  checked={!!_rubricEvaluation?.average}
-                  onChange={() => {
-                    updateRubricEvaluationProperties(rubricEvaluationTitle, { average: !_rubricEvaluation?.average });
-                  }}
-                />
-                <Typography>Average</Typography>
-              </Stack>
-              <Stack direction='row' alignItems='center'>
-                <Checkbox
-                  size='small'
-                  checked={!!_rubricEvaluation?.total}
-                  onChange={() => {
-                    updateRubricEvaluationProperties(rubricEvaluationTitle, { total: !_rubricEvaluation?.total });
-                  }}
-                />
-                <Typography>Total</Typography>
-              </Stack>
-              <Stack direction='row' alignItems='center'>
-                <Checkbox
-                  size='small'
-                  checked={!!_rubricEvaluation?.reviewers}
-                  onChange={() => {
-                    updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                      reviewers: !_rubricEvaluation?.reviewers
-                    });
-                  }}
-                />
-                <Typography>Reviewers</Typography>
-              </Stack>
-              <Stack direction='row' alignItems='center'>
-                <Checkbox
-                  size='small'
-                  checked={!!_rubricEvaluation?.criteriaTotal}
-                  onChange={() => {
-                    updateRubricEvaluationProperties(rubricEvaluationTitle, {
-                      criteriaTotal: !_rubricEvaluation?.criteriaTotal
-                    });
-                  }}
-                />
-                <Typography>Criteria total</Typography>
-              </Stack>
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.average}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, { average: !_rubricEvaluation?.average });
+                }}
+                label='Average'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.total}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, { total: !_rubricEvaluation?.total });
+                }}
+                label='Total'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.reviewers}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, { reviewers: !_rubricEvaluation?.reviewers });
+                }}
+                label='Reviewers'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.criteriaTotal}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    criteriaTotal: !_rubricEvaluation?.criteriaTotal
+                  });
+                }}
+                label='Criteria total'
+              />
             </Stack>
           </Stack>
         );

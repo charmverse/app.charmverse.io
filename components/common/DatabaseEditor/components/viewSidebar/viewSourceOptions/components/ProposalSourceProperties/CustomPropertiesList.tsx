@@ -1,7 +1,8 @@
-import { Checkbox, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
 
+import { PropertySelector } from './PropertiesListSelector';
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 
 export function CustomPropertiesList({
@@ -21,50 +22,45 @@ export function CustomPropertiesList({
 
   return (
     <Stack>
-      <Stack direction='row' alignItems='center'>
-        <Checkbox
-          size='small'
-          onClick={() => {
-            if (isAllChecked) {
-              setSelectedProperties({
-                ...selectedProperties,
-                customProperties: []
-              });
-            } else {
-              setSelectedProperties({
-                ...selectedProperties,
-                customProperties: boardCustomProperties.fields.cardProperties.map((p) => p.id)
-              });
-            }
-          }}
-          checked={isAllChecked}
-        />
-        <Typography fontWeight='bold'>Select All</Typography>
-      </Stack>
+      <PropertySelector
+        isChecked={isAllChecked}
+        label='Select All'
+        bold
+        onClick={() => {
+          setSelectedProperties(
+            isAllChecked
+              ? {
+                  ...selectedProperties,
+                  customProperties: []
+                }
+              : {
+                  ...selectedProperties,
+                  customProperties: boardCustomProperties.fields.cardProperties.map((p) => p.id)
+                }
+          );
+        }}
+      />
       <Stack>
         {boardCustomProperties.fields.cardProperties.map((property) => {
-          const isSelected = selectedProperties.customProperties.includes(property.id);
           return (
-            <Stack key={property.id} direction='row' alignItems='center'>
-              <Checkbox
-                size='small'
-                checked={isSelected}
-                onClick={() => {
-                  if (isSelected) {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      customProperties: selectedProperties.customProperties.filter((p) => p !== property.id)
-                    });
-                  } else {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      customProperties: [...selectedProperties.customProperties, property.id]
-                    });
-                  }
-                }}
-              />
-              <Typography>{property.name}</Typography>
-            </Stack>
+            <PropertySelector
+              key={property.id}
+              isChecked={selectedProperties.customProperties.includes(property.id)}
+              label={property.name}
+              onClick={() => {
+                if (selectedProperties.customProperties.includes(property.id)) {
+                  setSelectedProperties({
+                    ...selectedProperties,
+                    customProperties: selectedProperties.customProperties.filter((p) => p !== property.id)
+                  });
+                } else {
+                  setSelectedProperties({
+                    ...selectedProperties,
+                    customProperties: [...selectedProperties.customProperties, property.id]
+                  });
+                }
+              }}
+            />
           );
         })}
       </Stack>

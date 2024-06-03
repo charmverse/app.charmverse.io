@@ -1,8 +1,9 @@
-import { Checkbox, Divider, Stack, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import { useMemo } from 'react';
 
 import { useProposalTemplates } from 'components/proposals/hooks/useProposalTemplates';
 
+import { PropertySelector } from './PropertiesListSelector';
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
@@ -31,50 +32,41 @@ export function FormFieldPropertiesList({
 
   return (
     <Stack>
-      <Stack direction='row' alignItems='center'>
-        <Checkbox
-          size='small'
-          checked={selectedProperties.formFields.length === formFields.length}
-          onChange={() => {
-            setSelectedProperties(
-              selectedProperties.formFields.length === formFields.length
-                ? {
-                    ...selectedProperties,
-                    formFields: []
-                  }
-                : {
-                    ...selectedProperties,
-                    formFields: formFields.map((formField) => formField.id)
-                  }
-            );
-          }}
-        />
-        <Typography fontWeight='bold'>Form Fields</Typography>
-      </Stack>
+      <PropertySelector
+        isChecked={selectedProperties.formFields.length === formFields.length}
+        label='Select All'
+        bold
+        onClick={() => {
+          if (selectedProperties.formFields.length === formFields.length) {
+            setSelectedProperties({
+              ...selectedProperties,
+              formFields: []
+            });
+          } else {
+            setSelectedProperties({
+              ...selectedProperties,
+              formFields: formFields.map((formField) => formField.id)
+            });
+          }
+        }}
+      />
       <Stack ml={2}>
         {formFields.map((formField) => {
-          const isSelected = selectedProperties.formFields.includes(formField.id);
           return (
-            <Stack key={formField.id} direction='row' alignItems='center'>
-              <Checkbox
-                size='small'
-                checked={isSelected}
-                onChange={() => {
-                  if (isSelected) {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      formFields: selectedProperties.formFields.filter((id) => id !== formField.id)
-                    });
-                  } else {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      formFields: [...selectedProperties.formFields, formField.id]
-                    });
-                  }
-                }}
-              />
-              <Typography>{formField.name}</Typography>
-            </Stack>
+            <PropertySelector
+              key={formField.id}
+              isChecked={selectedProperties.formFields.includes(formField.id)}
+              label={formField.name}
+              onClick={() => {
+                const isChecked = selectedProperties.formFields.includes(formField.id);
+                setSelectedProperties({
+                  ...selectedProperties,
+                  formFields: isChecked
+                    ? selectedProperties.formFields.filter((id) => id !== formField.id)
+                    : [...selectedProperties.formFields, formField.id]
+                });
+              }}
+            />
           );
         })}
       </Stack>

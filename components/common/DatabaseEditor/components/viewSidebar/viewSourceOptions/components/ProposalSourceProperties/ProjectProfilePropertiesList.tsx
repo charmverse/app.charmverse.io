@@ -1,8 +1,9 @@
-import { Checkbox, Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import { useMemo } from 'react';
 
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 
+import { PropertySelector } from './PropertiesListSelector';
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
@@ -24,34 +25,34 @@ export function ProjectProfilePropertiesList({
 
   return (
     <Stack>
-      <Stack direction='row' alignItems='center'>
-        <Checkbox
-          size='small'
-          checked={isAllProjectPropertiesSelected}
-          onChange={() => {
-            setSelectedProperties(
-              isAllProjectPropertiesSelected
-                ? {
-                    projectMember: [],
-                    project: [],
-                    defaults: [],
-                    formFields: [],
-                    rubricEvaluations: [],
-                    customProperties: []
-                  }
-                : {
-                    ...selectedProperties,
-                    projectMember: [...projectMemberFields],
-                    project: [...projectFields]
-                  }
-            );
-          }}
-        />
-        <Typography fontWeight='bold'>Project Profile</Typography>
-      </Stack>
+      <PropertySelector
+        isChecked={isAllProjectPropertiesSelected}
+        label='Project Profile'
+        bold
+        onClick={() => {
+          setSelectedProperties(
+            isAllProjectPropertiesSelected
+              ? {
+                  projectMember: [],
+                  project: [],
+                  defaults: [],
+                  formFields: [],
+                  rubricEvaluations: [],
+                  customProperties: []
+                }
+              : {
+                  ...selectedProperties,
+                  projectMember: [...projectMemberFields],
+                  project: [...projectFields]
+                }
+          );
+        }}
+      />
       <Stack ml={2}>
         {projectFieldProperties.map((propertyFieldProperty) => (
-          <Stack
+          <PropertySelector
+            key={propertyFieldProperty.field}
+            isChecked={selectedProperties.project.includes(propertyFieldProperty.field)}
             onClick={() => {
               const isChecked = selectedProperties.project.includes(propertyFieldProperty.field);
               setSelectedProperties({
@@ -63,36 +64,25 @@ export function ProjectProfilePropertiesList({
                   : [...selectedProperties.project, propertyFieldProperty.field]
               });
             }}
-            alignItems='center'
-            direction='row'
-            sx={{
-              cursor: 'pointer'
-            }}
-            key={propertyFieldProperty.field}
-          >
-            <Checkbox size='small' checked={selectedProperties.project.includes(propertyFieldProperty.field)} />
-            <Typography>{propertyFieldProperty.columnTitle}</Typography>
-          </Stack>
+            label={propertyFieldProperty.columnTitle}
+          />
         ))}
-        <Stack
-          direction='row'
-          alignItems='center'
-          sx={{
-            cursor: 'pointer'
-          }}
+        <PropertySelector
+          isChecked={isAllProjectMemberPropertiesSelected}
+          label='Project Member'
+          bold
           onClick={() => {
             setSelectedProperties({
               ...selectedProperties,
               projectMember: isAllProjectMemberPropertiesSelected ? [] : [...projectMemberFields]
             });
           }}
-        >
-          <Checkbox size='small' checked={isAllProjectMemberPropertiesSelected} />
-          <Typography fontWeight='bold'>Project Member</Typography>
-        </Stack>
+        />
         <Stack ml={2}>
           {projectMemberFieldProperties.map((projectMemberFieldProperty) => (
-            <Stack
+            <PropertySelector
+              key={projectMemberFieldProperty.field}
+              isChecked={selectedProperties.projectMember.includes(projectMemberFieldProperty.field)}
               onClick={() => {
                 const isChecked = selectedProperties.projectMember.includes(projectMemberFieldProperty.field);
                 setSelectedProperties({
@@ -104,19 +94,8 @@ export function ProjectProfilePropertiesList({
                     : [...selectedProperties.projectMember, projectMemberFieldProperty.field]
                 });
               }}
-              alignItems='center'
-              direction='row'
-              sx={{
-                cursor: 'pointer'
-              }}
-              key={projectMemberFieldProperty.field}
-            >
-              <Checkbox
-                size='small'
-                checked={selectedProperties.projectMember.includes(projectMemberFieldProperty.field)}
-              />
-              <Typography>{projectMemberFieldProperty.label}</Typography>
-            </Stack>
+              label={projectMemberFieldProperty.label}
+            />
           ))}
         </Stack>
       </Stack>
@@ -151,8 +130,12 @@ export function ProjectProfilePropertiesReadonlyList({
     >
       {selectedProjectMemberFields.length === 0 ? null : (
         <SelectedPropertiesList
+          itemsSx={{
+            ml: 2
+          }}
           items={selectedProjectMemberFields.map((projectMemberFieldProperty) => projectMemberFieldProperty.label)}
           title='Project Member'
+          hideDivider
         />
       )}
     </SelectedPropertiesList>

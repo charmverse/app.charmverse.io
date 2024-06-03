@@ -1,7 +1,8 @@
-import { Checkbox, Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 
 import { defaultProposalProperties, defaultProposalPropertyTypes } from 'lib/databases/proposalDbProperties';
 
+import { PropertySelector } from './PropertiesListSelector';
 import type { SelectedProposalProperties } from './ProposalSourcePropertiesDialog';
 import { SelectedPropertiesList } from './SelectedPropertiesList';
 
@@ -15,53 +16,46 @@ export function ProposalDefaultPropertiesList({
   const isAllChecked = defaultProposalPropertyTypes.length === selectedProperties.defaults.length;
   return (
     <Stack>
-      <Stack direction='row' alignItems='center'>
-        <Checkbox
-          size='small'
-          onClick={() => {
-            if (isAllChecked) {
-              setSelectedProperties({
-                ...selectedProperties,
-                defaults: []
-              });
-            } else {
-              setSelectedProperties({
-                ...selectedProperties,
-                defaults: [...defaultProposalPropertyTypes]
-              });
-            }
-          }}
-          checked={isAllChecked}
-        />
-        <Typography fontWeight='bold'>Select All</Typography>
-      </Stack>
-      <Stack>
-        {defaultProposalProperties.map((property) => {
-          const isSelected = selectedProperties.defaults.includes(property.type);
-          return (
-            <Stack key={property.id} direction='row' alignItems='center'>
-              <Checkbox
-                size='small'
-                checked={isSelected}
-                onClick={() => {
-                  if (isSelected) {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      defaults: selectedProperties.defaults.filter((p) => p !== property.type)
-                    });
-                  } else {
-                    setSelectedProperties({
-                      ...selectedProperties,
-                      defaults: [...selectedProperties.defaults, property.type]
-                    });
-                  }
-                }}
-              />
-              <Typography>{property.name}</Typography>
-            </Stack>
-          );
-        })}
-      </Stack>
+      <PropertySelector
+        isChecked={isAllChecked}
+        label='Select All'
+        bold
+        onClick={() => {
+          if (isAllChecked) {
+            setSelectedProperties({
+              ...selectedProperties,
+              defaults: []
+            });
+          } else {
+            setSelectedProperties({
+              ...selectedProperties,
+              defaults: [...defaultProposalPropertyTypes]
+            });
+          }
+        }}
+      />
+      {defaultProposalProperties.map((property) => {
+        return (
+          <PropertySelector
+            key={property.id}
+            isChecked={selectedProperties.defaults.includes(property.type)}
+            label={property.name}
+            onClick={() => {
+              if (selectedProperties.defaults.includes(property.type)) {
+                setSelectedProperties({
+                  ...selectedProperties,
+                  defaults: selectedProperties.defaults.filter((p) => p !== property.type)
+                });
+              } else {
+                setSelectedProperties({
+                  ...selectedProperties,
+                  defaults: [...selectedProperties.defaults, property.type]
+                });
+              }
+            }}
+          />
+        );
+      })}
     </Stack>
   );
 }
