@@ -22,8 +22,6 @@ import { initialDatabaseLoad } from '../../../store/databaseBlocksLoad';
 import { useAppDispatch, useAppSelector } from '../../../store/hooks';
 import { getViews } from '../../../store/views';
 
-import type { SelectedProposalProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
-
 export const allowedSourceDatabasePageTypes = ['board', 'inline_board'];
 type Props = {
   rootBoard: Board;

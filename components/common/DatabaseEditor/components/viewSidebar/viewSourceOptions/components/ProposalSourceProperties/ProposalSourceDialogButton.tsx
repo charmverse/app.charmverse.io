@@ -1,3 +1,4 @@
+import { Stack } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useMemo } from 'react';
 import useSWRMutation from 'swr/mutation';
@@ -7,6 +8,7 @@ import { Button } from 'components/common/Button';
 import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import { useProposalsBoardAdapter } from 'components/proposals/ProposalPage/components/ProposalProperties/hooks/useProposalsBoardAdapter';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board } from 'lib/databases/board';
 import { createSelectedPropertiesStateFromBoardProperties } from 'lib/databases/proposalsSource/createSelectedPropertiesFromBoardProperties';
 
@@ -19,6 +21,7 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
     (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProposalProperties } }>) =>
       charmClient.createProposalSource(arg)
   );
+  const isAdmin = useIsAdmin();
   const { boardCustomProperties } = useProposalsBoardAdapter();
   const dispatch = useAppDispatch();
 
@@ -34,19 +37,23 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
 
   return (
     <>
-      <Button
-        variant='outlined'
-        color='secondary'
-        onClick={proposalSourcePropertiesPopupState.open}
-        sx={{
-          m: 2,
-          mt: 1
-        }}
-        size='small'
-        loading={isLoadingProposalSource}
-      >
-        Select proposal properties
-      </Button>
+      <Stack justifyContent='center' direction='row'>
+        <Button
+          variant='outlined'
+          color='secondary'
+          disabled={!isAdmin}
+          disabledTooltip='You do not have permission to update this page'
+          onClick={isAdmin ? proposalSourcePropertiesPopupState.open : undefined}
+          sx={{
+            m: 2,
+            mt: 1
+          }}
+          size='small'
+          loading={isLoadingProposalSource}
+        >
+          Select proposal properties
+        </Button>
+      </Stack>
       {proposalSourcePropertiesPopupState.isOpen && (
         <ProposalSourcePropertiesDialog
           onClose={proposalSourcePropertiesPopupState.close}

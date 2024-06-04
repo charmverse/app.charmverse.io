@@ -27,6 +27,7 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
 import { UnauthorisedActionError } from 'lib/utils/errors';
+import { prettyPrint } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 
@@ -270,7 +271,6 @@ async function createBlocks(req: NextApiRequest, res: NextApiResponse<Omit<Block
 
 async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithDetails[]>) {
   const userId = req.session.user.id;
-
   const blocks: BlockWithDetails[] = req.body;
   const dbBlocks = await prisma.block.findMany({
     where: {
@@ -287,6 +287,19 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
       title: true
     }
   });
+
+  const { isAdmin } = await hasAccessToSpace({
+    userId,
+    spaceId: dbBlocks[0].spaceId
+  });
+
+  const proposalSourceBoardBlocks = blocks.filter(
+    (b) => b.type === 'board' && (b.fields as unknown as BoardFields).sourceType === 'proposals'
+  );
+
+  if (proposalSourceBoardBlocks.length && !isAdmin) {
+    throw new ActionNotPermittedError('You do not have permission to edit a proposal board block');
+  }
 
   const pages = await prisma.page.findMany({
     where: {

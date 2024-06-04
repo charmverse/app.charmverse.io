@@ -1,3 +1,4 @@
+import { hasAccessToSpace } from '@charmverse/core/permissions';
 import { prisma } from '@charmverse/core/prisma-client';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
@@ -44,6 +45,15 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse) {
     resourceId: pageId,
     userId
   });
+
+  const { isAdmin } = await hasAccessToSpace({
+    userId,
+    spaceId: boardPage.spaceId
+  });
+
+  if (!isAdmin) {
+    throw new ActionNotPermittedError('You do not have permission to update this page');
+  }
 
   if (permissions.edit_content !== true) {
     throw new ActionNotPermittedError('You do not have permission to update this page');

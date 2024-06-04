@@ -2,7 +2,7 @@ import type { ApiPageKey } from '@charmverse/core/prisma';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import { BsFiletypeCsv } from 'react-icons/bs';
@@ -60,7 +60,6 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const proposalSourcePropertiesPopupState = usePopupState({
     variant: 'dialog'
   });
-
   const dispatch = useAppDispatch();
   const { onCreateDatabase, onCsvImport, onSelectLinkedDatabase, onSelectSourceGoogleForm } = useSourceOptions({
     rootBoard,
@@ -179,9 +178,11 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             )}
 
             {/** Only admins can create proposals as datasource, to avoid accidentally revealing proposal data */}
-            {allowedSourceOptions.includes('proposals') && isAdmin && (
+            {allowedSourceOptions.includes('proposals') && (
               <SourceType
+                disabled={!isAdmin}
                 data-test='source-proposals'
+                disabledTooltip={!isAdmin ? 'Only admins can create proposals as datasource boards' : ''}
                 active={activeSourceType === 'proposals'}
                 onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesPopupState.open}
               >
