@@ -144,7 +144,7 @@ export async function indexOnchainProposalCredentials({
     .filter((txLog) => lowerCaseEqual(txLog.address, attestationContract))
     .map((txLog) => txLog.data);
 
-  const eas = await getEasInstance(chainId);
+  const eas = getEasInstance(chainId);
   eas.connect(new JsonRpcProvider(getChainById(chainId)?.rpcUrls[0] as string, chainId));
 
   const credentials = await Promise.all(
