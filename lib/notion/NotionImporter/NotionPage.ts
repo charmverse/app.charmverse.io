@@ -301,7 +301,14 @@ export class NotionPage {
               },
               client,
               cache
-            ).catch((err) => null)
+            ).catch((err) => {
+              log.warn('[notion] Error retrieving child blocks', {
+                error: err,
+                blockId: parentBlockId,
+                spaceId: this.spaceId,
+                userId: this.userId
+              });
+            })
           )
         )
       ).filter(isTruthy);
