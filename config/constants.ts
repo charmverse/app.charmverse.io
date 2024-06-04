@@ -57,3 +57,4 @@ export const graphQlServerEndpoint = process.env.CERAMIC_GRAPHQL_SERVER as strin
 // Github
 export const githubPrivateKey = process.env.GITHUB_APP_PRIVATE_KEY as string;
 export const githubAppId = Number(process.env.GITHUB_APP_ID);
+export const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN as string;

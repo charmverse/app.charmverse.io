@@ -6,6 +6,7 @@
   ],
   "scripts": {
     "testgen": "python scripts/testgen/make_tests.py",
+    "prisma:local": "rm -rf ./node_modules/.prisma && npm link @charmverse/core && npm run prisma:generate",
     "ceramic:local": "CERAMIC_ENABLE_EXPERIMENTAL_COMPOSE_DB='true' npx ceramic daemon",
     "ceramic:graphql": "npx dotenv -e .env.local --  tsx background/ceramicServer/ceramic-client.ts",
     "ceramic:graphql:stg": "npx dotenv -e .env.staging --  tsx background/ceramicServer/ceramic-client.ts",
