@@ -98,7 +98,7 @@ export default function PaymentForm({ onSubmit, defaultChainId = 1 }: Props) {
       setValue('tokenDecimals', tokenData.decimals ?? null);
       trigger('tokenDecimals');
       // If API returns empty data for any field, we allow manual input. Otherwise use pre-filled data
-      setAllowManualInput(!!(!tokenData.name || !tokenData.symbol || !tokenData.decimals || !tokenData.logo));
+      setAllowManualInput(!!(!tokenData.name || !tokenData.symbol || !tokenData.decimals));
       setLoadingToken(false);
     } catch (error) {
       setValue('tokenLogo', null);
