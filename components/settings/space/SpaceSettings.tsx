@@ -31,6 +31,7 @@ import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberPro
 import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
 import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
+import { blueColor } from 'theme/colors';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
@@ -51,12 +52,27 @@ export type FormValues = {
   requireMembersTwoFactorAuth: boolean;
   primaryMemberIdentity?: IdentityType | null;
   customDomain?: string | null;
+  emailBrandArtwork?: string | null;
+  emailBrandColor?: string | null;
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(),
   spaceArtwork: yup.string().nullable(),
+  emailBrandArtwork: yup.string().nullable(),
+  emailBrandColor: yup
+    .string()
+    .nullable()
+    .test({
+      name: 'isHexColor',
+      test(value, ctx) {
+        if (!value || /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
+          return true;
+        }
+        return ctx.createError({ message: 'Please provide a valid hex color code', path: 'emailBrandColor' });
+      }
+    }),
   notificationToggles: yup.object(),
   requireMembersTwoFactorAuth: yup.boolean().required(),
   enableTestnets: yup.boolean().required(),
@@ -71,7 +87,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   customDomain: yup
     .string()
     .nullable()
-    .test('isCusotmDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value))
+    .test('isCustomDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value))
 });
 
 export function SpaceSettings({
@@ -100,10 +116,11 @@ export function SpaceSettings({
     control,
     setValue,
     watch,
-    formState: { errors, isDirty }
+    formState: { errors, isDirty, isValid }
   } = useForm<FormValues>({
     defaultValues: _getFormValues(space),
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
+    reValidateMode: 'onChange'
   });
 
   const {
@@ -124,6 +141,8 @@ export function SpaceSettings({
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
   const watchSpaceArtwork = watch('spaceArtwork');
+  const watchEmailBrandArtwork = watch('emailBrandArtwork');
+  const watchEmailBrandColor = watch('emailBrandColor');
   const watchPrimaryMemberIdentity = watch('primaryMemberIdentity') ?? undefined;
 
   async function onSubmit(values: FormValues) {
@@ -152,7 +171,9 @@ export function SpaceSettings({
         spaceArtwork: values.spaceArtwork,
         enableTestnets: values.enableTestnets,
         requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
-        customDomain: values.customDomain || null
+        customDomain: values.customDomain || null,
+        emailBrandArtwork: values.emailBrandArtwork,
+        emailBrandColor: values.emailBrandColor
       },
       {
         onSuccess: (updatedSpace) => {
@@ -389,6 +410,47 @@ export function SpaceSettings({
             <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
           <Grid item>
+            <FieldLabel>Email Brand Image</FieldLabel>
+            <Typography variant='caption' mb={2} component='p'>
+              Customize the image when shown in email.
+            </Typography>
+            <Avatar
+              name='C'
+              variant='rounded'
+              image={watchEmailBrandArtwork}
+              updateImage={(url: string) => setValue('emailBrandArtwork', url, { shouldDirty: true })}
+              editable={isAdmin}
+            />
+            <TextField {...register('emailBrandArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
+          </Grid>
+          <Grid item>
+            <FieldLabel>Email Brand Color</FieldLabel>
+            <Typography variant='caption' mb={2} component='p'>
+              Customize the brand color in email.
+            </Typography>
+            <Stack direction='row' alignItems='center' gap={1}>
+              <TextField
+                {...register('emailBrandColor')}
+                disabled={!isAdmin}
+                fullWidth
+                error={!!errors.emailBrandColor}
+                helperText={errors.emailBrandColor?.message}
+                placeholder={blueColor}
+              />
+              <Box
+                sx={{
+                  border: (theme) => `1px solid ${theme.palette.divider}`,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: (theme) => theme.spacing(0.5),
+                  backgroundColor: watchEmailBrandColor?.startsWith('#')
+                    ? watchEmailBrandColor
+                    : `#${watchEmailBrandColor}`
+                }}
+              />
+            </Stack>
+          </Grid>
+          <Grid item>
             <Legend>Members</Legend>
           </Grid>
           <Grid item>
@@ -520,7 +582,7 @@ export function SpaceSettings({
             <Button
               disableElevation
               data-test='submit-space-update'
-              disabled={updateSpaceLoading || !dataChanged}
+              disabled={updateSpaceLoading || !dataChanged || !isAdmin || !isValid}
               type='submit'
               loading={updateSpaceLoading}
             >
@@ -583,6 +645,8 @@ function _getFormValues(space: Space): FormValues {
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
     notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
     customDomain: space.customDomain,
-    primaryMemberIdentity: space.primaryMemberIdentity
+    primaryMemberIdentity: space.primaryMemberIdentity,
+    emailBrandArtwork: space.emailBrandArtwork,
+    emailBrandColor: space.emailBrandColor || blueColor
   };
 }

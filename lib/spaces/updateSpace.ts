@@ -33,6 +33,8 @@ export type UpdateableSpaceFields = Partial<
     | 'credentialsChainId'
     | 'credentialsWallet'
     | 'kycOption'
+    | 'emailBrandArtwork'
+    | 'emailBrandColor'
   >
 >;
 
@@ -132,7 +134,9 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       useOnchainCredentials: updates.useOnchainCredentials,
       credentialsChainId: updates.credentialsChainId,
       credentialsWallet: updates.credentialsWallet?.toLowerCase(),
-      kycOption: updates.kycOption
+      kycOption: updates.kycOption,
+      emailBrandArtwork: updates.emailBrandArtwork,
+      emailBrandColor: updates.emailBrandColor
     }
   });
 
