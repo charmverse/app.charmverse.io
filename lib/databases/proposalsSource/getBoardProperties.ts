@@ -85,6 +85,10 @@ export function getBoardProperties({
   // properties related to project profile
   applyProjectProfileProperties(boardProperties);
 
+  boardProperties.forEach((property) => {
+    property.name = getPropertyName(property);
+  });
+
   if (!selectedProperties) {
     return boardProperties;
   }
@@ -125,7 +129,7 @@ function applyRubricEvaluationQuestionProperties(
       applyToPropertiesByTypeAndName(boardProperties, {
         id: uuid(),
         type: 'proposalRubricCriteriaTotal',
-        name: rubricCriteriaTitle,
+        name: `${evaluationTitle}: ${rubricCriteriaTitle}`,
         tooltip: rubricCriteriaDescription,
         readOnly: true,
         readOnlyValues: true,
@@ -214,19 +218,22 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluatedBy',
-      name: rubricStepTitle
+      name: rubricStepTitle,
+      evaluationTitle: rubricStepTitle
     });
 
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationTotal',
-      name: rubricStepTitle
+      name: rubricStepTitle,
+      evaluationTitle: rubricStepTitle
     });
 
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationAverage',
-      name: rubricStepTitle
+      name: rubricStepTitle,
+      evaluationTitle: rubricStepTitle
     });
   }
 }
@@ -263,7 +270,7 @@ function applyToPropertiesByTypeAndName(
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
   const existingPropIndex = boardProperties.findIndex(
-    (p) => p.type === fieldProperty.type && p.name === fieldProperty.name
+    (p) => p.type === fieldProperty.type && p.evaluationTitle === fieldProperty.evaluationTitle
   );
   if (existingPropIndex === -1) {
     boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
@@ -290,14 +297,14 @@ function applyFormFieldToProperties(
   }
 }
 
-export function getPropertyName(property: IPropertyTemplate) {
+function getPropertyName(property: IPropertyTemplate) {
   return property.type === 'proposalEvaluatedBy'
-    ? `${property.name} (Evaluation reviewers)`
+    ? `${property.name} (Step reviewers)`
     : property.type === 'proposalEvaluationAverage'
-    ? `${property.name} (Evaluation average)`
+    ? `${property.name} (Step average)`
     : property.type === 'proposalEvaluationTotal'
-    ? `${property.name} (Evaluation total)`
+    ? `${property.name} (Step total)`
     : property.type === 'proposalRubricCriteriaTotal'
-    ? `${property.name} (Total score)`
-    : undefined;
+    ? `${property.name} (Criterial total)`
+    : property.name;
 }

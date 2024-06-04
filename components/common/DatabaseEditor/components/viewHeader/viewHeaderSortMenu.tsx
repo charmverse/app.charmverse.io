@@ -9,7 +9,6 @@ import type { IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import { getPropertyName } from 'lib/databases/getPropertyName';
 
 import mutator from '../../mutator';
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -23,7 +22,7 @@ const ViewHeaderSortMenu = React.memo((props: Props) => {
   const { properties, activeView, orderedCards } = props;
   const sortDisplayOptions = properties
     ?.filter((o) => o.type !== 'proposalReviewerNotes')
-    ?.map((o) => ({ id: o.id, name: getPropertyName(o), icon: iconForPropertyType(o.type) }));
+    ?.map((o) => ({ id: o.id, name: o.name, icon: iconForPropertyType(o.type) }));
   sortDisplayOptions?.unshift({ id: Constants.titleColumnId, icon: iconForPropertyType('text'), name: 'Title' });
   const localViewSettings = useLocalDbViewSettings();
 

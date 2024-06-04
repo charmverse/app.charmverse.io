@@ -57,23 +57,26 @@ export function filterBoardProperties({
     if (
       p.type === 'proposalEvaluationAverage' ||
       p.type === 'proposalEvaluationTotal' ||
-      p.type === 'proposalEvaluatedBy'
+      p.type === 'proposalEvaluatedBy' ||
+      p.type === 'proposalRubricCriteriaTotal'
     ) {
-      const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.name);
-      if (rubricEvaluation && rubricEvaluation.average && p.type === 'proposalEvaluationAverage') {
-        return true;
-      }
-
-      if (rubricEvaluation && rubricEvaluation.total && p.type === 'proposalEvaluationTotal') {
-        return true;
-      }
-
-      if (rubricEvaluation && rubricEvaluation.reviewers && p.type === 'proposalEvaluatedBy') {
-        return true;
-      }
-    } else if (p.type === 'proposalRubricCriteriaTotal') {
       const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
-      if (rubricEvaluation && rubricEvaluation.criteriaTotal) {
+      if (!rubricEvaluation) {
+        return false;
+      }
+      if (rubricEvaluation.average && p.type === 'proposalEvaluationAverage') {
+        return true;
+      }
+
+      if (rubricEvaluation.total && p.type === 'proposalEvaluationTotal') {
+        return true;
+      }
+
+      if (rubricEvaluation.reviewers && p.type === 'proposalEvaluatedBy') {
+        return true;
+      }
+
+      if (rubricEvaluation.criteriaTotal && p.type === 'proposalRubricCriteriaTotal') {
         return true;
       }
     }
