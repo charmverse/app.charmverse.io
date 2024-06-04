@@ -3,7 +3,7 @@ import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
 import debounce from 'lodash/debounce';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
@@ -88,22 +88,25 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     onChange(updatedList);
   }
 
-  function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
-    if (readOnly) {
-      return;
-    }
-    const newCriteriaList = [...criteriaList];
-    const criteria = newCriteriaList.find((c) => c.id === id);
-    if (criteria) {
-      Object.assign(criteria, updates);
-      setCriteriaList([...newCriteriaList]);
-      if (newCriteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
-        onChange(newCriteriaList);
+  const setCriteriaProperty = useCallback(
+    (id: string, updates: Partial<RangeProposalCriteria>) => {
+      if (readOnly) {
+        return;
       }
-    }
-  }
+      const newCriteriaList = [...criteriaList];
+      const criteria = newCriteriaList.find((c) => c.id === id);
+      if (criteria) {
+        Object.assign(criteria, updates);
+        setCriteriaList([...newCriteriaList]);
+        if (newCriteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
+          onChange(newCriteriaList);
+        }
+      }
+    },
+    [answers, criteriaList, onChange, readOnly]
+  );
 
-  const debouncedSetCriteriaProperty = useRef(debounce(setCriteriaProperty, 300)).current;
+  const debouncedSetCriteriaProperty = useMemo(() => debounce(setCriteriaProperty, 300), [setCriteriaProperty]);
 
   useEffect(() => {
     return () => {
@@ -113,9 +116,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
 
   useEffect(() => {
     // This useEffect is needed here for the case the user imports criteria from a template and teh value changes
-    if (value.length !== criteriaList.length) {
-      setCriteriaList(value);
-    }
+    setCriteriaList(value);
   }, [value.length]);
 
   function handleClickDelete(criteriaId: string) {
