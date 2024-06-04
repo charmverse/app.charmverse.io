@@ -1,3 +1,5 @@
+import { log } from '@charmverse/core/log';
+
 import { InvalidStateError } from 'lib/middleware';
 
 import type { GithubGraphQLQuery, GithubUserName } from './getMergedPullRequests';
@@ -15,7 +17,9 @@ export async function summariseDeveloperActivity({
   githubUsername,
   fromDate = getDefaultFromDate(),
   limit = 5
-}: GithubUserName & GithubGraphQLQuery): Promise<PullRequestSummaryWithFilePatches[]> {
+}: GithubUserName & GithubGraphQLQuery): Promise<
+  Pick<PullRequestSummaryWithFilePatches, 'additions' | 'deletions' | 'summary'>[]
+> {
   // Loads 100 pull requests, then groups and sorts them by repository so we have a more accurate assessment of the most active repo
   const pullRequests = await getPullRequestsByRepo({ githubUsername, fromDate, limit: 100 });
 
@@ -30,18 +34,26 @@ export async function summariseDeveloperActivity({
     throw new InvalidStateError('No pull requests for the given criteria');
   }
 
-  const summaries = await Promise.all(
-    filteredPullRequests.map((pr) =>
-      summarisePullRequest({
-        githubUsername,
-        prNumber: pr.number,
-        prTitle: pr.title,
-        repoName: mostActiveRepo.repoName,
-        repoOwner: mostActiveRepo.repoOwner,
-        status: 'merged'
-      })
-    )
-  );
+  const summaries: PullRequestSummaryWithFilePatches[] = [];
 
-  return summaries;
+  for (let i = 0; i < filteredPullRequests.length; i++) {
+    const pr = filteredPullRequests[i];
+    log.info(`Summarising PR (${i + 1}/${filteredPullRequests.length}) for ${githubUsername}`);
+    const summary = await summarisePullRequest({
+      githubUsername,
+      prNumber: pr.number,
+      prTitle: pr.title,
+      repoName: mostActiveRepo.repoName,
+      repoOwner: mostActiveRepo.repoOwner,
+      status: 'merged'
+    });
+
+    summaries.push(summary);
+  }
+
+  return summaries.map((summary) => ({
+    additions: summary.additions,
+    deletions: summary.deletions,
+    summary: summary.summary
+  }));
 }
