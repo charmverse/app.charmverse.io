@@ -1,5 +1,8 @@
+import { prisma } from '@charmverse/core/prisma-client';
+
 import { GET } from 'adapters/http';
 import { githubAccessToken } from 'config/constants';
+import { randomIntFromInterval } from 'lib/utils/random';
 
 import { GITHUB_API_BASE_URL } from '../constants';
 import type { GithubFileChange, PullRequestToQuery } from '../getPullRequestFileChanges';
@@ -22,6 +25,7 @@ const exampleFileChanges: GithubFileChange[] = [
     contents_url: 'https://github.com/repo/contents/1',
     patch: 'patch1'
   },
+  // This file should be ignored
   {
     sha: '2',
     filename: 'src/package-lock.json',
@@ -48,7 +52,19 @@ const exampleFileChanges: GithubFileChange[] = [
   }
 ];
 
+const exampleOwner = `owner-${randomIntFromInterval(1, 1000)}`;
+const exampleRepo = `repo-${randomIntFromInterval(1, 1000)}`;
+
 describe('getPullRequestFileChanges', () => {
+  beforeAll(async () => {
+    await prisma.pullRequestSummary.deleteMany({
+      where: {
+        repoOwner: exampleOwner,
+        repoName: exampleRepo
+      }
+    });
+  });
+
   beforeEach(() => {
     mockedGET.mockClear();
   });
@@ -57,9 +73,9 @@ describe('getPullRequestFileChanges', () => {
     mockedGET.mockResolvedValueOnce(exampleFileChanges);
 
     const params: PullRequestToQuery = {
-      number: 123,
-      repoName: 'repo',
-      repoOwner: 'owner'
+      prNumber: 123,
+      repoName: exampleRepo,
+      repoOwner: exampleOwner
     };
 
     const result = await getPullRequestFileChanges(params);
@@ -68,11 +84,15 @@ describe('getPullRequestFileChanges', () => {
 
     expect(result).toEqual(expected);
     expect(result).not.toContain(exampleFileChanges[1]);
-    expect(mockedGET).toHaveBeenCalledWith(`${GITHUB_API_BASE_URL}/repos/owner/repo/pulls/123/files`, undefined, {
-      headers: {
-        Authorization: `bearer ${githubAccessToken}`,
-        Accept: 'application/vnd.github.v3+json'
+    expect(mockedGET).toHaveBeenCalledWith(
+      `${GITHUB_API_BASE_URL}/repos/${exampleOwner}/${exampleRepo}/pulls/123/files`,
+      undefined,
+      {
+        headers: {
+          Authorization: `bearer ${githubAccessToken}`,
+          Accept: 'application/vnd.github.v3+json'
+        }
       }
-    });
+    );
   });
 });

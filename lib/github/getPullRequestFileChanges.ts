@@ -20,14 +20,14 @@ export type GithubFileChange = {
 
 const ignoredFiles = ['package-lock.json'];
 
-export type PullRequestToQuery = Pick<PullRequestSummary, 'number' | 'repoOwner' | 'repoName'>;
+export type PullRequestToQuery = Pick<PullRequestSummary, 'prNumber' | 'repoOwner' | 'repoName'>;
 
 export async function getPullRequestFileChanges({
-  number,
+  prNumber,
   repoName,
   repoOwner
 }: PullRequestToQuery): Promise<GithubFileChange[]> {
-  const requestUrl = `${GITHUB_API_BASE_URL}/repos/${repoOwner}/${repoName}/pulls/${number}/files`;
+  const requestUrl = `${GITHUB_API_BASE_URL}/repos/${repoOwner}/${repoName}/pulls/${prNumber}/files`;
 
   const response = await GET<GithubFileChange[]>(requestUrl, undefined, {
     headers: {
