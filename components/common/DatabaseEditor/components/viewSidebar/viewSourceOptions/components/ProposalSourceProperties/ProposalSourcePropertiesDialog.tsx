@@ -115,7 +115,7 @@ function ProposalSourcePropertiesGroup({
             });
           }}
         >
-          <ListItemText>Rubric Evaluations</ListItemText>
+          <ListItemText>Proposal Rubric Evaluations</ListItemText>
         </MenuItem>
         <MenuItem
           dense
@@ -197,7 +197,7 @@ function ProposalSourcePropertiesSelector({
       )}
       {selectedGroup.group === 'rubricEvaluations' && (
         <>
-          <Typography variant='h6'>Rubric evaluations properties</Typography>
+          <Typography variant='h6'>Proposal rubric evaluations properties</Typography>
           <RubricEvaluationPropertiesList
             selectedProperties={selectedProperties}
             setSelectedProperties={setSelectedProperties}

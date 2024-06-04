@@ -112,21 +112,21 @@ export function RubricEvaluationPropertiesList({
                 onClick={() => {
                   updateRubricEvaluationProperties(rubricEvaluationTitle, { average: !_rubricEvaluation?.average });
                 }}
-                label='Average'
+                label='Step Average'
               />
               <PropertySelector
                 isChecked={!!_rubricEvaluation?.total}
                 onClick={() => {
                   updateRubricEvaluationProperties(rubricEvaluationTitle, { total: !_rubricEvaluation?.total });
                 }}
-                label='Total'
+                label='Step Total'
               />
               <PropertySelector
                 isChecked={!!_rubricEvaluation?.reviewers}
                 onClick={() => {
                   updateRubricEvaluationProperties(rubricEvaluationTitle, { reviewers: !_rubricEvaluation?.reviewers });
                 }}
-                label='Reviewers'
+                label='Step Reviewers'
               />
               <PropertySelector
                 isChecked={!!_rubricEvaluation?.criteriaTotal}
@@ -135,7 +135,7 @@ export function RubricEvaluationPropertiesList({
                     criteriaTotal: !_rubricEvaluation?.criteriaTotal
                   });
                 }}
-                label='Criteria total'
+                label='Criteria total (for each criteria)'
               />
             </Stack>
           </Stack>
@@ -157,19 +157,19 @@ export function RubricEvaluationPropertiesReadonlyList({
   return (
     <Stack gap={1}>
       <Typography fontWeight='bold' variant='body2'>
-        Rubric Evaluations
+        Proposal Rubric Evaluations
       </Typography>
       <Stack gap={2}>
         {selectedProperties.rubricEvaluations.map((rubricEvaluation) => {
           const items: string[] = [];
           if (rubricEvaluation.average) {
-            items.push('Average');
+            items.push('Step Average');
           }
           if (rubricEvaluation.total) {
-            items.push('Total');
+            items.push('Step Total');
           }
           if (rubricEvaluation.reviewers) {
-            items.push('Reviewers');
+            items.push('Step Reviewers');
           }
           if (rubricEvaluation.criteriaTotal) {
             items.push('Criteria total');
