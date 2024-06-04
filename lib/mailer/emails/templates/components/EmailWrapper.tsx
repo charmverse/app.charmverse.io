@@ -14,6 +14,10 @@ interface Props {
   preview?: string;
   title: string;
   headerSize?: 'medium' | 'small';
+  emailBranding?: {
+    artwork: string;
+    color: string;
+  };
 }
 
 export default function EmailWrapper(props: Props) {
@@ -35,7 +39,7 @@ export default function EmailWrapper(props: Props) {
             padding: 30
           }}
         >
-          <Header size={props.headerSize} />
+          <Header size={props.headerSize} image={props.emailBranding?.artwork} />
           {props.children}
         </Section>
         <Footer />
