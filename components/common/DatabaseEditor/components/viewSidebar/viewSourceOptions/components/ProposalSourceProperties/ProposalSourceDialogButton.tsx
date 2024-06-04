@@ -42,7 +42,7 @@ export function ProposalSourceDialogButton({ board }: { board: Board }) {
           variant='outlined'
           color='secondary'
           disabled={!isAdmin}
-          disabledTooltip='You do not have permission to update this page'
+          disabledTooltip='You do not have permission to update proposal properties'
           onClick={isAdmin ? proposalSourcePropertiesPopupState.open : undefined}
           sx={{
             m: 2,

@@ -226,20 +226,4 @@ describe('getBoardProperties', () => {
     expect(projectMemberWalletProperty).toBeTruthy();
     expect(projectMemberWalletProperty?.private).toBeTruthy();
   });
-
-  it('Should not return hidden properties for project profile', () => {
-    const properties = getBoardProperties({
-      formFields: [
-        getFormInput({
-          id: 'project-profile-id',
-          type: 'project_profile',
-          fieldConfig: getProjectProfileFieldConfig({
-            website: { show: false }
-          })
-        })
-      ]
-    });
-
-    expect(properties.some((r) => r.id === constants.PROJECT_WEBSITE_ID)).toBeFalsy();
-  });
 });

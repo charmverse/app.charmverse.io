@@ -6,8 +6,7 @@ import type { SelectOptionType } from 'components/common/form/fields/Select/inte
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FormFieldInput } from 'lib/forms/interfaces';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
-import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
+import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
 
 import { filterBoardProperties } from './filterBoardProperties';
@@ -82,6 +81,9 @@ export function getBoardProperties({
 
   // properties for each unique questions on rubric evaluation step
   applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
+
+  // properties related to project profile
+  applyProjectProfileProperties(boardProperties);
 
   if (!selectedProperties) {
     return boardProperties;
@@ -164,10 +166,6 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         }));
         break;
       }
-      case 'project_profile': {
-        applyProjectProfileProperties(boardProperties, formField.fieldConfig as ProjectAndMembersFieldConfig);
-        break;
-      }
       default: {
         if (!excludedFieldTypes.includes(formField.type)) {
           boardPropertyType = formField.type as IPropertyTemplate['type'];
@@ -193,32 +191,21 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
 }
 
 // field config ref: lib/projects/constants.ts
-function applyProjectProfileProperties(
-  boardProperties: IPropertyTemplate[],
-  fieldConfig: ProjectAndMembersFieldConfig
-) {
+function applyProjectProfileProperties(boardProperties: IPropertyTemplate[]) {
   projectFieldProperties.forEach((field) => {
-    const config = getFieldConfig(fieldConfig[field.field]);
-    if (config.show) {
-      applyToPropertiesById(boardProperties, {
-        id: field.columnPropertyId,
-        name: field.columnTitle,
-        private: config.private,
-        type: 'text'
-      });
-    }
+    applyToPropertiesById(boardProperties, {
+      id: field.columnPropertyId,
+      name: field.columnTitle,
+      type: 'text'
+    });
   });
   projectMemberFieldProperties.forEach((field) => {
-    const config = getFieldConfig(fieldConfig[field.field]);
-    if (getFieldConfig(fieldConfig[field.field]).show) {
-      applyToPropertiesById(boardProperties, {
-        id: field.columnPropertyId,
-        name: field.columnTitle,
-        private: config.private,
-        type: 'multiSelect',
-        dynamicOptions: true
-      });
-    }
+    applyToPropertiesById(boardProperties, {
+      id: field.columnPropertyId,
+      name: field.columnTitle,
+      type: 'multiSelect',
+      dynamicOptions: true
+    });
   });
 }
 
