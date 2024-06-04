@@ -46,7 +46,8 @@ const notificationTypes: Record<ConfigurableGroups, { title: string; types: Noti
         { label: 'Vote ready (Authors and Voters)', type: 'proposals__vote' },
         { label: 'Vote passed (Authors and Voters)', type: 'proposals__vote_passed' },
         { label: 'Proposal declined (Authors)', type: 'proposals__proposal_failed' },
-        { label: 'Proposal passed (Authors)', type: 'proposals__proposal_passed' }
+        { label: 'Proposal passed (Authors)', type: 'proposals__proposal_passed' },
+        { label: 'Proposal published (Authors)', type: 'proposals__proposal_published' }
       ]
     ]
   },

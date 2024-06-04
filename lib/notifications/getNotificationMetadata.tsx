@@ -210,6 +210,9 @@ function getProposalContent({
     case 'proposal_appealed': {
       return `The ${proposalFeatureTitle} has been appealed and requires your review.`;
     }
+    case 'proposal_published': {
+      return `Your ${proposalFeatureTitle}, has been published`;
+    }
     case 'vote_passed': {
       return `The vote on ${notification.pageTitle} has passed. View results.`;
     }
