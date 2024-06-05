@@ -66,7 +66,6 @@ export function mockRewardBlocks({
         columnWrappedIds: ['__title'],
         visibleOptionIds: [],
         defaultTemplateId: '',
-        collapsedOptionIds: [],
         columnCalculations: {},
         kanbanCalculations: {},
         visiblePropertyIds: [

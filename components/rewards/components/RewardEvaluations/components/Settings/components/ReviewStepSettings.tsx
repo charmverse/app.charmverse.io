@@ -14,9 +14,18 @@ export function ReviewStepSettings({
 }: Pick<EvaluationStepSettingsProps, 'rewardInput' | 'readOnly' | 'onChange'>) {
   function handleOnChangeReviewers(reviewers: SelectOption[]) {
     onChange({
-      reviewers: reviewers as UpdateableRewardFields['reviewers']
+      reviewers: reviewers.map((reviewer) => ({
+        roleId: reviewer.group === 'role' ? reviewer.id : undefined,
+        userId: reviewer.group === 'user' ? reviewer.id : undefined
+      }))
     });
   }
+
+  const value: SelectOption[] =
+    rewardInput?.reviewers?.map((reviewer) => ({
+      group: reviewer.roleId ? 'role' : 'user',
+      id: (reviewer.roleId ?? reviewer.userId) as string
+    })) ?? [];
 
   return (
     <Stack gap={1.5}>
@@ -25,7 +34,7 @@ export function ReviewStepSettings({
         <UserAndRoleSelect
           data-test='reward-reviewer-select'
           emptyPlaceholderContent='Select user or role'
-          value={(rewardInput?.reviewers ?? []) as SelectOption[]}
+          value={value}
           readOnly={readOnly}
           variant='outlined'
           onChange={handleOnChangeReviewers}

@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { objectUtils } from '@charmverse/core/utilities';
 import { useMemo } from 'react';
 
@@ -173,13 +172,7 @@ export function mapProposalToCard({
     [PROPOSAL_EVALUATION_TYPE_ID]: proposal.currentStep?.step ?? 'draft',
     [PROPOSAL_REVIEWERS_BLOCK_ID]:
       proposal && 'reviewers' in proposal
-        ? proposal.reviewers.map(
-            (r) =>
-              ({
-                group: r.userId ? 'user' : r.roleId ? 'role' : 'system_role',
-                id: r.userId ?? r.roleId ?? r.systemRole
-              } as TargetPermissionGroup<'user' | 'role'>)
-          )
+        ? proposal.reviewers.map(({ userId, roleId, systemRole }) => ({ userId, roleId, systemRole }))
         : []
   };
   const card: Card<ProposalPropertyValue> = {

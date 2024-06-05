@@ -12,6 +12,11 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
+    },
+    select: {
+      spaceId: true,
+      fields: true,
+      id: true
     }
   });
 
@@ -42,11 +47,7 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
         rubricCriteria: {
           select: {
             title: true,
-            answers: {
-              select: {
-                response: true
-              }
-            }
+            description: true
           }
         }
       },

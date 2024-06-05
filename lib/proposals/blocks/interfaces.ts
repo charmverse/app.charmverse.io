@@ -1,5 +1,4 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
-import type { ProposalBlock } from '@charmverse/core/prisma-client';
+import type { ProposalBlock, ProposalReviewer } from '@charmverse/core/prisma';
 
 import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
@@ -20,7 +19,9 @@ export type ProposalBoardBlock = ProposalBlock & {
 // TODO: Add other block types i.e. view.
 export type ProposalBlockWithTypedFields = ProposalBoardBlock;
 
-export type ProposalPropertyValue = string | string[] | number | TargetPermissionGroup<'user' | 'role'>[];
+export type ProposalReviewerProperty = Partial<Pick<ProposalReviewer, 'userId' | 'roleId' | 'systemRole'>>[];
+
+export type ProposalPropertyValue = string | string[] | number | ProposalReviewerProperty;
 
 export type ProposalPropertiesField = Record<string, ProposalPropertyValue>;
 

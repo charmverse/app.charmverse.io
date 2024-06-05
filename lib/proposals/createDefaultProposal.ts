@@ -76,8 +76,7 @@ export async function createDefaultProposal({ spaceId, userId }: { spaceId: stri
         // [CREATED_AT_ID]: '',
         [PROPOSAL_REVIEWERS_BLOCK_ID]: [
           {
-            group: 'user',
-            id: userId
+            userId
           }
         ]
         // [Constants.titleColumnId]: 'Getting Started'

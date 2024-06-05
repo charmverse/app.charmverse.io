@@ -5,7 +5,7 @@ import { stringUtils } from '@charmverse/core/utilities';
 import { InvalidInputError, PositiveNumbersOnlyError } from 'lib/utils/errors';
 
 import { countRemainingSubmissionSlots } from './countRemainingSubmissionSlots';
-import type { RewardReviewer, RewardWithUsers, RewardType } from './interfaces';
+import type { RewardReviewer, RewardWithUsers } from './interfaces';
 import { setRewardUsers } from './setRewardUsers';
 
 export type UpdateableRewardFields = Partial<

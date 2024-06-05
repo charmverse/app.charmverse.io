@@ -128,6 +128,13 @@ export function PropertyTemplateMenu({
 
     case 'person': {
       if (propertyTemplate.id === REWARD_REVIEWERS_BLOCK_ID) {
+        const reviewerOptions = ((propertyValue as RewardReviewer[]) ?? []).map(
+          (reviewer) =>
+            ({
+              group: reviewer.roleId ? 'role' : 'user',
+              id: reviewer.roleId ?? reviewer.userId
+            } as SelectOption)
+        );
         return (
           <PropertyMenu lastChild={lastChild} disabledTooltip={disabledTooltip} propertyTemplate={propertyTemplate}>
             <UserAndRoleSelect
@@ -137,7 +144,7 @@ export function PropertyTemplateMenu({
                   onChange();
                 }
               }}
-              value={(propertyValue ?? []) as unknown as RewardReviewer[]}
+              value={reviewerOptions}
             />
           </PropertyMenu>
         );
