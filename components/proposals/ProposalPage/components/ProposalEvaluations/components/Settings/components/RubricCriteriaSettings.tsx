@@ -63,8 +63,13 @@ export const CriteriaRow = styled(Box)`
     color: var(--secondary-text);
   }
 `;
-export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value, onChange, answers }: Props) {
-  const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>(value);
+export function RubricCriteriaSettings({
+  readOnly,
+  showDeleteConfirmation,
+  value: criteriaList,
+  onChange,
+  answers
+}: Props) {
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
 
   function addCriteria() {
@@ -74,16 +79,15 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const lastCriteria = criteriaList[criteriaList.length - 1];
     const newCriteria = getNewCriteria(lastCriteria);
     const updatedList = [...criteriaList, newCriteria];
-    setCriteriaList(updatedList);
+    onChange(updatedList);
   }
-  // console.log('criteriaList', criteriaList, value);
+
   function deleteCriteria(id: string) {
     if (readOnly || !id) {
       return;
     }
     setRubricCriteriaIdToDelete(null);
     const updatedList = criteriaList.filter((c) => c.id !== id);
-    setCriteriaList(updatedList);
 
     onChange(updatedList);
   }
@@ -93,13 +97,14 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
       if (readOnly) {
         return;
       }
-      const newCriteriaList = [...criteriaList];
-      const criteria = newCriteriaList.find((c) => c.id === id);
+      const combinedCriteriaList = [...criteriaList];
+      const criteria = combinedCriteriaList.find((c) => c.id === id);
+
       if (criteria) {
         Object.assign(criteria, updates);
-        setCriteriaList([...newCriteriaList]);
-        if (newCriteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
-          onChange(newCriteriaList);
+
+        if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
+          onChange(combinedCriteriaList);
         }
       }
     },
@@ -113,11 +118,6 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
       debouncedSetCriteriaProperty.cancel();
     };
   }, [debouncedSetCriteriaProperty]);
-
-  useEffect(() => {
-    // This useEffect is needed here for the case the user imports criteria from a template and teh value changes
-    setCriteriaList(value);
-  }, [value.length]);
 
   function handleClickDelete(criteriaId: string) {
     if (showDeleteConfirmation) {
@@ -136,7 +136,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const droppedOnIndex = newOrder.findIndex((val) => val.id === droppedOnProperty); // find the index of the space that was dropped on
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
-    setCriteriaList(newOrder);
+
     onChange(newOrder);
   }
 
