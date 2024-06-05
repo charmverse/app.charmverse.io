@@ -107,3 +107,5 @@ export async function summarisePullRequest(params: PullRequestToSummarise): Prom
 // })
 //   .then((obj) => console.log(obj.id))
 //   .catch(console.error);
+
+// askChatGPT({ prompt: baseSummarisePRPrompt({ prTitle: 'Refactor docusign' }) }).then(console.log);
