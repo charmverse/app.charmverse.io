@@ -156,7 +156,6 @@ export async function applyProposalTemplate({
           }))
         });
       }
-      // apply vote settings
       await prisma.proposalEvaluation.update({
         where: {
           id: proposal.evaluations[index].id

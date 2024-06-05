@@ -28,6 +28,7 @@ import { getDefaultEvaluation } from 'lib/proposals/workflows/defaultEvaluation'
 
 import type { EvaluationTemplateFormItem } from './EvaluationDialog';
 import { EvaluationDialog } from './EvaluationDialog';
+import { EvaluationNotificationsRow } from './EvaluationNotifications';
 import { EvaluationPermissionsRow } from './EvaluationPermissions';
 import { EvaluationRow } from './EvaluationRow';
 
@@ -237,7 +238,7 @@ export function ProposalWorkflowItem({
         </Box>
       </AccordionSummary>
       <AccordionDetails>
-        <MultiTabs tabs={['Steps', 'Permissions']}>
+        <MultiTabs tabs={['Steps', 'Permissions', 'Notifications']}>
           {({ value }) => (
             <Box pt={2}>
               {value === 'Steps' &&
@@ -264,6 +265,19 @@ export function ProposalWorkflowItem({
                     onEdit={openEvaluationStep}
                     onChange={updateEvaluationStep}
                     readOnly={readOnly}
+                  />
+                ))}
+
+              {value === 'Notifications' &&
+                workflow.evaluations.map((evaluation, index) => (
+                  <EvaluationNotificationsRow
+                    key={evaluation.id}
+                    evaluation={evaluation}
+                    readOnly={readOnly}
+                    onChange={updateEvaluationStep}
+                    nextEvaluationTitle={
+                      workflow.evaluations.length > index + 1 ? workflow.evaluations[index + 1].title : undefined
+                    }
                   />
                 ))}
 

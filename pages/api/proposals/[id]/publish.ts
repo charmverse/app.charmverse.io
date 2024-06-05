@@ -110,6 +110,7 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
       ...proposalPage.proposal,
       evaluations: proposalPage.proposal.evaluations.map((e) => ({
         ...e,
+        notificationLabels: e.notificationLabels as WorkflowEvaluationJson['notificationLabels'],
         actionLabels: e.actionLabels as WorkflowEvaluationJson['actionLabels'],
         voteSettings: e.voteSettings as any,
         rubricCriteria: e.rubricCriteria as any[]
