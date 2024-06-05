@@ -40,7 +40,7 @@ export function PendingNotification({
         notification={notification}
       />
       <Hr />
-      <Feedback emailBranding={emailBranding} />
+      <Feedback />
     </EmailWrapper>
   );
 }

@@ -1,4 +1,4 @@
-import type { Space, IdentityType } from '@charmverse/core/prisma';
+import type { IdentityType, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormHelperText, Grid, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import isEqual from 'lodash/isEqual';
@@ -26,17 +26,14 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import type { Feature } from 'lib/features/constants';
-import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
 import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
-import { blueColor } from 'theme/colors';
 
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
 import Avatar from './components/LargeAvatar';
-import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { PrimaryMemberIdentity } from './components/PrimaryMemberIdentity';
 import { SettingsItem } from './components/SettingsItem';
 import { SetupCustomDomain } from './components/SetupCustomDomain';
@@ -48,31 +45,15 @@ export type FormValues = {
   spaceArtwork?: string | null;
   domain: string;
   enableTestnets: boolean;
-  notificationToggles: NotificationToggles;
   requireMembersTwoFactorAuth: boolean;
   primaryMemberIdentity?: IdentityType | null;
   customDomain?: string | null;
-  emailBrandArtwork?: string | null;
-  emailBrandColor?: string | null;
 };
 
 const schema: yup.Schema<FormValues> = yup.object({
   name: yup.string().ensure().trim().min(3, 'Name must be at least 3 characters').required('Name is required'),
   spaceImage: yup.string().nullable(),
   spaceArtwork: yup.string().nullable(),
-  emailBrandArtwork: yup.string().nullable(),
-  emailBrandColor: yup
-    .string()
-    .nullable()
-    .test({
-      name: 'isHexColor',
-      test(value, ctx) {
-        if (!value || /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)) {
-          return true;
-        }
-        return ctx.createError({ message: 'Please provide a valid hex color code', path: 'emailBrandColor' });
-      }
-    }),
   notificationToggles: yup.object(),
   requireMembersTwoFactorAuth: yup.boolean().required(),
   enableTestnets: yup.boolean().required(),
@@ -141,27 +122,16 @@ export function SpaceSettings({
   const watchName = watch('name');
   const watchSpaceImage = watch('spaceImage');
   const watchSpaceArtwork = watch('spaceArtwork');
-  const watchEmailBrandArtwork = watch('emailBrandArtwork');
-  const watchEmailBrandColor = watch('emailBrandColor');
   const watchPrimaryMemberIdentity = watch('primaryMemberIdentity') ?? undefined;
 
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
-
-    // remove 'true' values from notificationToggles
-    const notificationToggles = { ...values.notificationToggles };
-    for (const key in notificationToggles) {
-      if (notificationToggles[key as NotificationToggleOption] !== false) {
-        delete notificationToggles[key as NotificationToggleOption];
-      }
-    }
 
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
 
     await updateSpace(
       {
-        notificationToggles,
         features: featuresInput,
         memberProfiles: memberProfileTypesInput,
         name: values.name,
@@ -171,9 +141,7 @@ export function SpaceSettings({
         spaceArtwork: values.spaceArtwork,
         enableTestnets: values.enableTestnets,
         requireMembersTwoFactorAuth: values.requireMembersTwoFactorAuth,
-        customDomain: values.customDomain || null,
-        emailBrandArtwork: values.emailBrandArtwork,
-        emailBrandColor: values.emailBrandColor
+        customDomain: values.customDomain || null
       },
       {
         onSuccess: (updatedSpace) => {
@@ -410,47 +378,6 @@ export function SpaceSettings({
             <TextField {...register('spaceArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
           </Grid>
           <Grid item>
-            <FieldLabel>Email Brand Image</FieldLabel>
-            <Typography variant='caption' mb={2} component='p'>
-              Customize the image when shown in email.
-            </Typography>
-            <Avatar
-              name='C'
-              variant='rounded'
-              image={watchEmailBrandArtwork}
-              updateImage={(url: string) => setValue('emailBrandArtwork', url, { shouldDirty: true })}
-              editable={isAdmin}
-            />
-            <TextField {...register('emailBrandArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
-          </Grid>
-          <Grid item>
-            <FieldLabel>Email Brand Color</FieldLabel>
-            <Typography variant='caption' mb={2} component='p'>
-              Customize the brand color in email.
-            </Typography>
-            <Stack direction='row' alignItems='center' gap={1}>
-              <TextField
-                {...register('emailBrandColor')}
-                disabled={!isAdmin}
-                fullWidth
-                error={!!errors.emailBrandColor}
-                helperText={errors.emailBrandColor?.message}
-                placeholder={blueColor}
-              />
-              <Box
-                sx={{
-                  border: (theme) => `1px solid ${theme.palette.divider}`,
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: (theme) => theme.spacing(0.5),
-                  backgroundColor: watchEmailBrandColor?.startsWith('#')
-                    ? watchEmailBrandColor
-                    : `#${watchEmailBrandColor}`
-                }}
-              />
-            </Stack>
-          </Grid>
-          <Grid item>
             <Legend>Members</Legend>
           </Grid>
           <Grid item>
@@ -528,19 +455,6 @@ export function SpaceSettings({
           </Grid>
           <Grid item>
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
-          </Grid>
-          <Grid item>
-            <FieldLabel>Notifications</FieldLabel>
-            <Typography variant='caption' mb={1} component='p'>
-              Control notifications for your members.
-            </Typography>
-            <NotificationTogglesInput
-              control={control}
-              isAdmin={isAdmin}
-              register={register}
-              watch={watch}
-              setValue={setValue}
-            />
           </Grid>
           <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
@@ -643,10 +557,7 @@ function _getFormValues(space: Space): FormValues {
     domain: space.domain,
     enableTestnets: !!space.enableTestnets,
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
-    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
     customDomain: space.customDomain,
-    primaryMemberIdentity: space.primaryMemberIdentity,
-    emailBrandArtwork: space.emailBrandArtwork,
-    emailBrandColor: space.emailBrandColor || blueColor
+    primaryMemberIdentity: space.primaryMemberIdentity
   };
 }
