@@ -194,7 +194,7 @@ function getProposalContent({
   actorUsername?: string;
   spaceFeatures: FeatureJson[];
 }): string | ReactNode {
-  const proposalFeatureTitle = getFeatureTitle('proposals', spaceFeatures);
+  const proposalFeatureTitle = getFeatureTitle('proposal', spaceFeatures);
   const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {

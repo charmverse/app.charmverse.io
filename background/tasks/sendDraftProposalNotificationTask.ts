@@ -53,7 +53,7 @@ export async function sendDraftProposalNotificationTask() {
   for (const proposalWithAuthor of proposalsWithAuthor) {
     try {
       const proposalNotification = await saveProposalNotification({
-        createdAt: new Date().toDateString(),
+        createdAt: new Date().toISOString(),
         createdBy: proposalWithAuthor.authorId,
         proposalId: proposalWithAuthor.proposalId,
         spaceId: proposalWithAuthor.spaceId,
