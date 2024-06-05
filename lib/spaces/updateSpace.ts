@@ -136,7 +136,11 @@ export async function updateSpace(spaceId: string, updates: UpdateableSpaceField
       credentialsWallet: updates.credentialsWallet?.toLowerCase(),
       kycOption: updates.kycOption,
       emailBrandArtwork: updates.emailBrandArtwork,
-      emailBrandColor: updates.emailBrandColor?.includes('#') ? updates.emailBrandColor : `#${updates.emailBrandColor}`
+      emailBrandColor: updates.emailBrandColor
+        ? updates.emailBrandColor.includes('#')
+          ? updates.emailBrandColor
+          : `#${updates.emailBrandColor}`
+        : undefined
     }
   });
 
