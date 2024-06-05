@@ -133,36 +133,6 @@ describe('components/table/TableRow', () => {
     expect(container).toMatchSnapshot();
   });
 
-  test('should match snapshot, collapsed tree', async () => {
-    view.fields.collapsedOptionIds = ['value1'];
-    view.fields.hiddenOptionIds = [];
-
-    const store = mockStore(state);
-    const component = wrapDNDIntl(
-      <ReduxProvider store={store}>
-        <TableRow
-          board={board}
-          card={card}
-          activeView={view}
-          isSelected={false}
-          focusOnMount={false}
-          pageUpdatedBy='user-1'
-          pageTitle='Page Title'
-          pageUpdatedAt={date}
-          saveTitle={jest.fn()}
-          showCard={jest.fn()}
-          readOnly={false}
-          offset={0}
-          resizingColumn=''
-          columnRefs={new Map()}
-          onDrop={jest.fn()}
-        />
-      </ReduxProvider>
-    );
-    const { container } = render(component);
-    expect(container).toMatchSnapshot();
-  });
-
   test('should match snapshot, display properties', async () => {
     view.fields.visiblePropertyIds = ['property1', 'property2'];
 

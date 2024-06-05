@@ -62,9 +62,11 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
   }
 
   async function onChangeRewardsReviewers(pageIds: string[], options: SelectOption[]) {
-    const reviewerOptions = options.filter(
-      (option) => option.group === 'role' || option.group === 'user'
-    ) as RewardReviewer[];
+    const reviewerOptions: RewardReviewer[] = options
+      .map((option) =>
+        option.group === 'role' ? { roleId: option.id } : option.group === 'user' ? { userId: option.id } : undefined
+      )
+      .filter(isTruthy);
 
     try {
       for (const pageId of pageIds) {
@@ -73,7 +75,7 @@ export function RewardsHeaderRowsMenu({ board, visiblePropertyIds, cards, checke
           await updateReward({
             rewardId: page.bountyId,
             updateContent: {
-              reviewers: reviewerOptions.map((option) => ({ group: option.group, id: option.id }))
+              reviewers: reviewerOptions
             }
           });
         }

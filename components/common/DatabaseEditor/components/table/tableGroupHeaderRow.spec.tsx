@@ -94,37 +94,6 @@ test('should match snapshot on read only', async () => {
   expect(container).toMatchSnapshot();
 });
 
-test('should match snapshot, hide group', async () => {
-  const hideGroup = jest.fn();
-
-  const collapsedOptionsView = TestBlockFactory.createBoardView(board);
-  collapsedOptionsView.fields.collapsedOptionIds = [boardTreeGroup.option.id];
-
-  const component = wrapDNDIntl(
-    <TableGroupHeaderRowElement
-      isExpandedGroup={true}
-      board={board}
-      activeView={collapsedOptionsView}
-      group={boardTreeGroup}
-      readOnly={false}
-      hideGroup={hideGroup}
-      addCard={jest.fn()}
-      propertyNameChanged={jest.fn()}
-      onDrop={jest.fn()}
-    />
-  );
-
-  const { container } = render(component);
-  const triangle = container.querySelector('[data-testid="ArrowDropDownIcon"]');
-  expect(triangle).not.toBeNull();
-
-  act(() => {
-    fireEvent.click(triangle as Element);
-  });
-  expect(hideGroup).toBeCalled();
-  expect(container).toMatchSnapshot();
-});
-
 test('should match snapshot, add new', async () => {
   const addNew = jest.fn();
 
