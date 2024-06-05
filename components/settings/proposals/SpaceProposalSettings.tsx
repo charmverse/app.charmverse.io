@@ -45,7 +45,8 @@ export function SpaceProposalSettings({ space }: { space: Space }) {
       isNew: true,
       id: uuid(),
       index: lowestIndex - 1,
-      privateEvaluations: false
+      privateEvaluations: false,
+      draftReminder: false
     };
     // insert the new evaluation after the existing one
     if (existingIndex > -1) {

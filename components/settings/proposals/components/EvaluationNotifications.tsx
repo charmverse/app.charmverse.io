@@ -22,7 +22,7 @@ export function EvaluationNotificationsRow({
   const actionLabels = getActionButtonLabels(evaluation);
 
   return (
-    <Card variant='outlined' key={evaluation.id} sx={{ mb: 1 }}>
+    <Card variant='outlined' sx={{ mb: 1 }}>
       <Stack gap={1} p={2}>
         <Box display='flex' alignItems='center' gap={1} justifyContent='space-between'>
           {evaluationIcons[evaluation.type]()}
