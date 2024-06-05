@@ -3,10 +3,11 @@ import { SchemaRegistry, getSchemaUID } from '@ethereum-attestation-service/eas-
 import { optimismSepolia } from 'viem/chains';
 import { easSchemaChains, easConnectors, getEasInstance } from 'lib/credentials/connectors';
 import { NULL_ADDRESS } from 'lib/credentials/constants';
+
+import { Wallet, providers } from 'ethers';
 import { http } from 'viem';
-import { publicClientToProvider, walletClientToSigner } from 'lib/utils/ethers';
-import { createWalletClient, createPublicClient, PublicClient } from 'viem';
-import { privateKeyToAccount, generatePrivateKey } from 'viem/accounts';
+import { publicClientToProvider } from 'lib/utils/ethers';
+import { createPublicClient, PublicClient } from 'viem';
 
 type PrivateKeyString = `0x${string}`;
 const privateKey = process.env.PRIVATE_KEY as PrivateKeyString;
@@ -39,8 +40,8 @@ async function attest() {
   // Initialize SchemaEncoder with the schema string
   const schemaEncoder = new SchemaEncoder(schema);
   const encodedData = schemaEncoder.encodeData([
-    { name: 'eventId', value: 123, type: 'uint256' },
-    { name: 'tokenWeight', value: 3, type: 'uint8' }
+    { name: 'eventId', value: 1, type: 'uint256' },
+    { name: 'tokenWeight', value: 1, type: 'uint8' }
   ]);
 
   // SchemaUID is deterministic
@@ -90,13 +91,8 @@ async function getAttest() {
 }
 
 function _getSigner(_privateKey: PrivateKeyString) {
-  const account = privateKeyToAccount(_privateKey as `0x${string}`);
-  const client = createWalletClient({
-    account,
-    chain: optimismSepolia,
-    transport: http()
-  });
-  return walletClientToSigner(client);
+  const provider = new providers.JsonRpcProvider(optimismSepolia.rpcUrls.default.http[0], optimismSepolia.id);
+  return new Wallet(_privateKey, provider);
 }
 
-deploy().then().catch(console.error);
+attest().then().catch(console.error);
