@@ -1,5 +1,4 @@
 {
-  "extends": "../../tsconfig.next.json",
   "ts-node": {
     "compilerOptions": {
       "jsx": "react-jsx",
@@ -59,6 +58,6 @@
       "@charmverse/core/errors": ["node_modules/@charmverse/core/dist/cjs/errors"]
     }
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "apps"],
   "include": ["**/*.ts", "**/*.tsx"]
 }
