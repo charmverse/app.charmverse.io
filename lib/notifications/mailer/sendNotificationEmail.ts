@@ -4,6 +4,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import type { FeatureJson } from 'lib/features/constants';
 import * as mailer from 'lib/mailer';
 import * as emails from 'lib/mailer/emails';
+import { REPLYABLE_SENDER_ADDRESS } from 'lib/mailer/mailgunClient';
 import { getMemberUsernameBySpaceRole } from 'lib/members/getMemberUsername';
 import { getCardNotifications } from 'lib/notifications/cards/getCardNotifications';
 import { getDocumentNotifications } from 'lib/notifications/documents/getDocumentNotifications';
@@ -232,7 +233,8 @@ async function sendEmail({
       userId: user.id
     },
     subject: template.subject,
-    html: template.html
+    html: template.html,
+    senderAddress: REPLYABLE_SENDER_ADDRESS
   });
 
   return result;

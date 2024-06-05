@@ -19,11 +19,7 @@ export function PageInviteEmail(props: PageInviteEmailProps) {
   const pageLink = `${baseUrl}/invite/page?id=${props.pageId}&email=${encodeURIComponent(props.guestEmail)}`;
 
   return (
-    <EmailWrapper
-      emailBranding={props.emailBranding}
-      title={`${props.invitingUserName} shared a document`}
-      headerSize='small'
-    >
+    <EmailWrapper emailBranding={props.emailBranding} title={`${props.invitingUserName} shared a document`}>
       <Text>
         {props.invitingUserName} has invited you to <b>view</b> the following document:
       </Text>

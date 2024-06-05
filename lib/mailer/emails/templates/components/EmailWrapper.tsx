@@ -13,7 +13,6 @@ interface Props {
   children: React.ReactNode;
   preview?: string;
   title: string;
-  headerSize?: 'medium' | 'small';
   emailBranding?: {
     artwork: string;
     color: string;
@@ -39,7 +38,7 @@ export default function EmailWrapper(props: Props) {
             padding: 30
           }}
         >
-          <Header size={props.headerSize} image={props.emailBranding?.artwork} />
+          <Header image={props.emailBranding?.artwork} />
           {props.children}
         </Section>
         <Footer />
