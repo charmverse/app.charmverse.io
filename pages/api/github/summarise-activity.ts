@@ -25,8 +25,6 @@ async function summariseDeveloperActivityController(req: NextApiRequest, res: Ne
     fromDate: req.body.fromDate
   });
 
-  prettyPrint({ summaries });
-
   res.status(200).json(summaries);
 }
 
