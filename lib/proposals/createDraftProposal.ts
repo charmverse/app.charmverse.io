@@ -20,7 +20,7 @@ export type CreateDraftProposalInput = {
   createdBy: string;
   spaceId: string;
   contentType: ProposalContentType;
-  pageType?: Extract<PageType, 'proposal_template'>;
+  pageType?: Extract<PageType, 'proposal_template' | 'proposal'>;
   templateId?: string;
   sourcePageId?: string;
   sourcePostId?: string;

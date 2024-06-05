@@ -27,8 +27,9 @@ export async function sendDraftProposalNotificationTask() {
           status: 'draft',
           page: {
             createdAt: {
-              // Within 48 hrs
-              gte: new Date(Date.now() - 48 * 60 * 60 * 1000)
+              // Within 24 hours
+              gte: new Date(Date.now() - 48 * 60 * 60 * 1000),
+              lte: new Date(Date.now() - 24 * 60 * 60 * 1000)
             }
           }
         }
