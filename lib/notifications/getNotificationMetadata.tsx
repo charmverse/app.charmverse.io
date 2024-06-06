@@ -198,6 +198,9 @@ function getProposalContent({
   const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
+    case 'draft_reminder': {
+      return `Reminder: Your ${proposalFeatureTitle}, ${notification.pageTitle}, in space ${notification.spaceName} is an unpublished draft. Visit CharmVerse to publish it.`;
+    }
     case 'start_discussion': {
       return username ? (
         <span>
@@ -214,20 +217,33 @@ function getProposalContent({
       return `Your ${proposalFeatureTitle} has been successfully submitted`;
     }
     case 'vote_passed': {
-      return `The vote on ${notification.pageTitle} has passed. View results.`;
+      return (
+        notification.previousEvaluation?.notificationLabels?.approve ||
+        `The vote on ${notification.pageTitle} has passed. View results.`
+      );
     }
     case 'reward_published': {
       return `Your ${proposalFeatureTitle} reward has been created`;
     }
     case 'step_passed': {
-      return `Your ${proposalFeatureTitle} has successfully completed the ${notification.previousEvaluation?.title} step and is now moving to the ${notification.evaluation?.title} step`;
+      return (
+        notification.previousEvaluation?.notificationLabels?.approve ||
+        `Your ${proposalFeatureTitle} has successfully completed the ${notification.previousEvaluation?.title} step and is now moving to the ${notification.evaluation?.title} step`
+      );
     }
-    case 'proposal_failed':
+    case 'proposal_failed': {
+      const actionLabels = getActionButtonLabels(notification.evaluation);
+      return (
+        notification.evaluation.notificationLabels?.reject ||
+        `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.reject}`
+      );
+    }
     case 'proposal_passed': {
       const actionLabels = getActionButtonLabels(notification.evaluation);
-      return `The status of your ${proposalFeatureTitle} has changed to: ${
-        type === 'proposal_failed' ? actionLabels.reject : actionLabels.approve
-      }`;
+      return (
+        notification.evaluation?.notificationLabels?.approve ||
+        `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.approve}`
+      );
     }
     case 'vote': {
       return `Voting started for a ${proposalFeatureTitle}`;
