@@ -76,6 +76,38 @@ services:
     profiles:
       - stg-ceramic
 
+
+  stg-builder-network:
+    extends:
+      service: defaults
+    command:
+      [
+        'sh',
+        '-c',
+        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=750 apps/builder-network/node_modules/.bin/next start --keepAliveTimeout 70000'
+      ]
+    environment:
+      - REACT_APP_APP_ENV=staging
+      - BUILDER_API_URL=http://builder-api:5005
+    profiles:
+      - stg-builder-network
+    ports:
+      - '4200:4200'
+
+
+  stg-builder-api:
+    extends:
+      service: defaults
+    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    environment:
+      - HOST=builder-api
+    ports:
+      - '5005:5005'
+    profiles:
+      - stg-ceramic
+
+
+
   prd-ceramic:
     extends:
       service: defaults

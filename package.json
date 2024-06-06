@@ -78,6 +78,7 @@
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
     "builder-network": "dotenv -e .env.local -- npm run dev --workspace=apps/builder-network",
     "builder-api": "dotenv -e .env.local -- npm run start --workspace=apps/builder-api",
+    "builder-api:build": "dotenv -e .env.local -- npm run build --workspace=apps/builder-api",
     "builder-all": "npm run builder-api & npm run builder-app",
     "builder-all:local": "dotenv -e .env.local -- npm run builder-all"
   },

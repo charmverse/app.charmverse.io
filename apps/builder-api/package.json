@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npx tsx --watch ./main.ts",
-    "build": "npx tsx esbuild --project=./tsconfig.json ./main.ts --bundle --minify --outfile=dist/main.js",
+    "build": "npx tsc --project ./tsconfig.json",
     "test": "test",
     "echo": "echo \"Builder api\""
   }
