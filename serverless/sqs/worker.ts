@@ -70,8 +70,16 @@ export const webhookWorker = async (event: SQSEvent): Promise<SQSBatchResponse> 
         // Send emails
         let notificationCount = 0;
         for (const notification of notifications) {
-          const sent = await sendNotificationEmail(notification);
-          if (sent) {
+          const sendResult = await sendNotificationEmail(notification);
+          if (sendResult && sendResult.id) {
+            await prisma.userNotificationMetadata.update({
+              where: {
+                id: notification.id
+              },
+              data: {
+                messageId: sendResult.id
+              }
+            });
             notificationCount += 1;
           }
         }

@@ -42,7 +42,7 @@ constructs:
         DATABASE_URL: ${env:DATABASE_URL}
         CREDENTIAL_WALLET_KEY: ${env:CREDENTIAL_WALLET_KEY}
         MAILGUN_DOMAIN: ${env:MAILGUN_DOMAIN}
-        MAILGUN_KEY: ${env:MAILGUN_KEY}
+        MAILGUN_API_KEY: ${env:MAILGUN_API_KEY}
         PERMISSIONS_API_URL: ${env:PERMISSIONS_API_URL}
         DOMAIN: https://app.charmverse.io
 
