@@ -280,6 +280,7 @@ export type WebhookEvent = WebhookEventSharedProps &
         document: DocumentEntity | null;
         post: PostEntity | null;
         comment: CommentEntity;
+        messageId?: string;
       }
     | {
         scope: WebhookEventNames.DocumentInlineCommentCreated;
