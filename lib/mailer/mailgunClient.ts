@@ -3,7 +3,7 @@ import Mailgun from 'mailgun.js';
 
 import { isProdEnv } from 'config/constants';
 
-export const API_KEY = process.env.MAILGUN_KEY as string | undefined;
+export const API_KEY = process.env.MAILGUN_API_KEY as string | undefined;
 export const SIGNING_KEY = process.env.MAILGUN_SIGNING_KEY as string;
 export const DOMAIN = process.env.MAILGUN_DOMAIN as string;
 export const SENDER_ADDRESS = `CharmVerse <replies@${DOMAIN}>`;
