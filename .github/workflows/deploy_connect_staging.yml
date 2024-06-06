@@ -91,7 +91,7 @@ jobs:
 
       - name: Set DDENABLED variable in environment for build and deploy steps
         run: |
-          cat  .ebextensions/00_env_vars.config
+          cat  .ebextensions_connect/00_env_vars.config
           COMPOSE_PROFILES=${{ steps.get_compose_profiles.outputs.result }}
           if [[ "$COMPOSE_PROFILES" =~ ddtst ]]; then
             echo "DDENABLED=true" >> $GITHUB_ENV
