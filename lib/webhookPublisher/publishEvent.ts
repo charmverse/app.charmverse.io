@@ -156,16 +156,9 @@ type ProposalEventContext = {
   spaceId: string;
   proposalId: string;
   currentEvaluationId: string;
-  appealed?: boolean;
 };
 
-export async function publishProposalEvent({
-  appealed,
-  currentEvaluationId,
-  proposalId,
-  spaceId,
-  userId
-}: ProposalEventContext) {
+export async function publishProposalEvent({ currentEvaluationId, proposalId, spaceId, userId }: ProposalEventContext) {
   const proposalEvaluations = await prisma.proposalEvaluation.findMany({
     where: {
       proposalId
@@ -182,35 +175,25 @@ export async function publishProposalEvent({
     }
   });
 
-  if (appealed) {
-    await publishProposalEventBase({
-      currentEvaluationId,
-      proposalId,
-      spaceId,
-      userId,
-      scope: WebhookEventNames.ProposalAppealed
-    });
-  } else {
-    const finalEvaluation =
-      proposalEvaluations.find((proposalEvaluation) => proposalEvaluation.finalStep || proposalEvaluation.appealedAt) ??
-      proposalEvaluations[proposalEvaluations.length - 1];
+  const finalEvaluation =
+    proposalEvaluations.find((proposalEvaluation) => proposalEvaluation.finalStep || proposalEvaluation.appealedAt) ??
+    proposalEvaluations[proposalEvaluations.length - 1];
 
-    if (finalEvaluation.id === currentEvaluationId && finalEvaluation.result) {
-      await publishProposalEventBase({
-        proposalId,
-        scope: finalEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
-        spaceId
-      });
-    }
-
+  if (finalEvaluation.id === currentEvaluationId && finalEvaluation.result) {
     await publishProposalEventBase({
-      currentEvaluationId,
       proposalId,
-      spaceId,
-      userId,
-      scope: WebhookEventNames.ProposalStatusChanged
+      scope: finalEvaluation.result === 'fail' ? WebhookEventNames.ProposalFailed : WebhookEventNames.ProposalPassed,
+      spaceId
     });
   }
+
+  await publishProposalEventBase({
+    currentEvaluationId,
+    proposalId,
+    spaceId,
+    userId,
+    scope: WebhookEventNames.ProposalStatusChanged
+  });
 }
 
 type ProposalEventBaseContext =
@@ -219,6 +202,12 @@ type ProposalEventBaseContext =
       proposalId: string;
       spaceId: string;
       currentEvaluationId: string;
+      userId: string;
+    }
+  | {
+      scope: WebhookEventNames.ProposalPublished;
+      proposalId: string;
+      spaceId: string;
       userId: string;
     }
   | {
@@ -252,6 +241,15 @@ export async function publishProposalEventBase(context: ProposalEventBaseContext
         space,
         user,
         currentEvaluationId: context.currentEvaluationId
+      });
+    }
+    case WebhookEventNames.ProposalPublished: {
+      const user = await getUserEntity(context.userId);
+      return publishWebhookEvent(context.spaceId, {
+        scope: context.scope,
+        proposal,
+        space,
+        user
       });
     }
     case WebhookEventNames.ProposalAppealed: {
