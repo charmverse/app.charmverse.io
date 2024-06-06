@@ -77,34 +77,35 @@ services:
       - stg-ceramic
 
 
-  stg-builder-network:
+  stg-connect:
     extends:
       service: defaults
     command:
       [
         'sh',
         '-c',
-        'npm run prisma:deploy && npx react-env --path .env -- node --max-old-space-size=750 apps/builder-network/node_modules/.bin/next start --keepAliveTimeout 70000'
+        'npm run prisma:deploy && npm run connect:start:prod --keepAliveTimeout 70000'
       ]
     environment:
       - REACT_APP_APP_ENV=staging
-      - CONNECT_API_URL=http://builder-api:5005
+      - CONNECT_API_URL=http://connect-api:3333
     profiles:
-      - stg-builder-network
+      - stg-connect
+      - stg-connect-api
     ports:
       - '4200:4200'
 
 
-  stg-builder-api:
+  stg-connect-api:
     extends:
       service: defaults
-    command: ['sh', '-c', 'node ./dist/ceramic-client.js']
+    command: ['sh', '-c', 'npm run connect:api:start:prod']
     environment:
-      - HOST=builder-api
+      - HOST=connect-api
     ports:
-      - '5005:5005'
+      - '3333:3333'
     profiles:
-      - stg-ceramic
+      - stg-connect-api
 
 
 
