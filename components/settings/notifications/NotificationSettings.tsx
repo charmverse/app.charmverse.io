@@ -90,59 +90,55 @@ export function NotificationSettings({ space }: { space: Space }) {
   }
 
   return (
-    <>
-      <Legend>Notifications</Legend>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
       <FormProvider {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Stack gap={2}>
-            <SpaceEmailBrandingSettings />
-            <SpaceNotificationSettings />
-            {isAdmin && (
-              <Box
-                sx={{
-                  py: 1,
-                  px: { xs: 5, md: 3 },
-                  position: 'sticky',
-                  bottom: '0',
-                  background: (theme) => theme.palette.background.paper,
-                  borderTop: (theme) => `1px solid ${theme.palette.divider}`,
-                  textAlign: 'right'
-                }}
-              >
-                {dataChanged && (
-                  <Button
-                    disableElevation
-                    variant='outlined'
-                    data-test='reset-space-update'
-                    disabled={updateSpaceLoading || !dataChanged}
-                    onClick={() =>
-                      form.reset({
-                        emailBrandArtwork: space.emailBrandArtwork,
-                        emailBrandColor: space.emailBrandColor || blueColor,
-                        notificationToggles: getDefaultNotificationValues(
-                          space.notificationToggles as NotificationToggles
-                        )
-                      })
-                    }
-                    sx={{ mr: 2 }}
-                  >
-                    Cancel
-                  </Button>
-                )}
-                <Button
-                  disableElevation
-                  data-test='submit-space-update'
-                  disabled={updateSpaceLoading || !dataChanged || !isAdmin || !form.formState.isValid}
-                  type='submit'
-                  loading={updateSpaceLoading}
-                >
-                  Save
-                </Button>
-              </Box>
-            )}
-          </Stack>
-        </form>
+        <Stack gap={2} position='relative' p='20px 24px'>
+          <Legend>Notifications</Legend>
+          <SpaceEmailBrandingSettings />
+          <SpaceNotificationSettings />
+        </Stack>
       </FormProvider>
-    </>
+      {isAdmin && (
+        <Box
+          sx={{
+            py: 1,
+            px: { xs: 5, md: 3 },
+            position: 'sticky',
+            bottom: '0',
+            background: (theme) => theme.palette.background.paper,
+            borderTop: (theme) => `1px solid ${theme.palette.divider}`,
+            textAlign: 'right'
+          }}
+        >
+          {dataChanged && (
+            <Button
+              disableElevation
+              variant='outlined'
+              data-test='reset-space-update'
+              disabled={updateSpaceLoading || !dataChanged}
+              onClick={() =>
+                form.reset({
+                  emailBrandArtwork: space.emailBrandArtwork,
+                  emailBrandColor: space.emailBrandColor || blueColor,
+                  notificationToggles: getDefaultNotificationValues(space.notificationToggles as NotificationToggles)
+                })
+              }
+              sx={{ mr: 2 }}
+            >
+              Cancel
+            </Button>
+          )}
+          <Button
+            disableElevation
+            data-test='submit-space-update'
+            disabled={updateSpaceLoading || !dataChanged || !isAdmin || !form.formState.isValid}
+            type='submit'
+            loading={updateSpaceLoading}
+          >
+            Save
+          </Button>
+        </Box>
+      )}
+    </form>
   );
 }
