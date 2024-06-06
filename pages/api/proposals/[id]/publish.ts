@@ -13,7 +13,8 @@ import type { ProposalFields } from 'lib/proposals/interfaces';
 import { publishProposal } from 'lib/proposals/publishProposal';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -136,7 +137,14 @@ async function publishProposalStatusController(req: NextApiRequest, res: NextApi
     userId
   });
 
-  if (proposalPage && currentEvaluationId) {
+  await publishProposalEventBase({
+    proposalId,
+    spaceId: proposalPage.spaceId,
+    userId,
+    scope: WebhookEventNames.ProposalPublished
+  });
+
+  if (currentEvaluationId) {
     await publishProposalEvent({
       proposalId,
       spaceId: proposalPage.spaceId,
