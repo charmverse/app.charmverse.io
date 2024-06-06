@@ -11,8 +11,14 @@ export function Button({
   href,
   variant = 'filled',
   style,
+  primaryColor = blueColor,
   ...props
-}: { variant?: 'filled' | 'outlined'; children: ReactNode; href: string } & LinkProps) {
+}: {
+  primaryColor?: string;
+  variant?: 'filled' | 'outlined';
+  children: ReactNode;
+  href: string;
+} & LinkProps) {
   return (
     <Link
       {...props}
@@ -30,7 +36,7 @@ export function Button({
                 borderRadius: '30px',
                 border: '1px solid #ccc',
                 padding: '8px 24px',
-                color: blueColor,
+                color: primaryColor,
                 ...style
               }
             : {
@@ -38,7 +44,7 @@ export function Button({
                 color: '#fff',
                 padding: '8px 24px',
                 borderRadius: '3px',
-                background: blueColor,
+                background: primaryColor,
                 ...style
               }
         }

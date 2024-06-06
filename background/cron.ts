@@ -14,6 +14,7 @@ import { task as processCollablandWebhookMessages } from './tasks/processCollabl
 import { task as processGithubWebhookMessages } from './tasks/processGithubWebhookMessages';
 import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
+import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNotificationTask';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -35,6 +36,9 @@ processSynapsWebhookMessages();
 
 // Delete archived pages once an hour
 cron.schedule('0 * * * *', archiveTask);
+
+// Send notification to draft proposal authors once an hour
+cron.schedule('0 * * * *', sendDraftProposalNotificationTask);
 
 // Index pending gnosis safe credentials every 30 minutes
 cron.schedule('*/30 * * * *', indexPendingCredentialsTask);

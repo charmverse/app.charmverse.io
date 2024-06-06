@@ -454,6 +454,7 @@ export function _generateNewPages({
           );
           return {
             ...evaluation,
+            notificationLabels: (evaluation.notificationLabels ?? null) as Prisma.InputJsonValue,
             actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue,
             decidedBy: importingToDifferentSpace ? undefined : evaluation.decidedBy,
             id: newEvaluationId,

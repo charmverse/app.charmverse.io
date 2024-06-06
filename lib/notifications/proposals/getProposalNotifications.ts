@@ -32,6 +32,7 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
           evaluations: {
             select: {
               actionLabels: true,
+              notificationLabels: true,
               title: true
             },
             orderBy: {
@@ -51,7 +52,8 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
         select: {
           title: true,
           index: true,
-          actionLabels: true
+          actionLabels: true,
+          notificationLabels: true
         }
       },
       notificationMetadata: {
@@ -83,11 +85,13 @@ export async function getProposalNotifications({ id, userId }: QueryCondition): 
       evaluation: notification.evaluation
         ? {
             actionLabels: notification.evaluation.actionLabels,
+            notificationLabels: notification.evaluation.notificationLabels,
             title: notification.evaluation.title
           }
         : null,
       previousEvaluation: previousEvaluation
         ? {
+            notificationLabels: previousEvaluation.notificationLabels,
             title: previousEvaluation.title,
             actionLabels: previousEvaluation.actionLabels
           }
