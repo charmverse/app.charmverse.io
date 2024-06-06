@@ -338,7 +338,6 @@ export async function createDocumentNotifications(webhookData: {
         : webhookData.event.document?.authors.map(({ id }) => id) ?? [];
       const documentId = webhookData.event.document?.id;
       const postId = webhookData.event.post?.id;
-      const messageId = webhookData.event.messageId;
 
       const comment = webhookData.event.post
         ? await prisma.postComment.findFirstOrThrow({
@@ -377,8 +376,7 @@ export async function createDocumentNotifications(webhookData: {
               pageCommentId: documentId ? commentId : undefined,
               postCommentId: postId ? commentId : undefined,
               userId: authorId,
-              content: comment.content,
-              messageId
+              content: comment.content
             });
             ids.push(id);
             notificationSentUserIds.add(authorId);
@@ -416,8 +414,7 @@ export async function createDocumentNotifications(webhookData: {
             pageCommentId: documentId ? commentId : undefined,
             postCommentId: postId ? commentId : undefined,
             userId: parentCommentAuthorId,
-            content: comment.content,
-            messageId
+            content: comment.content
           });
           ids.push(id);
           notificationSentUserIds.add(parentCommentAuthorId);

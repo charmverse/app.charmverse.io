@@ -14,7 +14,7 @@ type WebhookPayload = {
   body: string;
 };
 
-interface MailgunWebhookPayload {
+type MailgunWebhookPayload = {
   'Content-Type': string;
   Date: string;
   'Dkim-Signature': string;
@@ -45,7 +45,7 @@ interface MailgunWebhookPayload {
   subject: string;
   timestamp: string;
   token: string;
-}
+};
 
 // Function to verify the Mailgun webhook payload
 function verifyMailgunWebhook(payload: MailgunWebhookPayload): boolean {
@@ -117,8 +117,6 @@ export async function processWebhookMessage(message: WebhookPayload): Promise<We
 
   const text = decodedData['stripped-text'];
 
-  const messageId = decodedData['Message-Id'];
-
   const pageComment = await createPageComment({
     content: createDocumentWithText(text),
     contentText: text,
@@ -131,8 +129,7 @@ export async function processWebhookMessage(message: WebhookPayload): Promise<We
     documentId: pageId,
     scope: WebhookEventNames.DocumentCommentCreated,
     commentId: pageComment.id,
-    spaceId,
-    messageId
+    spaceId
   });
 
   return {

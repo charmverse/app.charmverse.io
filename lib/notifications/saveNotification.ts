@@ -123,7 +123,6 @@ type DocumentNotificationInput = NotificationInput & {
   applicationCommentId?: string;
   type: DocumentNotificationType;
   content: Prisma.JsonValue | null;
-  messageId?: string;
 } & (CommentNotification | MentionNotification | InlineCommentNotification | ApplicationCommentNotification);
 
 export async function saveDocumentNotification({
@@ -139,8 +138,7 @@ export async function saveDocumentNotification({
   type,
   pageCommentId,
   postCommentId,
-  applicationCommentId,
-  messageId
+  applicationCommentId
 }: DocumentNotificationInput) {
   const notificationId = v4();
   const record = await prisma.documentNotification.create({
@@ -154,8 +152,7 @@ export async function saveDocumentNotification({
           createdAt,
           createdBy,
           spaceId,
-          userId,
-          messageId
+          userId
         }
       },
       content: content ?? Prisma.DbNull,

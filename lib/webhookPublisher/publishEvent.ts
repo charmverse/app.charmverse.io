@@ -323,7 +323,6 @@ type DocumentEventContext = (
       commentId: string;
       postId?: string;
       documentId?: string;
-      messageId?: string;
     }
   | {
       scope: WebhookEventNames.DocumentApplicationCommentCreated;
@@ -396,8 +395,7 @@ export async function publishDocumentEvent(context: DocumentEventContext) {
           document,
           post: null,
           space,
-          comment,
-          messageId: context.messageId
+          comment
         });
       } else if (context.postId) {
         const post = await getPostEntity(context.postId);
@@ -406,8 +404,7 @@ export async function publishDocumentEvent(context: DocumentEventContext) {
           document: null,
           post,
           space,
-          comment,
-          messageId: context.messageId
+          comment
         });
       } else {
         return null;
