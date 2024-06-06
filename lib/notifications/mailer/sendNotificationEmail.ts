@@ -1,5 +1,6 @@
 import type { User } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
+import type { MessagesSendResult } from 'mailgun.js';
 
 import type { FeatureJson } from 'lib/features/constants';
 import * as mailer from 'lib/mailer';
@@ -21,7 +22,10 @@ const notificationSelectFields = {
 
 export type NotificationEmailInput = { id: string; type: NotificationGroup };
 
-export async function sendNotificationEmail({ id, type }: NotificationEmailInput): Promise<boolean> {
+export async function sendNotificationEmail({
+  id,
+  type
+}: NotificationEmailInput): Promise<MessagesSendResult | undefined> {
   switch (type) {
     case 'card': {
       const {
@@ -33,7 +37,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       if (user.email && user.emailNotifications) {
         const notifications = await getCardNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -43,7 +47,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -57,7 +60,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       if (user.email && user.emailNotifications) {
         const notifications = await getPostNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -67,7 +70,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -81,7 +83,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       if (user.email && user.emailNotifications) {
         const notifications = await getDocumentNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -91,7 +93,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -105,7 +106,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       if (user.email && user.emailNotifications) {
         const notifications = await getPollNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -115,7 +116,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -129,7 +129,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       if (user.email && user.emailNotifications) {
         const notifications = await getProposalNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -139,7 +139,6 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
@@ -153,7 +152,7 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
       if (user.email && user.emailNotifications) {
         const notifications = await getBountyNotifications({ id, userId: user.id });
         if (notifications.length) {
-          await sendEmail({
+          return sendEmail({
             notification: notifications[0],
             user: {
               email: user.email,
@@ -163,14 +162,12 @@ export async function sendNotificationEmail({ id, type }: NotificationEmailInput
             }
           });
         }
-        return true;
       }
       break;
     }
     default:
       throw new Error(`Unknown notification type: ${type}`);
   }
-  return false;
 }
 
 async function sendEmail({
