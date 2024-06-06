@@ -76,11 +76,10 @@
     "build:storybook": "npx storybook build",
     "upgrade:storybook": "npx storybook@latest upgrade",
     "chromatic:ci": "chromatic --only-changed --exit-zero-on-changes",
-    "builder-network": "dotenv -e .env.local -- npm run dev --workspace=apps/builder-network",
-    "builder-api": "dotenv -e .env.local -- npm run start --workspace=apps/builder-api",
-    "builder-api:build": "dotenv -e .env.local -- npm run build --workspace=apps/builder-api",
-    "builder-all": "npm run builder-api & npm run builder-app",
-    "builder-all:local": "dotenv -e .env.local -- npm run builder-all"
+    "connect": "dotenv -e .env.local -- npm run dev --workspace=apps/connect",
+    "connect-api": "dotenv -e .env.local -- npm run start --workspace=apps/connect-api",
+    "connect-api:build": "dotenv -e .env.local -- npm run build --workspace=apps/connect-api",
+    "connect-all": "npm run connect-api & npm run connect"
   },
   "lint-staged": {
     "*.{ts,tsx}": [

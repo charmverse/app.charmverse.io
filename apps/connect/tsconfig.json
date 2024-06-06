@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "../../dist/apps/builder-network",
+    "outDir": "../../dist/apps/connect",
     "rootDir": "../../",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
