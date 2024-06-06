@@ -241,7 +241,7 @@ function getProposalContent({
     case 'proposal_passed': {
       const actionLabels = getActionButtonLabels(notification.evaluation);
       return (
-        notification.previousEvaluation?.notificationLabels?.approve ||
+        notification.evaluation?.notificationLabels?.approve ||
         `The status of your ${proposalFeatureTitle} has changed to: ${actionLabels.approve}`
       );
     }
