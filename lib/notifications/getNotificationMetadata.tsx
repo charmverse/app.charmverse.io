@@ -198,6 +198,9 @@ function getProposalContent({
   const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
+    case 'draft_reminder': {
+      return `You have a draft ${proposalFeatureTitle} that needs to be published.`;
+    }
     case 'start_discussion': {
       return username ? (
         <span>
