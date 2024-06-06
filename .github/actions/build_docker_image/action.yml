@@ -1,4 +1,4 @@
-name: 'Build Docker Image'
+name: 'Build Connect Docker Image'
 
 inputs:
   codebase_sha:
