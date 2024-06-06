@@ -36,7 +36,7 @@ jobs:
         uses: ./.github/actions/install
 
       - name: Build app
-        uses: ./.github/actions/build
+        uses: ./.github/actions/build_connect
         with:
           REACT_APP_APP_ENV: 'staging'
 
@@ -87,7 +87,7 @@ jobs:
         id: get_compose_profiles
         uses: mikefarah/yq@master
         with:
-          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions/00_env_vars.config
+          cmd: yq -r '.option_settings."aws:elasticbeanstalk:application:environment".COMPOSE_PROFILES' .ebextensions_connect/00_env_vars.config
 
       - name: Set DDENABLED variable in environment for build and deploy steps
         run: |
@@ -143,6 +143,6 @@ jobs:
         run: |
           npm install @datadog/datadog-ci --force
           npx datadog-ci sourcemaps upload .next/static  \
-            --service=webapp                             \
+            --service=connect                             \
             --release-version=${{ steps.docker_build_push.outputs.img_tag }}  \
             --minified-path-prefix=${{ steps.cdk_deploy.outputs.env_url }}_next/static
