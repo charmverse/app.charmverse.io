@@ -74,9 +74,11 @@ export async function processWebhookMessage(message: WebhookPayload): Promise<We
     };
   }
 
+  const referencedMessageIds = decodedData.References.split(' ').map((ref) => ref.trim());
+
   const notification = await prisma.userNotificationMetadata.findFirst({
     where: {
-      messageId: decodedData['In-Reply-To'],
+      messageId: referencedMessageIds[0] || decodedData['In-Reply-To'],
       documentNotifications: {
         some: {
           type: {
