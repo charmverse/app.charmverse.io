@@ -24,7 +24,7 @@ export function SpaceEmailBrandingSettings() {
       <Grid item>
         <FieldLabel>Email Logo</FieldLabel>
         <Typography variant='caption' mb={2} component='p'>
-          Add a custom logo for your email notifications
+          Add a custom logo for your email notifications (recommended max height: 250px)
         </Typography>
         <Avatar
           accept='image/jpeg, image/png, image/gif, image/webp'
