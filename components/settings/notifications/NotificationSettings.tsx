@@ -1,6 +1,6 @@
 import type { Space } from '@charmverse/core/prisma-client';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Stack } from '@mui/material';
+import { Box, Divider, Stack } from '@mui/material';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
 
@@ -95,6 +95,11 @@ export function NotificationSettings({ space }: { space: Space }) {
         <Stack gap={2} position='relative' p='20px 24px'>
           <Legend>Notifications</Legend>
           <SpaceEmailBrandingSettings />
+          <Divider
+            sx={{
+              my: 1
+            }}
+          />
           <SpaceNotificationSettings />
         </Stack>
       </FormProvider>
