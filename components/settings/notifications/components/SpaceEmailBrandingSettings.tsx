@@ -22,27 +22,29 @@ export function SpaceEmailBrandingSettings() {
   return (
     <>
       <Grid item>
-        <FieldLabel>Email Brand Image</FieldLabel>
+        <FieldLabel>Email Logo</FieldLabel>
         <Typography variant='caption' mb={2} component='p'>
-          Customize the image shown in email.
+          Add a custom logo for your email notifications
         </Typography>
         <Avatar
+          accept='image/jpeg, image/png, image/gif, image/webp'
           name='C'
           variant='rounded'
           image={watchEmailBrandArtwork}
-          updateImage={(url: string) => setValue('emailBrandArtwork', url, { shouldDirty: true })}
+          updateImage={(url: string) => setValue('emailBrandArtwork', url, { shouldDirty: true, shouldTouch: true })}
           editable={isAdmin}
         />
         <TextField {...register('emailBrandArtwork')} sx={{ visibility: 'hidden', width: '0px', height: '0px' }} />
       </Grid>
       <Grid item>
-        <FieldLabel>Email Brand Color</FieldLabel>
+        <FieldLabel>Email Color</FieldLabel>
         <Typography variant='caption' mb={2} component='p'>
-          Customize the color shown in email.
+          Select the primary color for your email notifications
         </Typography>
-        <Stack direction='row' alignItems='center' gap={1}>
+        <Stack direction='row' alignItems='flex-start' gap={1}>
           <TextField
-            {...register('emailBrandColor')}
+            value={watchEmailBrandColor}
+            onChange={(e) => setValue('emailBrandColor', e.target.value, { shouldDirty: true, shouldValidate: true })}
             disabled={!isAdmin}
             fullWidth
             error={!!errors.emailBrandColor}
@@ -55,7 +57,7 @@ export function SpaceEmailBrandingSettings() {
               width: '40px',
               height: '40px',
               borderRadius: (theme) => theme.spacing(0.5),
-              backgroundColor: watchEmailBrandColor?.startsWith('#') ? watchEmailBrandColor : `#${watchEmailBrandColor}`
+              backgroundColor: watchEmailBrandColor
             }}
           />
         </Stack>

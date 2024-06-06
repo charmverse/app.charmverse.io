@@ -23,10 +23,7 @@ export default function Header({ image }: { image?: string }) {
         src={image || `${domain}${logoImagePath}`}
         style={
           image
-            ? {
-                width: '100%',
-                height: 'auto'
-              }
+            ? undefined
             : {
                 width: dimensions.medium.width,
                 height: dimensions.medium.height

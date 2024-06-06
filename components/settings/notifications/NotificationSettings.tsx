@@ -25,13 +25,17 @@ export type FormValues = {
 
 const schema: yup.Schema<FormValues> = yup.object({
   notificationToggles: yup.object(),
-  emailBrandArtwork: yup.string().nullable(),
+  emailBrandArtwork: yup
+    .string()
+    .url()
+    .transform((value) => (value === '' ? null : value))
+    .nullable(),
   emailBrandColor: yup
     .string()
     .test(
       'isHexColor',
-      'Please provide a valid hex color code',
-      (value) => !value || /^#?([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
+      'Please provide a valid hex color code e.g. #ABC123',
+      (value) => !value || /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
     )
 });
 
