@@ -2,8 +2,8 @@ import { log } from '@charmverse/core/log';
 import type { PullRequestStatus, PullRequestSummary } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
-import { askChatGPT } from 'lib/ai/askChatgpt';
-import type { ChatGPTModel } from 'lib/ai/constants';
+import { askChatGPT } from 'lib/chatGPT/askChatgpt';
+import type { ChatGPTModel } from 'lib/chatGPT/constants';
 
 import { GITHUB_API_BASE_URL } from './constants';
 import type { GithubUserName } from './getMergedPullRequests';

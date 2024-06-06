@@ -1,6 +1,6 @@
 import { GET } from 'adapters/http';
 import { githubAccessToken } from 'config/constants';
-import { askChatGPT } from 'lib/ai/askChatgpt';
+import { askChatGPT } from 'lib/chatGPT/askChatgpt';
 import { randomIntFromInterval } from 'lib/utils/random';
 
 import { GITHUB_API_BASE_URL } from '../constants';

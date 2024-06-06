@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 
 import { InvalidStateError } from 'lib/middleware';
+import { prettyPrint } from 'lib/utils/strings';
 
 import type { GithubGraphQLQuery, GithubUserName } from './getMergedPullRequests';
 import { getPullRequestsByRepo } from './getPullRequestsByRepo';
@@ -38,9 +39,7 @@ export async function summariseDeveloperActivity({
   const mostActiveRepo = pullRequests[0];
 
   // Apply business logic for additional filtering and only pull necessary prs
-  const filteredPullRequests = mostActiveRepo.pullRequests
-    .filter((pr) => pr.additions + pr.deletions > 10)
-    .slice(0, limit);
+  const filteredPullRequests = mostActiveRepo.pullRequests.filter((pr) => pr.additions + pr.deletions > 10);
 
   if (filteredPullRequests.length === 0) {
     throw new InvalidStateError('No pull requests for the given criteria');
@@ -51,16 +50,28 @@ export async function summariseDeveloperActivity({
   for (let i = 0; i < filteredPullRequests.length; i++) {
     const pr = filteredPullRequests[i];
     log.info(`Summarising PR (${i + 1}/${filteredPullRequests.length}) for ${githubUsername}`);
-    const summary = await summarisePullRequest({
-      githubUsername,
-      prNumber: pr.number,
-      prTitle: pr.title,
-      repoName: mostActiveRepo.repoName,
-      repoOwner: mostActiveRepo.repoOwner,
-      status: 'merged'
-    });
 
-    summaries.push(summary);
+    try {
+      const summary = await summarisePullRequest({
+        githubUsername,
+        prNumber: pr.number,
+        prTitle: pr.title,
+        repoName: mostActiveRepo.repoName,
+        repoOwner: mostActiveRepo.repoOwner,
+        status: 'merged'
+      });
+
+      summaries.push(summary);
+    } catch (err) {
+      log.error(
+        `Failed to summarise PR ${mostActiveRepo.repoOwner}/${mostActiveRepo.repoName}/${pr.number} for ${githubUsername}`,
+        { error: err }
+      );
+    }
+
+    if (summaries.length >= limit) {
+      break;
+    }
   }
 
   const liteSummaries: LitePullRequestSummary[] = summaries.map((summary) => ({
