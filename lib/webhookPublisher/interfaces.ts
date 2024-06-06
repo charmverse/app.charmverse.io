@@ -128,6 +128,7 @@ export enum WebhookEventNames {
   ProposalUserVoted = 'proposal.user_voted',
   ProposalStatusChanged = 'proposal.status_changed',
   ProposalAppealed = 'proposal.appealed',
+  ProposalPublished = 'proposal.published',
   ProposalCredentialCreated = 'proposal.credential_created',
   UserJoined = 'user.joined',
   HelloWorld = 'hello.world',
@@ -194,6 +195,11 @@ export type WebhookEvent = WebhookEventSharedProps &
       }
     | {
         scope: WebhookEventNames.ProposalAppealed;
+        proposal: ProposalEntity;
+        user: UserEntity;
+      }
+    | {
+        scope: WebhookEventNames.ProposalPublished;
         proposal: ProposalEntity;
         user: UserEntity;
       }
