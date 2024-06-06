@@ -70,7 +70,8 @@ test.beforeAll(async () => {
       evaluations: [getDefaultFeedbackEvaluation()],
       index: 0,
       spaceId: space.id,
-      privateEvaluations: false
+      privateEvaluations: false,
+      draftReminder: false
     }
   ];
 

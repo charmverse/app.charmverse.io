@@ -43,7 +43,8 @@ describe('Saving space workflows', () => {
             }
           ]
         }
-      ]
+      ],
+      draftReminder: false
     });
   });
 
