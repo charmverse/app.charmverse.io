@@ -194,7 +194,7 @@ function getProposalContent({
   actorUsername?: string;
   spaceFeatures: FeatureJson[];
 }): string | ReactNode {
-  const proposalFeatureTitle = getFeatureTitle('proposals', spaceFeatures);
+  const proposalFeatureTitle = getFeatureTitle('proposal', spaceFeatures);
   const { type, createdBy } = notification;
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
@@ -209,6 +209,9 @@ function getProposalContent({
     }
     case 'proposal_appealed': {
       return `The ${proposalFeatureTitle} has been appealed and requires your review.`;
+    }
+    case 'proposal_published': {
+      return `Your ${proposalFeatureTitle} has been successfully submitted`;
     }
     case 'vote_passed': {
       return `The vote on ${notification.pageTitle} has passed. View results.`;
