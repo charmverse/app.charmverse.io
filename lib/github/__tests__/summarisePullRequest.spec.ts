@@ -9,7 +9,7 @@ import type { PullRequestSummaryWithFilePatches, PullRequestToSummarise } from '
 import { baseSummarisePRPrompt, summarisePullRequest } from '../summarisePullRequest';
 
 jest.mock('adapters/http');
-jest.mock('lib/ai/askChatgpt');
+jest.mock('lib/chatGPT/askChatgpt');
 
 const mockedGET = GET as jest.MockedFunction<typeof GET>;
 const mockedAskChatGPT = askChatGPT as jest.MockedFunction<typeof askChatGPT>;
