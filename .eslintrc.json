@@ -88,8 +88,8 @@
         "devDependencies": true,
         "packageDir": [
           "./",
-          "./apps/builder-network",
-          "./apps/builder-api"
+          "./apps/connect",
+          "./apps/connect-api"
         ]
       }
     ],
