@@ -18,7 +18,7 @@ outputs:
     value: '${{ steps.get_img_tag.outputs.version }}'
   img_repo:
     description: 'Image tag of the image'
-    value: '${{ steps.login-ecr.outputs.registry }}/{{ inputs.ecr_registry }}'
+    value: '${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_registry }}'
   full_image_name:
     description: 'Full image repo and tag'
     value: '${{ steps.get_img_tag.outputs.tags }}'
@@ -50,7 +50,7 @@ runs:
       id: get_img_tag
       uses: docker/metadata-action@v4
       with:
-        images: ${{steps.login-ecr.outputs.registry}}/{{ inputs.ecr_registry }}
+        images: ${{steps.login-ecr.outputs.registry}}/${{ inputs.ecr_registry }}
         tags: |
           type=sha,prefix=${{github.run_id}}-,format=short
         flavor: |
