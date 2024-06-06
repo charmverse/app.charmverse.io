@@ -34,6 +34,7 @@ const TextStyleConfig: Record<TextVariant, CSSProperties> = {
 
 export default function Text({
   primary = false,
+  primaryColor = blueColor,
   children,
   variant = 'body1',
   bold = false,
@@ -41,6 +42,7 @@ export default function Text({
   style = {},
   ...props
 }: {
+  primaryColor?: string;
   hideOverflow?: boolean;
   variant?: TextVariant;
   bold?: boolean;
@@ -52,7 +54,7 @@ export default function Text({
       {...props}
       style={{
         fontFamily: defaultFont,
-        color: primary ? blueColor : primaryTextColor,
+        color: primary ? primaryColor : primaryTextColor,
         fontWeight: bold ? 'bold' : 'normal',
         padding: 0,
         lineHeight: 1.5,

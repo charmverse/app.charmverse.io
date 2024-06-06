@@ -16,13 +16,18 @@ import { emailSubject, PageInviteEmail } from './templates/PageInviteEmail';
 export function getPendingNotificationEmail({
   notification,
   spaceFeatures,
-  user
+  user,
+  emailBranding
 }: {
   notification: Notification;
   user: Pick<User, 'username' | 'id' | 'avatar'>;
   spaceFeatures: FeatureJson[];
+  emailBranding?: {
+    artwork: string;
+    color: string;
+  };
 }) {
-  const html = render(PendingNotification({ notification, user, spaceFeatures }));
+  const html = render(PendingNotification({ emailBranding, notification, user, spaceFeatures }));
   const content = getNotificationMetadata({ notification, spaceFeatures }).content;
   const subject =
     typeof content === 'string' ? content : htmlToText(ReactDOMServer.renderToString(content as ReactElement));

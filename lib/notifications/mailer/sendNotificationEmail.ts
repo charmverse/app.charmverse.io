@@ -12,6 +12,7 @@ import type { Notification, NotificationGroup } from 'lib/notifications/interfac
 import { getPollNotifications } from 'lib/notifications/polls/getPollNotifications';
 import { getProposalNotifications } from 'lib/notifications/proposals/getProposalNotifications';
 import { getBountyNotifications } from 'lib/notifications/rewards/getRewardNotifications';
+import { blueColor } from 'theme/colors';
 
 const notificationSelectFields = {
   notificationMetadata: {
@@ -186,7 +187,9 @@ async function sendEmail({
       id: notificationSpaceId
     },
     select: {
-      features: true
+      features: true,
+      emailBrandArtwork: true,
+      emailBrandColor: true
     }
   });
   const spaceFeatures = (space.features ?? []) as FeatureJson[];
@@ -216,7 +219,11 @@ async function sendEmail({
   const template = emails.getPendingNotificationEmail({
     notification,
     user: { ...user, username: primaryIdentity },
-    spaceFeatures
+    spaceFeatures,
+    emailBranding: {
+      artwork: space.emailBrandArtwork || '',
+      color: space.emailBrandColor || blueColor
+    }
   });
   const result = await mailer.sendEmail({
     to: {
