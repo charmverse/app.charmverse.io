@@ -1,10 +1,13 @@
 /** @type {import('next').NextConfig} */
+
+const CONNECT_API_URL = process.env.CONNECT_API_URL;
+
 const nextConfig = {
   rewrites: async () => {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.BUILDER_API_URL}/api/:path*` // Proxy to Backend
+        destination: `${CONNECT_API_URL}/api/:path*` // Proxy to Backend
       }
     ];
   }

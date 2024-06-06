@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "npx tsx --watch ./main.ts",
+    "start": "npx tsx --watch ./src/main.ts",
+    "start:prod": "npx tsx ./dist/apps/connect-api/src/main.js",
     "build": "npx tsc --project ./tsconfig.json",
     "test": "test",
     "echo": "echo \"Builder api\""

@@ -88,7 +88,7 @@ services:
       ]
     environment:
       - REACT_APP_APP_ENV=staging
-      - BUILDER_API_URL=http://builder-api:5005
+      - CONNECT_API_URL=http://builder-api:5005
     profiles:
       - stg-builder-network
     ports:
