@@ -199,7 +199,7 @@ function getProposalContent({
   const username = actorUsername ?? createdBy?.username;
   switch (type) {
     case 'draft_reminder': {
-      return `You have a draft ${proposalFeatureTitle} that needs to be published.`;
+      return `Reminder: Your ${proposalFeatureTitle}, ${notification.pageTitle}, in space ${notification.spaceName} is an unpublished draft. Visit CharmVerse to publish it.`;
     }
     case 'start_discussion': {
       return username ? (
