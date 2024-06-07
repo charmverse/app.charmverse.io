@@ -8,7 +8,6 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { askChatGPT } from 'lib/chatGPT/askChatgpt';
 import type { ChatGPTModel } from 'lib/chatGPT/constants';
 import { writeToSameFolder } from 'lib/utils/file';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { GITHUB_API_BASE_URL } from './constants';
 import type { PullRequestToQuery } from './getPullRequestFileChanges';

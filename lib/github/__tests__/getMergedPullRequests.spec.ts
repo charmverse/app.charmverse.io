@@ -1,7 +1,7 @@
 import { POST } from 'adapters/http';
 
 import { getMergedPullRequests } from '../getMergedPullRequests';
-import type { PullRequestMeta } from '../getMergedPullRequests';
+import type { PullRequestMeta } from '../getPullRequestMeta';
 
 jest.mock('adapters/http');
 
@@ -9,7 +9,6 @@ const mockedPOST = POST as jest.MockedFunction<typeof POST>;
 
 const exampleData: PullRequestMeta[] = [
   {
-    id: 'PR_kwDOGoDRm85wp9qb',
     number: 4099,
     title: 'Fix type for deploy',
     url: 'https://github.com/charmverse/app.charmverse.io/pull/4099',
@@ -21,7 +20,6 @@ const exampleData: PullRequestMeta[] = [
     repository: { nameWithOwner: 'charmverse/app.charmverse.io' }
   },
   {
-    id: 'PR_kwDOGoDRm85uJ4zn',
     number: 4004,
     title: 'Docusign integration',
     url: 'https://github.com/charmverse/app.charmverse.io/pull/4004',
@@ -33,7 +31,6 @@ const exampleData: PullRequestMeta[] = [
     repository: { nameWithOwner: 'charmverse/app.charmverse.io' }
   },
   {
-    id: 'PR_kwDOJMfgxs5t7iOz',
     number: 285,
     title: 'Docusign',
     url: 'https://github.com/charmverse/core/pull/285',
@@ -45,7 +42,6 @@ const exampleData: PullRequestMeta[] = [
     repository: { nameWithOwner: 'charmverse/core' }
   },
   {
-    id: 'PR_kwDOGoDRm85vz8zp',
     number: 4066,
     title: 'redeploy',
     url: 'https://github.com/charmverse/app.charmverse.io/pull/4066',
