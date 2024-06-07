@@ -127,9 +127,18 @@ test.describe.serial('Proposal Evaluations', () => {
       proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel),
       proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
     ]);
-    await proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription);
-    await proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString());
-    await proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString());
+    await Promise.all([
+      proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription),
+      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+    ]);
+    await Promise.all([
+      proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString()),
+      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+    ]);
+    await Promise.all([
+      proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString()),
+      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+    ]);
 
     // Configure review
     await proposalPage.selectEvaluationReviewer('pass_fail', role.id);
