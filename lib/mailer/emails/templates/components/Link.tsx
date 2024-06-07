@@ -4,14 +4,21 @@ import type { ReactNode } from 'react';
 
 import { blueColor } from 'theme/colors';
 
-export default function Link({ children, ...props }: { children: ReactNode } & LinkProps) {
+export default function Link({
+  primaryColor = blueColor,
+  children,
+  ...props
+}: {
+  primaryColor?: string;
+  children: ReactNode;
+} & LinkProps) {
   return (
     <ReactEmailLink
       {...props}
       target='_blank'
       rel='noreferrer'
       style={{
-        color: blueColor,
+        color: primaryColor,
         textDecoration: 'none',
         ...(props.style ?? {})
       }}

@@ -285,7 +285,8 @@ describe('importSpaceSettings', () => {
             { operation: 'archive', systemRole: 'author' }
           ]
         }
-      ]
+      ],
+      draftReminder: false
     };
 
     dataToImport = {
@@ -739,7 +740,8 @@ describe('importSpaceSettings', () => {
                 { operation: 'archive', systemRole: 'author' }
               ]
             }
-          ]
+          ],
+          draftReminder: false
         },
         {
           ...existingProposalWorkflow

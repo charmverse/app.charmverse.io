@@ -6,6 +6,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import SettingsIcon from '@mui/icons-material/WorkOutline';
 import MedalIcon from '@mui/icons-material/WorkspacePremium';
 import { FaBriefcase } from 'react-icons/fa';
@@ -24,7 +25,8 @@ export const SPACE_SETTINGS_TABS = [
   { icon: <CreditCardIcon fontSize='small' />, path: 'subscription', label: 'Billing' },
   { icon: <MedalIcon fontSize='small' />, path: 'credentials', label: 'Credentials' },
   { icon: <ProposalIcon fontSize='small' />, path: 'proposals', label: 'Proposals' },
-  { icon: <AppsIcon fontSize='small' />, path: 'integrations', label: 'Integrations' }
+  { icon: <AppsIcon fontSize='small' />, path: 'integrations', label: 'Integrations' },
+  { icon: <NotificationsOutlinedIcon fontSize='small' />, path: 'notifications', label: 'Notifications' }
 ] as const;
 
 export type SpaceSettingsTab = (typeof SPACE_SETTINGS_TABS)[number];

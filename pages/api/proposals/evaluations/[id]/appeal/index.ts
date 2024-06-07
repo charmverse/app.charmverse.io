@@ -5,7 +5,8 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -87,12 +88,12 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
     }
   });
 
-  await publishProposalEvent({
+  await publishProposalEventBase({
     currentEvaluationId: evaluationId,
-    appealed: true,
     proposalId: proposal.id,
     spaceId: proposal.spaceId,
-    userId
+    userId,
+    scope: WebhookEventNames.ProposalAppealed
   });
 
   return res.status(200).end();
