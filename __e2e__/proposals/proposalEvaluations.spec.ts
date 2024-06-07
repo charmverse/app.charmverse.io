@@ -123,12 +123,11 @@ test.describe.serial('Proposal Evaluations', () => {
     // Configure rubric
     await proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole);
 
-    // while editing this form, the response from the api updates the state, so we need to wait for it to finish between inputs or it will override the next one with stale values
-    // TODO: find way to simplify state in the ui so it is one-directional
-    await proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel);
-    await proposalPage.page.waitForTimeout(100); // let api update before continuing
+    await Promise.all([
+      proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel),
+      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+    ]);
     await proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription);
-    await proposalPage.page.waitForTimeout(100); // let api update before continuing
     await proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString());
     await proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString());
 
@@ -140,9 +139,8 @@ test.describe.serial('Proposal Evaluations', () => {
     await proposalPage.evaluationVoteSettings.click();
 
     await proposalPage.evaluationVoteDurationInput.fill(settingsToTest.voteDuration.toString());
-    const apiResponse = proposalPage.page.waitForResponse('**/evaluation');
     await proposalPage.evaluationVotePassThresholdInput.fill(settingsToTest.votePassThreshold.toString());
-    await apiResponse;
+    await proposalPage.page.waitForResponse('**/evaluation');
 
     await Promise.all([
       proposalPage.page.waitForResponse('**/api/proposals/**/publish'),

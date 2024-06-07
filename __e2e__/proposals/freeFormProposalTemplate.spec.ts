@@ -114,7 +114,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     // Configure first rubric criteria added by default
 
-    await proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title);
+    await Promise.all([
+      proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title),
+      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+    ]);
     await proposalPage.editRubricCriteriaDescription.fill(firstRubricConfig.description);
     await proposalPage.editRubricCriteriaMinScore.fill(firstRubricConfig.minScore.toString());
     const updateProposalResponse = proposalPage.page.waitForResponse('**/api/proposals/**');
