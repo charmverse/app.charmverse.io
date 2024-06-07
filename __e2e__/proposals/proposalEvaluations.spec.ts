@@ -17,7 +17,7 @@ test.describe.serial('Proposal Evaluations', () => {
     proposalTitle: 'Proposal test title',
     rubricLabel: 'Rubric criteria label',
     rubricDescription: 'Rubric criteria description',
-    rubricMinScore: 1,
+    rubricMinScore: 2,
     rubricMaxScore: 10,
     voteDuration: 12,
     votePassThreshold: 70,
@@ -121,24 +121,26 @@ test.describe.serial('Proposal Evaluations', () => {
     await expect(proposalPage.evaluationSettingsSidebar).toBeVisible();
 
     // Configure rubric
-    await proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole);
+    await proposalPage.page.waitForTimeout(1000);
 
     await Promise.all([
-      proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel),
-      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+      proposalPage.selectEvaluationReviewer('rubric', 'space_member' as ProposalSystemRole),
+      proposalPage.page.waitForResponse('**/evaluation')
     ]);
-    await Promise.all([
-      proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription),
-      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
-    ]);
-    await Promise.all([
-      proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString()),
-      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
-    ]);
-    await Promise.all([
-      proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString()),
-      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
-    ]);
+
+    await proposalPage.page.waitForTimeout(100);
+
+    await proposalPage.editRubricCriteriaLabel.fill(settingsToTest.rubricLabel);
+    await proposalPage.page.waitForResponse('**/rubric-criteria');
+    await proposalPage.page.waitForTimeout(100);
+    await proposalPage.editRubricCriteriaDescription.fill(settingsToTest.rubricDescription);
+    await proposalPage.page.waitForResponse('**/rubric-criteria');
+    await proposalPage.page.waitForTimeout(100);
+    await proposalPage.editRubricCriteriaMinScore.fill(settingsToTest.rubricMinScore.toString());
+    await proposalPage.page.waitForResponse('**/rubric-criteria');
+    await proposalPage.page.waitForTimeout(100);
+    await proposalPage.editRubricCriteriaMaxScore.fill(settingsToTest.rubricMaxScore.toString());
+    await proposalPage.page.waitForResponse('**/rubric-criteria');
 
     // Configure review
     await proposalPage.selectEvaluationReviewer('pass_fail', role.id);
