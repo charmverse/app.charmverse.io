@@ -19,6 +19,7 @@ import type { RubricTemplate } from 'lib/proposals/rubric/getRubricTemplates';
 import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 import type { RubricAnswerUpsert } from 'lib/proposals/rubric/upsertRubricAnswers';
 import type { RubricCriteriaUpsert } from 'lib/proposals/rubric/upsertRubricCriteria';
+import type { AppealReviewEvaluationRequest } from 'lib/proposals/submitEvaluationAppealResult';
 import type { ReviewEvaluationRequest } from 'lib/proposals/submitEvaluationResult';
 import type { UpdateProposalRequest } from 'lib/proposals/updateProposal';
 import type { UpdateEvaluationRequest } from 'lib/proposals/updateProposalEvaluation';
@@ -187,7 +188,7 @@ export function useAppealProposalEvaluation({ evaluationId }: { evaluationId: st
 }
 
 export function useSubmitEvaluationAppealReview({ evaluationId }: { evaluationId: string }) {
-  return usePUT<Omit<ReviewEvaluationRequest, 'evaluationId' | 'decidedBy' | 'proposalId'>>(
+  return usePUT<Omit<AppealReviewEvaluationRequest, 'evaluationId' | 'decidedBy' | 'proposalId'>>(
     `/api/proposals/evaluations/${evaluationId}/appeal/submit-result`
   );
 }

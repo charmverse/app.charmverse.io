@@ -96,7 +96,7 @@ export function SpaceEmailBrandingSettings() {
         </Typography>
         <Stack direction='row' alignItems='flex-start' gap={1}>
           <TextField
-            value={testEmail}
+            value={isAdmin ? testEmail : ''}
             onChange={(e) => {
               setTestEmail(e.target.value);
             }}
@@ -105,7 +105,7 @@ export function SpaceEmailBrandingSettings() {
             error={testEmail !== '' && !validEmail}
             placeholder='test@gmail.com'
           />
-          <Button loading={isMutating} disabled={!validEmail} primary onClick={sendTestEmail}>
+          <Button loading={isMutating} disabled={!validEmail || !isAdmin} primary onClick={sendTestEmail}>
             Test
           </Button>
         </Stack>
