@@ -25,8 +25,10 @@ import type { Application, PagePermission, PageType } from '@charmverse/core/pri
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { DataSourceType } from 'lib/databases/board';
 import type { IViewType } from 'lib/databases/boardView';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
@@ -1030,8 +1032,10 @@ export async function generateBoard({
   linkedSourceId,
   customProps,
   deletedAt,
-  permissions
+  permissions,
+  selectedProperties
 }: {
+  selectedProperties?: SelectedProposalProperties;
   createdBy: string;
   spaceId: string;
   cardCount?: number;
@@ -1095,9 +1099,18 @@ export async function generateBoard({
     data: permissionCreateArgs as any
   });
 
-  return prisma
+  const proposalsDatabase = await prisma
     .$transaction([prisma.block.createMany(blockArgs), ...pageArgs.map((p) => createPageDb(p)), permissionsToCreate])
     .then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
+
+  if (selectedProperties) {
+    await updateBoardProperties({
+      boardId: proposalsDatabase.id,
+      selectedProperties
+    });
+  }
+
+  return proposalsDatabase;
 }
 
 export async function generateForumComment({
