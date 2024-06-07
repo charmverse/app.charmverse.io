@@ -53,12 +53,9 @@ export async function summariseDeveloperActivity({
 
     try {
       const summary = await summarisePullRequest({
-        githubUsername,
         prNumber: pr.number,
-        prTitle: pr.title,
         repoName: mostActiveRepo.repoName,
-        repoOwner: mostActiveRepo.repoOwner,
-        status: 'merged'
+        repoOwner: mostActiveRepo.repoOwner
       });
 
       summaries.push(summary);

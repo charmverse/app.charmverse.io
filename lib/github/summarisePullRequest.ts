@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { log } from '@charmverse/core/log';
-import type { Prisma, PullRequestStatus, PullRequestSummary } from '@charmverse/core/prisma-client';
+import type { PullRequestSummary } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { askChatGPT } from 'lib/chatGPT/askChatgpt';
@@ -11,9 +11,9 @@ import { writeToSameFolder } from 'lib/utils/file';
 import { prettyPrint } from 'lib/utils/strings';
 
 import { GITHUB_API_BASE_URL } from './constants';
-import type { GithubUserName } from './getMergedPullRequests';
 import type { PullRequestToQuery } from './getPullRequestFileChanges';
 import { getPullRequestFileChanges } from './getPullRequestFileChanges';
+import { getPullRequestMeta } from './getPullRequestMeta';
 
 type PullRequestFilePatch = {
   filename: string;
@@ -21,6 +21,8 @@ type PullRequestFilePatch = {
   deletions: number;
   patch: string;
 };
+
+const promptAndFileSeparator = '----';
 
 /**
  * @createdBy github username of pull request author
@@ -31,37 +33,54 @@ export type PullRequestSummaryWithFilePatches = Omit<PullRequestSummary, 'patche
   model: ChatGPTModel;
 };
 
-export function baseSummarisePRPrompt({ prTitle }: { prTitle: string }) {
-  return `Please summarise the changes made within this pull request titled "${prTitle}:
+export function baseSummarisePRPrompt({ files }: { files: string }) {
+  return `Please review this pull request
+  
+  Start from the back end, and explain it through to the client-side experience.
 
-  Produce a single paragraph that summarises the changes of this pull request.
+  Use this template. Do not refer to specific files, just focus on functionality and technical improvements.
 
-  Infer the overall impact on the project.
+  Backend
+  - Features
+
+  Frontend
+  - User Interface components
+  - New or updated user interactions
+
+  ${promptAndFileSeparator}
   
-  Here is a list of files that were changed, in JSON format:
-  
-  ----
-  
-  {files}
+  ${files}
+
+  ${promptAndFileSeparator}
+
+  Perform your analysis using the provided template. Focus on the overall changes.
+
+  Be concise and summarise well. Limit use of adjectives and adverbs.
   `;
 }
 
-export type PullRequestToSummarise = PullRequestToQuery &
-  GithubUserName &
-  Pick<PullRequestSummary, 'prTitle' | 'status'>;
 /**
  * Summarise the PR, and return the summary with metadata
  * @param params
  * @returns
  */
-export async function summarisePullRequest(params: PullRequestToSummarise): Promise<PullRequestSummaryWithFilePatches> {
-  const existingSummary = await prisma.pullRequestSummary.findFirst({
-    where: {
-      prNumber: params.prNumber,
-      repoOwner: params.repoOwner,
-      repoName: params.repoName
-    }
-  });
+export async function summarisePullRequest(
+  params: PullRequestToQuery & { forceRefresh?: boolean }
+): Promise<PullRequestSummaryWithFilePatches> {
+  // Don't search for existing ones if we're forcing a refresh
+  const existingSummary = params.forceRefresh
+    ? null
+    : await prisma.pullRequestSummary.findFirst({
+        where: {
+          prNumber: params.prNumber,
+          repoOwner: params.repoOwner,
+          repoName: params.repoName
+        },
+        orderBy: {
+          // Always get the latest summary
+          createdAt: 'desc'
+        }
+      });
 
   if (existingSummary) {
     log.info(
@@ -70,30 +89,36 @@ export async function summarisePullRequest(params: PullRequestToSummarise): Prom
     return existingSummary as PullRequestSummaryWithFilePatches;
   }
 
+  const pr = await getPullRequestMeta({
+    number: params.prNumber,
+    repo: params.repoName,
+    owner: params.repoOwner
+  });
+
   const files = await getPullRequestFileChanges(params);
 
-  const basePrompt = baseSummarisePRPrompt({ prTitle: params.prTitle });
+  const prompt = baseSummarisePRPrompt({ files: JSON.stringify(files, null, 2) });
+
+  log.info(`Summarising pull request ${params.repoOwner}/${params.repoName}/${params.prNumber}`);
 
   const selectedModel: ChatGPTModel = 'gpt4';
 
-  const fullPrompt = basePrompt.replace('{files}', JSON.stringify(files, null, 2));
-
-  const response = await askChatGPT({ prompt: fullPrompt, model: selectedModel });
+  const response = await askChatGPT({ prompt, model: selectedModel });
 
   const persistedSummary = await prisma.pullRequestSummary.create({
     data: {
-      prTitle: params.prTitle,
+      prTitle: pr.title,
       prNumber: params.prNumber,
       repoOwner: params.repoOwner,
       repoName: params.repoName,
-      status: params.status,
+      status: pr.mergedAt ? 'merged' : 'open',
       patches: files,
       model: selectedModel,
       additions: files.reduce((acc, file) => acc + file.additions, 0),
       deletions: files.reduce((acc, file) => acc + file.deletions, 0),
       changedFiles: files.length,
-      createdBy: params.githubUsername,
-      prompt: basePrompt,
+      createdBy: pr.author.login,
+      prompt: prompt.split(promptAndFileSeparator)[0].trim(),
       promptTokens: response.inputTokens,
       summary: response.answer,
       summaryTokens: response.outputTokens

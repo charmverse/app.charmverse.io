@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 
 import type { ApolloQueryResult, QueryOptions } from '@apollo/client';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from '@apollo/client';
 import { log } from '@charmverse/core/log';
 import type { RedisClientType } from 'redis';
 
@@ -22,15 +22,37 @@ export class ApolloClientWithRedisCache extends ApolloClient<any> {
   /**
    * @cacheKeyPrefix - A prefix to be added to the cache key. Useful when multiple different clients use the same cache and might have similar queries
    */
-  constructor(args: { uri: string; persistForSeconds: number; cacheKeyPrefix?: string; skipRedisCache?: boolean }) {
+  constructor(args: {
+    uri: string;
+    persistForSeconds: number;
+    cacheKeyPrefix?: string;
+    skipRedisCache?: boolean;
+    authHeader?: string;
+  }) {
+    const httpLink = new HttpLink({ uri: args.uri });
+
+    let link = httpLink;
+
+    if (args.authHeader) {
+      const authLink = new ApolloLink((operation, forward) => {
+        operation.setContext({
+          headers: {
+            authorization: args.authHeader
+          }
+        });
+        return forward(operation);
+      });
+
+      link = ApolloLink.from([authLink, httpLink]) as HttpLink;
+    }
+
     super({
       cache: new InMemoryCache(),
-      uri: args.uri
+      link
     });
+
     this.persistForSeconds = args.persistForSeconds;
-
     this.cacheKeyPrefix = args.cacheKeyPrefix || '';
-
     this.skipRedisCache = !!args.skipRedisCache;
   }
 

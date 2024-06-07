@@ -1,30 +1,13 @@
-import { POST } from 'adapters/http';
-import { githubAccessToken } from 'config/constants';
+import { gql } from '@apollo/client';
 
-import { GITHUB_GRAPHQL_BASE_URL } from './constants';
+import type { PullRequestMeta } from './getPullRequestMeta';
+import { githubGrapghQLClient } from './githubGraphQLClient';
 
 export type GithubUserName = { githubUsername: string };
 
 export type GithubGraphQLQuery = {
   limit?: number;
   fromDate?: Date | string;
-};
-
-export type PullRequestMeta = {
-  id: string;
-  number: number;
-  title: string;
-  url: string;
-  author: {
-    login: string;
-  };
-  additions: number;
-  deletions: number;
-  createdAt: string;
-  mergedAt: string;
-  repository: {
-    nameWithOwner: string;
-  };
 };
 
 const filteredRequestTitles = ['revert'];
@@ -34,35 +17,24 @@ export async function getMergedPullRequests({
   limit = 100,
   fromDate
 }: GithubUserName & GithubGraphQLQuery): Promise<PullRequestMeta[]> {
-  let hasNextPage = true;
-  let afterCursor = null;
-  let allPullRequestsInRange: PullRequestMeta[] = [];
-  const fromDateObj = fromDate ? new Date(fromDate) : null;
-
-  while (hasNextPage && allPullRequestsInRange.length < limit) {
-    const query: string = `{
-      user(login: "${githubUsername}") {
-        pullRequests(first: ${Math.min(
-          // If we are near the end, don't fetch more than the limit
-          limit - allPullRequestsInRange.length,
-          100
-        )}, states: MERGED, orderBy: {field: UPDATED_AT, direction: DESC}${
-      afterCursor ? `, after: "${afterCursor}"` : ''
-    }) {
+  const query = gql`
+    query GetMergedPullRequests($login: String!, $after: String, $limit: Int!) {
+      user(login: $login) {
+        pullRequests(first: $limit, states: MERGED, orderBy: { field: UPDATED_AT, direction: DESC }, after: $after) {
           nodes {
-            id
             number
+            state
             title
-            url
-            additions
-            deletions
             createdAt
+            updatedAt
+            closedAt
             mergedAt
+            mergeCommit {
+              oid
+            }
             author {
               login
-            }
-            repository {
-              nameWithOwner
+              id
             }
           }
           pageInfo {
@@ -71,29 +43,37 @@ export async function getMergedPullRequests({
           }
         }
       }
-    }`;
+    }
+  `;
 
-    const { data } = await POST<{
-      data: {
-        user: {
-          pullRequests: {
-            nodes: PullRequestMeta[];
-            pageInfo: {
-              hasNextPage: boolean;
-              endCursor: string;
-            };
+  let hasNextPage = true;
+  let afterCursor = null;
+  let allPullRequestsInRange: PullRequestMeta[] = [];
+
+  // The variables to pass to the query
+  const variables = {
+    login: githubUsername,
+    after: afterCursor || null,
+    limit: Math.min(limit - allPullRequestsInRange.length, 100)
+  };
+
+  const fromDateObj = fromDate ? new Date(fromDate) : null;
+
+  while (hasNextPage && allPullRequestsInRange.length < limit) {
+    const { data } = await githubGrapghQLClient.query<{
+      user: {
+        pullRequests: {
+          nodes: PullRequestMeta[];
+          pageInfo: {
+            hasNextPage: boolean;
+            endCursor: string;
           };
         };
       };
-    }>(
-      GITHUB_GRAPHQL_BASE_URL,
-      { query },
-      {
-        headers: {
-          Authorization: `bearer ${githubAccessToken}`
-        }
-      }
-    );
+    }>({
+      query,
+      variables
+    });
 
     const { nodes, pageInfo } = data.user.pullRequests;
 

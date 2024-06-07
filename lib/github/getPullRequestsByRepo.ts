@@ -1,5 +1,6 @@
 import { getMergedPullRequests } from './getMergedPullRequests';
-import type { GithubGraphQLQuery, GithubUserName, PullRequestMeta } from './getMergedPullRequests';
+import type { GithubGraphQLQuery, GithubUserName } from './getMergedPullRequests';
+import type { PullRequestMeta } from './getPullRequestMeta';
 
 export type PullRequestsByRepo = {
   repoName: string;
