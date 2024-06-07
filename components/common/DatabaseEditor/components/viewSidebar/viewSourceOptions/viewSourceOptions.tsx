@@ -182,7 +182,7 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SourceType
                 disabled={!isAdmin}
                 data-test='source-proposals'
-                disabledTooltip={!isAdmin ? 'Only admins can create proposals as datasource boards' : ''}
+                disabledTooltip='Only admins can create proposals as datasource boards'
                 active={activeSourceType === 'proposals'}
                 onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesPopupState.open}
               >

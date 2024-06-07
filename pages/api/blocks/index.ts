@@ -27,7 +27,6 @@ import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
 import { UnauthorisedActionError } from 'lib/utils/errors';
-import { prettyPrint } from 'lib/utils/strings';
 import { isTruthy } from 'lib/utils/types';
 import { relay } from 'lib/websockets/relay';
 

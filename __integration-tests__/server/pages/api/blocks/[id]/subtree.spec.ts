@@ -10,7 +10,6 @@ import type { BlockWithDetails } from 'lib/databases/block';
 import type { BoardFields, IPropertyTemplate } from 'lib/databases/board';
 import { createMissingCards } from 'lib/databases/proposalsSource/createMissingCards';
 import { getCardPropertyTemplates } from 'lib/databases/proposalsSource/getCardProperties';
-import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { baseUrl, loginUser } from 'testing/mockApiCall';
 import { generateBoard } from 'testing/setupDatabase';
 import { addUserToSpace } from 'testing/utils/spaces';
@@ -563,7 +562,15 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
       createdBy: admin.id,
       spaceId: space.id,
       viewDataSource: 'proposals',
-      cardCount: 0
+      cardCount: 0,
+      selectedProperties: {
+        defaults: ['proposalStep', 'proposalEvaluationType'],
+        customProperties: [],
+        formFields: [],
+        project: [],
+        projectMember: [],
+        rubricEvaluations: []
+      }
     });
     const visibleProposal = await testUtilsProposals.generateProposal({
       proposalStatus: 'published',
@@ -577,17 +584,6 @@ describe('GET /api/blocks/[id]/subtree - proposal databases', () => {
           reviewers: []
         }
       ]
-    });
-    await updateBoardProperties({
-      boardId: proposalsDatabase.id,
-      selectedProperties: {
-        defaults: ['proposalStep', 'proposalEvaluationType'],
-        customProperties: [],
-        formFields: [],
-        project: [],
-        projectMember: [],
-        rubricEvaluations: []
-      }
     });
     const sessionCookie = await loginUser(admin.id);
 

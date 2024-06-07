@@ -52,7 +52,7 @@ async function createProposalSource(req: NextApiRequest, res: NextApiResponse) {
   });
 
   if (!isAdmin) {
-    throw new ActionNotPermittedError('You do not have permission to update this page');
+    throw new ActionNotPermittedError('Only admins can use proposals as a source');
   }
 
   if (permissions.edit_content !== true) {

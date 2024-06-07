@@ -92,7 +92,6 @@ export type GoogleFormSourceData = {
 
 export type BoardFields = {
   icon: string;
-  selectedProperties?: SelectedProposalProperties;
   description: PageContent;
   showDescription?: boolean;
   isTemplate?: boolean;

@@ -15,7 +15,7 @@ export function SourceType<C extends React.ElementType>({
 >) {
   return (
     <Grid item xs={6} {...restProps} onClick={disabled ? undefined : restProps.onClick}>
-      <Tooltip title={disabledTooltip}>
+      <Tooltip title={disabled ? disabledTooltip : ''}>
         <Card
           variant='outlined'
           sx={{
