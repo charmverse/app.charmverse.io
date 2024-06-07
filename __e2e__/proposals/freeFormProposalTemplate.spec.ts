@@ -102,7 +102,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalsListPage.addNewTemplate.click();
     await proposalsListPage.proposalTemplateFreeFormOption.click();
 
-    await expect(proposalPage.workflowSelect).toBeVisible();
+    await proposalPage.workflowSelect.isVisible();
 
     // Select a workflow
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
@@ -147,7 +147,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // Edit the proposal content
     await documentPage.typeText(templatePageContent.description);
 
-    await expect(proposalPage.publishNewProposalButton).toBeEnabled();
+    await proposalPage.publishNewProposalButton.isEnabled();
     await Promise.all([page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     // Check the actual data
