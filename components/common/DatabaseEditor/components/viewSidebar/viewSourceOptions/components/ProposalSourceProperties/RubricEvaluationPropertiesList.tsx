@@ -14,7 +14,9 @@ export function RubricEvaluationPropertiesList({
   selectedProperties: SelectedProposalProperties;
   setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
 }) {
-  const { proposalTemplates } = useProposalTemplates();
+  const { proposalTemplates } = useProposalTemplates({
+    detailed: true
+  });
   const rubricEvaluationTitles = useMemo(() => {
     const _rubricEvaluationTitles: Set<string> = new Set();
     proposalTemplates?.forEach((template) => {

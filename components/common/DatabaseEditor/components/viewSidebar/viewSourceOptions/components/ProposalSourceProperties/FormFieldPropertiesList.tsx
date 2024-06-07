@@ -16,7 +16,7 @@ export function FormFieldPropertiesList({
   selectedProperties: SelectedProposalProperties;
   setSelectedProperties: (selectedProperties: SelectedProposalProperties) => void;
 }) {
-  const { proposalTemplates } = useProposalTemplates();
+  const { proposalTemplates } = useProposalTemplates({ detailed: true });
   const formFields = useMemo(() => {
     const proposalTemplate = proposalTemplates?.find((template) => template.pageId === templatePageId);
     return (
@@ -79,7 +79,7 @@ export function FormFieldPropertiesReadonlyList({
 }: {
   selectedProperties: SelectedProposalProperties;
 }) {
-  const { proposalTemplates } = useProposalTemplates();
+  const { proposalTemplates } = useProposalTemplates({ detailed: true });
   const proposalTemplateFormFields = useMemo(() => {
     return (
       proposalTemplates
