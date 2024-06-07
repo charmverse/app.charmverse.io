@@ -48,7 +48,6 @@ async function sendTestEmail(req: NextApiRequest, res: NextApiResponse) {
     select: {
       id: true,
       username: true,
-      email: true,
       avatar: true
     }
   });
@@ -116,7 +115,7 @@ async function sendTestEmail(req: NextApiRequest, res: NextApiResponse) {
   await mailer.sendEmail({
     to: {
       displayName: user.username,
-      email: user.email!,
+      email,
       userId: user.id
     },
     subject: template.subject,
