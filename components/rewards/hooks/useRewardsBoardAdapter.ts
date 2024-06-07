@@ -36,7 +36,7 @@ import {
 import type { RewardFields } from 'lib/rewards/blocks/interfaces';
 import { getDefaultView } from 'lib/rewards/blocks/views';
 import { countRemainingSubmissionSlots } from 'lib/rewards/countRemainingSubmissionSlots';
-import type { ApplicationMeta, RewardReviewer, RewardWithUsers } from 'lib/rewards/interfaces';
+import type { ApplicationMeta, RewardWithUsers } from 'lib/rewards/interfaces';
 import { getAbsolutePath } from 'lib/utils/browser';
 import { isTruthy } from 'lib/utils/types';
 

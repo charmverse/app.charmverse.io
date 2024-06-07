@@ -1,4 +1,4 @@
-import PanToolIcon from '@mui/icons-material/PanTool';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import { Box, Card, FormLabel, Stack, TextField, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
@@ -193,7 +193,7 @@ export function PassFailEvaluationContainer({
               <Stack>
                 <Card sx={{ mb: 2 }} variant='outlined'>
                   <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-                    <PanToolIcon color='warning' />
+                    <PanToolOutlinedIcon color='warning' />
                     <Typography variant='body2'>
                       Appealed by {evaluation.appealedBy ? membersRecord[evaluation.appealedBy]?.username : 'member'}{' '}
                       {getRelativeTimeInThePast(new Date(evaluation.appealedAt!.toString()))}

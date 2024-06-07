@@ -105,7 +105,6 @@ export class NotionPage {
         const pageRecord = this.cache.pagesRecord.get(notionPageId) as DatabasePageItem;
 
         const { pageIds } = pageRecord?.notionPage ?? (await this.fetchNotionDatabaseChildPages({ notionPageId }));
-
         if (pageRecord?.charmversePage) {
           return pageRecord.charmversePage;
         }
@@ -116,7 +115,6 @@ export class NotionPage {
           cache: this.cache,
           notionPage: this
         });
-
         const databasePage = await charmverseDatabasePage.create();
 
         relay.broadcast(
@@ -303,7 +301,14 @@ export class NotionPage {
               },
               client,
               cache
-            )
+            ).catch((err) => {
+              log.warn('[notion] Error retrieving child blocks', {
+                error: err,
+                blockId: parentBlockId,
+                spaceId: this.spaceId,
+                userId: this.userId
+              });
+            })
           )
         )
       ).filter(isTruthy);

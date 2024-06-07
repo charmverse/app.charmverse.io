@@ -263,6 +263,11 @@ export async function createProposalNotifications(webhookData: {
         }
       });
 
+      const notificationToggles = space.notificationToggles as NotificationToggles;
+      if (notificationToggles.proposals__review_required === false) {
+        break;
+      }
+
       for (const spaceRole of spaceRoles) {
         // The user who triggered the event should not receive a notification
         if (spaceRole.userId === userId) {
@@ -284,11 +289,6 @@ export async function createProposalNotifications(webhookData: {
           continue;
         }
 
-        const notificationToggles = space.notificationToggles as NotificationToggles;
-        if (notificationToggles.proposals__review_required === false) {
-          continue;
-        }
-
         const { id } = await saveProposalNotification({
           createdAt: webhookData.createdAt,
           createdBy: userId,
@@ -297,6 +297,61 @@ export async function createProposalNotifications(webhookData: {
           userId: spaceRole.userId,
           type: 'proposal_appealed',
           evaluationId: currentEvaluation.id
+        });
+
+        ids.push(id);
+      }
+
+      break;
+    }
+
+    case WebhookEventNames.ProposalPublished: {
+      const userId = webhookData.event.user.id;
+      const spaceId = webhookData.spaceId;
+      const proposalId = webhookData.event.proposal.id;
+
+      const proposal = await prisma.proposal.findUniqueOrThrow({
+        where: {
+          id: proposalId
+        },
+        select: {
+          authors: true,
+          page: {
+            select: {
+              deletedAt: true
+            }
+          }
+        }
+      });
+
+      const space = await prisma.space.findUniqueOrThrow({
+        where: {
+          id: spaceId
+        },
+        select: {
+          notificationToggles: true
+        }
+      });
+
+      const isProposalDeleted = proposal.page?.deletedAt;
+
+      if (isProposalDeleted) {
+        break;
+      }
+
+      const notificationToggles = space.notificationToggles as NotificationToggles;
+      if (notificationToggles.proposals__proposal_published === false) {
+        break;
+      }
+
+      for (const author of proposal.authors) {
+        const { id } = await saveProposalNotification({
+          createdAt: webhookData.createdAt,
+          createdBy: userId,
+          proposalId,
+          spaceId,
+          userId: author.userId,
+          type: 'proposal_published'
         });
 
         ids.push(id);

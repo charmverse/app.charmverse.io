@@ -16,15 +16,19 @@ const dimensions = {
 const domain = process.env.DOMAIN;
 const logoImagePath = '/images/charmverse_logo_sm_black.png';
 
-export default function Header({ size = 'medium' }: { size?: 'medium' | 'small' }) {
+export default function Header({ image }: { image?: string }) {
   return (
     <Link href={domain}>
       <Img
-        src={`${domain}${logoImagePath}`}
-        style={{
-          width: dimensions[size].width,
-          height: dimensions[size].height
-        }}
+        src={image || `${domain}${logoImagePath}`}
+        style={
+          image
+            ? undefined
+            : {
+                width: dimensions.medium.width,
+                height: dimensions.medium.height
+              }
+        }
       />
     </Link>
   );

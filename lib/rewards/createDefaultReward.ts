@@ -26,8 +26,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
     customReward: 'Meet CharmVerse',
     reviewers: [
       {
-        group: 'user',
-        id: userId
+        userId
       }
     ],
     chainId: null,
@@ -43,8 +42,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
         [DUE_DATE_ID]: '',
         [REWARD_REVIEWERS_BLOCK_ID]: [
           {
-            group: 'user',
-            id: userId
+            userId
           }
         ],
         [REWARD_AMOUNT]: '',
@@ -90,8 +88,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
     userId,
     reviewers: [
       {
-        group: 'user',
-        id: userId
+        userId
       }
     ],
     chainId: null,
@@ -107,8 +104,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
         [DUE_DATE_ID]: '',
         [REWARD_REVIEWERS_BLOCK_ID]: [
           {
-            group: 'user',
-            id: userId
+            userId
           }
         ],
         [REWARD_AMOUNT]: '',

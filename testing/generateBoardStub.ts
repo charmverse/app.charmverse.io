@@ -334,7 +334,6 @@ export function boardWithCardsArgs({
         hiddenOptionIds: [],
         visibleOptionIds: [],
         defaultTemplateId: '',
-        collapsedOptionIds: [],
         columnCalculations: {},
         kanbanCalculations: {},
         visiblePropertyIds: customProps?.propertyTemplates

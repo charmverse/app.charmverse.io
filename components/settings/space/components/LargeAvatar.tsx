@@ -62,6 +62,7 @@ type LargeAvatarProps = {
   isNft?: boolean;
   alwaysShowEdit?: boolean;
   hideDelete?: boolean;
+  accept?: string;
 };
 
 export default function LargeAvatar(props: LargeAvatarProps) {
@@ -75,7 +76,8 @@ export default function LargeAvatar(props: LargeAvatarProps) {
     canSetNft,
     isSaving,
     updateImage,
-    isNft
+    isNft,
+    accept = 'image/*'
   } = props;
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
   const [isGalleryVisible, setIsGalleryVisible] = useState(false);
@@ -131,7 +133,7 @@ export default function LargeAvatar(props: LargeAvatarProps) {
   return (
     <StyledBox>
       <ProgressOverlay isLoading={isSaving || isUploading}>
-        <input type='file' hidden accept='image/*' ref={inputRef} onChange={onFileChange} />
+        <input type='file' hidden accept={accept} ref={inputRef} onChange={onFileChange} />
         <StyledAvatarWithIcons
           alwaysShow={props.alwaysShowEdit}
           avatar={image}

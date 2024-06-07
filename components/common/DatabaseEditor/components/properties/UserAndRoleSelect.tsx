@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import styled from '@emotion/styled';
 import CloseIcon from '@mui/icons-material/Close';
 import { Autocomplete, Box, Chip, IconButton, Stack, TextField, Tooltip } from '@mui/material';
@@ -19,8 +18,8 @@ import { EmptyPlaceholder } from './EmptyPlaceholder';
 import { PopupFieldWrapper } from './PopupFieldWrapper';
 import { SelectPreviewContainer } from './TagSelect/TagSelect';
 
-export type RoleOption = TargetPermissionGroup<'role'>;
-type MemberOption = TargetPermissionGroup<'user'>;
+type RoleOption = { group: 'role'; id: string };
+type MemberOption = { group: 'user'; id: string };
 type SystemRoleOption<T extends string = string> = { group: 'system_role'; id: T };
 export type SelectOption = RoleOption | MemberOption | SystemRoleOption;
 type RoleOptionPopulated = ListSpaceRolesResponse & RoleOption;
@@ -175,7 +174,7 @@ type Props<T> = {
   readOnlyMessage?: string;
   showEmptyPlaceholder?: boolean;
   systemRoles?: SystemRoleOptionPopulated[];
-  value: T[];
+  value: (T | string)[];
   isRequiredValue?: (value: SelectOptionPopulated) => boolean;
   variant?: 'outlined' | 'standard';
   'data-test'?: string;
@@ -206,14 +205,29 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
 }: Props<T>): JSX.Element | null {
   const [isOpen, setIsOpen] = useState(false);
   const { roles } = useRoles();
-  const { members } = useMembers();
+  const { members, membersRecord } = useMembers();
   const { isFreeSpace } = useIsFreeSpace();
+
+  const selectInputValue: T[] = inputValue
+    .map((elem) => {
+      if (typeof elem === 'string') {
+        const user = membersRecord[elem];
+        if (user) {
+          return { group: 'user', id: elem } as T;
+        }
+        const role = roles?.find((r) => r.id === elem);
+        if (role) {
+          return { group: 'role', id: elem } as T;
+        }
+        return null;
+      }
+      return elem;
+    })
+    .filter(isTruthy);
 
   const filteredMembers = members.filter((member) => !member.isBot);
   // For public spaces, we don't want to show reviewer roles
-  const applicableValues = isFreeSpace
-    ? (inputValue as { id: string; group: 'user' | 'role' }[]).filter((elem) => elem.group === 'user')
-    : (inputValue as { id: string; group: 'user' | 'role' }[]);
+  const applicableValues = isFreeSpace ? selectInputValue.filter((elem) => elem.group === 'user') : selectInputValue;
 
   const mappedMembers: MemberOptionPopulated[] = filteredMembers.map((member) => ({ ...member, group: 'user' }));
   const mappedRoles: RoleOptionPopulated[] =
@@ -246,7 +260,7 @@ export function UserAndRoleSelect<T extends { id: string; group: string } = Sele
     }
   }, [filteredMembers, roles]);
 
-  const populatedValue = inputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
+  const populatedValue = selectInputValue.map(({ id }) => allOptions.find((opt) => opt.id === id)).filter(isTruthy);
 
   const onClickToEdit = useCallback(() => {
     if (!readOnly) {

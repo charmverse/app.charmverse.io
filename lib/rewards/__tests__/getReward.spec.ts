@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import type { Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
@@ -8,7 +7,7 @@ import { DataNotFoundError } from 'lib/utils/errors';
 import { generateBounty, generateBountyWithSingleApplication } from 'testing/setupDatabase';
 
 import { getReward, getRewardOrThrow } from '../getReward';
-import type { ApplicationMeta, Reward, RewardWithUsers } from '../interfaces';
+import type { Reward, RewardWithUsers } from '../interfaces';
 
 let space: Space;
 let user: User;
@@ -81,9 +80,9 @@ describe('getReward', () => {
     const reward = (await getReward({ rewardId: rewardWithApplication.id })) as Reward;
     expect(reward as RewardWithUsers).toMatchObject<Partial<RewardWithUsers>>({
       allowedSubmitterRoles: [submitterRole.id],
-      reviewers: expect.arrayContaining<TargetPermissionGroup<'role' | 'user'>>([
-        { group: 'role', id: reviewerRole.id },
-        { group: 'user', id: reviewerUser.id }
+      reviewers: expect.arrayContaining([
+        expect.objectContaining({ userId: reviewerUser.id }),
+        expect.objectContaining({ roleId: reviewerRole.id })
       ]),
       applications: [
         {

@@ -11,7 +11,7 @@ import Text from './Text';
 const domain = process.env.DOMAIN;
 const chatIconPath = '/images/icons/speech-bubbles.png';
 
-export default function Feedback() {
+export default function Feedback({ primaryColor }: { primaryColor?: string }) {
   return (
     <Container
       style={{
@@ -35,7 +35,10 @@ export default function Feedback() {
             <strong>Do you have any feedback on this email?</strong>
           </Row>
           <Row>
-            Please share it with us on <Link href={charmverseDiscordInvite}>Discord</Link>
+            Please share it with us on{' '}
+            <Link primaryColor={primaryColor} href={charmverseDiscordInvite}>
+              Discord
+            </Link>
           </Row>
         </Text>
       </Column>
