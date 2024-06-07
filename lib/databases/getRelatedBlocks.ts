@@ -5,6 +5,7 @@ import { isTruthy } from 'lib/utils/types';
 
 import type { BlockWithDetails } from './block';
 import type { BoardFields } from './board';
+import type { BoardViewFields } from './boardView';
 
 type SourceType = 'proposals';
 

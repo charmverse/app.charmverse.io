@@ -34,6 +34,7 @@ import type { FilterClause, FilterCondition } from 'lib/databases/filterClause';
 import { propertyConfigs } from 'lib/databases/filterClause';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { createFilterGroup } from 'lib/databases/filterGroup';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
@@ -472,7 +473,7 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <EllipsisText fontSize='small'>{template.name}</EllipsisText>
+                  <EllipsisText fontSize='small'>{getPropertyName(template)}</EllipsisText>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
@@ -497,7 +498,7 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <EllipsisText fontSize='small'>{property.name}</EllipsisText>
+                    <EllipsisText fontSize='small'>{getPropertyName(property)}</EllipsisText>
                   </MenuItem>
                 ))}
               </Menu>

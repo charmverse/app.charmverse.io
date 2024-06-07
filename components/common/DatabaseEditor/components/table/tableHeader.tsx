@@ -34,6 +34,7 @@ import { isReadonlyPropertyTitle } from 'lib/databases/board';
 import type { BoardView, ISortOption } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 import { isReturnKey } from 'lib/utils/react';
 
 import { useSortable } from '../../hooks/sortable';
@@ -63,7 +64,7 @@ function TableHeader(props: Props): JSX.Element {
   const { activeView, board, views, cards, sorted, template, readOnly } = props;
   const { type } = template;
   const { id: templateId } = template;
-  const name = template.name;
+  const name = getPropertyName(template);
   const [isDragging, isOver, columnRef] = useSortable('column', props.template, !readOnly, props.onDrop);
   const columnWidth = (_templateId: string): number => {
     return Math.max(Constants.minColumnWidth, (activeView.fields.columnWidths[_templateId] || 0) + props.offset);

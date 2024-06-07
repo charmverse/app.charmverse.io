@@ -26,6 +26,7 @@ const test = base.extend<Fixtures>({
 // Will be set by the first test
 let spaceUser: User;
 let space: Space;
+let databasePagePath: string;
 
 let firstProposal: Proposal;
 let secondProposal: Proposal;
@@ -92,8 +93,13 @@ test.describe('Database with proposals as datasource', async () => {
 
     // Initialise the new database
     await expect(databasePage.selectProposalsAsSource()).toBeVisible();
-    await databasePage.selectProposalsAsSource().click();
-    await databasePage.page.locator('data-test=apply-proposal-source-properties').click();
+
+    // This is important as we want to simulate multiple clicks to ensure the card creation only happens once
+    await Promise.all([
+      databasePage.selectProposalsAsSource().click(),
+      databasePage.selectProposalsAsSource().click(),
+      databasePage.selectProposalsAsSource().click()
+    ]);
 
     await databasePage.page.waitForResponse(/api\/pages\/.{1,}\/proposal-source/);
 
@@ -116,6 +122,17 @@ test.describe('Database with proposals as datasource', async () => {
     });
     // Regression check to make sure we did not create duplicate cards
     expect(syncedCards.length).toBe(3);
+
+    databasePagePath = (
+      await prisma.page.findFirstOrThrow({
+        where: {
+          id: syncedCards[0].parentId as string
+        },
+        select: {
+          path: true
+        }
+      })
+    ).path;
 
     const allTargetProposalIds = [firstProposal.id, secondProposal.id, thirdProposal.id];
 

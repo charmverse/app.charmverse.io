@@ -88,7 +88,7 @@ async function getBlockSubtree(req: NextApiRequest, res: NextApiResponse<BlockWi
       userId: req.session.user?.id
     });
 
-    // Remember to allow normal blocks that do not have a page, like views, to be shown
+    // Rememeber to allow normal blocks that do not have a page, like views, to be shown
     let filtered = blocks.filter((b) => typeof b.pageId === 'undefined' || !!permissionsById[b.pageId]?.read);
 
     // Only edit

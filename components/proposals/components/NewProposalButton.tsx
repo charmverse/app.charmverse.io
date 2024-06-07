@@ -21,7 +21,7 @@ import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
-import type { ProposalContentType } from 'lib/proposals/createDraftProposal';
+import type { CreateDraftProposalInput, ProposalContentType } from 'lib/proposals/createDraftProposal';
 
 import { useProposalTemplates } from '../hooks/useProposalTemplates';
 
