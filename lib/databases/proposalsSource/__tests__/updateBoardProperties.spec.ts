@@ -241,13 +241,13 @@ describe('updateBoardProperties()', () => {
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
     // Check status
     const rubricCriteria1Property = properties.find(
-      (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 1'
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.name === 'Criteria 1'
     );
     const rubricCriteria2Property = properties.find(
-      (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 2'
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.name === 'Criteria 2'
     );
     const rubricCriteria21Property = properties.find(
-      (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 2.1'
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.name === 'Criteria 2.1'
     );
 
     expect(rubricCriteria1Property).toBeDefined();

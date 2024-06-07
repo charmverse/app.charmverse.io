@@ -37,8 +37,8 @@ export function useGetProposalsBySpace({ spaceId }: Partial<ListProposalsRequest
   return useGET<ProposalWithUsersLite[]>(spaceId ? `/api/spaces/${spaceId}/proposals` : null);
 }
 
-export function useGetProposalTemplatesBySpace(spaceId: MaybeString, detailed?: boolean) {
-  return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null, { detailed });
+export function useGetProposalTemplatesBySpace(spaceId: MaybeString) {
+  return useGET<ProposalTemplateMeta[]>(spaceId ? `/api/spaces/${spaceId}/proposal-templates` : null);
 }
 
 export function useGetProposalTemplate(pageId: MaybeString) {

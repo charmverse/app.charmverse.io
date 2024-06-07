@@ -11,6 +11,7 @@ import type { Board, IPropertyTemplate } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
+import { getPropertyName } from 'lib/databases/getPropertyName';
 import { isReturnKey } from 'lib/utils/react';
 
 import mutator from '../../mutator';
@@ -40,7 +41,7 @@ function ViewPropertyOption({
   view: BoardView;
   goBackStep: VoidFunction;
 }) {
-  const name = property.name;
+  const name = getPropertyName(property);
   const [tempName, setTempName] = useState(name || '');
   const { visiblePropertyIds } = view.fields;
   const titlePropertyIndex = visiblePropertyIds.indexOf(Constants.titleColumnId);

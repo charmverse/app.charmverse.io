@@ -1,11 +1,9 @@
 import type { GridProps } from '@mui/material';
-import { Box, Typography, Card, Grid, Tooltip } from '@mui/material';
+import { Box, Typography, Card, Grid } from '@mui/material';
 
 export function SourceType<C extends React.ElementType>({
   active,
   children,
-  disabled,
-  disabledTooltip,
   ...restProps
 }: GridProps<
   C,
@@ -14,35 +12,30 @@ export function SourceType<C extends React.ElementType>({
   }
 >) {
   return (
-    <Grid item xs={6} {...restProps} onClick={disabled ? undefined : restProps.onClick}>
-      <Tooltip title={disabled ? disabledTooltip : ''}>
-        <Card
-          variant='outlined'
-          sx={{
-            height: '80px',
-            userSelect: disabled ? 'none' : 'auto',
-            cursor: disabled ? undefined : 'pointer',
-            borderColor: active ? 'var(--primary-color)' : '',
-            opacity: (theme) => (disabled ? theme.palette.action.disabledOpacity : ''),
-            bgcolor: (theme) => (disabled ? theme.palette.action.disabledBackground : ''),
-            '&:hover': { bgcolor: disabled ? undefined : !active ? 'sidebar.background' : '' }
-          }}
-        >
-          <Typography align='center' height='100%' variant='body2' color={active ? 'primary' : 'secondary'}>
-            <Box
-              component='span'
-              height='100%'
-              display='flex'
-              p={1}
-              alignItems='center'
-              flexDirection='column'
-              justifyContent='center'
-            >
-              {children}
-            </Box>
-          </Typography>
-        </Card>
-      </Tooltip>
+    <Grid item xs={6} {...restProps}>
+      <Card
+        variant='outlined'
+        sx={{
+          height: '80px',
+          cursor: 'pointer',
+          borderColor: active ? 'var(--primary-color)' : '',
+          '&:hover': { bgcolor: !active ? 'sidebar.background' : '' }
+        }}
+      >
+        <Typography align='center' height='100%' variant='body2' color={active ? 'primary' : 'secondary'}>
+          <Box
+            component='span'
+            height='100%'
+            display='flex'
+            p={1}
+            alignItems='center'
+            flexDirection='column'
+            justifyContent='center'
+          >
+            {children}
+          </Box>
+        </Typography>
+      </Card>
     </Grid>
   );
 }
