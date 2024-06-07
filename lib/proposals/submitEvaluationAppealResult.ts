@@ -7,12 +7,13 @@ import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
 import { createVoteIfNecessary } from './createVoteIfNecessary';
 import { setPageUpdatedAt } from './setPageUpdatedAt';
 
-export type ReviewEvaluationRequest = {
+export type AppealReviewEvaluationRequest = {
   decidedBy: string;
   proposalId: string;
   evaluationId: string;
   result: ProposalEvaluationResult;
   declineReasons?: string[];
+  declineInput?: string;
 };
 
 export async function updateEvaluationResult({
@@ -72,8 +73,9 @@ export async function submitEvaluationAppealResult({
   result,
   spaceId,
   evaluation,
-  declineReasons
-}: Omit<ReviewEvaluationRequest, 'evaluationId'> & {
+  declineReasons,
+  declineInput
+}: Omit<AppealReviewEvaluationRequest, 'evaluationId'> & {
   spaceId: string;
   evaluation: {
     id: string;
@@ -91,7 +93,8 @@ export async function submitEvaluationAppealResult({
       evaluationId,
       result,
       reviewerId: decidedBy,
-      declineReasons
+      declineReasons,
+      declineInput
     }
   });
 

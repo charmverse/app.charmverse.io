@@ -1,7 +1,8 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -160,7 +161,7 @@ export function PassFailEvaluation({
           <Stack p={2} gap={2.5}>
             {evaluationReviews.map((evaluationReview) => {
               return (
-                <Stack key={evaluationReview.id} gap={1}>
+                <Stack key={evaluationReview.id} gap={1.5}>
                   <Stack direction='row' justifyContent='space-between' alignItems='center'>
                     <Stack direction='row' gap={1} alignItems='center'>
                       <UserDisplay userId={evaluationReview.reviewerId} avatarSize='xSmall' />
@@ -188,28 +189,31 @@ export function PassFailEvaluation({
                     </Stack>
                   </Stack>
                   {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
-                    <Stack flexDirection='row' gap={1.5}>
-                      {evaluationReview.declineReasons.map((reason) => (
-                        <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
-                      ))}
+                    <Stack direction='row' justifyContent='space-between' alignItems='center'>
+                      <Stack flexDirection='row' gap={1.5}>
+                        {evaluationReview.declineReasons.map((reason) => (
+                          <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
+                        ))}
+                      </Stack>
+                      {evaluationReview.declineInput && (
+                        <Tooltip title='View additional comment'>
+                          <div>
+                            <InfoOutlinedIcon
+                              sx={{
+                                cursor: 'pointer'
+                              }}
+                              onClick={() => {
+                                setEvaluationReviewId(evaluationReview.id);
+                                evaluationReviewDeclineInputPopupState.open();
+                              }}
+                              fontSize='small'
+                              color='secondary'
+                            />
+                          </div>
+                        </Tooltip>
+                      )}
                     </Stack>
                   ) : null}
-                  {evaluationReview.declineInput && (
-                    <Button
-                      size='small'
-                      sx={{
-                        width: 'fit-content'
-                      }}
-                      color='secondary'
-                      variant='outlined'
-                      onClick={() => {
-                        setEvaluationReviewId(evaluationReview.id);
-                        evaluationReviewDeclineInputPopupState.open();
-                      }}
-                    >
-                      View comment
-                    </Button>
-                  )}
                 </Stack>
               );
             })}
@@ -292,7 +296,7 @@ export function PassFailEvaluation({
           <TextField
             multiline
             fullWidth
-            rows={3}
+            rows={5}
             onChange={(e) => {
               setDeclineInput(e.target.value);
             }}
@@ -326,7 +330,7 @@ export function PassFailEvaluation({
         <Modal open onClose={onClose} title='Additional comment' size='small'>
           <TextField
             multiline
-            rows={3}
+            rows={10}
             fullWidth
             value={evaluationReviews.find((review) => review.id === evaluationReviewId)?.declineInput}
             disabled
