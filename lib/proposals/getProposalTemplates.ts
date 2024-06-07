@@ -52,10 +52,10 @@ export async function getProposalTemplates({
           archived: true,
           formId: true,
           status: true,
-          form: {
-            select: {
-              formFields: evaluationsAndFormFields
-                ? {
+          form: evaluationsAndFormFields
+            ? {
+                select: {
+                  formFields: {
                     orderBy: {
                       index: 'asc'
                     },
@@ -65,9 +65,9 @@ export async function getProposalTemplates({
                       name: true
                     }
                   }
-                : undefined
-            }
-          },
+                }
+              }
+            : undefined,
           evaluations: evaluationsAndFormFields
             ? {
                 orderBy: {
@@ -93,7 +93,7 @@ export async function getProposalTemplates({
     archived: page.proposal?.archived || undefined,
     draft: page.proposal?.status === 'draft',
     evaluations: page.proposal?.evaluations ?? [],
-    formFields: page.proposal?.form?.formFields ?? []
+    formFields: (page.proposal?.form as { formFields?: Pick<FormField, 'type' | 'id' | 'name'>[] })?.formFields ?? []
   }));
 
   if (!isAdmin) {

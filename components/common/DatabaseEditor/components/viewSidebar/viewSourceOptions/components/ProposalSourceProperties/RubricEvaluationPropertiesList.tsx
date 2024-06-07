@@ -18,7 +18,7 @@ export function RubricEvaluationPropertiesList({
   const rubricEvaluationTitles = useMemo(() => {
     const _rubricEvaluationTitles: Set<string> = new Set();
     proposalTemplates?.forEach((template) => {
-      template.evaluations.forEach((evaluation) => {
+      template.evaluations?.forEach((evaluation) => {
         if (evaluation.type === 'rubric') {
           _rubricEvaluationTitles.add(evaluation.title);
         }
