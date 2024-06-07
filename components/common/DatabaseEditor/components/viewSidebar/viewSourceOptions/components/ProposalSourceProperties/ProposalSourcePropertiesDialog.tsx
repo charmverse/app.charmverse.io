@@ -60,7 +60,9 @@ function ProposalSourcePropertiesGroup({
   setSelectedGroup: (selectedGroup: SelectedGroup) => void;
   selectedGroup: SelectedGroup;
 }) {
-  const { proposalTemplates } = useProposalTemplates();
+  const { proposalTemplates } = useProposalTemplates({
+    detailed: true
+  });
 
   const proposalTemplatePages = useMemo(() => {
     return (proposalTemplates || [])

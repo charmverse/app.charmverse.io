@@ -6,7 +6,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import nc from 'next-connect';
 
 import type { BlockWithDetails } from 'lib/databases/block';
-import { prismaToUIBlock, prismaToBlock } from 'lib/databases/block';
+import { prismaToBlock, prismaToUIBlock } from 'lib/databases/block';
 import type { BoardFields } from 'lib/databases/board';
 import type { BoardViewFields } from 'lib/databases/boardView';
 import {
@@ -286,19 +286,6 @@ async function updateBlocks(req: NextApiRequest, res: NextApiResponse<BlockWithD
       title: true
     }
   });
-
-  const { isAdmin } = await hasAccessToSpace({
-    userId,
-    spaceId: dbBlocks[0].spaceId
-  });
-
-  const proposalSourceBoardBlocks = blocks.filter(
-    (b) => b.type === 'board' && (b.fields as unknown as BoardFields).sourceType === 'proposals'
-  );
-
-  if (proposalSourceBoardBlocks.length && !isAdmin) {
-    throw new ActionNotPermittedError('You do not have permission to edit a proposal board block');
-  }
 
   const pages = await prisma.page.findMany({
     where: {

@@ -13,14 +13,17 @@ export type ProposalTemplateMeta = {
   title: string;
   archived?: boolean;
   draft?: boolean;
-  evaluations: Pick<ProposalEvaluation, 'id' | 'type' | 'title'>[];
+  evaluations?: Pick<ProposalEvaluation, 'id' | 'type' | 'title'>[];
   formFields?: Pick<FormField, 'id' | 'type' | 'name'>[];
 };
 
 export async function getProposalTemplates({
   spaceId,
-  userId
-}: SpaceResourcesRequest): Promise<ProposalTemplateMeta[]> {
+  userId,
+  evaluationsAndFormFields
+}: SpaceResourcesRequest & {
+  evaluationsAndFormFields?: boolean;
+}): Promise<ProposalTemplateMeta[]> {
   if (!stringUtils.isUUID(spaceId)) {
     throw new InvalidInputError(`SpaceID is required`);
   }
@@ -51,28 +54,32 @@ export async function getProposalTemplates({
           status: true,
           form: {
             select: {
-              formFields: {
+              formFields: evaluationsAndFormFields
+                ? {
+                    orderBy: {
+                      index: 'asc'
+                    },
+                    select: {
+                      type: true,
+                      id: true,
+                      name: true
+                    }
+                  }
+                : undefined
+            }
+          },
+          evaluations: evaluationsAndFormFields
+            ? {
                 orderBy: {
                   index: 'asc'
                 },
                 select: {
-                  type: true,
                   id: true,
-                  name: true
+                  type: true,
+                  title: true
                 }
               }
-            }
-          },
-          evaluations: {
-            orderBy: {
-              index: 'asc'
-            },
-            select: {
-              id: true,
-              type: true,
-              title: true
-            }
-          }
+            : undefined
         }
       }
     }

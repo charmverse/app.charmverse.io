@@ -164,19 +164,22 @@ describe('filterBoardProperties', () => {
           id: v4(),
           type: 'proposalEvaluationAverage',
           name: 'Rubric 1',
-          options: []
+          options: [],
+          evaluationTitle: 'Rubric 1'
         },
         {
           id: v4(),
           type: 'proposalEvaluationTotal',
           name: 'Rubric 1',
-          options: []
+          options: [],
+          evaluationTitle: 'Rubric 1'
         },
         {
           id: v4(),
           type: 'proposalEvaluationAverage',
           name: 'Rubric 2',
-          options: []
+          options: [],
+          evaluationTitle: 'Rubric 2'
         }
       ],
       proposalCustomProperties: [],

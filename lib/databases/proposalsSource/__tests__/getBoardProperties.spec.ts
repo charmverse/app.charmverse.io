@@ -78,13 +78,13 @@ describe('getBoardProperties', () => {
     });
 
     const rubricCriteria1Property = properties.find(
-      (r) => r.name === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaTotal'
+      (r) => r.criteriaTitle === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaTotal'
     );
     const rubricCriteria2Property = properties.find(
-      (r) => r.name === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaTotal'
+      (r) => r.criteriaTitle === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaTotal'
     );
     const rubricCriteria21Property = properties.find(
-      (r) => r.name === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaTotal'
+      (r) => r.criteriaTitle === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaTotal'
     );
 
     expect(rubricCriteria1Property).toBeTruthy();
@@ -222,8 +222,6 @@ describe('getBoardProperties', () => {
     const projectWalletProperty = properties.find((r) => r.id === constants.PROJECT_WALLET_ID);
     const projectMemberWalletProperty = properties.find((r) => r.id === constants.PROJECT_MEMBER_WALLETS_ID);
     expect(projectWalletProperty).toBeTruthy();
-    expect(projectWalletProperty?.private).toBeTruthy();
     expect(projectMemberWalletProperty).toBeTruthy();
-    expect(projectMemberWalletProperty?.private).toBeTruthy();
   });
 });

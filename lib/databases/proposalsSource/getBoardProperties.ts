@@ -134,6 +134,7 @@ function applyRubricEvaluationQuestionProperties(
         readOnly: true,
         readOnlyValues: true,
         evaluationTitle,
+        criteriaTitle: rubricCriteriaTitle,
         private: false
       });
     }
@@ -270,7 +271,10 @@ function applyToPropertiesByTypeAndName(
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
   const existingPropIndex = boardProperties.findIndex(
-    (p) => p.type === fieldProperty.type && p.evaluationTitle === fieldProperty.evaluationTitle
+    (p) =>
+      p.type === fieldProperty.type &&
+      p.evaluationTitle === fieldProperty.evaluationTitle &&
+      p.criteriaTitle === fieldProperty.criteriaTitle
   );
   if (existingPropIndex === -1) {
     boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
