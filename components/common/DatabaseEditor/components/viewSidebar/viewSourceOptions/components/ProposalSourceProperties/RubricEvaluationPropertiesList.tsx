@@ -18,7 +18,9 @@ export function RubricEvaluationPropertiesList({
     detailed: true
   });
   const rubricEvaluationTitles = useMemo(() => {
-    const _rubricEvaluationTitles: Set<string> = new Set();
+    const _rubricEvaluationTitles: Set<string> = new Set(
+      selectedProperties.rubricEvaluations.map((evaluation) => evaluation.title)
+    );
     proposalTemplates?.forEach((template) => {
       template.evaluations?.forEach((evaluation) => {
         if (evaluation.type === 'rubric') {
@@ -27,7 +29,7 @@ export function RubricEvaluationPropertiesList({
       });
     });
     return Array.from(_rubricEvaluationTitles);
-  }, [proposalTemplates]);
+  }, [proposalTemplates, selectedProperties.rubricEvaluations]);
 
   if (rubricEvaluationTitles.length === 0) {
     return <Typography>No rubric evaluations available</Typography>;
