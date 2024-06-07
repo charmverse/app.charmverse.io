@@ -194,6 +194,7 @@ export async function addOrangeDaoMembersAndCreateNotifications({
   }
 }
 
+// This was useful only once for updating custom notifications that didn't have the same id with notificationMetadata
 async function updateOrangeDaoCustomNotifications() {
   const notifications = await prisma.customNotification.findMany({
     where: {
@@ -220,5 +221,3 @@ async function updateOrangeDaoCustomNotifications() {
     console.log('Updated customNotification with old id', notification.id, 'into new id', newId);
   }
 }
-
-updateOrangeDaoCustomNotifications();
