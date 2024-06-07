@@ -102,7 +102,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalsListPage.addNewTemplate.click();
     await proposalsListPage.proposalTemplateFreeFormOption.click();
 
-    await expect(proposalPage.workflowSelect).toBeVisible();
+    await proposalPage.workflowSelect.isVisible();
 
     // Select a workflow
     await proposalPage.selectWorkflow(secondProposalWorkflow.id);
@@ -114,7 +114,10 @@ test.describe.serial('Create and use Proposal Template', async () => {
 
     // Configure first rubric criteria added by default
 
-    await proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title);
+    await Promise.all([
+      proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title),
+      proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
+    ]);
     await proposalPage.editRubricCriteriaDescription.fill(firstRubricConfig.description);
     await proposalPage.editRubricCriteriaMinScore.fill(firstRubricConfig.minScore.toString());
     const updateProposalResponse = proposalPage.page.waitForResponse('**/api/proposals/**');
@@ -147,7 +150,7 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // Edit the proposal content
     await documentPage.typeText(templatePageContent.description);
 
-    await expect(proposalPage.publishNewProposalButton).toBeEnabled();
+    await proposalPage.publishNewProposalButton.isEnabled();
     await Promise.all([page.waitForResponse('**/publish'), proposalPage.publishNewProposalButton.click()]);
 
     // Check the actual data
