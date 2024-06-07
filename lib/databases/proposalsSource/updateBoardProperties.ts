@@ -1,6 +1,7 @@
 import type { Block } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { IPropertyTemplate, BoardFields } from 'lib/databases/board';
 import type { FormFieldInput } from 'lib/forms/interfaces';
 import { InvalidStateError } from 'lib/middleware/errors';
@@ -8,7 +9,13 @@ import { DEFAULT_BOARD_BLOCK_ID } from 'lib/proposals/blocks/constants';
 
 import { getBoardProperties } from './getBoardProperties';
 
-export async function updateBoardProperties({ boardId }: { boardId: string }): Promise<Block> {
+export async function updateBoardProperties({
+  boardId,
+  selectedProperties
+}: {
+  selectedProperties?: SelectedProposalProperties;
+  boardId: string;
+}): Promise<Block> {
   const boardBlock = await prisma.block.findUniqueOrThrow({
     where: {
       id: boardId
@@ -106,7 +113,8 @@ export async function updateBoardProperties({ boardId }: { boardId: string }): P
     evaluationSteps,
     formFields,
     proposalCustomProperties,
-    currentCardProperties: boardFields.cardProperties
+    currentCardProperties: boardFields.cardProperties,
+    selectedProperties
   });
 
   return prisma.block.update({

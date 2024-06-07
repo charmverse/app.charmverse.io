@@ -4,7 +4,6 @@ import { TagSelect } from 'components/common/DatabaseEditor/components/propertie
 import type { PropertyValueDisplayType } from 'components/common/DatabaseEditor/interfaces';
 import type { IPropertyOption } from 'lib/databases/board';
 import type { ProposalWithUsersLite } from 'lib/proposals/getProposals';
-import { prettyPrint } from 'lib/utils/strings';
 
 import { useBatchUpdateProposalStatusOrStep } from '../hooks/useBatchUpdateProposalStatusOrStep';
 
