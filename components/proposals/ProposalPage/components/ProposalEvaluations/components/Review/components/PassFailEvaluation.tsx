@@ -1,7 +1,7 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
-import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useState } from 'react';
 
@@ -23,10 +23,11 @@ export type PassFailEvaluationProps = {
   isCurrent: boolean;
   isReviewer?: boolean;
   archived?: boolean;
-  onSubmitEvaluationReview: (
-    declineReason: string | null,
-    result: NonNullable<PopulatedEvaluation['result']>
-  ) => Promise<void>;
+  onSubmitEvaluationReview: (params: {
+    declineReason: string | null;
+    result: NonNullable<PopulatedEvaluation['result']>;
+    declineInput?: string;
+  }) => Promise<void>;
   onResetEvaluationReview?: () => void;
   isResettingEvaluationReview: boolean;
   reviewerOptions: {
@@ -38,6 +39,7 @@ export type PassFailEvaluationProps = {
     id: string;
     reviewerId: string;
     declineReasons: string[];
+    declineInput?: string | null;
     result: ProposalEvaluationResult;
     completedAt: Date;
   }[];
@@ -81,6 +83,8 @@ export function PassFailEvaluation({
   const { user } = useUser();
   const currentUserEvaluationReview = evaluationReviews?.find((review) => review.reviewerId === user?.id);
   const [declineReason, setDeclineReason] = useState<string | null>(null);
+  const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
+  const [declineInput, setDeclineInput] = useState('');
   const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
@@ -92,6 +96,7 @@ export function PassFailEvaluation({
     ? 'You cannot move an archived proposal'
     : null;
   const completedDate = completedAt ? getRelativeTimeInThePast(new Date(completedAt)) : null;
+  const evaluationReviewDeclineInputPopupState = usePopupState({ variant: 'popover' });
 
   const actionLabels = getActionButtonLabels({
     actionLabels: _actionLabels
@@ -111,8 +116,19 @@ export function PassFailEvaluation({
       }
     }
 
-    await onSubmitEvaluationReview(declineReason, result);
+    await onSubmitEvaluationReview({
+      declineReason,
+      result,
+      declineInput
+    });
   };
+
+  function onClose() {
+    setDeclineReason(null);
+    setDeclineInput('');
+    setEvaluationReviewId(null);
+    declineReasonModalPopupState.close();
+  }
 
   return (
     <>
@@ -178,11 +194,28 @@ export function PassFailEvaluation({
                       ))}
                     </Stack>
                   ) : null}
+                  {evaluationReview.declineInput && (
+                    <Button
+                      size='small'
+                      sx={{
+                        width: 'fit-content'
+                      }}
+                      color='secondary'
+                      variant='outlined'
+                      onClick={() => {
+                        setEvaluationReviewId(evaluationReview.id);
+                        evaluationReviewDeclineInputPopupState.open();
+                      }}
+                    >
+                      View comment
+                    </Button>
+                  )}
                 </Stack>
               );
             })}
           </Stack>
         )}
+
         {canReview && (
           <Box display='flex' justifyContent='space-between' alignItems='center' p={2}>
             <FormLabel>
@@ -236,16 +269,8 @@ export function PassFailEvaluation({
           </ResultCopyStack>
         )}
       </Card>
-      <Modal
-        open={!!declineReasonModalPopupState.isOpen}
-        onClose={() => {
-          setDeclineReason(null);
-          declineReasonModalPopupState.close();
-        }}
-        title='Reason for decline'
-        size='small'
-      >
-        <Stack gap={1}>
+      <Modal open={!!declineReasonModalPopupState.isOpen} onClose={onClose} title='Reason for decline' size='small'>
+        <Stack gap={1} mb={3}>
           <Typography>Please select at least one reason for declining this proposal.</Typography>
           <Select
             value={declineReason}
@@ -261,15 +286,22 @@ export function PassFailEvaluation({
             ))}
           </Select>
         </Stack>
-        <Box display='flex' justifyContent='flex-end' mt={3} gap={2}>
-          <Button
-            color='secondary'
-            variant='outlined'
-            onClick={() => {
-              setDeclineReason(null);
-              declineReasonModalPopupState.close();
+
+        <Stack gap={1}>
+          <Typography>Additional comment</Typography>
+          <TextField
+            multiline
+            fullWidth
+            rows={3}
+            onChange={(e) => {
+              setDeclineInput(e.target.value);
             }}
-          >
+            value={declineInput}
+          />
+        </Stack>
+
+        <Box display='flex' justifyContent='flex-end' mt={3} gap={2}>
+          <Button color='secondary' variant='outlined' onClick={onClose}>
             Cancel
           </Button>
           <Button
@@ -281,8 +313,7 @@ export function PassFailEvaluation({
             data-testid='confirm-delete-button'
             onClick={async () => {
               await _onSubmitEvaluationReview('fail');
-              setDeclineReason(null);
-              declineReasonModalPopupState.close();
+              onClose();
             }}
             disabled={declineReason === null}
           >
@@ -290,6 +321,18 @@ export function PassFailEvaluation({
           </Button>
         </Box>
       </Modal>
+
+      {evaluationReviewId && !!evaluationReviewDeclineInputPopupState.isOpen && (
+        <Modal open onClose={onClose} title='Additional comment' size='small'>
+          <TextField
+            multiline
+            rows={3}
+            fullWidth
+            value={evaluationReviews.find((review) => review.id === evaluationReviewId)?.declineInput}
+            disabled
+          />
+        </Modal>
+      )}
     </>
   );
 }
