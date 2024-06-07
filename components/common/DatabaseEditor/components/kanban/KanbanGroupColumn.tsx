@@ -41,8 +41,7 @@ export function KanbanGroupColumn({
   disableAddingCards,
   hideLinkedBounty
 }: Props) {
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const { data: cards, hasNextPage, showNextPage } = usePaginatedData(group.cards, { pageSize });
+  const { data: cards, pageSize, setPageSize, hasNextPage, showNextPage } = usePaginatedData(group.cards);
   return (
     <KanbanColumn onDrop={(card: Card) => onDropToColumn(group.option!, card)}>
       {cards.map((card) => (

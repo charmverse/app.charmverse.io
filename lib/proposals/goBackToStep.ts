@@ -107,6 +107,7 @@ export async function goBackToStep({
         decidedBy: null,
         completedAt: null,
         voteId: null,
+        appealReason: null,
         appealedAt: null
       }
     })

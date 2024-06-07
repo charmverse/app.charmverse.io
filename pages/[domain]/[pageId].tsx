@@ -1,6 +1,5 @@
 import { prisma } from '@charmverse/core/prisma-client';
 import type { GetServerSidePropsContext } from 'next';
-import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 
 import { EditorPage } from 'components/[pageId]/EditorPage/EditorPage';
@@ -16,6 +15,7 @@ import { useSharedPage } from 'hooks/useSharedPage';
 import { useUser } from 'hooks/useUser';
 import { useWebSocketClient } from 'hooks/useWebSocketClient';
 import { setUrlWithoutRerender } from 'lib/utils/browser';
+import { getCanonicalURL } from 'lib/utils/domains/getCanonicalURL';
 import { getCustomDomainFromHost } from 'lib/utils/domains/getCustomDomainFromHost';
 import { getPagePath } from 'lib/utils/domains/getPagePath';
 import { isUUID } from 'lib/utils/strings';
@@ -58,6 +58,8 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         type: true,
         space: {
           select: {
+            customDomain: true,
+            domain: true,
             paidTier: true,
             publicProposals: true,
             spaceImage: true
@@ -94,12 +96,19 @@ export async function getServerSideProps(ctx: GetServerSidePropsContext) {
         page.space.paidTier === 'free' ||
         (page.type === 'proposal' && page.space.publicProposals)
       ) {
+        const canonicalUrl = getCanonicalURL({
+          req: ctx.req,
+          path: page.path,
+          spaceDomain: page.space.domain,
+          spaceCustomDomain: page.space.customDomain
+        });
         return {
           props: {
             openGraphData: {
               title: page.title,
               description: page.contentText?.slice(0, 200),
-              image: page.space?.spaceImage
+              image: page.space?.spaceImage,
+              canonicalUrl
             }
           } as Pick<GlobalPageProps, 'openGraphData'>
         };

@@ -338,16 +338,6 @@ export function getAbsolutePath(path: string, spaceDomain?: string) {
   return absolutePath;
 }
 
-export function getCustomDomainUrl(customDomain: string, path = '/') {
-  if (typeof window !== 'undefined') {
-    return `${window.location.protocol}//${customDomain}${path}`;
-  }
-
-  const protocol = isDevEnv ? 'http:' : 'https:';
-
-  return `${protocol}//${customDomain}${path}`;
-}
-
 export function getDefaultSpaceUrl({
   domain,
   path = '/',

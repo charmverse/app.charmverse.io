@@ -86,6 +86,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalEvaluationTotal'
   }),
+  proposalRubricCriteriaTotal: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Total',
+    options: [],
+    type: 'proposalRubricCriteriaTotal'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',
@@ -129,7 +135,8 @@ export const PROPOSAL_STEP_LABELS: Record<ProposalEvaluationStep, string> = {
   rubric: 'Rubric',
   vote: 'Vote',
   rewards: 'Rewards',
-  credentials: 'Credentials'
+  credentials: 'Credentials',
+  sign_documents: 'Sign Documents'
 };
 
 export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (typeof Constants)['menuColors']> = {
@@ -139,7 +146,8 @@ export const proposalStepBoardColors: Record<ProposalEvaluationStep, keyof (type
   vote: 'propColorGray',
   draft: 'propColorGray',
   rewards: 'propColorGray',
-  credentials: 'propColorGray'
+  credentials: 'propColorGray',
+  sign_documents: 'propColorGray'
 };
 
 export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, string> = {

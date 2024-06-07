@@ -39,6 +39,16 @@ export function ViewFilterControl({ activeBoard, activeView }: Props) {
         sx={{
           overflow: 'auto'
         }}
+        slotProps={{
+          paper: {
+            sx: {
+              overflowX: {
+                xs: 'auto',
+                sm: 'hidden'
+              }
+            }
+          }
+        }}
       >
         <FilterComponent properties={activeBoard?.fields.cardProperties ?? []} activeView={activeView} />
       </Popover>

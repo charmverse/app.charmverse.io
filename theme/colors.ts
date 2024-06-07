@@ -9,7 +9,7 @@ export const whiteColor = '#fff';
 export const lightGreyColor = '#edf2f4';
 export const greyColor2 = '#aaa';
 export const darkGreyColor = '#696773';
-export const greyColor = '#525252';
+// export const greyColor = '#525252';
 
 // light mode
 export const primaryTextColor = '#37352f';

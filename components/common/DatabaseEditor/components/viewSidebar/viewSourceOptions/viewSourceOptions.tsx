@@ -1,5 +1,6 @@
 import type { ApiPageKey } from '@charmverse/core/prisma';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
 import { Box, Grid, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -11,13 +12,16 @@ import { TbDatabase } from 'react-icons/tb';
 import useSWRMutation from 'swr/mutation';
 
 import charmClient from 'charmClient';
+import mutator from 'components/common/DatabaseEditor/mutator';
 import { initialDatabaseLoad } from 'components/common/DatabaseEditor/store/databaseBlocksLoad';
 import { useAppDispatch } from 'components/common/DatabaseEditor/store/hooks';
 import ConfirmApiPageKeyModal from 'components/common/Modal/ConfirmApiPageKeyModal';
+import { PageIcon } from 'components/common/PageIcon';
 import { webhookEndpoint } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
-import type { BoardView } from 'lib/databases/boardView';
+import { createBoardView, type BoardView } from 'lib/databases/boardView';
+import { APPLICANT_STATUS_BLOCK_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 
 import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 
@@ -29,7 +33,15 @@ import { useSourceOptions } from './useSourceOptions';
 
 type FormStep = 'select_source' | 'configure_source';
 
-type SourceOptions = 'new' | 'linked' | 'csv' | 'proposals' | 'google_form' | 'typeform';
+type SourceOptions =
+  | 'new'
+  | 'linked'
+  | 'csv'
+  | 'proposals'
+  | 'google_form'
+  | 'typeform'
+  | 'reward_applications'
+  | 'rewards';
 
 type ViewSourceOptionsProps = {
   closeSidebar?: () => void;
@@ -39,10 +51,11 @@ type ViewSourceOptionsProps = {
   views: BoardView[];
   rootBoard: Board;
   showView: (viewId: string) => void;
+  isReward?: boolean;
 };
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
-  const { view: activeView, views, rootBoard, title, closeSourceOptions, closeSidebar, showView } = props;
+  const { view: activeView, views, rootBoard, title, closeSourceOptions, closeSidebar, showView, isReward } = props;
 
   const dispatch = useAppDispatch();
   const { onCreateDatabase, onCsvImport, onSelectLinkedDatabase, onSelectSourceGoogleForm } = useSourceOptions({
@@ -70,14 +83,15 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
   const isCreatingProposals = useRef(false);
 
-  const allowedSourceOptions: SourceOptions[] = [];
+  let allowedSourceOptions: SourceOptions[] = [];
 
-  if (rootIsLinkedBoard && activeSourceType !== 'google_form' && props.views.length > 0) {
+  if (isReward) {
+    allowedSourceOptions = ['reward_applications', 'rewards'];
+  } else if (rootIsLinkedBoard && activeSourceType !== 'google_form' && props.views.length > 0) {
     allowedSourceOptions.push('linked');
     // Databases start out as linked pages. As long as they are not already linked, we can offer all options
   } else if (views.length === 0) {
     allowedSourceOptions.push(...(['new', 'linked', 'google_form', 'proposals', 'typeform', 'csv'] as SourceOptions[]));
-
     // Only allow Google form to be used once this is connected
   } else if (activeSourceType === 'google_form') {
     allowedSourceOptions.push('google_form');
@@ -99,6 +113,17 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     `/api/pages/${rootDatabaseId}/proposal-source`,
     (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.createProposalSource(arg)
   );
+
+  const handleRewardSource = async (_sourceType: Extract<DataSourceType, 'rewards' | 'reward_applications'>) => {
+    if (!activeView || activeView.fields.viewType !== 'board') {
+      return;
+    }
+
+    const oldBlocks = [activeView];
+    const newBoard = createBoardView(activeView);
+    newBoard.fields.sourceType = _sourceType;
+    await mutator.updateBlocks([newBoard], oldBlocks, 'Update rewards board source type');
+  };
 
   const typeformPopup = usePopupState({ variant: 'popover', popupId: 'typeformPopup' });
 
@@ -210,6 +235,21 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
               <SourceType data-test='source-new-database' onClick={onCreateDatabase}>
                 <AddCircleIcon style={{ fontSize: 24 }} />
                 New database
+              </SourceType>
+            )}
+            {allowedSourceOptions.includes('rewards') && (
+              <SourceType data-test='source-new-rewards' onClick={() => handleRewardSource('rewards')}>
+                <PageIcon pageType='rewards' style={{ fontSize: 24 }} />
+                Rewards
+              </SourceType>
+            )}
+            {allowedSourceOptions.includes('reward_applications') && (
+              <SourceType
+                data-test='source-new-reward-applications'
+                onClick={() => handleRewardSource('reward_applications')}
+              >
+                <DescriptionOutlinedIcon style={{ fontSize: 24 }} />
+                Submissions
               </SourceType>
             )}
           </Grid>

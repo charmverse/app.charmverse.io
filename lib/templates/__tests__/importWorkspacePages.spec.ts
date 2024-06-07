@@ -358,7 +358,7 @@ describe('importWorkspacePages - proposal content', () => {
       id: copiedProposal.id,
       fields: {},
       evaluations: [
-        {
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 0,
@@ -382,8 +382,8 @@ describe('importWorkspacePages - proposal content', () => {
           finalStep: null,
           appealedBy: null,
           declinedAt: null
-        },
-        {
+        }),
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 1,
@@ -404,6 +404,7 @@ describe('importWorkspacePages - proposal content', () => {
           appealedAt: null,
           appealRequiredReviews: null,
           finalStep: null,
+          appealReason: null,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,
@@ -464,7 +465,7 @@ describe('importWorkspacePages - proposal content', () => {
               id: expect.any(String)
             })
           ])
-        }
+        })
       ]
     });
   });
@@ -532,7 +533,7 @@ describe('importWorkspacePages - proposal content', () => {
       fields: {},
       workflowId: targetSpaceWorkflow.id,
       evaluations: [
-        {
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 0,
@@ -556,8 +557,8 @@ describe('importWorkspacePages - proposal content', () => {
           finalStep: null,
           appealedBy: null,
           declinedAt: null
-        },
-        {
+        }),
+        expect.objectContaining({
           completedAt: null,
           decidedBy: null,
           index: 1,
@@ -574,6 +575,7 @@ describe('importWorkspacePages - proposal content', () => {
           requiredReviews: 1,
           appealedBy: null,
           declinedAt: null,
+          appealReason: null,
           permissions: expect.arrayContaining<ProposalEvaluationPermission>([
             expect.objectContaining({
               operation: rolePermission.operation as any,
@@ -622,7 +624,7 @@ describe('importWorkspacePages - proposal content', () => {
           appealedAt: null,
           appealRequiredReviews: null,
           finalStep: null
-        }
+        })
       ]
     });
   });

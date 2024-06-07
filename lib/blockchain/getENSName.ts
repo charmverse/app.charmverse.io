@@ -32,14 +32,28 @@ export async function getENSDetails(ensName?: string | null) {
   const publicClient = getPublicClient(1);
 
   try {
-    const avatar = await publicClient.getEnsAvatar({ name });
-    const [description, discord, github, twitter, reddit, linkedin, emails] = await Promise.all(
-      ['description', 'com.discord', 'com.github', 'com.twitter', 'com.reddit', 'com.linkedin', 'emails'].map(
+    const [avatar, description, discord, github, twitter, reddit, linkedin, emails] = await Promise.all(
+      ['avatar', 'description', 'com.discord', 'com.github', 'com.twitter', 'com.reddit', 'com.linkedin', 'emails'].map(
         async (key) => publicClient.getEnsText({ name, key })
       )
     );
 
-    return { avatar, description, discord, github, twitter, reddit, linkedin, emails };
+    const ensData = {
+      avatar,
+      description,
+      discord,
+      github,
+      twitter,
+      reddit,
+      linkedin,
+      emails
+    };
+
+    if (avatar?.startsWith('ipfs')) {
+      ensData.avatar = `https://metadata.ens.domains/mainnet/avatar/${name}`;
+    }
+
+    return ensData;
   } catch (error) {
     log.warn(`Error looking up ENS details for ens name ${ensName}`, { error });
     return null;

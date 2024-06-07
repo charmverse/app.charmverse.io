@@ -1,4 +1,4 @@
-import type { Space, IdentityType } from '@charmverse/core/prisma';
+import type { IdentityType, Space } from '@charmverse/core/prisma';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, FormHelperText, Grid, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
 import isEqual from 'lodash/isEqual';
@@ -26,7 +26,6 @@ import { usePreventReload } from 'hooks/usePreventReload';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import { useSpaces } from 'hooks/useSpaces';
 import type { Feature } from 'lib/features/constants';
-import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 import type { MemberProfileJson, MemberProfileName } from 'lib/profile/memberProfiles';
 import { getSpaceUrl, getSubdomainPath } from 'lib/utils/browser';
 import { getSpaceDomainFromHost } from 'lib/utils/domains/getSpaceDomainFromHost';
@@ -35,7 +34,6 @@ import { isValidDomainName } from 'lib/utils/domains/isValidDomainName';
 import { AddMoreMemberProfilesModal, getProfileWidgetLogo } from './components/AddMoreMemberProfilesModal';
 import { BlockchainSettings } from './components/BlockchainSettings';
 import Avatar from './components/LargeAvatar';
-import { NotificationTogglesInput, getDefaultValues } from './components/NotificationToggles';
 import { PrimaryMemberIdentity } from './components/PrimaryMemberIdentity';
 import { SettingsItem } from './components/SettingsItem';
 import { SetupCustomDomain } from './components/SetupCustomDomain';
@@ -47,7 +45,6 @@ export type FormValues = {
   spaceArtwork?: string | null;
   domain: string;
   enableTestnets: boolean;
-  notificationToggles: NotificationToggles;
   requireMembersTwoFactorAuth: boolean;
   primaryMemberIdentity?: IdentityType | null;
   customDomain?: string | null;
@@ -71,7 +68,7 @@ const schema: yup.Schema<FormValues> = yup.object({
   customDomain: yup
     .string()
     .nullable()
-    .test('isCusotmDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value))
+    .test('isCustomDomainValid', 'Please provide valid domain name.', (value) => !value || isValidDomainName(value))
 });
 
 export function SpaceSettings({
@@ -100,10 +97,11 @@ export function SpaceSettings({
     control,
     setValue,
     watch,
-    formState: { errors, isDirty }
+    formState: { errors, isDirty, isValid }
   } = useForm<FormValues>({
     defaultValues: _getFormValues(space),
-    resolver: yupResolver(schema)
+    resolver: yupResolver(schema),
+    reValidateMode: 'onChange'
   });
 
   const {
@@ -129,20 +127,11 @@ export function SpaceSettings({
   async function onSubmit(values: FormValues) {
     if (!isAdmin || !values.domain) return;
 
-    // remove 'true' values from notificationToggles
-    const notificationToggles = { ...values.notificationToggles };
-    for (const key in notificationToggles) {
-      if (notificationToggles[key as NotificationToggleOption] !== false) {
-        delete notificationToggles[key as NotificationToggleOption];
-      }
-    }
-
     // reload with new subdomain
     const newDomain = space.domain !== values.domain;
 
     await updateSpace(
       {
-        notificationToggles,
         features: featuresInput,
         memberProfiles: memberProfileTypesInput,
         name: values.name,
@@ -468,19 +457,6 @@ export function SpaceSettings({
             <TwoFactorAuth control={control} isAdmin={isAdmin} />
           </Grid>
           <Grid item>
-            <FieldLabel>Notifications</FieldLabel>
-            <Typography variant='caption' mb={1} component='p'>
-              Control notifications for your members.
-            </Typography>
-            <NotificationTogglesInput
-              control={control}
-              isAdmin={isAdmin}
-              register={register}
-              watch={watch}
-              setValue={setValue}
-            />
-          </Grid>
-          <Grid item>
             <Legend helperText={`Advanced settings for ${isAdmin ? 'deleting' : 'leaving'} a space.`}>Warning</Legend>
             {isAdmin ? (
               <Button variant='outlined' color='error' onClick={deleteWorkspace} data-test='submit-space-delete'>
@@ -520,7 +496,7 @@ export function SpaceSettings({
             <Button
               disableElevation
               data-test='submit-space-update'
-              disabled={updateSpaceLoading || !dataChanged}
+              disabled={updateSpaceLoading || !dataChanged || !isAdmin || !isValid}
               type='submit'
               loading={updateSpaceLoading}
             >
@@ -581,7 +557,6 @@ function _getFormValues(space: Space): FormValues {
     domain: space.domain,
     enableTestnets: !!space.enableTestnets,
     requireMembersTwoFactorAuth: space.requireMembersTwoFactorAuth,
-    notificationToggles: getDefaultValues(space.notificationToggles as NotificationToggles),
     customDomain: space.customDomain,
     primaryMemberIdentity: space.primaryMemberIdentity
   };

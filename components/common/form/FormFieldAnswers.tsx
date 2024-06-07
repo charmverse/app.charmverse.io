@@ -1,16 +1,14 @@
 import type { FormField } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { Box, Chip, Stack } from '@mui/material';
-import debounce from 'lodash/debounce';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Control, FieldErrors } from 'react-hook-form';
+import { useCallback, useMemo } from 'react';
 import { Controller } from 'react-hook-form';
+import type { Control, UseFormGetFieldState } from 'react-hook-form';
 
 import type { ProposalRewardsTableProps } from 'components/proposals/ProposalPage/components/ProposalProperties/components/ProposalRewards/ProposalRewardsTable';
-import { useDebouncedValue } from 'hooks/useDebouncedValue';
 import { useSnackbar } from 'hooks/useSnackbar';
 import { useUser } from 'hooks/useUser';
-import type { FormFieldValue, FieldAnswerInput } from 'lib/forms/interfaces';
+import type { FieldAnswerInput, FormFieldValue } from 'lib/forms/interfaces';
 import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
 import type { ProjectWithMembers } from 'lib/projects/interfaces';
 import type { PageContent } from 'lib/prosemirror/interfaces';
@@ -25,7 +23,6 @@ import { ProjectProfileInputField } from './fields/ProjectProfileInputField';
 import type { SelectOptionType } from './fields/Select/interfaces';
 import { isWalletConfig } from './fields/utils';
 import { FormFieldAnswerComment } from './FormFieldAnswerComment';
-import { useFormFields } from './hooks/useFormFields';
 
 const FormFieldAnswersContainer = styled(Stack)`
   gap: ${(props) => props.theme.spacing(1)};
@@ -40,14 +37,15 @@ type FormFieldAnswersProps = {
   })[];
   disabled?: boolean;
   enableComments: boolean;
-  errors: FieldErrors<Record<string, FormFieldValue>>;
+  // errors: FieldErrors<Record<string, FormFieldValue>>;
+  getFieldState: UseFormGetFieldState<Record<string, FormFieldValue>>;
   control: Control<Record<string, FormFieldValue>, any>;
-  onFormChange: (
-    updatedFields: {
-      id: string;
-      value: FormFieldValue;
-    }[]
-  ) => void;
+  // onFormChange: (
+  //   updatedFields: {
+  //     id: string;
+  //     value: FormFieldValue;
+  //   }[]
+  // ) => void;
   onSave?: (answers: { id: string; value: FormFieldValue }[]) => Promise<void>;
   getValues?: () => Record<string, FormFieldValue>;
   values?: Record<string, FormFieldValue>;
@@ -67,64 +65,34 @@ const StyledStack = styled(Stack)`
   position: relative;
 `;
 
-export function FormFieldAnswers(
-  props: Omit<FormFieldAnswersProps, 'control' | 'errors' | 'onFormChange' | 'onProjectUpdate'>
-) {
-  const { control, errors, onFormChange, getValues } = useFormFields({
-    fields: props.formFields
-  });
-
-  return (
-    <FormFieldAnswersControlled
-      {...props}
-      control={control}
-      errors={errors}
-      onFormChange={onFormChange}
-      getValues={getValues}
-    />
-  );
-}
-
-export function FormFieldAnswersControlled({
+export function FormFieldAnswers({
   onSave,
   formFields,
   disabled,
   enableComments,
+  getFieldState,
   control,
-  errors,
-  onFormChange,
-  getValues,
   pageId,
   project,
   threads = {},
   proposalId,
   milestoneProps
-}: FormFieldAnswersProps & {
-  threads?: Record<string, ThreadWithComments | undefined>;
-}) {
+}: FormFieldAnswersProps) {
   const { user } = useUser();
-  const [isFormDirty, setIsFormDirty] = useState(false);
   const { showMessage } = useSnackbar();
 
-  const hasErrors = Object.keys(errors).length !== 0;
-
-  const saveFormFieldAnswers = useCallback(async () => {
-    if (hasErrors) {
-      showMessage('Your form contains errors and cannot be saved.', 'error');
-      return;
-    }
-
-    if (!onSave || disabled || !isFormDirty) return;
-
-    try {
-      const _values = getValues?.();
-      await onSave?.(Object.entries(_values ?? {}).map(([id, value]) => ({ id, value })));
-    } catch (e: any) {
-      showMessage(e.message, 'error');
-    } finally {
-      setIsFormDirty(false);
-    }
-  }, [disabled, isFormDirty]);
+  const saveFormFieldAnswers = useCallback(
+    async (answer: { id: string; value: FormFieldValue }) => {
+      if (onSave && !disabled) {
+        try {
+          await onSave([answer]);
+        } catch (e: any) {
+          showMessage(e.message, 'error');
+        }
+      }
+    },
+    [showMessage, onSave, disabled]
+  );
 
   const fieldAnswerIdThreadRecord: Record<string, ThreadWithComments[]> = useMemo(() => {
     if (!threads) {
@@ -154,21 +122,6 @@ export function FormFieldAnswersControlled({
       };
     }, {} as Record<string, ThreadWithComments[]>);
   }, [threads]);
-
-  const debouncedFunc = useMemo(() => debounce(saveFormFieldAnswers, 300), [saveFormFieldAnswers]);
-
-  useEffect(() => {
-    // auto-save form fields if the form is dirty and there are no errors
-
-    if (isFormDirty) {
-      const _values = getValues?.();
-      if (_values) {
-        debouncedFunc();
-      }
-    }
-    return () => debouncedFunc.cancel();
-  }, [isFormDirty]);
-
   return (
     <FormFieldAnswersContainer>
       {formFields?.map((formField) => {
@@ -183,23 +136,18 @@ export function FormFieldAnswersControlled({
             <Controller
               name={formField.id}
               control={control}
-              render={({ field }) => {
+              render={({ field, fieldState: { error } }) => {
                 return formField.type === 'project_profile' ? (
                   <FieldWrapper required label='Project'>
                     <ProjectProfileInputField
                       disabled={disabled}
                       proposalId={proposalId}
+                      formFieldId={formField.id}
                       formFieldValue={field.value as { selectedMemberIds: string[] }}
+                      getFieldState={getFieldState}
                       fieldConfig={formField.fieldConfig as ProjectAndMembersFieldConfig}
-                      onChange={(projectFormValues) => {
-                        setIsFormDirty(true);
-                        onFormChange([
-                          {
-                            id: formField.id,
-                            value: projectFormValues
-                          }
-                        ]);
-                      }}
+                      onChange={field.onChange}
+                      onChangeDebounced={saveFormFieldAnswers}
                       inputEndAdornment={
                         pageId &&
                         formField.formFieldAnswer?.id &&
@@ -231,6 +179,8 @@ export function FormFieldAnswersControlled({
                 ) : (
                   <FieldTypeRenderer
                     {...field}
+                    formFieldId={formField.id}
+                    getFieldState={getFieldState}
                     rows={undefined}
                     maxRows={10}
                     sx={{ mb: 2 }}
@@ -278,18 +228,11 @@ export function FormFieldAnswersControlled({
                     type={formField.type === 'short_text' ? 'text_multiline' : formField.type}
                     label={formField.name}
                     options={formField.options as SelectOptionType[]}
-                    error={errors[formField.id] as any}
+                    error={error ? error?.message || 'invalid input' : ''}
                     required={formField.required}
                     data-test={`form-field-input-${formField.id}`}
-                    onChange={(e) => {
-                      setIsFormDirty(true);
-                      onFormChange([
-                        {
-                          id: formField.id,
-                          value: typeof e?.target?.value === 'string' ? e.target.value : e
-                        }
-                      ]);
-                    }}
+                    onChange={field.onChange}
+                    onChangeDebounced={saveFormFieldAnswers}
                   />
                 );
               }}

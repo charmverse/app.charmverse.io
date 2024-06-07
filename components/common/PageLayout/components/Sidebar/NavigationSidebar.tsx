@@ -14,7 +14,7 @@ import { useCallback, useMemo, useState } from 'react';
 
 import { SpaceSettingsDialog } from 'components/settings/SettingsDialog';
 import { BlockCounts } from 'components/settings/subscription/BlockCounts';
-import { charmverseDiscordInvite } from 'config/constants';
+import { userManualUrl } from 'config/constants';
 import { useCharmRouter } from 'hooks/useCharmRouter';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useCurrentSpacePermissions } from 'hooks/useCurrentSpacePermissions';
@@ -200,7 +200,7 @@ export function NavigationSidebar({ closeSidebar, enableSpaceFeatures, navAction
             <SidebarLink
               active={false}
               external
-              href={charmverseDiscordInvite}
+              href={userManualUrl}
               icon={<QuestionMarkIcon color='secondary' fontSize='small' />}
               label='Support & Feedback'
               target='_blank'

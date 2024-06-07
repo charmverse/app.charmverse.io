@@ -748,7 +748,7 @@ export function groupCardsByOptions(
     const valueMap: Record<string, Card[]> = {};
     for (const card of cards) {
       const cardValue = card.fields.properties[groupByProperty.id];
-      const proposalTitle = typeof cardValue === 'string' ? cardValue : Array.isArray(cardValue) ? cardValue[0] : null;
+      const proposalTitle = typeof cardValue === 'string' ? cardValue : Array.isArray(cardValue) ? cardValue[1] : null;
       if (typeof proposalTitle === 'string') {
         if (!valueMap[proposalTitle]) {
           valueMap[proposalTitle] = [];

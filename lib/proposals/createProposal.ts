@@ -38,6 +38,7 @@ export type ProposalEvaluationInput = Pick<ProposalEvaluation, 'id' | 'index' | 
   rubricCriteria: RubricDataInput[];
   voteSettings?: VoteSettings | null;
   requiredReviews?: WorkflowEvaluationJson['requiredReviews'];
+  notificationLabels?: WorkflowEvaluationJson['notificationLabels'];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
   appealable?: boolean | null;
   appealRequiredReviews?: WorkflowEvaluationJson['appealRequiredReviews'] | null;
@@ -195,6 +196,7 @@ export async function createProposal({
               title: evaluation.title,
               type: evaluation.type,
               actionLabels: (evaluation.actionLabels ?? null) as Prisma.InputJsonValue,
+              notificationLabels: (evaluation.notificationLabels ?? null) as Prisma.InputJsonValue,
               requiredReviews: evaluation.requiredReviews ?? 1,
               finalStep: evaluation.finalStep,
               appealable: evaluation.appealable,

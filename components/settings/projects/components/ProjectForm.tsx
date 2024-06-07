@@ -1,6 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import { Box, Divider, IconButton, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 
 import { useGetProjects } from 'charmClient/hooks/projects';
@@ -57,6 +58,29 @@ export function ProposalProjectFormAnswers({
     }
   }
 
+  const onProjectUpdateMemo = useCallback(
+    (updatedProjectValues: Record<string, any>) => {
+      onProjectUpdate({
+        ...updatedProjectValues,
+        id: projectId
+      });
+    },
+    [onProjectUpdate, projectId]
+  );
+
+  const teamLeadMemberId = projectWithMember?.projectMembers[0]?.id;
+  const onProjectMemberUpdateMemo = useCallback(
+    (updatedProjectMember: Record<string, any>) => {
+      if (teamLeadMemberId) {
+        onProjectMemberUpdate({
+          ...updatedProjectMember,
+          id: teamLeadMemberId
+        });
+      }
+    },
+    [onProjectMemberUpdate, teamLeadMemberId]
+  );
+
   return (
     <Stack gap={2} width='100%'>
       <Typography variant='h6'>Project Info</Typography>
@@ -64,12 +88,7 @@ export function ProposalProjectFormAnswers({
         defaultRequired
         disabled={!isTeamLead || disabled}
         fieldConfig={fieldConfig}
-        onChange={(updatedProjectValues) => {
-          onProjectUpdate({
-            ...updatedProjectValues,
-            id: projectId
-          });
-        }}
+        onChange={onProjectUpdateMemo}
       />
       <Typography variant='h6' mt={2}>
         Team Info
@@ -80,14 +99,7 @@ export function ProposalProjectFormAnswers({
         disabled={!isTeamLead || disabled}
         defaultRequired
         fieldConfig={fieldConfig?.projectMember}
-        onChange={(updatedProjectMember) => {
-          if (projectWithMember) {
-            onProjectMemberUpdate({
-              ...updatedProjectMember,
-              id: projectWithMember.projectMembers[0].id!
-            });
-          }
-        }}
+        onChange={onProjectMemberUpdateMemo}
       />
       <Divider
         sx={{

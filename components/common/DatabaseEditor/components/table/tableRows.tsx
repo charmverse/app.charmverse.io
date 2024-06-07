@@ -1,17 +1,16 @@
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import type { Dispatch, ReactElement, SetStateAction } from 'react';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 
 import charmClient from 'charmClient';
-import { PageSizeInputPopup } from 'components/PageSizeInputPopup';
 import { NewWorkButton } from 'components/rewards/components/RewardApplications/NewWorkButton';
 import { useLocalStorage } from 'hooks/useLocalStorage';
-import { DEFAULT_PAGE_SIZE, usePaginatedData } from 'hooks/usePaginatedData';
+import { usePaginatedData } from 'hooks/usePaginatedData';
 import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card, CardWithRelations } from 'lib/databases/card';
 
+import { PaginationShowMore } from './PaginationShowMore';
 import TableRow from './tableRow';
 
 type Props = {
@@ -36,6 +35,7 @@ type Props = {
   checkedIds?: string[];
   setCheckedIds?: Dispatch<SetStateAction<string[]>>;
   disableDragAndDrop?: boolean;
+  isExpandedGroup?: boolean;
 };
 
 function TableRows(props: Props): JSX.Element {
@@ -52,12 +52,13 @@ function TableRows(props: Props): JSX.Element {
     checkedIds = []
   } = props;
   const hasSubPages = allCards.some((card) => card.subPages?.length);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const {
     data: cardsInView,
+    pageSize,
+    setPageSize,
     hasNextPage,
     showNextPage
-  } = usePaginatedData(allCards as CardWithRelations[], { pageSize });
+  } = usePaginatedData(allCards as CardWithRelations[]);
 
   const [collapsedCardIds = [], setCollapsedCardIds] = useLocalStorage<string[]>(
     hasSubPages && props.rowExpansionLocalStoragePrefix
@@ -100,7 +101,6 @@ function TableRows(props: Props): JSX.Element {
       ? !collapsedCardIds?.includes(cardId)
       : !!props.expandSubRowsOnLoad;
   };
-
   return (
     <>
       {cardsInView.map((card) => (
@@ -131,6 +131,7 @@ function TableRows(props: Props): JSX.Element {
           setIsExpanded={setIsExpanded}
           setCheckedIds={setCheckedIds}
           isChecked={checkedIds.includes(card.id)}
+          isExpandedGroup={props.isExpandedGroup}
           disableDragAndDrop={disableDragAndDrop}
           emptySubPagesPlaceholder={
             card.reward ? (
@@ -150,17 +151,12 @@ function TableRows(props: Props): JSX.Element {
         />
       ))}
 
-      {hasNextPage && (
-        <div className='octo-table-footer'>
-          <div className='octo-table-cell' onClick={showNextPage}>
-            <Box display='flex' gap={1} alignItems='center'>
-              <ArrowDownwardIcon fontSize='small' />
-              <Typography fontSize='small'>Load more</Typography>
-              <PageSizeInputPopup onChange={setPageSize} pageSize={pageSize} />
-            </Box>
-          </div>
-        </div>
-      )}
+      <PaginationShowMore
+        pageSize={pageSize}
+        setPageSize={setPageSize}
+        hasNextPage={hasNextPage}
+        showNextPage={showNextPage}
+      />
     </>
   );
 }

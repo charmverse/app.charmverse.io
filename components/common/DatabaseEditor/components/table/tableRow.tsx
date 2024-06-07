@@ -20,7 +20,7 @@ import type { Board } from 'lib/databases/board';
 import type { BoardView } from 'lib/databases/boardView';
 import type { Card, CardWithRelations } from 'lib/databases/card';
 import { Constants } from 'lib/databases/constants';
-import { REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
+import { APPLICANT_STATUS_BLOCK_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { isTouchScreen } from 'lib/utils/browser';
 import { mergeRefs } from 'lib/utils/react';
 
@@ -44,7 +44,7 @@ type Props = {
   pageTitle: string;
   isSelected: boolean;
   focusOnMount: boolean;
-  showCard: (cardId: string) => void;
+  showCard: (cardId: string, parentId?: string) => void;
   readOnly: boolean;
   offset: number;
   pageUpdatedAt: string;
@@ -56,6 +56,7 @@ type Props = {
   onDrop: (srcCard: Card, dstCard: Card) => void;
   saveTitle: (saveType: string, cardId: string, title: string, oldTitle: string) => void;
   readOnlyTitle?: boolean;
+  isExpandedGroup?: boolean;
   isExpanded?: boolean | null;
   setIsExpanded?: (option: { expanded: boolean; cardId: string }) => void;
   indentTitle?: number;
@@ -192,18 +193,8 @@ function TableRow(props: Props) {
 
   let className = props.isSelected ? 'TableRow octo-table-row selected' : 'TableRow octo-table-row';
 
-  if (isGrouped) {
-    const groupID = activeView.fields.groupById || '';
-    // look up property id if we grouped by column type (eg proposalUrl)
-    const groupTemplate = board.fields.cardProperties.find((prop) => prop.type === groupID);
-    const groupValue =
-      (groupTemplate ? card.fields.properties[groupTemplate.id] : (card.fields.properties[groupID] as string)) ||
-      'undefined';
-    const groupValueStr =
-      typeof groupValue === 'string' ? groupValue : Array.isArray(groupValue) ? groupValue[0] : null;
-    if (groupValueStr !== null && activeView.fields.collapsedOptionIds.indexOf(groupValueStr) > -1) {
-      className += ' hidden';
-    }
+  if (isGrouped && !props.isExpandedGroup) {
+    className += ' hidden';
   }
 
   const wrapColumn = activeView.fields.columnWrappedIds?.includes(Constants.titleColumnId);
@@ -316,11 +307,16 @@ function TableRow(props: Props) {
                     ))}
 
                   {indentTitle && <div style={{ paddingRight: `${indentTitle}px` }}></div>}
-                  {card.customIconType === 'applicationStatus' && card.fields.properties[REWARD_STATUS_BLOCK_ID] && (
-                    <RewardApplicationStatusIcon
-                      status={card.fields.properties[REWARD_STATUS_BLOCK_ID] as ApplicationStatus}
-                    />
-                  )}
+                  {card.customIconType === 'applicationStatus' &&
+                    (card.fields.properties[REWARD_STATUS_BLOCK_ID] ||
+                      card.fields.properties[APPLICANT_STATUS_BLOCK_ID]) && (
+                      <RewardApplicationStatusIcon
+                        status={
+                          (card.fields.properties[REWARD_STATUS_BLOCK_ID] ||
+                            card.fields.properties[APPLICANT_STATUS_BLOCK_ID]) as ApplicationStatus
+                        }
+                      />
+                    )}
                   {card.customIconType !== 'applicationStatus' && card.customIconType !== 'reward' && (
                     <PageIcon
                       isStructuredProposal={card.isStructuredProposal}
@@ -333,7 +329,7 @@ function TableRow(props: Props) {
                 </div>
 
                 <div className='open-button' data-test={`database-open-button-${card.id}`}>
-                  <Button onClick={() => props.showCard(card.id)}>
+                  <Button onClick={() => props.showCard(card.id || '', card.parentId)}>
                     <FormattedMessage id='TableRow.open' defaultMessage='Open' />
                   </Button>
                 </div>
@@ -390,15 +386,18 @@ function TableRow(props: Props) {
 }
 
 function ExpandableTableRow({ subPages, ...props }: Props & { isNested?: boolean; subPages?: Card[] }) {
+  const isGrouped = Boolean(props.activeView.fields.groupById);
   return (
     <>
       <TableRow
         {...props}
         subRowsEmptyValueContent={props.isNested ? props.subRowsEmptyValueContent : undefined}
         isExpanded={props.isExpanded}
+        isExpandedGroup={props.isExpandedGroup}
         setIsExpanded={subPages ? props.setIsExpanded : undefined}
       />
       {props.isExpanded &&
+        (!isGrouped || props.isExpandedGroup === true) &&
         (!subPages || subPages?.length === 0
           ? props.emptySubPagesPlaceholder
           : subPages?.map((subPage) => (

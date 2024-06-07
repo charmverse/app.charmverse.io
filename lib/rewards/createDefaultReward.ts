@@ -14,7 +14,8 @@ import {
   REWARD_CUSTOM_VALUE,
   REWARD_STATUS_BLOCK_ID,
   REWARD_TOKEN,
-  REWARDER_BLOCK_ID
+  REWARDER_BLOCK_ID,
+  APPLICANT_STATUS_BLOCK_ID
 } from './blocks/constants';
 import { createReward } from './createReward';
 
@@ -25,8 +26,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
     customReward: 'Meet CharmVerse',
     reviewers: [
       {
-        group: 'user',
-        id: userId
+        userId
       }
     ],
     chainId: null,
@@ -42,8 +42,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
         [DUE_DATE_ID]: '',
         [REWARD_REVIEWERS_BLOCK_ID]: [
           {
-            group: 'user',
-            id: userId
+            userId
           }
         ],
         [REWARD_AMOUNT]: '',
@@ -51,6 +50,7 @@ export async function createDefaultReward({ spaceId, userId }: { spaceId: string
         [REWARD_CHAIN]: '',
         [REWARD_CUSTOM_VALUE]: 'Meet CharmVerse',
         [REWARD_STATUS_BLOCK_ID]: '',
+        [APPLICANT_STATUS_BLOCK_ID]: '',
         [REWARD_TOKEN]: '',
         [REWARDER_BLOCK_ID]: '',
         [Constants.titleColumnId]: 'Getting Started'
@@ -88,8 +88,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
     userId,
     reviewers: [
       {
-        group: 'user',
-        id: userId
+        userId
       }
     ],
     chainId: null,
@@ -105,8 +104,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
         [DUE_DATE_ID]: '',
         [REWARD_REVIEWERS_BLOCK_ID]: [
           {
-            group: 'user',
-            id: userId
+            userId
           }
         ],
         [REWARD_AMOUNT]: '',
@@ -114,6 +112,7 @@ export async function createDefaultRewardTemplate({ spaceId, userId }: { spaceId
         [REWARD_CHAIN]: '',
         [REWARD_CUSTOM_VALUE]: '',
         [REWARD_STATUS_BLOCK_ID]: '',
+        [APPLICANT_STATUS_BLOCK_ID]: '',
         [REWARD_TOKEN]: '',
         [REWARDER_BLOCK_ID]: '',
         [Constants.titleColumnId]: 'Default milestone template'

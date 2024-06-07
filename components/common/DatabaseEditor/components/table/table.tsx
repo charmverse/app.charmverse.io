@@ -21,7 +21,9 @@ import { updateView } from '../../store/views';
 import { Utils } from '../../utils';
 
 import CalculationRow from './calculation/calculationRow';
+import { PaginatedRows } from './PaginatedRows';
 import TableGroup from './tableGroup';
+import { TableGroups } from './tableGroups';
 import TableHeaders from './tableHeaders';
 import TableRows from './tableRows';
 
@@ -164,25 +166,6 @@ function Table(props: Props): JSX.Element {
         }
       }
     }),
-    [activeView]
-  );
-
-  const hideGroup = useCallback(
-    (groupById: string): void => {
-      const index: number = activeView.fields.collapsedOptionIds.indexOf(groupById);
-      const newValue: string[] = [...activeView.fields.collapsedOptionIds];
-      if (index > -1) {
-        newValue.splice(index, 1);
-      } else if (groupById !== '') {
-        newValue.push(groupById);
-      }
-
-      const newView = createBoardView(activeView);
-      newView.fields.collapsedOptionIds = newValue;
-      mutator.performAsUndoGroup(async () => {
-        await mutator.updateBlock(newView, activeView, 'hide group');
-      });
-    },
     [activeView]
   );
 
@@ -344,37 +327,32 @@ function Table(props: Props): JSX.Element {
         {/* Table rows */}
         <SelectionContext.Provider value={areaSelection}>
           <TableRowsContainer ref={selectContainerRef}>
-            {activeView.fields.groupById &&
-              visibleGroups.map((group) => {
-                return (
-                  <TableGroup
-                    key={group.id}
-                    board={board}
-                    activeView={activeView}
-                    groupByProperty={groupByProperty}
-                    group={group}
-                    readOnly={props.readOnly}
-                    columnRefs={columnRefs}
-                    selectedCardIds={props.selectedCardIds}
-                    cardIdToFocusOnRender={props.cardIdToFocusOnRender}
-                    hideGroup={hideGroup}
-                    addCard={props.addCard}
-                    showCard={props.showCard}
-                    propertyNameChanged={propertyNameChanged}
-                    onCardClicked={props.onCardClicked}
-                    onDropToGroupHeader={onDropToGroupHeader}
-                    onDropToCard={onDropToCard}
-                    onDropToGroup={onDropToGroup}
-                    readOnlyTitle={props.readOnlyTitle}
-                    disableAddingCards={props.disableAddingCards}
-                    expandSubRowsOnLoad={expandSubRowsOnLoad}
-                    rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
-                    subRowsEmptyValueContent={subRowsEmptyValueContent}
-                    checkedIds={checkedIds}
-                    setCheckedIds={setCheckedIds}
-                  />
-                );
-              })}
+            {activeView.fields.groupById && (
+              <TableGroups
+                groups={visibleGroups}
+                board={board}
+                activeView={activeView}
+                groupByProperty={groupByProperty}
+                readOnly={props.readOnly}
+                columnRefs={columnRefs}
+                selectedCardIds={props.selectedCardIds}
+                cardIdToFocusOnRender={props.cardIdToFocusOnRender}
+                addCard={props.addCard}
+                showCard={props.showCard}
+                propertyNameChanged={propertyNameChanged}
+                onCardClicked={props.onCardClicked}
+                onDropToGroupHeader={onDropToGroupHeader}
+                onDropToCard={onDropToCard}
+                onDropToGroup={onDropToGroup}
+                readOnlyTitle={props.readOnlyTitle}
+                disableAddingCards={props.disableAddingCards}
+                expandSubRowsOnLoad={expandSubRowsOnLoad}
+                rowExpansionLocalStoragePrefix={rowExpansionLocalStoragePrefix}
+                subRowsEmptyValueContent={subRowsEmptyValueContent}
+                checkedIds={checkedIds}
+                setCheckedIds={setCheckedIds}
+              />
+            )}
 
             {/* No Grouping, Rows, one per card */}
             {!activeView.fields.groupById && (

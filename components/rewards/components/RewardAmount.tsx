@@ -8,8 +8,8 @@ import { getChainById } from 'connectors/chains';
 import millify from 'millify';
 
 import { EmptyPlaceholder } from 'components/common/DatabaseEditor/components/properties/EmptyPlaceholder';
+import { TokenLogo } from 'components/common/Icons/TokenLogo';
 import { TokenBadge } from 'components/common/TokenBadge';
-import TokenLogo from 'components/common/TokenLogo';
 import { usePaymentMethods } from 'hooks/usePaymentMethods';
 import { getTokenInfo } from 'lib/tokens/tokenData';
 import { fancyTrim } from 'lib/utils/strings';
@@ -83,7 +83,7 @@ export function RewardAmount({
           <TokenBadge tokenAmount={rewardAmount} chainId={chainId} tokenAddress={rewardToken} />
         ) : (
           <>
-            <TokenLogo height={20} src={tokenInfo.canonicalLogo} />
+            <TokenLogo src={tokenInfo.canonicalLogo} />
             {truncatedAmount && (
               <Typography component='span' variant='body2' data-test='reward-amount' {...typographyProps}>
                 {truncatedAmount} {tokenInfo.isContract && tokenInfo.tokenSymbol}

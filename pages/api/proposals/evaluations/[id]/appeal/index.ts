@@ -5,7 +5,8 @@ import nc from 'next-connect';
 import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { publishProposalEvent } from 'lib/webhookPublisher/publishEvent';
+import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
+import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
@@ -14,6 +15,7 @@ handler.put(appealEvaluationEndpoint);
 async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const evaluationId = req.query.id as string;
   const userId = req.session.user.id;
+  const appealReason = req.body.appealReason as string;
 
   const proposalEvaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
     where: {
@@ -81,16 +83,17 @@ async function appealEvaluationEndpoint(req: NextApiRequest, res: NextApiRespons
       appealedAt: new Date(),
       result: null,
       appealedBy: userId,
+      appealReason,
       completedAt: null
     }
   });
 
-  await publishProposalEvent({
+  await publishProposalEventBase({
     currentEvaluationId: evaluationId,
-    appealed: true,
     proposalId: proposal.id,
     spaceId: proposal.spaceId,
-    userId
+    userId,
+    scope: WebhookEventNames.ProposalAppealed
   });
 
   return res.status(200).end();

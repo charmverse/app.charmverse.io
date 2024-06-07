@@ -96,6 +96,7 @@ export async function applyProposalWorkflow({
           },
           appealable: evaluation.appealable,
           appealRequiredReviews,
+          notificationLabels: evaluation.notificationLabels || undefined,
           actionLabels: evaluation.actionLabels || undefined,
           finalStep: evaluation.finalStep
         }

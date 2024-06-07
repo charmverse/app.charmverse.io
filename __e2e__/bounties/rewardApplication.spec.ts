@@ -2,12 +2,11 @@
 import type { Application, Bounty, Page, Space, User } from '@charmverse/core/prisma';
 import { prisma } from '@charmverse/core/prisma-client';
 import { testUtilsUser } from '@charmverse/core/test';
+import { expect, test } from '__e2e__/testWithFixtures';
 import { login } from '__e2e__/utils/session';
 
 import { REWARD_APPLICATION_STATUS_LABELS } from 'components/rewards/components/RewardApplicationStatusChip';
 import { generateBounty } from 'testing/setupDatabase';
-
-import { test, expect } from '../utils/test';
 
 test.describe('Review reward', () => {
   let space: Space;
@@ -61,13 +60,18 @@ test.describe('Review reward', () => {
     });
   });
 
-  test('Reward creator can review their own application', async ({ page, rewardPage }) => {
+  test('Reward creator can review their own application', async ({ page, rewardPage, databasePage }) => {
     await login({ page, userId: adminUser.id });
 
-    await rewardPage.openApplication({
-      applicationId: application.id,
+    await rewardPage.gotoRewardPage({
       spaceDomain: space.domain
     });
+
+    const secondRow = databasePage.getTableRowByIndex({ index: 1 });
+
+    await secondRow.hover();
+
+    await databasePage.getTableRowOpenLocator(application.id).click();
 
     await expect(rewardPage.rewardApplicationPage).toBeVisible();
 

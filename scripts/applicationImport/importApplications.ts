@@ -331,7 +331,7 @@ async function importApplications({
 
 function parseMilestones({
   text,
-  reviewers,
+  reviewers: _reviewers,
   authorId
 }: {
   text: string;
@@ -345,6 +345,10 @@ function parseMilestones({
     .filter((m) => m !== '');
 
   const titleMatcher = /__TITLE__(.){2,}__TITLE__/;
+
+  const reviewers = _reviewers.map((review) =>
+    review.group === 'role' ? { roleId: review.id } : { userId: review.id }
+  );
 
   splitMilestones.forEach((milestone) => {
     const titleMatch = milestone.match(titleMatcher);

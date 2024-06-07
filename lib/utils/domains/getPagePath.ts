@@ -27,7 +27,7 @@ export function getPagePath({
   return encodeURI(pathWithQuery);
 }
 
-// Given a hostname, space domain, and path, return a path that can be used to open a page.
+// get path to reward application
 export function getSubmissionPagePath({
   hostName,
   spaceDomain,
@@ -37,7 +37,9 @@ export function getSubmissionPagePath({
   spaceDomain: string;
   submissionId: string;
 }) {
-  const isDomainInPath = !getCustomDomainFromHost(hostName) && !getSpaceDomainFromHost(hostName);
-  const pathWithDomain = `/${isDomainInPath ? `${spaceDomain}/` : ''}rewards/applications/${submissionId}`;
-  return encodeURI(pathWithDomain);
+  return getPagePath({
+    hostName,
+    spaceDomain,
+    path: `rewards/applications/${submissionId}`
+  });
 }

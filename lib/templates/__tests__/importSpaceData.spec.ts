@@ -321,7 +321,6 @@ describe('importSpaceData', () => {
               columnWrappedIds: [],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: ['__status', '__evaluationType', '__authors', '__reviewers']
@@ -385,7 +384,6 @@ describe('importSpaceData', () => {
               columnWrappedIds: ['__title'],
               visibleOptionIds: [],
               defaultTemplateId: '',
-              collapsedOptionIds: [],
               columnCalculations: {},
               kanbanCalculations: {},
               visiblePropertyIds: [

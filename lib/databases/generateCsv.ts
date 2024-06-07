@@ -252,7 +252,8 @@ function getCSVColumns({
     } else if (
       propertyTemplate.type === 'number' ||
       propertyTemplate.type === 'proposalEvaluationAverage' ||
-      propertyTemplate.type === 'proposalEvaluationTotal'
+      propertyTemplate.type === 'proposalEvaluationTotal' ||
+      propertyTemplate.type === 'proposalRubricCriteriaTotal'
     ) {
       const numericValue = propertyValue ? Number(propertyValue).toString() : '';
       columns.push(numericValue);

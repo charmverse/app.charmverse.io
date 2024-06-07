@@ -1,14 +1,15 @@
 import CircleIcon from '@mui/icons-material/Circle';
 import { Box, Checkbox, FormControlLabel, Grid, Stack, Switch, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import type { Control, UseFormRegister } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
+import { Controller, useFormContext } from 'react-hook-form';
 
+import FieldLabel from 'components/common/form/FieldLabel';
+import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useSpaceFeatures } from 'hooks/useSpaceFeatures';
 import type { NotificationGroup } from 'lib/notifications/interfaces';
-import type { NotificationToggles, NotificationToggleOption } from 'lib/notifications/notificationToggles';
+import type { NotificationToggleOption, NotificationToggles } from 'lib/notifications/notificationToggles';
 
-import type { FormValues } from '../SpaceSettings';
+import type { FormValues } from '../NotificationSettings';
 
 type NotificationType = { label: string; type?: NotificationToggleOption };
 
@@ -36,17 +37,18 @@ const notificationTypes: Record<ConfigurableGroups, { title: string; types: Noti
     title: 'Proposals',
     types: [
       [
+        { label: 'Proposal submitted (Authors)', type: 'proposals__proposal_published' },
         { label: 'Feedback ready (All members)', type: 'proposals__start_discussion' },
         { label: 'Review ready (Reviewers)', type: 'proposals__review_required' },
         { label: 'Review completed (Authors)', type: 'proposals__step_passed' },
-        { label: 'Rewards published (Authors)', type: 'proposals__reward_published' },
-        { label: 'Issued Credentials', type: 'proposals__credential_created' }
+        { label: 'Vote ready (Authors and Voters)', type: 'proposals__vote' }
       ],
       [
-        { label: 'Vote ready (Authors and Voters)', type: 'proposals__vote' },
         { label: 'Vote passed (Authors and Voters)', type: 'proposals__vote_passed' },
         { label: 'Proposal declined (Authors)', type: 'proposals__proposal_failed' },
-        { label: 'Proposal passed (Authors)', type: 'proposals__proposal_passed' }
+        { label: 'Proposal passed (Authors)', type: 'proposals__proposal_passed' },
+        { label: 'Rewards published (Authors)', type: 'proposals__reward_published' },
+        { label: 'Issued Credentials', type: 'proposals__credential_created' }
       ]
     ]
   },
@@ -57,7 +59,7 @@ const notificationTypes: Record<ConfigurableGroups, { title: string; types: Noti
 };
 
 // set all notifications to true by default
-export function getDefaultValues(toggles: NotificationToggles): NotificationToggles {
+export function getDefaultNotificationValues(toggles: NotificationToggles): NotificationToggles {
   const defaultValues: NotificationToggles = {
     rewards: toggles.rewards ?? true,
     proposals: toggles.proposals ?? true,
@@ -75,86 +77,16 @@ export function getDefaultValues(toggles: NotificationToggles): NotificationTogg
   return defaultValues;
 }
 
-export function NotificationTogglesInput({
-  isAdmin,
-  control,
-  watch,
-  register,
-  setValue
-}: {
-  isAdmin: boolean;
-  control: Control<FormValues>;
-  watch: () => FormValues;
-  register: UseFormRegister<FormValues>;
-  setValue: (name: `notificationToggles.${NotificationToggleOption}`, value: any) => void;
-}) {
-  const { getFeatureTitle } = useSpaceFeatures();
-  const formValues = watch();
-  // console.log(formValues);
-  return (
-    <Stack>
-      <ToggleInput
-        name='notificationToggles.rewards'
-        label={
-          <NotificationRuleComponent
-            control={control}
-            disabled={!isAdmin}
-            enabled={formValues.notificationToggles?.rewards}
-            title={getFeatureTitle('Rewards')}
-            types={notificationTypes.rewards.types}
-          />
-        }
-        disabled={!isAdmin}
-        control={control}
-        setValue={setValue}
-      />
-      <ToggleInput
-        name='notificationToggles.proposals'
-        label={
-          <NotificationRuleComponent
-            control={control}
-            disabled={!isAdmin}
-            enabled={formValues.notificationToggles?.proposals}
-            title={getFeatureTitle('Proposals')}
-            types={notificationTypes.proposals.types}
-          />
-        }
-        disabled={!isAdmin}
-        control={control}
-        setValue={setValue}
-      />
-      <ToggleInput
-        name='notificationToggles.polls'
-        label={
-          <NotificationRuleComponent
-            control={control}
-            disabled={!isAdmin}
-            enabled={formValues.notificationToggles?.polls}
-            title={notificationTypes.polls.title}
-            types={notificationTypes.polls.types}
-          />
-        }
-        disabled={!isAdmin}
-        control={control}
-        setValue={setValue}
-      />
-    </Stack>
-  );
-}
-
 function ToggleInput({
   disabled,
   name,
-  label,
-  control,
-  setValue
+  label
 }: {
   disabled?: boolean;
   name: `notificationToggles.${NotificationToggleOption}`;
   label: ReactNode;
-  control: any;
-  setValue: (name: `notificationToggles.${NotificationToggleOption}`, value: any) => void;
 }) {
+  const { control, setValue } = useFormContext<FormValues>();
   return (
     <Controller
       control={control}
@@ -185,18 +117,18 @@ function ToggleInput({
 }
 
 function NotificationRuleComponent({
-  control,
   enabled,
   title,
   disabled,
   types: typeColumns
 }: {
   disabled: boolean;
-  control: any;
   enabled?: boolean;
   title: string;
   types: (typeof notificationTypes)['rewards']['types'];
 }) {
+  const { control } = useFormContext<FormValues>();
+
   return (
     <Box width='100%'>
       <Typography sx={{ my: 1 }}>{title}</Typography>
@@ -250,5 +182,65 @@ function NotificationRuleComponent({
         ))}
       </Grid>
     </Box>
+  );
+}
+
+export function NotificationTogglesInput({ isAdmin }: { isAdmin: boolean }) {
+  const { watch } = useFormContext<FormValues>();
+  const { getFeatureTitle } = useSpaceFeatures();
+  const formValues = watch();
+  return (
+    <Stack>
+      <ToggleInput
+        name='notificationToggles.rewards'
+        label={
+          <NotificationRuleComponent
+            disabled={!isAdmin}
+            enabled={formValues.notificationToggles?.rewards}
+            title={getFeatureTitle('Rewards')}
+            types={notificationTypes.rewards.types}
+          />
+        }
+        disabled={!isAdmin}
+      />
+      <ToggleInput
+        name='notificationToggles.proposals'
+        label={
+          <NotificationRuleComponent
+            disabled={!isAdmin}
+            enabled={formValues.notificationToggles?.proposals}
+            title={getFeatureTitle('Proposals')}
+            types={notificationTypes.proposals.types}
+          />
+        }
+        disabled={!isAdmin}
+      />
+      <ToggleInput
+        name='notificationToggles.polls'
+        label={
+          <NotificationRuleComponent
+            disabled={!isAdmin}
+            enabled={formValues.notificationToggles?.polls}
+            title={notificationTypes.polls.title}
+            types={notificationTypes.polls.types}
+          />
+        }
+        disabled={!isAdmin}
+      />
+    </Stack>
+  );
+}
+
+export function SpaceNotificationSettings() {
+  const isAdmin = useIsAdmin();
+
+  return (
+    <Grid item>
+      <FieldLabel>Enabled Notifications</FieldLabel>
+      <Typography variant='caption' mb={1} component='p'>
+        Control notifications for your members.
+      </Typography>
+      <NotificationTogglesInput isAdmin={isAdmin} />
+    </Grid>
   );
 }

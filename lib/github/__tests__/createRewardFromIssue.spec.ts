@@ -47,8 +47,7 @@ describe('createRewardFromIssue', () => {
       githubIssueUrl,
       reviewers: [
         {
-          group: 'user',
-          id: user.id
+          userId: user.id
         }
       ],
       pageProps: {
@@ -394,8 +393,7 @@ describe('createRewardFromIssue', () => {
       rewardType: 'token',
       reviewers: [
         {
-          group: 'user',
-          id: user.id
+          userId: user.id
         }
       ]
     });
