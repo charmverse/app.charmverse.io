@@ -236,7 +236,7 @@ export function SpaceNotificationSettings() {
 
   return (
     <Grid item>
-      <FieldLabel>Enabled Notifications</FieldLabel>
+      <FieldLabel>Notifications</FieldLabel>
       <Typography variant='caption' mb={1} component='p'>
         Control notifications for your members.
       </Typography>

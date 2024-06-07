@@ -62,7 +62,7 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
-  const spaceStyles = value === 'space' || value === 'notifications' ? { p: 0 } : undefined;
+  const spaceStyles = value === 'space' ? { p: 0 } : undefined;
 
   return (
     <Box
