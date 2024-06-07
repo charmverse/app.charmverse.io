@@ -13,7 +13,7 @@ export type ReviewEvaluationRequest = {
   evaluationId: string;
   result: ProposalEvaluationResult;
   declineReasons?: string[];
-  declineInput?: string;
+  declineMessage?: string;
 };
 
 export async function updateEvaluationResult({
@@ -76,7 +76,7 @@ export async function submitEvaluationResult({
   spaceId,
   evaluation,
   declineReasons,
-  declineInput
+  declineMessage
 }: Omit<ReviewEvaluationRequest, 'evaluationId'> & {
   spaceId: string;
   evaluation: {
@@ -99,7 +99,7 @@ export async function submitEvaluationResult({
         result,
         reviewerId: decidedBy,
         declineReasons,
-        declineInput
+        declineMessage
       }
     });
   }

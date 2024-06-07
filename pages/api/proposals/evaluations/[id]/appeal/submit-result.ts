@@ -16,7 +16,7 @@ handler.use(requireKeys(['result'], 'body')).put(submitEvaluationAppealResultEnd
 async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: NextApiResponse) {
   const evaluationId = req.query.id as string;
   const userId = req.session.user.id;
-  const { result, declineReasons, declineInput } = req.body as ReviewEvaluationRequest;
+  const { result, declineReasons, declineMessage } = req.body as ReviewEvaluationRequest;
 
   const proposalEvaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
     where: {
@@ -95,7 +95,7 @@ async function submitEvaluationAppealResultEndpoint(req: NextApiRequest, res: Ne
     decidedBy: userId,
     spaceId: proposalEvaluation.proposal.spaceId,
     declineReasons,
-    declineInput
+    declineMessage
   });
 
   return res.status(200).end();

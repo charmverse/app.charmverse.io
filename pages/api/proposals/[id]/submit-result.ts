@@ -18,7 +18,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
   const proposalId = req.query.id as string;
   const userId = req.session.user.id;
 
-  const { evaluationId, result, declineReasons, declineInput } = req.body as ReviewEvaluationRequest;
+  const { evaluationId, result, declineReasons, declineMessage } = req.body as ReviewEvaluationRequest;
   // A proposal can only be updated when its in draft or discussion status and only the proposal author can update it
   const proposalPermissions = await permissionsApiClient.proposals.computeProposalPermissions({
     resourceId: proposalId,
@@ -75,7 +75,7 @@ async function updateEvaluationResultEndpoint(req: NextApiRequest, res: NextApiR
     decidedBy: userId,
     spaceId: evaluation.proposal.spaceId,
     declineReasons,
-    declineInput
+    declineMessage
   });
 
   return res.status(200).end();

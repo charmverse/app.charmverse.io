@@ -103,18 +103,17 @@ export function PassFailEvaluationContainer({
 
   const { showMessage } = useSnackbar();
   const actionLabels = getActionButtonLabels(evaluation);
-  const [selectedEvaluationId, setSelectedEvaluationId] = useState<string | null>(null);
   async function onSubmitEvaluationReview(params: {
     declineReason: string | null;
     result: NonNullable<PopulatedEvaluation['result']>;
-    declineInput?: string;
+    declineMessage?: string;
   }) {
     try {
       await submitEvaluationReview({
         evaluationId: evaluation.id,
         result: params.result,
         declineReasons: params.declineReason ? [params.declineReason] : [],
-        declineInput: params.declineInput
+        declineMessage: params.declineMessage
       });
       refreshProposal?.();
     } catch (error) {
@@ -125,13 +124,13 @@ export function PassFailEvaluationContainer({
   async function onSubmitEvaluationAppealReview(params: {
     result: NonNullable<PopulatedEvaluation['result']>;
     declineReason: string | null;
-    declineInput?: string;
+    declineMessage?: string;
   }) {
     try {
       await submitEvaluationAppealReview({
         result: params.result,
         declineReasons: params.declineReason ? [params.declineReason] : [],
-        declineInput: params.declineInput
+        declineMessage: params.declineMessage
       });
       refreshProposal?.();
     } catch (error) {

@@ -27,7 +27,7 @@ export type PassFailEvaluationProps = {
   onSubmitEvaluationReview: (params: {
     declineReason: string | null;
     result: NonNullable<PopulatedEvaluation['result']>;
-    declineInput?: string;
+    declineMessage?: string;
   }) => Promise<void>;
   onResetEvaluationReview?: () => void;
   isResettingEvaluationReview: boolean;
@@ -40,7 +40,7 @@ export type PassFailEvaluationProps = {
     id: string;
     reviewerId: string;
     declineReasons: string[];
-    declineInput?: string | null;
+    declineMessage?: string | null;
     result: ProposalEvaluationResult;
     completedAt: Date;
   }[];
@@ -85,7 +85,7 @@ export function PassFailEvaluation({
   const currentUserEvaluationReview = evaluationReviews?.find((review) => review.reviewerId === user?.id);
   const [declineReason, setDeclineReason] = useState<string | null>(null);
   const [evaluationReviewId, setEvaluationReviewId] = useState<string | null>(null);
-  const [declineInput, setDeclineInput] = useState('');
+  const [declineMessage, setDeclineMessage] = useState('');
   const declineReasonModalPopupState = usePopupState({ variant: 'dialog' });
   const disabledTooltip = !isCurrent
     ? 'This evaluation step is not active'
@@ -120,13 +120,13 @@ export function PassFailEvaluation({
     await onSubmitEvaluationReview({
       declineReason,
       result,
-      declineInput
+      declineMessage
     });
   };
 
   function onClose() {
     setDeclineReason(null);
-    setDeclineInput('');
+    setDeclineMessage('');
     setEvaluationReviewId(null);
     declineReasonModalPopupState.close();
   }
@@ -195,7 +195,7 @@ export function PassFailEvaluation({
                           <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
                         ))}
                       </Stack>
-                      {evaluationReview.declineInput && (
+                      {evaluationReview.declineMessage && (
                         <Tooltip title='View additional comment'>
                           <div>
                             <InfoOutlinedIcon
@@ -298,9 +298,9 @@ export function PassFailEvaluation({
             fullWidth
             rows={5}
             onChange={(e) => {
-              setDeclineInput(e.target.value);
+              setDeclineMessage(e.target.value);
             }}
-            value={declineInput}
+            value={declineMessage}
           />
         </Stack>
 
@@ -332,7 +332,7 @@ export function PassFailEvaluation({
             multiline
             rows={10}
             fullWidth
-            value={evaluationReviews.find((review) => review.id === evaluationReviewId)?.declineInput}
+            value={evaluationReviews.find((review) => review.id === evaluationReviewId)?.declineMessage}
             disabled
           />
         </Modal>
