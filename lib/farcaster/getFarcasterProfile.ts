@@ -25,7 +25,7 @@ export async function getFarcasterProfile({
   fid
 }: {
   username?: string;
-  fid?: number;
+  fid?: number | string;
   wallets?: string[];
 }) {
   let _farcasterProfile: FarcasterProfile | null = null;

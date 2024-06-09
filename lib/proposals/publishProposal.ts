@@ -77,31 +77,31 @@ export async function publishProposal({ proposalId, userId }: { proposalId: stri
     result.space.credentialTemplates.some((spaceTemplate) => spaceTemplate.id === template)
   );
 
-  relay.broadcast(
-    {
-      type: 'proposals_updated',
-      payload: [
-        {
-          id: proposalId,
-          currentStep: getCurrentStep({
-            evaluations: result.evaluations,
-            hasPendingRewards: ((result.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
-            proposalStatus: result.status,
-            hasPublishedRewards: false,
-            credentialsEnabled: result.space.credentialTemplates.some((template) =>
-              result.selectedCredentialTemplates.includes(template.id)
-            ),
-            hasPendingCredentials: applicableSelectedCredentials.every((cred) =>
-              result.issuedCredentials.some((issuedCred) =>
-                issuedCred.credentialTemplateId === cred && result.space.useOnchainCredentials
-                  ? issuedCred.onchainAttestationId
-                  : !!issuedCred.ceramicId
-              )
-            )
-          })
-        }
-      ]
-    },
-    result.spaceId
-  );
+  // relay.broadcast(
+  //   {
+  //     type: 'proposals_updated',
+  //     payload: [
+  //       {
+  //         id: proposalId,
+  //         currentStep: getCurrentStep({
+  //           evaluations: result.evaluations,
+  //           hasPendingRewards: ((result.fields as ProposalFields)?.pendingRewards ?? []).length > 0,
+  //           proposalStatus: result.status,
+  //           hasPublishedRewards: false,
+  //           credentialsEnabled: result.space.credentialTemplates.some((template) =>
+  //             result.selectedCredentialTemplates.includes(template.id)
+  //           ),
+  //           hasPendingCredentials: applicableSelectedCredentials.every((cred) =>
+  //             result.issuedCredentials.some((issuedCred) =>
+  //               issuedCred.credentialTemplateId === cred && result.space.useOnchainCredentials
+  //                 ? issuedCred.onchainAttestationId
+  //                 : !!issuedCred.ceramicId
+  //             )
+  //           )
+  //         })
+  //       }
+  //     ]
+  //   },
+  //   result.spaceId
+  // );
 }

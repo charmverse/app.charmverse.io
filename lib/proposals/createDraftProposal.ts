@@ -21,6 +21,7 @@ export type CreateDraftProposalInput = {
   spaceId: string;
   contentType: ProposalContentType;
   pageType?: Extract<PageType, 'proposal_template' | 'proposal'>;
+  title?: string;
   templateId?: string;
   sourcePageId?: string;
   sourcePostId?: string;
@@ -143,7 +144,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
       contentText: template?.contentText || sourcePage?.contentText || sourcePost?.contentText || '',
       path: generatePagePathFromPathAndTitle({ title: 'page' }),
       sourceTemplateId: template?.id || undefined,
-      title: sourcePage?.title || sourcePost?.title || '',
+      title: input.title || sourcePage?.title || sourcePost?.title || '',
       type: input.pageType || 'proposal'
     },
     selectedCredentialTemplates: template?.proposal?.selectedCredentialTemplates || undefined,
