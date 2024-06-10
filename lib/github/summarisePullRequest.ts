@@ -139,7 +139,7 @@ export async function summarisePullRequest(
 
 // askChatGPT({ prompt: baseSummarisePRPrompt({ prTitle: 'Refactor docusign' }) }).then(console.log);
 
-const exportFileName = 'pullRequestSummaries.json';
+const exportFileName = 'pullRequestSummaries-local.json';
 
 async function exportSummaries() {
   const summaries = await prisma.pullRequestSummary.findMany({});
@@ -147,14 +147,15 @@ async function exportSummaries() {
   await writeToSameFolder({ fileName: exportFileName, data: JSON.stringify(summaries, null, 2) });
 }
 
-async function importSummaries() {
-  const summaries = JSON.parse(await readFile(path.join(__dirname, exportFileName), 'utf-8')) as PullRequestSummary[];
+async function importSummaries(fileName: string) {
+  const summaries = JSON.parse(await readFile(path.join(__dirname, fileName), 'utf-8')) as PullRequestSummary[];
 
   let skipped = 0;
 
+  log.info(`Importing ${summaries.length} pull request summaries`);
+
   for (let i = 0; i < summaries.length; i++) {
     const summary = summaries[i];
-    log.info(`Importing ${i + 1}/${summaries.length} pull request summaries`);
     const existing = await prisma.pullRequestSummary.findFirst({
       where: {
         prNumber: summary.prNumber,
@@ -166,7 +167,11 @@ async function importSummaries() {
     });
 
     if (!existing) {
-      log.info(`Creating pull request summary for ${summary.repoOwner}/${summary.repoName}/${summary.prNumber}`);
+      log.info(
+        `${i + 1}/${summaries.length}  // Creating pull request summary for ${summary.repoOwner}/${summary.repoName}/${
+          summary.prNumber
+        }`
+      );
       await prisma.pullRequestSummary.create({
         data: summary as any
       });

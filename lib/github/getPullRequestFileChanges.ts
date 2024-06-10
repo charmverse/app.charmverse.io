@@ -22,6 +22,9 @@ const ignoredFiles = ['package-lock.json'];
 
 export type PullRequestToQuery = Pick<PullRequestSummary, 'prNumber' | 'repoOwner' | 'repoName'>;
 
+/**
+ * This method fetchs all PR files changes and filters out files like package-lock.json so that we don't accidentally analyse an irrelevant file with lots of wasted tokens
+ */
 export async function getPullRequestFileChanges({
   prNumber,
   repoName,
