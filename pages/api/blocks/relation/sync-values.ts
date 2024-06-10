@@ -9,7 +9,6 @@ import { syncRelatedCardsValues } from 'lib/databases/relationProperty/syncRelat
 import { onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
-import { prettyPrint } from 'lib/utils/strings';
 import { relay } from 'lib/websockets/relay';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
