@@ -1,11 +1,11 @@
-import { POST } from 'adapters/http';
+import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
 
 import { getMergedPullRequests } from '../getMergedPullRequests';
 import type { PullRequestMeta } from '../getPullRequestMeta';
 
-jest.mock('adapters/http');
+jest.mock('lib/github/githubGraphQLClient');
 
-const mockedPOST = POST as jest.MockedFunction<typeof POST>;
+const mockedGraphQlClient = githubGrapghQLClient as jest.Mocked<typeof githubGrapghQLClient>;
 
 const exampleData: PullRequestMeta[] = [
   {
@@ -56,11 +56,11 @@ const exampleData: PullRequestMeta[] = [
 
 describe('getMergedPullRequests', () => {
   beforeEach(() => {
-    mockedPOST.mockClear();
+    mockedGraphQlClient.query.mockClear();
   });
 
   it('should fetch merged pull requests for a given username', async () => {
-    mockedPOST.mockResolvedValue({
+    mockedGraphQlClient.query.mockResolvedValue({
       data: {
         user: {
           pullRequests: {
@@ -72,15 +72,15 @@ describe('getMergedPullRequests', () => {
           }
         }
       }
-    });
+    } as any);
 
     const pullRequests = await getMergedPullRequests({ githubUsername: 'dev29' });
     expect(pullRequests).toEqual(exampleData);
-    expect(mockedPOST).toHaveBeenCalledTimes(1);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(1);
   });
 
   it('should respect the limit parameter', async () => {
-    mockedPOST.mockResolvedValue({
+    mockedGraphQlClient.query.mockResolvedValue({
       data: {
         user: {
           pullRequests: {
@@ -92,16 +92,16 @@ describe('getMergedPullRequests', () => {
           }
         }
       }
-    });
+    } as any);
 
     const pullRequests = await getMergedPullRequests({ githubUsername: 'dev29', limit: 2 });
     expect(pullRequests.length).toBe(2);
-    expect(mockedPOST).toHaveBeenCalledTimes(1);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(1);
   });
 
   it('should respect the fromDate parameter', async () => {
     const filteredData = exampleData.filter((pr) => new Date(pr.mergedAt) >= new Date('2024-05-20'));
-    mockedPOST.mockResolvedValue({
+    mockedGraphQlClient.query.mockResolvedValue({
       data: {
         user: {
           pullRequests: {
@@ -113,16 +113,16 @@ describe('getMergedPullRequests', () => {
           }
         }
       }
-    });
+    } as any);
 
     const pullRequests = await getMergedPullRequests({ githubUsername: 'dev29', fromDate: '2024-05-20' });
     expect(pullRequests).toEqual(filteredData);
-    expect(mockedPOST).toHaveBeenCalledTimes(1);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(1);
   });
 
   it('should handle pagination correctly', async () => {
     const paginatedData = [exampleData[0]];
-    mockedPOST
+    mockedGraphQlClient.query
       .mockResolvedValueOnce({
         data: {
           user: {
@@ -135,7 +135,7 @@ describe('getMergedPullRequests', () => {
             }
           }
         }
-      })
+      } as any)
       .mockResolvedValueOnce({
         data: {
           user: {
@@ -148,11 +148,11 @@ describe('getMergedPullRequests', () => {
             }
           }
         }
-      });
+      } as any);
 
     const pullRequests = await getMergedPullRequests({ githubUsername: 'dev29', limit: 4 });
     expect(pullRequests).toEqual(exampleData);
-    expect(mockedPOST).toHaveBeenCalledTimes(2);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(2);
   });
 
   it('should filter out pull requests with specific titles', async () => {
@@ -172,7 +172,7 @@ describe('getMergedPullRequests', () => {
     ];
     const filteredData = dataWithFilteredTitles.filter((pr) => !pr.title.toLowerCase().includes('revert'));
 
-    mockedPOST.mockResolvedValue({
+    mockedGraphQlClient.query.mockResolvedValue({
       data: {
         user: {
           pullRequests: {
@@ -184,10 +184,10 @@ describe('getMergedPullRequests', () => {
           }
         }
       }
-    });
+    } as any);
 
     const pullRequests = await getMergedPullRequests({ githubUsername: 'dev29' });
     expect(pullRequests).toEqual(filteredData);
-    expect(mockedPOST).toHaveBeenCalledTimes(1);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(1);
   });
 });

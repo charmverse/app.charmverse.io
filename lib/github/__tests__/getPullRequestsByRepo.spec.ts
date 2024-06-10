@@ -1,12 +1,12 @@
-import { POST } from 'adapters/http';
+import { githubGrapghQLClient } from 'lib/github/githubGraphQLClient';
 
 import type { PullRequestMeta } from '../getPullRequestMeta';
 import type { PullRequestsByRepo } from '../getPullRequestsByRepo';
 import { getPullRequestsByRepo } from '../getPullRequestsByRepo';
 
-jest.mock('adapters/http');
+jest.mock('lib/github/githubGraphQLClient');
 
-const mockedPOST = POST as jest.MockedFunction<typeof POST>;
+const mockedGraphQlClient = githubGrapghQLClient as jest.Mocked<typeof githubGrapghQLClient>;
 
 const exampleData: PullRequestMeta[] = [
   {
@@ -57,11 +57,11 @@ const exampleData: PullRequestMeta[] = [
 
 describe('getPullRequestsByRepo', () => {
   beforeEach(() => {
-    mockedPOST.mockClear();
+    mockedGraphQlClient.query.mockClear();
   });
 
   it('should fetch, group, and sort pull requests by repository', async () => {
-    mockedPOST.mockResolvedValueOnce({
+    mockedGraphQlClient.query.mockResolvedValueOnce({
       data: {
         user: {
           pullRequests: {
@@ -73,7 +73,7 @@ describe('getPullRequestsByRepo', () => {
           }
         }
       }
-    });
+    } as any);
 
     const params = { githubUsername: 'charmverse' };
     const result = await getPullRequestsByRepo(params);
@@ -93,11 +93,11 @@ describe('getPullRequestsByRepo', () => {
 
     expect(result).toEqual(expected);
     expect(result[0].pullRequests.length).toBeGreaterThanOrEqual(result[1].pullRequests.length);
-    expect(mockedPOST).toHaveBeenCalledTimes(1);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(1);
   });
 
   it('should handle empty response', async () => {
-    mockedPOST.mockResolvedValueOnce({
+    mockedGraphQlClient.query.mockResolvedValueOnce({
       data: {
         user: {
           pullRequests: {
@@ -109,20 +109,20 @@ describe('getPullRequestsByRepo', () => {
           }
         }
       }
-    });
+    } as any);
 
     const params = { githubUsername: 'charmverse' };
     const result = await getPullRequestsByRepo(params);
 
     expect(result).toEqual([]);
-    expect(mockedPOST).toHaveBeenCalledTimes(1);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(1);
   });
 
   it('should handle multiple pages of results', async () => {
     const paginatedData1 = [exampleData[0]];
     const paginatedData2 = [exampleData[1], exampleData[2], exampleData[3]];
 
-    mockedPOST
+    mockedGraphQlClient.query
       .mockResolvedValueOnce({
         data: {
           user: {
@@ -135,7 +135,7 @@ describe('getPullRequestsByRepo', () => {
             }
           }
         }
-      })
+      } as any)
       .mockResolvedValueOnce({
         data: {
           user: {
@@ -148,7 +148,7 @@ describe('getPullRequestsByRepo', () => {
             }
           }
         }
-      });
+      } as any);
 
     const params = { githubUsername: 'charmverse', limit: 4 };
     const result = await getPullRequestsByRepo(params);
@@ -168,6 +168,6 @@ describe('getPullRequestsByRepo', () => {
 
     expect(result).toEqual(expected);
     expect(result[0].pullRequests.length).toBeGreaterThanOrEqual(result[1].pullRequests.length);
-    expect(mockedPOST).toHaveBeenCalledTimes(2);
+    expect(mockedGraphQlClient.query).toHaveBeenCalledTimes(2);
   });
 });

@@ -1,9 +1,6 @@
-import { GET } from 'adapters/http';
-import { githubAccessToken } from 'config/constants';
 import { askChatGPT } from 'lib/chatGPT/askChatgpt';
 import { randomIntFromInterval } from 'lib/utils/random';
 
-import { GITHUB_API_BASE_URL } from '../constants';
 import {
   getPullRequestFileChanges,
   type GithubFileChange,
@@ -13,12 +10,10 @@ import { getPullRequestMeta } from '../getPullRequestMeta';
 import type { PullRequestSummaryWithFilePatches } from '../summarisePullRequest';
 import { baseSummarisePRPrompt, summarisePullRequest } from '../summarisePullRequest';
 
-jest.mock('adapters/http');
 jest.mock('lib/chatGPT/askChatgpt');
 jest.mock('lib/github/getPullRequestMeta');
 jest.mock('lib/github/getPullRequestFileChanges');
 
-const mockedGET = GET as jest.MockedFunction<typeof GET>;
 const mockedAskChatGPT = askChatGPT as jest.MockedFunction<typeof askChatGPT>;
 const mockedGetPullRequestFileChanges = getPullRequestFileChanges as jest.MockedFunction<
   typeof getPullRequestFileChanges
@@ -95,7 +90,13 @@ const expectedSummary: Partial<PullRequestSummaryWithFilePatches> = {
   deletions: totalDeletions,
   changedFiles: 2,
   createdBy: 'dev',
-  prompt: baseSummarisePRPrompt({ files: '' }),
+  prompt: baseSummarisePRPrompt({
+    files: JSON.stringify(
+      exampleFileChanges.filter((file) => file.filename !== 'package-lock.json'),
+      null,
+      2
+    )
+  }),
   promptTokens: exampleResponse.inputTokens,
   summary: exampleResponse.answer,
   summaryTokens: exampleResponse.outputTokens
@@ -108,7 +109,7 @@ mockedGetPullRequestMeta.mockResolvedValue({
   author: { login: 'dev' },
   additions: 1,
   deletions: 1,
-  number: 1000,
+  number: randomIntFromInterval(1, 10000),
   createdAt: new Date().toString(),
   mergedAt: new Date().toString(),
   repository: {
@@ -119,36 +120,38 @@ mockedGetPullRequestMeta.mockResolvedValue({
 
 describe('summarisePullRequest', () => {
   beforeEach(() => {
-    mockedGET.mockClear();
+    mockedGetPullRequestFileChanges.mockClear();
     mockedAskChatGPT.mockClear();
   });
 
   it('should fetch, summarise, and store pull request summary', async () => {
-    mockedGET.mockResolvedValueOnce(exampleFileChanges.filter((file) => file.filename !== 'package-lock.json'));
+    mockedGetPullRequestFileChanges.mockResolvedValueOnce(
+      exampleFileChanges.filter((file) => file.filename !== 'package-lock.json')
+    );
     mockedAskChatGPT.mockResolvedValueOnce(exampleResponse);
 
     const result = await summarisePullRequest(params);
 
-    expect(mockedGET).toHaveBeenCalledWith(
-      `${GITHUB_API_BASE_URL}/repos/${params.repoOwner}/${params.repoName}/pulls/${params.prNumber}/files`,
-      undefined,
-      {
-        headers: {
-          Authorization: `bearer ${githubAccessToken}`,
-          Accept: 'application/vnd.github.v3+json'
-        }
-      }
-    );
+    expect(mockedGetPullRequestFileChanges).toHaveBeenCalled();
+
     expect(mockedAskChatGPT).toHaveBeenCalledWith({
-      prompt: expectedSummary.prompt?.replace('{files}', JSON.stringify(expectedSummary.patches, null, 2)),
+      prompt: expectedSummary.prompt,
       model: 'gpt4'
     });
+
+    expect(result).toMatchObject(
+      expect.objectContaining<Partial<PullRequestSummaryWithFilePatches>>({
+        additions: expectedSummary.additions,
+        deletions: expectedSummary.deletions,
+        changedFiles: expectedSummary.changedFiles,
+        summary: expectedSummary.summary
+      })
+    );
   });
 
   it('should return existing summary if it exists without requerying the AI model', async () => {
     await summarisePullRequest(params);
 
-    expect(mockedGET).not.toHaveBeenCalled();
     expect(mockedAskChatGPT).not.toHaveBeenCalled();
   });
 });
