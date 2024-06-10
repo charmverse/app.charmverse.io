@@ -3,9 +3,13 @@ import { Checkbox, Stack, Typography } from '@mui/material';
 
 const StyledStack = styled(Stack)`
   cursor: pointer;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: row;
   width: fit-content;
+
+  & .MuiCheckbox-root {
+    padding-top: 2px;
+  }
 `;
 
 export function PropertySelector({

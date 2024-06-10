@@ -31,7 +31,7 @@ export function FormFieldPropertiesList({
   }
 
   return (
-    <Stack>
+    <Stack gap={0.5}>
       <PropertySelector
         isChecked={selectedProperties.formFields.length === formFields.length}
         label='Select All'
@@ -50,7 +50,7 @@ export function FormFieldPropertiesList({
           }
         }}
       />
-      <Stack ml={2}>
+      <Stack ml={2} gap={0.5}>
         {formFields.map((formField) => {
           return (
             <PropertySelector
