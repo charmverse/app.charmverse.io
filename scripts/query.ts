@@ -5,37 +5,55 @@ import { createDraftProposal } from 'lib/proposals/createDraftProposal';
  * Use this script to perform database searches.
  */
 
+const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
+
 async function search() {
-  console.log(
-    await prisma.page.delete({
-      where: {
-        id: '40650b3e-f365-4ad6-9003-5f5e614b8044'
-      }
-    })
-  );
-  console.log(
-    await prisma.proposal.delete({
-      where: {
-        id: '40650b3e-f365-4ad6-9003-5f5e614b8044'
-      }
-    })
-  );
-  // const proposal = await prisma.proposal.findFirstOrThrow({
-  //   where: {
-  //     page: {
-  //       id: '50799f98-571c-413b-8cec-e36cbf5ca572'
+  // console.log(
+  //   await prisma.page.delete({
+  //     where: {
+  //       id: 'a18016bd-a6e8-4b78-9e3f-c64aafa4d3b7'
   //     }
-  //   },
-  //   include: {
-  //     form: {
-  //       include: {
-  //         formFields: true
+  //   })
+  // );
+  // console.log(
+  //   await prisma.proposal.delete({
+  //     where: {
+  //       id: 'a18016bd-a6e8-4b78-9e3f-c64aafa4d3b7'
+  //     }
+  //   })
+  // );
+  const proposal = await prisma.proposal.findUniqueOrThrow({
+    where: {
+      id: 'a8ac2799-5c79-45f7-9527-a1d52d717625'
+    },
+    include: {
+      form: {
+        include: {
+          formFields: true
+        }
+      }
+    }
+  });
+  console.log(proposal.form.formFields);
+  // console.log(
+  //   await prisma.page.deleteMany({
+  //     where: {
+  //       id: {
+  //         in: proposal.map((p) => p.id)
   //       }
   //     }
-  //   }
-  // });
-
-  // console.log(proposal.form?.formFields || []);
+  //   })
+  // );
+  // console.log(
+  //   await prisma.proposal.deleteMany({
+  //     where: {
+  //       id: {
+  //         in: proposal.map((p) => p.id)
+  //       }
+  //     }
+  //   })
+  // );
+  // console.log(proposal.map((p) => p.title + ' ' + p.proposal?.status));
   // const { page } = await createDraftProposal({
   //   createdBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
   //   spaceId: 'f3ddde2e-17e9-42b1-803d-0c72880e4669',
