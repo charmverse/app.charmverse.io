@@ -26,6 +26,7 @@
     "sockets:test": "dotenv -e .env.test.local -v PORT=3336 -- node ./dist/initWebsockets.js",
     "sockets:test:ci": "npm run sockets:test",
     "sockets:staging": "cross-env PORT=3336 npx dotenv -e .env.staging.local -- tsx watch background/initWebsockets.ts",
+    "prisma:link": "rm -rf ./node_modules/.prisma && npm link @charmverse/core && npm run prisma:generate",
     "prisma:migrate": "cd node_modules/@charmverse/core && npm run prisma:migrate",
     "prisma:studio": "cd node_modules/@charmverse/core && npm run prisma:studio",
     "prisma:generate": "cd node_modules/@charmverse/core && npm run prisma:generate",
