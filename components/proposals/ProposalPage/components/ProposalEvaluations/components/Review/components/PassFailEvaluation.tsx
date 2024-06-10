@@ -192,7 +192,7 @@ export function PassFailEvaluation({
                   </Stack>
                   {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
                     <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                      <Stack flexDirection='row' gap={1.5}>
+                      <Stack flexDirection='row' gap={1.5} width='calc(100% - 50px)'>
                         {evaluationReview.declineReasons.map((reason) => (
                           <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
                         ))}
