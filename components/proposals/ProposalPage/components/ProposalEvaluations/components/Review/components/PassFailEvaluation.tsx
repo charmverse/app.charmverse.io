@@ -145,6 +145,7 @@ export function PassFailEvaluation({
               data-test='evaluation-reviewer-select'
               systemRoles={[allMembersSystemRole]}
               readOnly={true}
+              wrapColumn
               value={reviewerOptions}
               onChange={() => {}}
             />

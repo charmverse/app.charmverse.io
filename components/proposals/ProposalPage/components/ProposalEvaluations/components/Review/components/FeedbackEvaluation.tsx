@@ -57,6 +57,7 @@ export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep
         </FormLabel>
         <UserAndRoleSelect
           data-test='evaluation-reviewer-select'
+          wrapColumn
           systemRoles={[authorSystemRole, allMembersSystemRole]}
           readOnly={true}
           value={reviewerOptions}
