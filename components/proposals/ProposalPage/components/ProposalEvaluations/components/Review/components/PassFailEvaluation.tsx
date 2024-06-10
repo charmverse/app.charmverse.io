@@ -1,6 +1,7 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -199,7 +200,7 @@ export function PassFailEvaluation({
                       {evaluationReview.declineMessage && (
                         <Tooltip title='View additional comment'>
                           <div>
-                            <InfoOutlinedIcon
+                            <CommentOutlinedIcon
                               sx={{
                                 cursor: 'pointer'
                               }}
