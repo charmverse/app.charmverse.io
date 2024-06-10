@@ -79,11 +79,11 @@
     "connect": "dotenv -e .env.local -- npm run dev --workspace=apps/connect",
     "connect:build": "dotenv -e .env.local -- npx next build ./apps/connect",
     "connect:start:prod": "dotenv -e .env.local -- npm run start:prod --workspace=apps/connect",
-    "connect-api": "dotenv -e .env.local -- npm run start --workspace=apps/connect-api",
-    "connect-api:build": "dotenv -e .env.local -- npm run build --workspace=apps/connect-api",
-    "connect-api:start:prod": "dotenv -e .env.local -- npm run start:prod --workspace=apps/connect-api",
-    "connect-all": "npm run connect-api & npm run connect",
-    "connect-all:build": "npm run connect-api:build & npm run connect:build"
+    "connect:api": "dotenv -e .env.local -- npm run start --workspace=apps/connect-api",
+    "connect:api:build": "dotenv -e .env.local -- npm run build --workspace=apps/connect-api",
+    "connect:api:start:prod": "dotenv -e .env.local -- npm run start:prod --workspace=apps/connect-api",
+    "connect:all": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect\" \"npm run connect:api\"",
+    "connect:all:build": "concurrently --names \"connect,connect-api\" -c \"green,yellow\" \"npm run connect:build\" \"npm run connect:api:build\""
   },
   "lint-staged": {
     "*.{ts,tsx}": [
