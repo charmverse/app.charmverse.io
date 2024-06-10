@@ -11,3 +11,12 @@ export function formatMoney(amount: number, currency: FiatCurrency, userLocale: 
 
   return formatter.format(amount);
 }
+
+export function formatDecimal(amount: number, userLocale: string): string {
+  const formatter = new Intl.NumberFormat(userLocale, {
+    style: 'decimal',
+    notation: 'standard'
+  });
+
+  return formatter.format(amount);
+}

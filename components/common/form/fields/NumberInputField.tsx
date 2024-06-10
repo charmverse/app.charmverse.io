@@ -5,6 +5,7 @@ import { forwardRef } from 'react';
 
 import { FieldWrapper } from 'components/common/form/fields/FieldWrapper';
 import type { ControlFieldProps, FieldProps } from 'components/common/form/interfaces';
+import { formatDecimal } from 'lib/utils/formatting';
 
 type Props = ControlFieldProps &
   FieldProps & { disableArrows?: boolean; 'data-test'?: string } & Pick<
@@ -48,6 +49,7 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
     }: Props,
     ref
   ) => {
+    const isDisabled = textFieldProps.disabled;
     return (
       <FieldWrapper
         inputEndAdornment={inputEndAdornment}
@@ -66,8 +68,20 @@ export const NumberInputField = forwardRef<HTMLDivElement, Props>(
           placeholder={placeholder}
           disableArrows={disableArrows}
           ref={ref}
-          type='number'
+          type={isDisabled ? 'text' : 'number'}
           {...textFieldProps}
+          value={
+            isDisabled
+              ? formatDecimal(
+                  typeof textFieldProps.value === 'number'
+                    ? textFieldProps.value
+                    : textFieldProps.value
+                    ? parseFloat(textFieldProps.value.toString())
+                    : 0,
+                  window.navigator.language
+                )
+              : textFieldProps.value
+          }
         />
       </FieldWrapper>
     );
