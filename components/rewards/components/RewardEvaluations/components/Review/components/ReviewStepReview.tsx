@@ -46,7 +46,7 @@ export function ReviewStepReview({
             Reviewers
           </Typography>
         </FormLabel>
-        <UserAndRoleSelect readOnly={true} value={reviewerOptions} onChange={() => {}} />
+        <UserAndRoleSelect readOnly={true} value={reviewerOptions} wrapColumn onChange={() => {}} />
       </Box>
       {application && !hideReviewResult && (
         <>
