@@ -8,6 +8,46 @@ import { createDraftProposal } from 'lib/proposals/createDraftProposal';
 const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
 
 async function search() {
+  const verifiedUser = await prisma.verifiedEmail.findUniqueOrThrow({
+    where: {
+      email: 'alex.poon@charmverse.io'
+    },
+    include: {
+      user: true
+    }
+  });
+  const googleUser = await prisma.googleAccount.findUniqueOrThrow({
+    where: {
+      email: 'alex.poon@charmverse.io'
+    }
+  });
+  console.log('verified', verifiedUser.user.createdAt);
+  console.log('google', googleUser.userId);
+  // const reviewers = await prisma.proposalReviewer.updateMany({
+  //   where: {
+  //     proposal: { spaceId },
+  //     userId: verifiedUser.userId
+  //   },
+  //   data: {
+  //     userId: googleUser.userId
+  //   }
+  // });
+  // const spaceRole = await prisma.spaceRole.deleteMany({
+  //   where: {
+  //     spaceId,
+  //     userId: verifiedUser.userId
+  //   }
+  // });
+  // const appealreviewers = await prisma.proposalAppealReviewer.updateMany({
+  //   where: {
+  //     proposal: { spaceId },
+  //     userId: verifiedUser.userId
+  //   },
+  //   data: {
+  //     userId: googleUser.userId
+  //   }
+  // });
+  // console.log(spaceRole, reviewers, appealreviewers);
   // console.log(
   //   await prisma.page.delete({
   //     where: {
@@ -22,70 +62,19 @@ async function search() {
   //     }
   //   })
   // );
-  const proposal = await prisma.proposal.findUniqueOrThrow({
-    where: {
-      id: 'a8ac2799-5c79-45f7-9527-a1d52d717625'
-    },
-    include: {
-      form: {
-        include: {
-          formFields: true
-        }
-      }
-    }
-  });
-  console.log(proposal.form.formFields);
-  // console.log(
-  //   await prisma.page.deleteMany({
-  //     where: {
-  //       id: {
-  //         in: proposal.map((p) => p.id)
+  // const proposal = await prisma.proposal.findUniqueOrThrow({
+  //   where: {
+  //     id: 'a8ac2799-5c79-45f7-9527-a1d52d717625'
+  //   },
+  //   include: {
+  //     form: {
+  //       include: {
+  //         formFields: true
   //       }
   //     }
-  //   })
-  // );
-  // console.log(
-  //   await prisma.proposal.deleteMany({
-  //     where: {
-  //       id: {
-  //         in: proposal.map((p) => p.id)
-  //       }
-  //     }
-  //   })
-  // );
-  // console.log(proposal.map((p) => p.title + ' ' + p.proposal?.status));
-  // const { page } = await createDraftProposal({
-  //   createdBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
-  //   spaceId: 'f3ddde2e-17e9-42b1-803d-0c72880e4669',
-  //   contentType: 'free_form',
-  //   pageType: 'proposal_template'
-  // });
-  // await prisma.page.update({
-  //   where: {
-  //     id: page.id
-  //   },
-  //   data: {
-  //     createdAt: '2024-05-29T20:32:49.069Z',
-  //     createdBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
-  //     updatedAt: '2024-06-04T20:49:20.807Z',
-  //     updatedBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835',
-  //     title: 'Retro Funding 4 Review',
-  //     path: 'retro-funding-4-review-9411434043106064',
-  //     spaceId: 'f3ddde2e-17e9-42b1-803d-0c72880e4669'
   //   }
   // });
-  // await prisma.proposal.update({
-  //   where: {
-  //     id: page.id
-  //   },
-  //   data: {
-  //     formId: '1e777ef4-06d8-49f8-9986-321f6b29cd0a',
-  //     workflowId: 'f70825f7-d24d-4657-9222-9ac3952de7a0',
-  //     fields: { properties: {}, enableRewards: true, pendingRewards: [] },
-  //     status: 'published'
-  //   }
-  // });
-  // console.log('template id', page.id);
+  // console.log(proposal.form.formFields);
 }
 
 search().then(() => console.log('Done'));
