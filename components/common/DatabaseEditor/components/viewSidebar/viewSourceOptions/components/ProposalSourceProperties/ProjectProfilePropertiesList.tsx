@@ -33,12 +33,9 @@ export function ProjectProfilePropertiesList({
           setSelectedProperties(
             isAllProjectPropertiesSelected
               ? {
+                  ...selectedProperties,
                   projectMember: [],
-                  project: [],
-                  defaults: [],
-                  formFields: [],
-                  rubricEvaluations: [],
-                  customProperties: []
+                  project: []
                 }
               : {
                   ...selectedProperties,
