@@ -89,32 +89,46 @@ describe('filterBoardProperties', () => {
   });
 
   it('Should filter out custom properties that are not selected', () => {
-    const customPropertyId = v4();
+    const customProperty1Id = v4();
+    const customProperty3Id = v4();
     const properties = filterBoardProperties({
       boardProperties: [
         {
-          id: customPropertyId,
+          id: customProperty1Id,
           type: 'text',
           name: 'Custom property 1',
           options: []
         },
+        // Custom proposal source board properties
         {
           id: v4(),
           type: 'text',
           name: 'Custom property 2',
           options: []
+        },
+        {
+          id: customProperty3Id,
+          type: 'text',
+          name: 'Custom property 3',
+          options: []
         }
       ],
       proposalCustomProperties: [
         {
-          id: customPropertyId,
+          id: customProperty1Id,
           type: 'text',
           name: 'Custom property 1',
+          options: []
+        },
+        {
+          id: customProperty3Id,
+          type: 'text',
+          name: 'Custom property 3',
           options: []
         }
       ],
       selectedProperties: {
-        customProperties: [customPropertyId],
+        customProperties: [customProperty1Id],
         defaults: [],
         formFields: [],
         project: [],
@@ -123,8 +137,11 @@ describe('filterBoardProperties', () => {
       }
     });
 
-    expect(properties.length).toBe(1);
-    expect(properties[0].name).toBe('Custom property 1');
+    expect(properties.length).toBe(2);
+    const customProperty1 = properties.find((p) => p.id === customProperty1Id);
+    const customProperty2 = properties.find((p) => p.name === 'Custom property 2');
+    expect(customProperty1).toBeTruthy();
+    expect(customProperty2).toBeTruthy();
   });
 
   it('Should filter out default properties that are not selected', () => {
@@ -138,8 +155,8 @@ describe('filterBoardProperties', () => {
         },
         {
           id: v4(),
-          type: 'text',
-          name: 'Default property 2',
+          type: 'proposalStep',
+          name: 'Proposal step',
           options: []
         }
       ],
