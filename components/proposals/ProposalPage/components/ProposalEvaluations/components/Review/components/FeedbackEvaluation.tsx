@@ -59,8 +59,7 @@ export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep
           data-test='evaluation-reviewer-select'
           wrapColumn
           systemRoles={[authorSystemRole, allMembersSystemRole]}
-          readOnly={true}
-          wrapColumn
+          readOnly
           value={reviewerOptions}
           onChange={() => {}}
         />
