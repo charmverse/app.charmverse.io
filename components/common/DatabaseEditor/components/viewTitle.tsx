@@ -138,6 +138,7 @@ function ViewTitle(props: ViewTitleProps) {
       {board.fields.showDescription && (
         <div className='description'>
           <CharmEditor
+            key={board.id}
             disablePageSpecificFeatures
             isContentControlled
             disableRowHandles
