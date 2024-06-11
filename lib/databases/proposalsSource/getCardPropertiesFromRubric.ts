@@ -22,25 +22,45 @@ export function getCardPropertiesFromRubric({
     criteria: rubricCriteria.filter((c) => c.id !== step.id)
   });
 
-  const rubricStepScore: Record<string, number> = {};
+  const rubricStepScore: Record<
+    string,
+    {
+      total: number;
+      count: number;
+    }
+  > = {};
 
   rubricCriteria.forEach((criteria) => {
-    const totalScore = rubricAnswers
-      .filter((a) => a.rubricCriteriaId === criteria.id)
-      .reduce((acc, answer) => {
-        if (answer.response.score) {
-          acc += answer.response.score;
-        }
-        return acc;
-      }, 0);
+    const filteredRubricAnswers = rubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
 
-    rubricStepScore[criteria.title] = (rubricStepScore[criteria.title] ?? 0) + totalScore;
+    const totalScore = filteredRubricAnswers.reduce((acc, answer) => {
+      if (answer.response.score) {
+        acc += answer.response.score;
+      }
+      return acc;
+    }, 0);
+
+    if (rubricStepScore[criteria.title]) {
+      rubricStepScore[criteria.title].total += totalScore;
+      rubricStepScore[criteria.title].count += filteredRubricAnswers.length;
+    } else {
+      rubricStepScore[criteria.title] = {
+        total: totalScore,
+        count: filteredRubricAnswers.length
+      };
+    }
   });
 
   templates.forEach((template) => {
     if (template.type === 'proposalRubricCriteriaTotal' && template.criteriaTitle) {
       properties[template.id] =
-        ((properties[template.id] as number) ?? 0) + (rubricStepScore[template.criteriaTitle] ?? 0);
+        ((properties[template.id] as number) ?? 0) + (rubricStepScore[template.criteriaTitle]?.total ?? 0);
+    } else if (template.type === 'proposalRubricCriteriaAverage' && template.criteriaTitle) {
+      properties[template.id] =
+        ((properties[template.id] as number) ?? 0) +
+        (rubricStepScore[template.criteriaTitle]
+          ? rubricStepScore[template.criteriaTitle].total / rubricStepScore[template.criteriaTitle].count
+          : 0);
     }
   });
 

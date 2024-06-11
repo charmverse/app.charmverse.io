@@ -86,7 +86,19 @@ describe('getBoardProperties', () => {
     const rubricCriteria21Property = properties.find(
       (r) => r.criteriaTitle === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaTotal'
     );
+    const rubricCriteria1AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaAverage'
+    );
+    const rubricCriteria2AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaAverage'
+    );
+    const rubricCriteria21AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaAverage'
+    );
 
+    expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria2Property).toBeTruthy();
+    expect(rubricCriteria21Property).toBeTruthy();
     expect(rubricCriteria1Property).toBeTruthy();
     expect(rubricCriteria1Property?.tooltip).toEqual('Rubric Criteria 1 Description');
     expect(rubricCriteria2Property).toBeTruthy();

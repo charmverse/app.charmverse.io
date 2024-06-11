@@ -58,7 +58,8 @@ export function filterBoardProperties({
       p.type === 'proposalEvaluationAverage' ||
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
-      p.type === 'proposalRubricCriteriaTotal'
+      p.type === 'proposalRubricCriteriaTotal' ||
+      p.type === 'proposalRubricCriteriaAverage'
     ) {
       const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
       if (!rubricEvaluation) {
@@ -77,6 +78,10 @@ export function filterBoardProperties({
       }
 
       if (rubricEvaluation.criteriaTotal && p.type === 'proposalRubricCriteriaTotal') {
+        return true;
+      }
+
+      if (rubricEvaluation.criteriaAverage && p.type === 'proposalRubricCriteriaAverage') {
         return true;
       }
     }

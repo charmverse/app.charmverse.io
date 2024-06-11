@@ -139,7 +139,16 @@ export function RubricEvaluationPropertiesList({
                     criteriaTotal: !_rubricEvaluation?.criteriaTotal
                   });
                 }}
-                label='Criteria total (for each criteria)'
+                label='Criteria Total (for each criteria)'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.criteriaAverage}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    criteriaAverage: !_rubricEvaluation?.criteriaAverage
+                  });
+                }}
+                label='Criteria Average (for each criteria)'
               />
             </Stack>
           </Stack>
@@ -176,7 +185,10 @@ export function RubricEvaluationPropertiesReadonlyList({
             items.push('Step Reviewers');
           }
           if (rubricEvaluation.criteriaTotal) {
-            items.push('Criteria total');
+            items.push('Criteria Total');
+          }
+          if (rubricEvaluation.criteriaAverage) {
+            items.push('Criteria Average');
           }
 
           if (items.length === 0) {

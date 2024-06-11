@@ -30,6 +30,7 @@ export type SelectedProposalProperties = {
     total?: boolean;
     reviewers?: boolean;
     criteriaTotal?: boolean;
+    criteriaAverage?: boolean;
   }[];
   defaults: string[];
   formFields: string[];
