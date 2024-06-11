@@ -76,25 +76,17 @@ services:
     profiles:
       - stg-ceramic
 
-
   stg-connect:
     extends:
       service: defaults
-    command:
-      [
-        'sh',
-        '-c',
-        'npm run prisma:deploy && npm run connect:start:prod --keepAliveTimeout 70000'
-      ]
+    command: ['sh', '-c', 'npm run prisma:deploy && npm run connect:start:prod --keepAliveTimeout 70000']
     environment:
       - REACT_APP_APP_ENV=staging
       - CONNECT_API_URL=http://connect-api:3333
     profiles:
       - stg-connect
-      - stg-connect-api
     ports:
       - '4200:4200'
-
 
   stg-connect-api:
     extends:
@@ -105,9 +97,7 @@ services:
     ports:
       - '3333:3333'
     profiles:
-      - stg-connect-api
-
-
+      - stg-connect
 
   prd-ceramic:
     extends:
