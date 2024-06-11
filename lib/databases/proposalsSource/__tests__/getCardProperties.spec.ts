@@ -515,11 +515,13 @@ describe('getCardPropertiesFromProposals', () => {
 
     const cardFieldProperties = card.fields.properties;
 
-    expect(cardFieldProperties[proposalRubricCriteria1TotalProperty.id as string]).toStrictEqual(5 + 1 + 3);
-    expect(cardFieldProperties[proposalRubricCriteria2TotalProperty.id as string]).toStrictEqual(2 + 4);
+    expect(cardFieldProperties[proposalRubricCriteria1TotalProperty.id as string]).toStrictEqual(5 + 1 + 2);
+    expect(cardFieldProperties[proposalRubricCriteria1AverageProperty.id as string]).toStrictEqual(
+      Number(((5 + 1 + 2) / 3).toFixed(2))
+    );
+    expect(cardFieldProperties[proposalRubricCriteria2TotalProperty.id as string]).toStrictEqual(3 + 4);
     expect(cardFieldProperties[proposalRubricCriteria21TotalProperty.id as string]).toStrictEqual(3 + 5);
-    expect(cardFieldProperties[proposalRubricCriteria1AverageProperty.id as string]).toStrictEqual((5 + 1 + 3) / 3);
-    expect(cardFieldProperties[proposalRubricCriteria2AverageProperty.id as string]).toStrictEqual((2 + 4) / 2);
+    expect(cardFieldProperties[proposalRubricCriteria2AverageProperty.id as string]).toStrictEqual((3 + 4) / 2);
     expect(cardFieldProperties[proposalRubricCriteria21AverageProperty.id as string]).toStrictEqual((3 + 5) / 2);
   });
 

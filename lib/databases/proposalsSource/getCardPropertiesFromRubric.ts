@@ -1,28 +1,22 @@
 import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import type { AnswerData } from 'lib/proposals/rubric/aggregateResults';
 import { aggregateResults } from 'lib/proposals/rubric/aggregateResults';
+import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 
 import type { IPropertyTemplate } from '../board';
+
+import type { ProposalData } from './getCardProperties';
 
 export function getCardPropertiesFromRubric({
   properties,
   templates,
-  rubricAnswers,
-  rubricCriteria,
-  step
+  evaluations
 }: {
+  evaluations: ProposalData['proposal']['evaluations'];
   properties: Record<string, ProposalPropertyValue>;
   templates: IPropertyTemplate[];
-  rubricCriteria: { id: string; title: string }[];
-  rubricAnswers: AnswerData[];
-  step: { id: string; title: string };
 }): Record<string, ProposalPropertyValue> {
-  const { allScores, reviewersResults } = aggregateResults({
-    answers: rubricAnswers.filter((a) => a.evaluationId === step.id),
-    criteria: rubricCriteria.filter((c) => c.id !== step.id)
-  });
-
-  const rubricStepScore: Record<
+  const rubricCriteriaScore: Record<
     string,
     {
       total: number;
@@ -30,21 +24,22 @@ export function getCardPropertiesFromRubric({
     }
   > = {};
 
-  rubricCriteria.forEach((criteria) => {
-    const filteredRubricAnswers = rubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
+  const allRubricCriterias = evaluations.map((e) => e.rubricCriteria).flat();
+  const allRubricAnswers = evaluations
+    .map((e) => e.rubricAnswers)
+    .flat() as ProposalRubricCriteriaAnswerWithTypedResponse[];
 
+  allRubricCriterias.forEach((criteria) => {
+    const filteredRubricAnswers = allRubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
     const totalScore = filteredRubricAnswers.reduce((acc, answer) => {
-      if (answer.response.score) {
-        acc += answer.response.score;
-      }
-      return acc;
+      return answer.response.score ? acc + answer.response.score : acc;
     }, 0);
 
-    if (rubricStepScore[criteria.title]) {
-      rubricStepScore[criteria.title].total += totalScore;
-      rubricStepScore[criteria.title].count += filteredRubricAnswers.length;
+    if (rubricCriteriaScore[criteria.title]) {
+      rubricCriteriaScore[criteria.title].total += totalScore;
+      rubricCriteriaScore[criteria.title].count += filteredRubricAnswers.length;
     } else {
-      rubricStepScore[criteria.title] = {
+      rubricCriteriaScore[criteria.title] = {
         total: totalScore,
         count: filteredRubricAnswers.length
       };
@@ -52,40 +47,52 @@ export function getCardPropertiesFromRubric({
   });
 
   templates.forEach((template) => {
-    if (template.type === 'proposalRubricCriteriaTotal' && template.criteriaTitle) {
-      properties[template.id] =
-        ((properties[template.id] as number) ?? 0) + (rubricStepScore[template.criteriaTitle]?.total ?? 0);
-    } else if (template.type === 'proposalRubricCriteriaAverage' && template.criteriaTitle) {
-      properties[template.id] =
-        ((properties[template.id] as number) ?? 0) +
-        (rubricStepScore[template.criteriaTitle]
-          ? rubricStepScore[template.criteriaTitle].total / rubricStepScore[template.criteriaTitle].count
-          : 0);
+    if (template.criteriaTitle && rubricCriteriaScore[template.criteriaTitle]) {
+      if (template.type === 'proposalRubricCriteriaTotal') {
+        properties[template.id] =
+          ((properties[template.id] as number) ?? 0) + rubricCriteriaScore[template.criteriaTitle].total;
+      } else if (template.type === 'proposalRubricCriteriaAverage') {
+        properties[template.id] =
+          ((properties[template.id] as number) ?? 0) +
+          Number(
+            (
+              rubricCriteriaScore[template.criteriaTitle].total / rubricCriteriaScore[template.criteriaTitle].count
+            ).toFixed(2)
+          );
+      }
     }
   });
 
-  const uniqueReviewers = Object.keys(reviewersResults);
+  for (const evaluation of evaluations) {
+    const { rubricAnswers, rubricCriteria } = evaluation;
+    const { allScores, reviewersResults } = aggregateResults({
+      answers: rubricAnswers.filter((a) => a.evaluationId === evaluation.id) as unknown as AnswerData[],
+      criteria: rubricCriteria.filter((c) => c.id !== evaluation.id)
+    });
 
-  const proposalEvaluatedByProp = templates.find(
-    (p) => p.type === 'proposalEvaluatedBy' && p.evaluationTitle === step.title
-  );
-  const proposalEvaluationTotalProp = templates.find(
-    (p) => p.type === 'proposalEvaluationTotal' && p.evaluationTitle === step.title
-  );
-  const proposalEvaluationAverageProp = templates.find(
-    (p) => p.type === 'proposalEvaluationAverage' && p.evaluationTitle === step.title
-  );
+    const uniqueReviewers = Object.keys(reviewersResults);
 
-  if (proposalEvaluatedByProp) {
-    properties[proposalEvaluatedByProp.id] = uniqueReviewers;
-  }
+    const proposalEvaluatedByProp = templates.find(
+      (p) => p.type === 'proposalEvaluatedBy' && p.evaluationTitle === evaluation.title
+    );
+    const proposalEvaluationTotalProp = templates.find(
+      (p) => p.type === 'proposalEvaluationTotal' && p.evaluationTitle === evaluation.title
+    );
+    const proposalEvaluationAverageProp = templates.find(
+      (p) => p.type === 'proposalEvaluationAverage' && p.evaluationTitle === evaluation.title
+    );
 
-  if (proposalEvaluationTotalProp) {
-    properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
-  }
+    if (proposalEvaluatedByProp) {
+      properties[proposalEvaluatedByProp.id] = uniqueReviewers;
+    }
 
-  if (proposalEvaluationAverageProp) {
-    properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    if (proposalEvaluationTotalProp) {
+      properties[proposalEvaluationTotalProp.id] = allScores.sum ?? '';
+    }
+
+    if (proposalEvaluationAverageProp) {
+      properties[proposalEvaluationAverageProp.id] = allScores.average ?? '';
+    }
   }
 
   return properties;
