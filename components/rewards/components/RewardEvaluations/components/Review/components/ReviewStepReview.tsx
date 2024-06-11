@@ -1,5 +1,6 @@
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
 import { Box, Card, FormLabel, Stack, Typography } from '@mui/material';
+import { useMemo } from 'react';
 
 import { useGetRewardPermissions } from 'charmClient/hooks/rewards';
 import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
@@ -7,7 +8,7 @@ import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/p
 import { AcceptOrRejectButtons } from 'components/rewards/components/RewardApplicationPage/components/AcceptOrRejectButtons';
 import { useApplication } from 'components/rewards/hooks/useApplication';
 import type { RewardEvaluation } from 'lib/rewards/getRewardWorkflows';
-import type { ApplicationWithTransactions } from 'lib/rewards/interfaces';
+import type { RewardReviewer, ApplicationWithTransactions } from 'lib/rewards/interfaces';
 
 export function ReviewStepReview({
   reviewers,
@@ -17,7 +18,7 @@ export function ReviewStepReview({
   hideReviewResult
 }: {
   evaluation: RewardEvaluation;
-  reviewers: SelectOption[];
+  reviewers: RewardReviewer[];
   application?: ApplicationWithTransactions;
   rewardId: string;
   hideReviewResult?: boolean;
@@ -28,6 +29,15 @@ export function ReviewStepReview({
     applicationId: application?.id ?? ''
   });
 
+  const reviewerOptions: SelectOption[] = useMemo(
+    () =>
+      reviewers.map((reviewer) => ({
+        group: reviewer.roleId ? 'role' : 'user',
+        id: (reviewer.roleId ?? reviewer.userId) as string
+      })),
+    [reviewers]
+  );
+
   return (
     <Stack>
       <Box>
@@ -36,7 +46,7 @@ export function ReviewStepReview({
             Reviewers
           </Typography>
         </FormLabel>
-        <UserAndRoleSelect readOnly={true} value={reviewers} onChange={() => {}} />
+        <UserAndRoleSelect readOnly={true} value={reviewerOptions} wrapColumn onChange={() => {}} />
       </Box>
       {application && !hideReviewResult && (
         <>

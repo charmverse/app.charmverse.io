@@ -1,4 +1,3 @@
-import type { TargetPermissionGroup } from '@charmverse/core/permissions';
 import { prisma, type Bounty, type Role, type Space, type User } from '@charmverse/core/prisma-client';
 import { testUtilsMembers, testUtilsUser } from '@charmverse/core/test';
 import { v4 as uuid } from 'uuid';
@@ -43,10 +42,7 @@ describe('updateRewardSettings', () => {
     const submitterRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
     const reviewerRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
 
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
-      { group: 'role', id: reviewerRole.id },
-      { group: 'user', id: user.id }
-    ];
+    const reviewers = [{ roleId: reviewerRole.id }, { userId: user.id }];
 
     const credentialTemplateId = uuid();
 
@@ -74,10 +70,7 @@ describe('updateRewardSettings', () => {
     const submitterRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
     const reviewerRole = await testUtilsMembers.generateRole({ spaceId: space.id, createdBy: user.id });
 
-    const reviewers: TargetPermissionGroup<'role' | 'user'>[] = [
-      { group: 'role', id: reviewerRole.id },
-      { group: 'user', id: user.id }
-    ];
+    const reviewers = [{ roleId: reviewerRole.id }, { userId: user.id }];
 
     const updateContent: UpdateableRewardFields = {
       rewardAmount: 1000,

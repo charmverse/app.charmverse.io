@@ -7,12 +7,16 @@ export type OpenGraphProps = {
   canonicalUrl?: string;
 };
 
+const defaults = {
+  description: 'The Network for Onchain Communities. Manage grants. Connect with builders. Forge new ideas.',
+  title: 'CharmVerse',
+  image: 'https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png'
+};
+
 export function OpenGraphData({ description, title, image, canonicalUrl }: OpenGraphProps) {
-  const displayedDescription = description;
-
-  const displayedTitle = title || 'CharmVerse';
-
-  const displayedImage = image ?? 'https://app.charmverse.io/images/logo_black_lightgrey_opengraph.png';
+  const displayedDescription = description ?? defaults.description;
+  const displayedTitle = title || defaults.title;
+  const displayedImage = image ?? defaults.image;
 
   return (
     <>

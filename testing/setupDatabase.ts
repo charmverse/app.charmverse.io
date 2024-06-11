@@ -25,14 +25,15 @@ import type { Application, PagePermission, PageType } from '@charmverse/core/pri
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { DataSourceType } from 'lib/databases/board';
 import type { IViewType } from 'lib/databases/boardView';
+import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
 import { provisionApiKey } from 'lib/middleware/requireApiKey';
 import type { NotificationToggles } from 'lib/notifications/notificationToggles';
 import { createPage as createPageDb } from 'lib/pages/server/createPage';
 import { getPagePath } from 'lib/pages/utils';
-import type { BountyPermissions } from 'lib/permissions/bounties';
-import type { TargetPermissionGroup } from 'lib/permissions/interfaces';
+import type { TargetPermissionGroup, AssignablePermissionGroupsWithPublic } from 'lib/permissions/interfaces';
 import type { ProposalWithUsersAndRubric } from 'lib/proposals/interfaces';
 import { emptyDocument } from 'lib/prosemirror/constants';
 import { getRewardOrThrow } from 'lib/rewards/getReward';
@@ -302,6 +303,18 @@ export async function generateUserAndSpace({
     space: spaceRoles[0].space
   };
 }
+// TODO: can probably simplify the following functions
+
+// Groups that can be assigned to various reward actions
+type BountyReviewer = Extract<AssignablePermissionGroupsWithPublic, 'role' | 'user'>;
+type BountySubmitter = Extract<AssignablePermissionGroupsWithPublic, 'space' | 'role'>;
+
+// The set of all permissions for an individual reward
+export type BountyPermissions = {
+  reviewer: TargetPermissionGroup<BountyReviewer>[];
+  creator: TargetPermissionGroup[];
+  submitter: TargetPermissionGroup<BountySubmitter>[];
+};
 
 /**
  * @customPageId used for different reward and page ids to test edge cases where these ended up different
@@ -1019,8 +1032,10 @@ export async function generateBoard({
   linkedSourceId,
   customProps,
   deletedAt,
-  permissions
+  permissions,
+  selectedProperties
 }: {
+  selectedProperties?: SelectedProposalProperties;
   createdBy: string;
   spaceId: string;
   cardCount?: number;
@@ -1084,9 +1099,18 @@ export async function generateBoard({
     data: permissionCreateArgs as any
   });
 
-  return prisma
+  const proposalsDatabase = await prisma
     .$transaction([prisma.block.createMany(blockArgs), ...pageArgs.map((p) => createPageDb(p)), permissionsToCreate])
     .then((result) => result.filter((r) => (r as Page).boardId)[0] as Page);
+
+  if (selectedProperties) {
+    await updateBoardProperties({
+      boardId: proposalsDatabase.id,
+      selectedProperties
+    });
+  }
+
+  return proposalsDatabase;
 }
 
 export async function generateForumComment({

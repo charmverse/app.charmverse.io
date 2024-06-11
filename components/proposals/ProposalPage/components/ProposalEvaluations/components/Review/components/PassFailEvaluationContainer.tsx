@@ -1,5 +1,6 @@
-import PanToolIcon from '@mui/icons-material/PanTool';
-import { Card, Stack, Typography } from '@mui/material';
+import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
+import { Box, Card, FormLabel, Stack, TextField, Typography } from '@mui/material';
+import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useEffect, useState } from 'react';
 
 import {
@@ -10,6 +11,7 @@ import {
   useSubmitEvaluationReview
 } from 'charmClient/hooks/proposals';
 import { Button } from 'components/common/Button';
+import Modal from 'components/common/Modal';
 import MultiTabs from 'components/common/MultiTabs';
 import { useMembers } from 'hooks/useMembers';
 import { useSnackbar } from 'hooks/useSnackbar';
@@ -45,6 +47,7 @@ type Props = {
     | 'declinedAt'
     | 'isAppealReviewer'
     | 'appealReviews'
+    | 'appealReason'
   >;
   refreshProposal?: VoidFunction;
   confirmationMessage?: string;
@@ -61,6 +64,11 @@ export function PassFailEvaluationContainer({
   archived,
   authors
 }: Props) {
+  const appealReasonPopupState = usePopupState({
+    variant: 'dialog'
+  });
+  const [appealReason, setAppealReason] = useState<string | null>(null);
+
   const [evaluationTab, setEvaluationTab] = useState<number>(0);
   const { user } = useUser();
   const { membersRecord } = useMembers();
@@ -95,16 +103,17 @@ export function PassFailEvaluationContainer({
 
   const { showMessage } = useSnackbar();
   const actionLabels = getActionButtonLabels(evaluation);
-
-  async function onSubmitEvaluationReview(
-    declineReason: string | null,
-    result: NonNullable<PopulatedEvaluation['result']>
-  ) {
+  async function onSubmitEvaluationReview(params: {
+    declineReason: string | null;
+    result: NonNullable<PopulatedEvaluation['result']>;
+    declineMessage?: string;
+  }) {
     try {
       await submitEvaluationReview({
         evaluationId: evaluation.id,
-        result,
-        declineReasons: declineReason ? [declineReason] : []
+        result: params.result,
+        declineReasons: params.declineReason ? [params.declineReason] : [],
+        declineMessage: params.declineMessage
       });
       refreshProposal?.();
     } catch (error) {
@@ -112,14 +121,16 @@ export function PassFailEvaluationContainer({
     }
   }
 
-  async function onSubmitEvaluationAppealReview(
-    declineReason: string | null,
-    result: NonNullable<PopulatedEvaluation['result']>
-  ) {
+  async function onSubmitEvaluationAppealReview(params: {
+    result: NonNullable<PopulatedEvaluation['result']>;
+    declineReason: string | null;
+    declineMessage?: string;
+  }) {
     try {
       await submitEvaluationAppealReview({
-        result,
-        declineReasons: declineReason ? [declineReason] : []
+        result: params.result,
+        declineReasons: params.declineReason ? [params.declineReason] : [],
+        declineMessage: params.declineMessage
       });
       refreshProposal?.();
     } catch (error) {
@@ -137,8 +148,20 @@ export function PassFailEvaluationContainer({
     }).then(refreshProposal);
   }
 
+  function closeAppealReasonPopup() {
+    setAppealReason(null);
+    appealReasonPopupState.close();
+  }
+
   function onAppealProposalEvaluation() {
-    appealProposalEvaluation().then(refreshProposal);
+    if (!appealReason) {
+      return;
+    }
+    appealProposalEvaluation({
+      appealReason
+    })
+      .then(refreshProposal)
+      .finally(closeAppealReasonPopup);
   }
 
   const passFailProps: PassFailEvaluationProps = {
@@ -173,13 +196,23 @@ export function PassFailEvaluationContainer({
               <Stack>
                 <Card sx={{ mb: 2 }} variant='outlined'>
                   <Stack flexDirection='row' gap={1} alignItems='center' justifyContent='center' p={2}>
-                    <PanToolIcon color='warning' />
+                    <PanToolOutlinedIcon color='warning' />
                     <Typography variant='body2'>
                       Appealed by {evaluation.appealedBy ? membersRecord[evaluation.appealedBy]?.username : 'member'}{' '}
                       {getRelativeTimeInThePast(new Date(evaluation.appealedAt!.toString()))}
                     </Typography>
                   </Stack>
                 </Card>
+                {evaluation.appealReason && (
+                  <Box mb={2}>
+                    <FormLabel>
+                      <Typography sx={{ mb: 0.5 }} variant='subtitle1'>
+                        Appeal reason
+                      </Typography>
+                    </FormLabel>
+                    <Typography>{evaluation.appealReason}</Typography>
+                  </Box>
+                )}
                 <PassFailEvaluation
                   {...passFailProps}
                   isAppealProcess
@@ -205,19 +238,43 @@ export function PassFailEvaluationContainer({
     <>
       <PassFailEvaluation {...passFailProps} />
       {canAppeal ? (
-        <Stack width='100%' direction='row' justifyContent='flex-end'>
-          <Button
-            sx={{
-              width: 'fit-content',
-              my: 2
-            }}
-            data-test='evaluation-appeal-button'
-            onClick={onAppealProposalEvaluation}
-            loading={isAppealingProposalEvaluation}
-          >
-            Appeal
-          </Button>
-        </Stack>
+        <>
+          <Stack width='100%' direction='row' justifyContent='flex-end'>
+            <Button
+              sx={{
+                width: 'fit-content',
+                my: 2
+              }}
+              data-test='evaluation-appeal-button'
+              onClick={appealReasonPopupState.open}
+              loading={isAppealingProposalEvaluation}
+            >
+              Appeal
+            </Button>
+          </Stack>
+          <Modal open={appealReasonPopupState.isOpen} onClose={closeAppealReasonPopup} title='Reason for Appeal'>
+            <Stack gap={1}>
+              <TextField
+                fullWidth
+                data-test='appeal-reason-input'
+                placeholder='Enter your reason for appealing'
+                required
+                value={appealReason ?? ''}
+                onChange={(e) => setAppealReason(e.target.value)}
+              />
+              <Button
+                sx={{
+                  width: 'fit-content'
+                }}
+                data-test='appeal-reason-submit-button'
+                disabled={!appealReason}
+                onClick={onAppealProposalEvaluation}
+              >
+                Submit
+              </Button>
+            </Stack>
+          </Modal>
+        </>
       ) : null}
     </>
   );

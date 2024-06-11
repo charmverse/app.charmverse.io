@@ -39,7 +39,7 @@ export async function loginWithGoogle({
       throw new InvalidInputError(`Email required to complete signup`);
     }
 
-    const [matchedUser, verifiedEmail] = await Promise.all([
+    const [matchedUser, verifiedEmail, userWithNotificationEmail] = await Promise.all([
       prisma.user.findFirst({
         where: {
           googleAccounts: {
@@ -59,6 +59,12 @@ export async function loginWithGoogle({
             include: sessionUserRelations
           }
         }
+      }),
+      prisma.user.findFirst({
+        where: {
+          email
+        },
+        include: sessionUserRelations
       })
     ]);
 
@@ -78,6 +84,16 @@ export async function loginWithGoogle({
         }
       });
       user = verifiedEmail.user;
+    } else if (!matchedUser && userWithNotificationEmail) {
+      await prisma.googleAccount.create({
+        data: {
+          avatarUrl,
+          email,
+          name: displayName,
+          user: { connect: { id: userWithNotificationEmail.id } }
+        }
+      });
+      user = userWithNotificationEmail;
     } else if (!matchedUser) {
       user = await prisma.user.create({
         data: {

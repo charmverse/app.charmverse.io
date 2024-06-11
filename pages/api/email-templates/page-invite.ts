@@ -2,6 +2,7 @@ import nc from 'next-connect';
 
 import * as emails from 'lib/mailer/emails/emails';
 import { onError, onNoMatch } from 'lib/middleware';
+import { blueColor } from 'theme/colors';
 
 const handler = nc({
   onError,
@@ -14,7 +15,11 @@ const templates = {
       guestEmail: 'matt.blockchain',
       invitingUserName: 'momakes.blockchain',
       pageTitle: 'Acme Inc proposal',
-      pageId: '12344553'
+      pageId: '12344553',
+      emailBranding: {
+        artwork: '',
+        color: blueColor
+      }
     });
   }
 };

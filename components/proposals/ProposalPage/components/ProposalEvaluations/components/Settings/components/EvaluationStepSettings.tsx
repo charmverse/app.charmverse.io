@@ -59,15 +59,6 @@ export function EvaluationStepSettings({
   const readOnlyVoteSettings = readOnly || (!isAdmin && !!evaluationTemplate?.voteSettings);
   const readOnlyRequireReviews =
     isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.requiredReviews) || !!evaluation.result;
-  const readOnlyAppealRequiredReviews =
-    isPublishedProposal || readOnly || (!isAdmin && !!evaluationTemplate?.appealRequiredReviews) || !!evaluation.result;
-  const readOnlyAppealable =
-    isPublishedProposal ||
-    readOnly ||
-    (!isAdmin && evaluationTemplate?.appealable !== undefined) ||
-    !!evaluation.result;
-  const readOnlyFinalStep =
-    isPublishedProposal || readOnly || (!isAdmin && evaluationTemplate?.finalStep !== undefined) || !!evaluation.result;
 
   const reviewerOptions = evaluation.reviewers.map((reviewer) => ({
     group: reviewer.roleId ? 'role' : reviewer.userId ? 'user' : 'system_role',

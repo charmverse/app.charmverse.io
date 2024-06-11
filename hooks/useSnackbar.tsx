@@ -1,6 +1,6 @@
 import type { AlertColor, SnackbarOrigin, SnackbarProps } from '@mui/material';
 import type { Dispatch, ReactNode, SetStateAction } from 'react';
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext, useCallback, useMemo, useState } from 'react';
 
 type IContext = {
   isOpen: boolean;
@@ -54,12 +54,15 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
     resetState();
   };
 
-  function showMessage(msg: ReactNode, newSeverity?: AlertColor) {
-    newSeverity = newSeverity ?? 'info';
-    setMessage(msg);
-    setSeverity(newSeverity);
-    setIsOpen(true);
-  }
+  const showMessage = useCallback(
+    (msg: ReactNode, newSeverity?: AlertColor) => {
+      newSeverity = newSeverity ?? 'info';
+      setMessage(msg);
+      setSeverity(newSeverity);
+      setIsOpen(true);
+    },
+    [setIsOpen, setMessage, setSeverity]
+  );
 
   // error can be a string or instance of Error
   function showError(error: any, defaultMessage?: string) {

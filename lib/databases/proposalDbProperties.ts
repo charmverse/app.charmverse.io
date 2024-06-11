@@ -86,6 +86,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalEvaluationTotal'
   }),
+  proposalRubricCriteriaTotal: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Total',
+    options: [],
+    type: 'proposalRubricCriteriaTotal'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',
@@ -149,3 +155,15 @@ export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, st
   fail: 'Failed',
   pass: 'Passed'
 };
+
+export const defaultProposalProperties = [
+  proposalDbProperties.proposalReviewerNotes(),
+  proposalDbProperties.proposalStatus(),
+  proposalDbProperties.proposalStep(),
+  proposalDbProperties.proposalUrl(),
+  proposalDbProperties.proposalAuthor(),
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalEvaluationType()
+];
+
+export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

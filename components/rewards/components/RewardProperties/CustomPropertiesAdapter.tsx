@@ -37,6 +37,7 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
       reward,
       rewardPage,
       spaceId: space.id,
+      spaceDomain: space.domain,
       members: membersRecord
     });
 

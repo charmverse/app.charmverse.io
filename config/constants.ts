@@ -65,3 +65,5 @@ export const docusignOauthBaseUri = process.env.DOCUSIGN_OAUTH_BASE_URI as strin
 
 // export const docusignBaseUri = process.env.DOCUSIGN_BASE_URI as string;
 // export const docusignApiKey = process.env.DOCUSIGN_API_KEY as string;
+// This is a Personal Access Token for the Github API, generated within an individual developer account
+export const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN as string;

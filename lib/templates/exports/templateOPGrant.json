@@ -17007,7 +17007,6 @@
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
@@ -17131,7 +17130,6 @@
                     "2711e75f-ca53-4ca9-99a1-86874cb3cdab"
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": ["__title", "432d6b75-2446-49f0-acde-8b7129c695e3"]
@@ -17251,7 +17249,6 @@
                     "a3eba456-28d2-4b4d-93a9-b09c985d3b64"
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": ["432d6b75-2446-49f0-acde-8b7129c695e3"]
@@ -17739,7 +17736,6 @@
                     ""
                   ],
                   "defaultTemplateId": "",
-                  "collapsedOptionIds": [],
                   "columnCalculations": {},
                   "kanbanCalculations": {},
                   "visiblePropertyIds": [
@@ -18423,7 +18419,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [
@@ -18673,7 +18668,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [
@@ -19097,7 +19091,6 @@
                       "hiddenOptionIds": [],
                       "visibleOptionIds": [],
                       "defaultTemplateId": "",
-                      "collapsedOptionIds": [],
                       "columnCalculations": {},
                       "kanbanCalculations": {},
                       "visiblePropertyIds": [

@@ -1,12 +1,15 @@
+import type { ProposalEvaluationType } from '@charmverse/core/prisma-client';
 import { v4 as uuid } from 'uuid';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import type { SelectOptionType } from 'components/common/form/fields/Select/interfaces';
 import type { IPropertyTemplate } from 'lib/databases/board';
 import { proposalDbProperties } from 'lib/databases/proposalDbProperties';
 import type { FormFieldInput } from 'lib/forms/interfaces';
-import { getFieldConfig, projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
-import type { ProjectAndMembersFieldConfig } from 'lib/projects/formField';
+import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
 import type { PageContent } from 'lib/prosemirror/interfaces';
+
+import { filterBoardProperties } from './filterBoardProperties';
 
 // Note: maybe we should instead hav ea whitelist of form field answers that we support?
 export const excludedFieldTypes = ['project_profile', 'label'];
@@ -14,20 +17,38 @@ export const excludedFieldTypes = ['project_profile', 'label'];
 // define properties that will apply to all source fields
 const defaultOptions = { readOnly: true, readOnlyValues: true, options: [] };
 
+type EvaluationStep = {
+  title: string;
+  type: ProposalEvaluationType;
+  rubricCriteria: {
+    title: string;
+    description?: string | null;
+  }[];
+};
+
 // apply proposal-related properties to the board
 export function getBoardProperties({
   currentCardProperties = [],
   formFields = [],
-  evaluationStepTitles = [],
+  evaluationSteps = [],
   proposalCustomProperties = [],
-  rubricStepTitles = []
+  selectedProperties
 }: {
-  rubricStepTitles?: string[];
+  selectedProperties?: SelectedProposalProperties;
   proposalCustomProperties?: IPropertyTemplate[];
-  evaluationStepTitles?: string[];
+  evaluationSteps?: EvaluationStep[];
   currentCardProperties?: IPropertyTemplate[];
   formFields?: FormFieldInput[];
 }) {
+  const evaluationStepTitles: Set<string> = new Set();
+  const rubricStepTitles: Set<string> = new Set();
+  evaluationSteps.forEach((e) => {
+    evaluationStepTitles.add(e.title);
+    if (e.type === 'rubric') {
+      rubricStepTitles.add(e.title);
+    }
+  });
+
   const boardProperties = [...currentCardProperties];
 
   // standard proposal properties
@@ -36,13 +57,19 @@ export function getBoardProperties({
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalStatus());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalUrl());
   applyToPropertiesByType(boardProperties, proposalDbProperties.proposalEvaluationType());
+  applyToPropertiesByType(boardProperties, {
+    ...proposalDbProperties.proposalReviewer(),
+    name: 'Proposal Reviewers'
+  });
   applyToPropertiesByType(
     boardProperties,
-    proposalDbProperties.proposalStep({ options: ['Draft', ...evaluationStepTitles, 'Rewards', 'Credentials'] })
+    proposalDbProperties.proposalStep({
+      options: ['Draft', ...Array.from(evaluationStepTitles), 'Rewards', 'Credentials']
+    })
   );
 
   // properties per each evaluation step
-  applyProposalEvaluationProperties(boardProperties, rubricStepTitles);
+  applyProposalEvaluationProperties(boardProperties, Array.from(rubricStepTitles));
 
   // custom properties from the original proposals container
   proposalCustomProperties.forEach((cardProp) => {
@@ -52,7 +79,66 @@ export function getBoardProperties({
   // properties related to form proposals
   applyFormFieldProperties(boardProperties, formFields);
 
-  return boardProperties;
+  // properties for each unique questions on rubric evaluation step
+  applyRubricEvaluationQuestionProperties(boardProperties, evaluationSteps);
+
+  // properties related to project profile
+  applyProjectProfileProperties(boardProperties);
+
+  boardProperties.forEach((property) => {
+    property.name = getPropertyName(property);
+  });
+
+  if (!selectedProperties) {
+    return boardProperties;
+  }
+
+  return filterBoardProperties({
+    boardProperties,
+    proposalCustomProperties,
+    selectedProperties
+  });
+}
+
+function applyRubricEvaluationQuestionProperties(
+  boardProperties: IPropertyTemplate[],
+  evaluationSteps: EvaluationStep[]
+) {
+  const rubricCriteriaEvaluationTitlesRecord: Record<
+    string,
+    {
+      evaluationTitle: string;
+      rubricCriteriaDescription: string;
+    }
+  > = {};
+  evaluationSteps.forEach((evaluationStep) => {
+    if (evaluationStep.type === 'rubric') {
+      evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
+        if (!rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title]) {
+          rubricCriteriaEvaluationTitlesRecord[rubricCriteria.title] = {
+            evaluationTitle: evaluationStep.title,
+            rubricCriteriaDescription: rubricCriteria.description || ''
+          };
+        }
+      });
+    }
+  });
+
+  Object.entries(rubricCriteriaEvaluationTitlesRecord).forEach(
+    ([rubricCriteriaTitle, { evaluationTitle, rubricCriteriaDescription }]) => {
+      applyToPropertiesByTypeAndName(boardProperties, {
+        id: uuid(),
+        type: 'proposalRubricCriteriaTotal',
+        name: `${evaluationTitle}: ${rubricCriteriaTitle}`,
+        tooltip: rubricCriteriaDescription,
+        readOnly: true,
+        readOnlyValues: true,
+        evaluationTitle,
+        criteriaTitle: rubricCriteriaTitle,
+        private: false
+      });
+    }
+  );
 }
 
 function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFields: FormFieldInput[]) {
@@ -85,10 +171,6 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
         }));
         break;
       }
-      case 'project_profile': {
-        applyProjectProfileProperties(boardProperties, formField.fieldConfig as ProjectAndMembersFieldConfig);
-        break;
-      }
       default: {
         if (!excludedFieldTypes.includes(formField.type)) {
           boardPropertyType = formField.type as IPropertyTemplate['type'];
@@ -114,32 +196,21 @@ function applyFormFieldProperties(boardProperties: IPropertyTemplate[], formFiel
 }
 
 // field config ref: lib/projects/constants.ts
-function applyProjectProfileProperties(
-  boardProperties: IPropertyTemplate[],
-  fieldConfig: ProjectAndMembersFieldConfig
-) {
+function applyProjectProfileProperties(boardProperties: IPropertyTemplate[]) {
   projectFieldProperties.forEach((field) => {
-    const config = getFieldConfig(fieldConfig[field.field]);
-    if (config.show) {
-      applyToPropertiesById(boardProperties, {
-        id: field.columnPropertyId,
-        name: field.columnTitle,
-        private: config.private,
-        type: 'text'
-      });
-    }
+    applyToPropertiesById(boardProperties, {
+      id: field.columnPropertyId,
+      name: field.columnTitle,
+      type: 'text'
+    });
   });
   projectMemberFieldProperties.forEach((field) => {
-    const config = getFieldConfig(fieldConfig[field.field]);
-    if (getFieldConfig(fieldConfig[field.field]).show) {
-      applyToPropertiesById(boardProperties, {
-        id: field.columnPropertyId,
-        name: field.columnTitle,
-        private: config.private,
-        type: 'multiSelect',
-        dynamicOptions: true
-      });
-    }
+    applyToPropertiesById(boardProperties, {
+      id: field.columnPropertyId,
+      name: field.columnTitle,
+      type: 'multiSelect',
+      dynamicOptions: true
+    });
   });
 }
 
@@ -148,17 +219,22 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluatedBy',
-      name: rubricStepTitle
+      name: rubricStepTitle,
+      evaluationTitle: rubricStepTitle
     });
+
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationTotal',
-      name: rubricStepTitle
+      name: rubricStepTitle,
+      evaluationTitle: rubricStepTitle
     });
+
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationAverage',
-      name: rubricStepTitle
+      name: rubricStepTitle,
+      evaluationTitle: rubricStepTitle
     });
   }
 }
@@ -195,7 +271,10 @@ function applyToPropertiesByTypeAndName(
   { id, ...fieldProperty }: PartialPropertyTemplate
 ) {
   const existingPropIndex = boardProperties.findIndex(
-    (p) => p.type === fieldProperty.type && p.name === fieldProperty.name
+    (p) =>
+      p.type === fieldProperty.type &&
+      p.evaluationTitle === fieldProperty.evaluationTitle &&
+      p.criteriaTitle === fieldProperty.criteriaTitle
   );
   if (existingPropIndex === -1) {
     boardProperties.push({ id, ...defaultOptions, ...fieldProperty });
@@ -222,12 +301,14 @@ function applyFormFieldToProperties(
   }
 }
 
-export function getPropertyName(property: IPropertyTemplate) {
+function getPropertyName(property: IPropertyTemplate) {
   return property.type === 'proposalEvaluatedBy'
-    ? `${property.name} (Evaluation reviewers)`
+    ? `${property.name} (Step reviewers)`
     : property.type === 'proposalEvaluationAverage'
-    ? `${property.name} (Evaluation average)`
+    ? `${property.name} (Step average)`
     : property.type === 'proposalEvaluationTotal'
-    ? `${property.name} (Evaluation total)`
-    : undefined;
+    ? `${property.name} (Step total)`
+    : property.type === 'proposalRubricCriteriaTotal'
+    ? `${property.name} (Criterial total)`
+    : property.name;
 }

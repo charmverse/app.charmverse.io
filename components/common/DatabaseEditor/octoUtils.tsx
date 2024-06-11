@@ -83,7 +83,9 @@ class OctoUtils {
       case 'proposalEvaluatedBy':
       case 'proposalAuthor':
       case 'proposalReviewer': {
-        const valueArray = Array.isArray(propertyValue) ? propertyValue : [propertyValue];
+        const valueArray = Array.isArray(propertyValue)
+          ? propertyValue.map((val) => (val as unknown as { userId: string }).userId || val)
+          : [propertyValue];
         displayValue = valueArray
           .map((value) => (typeof value === 'string' ? context?.users[value]?.username : null))
           .filter(isTruthy);

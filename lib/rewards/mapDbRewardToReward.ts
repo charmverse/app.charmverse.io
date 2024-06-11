@@ -19,13 +19,7 @@ export function mapDbRewardToReward(
 ): RewardWithUsers {
   const reviewers = reward.permissions
     .filter((p) => (p.roleId || p.userId) && p.permissionLevel === 'reviewer')
-    .map((p) => {
-      const group = p.roleId ? 'role' : 'user';
-      return {
-        group,
-        id: (group === 'role' ? p.roleId : p.userId) as string
-      } as RewardReviewer;
-    });
+    .map((p) => ({ roleId: p.roleId, userId: p.userId } as RewardReviewer));
 
   const allowedSubmitterRoles = reward.permissions.filter((p) => p.permissionLevel === 'submitter' && p.roleId);
   const assignedSubmitters = reward.permissions.filter((p) => p.permissionLevel === 'submitter' && p.userId);

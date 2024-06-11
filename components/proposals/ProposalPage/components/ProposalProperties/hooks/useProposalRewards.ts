@@ -9,9 +9,6 @@ import { useRewardTemplates } from 'components/rewards/hooks/useRewardTemplates'
 import type { ProposalPendingReward } from 'lib/proposals/interfaces';
 import { getRewardErrors } from 'lib/rewards/getRewardErrors';
 import type { RewardTemplate } from 'lib/rewards/getRewardTemplate';
-import { getRewardType } from 'lib/rewards/getRewardType';
-import type { RewardReviewer } from 'lib/rewards/interfaces';
-import { isTruthy } from 'lib/utils/types';
 
 export function useProposalRewards({
   isProposalTemplate,
@@ -45,18 +42,7 @@ export function useProposalRewards({
   }
 
   const rewardReviewers = useMemo(() => {
-    return uniqBy(
-      reviewers
-        .map((reviewer) =>
-          reviewer.roleId
-            ? { group: 'role', id: reviewer.roleId }
-            : reviewer.userId
-            ? { group: 'user', id: reviewer.userId }
-            : null
-        )
-        .filter(isTruthy) as RewardReviewer[],
-      'id'
-    );
+    return uniqBy(reviewers, (reviewer) => reviewer.userId || reviewer.roleId);
   }, [reviewers]);
 
   const newRewardErrors = getRewardErrors({

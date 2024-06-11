@@ -32,6 +32,7 @@ import { SpaceCredentialSettings } from './credentials/SpaceCredentialSettings';
 import { ImportSettings } from './import/ImportSettings';
 import { IntegrationSettings } from './integrations/IntegrationSettings';
 import { Invites } from './invites/Invites';
+import { NotificationSettings } from './notifications/NotificationSettings';
 import { ProjectsSettings } from './projects/ProjectsSettings';
 import { SpaceProposalSettings } from './proposals/SpaceProposalSettings';
 import { RoleSettings } from './roles/RoleSettings';
@@ -55,12 +56,13 @@ const spaceTabs: Record<SpaceSettingsTab['path'], typeof SpaceSettings> = {
   space: SpaceSettings,
   proposals: SpaceProposalSettings,
   credentials: SpaceCredentialSettings,
-  integrations: IntegrationSettings
+  integrations: IntegrationSettings,
+  notifications: NotificationSettings
 };
 
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
-  const spaceStyles = value === 'space' ? { p: 0 } : undefined;
+  const spaceStyles = value === 'space' || value === 'notifications' ? { p: 0 } : undefined;
 
   return (
     <Box

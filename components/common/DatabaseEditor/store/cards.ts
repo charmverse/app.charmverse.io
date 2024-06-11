@@ -197,7 +197,8 @@ export function sortCards(
           template.type === 'date' ||
           template.type === 'tokenAmount' ||
           template.type === 'proposalEvaluationAverage' ||
-          template.type === 'proposalEvaluationTotal'
+          template.type === 'proposalEvaluationTotal' ||
+          template.type === 'proposalRubricCriteriaTotal'
         ) {
           // Always put empty values at the bottom
           if (aValue && !bValue) {
@@ -227,8 +228,8 @@ export function sortCards(
         } else if (template.id === PROPOSAL_REVIEWERS_BLOCK_ID) {
           const value1 = (Array.isArray(aValue) ? aValue[0] : aValue) as unknown as Record<string, any>;
           const value2 = (Array.isArray(bValue) ? bValue[0] : bValue) as unknown as Record<string, any>;
-          aValue = typeof value1 === 'object' && 'id' in value1 ? members[value1.id]?.username || '' : '';
-          bValue = typeof value2 === 'object' && 'id' in value2 ? members[value2.id]?.username || '' : '';
+          aValue = typeof value1 === 'object' && 'userId' in value1 ? members[value1.userId]?.username || '' : '';
+          bValue = typeof value2 === 'object' && 'userId' in value2 ? members[value2.userId]?.username || '' : '';
           result = aValue.localeCompare(bValue);
         } else {
           // Text-based sort

@@ -59,7 +59,6 @@ export function useProjectForm(options: {
             !member.teamLead && selectedMemberIds?.includes(member.id)
         )
         .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-
       form.reset(
         convertToProjectValues({
           ...projectWithMembers,

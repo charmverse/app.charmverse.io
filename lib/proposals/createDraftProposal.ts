@@ -20,7 +20,7 @@ export type CreateDraftProposalInput = {
   createdBy: string;
   spaceId: string;
   contentType: ProposalContentType;
-  pageType?: Extract<PageType, 'proposal_template'>;
+  pageType?: Extract<PageType, 'proposal_template' | 'proposal'>;
   templateId?: string;
   sourcePageId?: string;
   sourcePostId?: string;
@@ -84,6 +84,7 @@ export async function createDraftProposal(input: CreateDraftProposalInput) {
   const evaluations: ProposalEvaluationInput[] =
     template?.proposal?.evaluations.map((evaluation) => ({
       ...evaluation,
+      notificationLabels: evaluation.notificationLabels as WorkflowEvaluationJson['notificationLabels'],
       actionLabels: evaluation.actionLabels as WorkflowEvaluationJson['actionLabels'],
       rubricCriteria: evaluation.rubricCriteria.map((criteria) => ({
         ...criteria,

@@ -70,6 +70,7 @@ export type PopulatedEvaluation = Omit<ProposalEvaluation, 'voteSettings' | 'act
   reviews?: ProposalEvaluationReview[];
   appealReviews?: ProposalEvaluationAppealReview[];
   actionLabels?: WorkflowEvaluationJson['actionLabels'];
+  notificationLabels?: WorkflowEvaluationJson['notificationLabels'];
   type: ConcealableEvaluationType;
   documentsToSign?: DocumentWithSigners[];
 };

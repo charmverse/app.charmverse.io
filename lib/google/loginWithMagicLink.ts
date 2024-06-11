@@ -26,7 +26,7 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
     throw new InvalidInputError(`No email found in verification result`);
   }
 
-  const [matchedUser, googleAccount] = await Promise.all([
+  const [matchedUser, googleAccount, notificationEmailUser] = await Promise.all([
     prisma.user.findFirst({
       where: {
         verifiedEmails: {
@@ -46,6 +46,12 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
           include: sessionUserRelations
         }
       }
+    }),
+    prisma.user.findFirst({
+      where: {
+        email: verificationResult.email
+      },
+      include: sessionUserRelations
     })
   ]);
 
@@ -63,6 +69,16 @@ export async function loginWithMagicLink({ magicLink }: MagicLinkLoginRequest): 
       }
     });
     user = googleAccount.user;
+  } else if (!user && notificationEmailUser) {
+    await prisma.verifiedEmail.create({
+      data: {
+        avatarUrl: magicLink.avatarUrl ?? verificationResult.picture ?? '',
+        email: verificationResult.email,
+        name: verificationResult.name || verificationResult.email,
+        user: { connect: { id: notificationEmailUser.id } }
+      }
+    });
+    user = notificationEmailUser;
   } else if (!user) {
     isNew = true;
     user = await prisma.user.create({

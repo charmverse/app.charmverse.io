@@ -108,8 +108,8 @@ export function ProposalRewardsTable({
   const cards = useMemo(
     () =>
       publishedRewards.length > 0
-        ? getCardsFromPublishedRewards(publishedRewards, pages)
-        : getCardsFromPendingRewards(pendingRewards || [], space?.id),
+        ? getCardsFromPublishedRewards(publishedRewards, pages, space?.domain)
+        : getCardsFromPendingRewards(pendingRewards || [], space?.id, space?.domain),
     [pendingRewards, space?.id, pages, publishedRewards]
   );
 
@@ -232,10 +232,15 @@ export function ProposalRewardsTable({
   );
 }
 
-function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spaceId?: string): CardWithRelations[] {
+function getCardsFromPendingRewards(
+  pendingRewards: ProposalPendingReward[],
+  spaceId: string = '',
+  spaceDomain: string = ''
+): CardWithRelations[] {
   return pendingRewards.map(({ reward, page, draftId }) => {
     return mapRewardToCard({
-      spaceId: spaceId || '',
+      spaceId,
+      spaceDomain,
       reward: {
         // applications: [], // dont pass in applications or the expanded arrow icons will appear in tableRow
         assignedSubmitters: [],
@@ -267,7 +272,11 @@ function getCardsFromPendingRewards(pendingRewards: ProposalPendingReward[], spa
   });
 }
 
-function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMap): CardWithRelations[] {
+function getCardsFromPublishedRewards(
+  rewards: RewardWithUsers[],
+  pages: PagesMap,
+  spaceDomain: string = ''
+): CardWithRelations[] {
   return (
     rewards
       // dont pass in applications or the expanded arrow icons will appear in tableRow
@@ -278,6 +287,7 @@ function getCardsFromPublishedRewards(rewards: RewardWithUsers[], pages: PagesMa
         }
         return mapRewardToCard({
           spaceId: page.spaceId,
+          spaceDomain,
           reward: {
             ...reward,
             fields: reward.fields as any

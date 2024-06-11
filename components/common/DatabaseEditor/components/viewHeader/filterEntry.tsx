@@ -22,6 +22,8 @@ import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { UserAndRoleSelect } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
+import type { SelectOption } from 'components/common/DatabaseEditor/components/properties/UserAndRoleSelect';
 import { DatePicker } from 'components/common/DatePicker';
 import UserDisplay from 'components/common/UserDisplay';
 import { useCurrentSpace } from 'hooks/useCurrentSpace';
@@ -32,10 +34,10 @@ import type { FilterClause, FilterCondition } from 'lib/databases/filterClause';
 import { propertyConfigs } from 'lib/databases/filterClause';
 import type { FilterGroup } from 'lib/databases/filterGroup';
 import { createFilterGroup } from 'lib/databases/filterGroup';
-import { getPropertyName } from 'lib/databases/getPropertyName';
 import { EVALUATION_STATUS_LABELS, PROPOSAL_STEP_LABELS } from 'lib/databases/proposalDbProperties';
 import { AUTHORS_BLOCK_ID, PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalEvaluationStatus, ProposalEvaluationStep } from 'lib/proposals/interfaces';
+import { REWARD_REVIEWERS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 import { focalboardColorsMap } from 'theme/colors';
 
 import { iconForPropertyType } from '../../widgets/iconForPropertyType';
@@ -181,7 +183,10 @@ function FilterPropertyValue({
     updatePropertyValueDebounced(currentFilter, newFilterValue);
   };
 
-  const propertyDataType = propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
+  const propertyDataType =
+    REWARD_REVIEWERS_BLOCK_ID === filter.propertyId
+      ? 'user_roles'
+      : propertyConfigs[propertyRecord[filter.propertyId].type].datatype;
 
   if (filter.condition === 'is_empty' || filter.condition === 'is_not_empty') {
     return null;
@@ -204,6 +209,15 @@ function FilterPropertyValue({
     );
   } else if (propertyDataType === 'boolean') {
     return <Checkbox checked={filter.values[0] === 'true'} onChange={updateBooleanValue} />;
+  } else if (propertyDataType === 'user_roles') {
+    return (
+      <UserAndRoleSelect
+        onChange={async (values) => {
+          updateMultiSelect(values.map((value) => value.id));
+        }}
+        value={filter.values}
+      />
+    );
   } else if (propertyDataType === 'multi_select') {
     if (isPropertyTypePerson) {
       return (
@@ -342,7 +356,7 @@ function FilterPropertyValue({
     return (
       <Select<string>
         displayEmpty
-        value={filter.values[0]}
+        value={filter.values[0] || ''}
         renderValue={(selected) => {
           const foundOption = property.options?.find((o) => o.id === selected);
           return foundOption ? (
@@ -369,7 +383,7 @@ function FilterPropertyValue({
         ) : (
           property.options.map((option) => {
             return (
-              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)}>
+              <MenuItem key={option.id} onClick={() => updateSelectValue(option.id)} value={option.id}>
                 <Chip
                   size='small'
                   label={
@@ -458,7 +472,7 @@ function FilterEntry(props: Props) {
                   sx={{ whiteSpace: 'nowrap', overflow: 'hidden' }}
                 >
                   {iconForPropertyType(template.type, { color: 'secondary' })}
-                  <EllipsisText fontSize='small'>{getPropertyName(template)}</EllipsisText>
+                  <EllipsisText fontSize='small'>{template.name}</EllipsisText>
                 </Stack>
               </Button>
               <Menu {...bindMenu(popupState)} sx={{ maxWidth: 350 }}>
@@ -483,7 +497,7 @@ function FilterEntry(props: Props) {
                     }}
                   >
                     <ListItemIcon>{iconForPropertyType(property.type)}</ListItemIcon>
-                    <EllipsisText fontSize='small'>{getPropertyName(property)}</EllipsisText>
+                    <EllipsisText fontSize='small'>{property.name}</EllipsisText>
                   </MenuItem>
                 ))}
               </Menu>

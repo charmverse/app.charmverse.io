@@ -1,6 +1,8 @@
 import arrayEquals from 'lodash/isEqual';
 import { v4 } from 'uuid';
 
+import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
+
 import type { PropertyType } from './board';
 
 export const BooleanDataTypeConditions = ['is', 'is_not'] as const;
@@ -26,7 +28,6 @@ export const NumberDataTypeConditions = [
   'is_empty',
   'is_not_empty'
 ] as const;
-
 export const DateDataTypeConditions = [
   'is',
   'is_not',
@@ -44,7 +45,7 @@ export const SelectDataTypeConditions = ['is', 'is_not', 'is_empty', 'is_not_emp
 
 export const MiscDataTypeConditions = ['is_empty', 'is_not_empty'] as const;
 
-export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi_select' | 'select' | 'misc';
+export type DataType = 'text' | 'number' | 'boolean' | 'date' | 'multi_select' | 'select' | 'misc' | 'user_roles';
 
 export type DataTypeFactory<DT extends DataType, DataTypeDataTypeConditions extends readonly string[]> = {
   datatype: DT;
@@ -58,6 +59,7 @@ export type DateDataTypeConfig = DataTypeFactory<'date', typeof DateDataTypeCond
 export type MultiSelectDataTypeConfig = DataTypeFactory<'multi_select', typeof MultiSelectDataTypeConditions>;
 export type SelectDataTypeConfig = DataTypeFactory<'select', typeof SelectDataTypeConditions>;
 export type MiscDataTypeConfig = DataTypeFactory<'misc', typeof MiscDataTypeConditions>;
+export type UserRolesDataTypeConfig = DataTypeFactory<'user_roles', typeof MultiSelectDataTypeConditions>;
 
 export type DataTypeConfigs =
   | BooleanDataTypeConfig
@@ -66,7 +68,8 @@ export type DataTypeConfigs =
   | DateDataTypeConfig
   | MultiSelectDataTypeConfig
   | SelectDataTypeConfig
-  | MiscDataTypeConfig;
+  | MiscDataTypeConfig
+  | UserRolesDataTypeConfig;
 
 // @ts-ignore
 export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
@@ -154,12 +157,16 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'number',
     conditions: NumberDataTypeConditions
   },
+  proposalRubricCriteriaTotal: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
   proposalAuthor: {
     datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions
   },
   proposalReviewer: {
-    datatype: 'multi_select',
+    datatype: 'user_roles',
     conditions: MultiSelectDataTypeConditions
   },
   proposalEvaluationType: {

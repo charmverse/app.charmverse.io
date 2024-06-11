@@ -4,7 +4,7 @@ import type { Application, Bounty, BountyStatus, Page, Transaction } from '@char
 import type { EASAttestationFromApi } from 'lib/credentials/external/getOnchainCredentials';
 import type { IssuableRewardApplicationCredentialContent } from 'lib/credentials/findIssuableRewardCredentials';
 
-export type RewardReviewer = TargetPermissionGroup<'role' | 'user'>;
+export type RewardReviewer = { roleId?: string | null; userId?: string | null };
 
 export type ApplicationMeta = Pick<
   Application,
