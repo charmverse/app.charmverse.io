@@ -8,10 +8,8 @@ import { mux } from './muxClient';
 
 const charmVerseDomains = ['*.charmverse.io', '*.charmverse.co'];
 
-const domainLimit = 100; // 100 is the maximum number of allowed domains from Mux
-
 // update referrers to include all custom subdomains
-export async function updateAllowedPlaybackDomains() {
+export async function updateAllowedPlaybackDomains({ limit }: { limit?: number }) {
   if (mux && playbackRestrictionId) {
     const spaces = await prisma.space.findMany({
       where: {
@@ -21,8 +19,9 @@ export async function updateAllowedPlaybackDomains() {
       }
     });
     const customDomains = spaces.map((space) => space.customDomain).filter(isTruthy);
+    const allDomains = charmVerseDomains.concat(customDomains);
     mux.video.playbackRestrictions.updateReferrer(playbackRestrictionId, {
-      allowed_domains: charmVerseDomains.concat(customDomains).slice(0, domainLimit)
+      allowed_domains: limit ? allDomains.slice(0, limit) : allDomains
     });
     log.info('Updated referrers for mux playback restriction', { customDomains });
   }
