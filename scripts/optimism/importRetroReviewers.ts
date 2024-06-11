@@ -2,9 +2,9 @@ import { prisma } from '@charmverse/core/prisma-client';
 
 import { parse } from 'csv-parse/sync';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
-import { uniq } from 'lodash';
+import { difference, uniq } from 'lodash';
 
-const reviewerData = getCsvData<ProposalRow>('./sampled_badgeholder_review.csv');
+const reviewerData = getCsvData<ProposalRow>('../optimism-data/sampled_badgeholder_review.csv');
 
 // production
 const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
@@ -171,6 +171,96 @@ async function populateProject(raw: OPProjectData, spaceRoles: { userId: string 
 //   // }
 // }
 
+function getReviewerEmails(): string[] {
+  return uniq(
+    reviewerData
+      .map((r) => {
+        return [
+          ...r['Rule Violation: Reviewers (2)'].split(','),
+          ...r['Full Review: Reviewers (5)'].split(','),
+          ...r['Full Review: Appeal Reviewers (5)'].split(',')
+        ];
+      })
+      .flat()
+      .map((str) => str.trim().toLowerCase())
+  );
+}
+
+async function assignRole(roleId = 'ae8c0881-10cd-465a-8435-ef69a5d2d040') {
+  const userEmails = getReviewerEmails();
+  const users = await prisma.user.findMany({
+    where: {
+      verifiedEmails: {
+        some: {
+          email: {
+            in: userEmails
+          }
+        }
+      }
+    },
+    include: {
+      spaceRoles: {
+        include: {
+          spaceRoleToRole: true
+        }
+      },
+      verifiedEmails: true
+    }
+  });
+  console.log('found', userEmails.length, 'emails');
+  console.log('found', users.length, 'users');
+  const members = users.filter((user) => user.spaceRoles.some((role) => role.spaceId === spaceId));
+  console.log('found', members.length, 'members');
+  console.log(
+    'missing member',
+    difference(
+      userEmails,
+      members.map((m) => m.verifiedEmails[0].email)
+    )
+  );
+  console.log(
+    'missing role',
+    users.filter((user) => !user.spaceRoles.some((role) => role.spaceRoleToRole.some((c) => c.roleId === roleId)))
+      .length
+  );
+
+  for (const user of users) {
+    const spaceRole = user.spaceRoles.find((role) => role.spaceId === spaceId);
+    if (spaceRole) {
+      const hasRole = spaceRole.spaceRoleToRole.some((c) => c.roleId === roleId);
+      if (!hasRole) {
+        console.log('assigning role to', user.verifiedEmails[0].email);
+        await prisma.spaceRoleToRole.create({
+          data: {
+            spaceRoleId: spaceRole.id,
+            roleId
+          }
+        });
+      }
+    }
+  }
+
+  // const role = await prisma.role.findUniqueOrThrow({
+  //   where: {
+  //     id: roleId
+  //   },
+  //   include: {
+  //     spaceRolesToRole: {
+  //       include: {
+  //         spaceRole: true
+  //       }
+  //     }
+  //   }
+  // });
+  // const reviewers = await prisma.proposalReviewer.findMany({
+  //   where: {
+  //     proposal: {
+  //       spaceId
+  //     }
+  //   }
+  // });
+}
+
 async function importReviewers() {
   // Note: file path is relative to CWD
   const _projects = await getProjectsFromFile('./applicants.json');
@@ -228,7 +318,7 @@ async function importReviewers() {
   console.log('Done!');
 }
 
-importReviewers().catch((e) => {
+assignRole().catch((e) => {
   console.error('Error crashed script', e);
   process.exit(1);
 });
