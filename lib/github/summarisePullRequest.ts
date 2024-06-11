@@ -54,7 +54,10 @@ export function baseSummarisePRPrompt({ files }: { files: string }) {
 
   Perform your analysis using the provided template. Focus on the overall changes.
 
+  If the main change is a README.md file, focus the summary on improving documentation.
+
   Be concise and summarise well. Limit use of adjectives and adverbs.
+
   `;
 }
 
