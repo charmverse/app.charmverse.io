@@ -9,7 +9,7 @@ import { mux } from './muxClient';
 const charmVerseDomains = ['*.charmverse.io', '*.charmverse.co'];
 
 // update referrers to include all custom subdomains
-export async function updateAllowedPlaybackDomains({ limit }: { limit?: number }) {
+export async function updateAllowedPlaybackDomains({ limit }: { limit?: number } = {}) {
   if (mux && playbackRestrictionId) {
     const spaces = await prisma.space.findMany({
       where: {
