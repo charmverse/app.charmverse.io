@@ -60,6 +60,7 @@ export function FeedbackEvaluation({ proposalId, evaluation, isCurrent, nextStep
           wrapColumn
           systemRoles={[authorSystemRole, allMembersSystemRole]}
           readOnly={true}
+          wrapColumn
           value={reviewerOptions}
           onChange={() => {}}
         />

@@ -234,6 +234,7 @@ function ProposalSourcePropertiesList({
   onApply: (selectedProperties: SelectedProposalProperties) => Promise<void>;
 }) {
   const [isApplying, setIsApplying] = useState(false);
+  const isSmallScreen = useSmallScreen();
 
   const noPropertiesSelected =
     selectedProperties.project.length === 0 &&
@@ -248,7 +249,7 @@ function ProposalSourcePropertiesList({
       <Stack
         sx={{
           overflow: 'auto',
-          height: '80vh'
+          height: isSmallScreen ? '95%' : '80vh'
         }}
       >
         <SectionName>Selected Properties</SectionName>
@@ -312,7 +313,7 @@ export function ProposalSourcePropertiesDialog({
     return (
       <Dialog fullWidth maxWidth='lg' fullScreen open onClose={onClose}>
         <Stack direction='row' height='100%'>
-          <Stack width='50%' gap={1}>
+          <Stack width='60%' gap={1}>
             <MultiTabs
               tabs={[
                 [
@@ -323,7 +324,7 @@ export function ProposalSourcePropertiesDialog({
                 ],
                 [
                   'Properties',
-                  <Stack key='properties' gap={1} height='90vh' overflow='auto'>
+                  <Stack key='properties' gap={1} height='90vh' overflow='auto' pr={1}>
                     <ProposalSourcePropertiesSelector
                       selectedGroup={selectedGroup}
                       selectedProperties={selectedProperties}
@@ -337,7 +338,7 @@ export function ProposalSourcePropertiesDialog({
           <Stack
             sx={{
               pt: 3,
-              width: '50%',
+              width: '40%',
               backgroundColor: (theme) => theme.palette.sidebar.background
             }}
           >
