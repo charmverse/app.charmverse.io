@@ -26,32 +26,26 @@ export function filterBoardProperties({
 
     const matchedProjectFieldProperty = projectFieldProperties.find((field) => field.columnPropertyId === p.id);
 
-    if (matchedProjectFieldProperty && selectedProjectProperties.includes(matchedProjectFieldProperty.field)) {
-      return true;
+    if (matchedProjectFieldProperty) {
+      return selectedProjectProperties.includes(matchedProjectFieldProperty.field);
     }
 
     const matchedProjectMemberFieldProperty = projectMemberFieldProperties.find(
       (field) => field.columnPropertyId === p.id
     );
 
-    if (
-      matchedProjectMemberFieldProperty &&
-      selectedProjectMemberProperties.includes(matchedProjectMemberFieldProperty.field)
-    ) {
-      return true;
+    if (matchedProjectMemberFieldProperty) {
+      return selectedProjectMemberProperties.includes(matchedProjectMemberFieldProperty.field);
     }
 
-    if (proposalCustomPropertyIds.includes(p.id) && selectedCustomProperties.includes(p.id)) {
-      return true;
+    if (proposalCustomPropertyIds.includes(p.id)) {
+      return selectedCustomProperties.includes(p.id);
     }
 
     const isDefaultProposalProperty = defaultProposalPropertyTypes.includes(p.type);
 
-    if (
-      isDefaultProposalProperty &&
-      selectedProperties.defaults.includes(p.type as SelectedProposalProperties['defaults'][number])
-    ) {
-      return true;
+    if (isDefaultProposalProperty) {
+      return selectedProperties.defaults.includes(p.type as SelectedProposalProperties['defaults'][number]);
     }
 
     if (
@@ -80,7 +74,7 @@ export function filterBoardProperties({
         return true;
       }
     }
-
-    return false;
+    // Custom proposal source board properties, so always show them
+    return true;
   });
 }
