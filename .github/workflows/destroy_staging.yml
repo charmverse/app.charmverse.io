@@ -10,8 +10,8 @@ concurrency:
 jobs:
   clean-up:
     if: |
-      (github.event.action == 'unlabeled' && (github.event.label.name == ':rocket: deploy' || github.event.label.name == 'deploy-ceramic' || github.event.label.name == 'deploy-connect')) ||
-      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, 'deploy-ceramic') || contains(github.event.pull_request.labels.*.name, 'deploy-connect')))
+      (github.event.action == 'unlabeled' && (github.event.label.name == ':rocket: deploy' || github.event.label.name == 'deploy-ceramic' || github.event.label.name == ':rocket: deploy-connect')) ||
+      (github.event.action == 'closed' && (contains(github.event.pull_request.labels.*.name, ':rocket: deploy') || contains(github.event.pull_request.labels.*.name, 'deploy-ceramic') || contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect')))
     runs-on: ubuntu-latest
     # wait until all deploys are complete to destroy the env
     concurrency: deploy-pr-app-${{ github.head_ref }}

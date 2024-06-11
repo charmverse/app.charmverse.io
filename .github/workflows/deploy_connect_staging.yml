@@ -13,8 +13,8 @@ concurrency:
 jobs:
   deploy:
     if: |
-      (github.event.action == 'labeled' && github.event.label.name == 'deploy-connect') ||
-      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'deploy-connect'))
+      (github.event.action == 'labeled' && github.event.label.name == ':rocket: deploy-connect') ||
+      (github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, ':rocket: deploy-connect'))
     runs-on: ubuntu-latest
     # prevent workflows running in parallel
     concurrency: deploy-pr-app-${{ github.head_ref }}
@@ -81,7 +81,6 @@ jobs:
                     .COMPOSE_PROJECT_NAME = "pr${{ github.event.number }}" |
                     .IMGTAG = "${{ github.run_id }}-${{ env.GITHUB_SHA_SHORT }}")
               ' .ebextensions_connect/00_env_vars.config
-
 
       - name: Parse compose profile to see if we need to enable datadog
         id: get_compose_profiles
