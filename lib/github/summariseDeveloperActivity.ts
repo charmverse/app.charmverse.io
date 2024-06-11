@@ -39,7 +39,9 @@ export async function summariseDeveloperActivity({
   const mostActiveRepo = pullRequests[0];
 
   // Apply business logic for additional filtering and only pull necessary prs
-  const filteredPullRequests = mostActiveRepo.pullRequests.filter((pr) => pr.additions + pr.deletions > 10);
+  const filteredPullRequests = mostActiveRepo.pullRequests
+    .filter((pr) => pr.additions + pr.deletions > 5)
+    .slice(0, limit);
 
   if (filteredPullRequests.length === 0) {
     throw new InvalidStateError('No pull requests for the given criteria');
