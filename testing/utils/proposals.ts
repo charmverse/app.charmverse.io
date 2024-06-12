@@ -13,6 +13,7 @@ import { testUtilsProposals } from '@charmverse/core/test';
 import { sortBy } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
+import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { prismaToBlock } from 'lib/databases/block';
 import type { Board } from 'lib/databases/board';
 import { updateBoardProperties } from 'lib/databases/proposalsSource/updateBoardProperties';
@@ -309,7 +310,15 @@ export async function generateProposalWorkflowWithEvaluations(options: {
   });
 }
 
-export async function generateProposalSourceDb({ createdBy, spaceId }: { createdBy: string; spaceId: string }) {
+export async function generateProposalSourceDb({
+  createdBy,
+  spaceId,
+  selectedProperties
+}: {
+  createdBy: string;
+  spaceId: string;
+  selectedProperties?: SelectedProposalProperties;
+}) {
   const database = await generateBoard({
     createdBy,
     spaceId,
@@ -319,7 +328,7 @@ export async function generateProposalSourceDb({ createdBy, spaceId }: { created
   });
 
   // sync board properties
-  const updatedBlock = await updateBoardProperties({ boardId: database.id });
+  const updatedBlock = await updateBoardProperties({ boardId: database.id, selectedProperties });
   const updatedBoard = prismaToBlock(updatedBlock) as Board;
   await updateViews({ board: updatedBoard });
   return updatedBoard;

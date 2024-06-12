@@ -2,5 +2,6 @@ import { updateAllowedPlaybackDomains } from 'lib/mux/updateAllowedPlaybackDomai
 
 // run this to manually refresh the allowed domains for video playback via mux
 (async () => {
-  await updateAllowedPlaybackDomains();
+  // Mux limits us to 100 domains
+  await updateAllowedPlaybackDomains({ limit: 100 });
 })();

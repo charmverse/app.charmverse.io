@@ -6,8 +6,7 @@ import nc from 'next-connect';
 
 import type { BlockWithDetails } from 'lib/databases/block';
 import { applyPageToBlock } from 'lib/databases/block';
-import type { Board, BoardFields } from 'lib/databases/board';
-import type { Card } from 'lib/databases/card';
+import type { BoardFields } from 'lib/databases/board';
 import { getPageByBlockId } from 'lib/databases/getPageByBlockId';
 import { applyPropertiesToCard } from 'lib/databases/proposalsSource/applyPropertiesToCards';
 import { getCardPropertiesFromProposal } from 'lib/databases/proposalsSource/getCardProperties';

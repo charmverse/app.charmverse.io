@@ -2,7 +2,8 @@ import type { ProposalRubricCriteriaAnswer } from '@charmverse/core/prisma-clien
 import styled from '@emotion/styled';
 import { DeleteOutlined as DeleteIcon, DragIndicator } from '@mui/icons-material';
 import { Box, Grid, IconButton, TextField, Tooltip, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { AddAPropertyButton } from 'components/common/DatabaseEditor/components/properties/AddAProperty';
 import { TextInput } from 'components/common/DatabaseEditor/components/properties/TextInput';
@@ -62,8 +63,13 @@ export const CriteriaRow = styled(Box)`
     color: var(--secondary-text);
   }
 `;
-export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value, onChange, answers }: Props) {
-  const [criteriaList, setCriteriaList] = useState<RangeProposalCriteria[]>(value);
+export function RubricCriteriaSettings({
+  readOnly,
+  showDeleteConfirmation,
+  value: criteriaList,
+  onChange,
+  answers
+}: Props) {
   const [rubricCriteriaIdToDelete, setRubricCriteriaIdToDelete] = useState<string | null>(null);
 
   function addCriteria() {
@@ -73,37 +79,45 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const lastCriteria = criteriaList[criteriaList.length - 1];
     const newCriteria = getNewCriteria(lastCriteria);
     const updatedList = [...criteriaList, newCriteria];
-    setCriteriaList(updatedList);
+    onChange(updatedList);
   }
-  // console.log('criteriaList', criteriaList, value);
+
   function deleteCriteria(id: string) {
     if (readOnly || !id) {
       return;
     }
     setRubricCriteriaIdToDelete(null);
     const updatedList = criteriaList.filter((c) => c.id !== id);
-    setCriteriaList(updatedList);
 
     onChange(updatedList);
   }
 
-  function setCriteriaProperty(id: string, updates: Partial<RangeProposalCriteria>) {
-    if (readOnly) {
-      return;
-    }
-    const criteria = criteriaList.find((c) => c.id === id);
-    if (criteria) {
-      Object.assign(criteria, updates);
-      setCriteriaList([...criteriaList]);
-      if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
-        onChange(criteriaList);
+  const setCriteriaProperty = useCallback(
+    (id: string, updates: Partial<RangeProposalCriteria>) => {
+      if (readOnly) {
+        return;
       }
-    }
-  }
+      const combinedCriteriaList = [...criteriaList];
+      const criteria = combinedCriteriaList.find((c) => c.id === id);
+
+      if (criteria) {
+        Object.assign(criteria, updates);
+
+        if (criteriaList.every((rubricCriteria) => isValidCriteria(rubricCriteria, answers))) {
+          onChange(combinedCriteriaList);
+        }
+      }
+    },
+    [answers, criteriaList, onChange, readOnly]
+  );
+
+  const debouncedSetCriteriaProperty = useMemo(() => debounce(setCriteriaProperty, 300), [setCriteriaProperty]);
 
   useEffect(() => {
-    setCriteriaList(value);
-  }, [value]);
+    return () => {
+      debouncedSetCriteriaProperty.cancel();
+    };
+  }, [debouncedSetCriteriaProperty]);
 
   function handleClickDelete(criteriaId: string) {
     if (showDeleteConfirmation) {
@@ -122,7 +136,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
     const droppedOnIndex = newOrder.findIndex((val) => val.id === droppedOnProperty); // find the index of the space that was dropped on
     const newIndex = propIndex <= droppedOnIndex ? droppedOnIndex + 1 : droppedOnIndex; // if the dragged property was dropped on a space with a higher index, the new index needs to include 1 extra
     newOrder.splice(newIndex, 0, deletedElements[0]); // add the property to the new index
-    setCriteriaList(newOrder);
+
     onChange(newOrder);
   }
 
@@ -147,10 +161,10 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                 sx={{ flexGrow: 1 }}
                 multiline
                 fullWidth
-                onChange={(e) => setCriteriaProperty(criteria.id, { title: e.target.value })}
+                onChange={(e) => debouncedSetCriteriaProperty(criteria.id, { title: e.target.value })}
                 placeholder='Add a label...'
                 disabled={readOnly}
-                defaultValue={criteria.title}
+                defaultValue={criteria.title || ''}
                 data-test='edit-rubric-criteria-label'
               />
               {!readOnly && (
@@ -168,7 +182,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
               multiline
               fullWidth
               data-test='edit-rubric-criteria-description'
-              onChange={(e) => setCriteriaProperty(criteria.id, { description: e.target.value })}
+              onChange={(e) => debouncedSetCriteriaProperty(criteria.id, { description: e.target.value })}
               placeholder='Add a description...'
               disabled={readOnly}
               sx={{ flexGrow: 1, width: '100%' }}
@@ -181,7 +195,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                     inputProps={{ type: 'number' }}
                     data-test='edit-rubric-criteria-min-score'
                     onChange={(e) => {
-                      setCriteriaProperty(criteria.id, {
+                      debouncedSetCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, min: getNumberFromString(e.target.value) }
                       });
                     }}
@@ -208,7 +222,7 @@ export function RubricCriteriaSettings({ readOnly, showDeleteConfirmation, value
                     }}
                     data-test='edit-rubric-criteria-max-score'
                     onChange={(e) => {
-                      setCriteriaProperty(criteria.id, {
+                      debouncedSetCriteriaProperty(criteria.id, {
                         parameters: { ...criteria.parameters, max: getNumberFromString(e.target.value) }
                       });
                     }}

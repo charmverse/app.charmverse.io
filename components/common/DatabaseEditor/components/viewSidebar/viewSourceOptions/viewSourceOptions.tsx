@@ -2,7 +2,7 @@ import type { ApiPageKey } from '@charmverse/core/prisma';
 import AddCircleIcon from '@mui/icons-material/AddCircleOutline';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import TaskOutlinedIcon from '@mui/icons-material/TaskOutlined';
-import { Box, Grid, Typography } from '@mui/material';
+import { Box, Grid, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useRef, useState } from 'react';
 import { BsFiletypeCsv } from 'react-icons/bs';
@@ -21,13 +21,14 @@ import { webhookEndpoint } from 'config/constants';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import type { Board, DataSourceType } from 'lib/databases/board';
 import { createBoardView, type BoardView } from 'lib/databases/boardView';
-import { APPLICANT_STATUS_BLOCK_ID, REWARD_STATUS_BLOCK_ID } from 'lib/rewards/blocks/constants';
 
 import { DatabaseSidebarHeader } from '../databaseSidebarHeader';
 
 import { GoogleFormsSource } from './components/GoogleForms/GoogleFormsSource';
 import { LinkCharmVerseDatabase } from './components/LinkCharmVerseDatabase';
 import { NewCharmVerseDatabase } from './components/NewCharmVerseDatabase';
+import type { SelectedProposalProperties } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
+import { ProposalSourcePropertiesDialog } from './components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { SourceType } from './components/viewSourceType';
 import { useSourceOptions } from './useSourceOptions';
 
@@ -56,7 +57,9 @@ type ViewSourceOptionsProps = {
 
 export function ViewSourceOptions(props: ViewSourceOptionsProps) {
   const { view: activeView, views, rootBoard, title, closeSourceOptions, closeSidebar, showView, isReward } = props;
-
+  const proposalSourcePropertiesPopupState = usePopupState({
+    variant: 'dialog'
+  });
   const dispatch = useAppDispatch();
   const { onCreateDatabase, onCsvImport, onSelectLinkedDatabase, onSelectSourceGoogleForm } = useSourceOptions({
     rootBoard,
@@ -111,7 +114,8 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
 
   const { trigger: createProposalSource, isMutating: isLoadingProposalSource } = useSWRMutation(
     `/api/pages/${rootDatabaseId}/proposal-source`,
-    (_url, { arg }: Readonly<{ arg: { pageId: string } }>) => charmClient.createProposalSource(arg)
+    (_url, { arg }: Readonly<{ arg: { pageId: string; selectedProperties: SelectedProposalProperties } }>) =>
+      charmClient.createProposalSource(arg)
   );
 
   const handleRewardSource = async (_sourceType: Extract<DataSourceType, 'rewards' | 'reward_applications'>) => {
@@ -134,10 +138,10 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
     }
   }
 
-  async function handleProposalSource() {
+  async function handleProposalSource(selectedProperties: SelectedProposalProperties) {
     if (rootDatabaseId) {
       await onCreateDatabase?.({ sourceType: 'proposals' });
-      await createProposalSource({ pageId: rootDatabaseId });
+      await createProposalSource({ pageId: rootDatabaseId, selectedProperties });
       dispatch(initialDatabaseLoad({ pageId: rootDatabaseId }));
     }
   }
@@ -174,21 +178,13 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
             )}
 
             {/** Only admins can create proposals as datasource, to avoid accidentally revealing proposal data */}
-            {allowedSourceOptions.includes('proposals') && isAdmin && (
+            {allowedSourceOptions.includes('proposals') && (
               <SourceType
+                disabled={!isAdmin}
                 data-test='source-proposals'
+                disabledTooltip='Only admins can create proposals as datasource boards'
                 active={activeSourceType === 'proposals'}
-                onClick={
-                  isLoadingProposalSource
-                    ? undefined
-                    : () => {
-                        if (!isCreatingProposals.current) {
-                          isCreatingProposals.current = true;
-                          selectSourceType('proposals');
-                          handleProposalSource();
-                        }
-                      }
-                }
+                onClick={isLoadingProposalSource ? undefined : proposalSourcePropertiesPopupState.open}
               >
                 <TaskOutlinedIcon fontSize='small' />
                 Charmverse Proposals
@@ -291,6 +287,18 @@ export function ViewSourceOptions(props: ViewSourceOptionsProps) {
           typeformPopup.close();
         }}
       />
+      {proposalSourcePropertiesPopupState.isOpen && (
+        <ProposalSourcePropertiesDialog
+          onClose={proposalSourcePropertiesPopupState.close}
+          onApply={async (selectedProperties) => {
+            if (!isCreatingProposals.current) {
+              isCreatingProposals.current = true;
+              selectSourceType('proposals');
+              handleProposalSource(selectedProperties);
+            }
+          }}
+        />
+      )}
     </>
   );
 }
