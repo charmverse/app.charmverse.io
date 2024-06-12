@@ -13,10 +13,12 @@ handler.get(getProposalTemplatesController);
 async function getProposalTemplatesController(req: NextApiRequest, res: NextApiResponse<ProposalTemplateMeta[]>) {
   const userId = req.session.user?.id;
   const spaceId = req.query.id as string;
+  const detailed = req.query.detailed === 'true';
 
   const proposals = await getProposalTemplates({
     spaceId,
-    userId
+    userId,
+    evaluationsAndFormFields: detailed
   });
 
   return res.status(200).json(proposals);

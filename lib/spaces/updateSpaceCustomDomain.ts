@@ -1,3 +1,4 @@
+import { log } from '@charmverse/core/log';
 import { prisma } from '@charmverse/core/prisma-client';
 
 import { updateAllowedPlaybackDomains } from 'lib/mux/updateAllowedPlaybackDomains';
@@ -34,11 +35,16 @@ export async function updateSpaceCustomDomain(
     });
 
     // update referrers to include all custom subdomains
-    await updateAllowedPlaybackDomains();
+    try {
+      await updateAllowedPlaybackDomains();
+    } catch (error) {
+      log.error('Failed to update video playback referrers on Mux', { spaceId, error });
+    }
   } catch (error) {
     if (isUniqueConstraintError(error)) {
       throw new InvalidInputError(`Custom domain ${data.customDomain} is already in use`);
     }
+    log.warn('Error updating custom domain for space', { spaceId, error });
   }
   return data;
 }

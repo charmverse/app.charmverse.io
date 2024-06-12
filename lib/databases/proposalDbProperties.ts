@@ -155,3 +155,15 @@ export const PROPOSAL_RESULT_LABELS: Record<ProposalEvaluationResultExtended, st
   fail: 'Failed',
   pass: 'Passed'
 };
+
+export const defaultProposalProperties = [
+  proposalDbProperties.proposalReviewerNotes(),
+  proposalDbProperties.proposalStatus(),
+  proposalDbProperties.proposalStep(),
+  proposalDbProperties.proposalUrl(),
+  proposalDbProperties.proposalAuthor(),
+  proposalDbProperties.proposalReviewer(),
+  proposalDbProperties.proposalEvaluationType()
+];
+
+export const defaultProposalPropertyTypes = defaultProposalProperties.map((p) => p.type);

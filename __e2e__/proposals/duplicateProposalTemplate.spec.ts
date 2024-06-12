@@ -14,7 +14,6 @@ test.describe('Duplicate a proposal template', async () => {
   let proposalDBPage: Page;
   let proposalTemplate: Awaited<ReturnType<typeof testUtilsProposals.generateProposalTemplate>>;
 
-  let secondProposalWorkflow: ProposalWorkflowTyped;
   let role: Role;
 
   test.beforeAll(async () => {
