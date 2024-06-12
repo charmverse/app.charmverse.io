@@ -1,11 +1,11 @@
 import { POST, GET, DELETE, PUT } from 'adapters/http';
-import { connectApiUrl } from 'config/constants';
+import { connectApiHost } from 'config/constants';
 
-export class BaseApiClient {
+export class BaseConnectApiClient {
   readonly baseUrl: string;
 
   constructor() {
-    this.baseUrl = connectApiUrl;
+    this.baseUrl = connectApiHost;
   }
 
   async GET<T>(...args: Parameters<typeof GET>): Promise<T> {

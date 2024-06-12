@@ -1,9 +1,13 @@
 'use client';
 
+import env from '@beam-australia/react-env';
+// import { connectApiClient } from 'connect/api/apiClient';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { GET } from 'adapters/http';
+import { connectApiHost } from 'config/constants';
+
+import { connectApiClient } from '../api/apiClient';
 
 import styles from './page.module.css';
 
@@ -11,7 +15,7 @@ export default function Home() {
   const [number, setNumber] = useState<number | null>(null);
 
   async function showRandomNumber() {
-    const response = await GET<{ number: number }>('/api/random-number');
+    const response = await connectApiClient.test.getRandomNumber();
     setNumber(response.number);
   }
 
