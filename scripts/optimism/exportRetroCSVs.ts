@@ -14,8 +14,10 @@ async function exportSummary() {
     where: {
       status: 'published',
       spaceId,
+      archived: false,
       page: {
-        sourceTemplateId: templateId
+        sourceTemplateId: templateId,
+        deletedAt: null
       }
     },
     include: {
@@ -62,7 +64,12 @@ async function exportMembers() {
   const proposals = await prisma.proposal.findMany({
     where: {
       status: 'published',
-      spaceId
+      spaceId,
+      archived: false,
+      page: {
+        sourceTemplateId: templateId,
+        deletedAt: null
+      }
     },
     include: {
       evaluations: {
@@ -121,4 +128,4 @@ async function exportMembers() {
   writeFileSync(reviewersFile, csvString);
 }
 
-exportMembers().catch(console.error);
+exportSummary().catch(console.error);
