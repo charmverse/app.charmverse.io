@@ -1,6 +1,7 @@
 import env from '@beam-australia/react-env';
 import { log } from '@charmverse/core/log';
 import type { EmotionCache } from '@emotion/utils';
+import { AuthKitProvider } from '@farcaster/auth-kit';
 import type { LensConfig } from '@lens-protocol/react-web';
 import { development, LensProvider, production } from '@lens-protocol/react-web';
 import { bindings as wagmiBindings } from '@lens-protocol/wagmi';
@@ -53,6 +54,7 @@ import { useUserAcquisition } from 'hooks/useUserAcquisition';
 import { VerifyLoginOtpProvider } from 'hooks/useVerifyLoginOtp';
 import { Web3AccountProvider } from 'hooks/useWeb3Account';
 import { WebSocketClientProvider } from 'hooks/useWebSocketClient';
+import { warpcastConfig } from 'lib/farcaster/config';
 import { AppThemeProvider } from 'theme/AppThemeProvider';
 
 import 'components/common/DatabaseEditor/components/calculations/calculation.scss';
@@ -221,42 +223,44 @@ function DataProviders({ children }: { children: ReactNode }) {
       <UserProvider>
         <VerifyLoginOtpProvider>
           <DiscordProvider>
-            <WagmiProvider>
-              <Web3ConnectionManager>
-                <WalletSelectorModal />
-                <Web3AccountProvider>
-                  <SpacesProvider>
-                    <CurrentSpaceProvider>
-                      <PostCategoriesProvider>
-                        <IsSpaceMemberProvider>
-                          <WebSocketClientProvider>
-                            <MembersProvider>
-                              <PaymentMethodsProvider>
-                                <DatabaseProvider>
-                                  <PagesProvider>
-                                    <RewardsProvider>
-                                      <MemberPropertiesProvider>
-                                        <LensProvider config={lensConfig}>
-                                          <FarcasterUserProvider>
-                                            <UserProfileProvider>
-                                              <PageTitleProvider>{children}</PageTitleProvider>
-                                            </UserProfileProvider>
-                                          </FarcasterUserProvider>
-                                        </LensProvider>
-                                      </MemberPropertiesProvider>
-                                    </RewardsProvider>
-                                  </PagesProvider>
-                                </DatabaseProvider>
-                              </PaymentMethodsProvider>
-                            </MembersProvider>
-                          </WebSocketClientProvider>
-                        </IsSpaceMemberProvider>
-                      </PostCategoriesProvider>
-                    </CurrentSpaceProvider>
-                  </SpacesProvider>
-                </Web3AccountProvider>
-              </Web3ConnectionManager>
-            </WagmiProvider>
+            <AuthKitProvider config={warpcastConfig}>
+              <WagmiProvider>
+                <Web3ConnectionManager>
+                  <WalletSelectorModal />
+                  <Web3AccountProvider>
+                    <SpacesProvider>
+                      <CurrentSpaceProvider>
+                        <PostCategoriesProvider>
+                          <IsSpaceMemberProvider>
+                            <WebSocketClientProvider>
+                              <MembersProvider>
+                                <PaymentMethodsProvider>
+                                  <DatabaseProvider>
+                                    <PagesProvider>
+                                      <RewardsProvider>
+                                        <MemberPropertiesProvider>
+                                          <LensProvider config={lensConfig}>
+                                            <FarcasterUserProvider>
+                                              <UserProfileProvider>
+                                                <PageTitleProvider>{children}</PageTitleProvider>
+                                              </UserProfileProvider>
+                                            </FarcasterUserProvider>
+                                          </LensProvider>
+                                        </MemberPropertiesProvider>
+                                      </RewardsProvider>
+                                    </PagesProvider>
+                                  </DatabaseProvider>
+                                </PaymentMethodsProvider>
+                              </MembersProvider>
+                            </WebSocketClientProvider>
+                          </IsSpaceMemberProvider>
+                        </PostCategoriesProvider>
+                      </CurrentSpaceProvider>
+                    </SpacesProvider>
+                  </Web3AccountProvider>
+                </Web3ConnectionManager>
+              </WagmiProvider>
+            </AuthKitProvider>
           </DiscordProvider>
         </VerifyLoginOtpProvider>
       </UserProvider>

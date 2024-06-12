@@ -21,7 +21,7 @@ import type {
   SpaceOperation
 } from '@charmverse/core/prisma';
 import { Prisma } from '@charmverse/core/prisma';
-import type { Application, PagePermission, PageType } from '@charmverse/core/prisma-client';
+import type { Application, FarcasterUser, PagePermission, PageType } from '@charmverse/core/prisma-client';
 import { prisma } from '@charmverse/core/prisma-client';
 import { v4 } from 'uuid';
 
@@ -1166,6 +1166,20 @@ export async function generatePageComment({ createdBy, pageId }: { createdBy: st
       contentText: '',
       createdBy,
       pageId
+    }
+  });
+}
+
+export async function generateFarcasterUser({
+  account = {},
+  fid = Math.floor(Math.random() * 1000),
+  userId = v4()
+}: Partial<FarcasterUser>) {
+  return prisma.farcasterUser.create({
+    data: {
+      userId,
+      fid,
+      account: account as any
     }
   });
 }

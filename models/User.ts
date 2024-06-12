@@ -1,5 +1,6 @@
 import type {
   DiscordUser,
+  FarcasterUser,
   GoogleAccount,
   Role as RoleMembership,
   SpaceRole,
@@ -24,6 +25,7 @@ export interface LoggedInUser extends User {
   ensName?: string;
   discordUser?: DiscordUser | null;
   telegramUser?: TelegramUser | null;
+  farcasterUser?: FarcasterUser | null;
   notificationState?: UserNotificationState | null;
   isNew?: boolean;
   otp?: {

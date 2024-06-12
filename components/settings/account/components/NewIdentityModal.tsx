@@ -1,4 +1,5 @@
 import { log } from '@charmverse/core/log';
+import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import List from '@mui/material/List';
 import { useEffect, useRef, useState } from 'react';
 
@@ -7,6 +8,7 @@ import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 import { WalletSign } from 'components/login/components/WalletSign';
+import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -42,6 +44,7 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
   const { requestMagicLinkViaFirebase } = useFirebaseAuth();
   const sendingMagicLink = useRef(false);
   const telegramAccount = user?.telegramUser?.account as Partial<TelegramAccount> | undefined;
+  const farcasterAccount = user?.farcasterUser?.account as Partial<FarcasterAccount> | undefined;
   const [identityToAdd, setIdentityToAdd] = useState<'email' | 'wallet' | null>(null);
   const isUserWalletActive = !!user?.wallets?.some((w) => lowerCaseEqual(w.address, account));
   const { isOnCustomDomain } = useCustomDomain();
@@ -154,6 +157,11 @@ export function NewIdentityModal({ isOpen, onClose }: Props) {
               >
                 Connect
               </PrimaryButton>
+            </IdentityProviderItem>
+          )}
+          {!farcasterAccount && (
+            <IdentityProviderItem type='Farcaster'>
+              <WarpcastLogin type='connect' />
             </IdentityProviderItem>
           )}
           {(!user?.googleAccounts || user.googleAccounts.length === 0) && (

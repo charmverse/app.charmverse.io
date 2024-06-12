@@ -28,6 +28,7 @@ import { DiscordLoginHandler } from './DiscordLoginHandler';
 import { EmailAddressForm } from './EmailAddressForm';
 import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
+import { WarpcastLogin } from './WarpcastLogin';
 
 export type AnyIdLogin<I extends IdentityType = IdentityType> = {
   identityType: I;
@@ -140,7 +141,6 @@ function LoginHandler(props: DialogProps) {
   async function handleMagicLinkRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, redirectUrl });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
@@ -218,6 +218,11 @@ function LoginHandler(props: DialogProps) {
             </DialogTitle>
           )}
           {!loginMethod && !props.emailOnly && <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />}
+          {!loginMethod && !props.emailOnly && (
+            <ListItem>
+              <WarpcastLogin type='login' />
+            </ListItem>
+          )}
 
           {/* Google login method */}
           {!loginMethod && (
