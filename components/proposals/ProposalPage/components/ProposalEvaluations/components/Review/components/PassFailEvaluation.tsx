@@ -1,6 +1,7 @@
 import type { ProposalEvaluationResult } from '@charmverse/core/prisma-client';
 import styled from '@emotion/styled';
 import { ThumbUpOutlined as ApprovedIcon, ThumbDownOutlined as RejectedIcon } from '@mui/icons-material';
+import CommentOutlinedIcon from '@mui/icons-material/CommentOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Card, Chip, FormLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { usePopupState } from 'material-ui-popup-state/hooks';
@@ -145,6 +146,7 @@ export function PassFailEvaluation({
               data-test='evaluation-reviewer-select'
               systemRoles={[allMembersSystemRole]}
               readOnly={true}
+              wrapColumn
               value={reviewerOptions}
               onChange={() => {}}
             />
@@ -190,7 +192,7 @@ export function PassFailEvaluation({
                   </Stack>
                   {evaluationReview.result === 'fail' && evaluationReview.declineReasons.length ? (
                     <Stack direction='row' justifyContent='space-between' alignItems='center'>
-                      <Stack flexDirection='row' gap={1.5}>
+                      <Stack flexDirection='row' gap={1.5} width='calc(100% - 50px)'>
                         {evaluationReview.declineReasons.map((reason) => (
                           <Chip size='small' variant='outlined' key={reason} label={reason} sx={{ mr: 0.5 }} />
                         ))}
@@ -198,7 +200,7 @@ export function PassFailEvaluation({
                       {evaluationReview.declineMessage && (
                         <Tooltip title='View additional comment'>
                           <div>
-                            <InfoOutlinedIcon
+                            <CommentOutlinedIcon
                               sx={{
                                 cursor: 'pointer'
                               }}

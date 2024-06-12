@@ -231,3 +231,6 @@ export function getFieldConfig(field?: ProjectFieldConfig): ProjectFieldConfig {
     ...field
   };
 }
+
+export const projectFieldColumnIds = projectFieldProperties.map((field) => field.columnPropertyId);
+export const projectMemberFieldColumnIds = projectMemberFieldProperties.map((field) => field.columnPropertyId);
