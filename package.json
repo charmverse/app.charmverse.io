@@ -37,7 +37,7 @@
     "prisma:dev": "cd node_modules/@charmverse/core && npm run prisma:migrate",
     "prisma:deploy": "cd node_modules/@charmverse/core && npm run prisma:deploy",
     "debug:e2e": "npx dotenv -e .env.test.local -- npx playwright test --headed --timeout=0",
-    "postinstall": "patch-package && cd node_modules/@charmverse/core && npm run postinstall",
+    "postinstall": "npx patch-package && cd node_modules/@charmverse/core && npm run postinstall",
     "migrate:test": "dotenv -e .env.test.local -- npx prisma migrate deploy",
     "notifications:debug": "ts-node --transpileOnly ./scripts/readNotifications.ts",
     "server:dev": "NODE_OPTIONS=\"--max_old_space_size=8192\" npx react-env --path .env.local -- next dev",
