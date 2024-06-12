@@ -24,7 +24,7 @@ export default function Header({ image }: { image?: string }) {
         style={
           image
             ? {
-                height: '48px'
+                maxHeight: dimensions.medium.height
               }
             : {
                 width: dimensions.medium.width,
