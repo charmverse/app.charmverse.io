@@ -342,11 +342,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -532,11 +532,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 1`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -1130,11 +1130,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -1320,11 +1320,11 @@ exports[`components/table/Table extended should match snapshot with CreatedBy 2`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -1918,11 +1918,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -2108,11 +2108,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedAt 1`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -2706,11 +2706,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
@@ -2896,11 +2896,11 @@ exports[`components/table/Table extended should match snapshot with UpdatedBy 1`
                       style="height: 100%;"
                     >
                       <div
-                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-2umbt5-MuiInputBase-root"
+                        class="MuiInputBase-root MuiInputBase-colorPrimary MuiInputBase-fullWidth css-t4vlgn-MuiInputBase-root"
                         spellcheck="true"
                       >
                         <input
-                          class="MuiInputBase-input Editable octo-propertyvalue css-yz9k0d-MuiInputBase-input"
+                          class="MuiInputBase-input Editable octo-propertyvalue css-l7ze9l-MuiInputBase-input"
                           placeholder="Untitled"
                           type="text"
                           value="title"
