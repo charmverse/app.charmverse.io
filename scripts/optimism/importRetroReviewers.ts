@@ -4,7 +4,7 @@ import { parse } from 'csv-parse/sync';
 import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 import { difference, uniq } from 'lodash';
 
-const reviewerData = getCsvData<ProposalRow>('../optimism-data/sampled_badgeholder_review.csv');
+const reviewerData = getCsvData<ProposalRow>('../optimism-data/sampled_badgeholder_review_batch2.csv');
 
 // production
 const spaceId = 'f3ddde2e-17e9-42b1-803d-0c72880e4669';
@@ -18,6 +18,7 @@ type ProposalRow = {
   'Full Review: Appeal Reviewers (5)': string;
 };
 
+const spamCheckTitle = 'Automated Requirements Check';
 const ruleViolationTitle = 'Rule Violation Check';
 const fullReviewTitle = 'Full Review';
 
@@ -51,17 +52,20 @@ async function populateProject(raw: OPProjectData, spaceRoles: { userId: string 
     if (raw.name === 'Test Project') {
       ignore = true;
     } else {
-      throw new Error('Project not found: ' + raw.name + ' ' + projects.length);
+      console.error('Project not found: ' + raw.name + ' ' + projects.length);
+
+      return { ignore: true };
     }
   }
   const reviewerRow = reviewerData.find((r) => r['Project ID'] === raw.id);
   if (!reviewerRow) {
-    // console.error('Reviewer row not found: ' + raw.id);
+    //console.error('Reviewer row not found: ' + raw.id);
     //console.log(raw.id, raw.name);
     ignore = true;
   }
 
   const evaluations = projects[0]?.proposal?.evaluations;
+  const spamCheck = evaluations?.find((e) => e.title === spamCheckTitle);
   const ruleViolation = evaluations?.find((e) => e.title === ruleViolationTitle);
   const fullReview = evaluations?.find((e) => e.title === fullReviewTitle);
   if (!ruleViolation || !fullReview) {
@@ -101,6 +105,7 @@ async function populateProject(raw: OPProjectData, spaceRoles: { userId: string 
     proposalId: projects[0].proposal!.id,
     title: projects[0].title,
     fullReview,
+    spamCheck,
     ruleViolation: ruleViolation,
     reviewers: reviewerRow,
     verifiedEmails
@@ -263,38 +268,64 @@ async function assignRole(roleId = 'ae8c0881-10cd-465a-8435-ef69a5d2d040') {
 
 async function importReviewers() {
   // Note: file path is relative to CWD
-  const _projects = await getProjectsFromFile('./applicants.json');
+  const projects = await getProjectsFromFile('../optimism-data/applicants.json');
   const spaceRoles = await prisma.spaceRole.findMany({
     where: {
       spaceId
     }
   });
-  const projects = _projects;
-
   console.log('Validating', projects.length, 'projects...');
 
-  const populatedProjects = await Promise.all(projects.map((project) => populateProject(project, spaceRoles)));
-  const validProjects = populatedProjects.filter((p) => !p.ignore);
+  const populatedProjects = await Promise.all(projects.map((p) => populateProject(p, spaceRoles)));
+  const validProjects = populatedProjects.filter(
+    (p) => !p.ignore && p.proposalId !== '01267758-ffbe-460c-b84e-b5589b60a23b'
+  );
 
   console.log('Processing', validProjects.length, 'projects...');
 
   for (const project of validProjects) {
     console.log('processing', project.proposalId, project.title);
     await prisma.$transaction([
+      prisma.proposal.update({
+        where: {
+          id: project.proposalId
+        },
+        data: {
+          status: 'published'
+        }
+      }),
+      prisma.proposalEvaluation.update({
+        where: {
+          id: project.spamCheck!.id
+        },
+        data: {
+          result: 'pass',
+          completedAt: new Date(),
+          decidedBy: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835' // chris id
+        }
+      }),
+      prisma.proposalEvaluationReview.create({
+        data: {
+          result: 'pass',
+          evaluationId: project.spamCheck!.id,
+          completedAt: new Date(),
+          reviewerId: 'd5b4e5db-868d-47b0-bc78-ebe9b5b2c835' // chris id
+        }
+      }),
       prisma.proposalReviewer.createMany({
         data: [
           ...project.reviewers!['Rule Violation: Reviewers (2)'].split(',').map((r) => {
             return {
-              proposalId: project.proposalId,
-              evaluationId: project.ruleViolation.id,
-              userId: project.verifiedEmails.find((e) => e.email === r.trim().toLowerCase())!.userId
+              proposalId: project.proposalId!,
+              evaluationId: project.ruleViolation!.id,
+              userId: project.verifiedEmails!.find((e) => e.email === r.trim().toLowerCase())!.userId
             };
           }),
           ...project.reviewers!['Full Review: Reviewers (5)'].split(',').map((r) => {
             return {
-              proposalId: project.proposalId,
-              evaluationId: project.fullReview.id,
-              userId: project.verifiedEmails.find((e) => e.email === r.trim().toLowerCase())!.userId
+              proposalId: project.proposalId!,
+              evaluationId: project.fullReview!.id,
+              userId: project.verifiedEmails!.find((e) => e.email === r.trim().toLowerCase())!.userId
             };
           })
         ]
@@ -303,9 +334,9 @@ async function importReviewers() {
         data: [
           ...project.reviewers!['Full Review: Appeal Reviewers (5)'].split(',').map((r) => {
             return {
-              proposalId: project.proposalId,
-              evaluationId: project.fullReview.id,
-              userId: project.verifiedEmails.find((e) => e.email === r.trim().toLowerCase())!.userId
+              proposalId: project.proposalId!,
+              evaluationId: project.fullReview!.id,
+              userId: project.verifiedEmails!.find((e) => e.email === r.trim().toLowerCase())!.userId
             };
           })
         ]
@@ -318,7 +349,7 @@ async function importReviewers() {
   console.log('Done!');
 }
 
-assignRole().catch((e) => {
+importReviewers().catch((e) => {
   console.error('Error crashed script', e);
   process.exit(1);
 });

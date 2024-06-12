@@ -28,7 +28,7 @@ const rateLimiter = RateLimit(1);
 function _getFormAnswers(project: OPProjectData): FieldAnswerInput[] {
   const ventureFunding = project.funding.find((f) => f.type === 'venture');
   const optimismFunding = project.funding.find(
-    (f) => f.type === 'foundation-grant' || f.type === 'token-house-mission'
+    (f) => f.type === 'foundation-grant' || f.type === 'token-house-mission' || f.type === 'foundation-mission'
   );
   const revenueFunding = project.funding.find((f) => f.type !== 'venture');
   const otherGrantFunding = project.funding.find(
@@ -71,82 +71,6 @@ function _getFormAnswers(project: OPProjectData): FieldAnswerInput[] {
       value: {
         content: project.repos.length ? jsonDoc(...project.repos.map(({ url }) => _.p(url))) : null,
         contentText: project.repos.map(({ url }) => url).join('\n')
-      }
-    },
-    {
-      fieldId: fieldIds['Venture Funding Amount'],
-      value: ventureFunding?.amount
-    },
-    {
-      fieldId: fieldIds['Venture Funding Source'],
-      value: ventureFunding?.grant
-    },
-    {
-      fieldId: fieldIds['Venture Funding Date'],
-      value: ventureFunding?.createdAt
-    },
-    {
-      fieldId: fieldIds['Venture Funding Details'],
-      value: {
-        content: ventureFunding?.details ? jsonDoc(_.p(ventureFunding.details)) : null,
-        contentText: ventureFunding?.details
-      }
-    },
-    {
-      fieldId: fieldIds['Optimism Grants Amount'],
-      value: optimismFunding?.amount
-    },
-    {
-      fieldId: fieldIds['Optimism Grants Source'],
-      value: optimismFunding?.grantUrl || optimismFunding?.grant
-    },
-    {
-      fieldId: fieldIds['Optimism Grants Date'],
-      value: optimismFunding?.createdAt
-    },
-    {
-      fieldId: fieldIds['Optimism Grants Details'],
-      value: {
-        content: optimismFunding?.details ? jsonDoc(_.p(optimismFunding.details)) : null,
-        contentText: optimismFunding?.details
-      }
-    },
-    {
-      fieldId: fieldIds['Revenue Amount'],
-      value: revenueFunding?.amount
-    },
-    {
-      fieldId: fieldIds['Revenue Source'],
-      value: revenueFunding?.grantUrl || revenueFunding?.grant
-    },
-    {
-      fieldId: fieldIds['Revenue Date'],
-      value: revenueFunding?.createdAt
-    },
-    {
-      fieldId: fieldIds['Revenue Details'],
-      value: {
-        content: revenueFunding?.details ? jsonDoc(_.p(revenueFunding.details)) : null,
-        contentText: revenueFunding?.details || ''
-      }
-    },
-    {
-      fieldId: fieldIds['Other Grants Amount'],
-      value: otherGrantFunding?.amount
-    },
-    {
-      fieldId: fieldIds['Other Grants Source'],
-      value: otherGrantFunding?.grantUrl || otherGrantFunding?.grant
-    },
-    {
-      fieldId: fieldIds['Other Grants Date'],
-      value: otherGrantFunding?.createdAt
-    },
-    {
-      fieldId: fieldIds['Other Grants Details'],
-      value: {
-        content: otherGrantFunding?.details ? jsonDoc(_.p(otherGrantFunding.details)) : null,
-        contentText: otherGrantFunding?.details
       }
     },
     {

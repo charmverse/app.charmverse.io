@@ -92,12 +92,12 @@ export type OPProjectData = {
     chainId: number;
   }[];
   funding: {
-    type: 'venture' | 'revenue' | 'other-grant' | 'foundation-grant' | 'token-house-mission';
+    type: 'venture' | 'revenue' | 'other-grant' | 'foundation-grant' | 'token-house-mission' | 'foundation-mission';
     grant: string;
     grantUrl: string;
     amount: string;
     details: string; // "Funding received from Alien Capital, Founders' personal ";
-    createdAt: string;
+    receivedAt: string;
   }[];
   mirror: string;
   website: string[];
@@ -167,26 +167,27 @@ export const fieldIds = {
   Mirror: '904a9f7b-16f9-49c3-9419-274573989e36',
   website: 'f605a705-6b87-40c3-a40a-888414d10c2b',
   'Github Repo': 'b8048298-bc48-4c98-a7d2-87535ec41da1',
-  'Venture Funding Amount': '3397e913-e7be-4c34-803d-fa4312d393d9',
-  'Venture Funding Source': 'be002109-5b18-409c-be97-1f06984255dd',
-  'Venture Funding Date': '2f67fb54-1351-4a66-994a-a381c00e915d',
-  'Venture Funding Details': 'a3904afe-a75f-407c-a9de-5117a153dea9',
+  // 'Venture Funding Amount': '3397e913-e7be-4c34-803d-fa4312d393d9',
+  // 'Venture Funding Source': 'be002109-5b18-409c-be97-1f06984255dd',
+  // 'Venture Funding Date': '2f67fb54-1351-4a66-994a-a381c00e915d',
+  // 'Venture Funding Details': 'a3904afe-a75f-407c-a9de-5117a153dea9',
   // 'Grants Funding Amount': '5d5196b1-beb6-4bdb-b0ff-e558243608e7',
   // 'Grants Funding Source': '2557fd6f-7c1a-4ad9-9942-2b671fe3712d',
   // 'Grants Funding Date': '41eca67a-3272-4667-a964-877000f1ff1b',
   // 'Grants Funding Details': '5541e906-2258-4112-b210-00ecddd4872f',
-  'Revenue Amount': '7fec8119-c9b5-48f2-8ee5-1b4bd108d277',
-  'Revenue Source': 'd3cedf22-4d91-4a04-aeed-418efd21721e',
-  'Revenue Date': '3c633757-99c5-4b74-abf4-9d258f85552d',
-  'Revenue Details': '8b4e0790-5143-46cc-84b7-1e8371e94f99',
-  'Other Grants Amount': 'b7c12963-bb7b-493a-baa7-8780a556ff70',
-  'Other Grants Source': '4be6a12d-bc99-42cf-87b1-de3562a18f1c',
-  'Other Grants Date': '6f5cfeb1-7a59-471d-83ef-f9daef5bbd3d',
-  'Other Grants Details': '47004e0c-aa3f-40f5-8506-77b87322726c',
-  'Optimism Grants Amount': '7db510d2-a5bb-4f69-b240-94773f6b85ca',
-  'Optimism Grants Source': '275cca74-0fd6-4aad-b0af-e927469f4e72',
-  'Optimism Grants Date': 'df3706f9-0ff9-4923-8b0e-50284aab909c',
-  'Optimism Grants Details': 'b38728c9-2327-4465-8471-64f8b6095cc7',
+  // 'Revenue Amount': '7fec8119-c9b5-48f2-8ee5-1b4bd108d277',
+  // 'Revenue Source': 'd3cedf22-4d91-4a04-aeed-418efd21721e',
+  // 'Revenue Date': '3c633757-99c5-4b74-abf4-9d258f85552d',
+  // 'Revenue Details': '8b4e0790-5143-46cc-84b7-1e8371e94f99',
+  // 'Other Grants Amount': 'b7c12963-bb7b-493a-baa7-8780a556ff70',
+  // 'Other Grants Source': '4be6a12d-bc99-42cf-87b1-de3562a18f1c',
+  // 'Other Grants Date': '6f5cfeb1-7a59-471d-83ef-f9daef5bbd3d',
+  // 'Other Grants Details': '47004e0c-aa3f-40f5-8506-77b87322726c',
+  // 'Optimism Grants Amount': '7db510d2-a5bb-4f69-b240-94773f6b85ca',
+  // 'Optimism Grants Source': '275cca74-0fd6-4aad-b0af-e927469f4e72',
+  // 'Optimism Grants Date': 'df3706f9-0ff9-4923-8b0e-50284aab909c',
+  // 'Optimism Grants Details': 'b38728c9-2327-4465-8471-64f8b6095cc7',
+  'Grant Details': '4b2ae8c7-d86d-4162-a57f-7a26ad1c8f1c',
   'Contracts Address': '8e88a87d-ebf8-4890-9352-c17cff6351be',
   'OSO Slug': '4a57c132-3681-46b6-82cb-6ef2c29e5221'
 };

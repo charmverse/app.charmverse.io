@@ -2,7 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { stringify } from 'csv-stringify/sync';
 
 import { writeFileSync } from 'fs';
-import { spaceId } from './retroData';
+import { spaceId, templateId } from './retroData';
 
 type SummaryRow = {};
 
@@ -13,7 +13,10 @@ async function exportSummary() {
   const proposals = await prisma.proposal.findMany({
     where: {
       status: 'published',
-      spaceId
+      spaceId,
+      page: {
+        sourceTemplateId: templateId
+      }
     },
     include: {
       evaluations: {

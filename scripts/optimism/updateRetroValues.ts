@@ -29,25 +29,26 @@ async function populateProject(raw: OPProjectData) {
     if (raw.name === 'Test Project') {
       ignore = true;
     } else {
-      throw new Error('Project not found: ' + raw.name + ' ' + projects.length);
+      // throw new Error('Project not found: ' + raw.name + ' ' + projects.length);
+      //    console.error('Project not found: ' + raw.name + ' ' + projects.length);
+      return { answer: null, proposalId: null, fieldId: null, ignore: true };
     }
   }
   const project = projects[0];
-  const fieldId = fieldIds['OSO Slug'];
+  const fieldId = fieldIds['Grant Details'];
 
-  const answer = project.proposal?.formAnswers.find((a) => a.fieldId === fieldId);
+  const existingAnswer = project.proposal?.formAnswers.find((a) => a.fieldId === fieldId);
 
-  // const validRepos = raw.repos.filter((r) => r.url && !!r.containsContracts);
-  // let value = {
-  //   content: validRepos.length ? jsonDoc(...validRepos.map(({ url }) => _.p(url))) : null,
-  //   contentText: validRepos.map(({ url }) => url).join('\n')
-  // };
-  // if (!answer) {
-  //   console.log(project.proposal?.formAnswers);
-  //   throw new Error('Answer not found');
+  // ignore = true;
+  // if (project.path === 'page-11078911140653469') {
+  //   ignore = false;
   // }
-  ignore = true;
-  let value = '';
+
+  const optimismFunding = raw.funding.find((f) => f.type === 'foundation-mission');
+  const answer = null;
+  if (optimismFunding) {
+    console.log(project.id, ' : ', project.title);
+  }
   // const optimismFunding = raw.funding.find((f) => f.type === 'foundation-grant' || f.type === 'token-house-mission');
   // if (answer && optimismFunding) {
   //   const isNUmber = !isNaN(Number(optimismFunding.amount.trim()));
@@ -59,45 +60,43 @@ async function populateProject(raw: OPProjectData) {
   //   }
   // }
 
-  if (answer && raw.openSourceObserverSlug) {
-    value = raw.openSourceObserverSlug;
-    ignore = false;
-  }
   // if (!ignore && project.proposal.status === 'published') {
   //   console.log(project);
   // }
 
-  return { answer: answer, value, ignore };
+  return { answerId: existingAnswer?.id, answer: answer, proposalId: project.proposalId!, fieldId, ignore };
 }
 
 async function updateFields() {
   // Note: file path is relative to CWD
-  const projects = await getProjectsFromFile('./applicants.json');
+  const projects = await getProjectsFromFile('../optimism-data/applicants.json');
 
   console.log('Validating', projects.length, 'projects...');
 
   const populatedProjects = await Promise.all(projects.map((project) => populateProject(project)));
   const validProjects = populatedProjects.filter((p) => !p.ignore);
-
+  return;
   console.log('Processing', validProjects.length, 'projects...');
 
   for (const project of validProjects) {
     //console.log('processing', project.pageId, project.title);
-    await prisma.formFieldAnswer.update({
-      where: { id: project.answer!.id },
-      data: {
-        value: project.value
-      }
-    });
-
-    // await prisma.formFieldAnswer.create({
+    // await prisma.formFieldAnswer.update({
+    //   where: { id: project.answerId },
     //   data: {
-    //     fieldId: project.fieldId,
-    //     type: 'short_text',
-    //     proposalId: project.pageId,
-    //     value: project.answer
+    //     value: project.answer!
     //   }
     // });
+
+    // if (!project.answerId) {
+    //   await prisma.formFieldAnswer.create({
+    //     data: {
+    //       fieldId: project.fieldId!,
+    //       type: 'long_text',
+    //       proposalId: project.proposalId!,
+    //       value: project.answer!
+    //     }
+    //   });
+    // }
     if (validProjects.indexOf(project) % 10 === 0) {
       console.log('Processed', validProjects.indexOf(project), 'projects');
     }
