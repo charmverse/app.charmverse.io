@@ -25,14 +25,26 @@ export function getCardPropertiesFromRubric({
   const rubricStepScore: Record<string, number> = {};
 
   rubricCriteria.forEach((criteria) => {
-    const totalScore = rubricAnswers
-      .filter((a) => a.rubricCriteriaId === criteria.id)
-      .reduce((acc, answer) => {
-        if (answer.response.score) {
-          acc += answer.response.score;
+    const rubricCriteriaAnswers = rubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
+
+    rubricCriteriaAnswers.forEach((rubricCriteriaAnswer) => {
+      templates.forEach((template) => {
+        if (template.criteriaTitle === criteria.title && template.reviewerId === rubricCriteriaAnswer.userId) {
+          if (template.type === 'proposalRubricCriteriaReviewerComment') {
+            properties[template.id] = rubricCriteriaAnswer.comment ?? '';
+          } else if (template.type === 'proposalRubricCriteriaReviewerScore') {
+            properties[template.id] = rubricCriteriaAnswer.response.score ?? '';
+          }
         }
-        return acc;
-      }, 0);
+      });
+    });
+
+    const totalScore = rubricCriteriaAnswers.reduce((acc, answer) => {
+      if (answer.response.score) {
+        acc += answer.response.score;
+      }
+      return acc;
+    }, 0);
 
     rubricStepScore[criteria.title] = (rubricStepScore[criteria.title] ?? 0) + totalScore;
   });

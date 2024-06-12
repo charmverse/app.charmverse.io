@@ -66,7 +66,12 @@ export function RubricEvaluationPropertiesList({
           })
           .filter((evaluation) => {
             const isAllPropertiesFalsy =
-              !evaluation.average && !evaluation.total && !evaluation.reviewers && !evaluation.criteriaTotal;
+              !evaluation.average &&
+              !evaluation.total &&
+              !evaluation.reviewers &&
+              !evaluation.criteriaTotal &&
+              !evaluation.reviewerScore &&
+              !evaluation.reviewerComment;
             return !isAllPropertiesFalsy;
           })
       };
@@ -84,7 +89,9 @@ export function RubricEvaluationPropertiesList({
           _rubricEvaluation?.average &&
           _rubricEvaluation?.total &&
           _rubricEvaluation?.reviewers &&
-          _rubricEvaluation?.criteriaTotal;
+          _rubricEvaluation?.criteriaTotal &&
+          _rubricEvaluation?.reviewerScore &&
+          _rubricEvaluation?.reviewerComment;
 
         return (
           <Stack key={rubricEvaluationTitle}>
@@ -103,7 +110,9 @@ export function RubricEvaluationPropertiesList({
                     average: true,
                     total: true,
                     reviewers: true,
-                    criteriaTotal: true
+                    criteriaTotal: true,
+                    reviewerScore: true,
+                    reviewerComment: true
                   });
                 }
               }}
@@ -141,6 +150,24 @@ export function RubricEvaluationPropertiesList({
                 }}
                 label='Criteria total (for each criteria)'
               />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.reviewerScore}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    reviewerScore: !_rubricEvaluation?.reviewerScore
+                  });
+                }}
+                label='Individual Reviewer Scores'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.reviewerComment}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    reviewerComment: !_rubricEvaluation?.reviewerComment
+                  });
+                }}
+                label='Individual Reviewer Comments'
+              />
             </Stack>
           </Stack>
         );
@@ -177,6 +204,12 @@ export function RubricEvaluationPropertiesReadonlyList({
           }
           if (rubricEvaluation.criteriaTotal) {
             items.push('Criteria total');
+          }
+          if (rubricEvaluation.reviewerScore) {
+            items.push('Individual Reviewer Scores');
+          }
+          if (rubricEvaluation.reviewerComment) {
+            items.push('Individual Reviewer Comments');
           }
 
           if (items.length === 0) {

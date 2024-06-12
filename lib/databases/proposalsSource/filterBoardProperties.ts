@@ -1,5 +1,6 @@
 import type { SelectedProposalProperties } from 'components/common/DatabaseEditor/components/viewSidebar/viewSourceOptions/components/ProposalSourceProperties/ProposalSourcePropertiesDialog';
 import { projectFieldProperties, projectMemberFieldProperties } from 'lib/projects/formField';
+import { prettyPrint } from 'lib/utils/strings';
 
 import type { IPropertyTemplate } from '../board';
 import { defaultProposalPropertyTypes } from '../proposalDbProperties';
@@ -52,7 +53,9 @@ export function filterBoardProperties({
       p.type === 'proposalEvaluationAverage' ||
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
-      p.type === 'proposalRubricCriteriaTotal'
+      p.type === 'proposalRubricCriteriaTotal' ||
+      p.type === 'proposalRubricCriteriaReviewerComment' ||
+      p.type === 'proposalRubricCriteriaReviewerScore'
     ) {
       const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
       if (!rubricEvaluation) {
@@ -72,6 +75,14 @@ export function filterBoardProperties({
 
       if (p.type === 'proposalRubricCriteriaTotal') {
         return !!rubricEvaluation.criteriaTotal;
+      }
+
+      if (p.type === 'proposalRubricCriteriaReviewerComment') {
+        return !!rubricEvaluation.reviewerComment;
+      }
+
+      if (p.type === 'proposalRubricCriteriaReviewerScore') {
+        return !!rubricEvaluation.reviewerScore;
       }
     }
     // Custom proposal source board properties, so always show them

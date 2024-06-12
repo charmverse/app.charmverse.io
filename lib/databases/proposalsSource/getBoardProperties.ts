@@ -22,7 +22,14 @@ type EvaluationStep = {
   type: ProposalEvaluationType;
   rubricCriteria: {
     title: string;
+    id: string;
     description?: string | null;
+    answers: {
+      user: {
+        id: string;
+        username: string;
+      };
+    }[];
   }[];
 };
 
@@ -85,6 +92,8 @@ export function getBoardProperties({
   // properties related to project profile
   applyProjectProfileProperties(boardProperties);
 
+  applyRubricEvaluationReviewerProperties(boardProperties, evaluationSteps);
+
   boardProperties.forEach((property) => {
     property.name = getPropertyName(property);
   });
@@ -97,6 +106,59 @@ export function getBoardProperties({
     boardProperties,
     proposalCustomProperties,
     selectedProperties
+  });
+}
+
+function applyRubricEvaluationReviewerProperties(
+  boardProperties: IPropertyTemplate[],
+  evaluationSteps: EvaluationStep[]
+) {
+  evaluationSteps.forEach((evaluationStep) => {
+    if (evaluationStep.type === 'rubric') {
+      evaluationStep.rubricCriteria.forEach((rubricCriteria) => {
+        rubricCriteria.answers.forEach((answer) => {
+          const existingCriteriaReviewerScorePropIndex = boardProperties.findIndex(
+            (p) =>
+              p.type === 'proposalRubricCriteriaReviewerScore' &&
+              p.evaluationTitle === evaluationStep.title &&
+              p.criteriaTitle === rubricCriteria.title &&
+              p.reviewerId === answer.user.id
+          );
+          if (existingCriteriaReviewerScorePropIndex === -1) {
+            boardProperties.push({
+              id: uuid(),
+              type: 'proposalRubricCriteriaReviewerScore',
+              name: `${evaluationStep.title} - ${rubricCriteria.title} - ${answer.user.username} - Score`,
+              evaluationTitle: evaluationStep.title,
+              criteriaTitle: rubricCriteria.title,
+              reviewerId: answer.user.id,
+              private: false,
+              options: []
+            });
+          }
+
+          const existingCriteriaReviewerCommentPropIndex = boardProperties.findIndex(
+            (p) =>
+              p.type === 'proposalRubricCriteriaReviewerComment' &&
+              p.evaluationTitle === evaluationStep.title &&
+              p.criteriaTitle === rubricCriteria.title &&
+              p.reviewerId === answer.user.id
+          );
+          if (existingCriteriaReviewerCommentPropIndex === -1) {
+            boardProperties.push({
+              id: uuid(),
+              type: 'proposalRubricCriteriaReviewerComment',
+              name: `${evaluationStep.title} - ${rubricCriteria.title} - ${answer.user.username} - Comment`,
+              evaluationTitle: evaluationStep.title,
+              criteriaTitle: rubricCriteria.title,
+              reviewerId: answer.user.id,
+              private: false,
+              options: []
+            });
+          }
+        });
+      });
+    }
   });
 }
 
