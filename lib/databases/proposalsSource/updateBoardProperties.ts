@@ -55,7 +55,6 @@ export async function updateBoardProperties({
           select: {
             title: true,
             description: true,
-            id: true,
             answers: {
               select: {
                 user: {

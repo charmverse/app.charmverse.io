@@ -22,7 +22,6 @@ type EvaluationStep = {
   type: ProposalEvaluationType;
   rubricCriteria: {
     title: string;
-    id: string;
     description?: string | null;
     answers: {
       user: {

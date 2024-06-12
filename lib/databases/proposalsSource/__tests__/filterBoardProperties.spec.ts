@@ -220,6 +220,148 @@ describe('filterBoardProperties', () => {
     expect(properties[0].type).toBe('proposalEvaluationAverage');
   });
 
+  it('Should filter out rubric evaluations criteria reviewer properties that are not selected', () => {
+    const user1Id = v4();
+    const user2Id = v4();
+
+    const properties = filterBoardProperties({
+      boardProperties: [
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerComment',
+          name: 'Rubric 1 - Criteria 1 - User 1 - Comment',
+          options: [],
+          criteriaTitle: 'Criteria 1',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerScore',
+          name: 'Rubric 1 - Criteria 1 - User 1 - Score',
+          options: [],
+          criteriaTitle: 'Criteria 1',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerScore',
+          name: 'Rubric 1 - Criteria 1 - User 2 - Score',
+          options: [],
+          criteriaTitle: 'Criteria 1',
+          reviewerId: user2Id,
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerComment',
+          name: 'Rubric 2 - Criteria 1 - User 1 - Comment',
+          options: [],
+          criteriaTitle: 'Criteria 2',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 2'
+        },
+        {
+          id: v4(),
+          type: 'proposalRubricCriteriaReviewerScore',
+          name: 'Rubric 2 - Criteria 1 - User 1 - Score',
+          options: [],
+          criteriaTitle: 'Criteria 2',
+          reviewerId: user1Id,
+          evaluationTitle: 'Rubric 2'
+        }
+      ],
+      proposalCustomProperties: [],
+      selectedProperties: {
+        customProperties: [],
+        defaults: [],
+        formFields: [],
+        project: [],
+        projectMember: [],
+        rubricEvaluations: [
+          {
+            title: 'Rubric 1',
+            reviewerComment: true,
+            reviewerScore: true
+          },
+          {
+            title: 'Rubric 2',
+            reviewerComment: true,
+            reviewerScore: false
+          }
+        ]
+      }
+    });
+
+    const rubricCriteria1Reviewer1Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria1Reviewer1Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria1Reviewer2Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria1Reviewer2Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 1' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria2Reviewer1Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria2Reviewer1Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user1Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria2Reviewer2Comment = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerComment' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria2Reviewer2Score = properties.find(
+      (p) =>
+        p.evaluationTitle === 'Rubric 2' &&
+        p.reviewerId === user2Id &&
+        p.type === 'proposalRubricCriteriaReviewerScore' &&
+        p.criteriaTitle === 'Criteria 2'
+    );
+
+    expect(rubricCriteria1Reviewer1Comment).toBeTruthy();
+    expect(rubricCriteria1Reviewer1Score).toBeTruthy();
+    expect(rubricCriteria1Reviewer2Comment).toBeFalsy();
+    expect(rubricCriteria1Reviewer2Score).toBeTruthy();
+
+    expect(rubricCriteria2Reviewer1Comment).toBeTruthy();
+    expect(rubricCriteria2Reviewer1Score).toBeFalsy();
+    expect(rubricCriteria2Reviewer2Comment).toBeFalsy();
+    expect(rubricCriteria2Reviewer2Score).toBeFalsy();
+  });
+
   it(`Should filter out rubric criterial total properties that are not selected`, () => {
     const properties = filterBoardProperties({
       boardProperties: [
