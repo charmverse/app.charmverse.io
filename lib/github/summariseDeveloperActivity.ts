@@ -8,10 +8,10 @@ import { getPullRequestsByRepo } from './getPullRequestsByRepo';
 import { getUserGitHubProfile, type GitHubUserProfile } from './getUserGithubProfile';
 import { summarisePullRequest, type PullRequestSummaryWithFilePatches } from './summarisePullRequest';
 
-// Default to 6 months ago
+// Default to 12 months ago
 function getDefaultFromDate(): string {
   const date = new Date();
-  date.setMonth(date.getMonth() - 6);
+  date.setFullYear(date.getFullYear() - 1);
   return date.toISOString().split('T')[0]; // YYYY-MM-DD format
 }
 
