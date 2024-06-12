@@ -2,6 +2,7 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { readFile } from 'fs/promises';
 import * as http from 'adapters/http';
 
+import { parse } from 'csv-parse/sync';
 import { readFileSync } from 'fs';
 
 // const spaceId = 'f46f31d0-faee-4ccc-871c-336f0d4d06ae';
@@ -319,3 +320,7 @@ export const fieldIds = {
 //     name: 'contract address',
 //   },
 // ];
+
+export function getCsvData<T>(path: string): T[] {
+  return parse(readFileSync(path).toString(), { columns: true }) as T[];
+}
