@@ -17,7 +17,7 @@ router.get('/api/random-number', (ctx) => {
 
 app.use(router.routes()).use(router.allowedMethods());
 
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
   log.info(`Builder API server is running on http://localhost:${port}`);

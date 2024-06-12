@@ -48,7 +48,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: us-east-1
         with:
-          ecr_registry: charmverse-connect
+          ecr_registry: charmverse-web3-workspace
 
       - name: Replace env_var with staging settings
         run: |
@@ -69,8 +69,8 @@ jobs:
 
           rm .ebextensions*/06_cloudwatch_alarm.config
 
-          # substituting the websocket domain name
-          sed -i 's/REACT_APP_WEBSOCKETS_HOST=.*/REACT_APP_WEBSOCKETS_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3002/g' .ebstalk.apps.env/connect.env
+          # substituting the API domain name
+          sed -i 's/REACT_APP_CONNECT_API_HOST=.*/REACT_APP_CONNECT_API_HOST=https:\/\/${{env.STAGE}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
