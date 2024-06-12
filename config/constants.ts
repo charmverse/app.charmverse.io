@@ -60,3 +60,6 @@ export const githubAppId = Number(process.env.GITHUB_APP_ID);
 
 // This is a Personal Access Token for the Github API, generated within an individual developer account
 export const githubAccessToken = process.env.GITHUB_ACCESS_TOKEN as string;
+
+// API Client
+export const connectApiUrl = env('CONNECT_API_HOST') ?? (process.env.REACT_APP_CONNECT_API_HOST as string);

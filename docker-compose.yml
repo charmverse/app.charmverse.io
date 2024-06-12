@@ -84,7 +84,7 @@ services:
     command: ['sh', '-c', 'npm run prisma:deploy && npm run connect:start:prod --keepAliveTimeout 70000']
     environment:
       - REACT_APP_APP_ENV=staging
-      - CONNECT_API_URL=http://connect-api:3333
+      - REACT_APP_CONNECT_API_HOST=http://connect-api:3333
     profiles:
       - stg-connect
 
@@ -92,10 +92,10 @@ services:
     extends:
       service: defaults
     command: ['sh', '-c', 'npm run connect-api:start:prod']
-    # environment:
-    #   - HOST=connect-api
+    environment:
+      - HOST=connect-api
     ports:
-      - '4000:4000'
+      - '3333:3333'
     profiles:
       - stg-connect
 

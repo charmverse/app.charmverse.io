@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "start": "npx tsx --watch ./src/main.ts",
-    "start:prod": "node ./dist/apps/connect-api/src/main.js",
-    "build": "rm -rf ./dist && node_modules/typescript/bin/tsc --project ./tsconfig.json",
+    "start:prod": "npx tsx ./dist/apps/connect-api/src/main.js",
+    "build": "rm -rf ./dist && ../../node_modules/typescript/bin/tsc --project ./tsconfig.json",
     "test": "test",
     "echo": "echo \"Builder api\""
   }
