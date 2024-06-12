@@ -1,4 +1,4 @@
-name: 'Deploy Connect to staging'
+name: 'Deploy Connect app to staging'
 
 on:
   pull_request:
