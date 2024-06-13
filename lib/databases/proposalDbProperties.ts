@@ -104,6 +104,18 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalAuthor'
   }),
+  proposalRubricCriteriaReviewerComment: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Comment',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerComment'
+  }),
+  proposalRubricCriteriaReviewerScore: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Reviewer Score',
+    options: [],
+    type: 'proposalRubricCriteriaReviewerScore'
+  }),
   // This is for only the current reviewers
   proposalReviewer: () => ({
     id: PROPOSAL_REVIEWERS_BLOCK_ID,

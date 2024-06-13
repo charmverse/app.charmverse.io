@@ -402,7 +402,7 @@ describe('getCardPropertiesFromProposals', () => {
         {
           response: { score: 5 },
           userId: admin.id,
-          comment: null,
+          comment: 'Rubric Evaluation 1, Rubric Criteria 1, User 1 Comment',
           proposalId: generatedProposal.id,
           rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[proposalEvaluations[1].id][0],
           evaluationId: proposalEvaluations[1].id
@@ -411,7 +411,7 @@ describe('getCardPropertiesFromProposals', () => {
         {
           response: { score: 3 },
           userId: admin.id,
-          comment: null,
+          comment: 'Rubric Evaluation 1, Rubric Criteria 2, User 1 Comment',
           proposalId: generatedProposal.id,
           rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[proposalEvaluations[1].id][1],
           evaluationId: proposalEvaluations[1].id
@@ -420,7 +420,7 @@ describe('getCardPropertiesFromProposals', () => {
         {
           response: { score: 1 },
           userId: admin.id,
-          comment: null,
+          comment: 'Rubric Evaluation 2, Rubric Criteria 1, User 1 Comment',
           proposalId: generatedProposal.id,
           rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[proposalEvaluations[2].id][0],
           evaluationId: proposalEvaluations[2].id
@@ -439,7 +439,7 @@ describe('getCardPropertiesFromProposals', () => {
         {
           response: { score: 4 },
           userId: proposalReviewer.id,
-          comment: null,
+          comment: 'Rubric Evaluation 1, Rubric Criteria 2, User 2 Comment',
           proposalId: generatedProposal.id,
           rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[proposalEvaluations[1].id][1],
           evaluationId: proposalEvaluations[1].id
@@ -457,7 +457,7 @@ describe('getCardPropertiesFromProposals', () => {
         {
           response: { score: 5 },
           userId: proposalReviewer.id,
-          comment: null,
+          comment: 'Rubric Evaluation 2, Rubric Criteria 2.1, User 2 Comment',
           proposalId: generatedProposal.id,
           rubricCriteriaId: proposalEvaluationIdRubricCriteriasRecord[proposalEvaluations[2].id][1],
           evaluationId: proposalEvaluations[2].id
@@ -501,6 +501,91 @@ describe('getCardPropertiesFromProposals', () => {
     const proposalRubricCriteria21TotalProperty = properties.find(
       (prop) => prop.type === 'proposalRubricCriteriaTotal' && prop.criteriaTitle === 'Rubric criteria 2.1'
     ) as IPropertyTemplate;
+    const proposalRubricCriteria1Reviewer1CommentProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerComment' &&
+        prop.criteriaTitle === 'Rubric criteria 1' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === admin.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria1Reviewer1ScoreProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerScore' &&
+        prop.criteriaTitle === 'Rubric criteria 1' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === admin.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria2Reviewer1CommentProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerComment' &&
+        prop.criteriaTitle === 'Rubric criteria 2' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === admin.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria2Reviewer1ScoreProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerScore' &&
+        prop.criteriaTitle === 'Rubric criteria 2' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === admin.id
+    ) as IPropertyTemplate;
+    const proposaLRubricCriteria21Reviewer1CommentProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerComment' &&
+        prop.criteriaTitle === 'Rubric criteria 2.1' &&
+        prop.evaluationTitle === 'Rubric evaluation 2' &&
+        prop.reviewerId === admin.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria21Reviewer1ScoreProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerScore' &&
+        prop.criteriaTitle === 'Rubric criteria 2.1' &&
+        prop.evaluationTitle === 'Rubric evaluation 2' &&
+        prop.reviewerId === admin.id
+    ) as IPropertyTemplate;
+
+    const proposalRubricCriteria1Reviewer2CommentProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerComment' &&
+        prop.criteriaTitle === 'Rubric criteria 1' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === proposalReviewer.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria1Reviewer2ScoreProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerScore' &&
+        prop.criteriaTitle === 'Rubric criteria 1' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === proposalReviewer.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria2Reviewer2CommentProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerComment' &&
+        prop.criteriaTitle === 'Rubric criteria 2' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === proposalReviewer.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria2Reviewer2ScoreProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerScore' &&
+        prop.criteriaTitle === 'Rubric criteria 2' &&
+        prop.evaluationTitle === 'Rubric evaluation 1' &&
+        prop.reviewerId === proposalReviewer.id
+    ) as IPropertyTemplate;
+    const proposaLRubricCriteria21Reviewer2CommentProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerComment' &&
+        prop.criteriaTitle === 'Rubric criteria 2.1' &&
+        prop.evaluationTitle === 'Rubric evaluation 2' &&
+        prop.reviewerId === proposalReviewer.id
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria21Reviewer2ScoreProperty = properties.find(
+      (prop) =>
+        prop.type === 'proposalRubricCriteriaReviewerScore' &&
+        prop.criteriaTitle === 'Rubric criteria 2.1' &&
+        prop.evaluationTitle === 'Rubric evaluation 2' &&
+        prop.reviewerId === proposalReviewer.id
+    ) as IPropertyTemplate;
     const proposalRubricCriteria1AverageProperty = properties.find(
       (prop) => prop.type === 'proposalRubricCriteriaAverage' && prop.criteriaTitle === 'Rubric criteria 1'
     ) as IPropertyTemplate;
@@ -519,9 +604,31 @@ describe('getCardPropertiesFromProposals', () => {
     expect(cardFieldProperties[proposalRubricCriteria1AverageProperty.id as string]).toStrictEqual(
       Number(((5 + 1 + 2) / 3).toFixed(2))
     );
+    expect(cardFieldProperties[proposalRubricCriteria2Reviewer1CommentProperty.id as string]).toStrictEqual(
+      'Rubric Evaluation 1, Rubric Criteria 2, User 1 Comment'
+    );
+    expect(cardFieldProperties[proposalRubricCriteria1Reviewer1CommentProperty.id as string]).toStrictEqual(
+      'Rubric Evaluation 2, Rubric Criteria 1, User 1 Comment'
+    );
+    expect(cardFieldProperties[proposalRubricCriteria1Reviewer1ScoreProperty.id as string]).toStrictEqual(1);
+
     expect(cardFieldProperties[proposalRubricCriteria2TotalProperty.id as string]).toStrictEqual(3 + 4);
-    expect(cardFieldProperties[proposalRubricCriteria21TotalProperty.id as string]).toStrictEqual(3 + 5);
+    expect(cardFieldProperties[proposalRubricCriteria2Reviewer1ScoreProperty.id as string]).toStrictEqual(3);
+    expect(proposalRubricCriteria1Reviewer2CommentProperty).toBeFalsy();
+    expect(proposalRubricCriteria1Reviewer2ScoreProperty).toBeFalsy();
+    expect(cardFieldProperties[proposalRubricCriteria2Reviewer2CommentProperty.id as string]).toStrictEqual(
+      'Rubric Evaluation 1, Rubric Criteria 2, User 2 Comment'
+    );
+    expect(cardFieldProperties[proposalRubricCriteria2Reviewer2ScoreProperty.id as string]).toStrictEqual(4);
     expect(cardFieldProperties[proposalRubricCriteria2AverageProperty.id as string]).toStrictEqual((3 + 4) / 2);
+
+    expect(cardFieldProperties[proposalRubricCriteria21TotalProperty.id as string]).toStrictEqual(3 + 5);
+    expect(cardFieldProperties[proposaLRubricCriteria21Reviewer1CommentProperty.id as string]).toStrictEqual('');
+    expect(cardFieldProperties[proposalRubricCriteria21Reviewer1ScoreProperty.id as string]).toStrictEqual(3);
+    expect(cardFieldProperties[proposaLRubricCriteria21Reviewer2CommentProperty.id as string]).toStrictEqual(
+      'Rubric Evaluation 2, Rubric Criteria 2.1, User 2 Comment'
+    );
+    expect(cardFieldProperties[proposalRubricCriteria21Reviewer2ScoreProperty.id as string]).toStrictEqual(5);
     expect(cardFieldProperties[proposalRubricCriteria21AverageProperty.id as string]).toStrictEqual((3 + 5) / 2);
   });
 
@@ -823,8 +930,6 @@ describe('getCardPropertiesFromProposals', () => {
       spaceId: testSpace.id
     });
 
-    prettyPrint({ databaseBoard });
-
     const cards = await getCardPropertiesFromProposals({
       space: {
         features: testSpace.features,
@@ -955,8 +1060,6 @@ describe('getCardPropertiesFromProposals', () => {
       createdBy: proposalAuthor.id,
       spaceId: testSpace.id
     });
-
-    prettyPrint({ databaseBoard });
 
     const cards = await getCardPropertiesFromProposals({
       space: {

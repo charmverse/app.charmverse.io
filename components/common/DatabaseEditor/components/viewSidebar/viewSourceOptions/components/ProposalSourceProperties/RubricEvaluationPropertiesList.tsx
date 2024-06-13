@@ -70,6 +70,8 @@ export function RubricEvaluationPropertiesList({
               !evaluation.total &&
               !evaluation.reviewers &&
               !evaluation.criteriaTotal &&
+              !evaluation.reviewerScore &&
+              !evaluation.reviewerComment &&
               !evaluation.criteriaAverage;
             return !isAllPropertiesFalsy;
           })
@@ -89,6 +91,8 @@ export function RubricEvaluationPropertiesList({
           _rubricEvaluation?.total &&
           _rubricEvaluation?.reviewers &&
           _rubricEvaluation?.criteriaTotal &&
+          _rubricEvaluation?.reviewerScore &&
+          _rubricEvaluation?.reviewerComment &&
           _rubricEvaluation?.criteriaAverage;
 
         return (
@@ -109,6 +113,8 @@ export function RubricEvaluationPropertiesList({
                     total: true,
                     reviewers: true,
                     criteriaTotal: true,
+                    reviewerScore: true,
+                    reviewerComment: true,
                     criteriaAverage: true
                   });
                 }
@@ -156,6 +162,24 @@ export function RubricEvaluationPropertiesList({
                 }}
                 label='Criteria Average (for each criteria)'
               />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.reviewerScore}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    reviewerScore: !_rubricEvaluation?.reviewerScore
+                  });
+                }}
+                label='Individual Reviewer Scores'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.reviewerComment}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    reviewerComment: !_rubricEvaluation?.reviewerComment
+                  });
+                }}
+                label='Individual Reviewer Comments'
+              />
             </Stack>
           </Stack>
         );
@@ -195,6 +219,12 @@ export function RubricEvaluationPropertiesReadonlyList({
           }
           if (rubricEvaluation.criteriaAverage) {
             items.push('Criteria Average');
+          }
+          if (rubricEvaluation.reviewerScore) {
+            items.push('Individual Reviewer Scores');
+          }
+          if (rubricEvaluation.reviewerComment) {
+            items.push('Individual Reviewer Comments');
           }
 
           if (items.length === 0) {

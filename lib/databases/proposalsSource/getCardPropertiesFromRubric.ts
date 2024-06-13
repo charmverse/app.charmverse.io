@@ -31,6 +31,17 @@ export function getCardPropertiesFromRubric({
 
   allRubricCriterias.forEach((criteria) => {
     const filteredRubricAnswers = allRubricAnswers.filter((a) => a.rubricCriteriaId === criteria.id);
+    filteredRubricAnswers.forEach((rubricCriteriaAnswer) => {
+      templates.forEach((template) => {
+        if (template.criteriaTitle === criteria.title && template.reviewerId === rubricCriteriaAnswer.userId) {
+          if (template.type === 'proposalRubricCriteriaReviewerComment') {
+            properties[template.id] = rubricCriteriaAnswer.comment ?? '';
+          } else if (template.type === 'proposalRubricCriteriaReviewerScore') {
+            properties[template.id] = rubricCriteriaAnswer.response.score ?? '';
+          }
+        }
+      });
+    });
     const totalScore = filteredRubricAnswers.reduce((acc, answer) => {
       return answer.response.score ? acc + answer.response.score : acc;
     }, 0);
