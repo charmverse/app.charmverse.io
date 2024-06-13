@@ -7,6 +7,8 @@ import { useCurrentSpace } from 'hooks/useCurrentSpace';
 import { useIsAdmin } from 'hooks/useIsAdmin';
 import { useMembers } from 'hooks/useMembers';
 import { useUser } from 'hooks/useUser';
+import type { PropertyType } from 'lib/databases/board';
+import { REWARD_PROPOSAL_LINK } from 'lib/rewards/blocks/constants';
 import type { RewardPropertiesField } from 'lib/rewards/blocks/interfaces';
 
 import { mapRewardToCard } from '../../hooks/useRewardsBoardAdapter';
@@ -48,7 +50,17 @@ export function CustomPropertiesAdapter({ reward, onChange, readOnly }: Props) {
         fields: {
           ...board.fields,
           // extract non-custom properties
-          cardProperties: board.fields.cardProperties.filter((p) => !p.id.startsWith('__'))
+          cardProperties: [
+            ...board.fields.cardProperties.filter((p) => !p.id.startsWith('__')),
+            // Add proposal link as a custom property
+            {
+              readOnly: true,
+              options: [],
+              id: REWARD_PROPOSAL_LINK,
+              name: 'Proposal',
+              type: 'proposalUrl' as PropertyType
+            }
+          ]
         }
       };
     }
