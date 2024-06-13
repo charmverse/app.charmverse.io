@@ -54,7 +54,17 @@ export async function updateBoardProperties({
         rubricCriteria: {
           select: {
             title: true,
-            description: true
+            description: true,
+            answers: {
+              select: {
+                user: {
+                  select: {
+                    username: true,
+                    id: true
+                  }
+                }
+              }
+            }
           }
         }
       },

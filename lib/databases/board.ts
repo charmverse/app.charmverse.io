@@ -14,6 +14,7 @@ export const proposalPropertyTypesList = [
   'proposalStatus',
   'proposalEvaluatedBy',
   'proposalEvaluationTotal',
+  'proposalRubricCriteriaAverage',
   'proposalRubricCriteriaTotal',
   'proposalEvaluationAverage',
   'proposalAuthor',
@@ -21,7 +22,9 @@ export const proposalPropertyTypesList = [
   'proposalEvaluationType',
   'proposalCreatedAt',
   'proposalStep',
-  'proposalReviewerNotes'
+  'proposalReviewerNotes',
+  'proposalRubricCriteriaReviewerScore',
+  'proposalRubricCriteriaReviewerComment'
 ] as const;
 
 export type ProposalPropertyType = (typeof proposalPropertyTypesList)[number];
@@ -79,6 +82,7 @@ export type IPropertyTemplate<T extends PropertyType = PropertyType> = {
   dynamicOptions?: boolean; // do not rely on a static list of options
   evaluationTitle?: string; // store the title of the evaluation to group properties together
   criteriaTitle?: string; // store the title of the rubric evaluation criteria to group rubric criteria score properties together
+  reviewerId?: string; // store the reviewer id for rubric evaluation criteria score properties
 };
 
 export type DataSourceType = 'board_page' | 'google_form' | 'proposals' | 'reward_applications' | 'rewards';

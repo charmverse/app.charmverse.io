@@ -29,23 +29,34 @@ export function createSelectedPropertiesStateFromBoardProperties({
       field.type === 'proposalEvaluationAverage' ||
       field.type === 'proposalEvaluationTotal' ||
       field.type === 'proposalEvaluatedBy' ||
-      field.type === 'proposalRubricCriteriaTotal'
+      field.type === 'proposalRubricCriteriaTotal' ||
+      field.type === 'proposalRubricCriteriaReviewerComment' ||
+      field.type === 'proposalRubricCriteriaReviewerScore' ||
+      field.type === 'proposalRubricCriteriaAverage'
     ) {
-      const fieldKey = field.evaluationTitle || field.name;
-      if (!rubricEvaluationsPropertiesRecord[fieldKey]) {
-        rubricEvaluationsPropertiesRecord[fieldKey] = {
-          title: fieldKey
-        };
-      }
+      const fieldKey = field.evaluationTitle;
+      if (fieldKey) {
+        if (!rubricEvaluationsPropertiesRecord[fieldKey]) {
+          rubricEvaluationsPropertiesRecord[fieldKey] = {
+            title: fieldKey
+          };
+        }
 
-      if (field.type === 'proposalEvaluationAverage') {
-        rubricEvaluationsPropertiesRecord[fieldKey].average = true;
-      } else if (field.type === 'proposalEvaluationTotal') {
-        rubricEvaluationsPropertiesRecord[fieldKey].total = true;
-      } else if (field.type === 'proposalEvaluatedBy') {
-        rubricEvaluationsPropertiesRecord[fieldKey].reviewers = true;
-      } else if (field.type === 'proposalRubricCriteriaTotal') {
-        rubricEvaluationsPropertiesRecord[fieldKey].criteriaTotal = true;
+        if (field.type === 'proposalEvaluationAverage') {
+          rubricEvaluationsPropertiesRecord[fieldKey].average = true;
+        } else if (field.type === 'proposalEvaluationTotal') {
+          rubricEvaluationsPropertiesRecord[fieldKey].total = true;
+        } else if (field.type === 'proposalEvaluatedBy') {
+          rubricEvaluationsPropertiesRecord[fieldKey].reviewers = true;
+        } else if (field.type === 'proposalRubricCriteriaTotal') {
+          rubricEvaluationsPropertiesRecord[fieldKey].criteriaTotal = true;
+        } else if (field.type === 'proposalRubricCriteriaReviewerComment') {
+          rubricEvaluationsPropertiesRecord[fieldKey].reviewerComment = true;
+        } else if (field.type === 'proposalRubricCriteriaReviewerScore') {
+          rubricEvaluationsPropertiesRecord[fieldKey].reviewerScore = true;
+        } else if (field.type === 'proposalRubricCriteriaAverage') {
+          rubricEvaluationsPropertiesRecord[fieldKey].criteriaAverage = true;
+        }
       }
     } else if (customPropertyIds.includes(field.id)) {
       customProperties.push(field.id);
