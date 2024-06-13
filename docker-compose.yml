@@ -92,7 +92,7 @@ services:
       service: defaults
     command: ['sh', '-c', 'npm run connect-api:start:prod']
     ports:
-      - '4000:4000'
+      - '4000:3000'
     profiles:
       - stg-connect
 
