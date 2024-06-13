@@ -93,10 +93,6 @@ export function getBoardProperties({
 
   applyRubricEvaluationReviewerProperties(boardProperties, evaluationSteps);
 
-  boardProperties.forEach((property) => {
-    property.name = getPropertyName(property);
-  });
-
   if (!selectedProperties) {
     return boardProperties;
   }
@@ -190,7 +186,19 @@ function applyRubricEvaluationQuestionProperties(
       applyToPropertiesByTypeAndName(boardProperties, {
         id: uuid(),
         type: 'proposalRubricCriteriaTotal',
-        name: `${evaluationTitle}: ${rubricCriteriaTitle}`,
+        name: `${evaluationTitle}: ${rubricCriteriaTitle} (Criteria total)`,
+        tooltip: rubricCriteriaDescription,
+        readOnly: true,
+        readOnlyValues: true,
+        evaluationTitle,
+        criteriaTitle: rubricCriteriaTitle,
+        private: false
+      });
+
+      applyToPropertiesByTypeAndName(boardProperties, {
+        id: uuid(),
+        type: 'proposalRubricCriteriaAverage',
+        name: `${evaluationTitle}: ${rubricCriteriaTitle} (Criteria average)`,
         tooltip: rubricCriteriaDescription,
         readOnly: true,
         readOnlyValues: true,
@@ -280,21 +288,21 @@ function applyProposalEvaluationProperties(boardProperties: IPropertyTemplate[],
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluatedBy',
-      name: rubricStepTitle,
+      name: `${rubricStepTitle} (Step reviewers)`,
       evaluationTitle: rubricStepTitle
     });
 
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationTotal',
-      name: rubricStepTitle,
+      name: `${rubricStepTitle} (Step total)`,
       evaluationTitle: rubricStepTitle
     });
 
     applyToPropertiesByTypeAndName(boardProperties, {
       id: uuid(),
       type: 'proposalEvaluationAverage',
-      name: rubricStepTitle,
+      name: `${rubricStepTitle} (Step average)`,
       evaluationTitle: rubricStepTitle
     });
   }
@@ -360,16 +368,4 @@ function applyFormFieldToProperties(
     const existingProp = boardProperties[existingPropIndex];
     boardProperties[existingPropIndex] = { id: existingProp.id, ...defaultOptions, ...fieldProperty };
   }
-}
-
-function getPropertyName(property: IPropertyTemplate) {
-  return property.type === 'proposalEvaluatedBy'
-    ? `${property.name} (Step reviewers)`
-    : property.type === 'proposalEvaluationAverage'
-    ? `${property.name} (Step average)`
-    : property.type === 'proposalEvaluationTotal'
-    ? `${property.name} (Step total)`
-    : property.type === 'proposalRubricCriteriaTotal'
-    ? `${property.name} (Criterial total)`
-    : property.name;
 }

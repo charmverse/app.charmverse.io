@@ -71,7 +71,8 @@ export function RubricEvaluationPropertiesList({
               !evaluation.reviewers &&
               !evaluation.criteriaTotal &&
               !evaluation.reviewerScore &&
-              !evaluation.reviewerComment;
+              !evaluation.reviewerComment &&
+              !evaluation.criteriaAverage;
             return !isAllPropertiesFalsy;
           })
       };
@@ -91,7 +92,8 @@ export function RubricEvaluationPropertiesList({
           _rubricEvaluation?.reviewers &&
           _rubricEvaluation?.criteriaTotal &&
           _rubricEvaluation?.reviewerScore &&
-          _rubricEvaluation?.reviewerComment;
+          _rubricEvaluation?.reviewerComment &&
+          _rubricEvaluation?.criteriaAverage;
 
         return (
           <Stack key={rubricEvaluationTitle}>
@@ -112,7 +114,8 @@ export function RubricEvaluationPropertiesList({
                     reviewers: true,
                     criteriaTotal: true,
                     reviewerScore: true,
-                    reviewerComment: true
+                    reviewerComment: true,
+                    criteriaAverage: true
                   });
                 }
               }}
@@ -148,7 +151,16 @@ export function RubricEvaluationPropertiesList({
                     criteriaTotal: !_rubricEvaluation?.criteriaTotal
                   });
                 }}
-                label='Criteria total (for each criteria)'
+                label='Criteria Total (for each criteria)'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.criteriaAverage}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    criteriaAverage: !_rubricEvaluation?.criteriaAverage
+                  });
+                }}
+                label='Criteria Average (for each criteria)'
               />
               <PropertySelector
                 isChecked={!!_rubricEvaluation?.reviewerScore}
@@ -203,7 +215,10 @@ export function RubricEvaluationPropertiesReadonlyList({
             items.push('Step Reviewers');
           }
           if (rubricEvaluation.criteriaTotal) {
-            items.push('Criteria total');
+            items.push('Criteria Total');
+          }
+          if (rubricEvaluation.criteriaAverage) {
+            items.push('Criteria Average');
           }
           if (rubricEvaluation.reviewerScore) {
             items.push('Individual Reviewer Scores');

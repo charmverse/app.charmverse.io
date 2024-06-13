@@ -37,6 +37,7 @@ export const iconForPropertyType = (propertyType: PropertyType | 'title', props?
     case 'proposalEvaluationAverage':
     case 'proposalEvaluationTotal':
     case 'proposalRubricCriteriaTotal':
+    case 'proposalRubricCriteriaAverage':
     case 'number':
     case 'tokenAmount':
       return <NumbersIcon fontSize='small' {...props} />;

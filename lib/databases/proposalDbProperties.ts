@@ -92,6 +92,12 @@ export const proposalDbProperties: {
     options: [],
     type: 'proposalRubricCriteriaTotal'
   }),
+  proposalRubricCriteriaAverage: () => ({
+    id: uuid(),
+    name: 'Proposal Rubric Criteria Average',
+    options: [],
+    type: 'proposalRubricCriteriaAverage'
+  }),
   proposalAuthor: ({ name } = {}) => ({
     id: AUTHORS_BLOCK_ID,
     name: name || 'Proposal Authors',

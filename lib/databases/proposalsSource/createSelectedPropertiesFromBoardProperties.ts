@@ -31,7 +31,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
       field.type === 'proposalEvaluatedBy' ||
       field.type === 'proposalRubricCriteriaTotal' ||
       field.type === 'proposalRubricCriteriaReviewerComment' ||
-      field.type === 'proposalRubricCriteriaReviewerScore'
+      field.type === 'proposalRubricCriteriaReviewerScore' ||
+      field.type === 'proposalRubricCriteriaAverage'
     ) {
       const fieldKey = field.evaluationTitle;
       if (fieldKey) {
@@ -53,6 +54,8 @@ export function createSelectedPropertiesStateFromBoardProperties({
           rubricEvaluationsPropertiesRecord[fieldKey].reviewerComment = true;
         } else if (field.type === 'proposalRubricCriteriaReviewerScore') {
           rubricEvaluationsPropertiesRecord[fieldKey].reviewerScore = true;
+        } else if (field.type === 'proposalRubricCriteriaAverage') {
+          rubricEvaluationsPropertiesRecord[fieldKey].criteriaAverage = true;
         }
       }
     } else if (customPropertyIds.includes(field.id)) {

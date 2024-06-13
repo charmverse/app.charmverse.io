@@ -180,12 +180,28 @@ describe('getBoardProperties', () => {
     expect(rubricCriteria1Reviewer1ScoreProperty).toBeTruthy();
     expect(rubricCriteria1Reviewer2CommentProperty).toBeTruthy();
     expect(rubricCriteria1Reviewer2ScoreProperty).toBeTruthy();
+    const rubricCriteria1AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 1' && r.type === 'proposalRubricCriteriaAverage'
+    );
+    const rubricCriteria2AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2' && r.type === 'proposalRubricCriteriaAverage'
+    );
+    const rubricCriteria21AverageProperty = properties.find(
+      (r) => r.criteriaTitle === 'Rubric Criteria 2.1' && r.type === 'proposalRubricCriteriaAverage'
+    );
+
+    expect(rubricCriteria1Property).toBeTruthy();
+    expect(rubricCriteria2Property).toBeTruthy();
+    expect(rubricCriteria21Property).toBeTruthy();
+    expect(rubricCriteria1Property).toBeTruthy();
     expect(rubricCriteria1Property?.tooltip).toEqual('Rubric Criteria 1 Description');
+    expect(rubricCriteria1AverageProperty).toBeTruthy();
 
     expect(rubricCriteria2Property).toBeTruthy();
     expect(rubricCriteria2Property?.tooltip).toBe('');
     expect(rubricCriteria2Reviewer1CommentProperty).toBeFalsy();
     expect(rubricCriteria2Reviewer1ScoreProperty).toBeFalsy();
+    expect(rubricCriteria2AverageProperty).toBeTruthy();
 
     expect(rubricCriteria21Property).toBeTruthy();
     expect(rubricCriteria21Reviewer1CommentProperty).toBeTruthy();
@@ -194,6 +210,7 @@ describe('getBoardProperties', () => {
     expect(rubricCriteria21Reviewer1ScoreProperty).toBeTruthy();
     expect(rubricCriteria21Reviewer2CommentProperty).toBeFalsy();
     expect(rubricCriteria21Reviewer2ScoreProperty).toBeFalsy();
+    expect(rubricCriteria21AverageProperty).toBeTruthy();
   });
 
   // in case we change our mind about defaults, since all these fields are readonly
