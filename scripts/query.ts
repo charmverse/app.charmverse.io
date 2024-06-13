@@ -5,26 +5,18 @@ import { prisma } from '@charmverse/core/prisma-client';
  */
 
 async function search() {
-  const bountyCards = await prisma.proposal.findFirst({
+  const result = await prisma.user.findFirst({
     where: {
-      page: {
-        path: 'xandra-4799432385546818'
-      }
+      username: 'mattcasey.eth'
     },
     include: {
-      evaluations: {
-        include: {
-          permissions: true
-        }
-      }
+      verifiedEmails: true,
+      wallets: true,
+      googleAccounts: true,
+      spaceRoles: true
     }
   });
-
-  console.log(
-    bountyCards?.evaluations.map(
-      (e) => e.title + e.permissions.filter((p) => p.operation === 'view').map((p) => p.systemRole)
-    )
-  );
+  console.log(result);
 }
 
 search().then(() => console.log('Done'));
