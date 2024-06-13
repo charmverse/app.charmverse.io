@@ -104,7 +104,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:elasticbeanstalk:environment:process:websocket',
         optionName: 'Port',
-        value: '3002'
+        value: '4000'
       },
       {
         namespace: 'aws:elasticbeanstalk:environment:process:websocket',
@@ -112,22 +112,22 @@ export class CdkDeployStack extends Stack {
         value: 'HTTP'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'ListenerEnabled',
         value: 'true'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'Protocol',
         value: 'HTTPS'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'SSLCertificateArns',
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'DefaultProcess',
         value: 'websocket'
       },
