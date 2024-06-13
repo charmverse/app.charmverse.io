@@ -140,7 +140,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:autoscaling:launchconfiguration',
         optionName: 'EC2KeyName',
-        value: 'northshore-webapp'
+        value: 'stg-permission-api'
       },
       {
         namespace: 'aws:autoscaling:asg',
