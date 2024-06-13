@@ -271,7 +271,7 @@ function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   return (
     <Head>
       <title>
-        {`${prefix} `}
+        {prefix}
         {title || `CharmVerse - The Network for Onchain Communities`}
       </title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
