@@ -172,12 +172,7 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
         value: 'https://' + deploymentDomain
-      },
-      {
-        namespace: 'aws:autoscaling:asg',
-        optionName: 'Cooldown',
-        value: '7200' // Provide 2 hours to debug the instance
-      },
+      }
     ];
 
     const resourceTags: CfnTag[] = [
