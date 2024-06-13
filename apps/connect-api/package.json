@@ -6,8 +6,7 @@
     "start": "npx tsx --watch ./src/main.ts",
     "start:prod": "npx tsx ./dist/apps/connect-api/src/main.js",
     "build": "rm -rf ./dist && ../../node_modules/typescript/bin/tsc --project ./tsconfig.json",
-    "test:server": "npx jest --config=./jest.config-server.ts",
-    "test": "npx jest --config=./jest.config-all.ts",
+    "test": "npx jest --config=./jest.config.ts",
     "echo": "echo \"Builder api\""
   }
 }
