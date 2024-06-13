@@ -66,7 +66,11 @@ export function RubricEvaluationPropertiesList({
           })
           .filter((evaluation) => {
             const isAllPropertiesFalsy =
-              !evaluation.average && !evaluation.total && !evaluation.reviewers && !evaluation.criteriaTotal;
+              !evaluation.average &&
+              !evaluation.total &&
+              !evaluation.reviewers &&
+              !evaluation.criteriaTotal &&
+              !evaluation.criteriaAverage;
             return !isAllPropertiesFalsy;
           })
       };
@@ -84,7 +88,8 @@ export function RubricEvaluationPropertiesList({
           _rubricEvaluation?.average &&
           _rubricEvaluation?.total &&
           _rubricEvaluation?.reviewers &&
-          _rubricEvaluation?.criteriaTotal;
+          _rubricEvaluation?.criteriaTotal &&
+          _rubricEvaluation?.criteriaAverage;
 
         return (
           <Stack key={rubricEvaluationTitle}>
@@ -103,7 +108,8 @@ export function RubricEvaluationPropertiesList({
                     average: true,
                     total: true,
                     reviewers: true,
-                    criteriaTotal: true
+                    criteriaTotal: true,
+                    criteriaAverage: true
                   });
                 }
               }}
