@@ -16,7 +16,7 @@ const defaultBody = {
 
 describe('loginWithFarcaster', () => {
   afterEach(async () => {
-    await prisma.user.deleteMany({});
+    await prisma.userWallet.deleteMany({});
     await prisma.farcasterUser.deleteMany({});
   });
 
@@ -63,7 +63,7 @@ describe('loginWithFarcaster', () => {
       verifications: [walletAddress]
     };
 
-    const { user } = await generateUserAndSpace({
+    await generateUserAndSpace({
       walletAddress
     });
 
