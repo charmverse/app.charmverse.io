@@ -414,7 +414,7 @@ export function RewardsPage({ title }: { title: string }) {
                     selectedCardIds={[]}
                     readOnly={!isAdmin}
                     addCard={async () => {}}
-                    isApplication
+                    isApplication={activeView.fields.sourceType === 'reward_applications'}
                     onCardClicked={(_e, card) => showRewardOrApplication(card.id, card?.parentId)}
                     showCard={showRewardOrApplication}
                     disableAddingCards
