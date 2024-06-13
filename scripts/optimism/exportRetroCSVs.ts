@@ -7,7 +7,7 @@ import { spaceId, templateId } from './retroData';
 type SummaryRow = {};
 
 const summaryFile = './op-review-summary.csv';
-const reviewersFile = './op-reviewers.csv';
+const reviewersFile = './op-reviewers-june-13.csv';
 
 async function exportSummary() {
   const proposals = await prisma.proposal.findMany({
@@ -128,4 +128,4 @@ async function exportMembers() {
   writeFileSync(reviewersFile, csvString);
 }
 
-exportSummary().catch(console.error);
+exportMembers().catch(console.error);
