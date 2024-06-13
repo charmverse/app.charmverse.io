@@ -72,8 +72,8 @@ cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 // Create external eas credentials for Gitcoin and Questbook every day at midnight
 cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
 
-// Sync op reviews once an hour - remove by July 2024
-cron.schedule('0 * * * *', syncOptimismReviewsTask);
+// Sync op reviews every 15 minutes - remove by July 2024
+cron.schedule('*/15 * * * *', syncOptimismReviewsTask);
 
 const port = process.env.PORT || 4000;
 
