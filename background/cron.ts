@@ -16,6 +16,7 @@ import { task as processMailgunWebhookMessages } from './tasks/processMailgunWeb
 import { task as processSynapsWebhookMessages } from './tasks/processSynapsWebhookMessages';
 import { refreshBountyApplications } from './tasks/refreshBountyApplications/task';
 import { sendDraftProposalNotificationTask } from './tasks/sendDraftProposalNotificationTask';
+import { syncOptimismReviewsTask } from './tasks/syncOptimismReviews';
 import { syncSummonSpacesRoles } from './tasks/syncSummonSpaceRoles/task';
 import { task as proposalTask } from './tasks/updateProposalStatus';
 import { task as voteTask } from './tasks/updateVotesStatus';
@@ -70,6 +71,9 @@ cron.schedule('0 0 * * *', syncSummonSpacesRoles);
 
 // Create external eas credentials for Gitcoin and Questbook every day at midnight
 cron.schedule('0 0 * * *', createOffchainCredentialsForExternalProjects);
+
+// Sync op reviews once an hour - remove by July 2024
+cron.schedule('0 * * * *', syncOptimismReviewsTask);
 
 const port = process.env.PORT || 4000;
 
