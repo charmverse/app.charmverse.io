@@ -7,6 +7,9 @@ inputs:
   save_cache:
     description: 'Whether to save the cache'
     required: false
+  NEXT_PUBLIC_CONNECT_API_HOST:
+    description: '...'
+    required: false
 
 runs:
   using: 'composite'
@@ -31,8 +34,8 @@ runs:
     - name: Build
       shell: bash
       if: steps.restore_build.outputs.cache-hit != 'true'
-      # env:
-      #   NEXT_PUBLIC_CONNECT_API_HOST: 'https://localhost:3333'
+      env:
+        NEXT_PUBLIC_CONNECT_API_HOST: ${{ inputs.NEXT_PUBLIC_CONNECT_API_HOST }}
       run: npm run connect:all:build
 
     # building cache key takes almost a minute, so we only run this if we are saving the cache

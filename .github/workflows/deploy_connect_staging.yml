@@ -35,10 +35,11 @@ jobs:
       - name: Install dependencies
         uses: ./.github/actions/install
 
-      - name: Build app
+      - name: Build Connect App
         uses: ./.github/actions/build_connect
         with:
           REACT_APP_APP_ENV: 'staging'
+          NEXT_PUBLIC_CONNECT_API_HOST: https://${{ env.STAGE }}.charmverse.co:4000
 
       - name: Build and Push Docker image
         id: docker_build_push
@@ -70,7 +71,7 @@ jobs:
           rm .ebextensions*/06_cloudwatch_alarm.config
 
           # substituting the API domain name
-          sed -i 's/NEXT_PUBLIC_CONNECT_API_HOST=.*/NEXT_PUBLIC_CONNECT_API_HOST=https:\/\/${{env.STAGE}}.charmverse.co:3333/g' .ebstalk.apps.env/connect.env
+          sed -i 's/NEXT_PUBLIC_CONNECT_API_HOST=.*/NEXT_PUBLIC_CONNECT_API_HOST=https:\/\/${{env.STAGE}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
