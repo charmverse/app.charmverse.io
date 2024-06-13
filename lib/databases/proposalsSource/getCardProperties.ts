@@ -21,7 +21,6 @@ import { PROPOSAL_REVIEWERS_BLOCK_ID } from 'lib/proposals/blocks/constants';
 import type { ProposalPropertyValue } from 'lib/proposals/blocks/interfaces';
 import { getCurrentStep } from 'lib/proposals/getCurrentStep';
 import type { ProposalFields } from 'lib/proposals/interfaces';
-import type { ProposalRubricCriteriaAnswerWithTypedResponse } from 'lib/proposals/rubric/interfaces';
 
 import type { BlockWithDetails } from '../block';
 import type { BoardFields, IPropertyTemplate, ProposalPropertyType } from '../board';
@@ -36,7 +35,7 @@ import { getCardPropertiesFromRubric } from './getCardPropertiesFromRubric';
 
 export type ProposalCardData = Pick<BlockWithDetails, 'fields' | 'title'>;
 
-type ProposalData = {
+export type ProposalData = {
   page: {
     id: string;
     title: string;
@@ -252,16 +251,10 @@ function getCardProperties({ page, proposal, cardProperties, space }: ProposalDa
     properties[proposalProps.proposalAuthor.id] = proposal.authors.map((author) => author.userId);
   }
 
-  proposal.evaluations.forEach((evaluation) => {
-    if (evaluation.type === 'rubric') {
-      properties = getCardPropertiesFromRubric({
-        properties,
-        rubricAnswers: evaluation.rubricAnswers as ProposalRubricCriteriaAnswerWithTypedResponse[],
-        rubricCriteria: evaluation.rubricCriteria,
-        step: evaluation,
-        templates: cardProperties
-      });
-    }
+  properties = getCardPropertiesFromRubric({
+    properties,
+    evaluations: proposal.evaluations.filter((e) => e.type === 'rubric'),
+    templates: cardProperties
   });
 
   const currentEvaluation = getCurrentEvaluation(proposal.evaluations);

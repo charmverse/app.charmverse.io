@@ -161,6 +161,10 @@ export const propertyConfigs: Record<PropertyType, DataTypeConfigs> = {
     datatype: 'number',
     conditions: NumberDataTypeConditions
   },
+  proposalRubricCriteriaAverage: {
+    datatype: 'number',
+    conditions: NumberDataTypeConditions
+  },
   proposalAuthor: {
     datatype: 'multi_select',
     conditions: MultiSelectDataTypeConditions

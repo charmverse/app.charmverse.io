@@ -66,7 +66,11 @@ export function RubricEvaluationPropertiesList({
           })
           .filter((evaluation) => {
             const isAllPropertiesFalsy =
-              !evaluation.average && !evaluation.total && !evaluation.reviewers && !evaluation.criteriaTotal;
+              !evaluation.average &&
+              !evaluation.total &&
+              !evaluation.reviewers &&
+              !evaluation.criteriaTotal &&
+              !evaluation.criteriaAverage;
             return !isAllPropertiesFalsy;
           })
       };
@@ -84,7 +88,8 @@ export function RubricEvaluationPropertiesList({
           _rubricEvaluation?.average &&
           _rubricEvaluation?.total &&
           _rubricEvaluation?.reviewers &&
-          _rubricEvaluation?.criteriaTotal;
+          _rubricEvaluation?.criteriaTotal &&
+          _rubricEvaluation?.criteriaAverage;
 
         return (
           <Stack key={rubricEvaluationTitle}>
@@ -103,7 +108,8 @@ export function RubricEvaluationPropertiesList({
                     average: true,
                     total: true,
                     reviewers: true,
-                    criteriaTotal: true
+                    criteriaTotal: true,
+                    criteriaAverage: true
                   });
                 }
               }}
@@ -139,7 +145,16 @@ export function RubricEvaluationPropertiesList({
                     criteriaTotal: !_rubricEvaluation?.criteriaTotal
                   });
                 }}
-                label='Criteria total (for each criteria)'
+                label='Criteria Total (for each criteria)'
+              />
+              <PropertySelector
+                isChecked={!!_rubricEvaluation?.criteriaAverage}
+                onClick={() => {
+                  updateRubricEvaluationProperties(rubricEvaluationTitle, {
+                    criteriaAverage: !_rubricEvaluation?.criteriaAverage
+                  });
+                }}
+                label='Criteria Average (for each criteria)'
               />
             </Stack>
           </Stack>
@@ -176,7 +191,10 @@ export function RubricEvaluationPropertiesReadonlyList({
             items.push('Step Reviewers');
           }
           if (rubricEvaluation.criteriaTotal) {
-            items.push('Criteria total');
+            items.push('Criteria Total');
+          }
+          if (rubricEvaluation.criteriaAverage) {
+            items.push('Criteria Average');
           }
 
           if (items.length === 0) {

@@ -52,7 +52,8 @@ export function filterBoardProperties({
       p.type === 'proposalEvaluationAverage' ||
       p.type === 'proposalEvaluationTotal' ||
       p.type === 'proposalEvaluatedBy' ||
-      p.type === 'proposalRubricCriteriaTotal'
+      p.type === 'proposalRubricCriteriaTotal' ||
+      p.type === 'proposalRubricCriteriaAverage'
     ) {
       const rubricEvaluation = selectedProperties.rubricEvaluations.find((r) => r.title === p.evaluationTitle);
       if (!rubricEvaluation) {
@@ -72,6 +73,10 @@ export function filterBoardProperties({
 
       if (p.type === 'proposalRubricCriteriaTotal') {
         return !!rubricEvaluation.criteriaTotal;
+      }
+
+      if (rubricEvaluation.criteriaAverage && p.type === 'proposalRubricCriteriaAverage') {
+        return true;
       }
     }
     // Custom proposal source board properties, so always show them

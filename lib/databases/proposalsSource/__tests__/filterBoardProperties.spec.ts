@@ -232,6 +232,13 @@ describe('filterBoardProperties', () => {
         },
         {
           id: v4(),
+          type: 'proposalRubricCriteriaAverage',
+          name: 'Rubric 1',
+          options: [],
+          evaluationTitle: 'Rubric 1'
+        },
+        {
+          id: v4(),
           type: 'proposalRubricCriteriaTotal',
           name: 'Rubric 2',
           options: [],
@@ -248,13 +255,21 @@ describe('filterBoardProperties', () => {
         rubricEvaluations: [
           {
             title: 'Rubric 1',
-            criteriaTotal: true
+            criteriaTotal: true,
+            criteriaAverage: true
           }
         ]
       }
     });
 
-    expect(properties.length).toBe(1);
-    expect(properties[0].type).toBe('proposalRubricCriteriaTotal');
+    const rubric1CriteriaTotalProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaTotal' && p.evaluationTitle === 'Rubric 1'
+    );
+    const rubric1CriteriaAverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.evaluationTitle === 'Rubric 1'
+    );
+    expect(properties.length).toBe(2);
+    expect(rubric1CriteriaTotalProperty).toBeTruthy();
+    expect(rubric1CriteriaAverageProperty).toBeTruthy();
   });
 });

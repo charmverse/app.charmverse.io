@@ -409,7 +409,7 @@ describe('getCardPropertiesFromProposals', () => {
         },
         // Rubric Criteria 2
         {
-          response: { score: 2 },
+          response: { score: 3 },
           userId: admin.id,
           comment: null,
           proposalId: generatedProposal.id,
@@ -501,14 +501,28 @@ describe('getCardPropertiesFromProposals', () => {
     const proposalRubricCriteria21TotalProperty = properties.find(
       (prop) => prop.type === 'proposalRubricCriteriaTotal' && prop.criteriaTitle === 'Rubric criteria 2.1'
     ) as IPropertyTemplate;
+    const proposalRubricCriteria1AverageProperty = properties.find(
+      (prop) => prop.type === 'proposalRubricCriteriaAverage' && prop.criteriaTitle === 'Rubric criteria 1'
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria2AverageProperty = properties.find(
+      (prop) => prop.type === 'proposalRubricCriteriaAverage' && prop.criteriaTitle === 'Rubric criteria 2'
+    ) as IPropertyTemplate;
+    const proposalRubricCriteria21AverageProperty = properties.find(
+      (prop) => prop.type === 'proposalRubricCriteriaAverage' && prop.criteriaTitle === 'Rubric criteria 2.1'
+    ) as IPropertyTemplate;
 
     const card = Object.values(cards)[0];
 
     const cardFieldProperties = card.fields.properties;
 
     expect(cardFieldProperties[proposalRubricCriteria1TotalProperty.id as string]).toStrictEqual(5 + 1 + 2);
-    expect(cardFieldProperties[proposalRubricCriteria2TotalProperty.id as string]).toStrictEqual(2 + 4);
+    expect(cardFieldProperties[proposalRubricCriteria1AverageProperty.id as string]).toStrictEqual(
+      Number(((5 + 1 + 2) / 3).toFixed(2))
+    );
+    expect(cardFieldProperties[proposalRubricCriteria2TotalProperty.id as string]).toStrictEqual(3 + 4);
     expect(cardFieldProperties[proposalRubricCriteria21TotalProperty.id as string]).toStrictEqual(3 + 5);
+    expect(cardFieldProperties[proposalRubricCriteria2AverageProperty.id as string]).toStrictEqual((3 + 4) / 2);
+    expect(cardFieldProperties[proposalRubricCriteria21AverageProperty.id as string]).toStrictEqual((3 + 5) / 2);
   });
 
   it(`should add custom proposal properties as card properties`, async () => {
