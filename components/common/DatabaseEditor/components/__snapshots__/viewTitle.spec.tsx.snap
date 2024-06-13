@@ -197,7 +197,90 @@ exports[`components/viewTitle should match snapshot 1`] = `
       </div>
       <div
         class="description"
-      />
+      >
+        <div
+          class="bangle-editor-core  content-loaded"
+          data-page-id="test-id"
+        >
+          <span />
+          <div
+            class="css-1m71jyw"
+            id="test-id"
+            style="margin-left: 35px; width: 100%; height: 100%;"
+            translate="no"
+          >
+            <div
+              class="ProseMirror bangle-editor"
+              contenteditable="true"
+              data-placeholder="Type '/' for commands"
+              data-test="charm-editor-input"
+              translate="no"
+            >
+              <p>
+                <br
+                  class="ProseMirror-trailingBreak"
+                />
+              </p>
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </span>
 </div>
@@ -252,7 +335,89 @@ exports[`components/viewTitle should match snapshot readonly 1`] = `
       </div>
       <div
         class="description"
-      />
+      >
+        <div
+          class="bangle-editor-core readonly content-loaded"
+          data-page-id="test-id"
+        >
+          <span />
+          <div
+            class="css-1m71jyw"
+            id="test-id"
+            style="margin-left: 35px; width: 100%; height: 100%;"
+            translate="yes"
+          >
+            <div
+              class="ProseMirror bangle-editor"
+              contenteditable="false"
+              data-test="charm-editor-input"
+              translate="yes"
+            >
+              <p>
+                <br
+                  class="ProseMirror-trailingBreak"
+                />
+              </p>
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </span>
 </div>
@@ -355,7 +520,90 @@ exports[`components/viewTitle show description 1`] = `
       </div>
       <div
         class="description"
-      />
+      >
+        <div
+          class="bangle-editor-core  content-loaded"
+          data-page-id="test-id"
+        >
+          <span />
+          <div
+            class="css-1m71jyw"
+            id="test-id"
+            style="margin-left: 35px; width: 100%; height: 100%;"
+            translate="no"
+          >
+            <div
+              class="ProseMirror bangle-editor"
+              contenteditable="true"
+              data-placeholder="Type '/' for commands"
+              data-test="charm-editor-input"
+              translate="no"
+            >
+              <p>
+                <br
+                  class="ProseMirror-trailingBreak"
+                />
+              </p>
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+            <div
+              class="bangle-tooltip"
+              role="tooltip"
+            >
+              <div
+                class="bangle-tooltip-content"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </span>
 </div>
