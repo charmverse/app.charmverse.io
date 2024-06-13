@@ -1,5 +1,4 @@
-import type { AuthClientError } from '@farcaster/auth-kit';
-import '@farcaster/auth-kit/styles.css';
+import { AuthKitProvider, type AuthClientError } from '@farcaster/auth-kit';
 import { usePopupState } from 'material-ui-popup-state/hooks';
 import { useCallback } from 'react';
 
@@ -7,12 +6,13 @@ import { ConnectorButton } from 'components/_app/Web3ConnectionManager/component
 import PrimaryButton from 'components/common/PrimaryButton';
 import { useFarcasterConnection } from 'hooks/useFarcasterConnection';
 import { useSnackbar } from 'hooks/useSnackbar';
+import { warpcastConfig } from 'lib/farcaster/config';
 import type { LoginType } from 'lib/farcaster/interfaces';
 import type { LoggedInUser } from 'models';
 
 import { FarcasterLoginModal } from './FarcasterModal';
 
-export function WarpcastLogin({ type }: { type: LoginType }) {
+function WarpcastLoginButton({ type }: { type: LoginType }) {
   const popupState = usePopupState({ variant: 'popover', popupId: 'warpcast-login' });
   const { showMessage } = useSnackbar();
 
@@ -64,5 +64,13 @@ export function WarpcastLogin({ type }: { type: LoginType }) {
       )}
       <FarcasterLoginModal open={popupState.isOpen} onClose={popupState.close} url={url} />
     </>
+  );
+}
+
+export function WarpcastLogin({ type }: { type: LoginType }) {
+  return (
+    <AuthKitProvider config={warpcastConfig}>
+      <WarpcastLoginButton type={type} />
+    </AuthKitProvider>
   );
 }

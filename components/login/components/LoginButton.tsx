@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { useRef, useState } from 'react';
@@ -28,7 +29,6 @@ import { DiscordLoginHandler } from './DiscordLoginHandler';
 import { EmailAddressForm } from './EmailAddressForm';
 import { LoginErrorModal } from './LoginErrorModal';
 import { WalletSign } from './WalletSign';
-import { WarpcastLogin } from './WarpcastLogin';
 
 export type AnyIdLogin<I extends IdentityType = IdentityType> = {
   identityType: I;
@@ -61,6 +61,10 @@ type Props = {
   signInLabel?: string;
   emailOnly?: boolean;
 };
+
+const WarpcastLogin = dynamic(() => import('./WarpcastLogin').then((module) => module.WarpcastLogin), {
+  ssr: false
+});
 
 export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
