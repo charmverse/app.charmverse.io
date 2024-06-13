@@ -15,9 +15,9 @@ const defaultBody = {
 } as const;
 
 describe('loginWithFarcaster', () => {
-  beforeEach(async () => {
-    await prisma.user.deleteMany();
-    await prisma.farcasterUser.deleteMany();
+  afterEach(async () => {
+    await prisma.user.deleteMany({});
+    await prisma.farcasterUser.deleteMany({});
   });
 
   test('should fail if no fid or no username in the body', async () => {
