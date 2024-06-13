@@ -1,6 +1,7 @@
 import { log } from '@charmverse/core/log';
 import type { StatusAPIResponse as FarcasterAccount } from '@farcaster/auth-kit';
 import List from '@mui/material/List';
+import dynamic from 'next/dynamic';
 import { useEffect, useRef, useState } from 'react';
 
 import { useAddUserWallets } from 'charmClient/hooks/profile';
@@ -8,7 +9,6 @@ import Modal from 'components/common/Modal';
 import PrimaryButton from 'components/common/PrimaryButton';
 import { EmailAddressForm } from 'components/login/components/EmailAddressForm';
 import { WalletSign } from 'components/login/components/WalletSign';
-import { WarpcastLogin } from 'components/login/components/WarpcastLogin';
 import { AddWalletStep } from 'components/settings/account/components/AddWalletStep';
 import { useCustomDomain } from 'hooks/useCustomDomain';
 import { useDiscordConnection } from 'hooks/useDiscordConnection';
@@ -24,6 +24,11 @@ import type { TelegramAccount } from 'pages/api/telegram/connect';
 
 import IdentityProviderItem from './IdentityProviderItem';
 import { TELEGRAM_BOT_ID } from './TelegramLoginIframe';
+
+const WarpcastLogin = dynamic(
+  () => import('components/login/components/WarpcastLogin').then((module) => module.WarpcastLogin),
+  { ssr: false }
+);
 
 type Props = {
   isOpen: boolean;
