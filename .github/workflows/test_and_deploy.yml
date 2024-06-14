@@ -117,9 +117,7 @@ jobs:
             test_command: 'npm run test:browser'
           - test_name: 'Serverless tests'
             test_command: 'npm run serverless:start & sleep 10 && npm run test:serverless'
-          - test_name: 'Connect API - Server tests'
-            test_command: 'npm run connect-api:test:server'
-          - test_name: 'Connect API - Unit tests'
+          - test_name: 'Connect API - Tests'
             test_command: 'npm run connect-api:test'
 
     steps:

@@ -1,13 +1,9 @@
 'use client';
 
-import env from '@beam-australia/react-env';
 // import { connectApiClient } from 'connect/api/apiClient';
-import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { connectApiHost } from 'config/constants';
-
-import { connectApiClient } from '../api/apiClient';
+import { connectApiClient } from '../apiClient/apiClient';
 
 import styles from './page.module.css';
 

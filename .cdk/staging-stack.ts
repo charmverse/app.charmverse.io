@@ -57,6 +57,11 @@ export class CdkDeployStack extends Stack {
         value: 'aws-elasticbeanstalk-ec2-role'
       },
       {
+        namespace: 'aws:autoscaling:launchconfiguration',
+        optionName: 'RootVolumeSize',
+        value: '12' // example size in GB
+      },
+      {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
         value: 'LoadBalanced'
@@ -104,7 +109,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:elasticbeanstalk:environment:process:websocket',
         optionName: 'Port',
-        value: '3002'
+        value: '4000'
       },
       {
         namespace: 'aws:elasticbeanstalk:environment:process:websocket',
@@ -112,22 +117,22 @@ export class CdkDeployStack extends Stack {
         value: 'HTTP'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'ListenerEnabled',
         value: 'true'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'Protocol',
         value: 'HTTPS'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'SSLCertificateArns',
         value: 'arn:aws:acm:us-east-1:310849459438:certificate/bfea3120-a440-4667-80fd-d285146f2339'
       },
       {
-        namespace: 'aws:elbv2:listener:3002',
+        namespace: 'aws:elbv2:listener:4000',
         optionName: 'DefaultProcess',
         value: 'websocket'
       },
@@ -172,12 +177,7 @@ export class CdkDeployStack extends Stack {
         namespace: 'aws:elasticbeanstalk:application:environment',
         optionName: 'DOMAIN',
         value: 'https://' + deploymentDomain
-      },
-      {
-        namespace: 'aws:autoscaling:asg',
-        optionName: 'Cooldown',
-        value: '7200' // Provide 2 hours to debug the instance
-      },
+      }
     ];
 
     const resourceTags: CfnTag[] = [
