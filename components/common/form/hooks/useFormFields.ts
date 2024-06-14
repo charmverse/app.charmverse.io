@@ -103,7 +103,7 @@ export function useFormFieldsWithState({
     formState,
     setValue,
     onSubmit: () => {
-      if (formState.isValid) {
+      if (!formState.isValid) {
         return;
       }
       handleSubmit((_values) => {
