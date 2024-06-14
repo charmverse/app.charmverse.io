@@ -3,7 +3,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import type { AutocompleteChangeReason, AutocompleteProps } from '@mui/material';
 import { Autocomplete, TextField } from '@mui/material';
 import type { ReactNode } from 'react';
-import { createRef, useMemo } from 'react';
+import { createRef, useEffect, useState } from 'react';
 import { v4 } from 'uuid';
 
 import UserDisplay from 'components/common/UserDisplay';
@@ -148,28 +148,36 @@ export function InputSearchMemberMultiple({
   ...props
 }: IInputSearchMemberMultipleProps) {
   const { members, membersRecord } = useMembers();
-  const selectedMembers = useMemo(
-    () => (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean),
-    [defaultValue, membersRecord]
-  );
+  const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
+  const [value, setValue] = useState<Member[]>(defaultMembers);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
     onChange(
       users.map((user) => (user.id.startsWith('email') ? user.username : user.id)),
       reason
     );
+    setValue(users);
   }
+
+  useEffect(() => {
+    if (defaultValue && value.length === 0) {
+      const _defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
+      if (_defaultMembers.length > 0) {
+        setValue(_defaultMembers);
+      }
+    }
+  }, [defaultValue, membersRecord]);
 
   return (
     <InputSearchMemberBase
       filterSelectedOptions
       multiple={multiple}
-      value={selectedMembers}
+      value={value}
       disableCloseOnSelect={disableCloseOnSelect}
       onChange={(e, _value, reason) => emitValue(_value as Member[], reason)}
       isOptionEqualToValue={(option, val) => option.id === val.id}
       {...props}
-      placeholder={defaultValue?.length ? undefined : props.placeholder ?? 'Select members'}
+      placeholder={defaultValue?.length || value.length ? undefined : props.placeholder ?? 'Select members'}
       options={members.filter((member) => !member.isBot)}
     />
   );
