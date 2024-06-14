@@ -114,6 +114,7 @@
     "@ethersproject/contracts": "^5.7.0",
     "@ethersproject/providers": "^5.5.3",
     "@ethersproject/wallet": "^5.7.0",
+    "@farcaster/auth-kit": "^0.3.1",
     "@farcaster/core": "^0.13.7",
     "@fontsource/ia-writer-mono": "^4.5.3",
     "@fullcalendar/common": "^5.11.5",

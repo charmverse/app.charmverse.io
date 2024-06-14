@@ -8,6 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { usePopupState } from 'material-ui-popup-state/hooks';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import type { SyntheticEvent } from 'react';
 import { useRef, useState } from 'react';
@@ -60,6 +61,10 @@ type Props = {
   signInLabel?: string;
   emailOnly?: boolean;
 };
+
+const WarpcastLogin = dynamic(() => import('./WarpcastLogin').then((module) => module.WarpcastLogin), {
+  ssr: false
+});
 
 export function LoginButton({ redirectUrl, signInLabel = 'Sign in', showSignup, emailOnly }: Props) {
   const loginDialog = usePopupState({ variant: 'popover', popupId: 'login-dialog' });
@@ -140,7 +145,6 @@ function LoginHandler(props: DialogProps) {
   async function handleMagicLinkRequest(email: string) {
     if (sendingMagicLink.current === false) {
       sendingMagicLink.current = true;
-      // console.log('Handling magic link request');
       try {
         await requestMagicLinkViaFirebase({ email, redirectUrl });
         showMessage(`Magic link sent. Please check your inbox for ${email}`, 'success');
@@ -218,6 +222,11 @@ function LoginHandler(props: DialogProps) {
             </DialogTitle>
           )}
           {!loginMethod && !props.emailOnly && <DiscordLoginHandler redirectUrl={returnUrl ?? redirectUrl ?? '/'} />}
+          {!loginMethod && !props.emailOnly && (
+            <ListItem>
+              <WarpcastLogin type='login' />
+            </ListItem>
+          )}
 
           {/* Google login method */}
           {!loginMethod && (
