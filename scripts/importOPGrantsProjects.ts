@@ -8,7 +8,7 @@ import { getUserS3FilePath, uploadUrlToS3 } from 'lib/aws/uploadToS3Server';
 import { parse } from 'csv-parse/sync';
 import { stringify } from 'csv-stringify/sync';
 import { createOrGetUserFromWallet } from 'lib/users/createUser';
-import { getProjectsImportData } from 'scripts/optimisms/getRound3Projects';
+import { getProjectsImportData } from 'scripts/optimism/getRound3Projects';
 import { DateTime } from 'luxon';
 import { isTruthy } from 'lib/utils/types';
 import { getFilenameWithExtension } from 'lib/utils/getFilenameWithExtension';
