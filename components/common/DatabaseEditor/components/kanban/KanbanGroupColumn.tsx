@@ -25,6 +25,7 @@ type Props = {
   showCard: (cardId: string | null) => void;
   disableAddingCards?: boolean;
   hideLinkedBounty?: boolean;
+  isApplication?: boolean;
 };
 
 export function KanbanGroupColumn({
@@ -39,7 +40,8 @@ export function KanbanGroupColumn({
   onDropToCard,
   showCard,
   disableAddingCards,
-  hideLinkedBounty
+  hideLinkedBounty,
+  isApplication
 }: Props) {
   const { data: cards, pageSize, setPageSize, hasNextPage, showNextPage } = usePaginatedData(group.cards);
   return (
@@ -58,6 +60,7 @@ export function KanbanGroupColumn({
           onDrop={onDropToCard}
           showCard={showCard}
           hideLinkedBounty={hideLinkedBounty}
+          isApplication={isApplication}
         />
       ))}
       {hasNextPage && (
