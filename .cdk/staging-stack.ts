@@ -102,17 +102,17 @@ export class CdkDeployStack extends Stack {
         value: 'ELBSecurityPolicy-TLS13-1-2-2021-06'
       },
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        namespace: 'aws:elasticbeanstalk:environment:process:connect-api',
         optionName: 'HealthCheckPath',
-        value: '/health_check'
+        value: '/health-check'
       },
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        namespace: 'aws:elasticbeanstalk:environment:process:connect-api',
         optionName: 'Port',
         value: '4000'
       },
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:websocket',
+        namespace: 'aws:elasticbeanstalk:environment:process:connect-api',
         optionName: 'Protocol',
         value: 'HTTP'
       },
@@ -134,7 +134,7 @@ export class CdkDeployStack extends Stack {
       {
         namespace: 'aws:elbv2:listener:4000',
         optionName: 'DefaultProcess',
-        value: 'websocket'
+        value: 'connect-api'
       },
       {
         // add security group to access
