@@ -7,5 +7,12 @@
     "build": "npx next build",
     "start:prod": "npx next start",
     "lint": "npx next lint"
+  },
+  "dependencies": {
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.20",
+    "@mui/material-nextjs": "^5.15.11"
   }
 }
