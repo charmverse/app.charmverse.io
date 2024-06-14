@@ -57,6 +57,11 @@ export class CdkDeployStack extends Stack {
         value: 'aws-elasticbeanstalk-ec2-role'
       },
       {
+        namespace: 'aws:autoscaling:launchconfiguration',
+        optionName: 'RootVolumeSize',
+        value: '12' // example size in GB
+      },
+      {
         namespace: 'aws:elasticbeanstalk:environment',
         optionName: 'EnvironmentType',
         value: 'LoadBalanced'
