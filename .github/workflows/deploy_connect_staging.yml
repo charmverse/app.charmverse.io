@@ -71,7 +71,7 @@ jobs:
           rm .ebextensions*/06_cloudwatch_alarm.config
 
           # substituting the API domain name
-          sed -i 's/NEXT_PUBLIC_CONNECT_API_HOST=.*/NEXT_PUBLIC_CONNECT_API_HOST=https:\/\/${{env.STAGE}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
+          sed -i 's/ALLOWED_CONNECT_ORIGINS=.*/ALLOWED_CONNECT_ORIGINS=https:\/\/${{env.STAGE}}.charmverse.co:4000/g' .ebstalk.apps.env/connect.env
 
       - name: Set the docker compose env variables
         uses: mikefarah/yq@master
