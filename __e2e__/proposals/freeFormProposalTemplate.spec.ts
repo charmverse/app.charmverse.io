@@ -113,7 +113,6 @@ test.describe.serial('Create and use Proposal Template', async () => {
     await proposalPage.selectEvaluationReviewer('rubric', role.id);
 
     // Configure first rubric criteria added by default
-
     await Promise.all([
       proposalPage.editRubricCriteriaLabel.fill(firstRubricConfig.title),
       proposalPage.page.waitForResponse('**/api/proposals/**/rubric-criteria') // let api update before continuing
@@ -278,6 +277,8 @@ test.describe.serial('Create and use Proposal Template', async () => {
     // We only need to use to title. The content should come through from the template
     await expect(proposalPage.documentTitleInput).toBeVisible();
     await proposalPage.documentTitleInput.fill(userProposalConfig.title);
+
+    await proposalPage.page.getByRole('button', { name: 'Rubric' }).click();
 
     // Check that configuration fields are readonly and user cannot edit proposal
     const reviewerInputs = await proposalPage.getSelectedReviewers();
