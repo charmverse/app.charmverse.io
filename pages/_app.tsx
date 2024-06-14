@@ -266,14 +266,12 @@ function DataProviders({ children }: { children: ReactNode }) {
 
 function PageHead({ openGraphData }: { openGraphData?: OpenGraphProps }) {
   const [title] = usePageTitle();
-  const prefix = isDevEnv ? 'DEV | ' : '';
+  const prefix = isDevEnv ? 'DEV |' : '';
+  const titleString = `${prefix} ${title || `CharmVerse - The Network for Onchain Communities`}`;
 
   return (
     <Head>
-      <title>
-        {prefix}
-        {title || `CharmVerse - The Network for Onchain Communities`}
-      </title>
+      <title>{titleString}</title>
       {/* viewport meta tag goes in _app.tsx - https://nextjs.org/docs/messages/no-document-viewport-meta */}
       <meta name='viewport' content='minimum-scale=1, initial-scale=1, width=device-width' />
       {/* Verification required by google */}
