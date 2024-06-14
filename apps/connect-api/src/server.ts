@@ -29,6 +29,11 @@ router.get('/api/hello', (ctx) => {
   ctx.body = 'Hello from Koa!';
 });
 
+router.get('/health-check', (ctx) => {
+  ctx.body = { success: true };
+  ctx.status = 200;
+});
+
 router.get('/api/random-number', (ctx) => {
   ctx.body = { number: randomIntFromInterval(1, 100) };
 });
