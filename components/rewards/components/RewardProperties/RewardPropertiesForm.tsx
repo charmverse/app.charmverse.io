@@ -62,6 +62,7 @@ export function RewardPropertiesForm({
   const proposalLinkValue = sourceProposalPage
     ? [getAbsolutePath(`/${sourceProposalPage.id}`, space?.domain), sourceProposalPage.title]
     : '';
+  const rewards = values as unknown as BoardReward;
   return (
     <Box
       className='CardDetail content'
@@ -106,10 +107,19 @@ export function RewardPropertiesForm({
         <Collapse in={isExpanded} timeout='auto' unmountOnExit>
           <CustomPropertiesAdapter
             readOnly={readOnly}
-            reward={values as unknown as BoardReward}
+            reward={{
+              ...rewards,
+              fields: {
+                ...rewards.fields,
+                properties: {
+                  ...rewards.fields.properties,
+                  [REWARD_PROPOSAL_LINK]: proposalLinkValue
+                }
+              }
+            }}
             onChange={(properties: RewardPropertiesField) => {
               applyUpdates({
-                fields: { properties: { ...properties, [REWARD_PROPOSAL_LINK]: proposalLinkValue } } as Prisma.JsonValue
+                fields: { properties: { ...properties } } as Prisma.JsonValue
               });
             }}
           />
