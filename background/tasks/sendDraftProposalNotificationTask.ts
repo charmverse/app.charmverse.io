@@ -15,7 +15,15 @@ export async function sendDraftProposalNotificationTask() {
         select: {
           id: true,
           spaceId: true,
-          authors: true
+          authors: true,
+          formAnswers: true,
+          page: {
+            select: {
+              id: true,
+              contentText: true,
+              title: true
+            }
+          }
         },
         where: {
           notifications: {
@@ -38,44 +46,76 @@ export async function sendDraftProposalNotificationTask() {
   });
 
   const proposalsWithAuthor = workflowsWithDraftReminder
-    .flatMap((workflow) =>
+    .map((workflow) =>
       workflow.proposals.map((proposal) =>
         proposal.authors.map((author) => ({
           authorId: author.userId,
-          proposalId: proposal.id,
-          spaceId: proposal.spaceId
+          proposal
         }))
       )
     )
-    .flat();
+    .flat(2);
 
   let notificationCount = 0;
+  let deletedCount = 0;
 
-  for (const proposalWithAuthor of proposalsWithAuthor) {
+  // Check if a proposal had any content created for it
+  function proposalHasContent(proposal: (typeof proposalsWithAuthor)[0]['proposal']) {
+    return (
+      !!proposal.page?.contentText || !!proposal.page?.title || proposal.formAnswers.some((answer) => answer.value)
+    );
+  }
+
+  for (const { proposal, authorId } of proposalsWithAuthor) {
     try {
-      const proposalNotification = await saveProposalNotification({
-        createdAt: new Date().toISOString(),
-        createdBy: proposalWithAuthor.authorId,
-        proposalId: proposalWithAuthor.proposalId,
-        spaceId: proposalWithAuthor.spaceId,
-        type: 'draft_reminder',
-        userId: proposalWithAuthor.authorId,
-        evaluationId: null
-      });
+      if (!proposalHasContent(proposal)) {
+        log.info(`Deleting empty proposal ${proposal.id}`, { proposalId: proposal.id, userId: authorId });
+        const success = await prisma.proposal
+          .delete({
+            where: {
+              id: proposal.id
+            }
+          })
+          .catch((e) => {
+            // ignore error if proposal is already deleted
+          });
+        await prisma.page
+          .delete({
+            where: {
+              id: proposal.page!.id
+            }
+          })
+          .catch((e) => {
+            // ignore error if proposal is already deleted
+          });
+        if (success) {
+          deletedCount += 1;
+        }
+      } else {
+        const proposalNotification = await saveProposalNotification({
+          createdAt: new Date().toISOString(),
+          createdBy: authorId,
+          proposalId: proposal.id,
+          spaceId: proposal.spaceId,
+          type: 'draft_reminder',
+          userId: authorId,
+          evaluationId: null
+        });
 
-      const sent = await sendNotificationEmail({
-        id: proposalNotification.id,
-        type: 'proposals'
-      });
+        const sent = await sendNotificationEmail({
+          id: proposalNotification.id,
+          type: 'proposals'
+        });
 
-      if (sent) {
-        notificationCount += 1;
+        if (sent) {
+          notificationCount += 1;
+        }
       }
     } catch (error: any) {
       log.error(`Error sending draft proposal notification: ${error.stack || error.message || error}`, {
         error,
-        proposalId: proposalWithAuthor.proposalId,
-        userId: proposalWithAuthor.authorId
+        proposalId: proposal.id,
+        userId: authorId
       });
     }
   }
@@ -84,4 +124,9 @@ export async function sendDraftProposalNotificationTask() {
     log.info(`Sent ${notificationCount} draft proposal notifications`);
     count('cron.user-notifications.sent', notificationCount);
   }
+  if (deletedCount > 0) {
+    count('cron.user-notifications.deleted-draft-proposals', deletedCount);
+  }
+
+  return { deletedCount, notificationCount };
 }
