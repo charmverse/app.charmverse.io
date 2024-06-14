@@ -104,7 +104,7 @@ describe('sendDraftProposalNotificationTask', () => {
 
     const workflow = await generateProposalWorkflow({
       spaceId: space.id,
-      draftReminder: true,
+      draftReminder: false, // set to false to make sure we still delete drafts
       evaluations: [
         {
           type: 'feedback'

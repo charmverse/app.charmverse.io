@@ -4,57 +4,67 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { count } from 'lib/metrics';
 import { sendNotificationEmail } from 'lib/notifications/mailer/sendNotificationEmail';
 import { saveProposalNotification } from 'lib/notifications/saveNotification';
+import { isTruthy } from 'lib/utils/types';
 
 export async function sendDraftProposalNotificationTask() {
-  const workflowsWithDraftReminder = await prisma.proposalWorkflow.findMany({
+  const draftProposals = await prisma.proposal.findMany({
     where: {
-      draftReminder: true
+      archived: false,
+      status: 'draft',
+      notifications: {
+        none: {
+          type: 'draft_reminder'
+        }
+      },
+      page: {
+        createdAt: {
+          // Within 24 hours
+          gte: new Date(Date.now() - 48 * 60 * 60 * 1000),
+          lte: new Date(Date.now() - 24 * 60 * 60 * 1000)
+        }
+      }
     },
     select: {
-      proposals: {
+      id: true,
+      spaceId: true,
+      authors: true,
+      formAnswers: true,
+      workflowId: true,
+      page: {
         select: {
           id: true,
-          spaceId: true,
-          authors: true,
-          formAnswers: true,
-          page: {
-            select: {
-              id: true,
-              contentText: true,
-              title: true
-            }
-          }
-        },
-        where: {
-          notifications: {
-            none: {
-              type: 'draft_reminder'
-            }
-          },
-          archived: false,
-          status: 'draft',
-          page: {
-            createdAt: {
-              // Within 24 hours
-              gte: new Date(Date.now() - 48 * 60 * 60 * 1000),
-              lte: new Date(Date.now() - 24 * 60 * 60 * 1000)
-            }
-          }
+          contentText: true,
+          title: true
         }
       }
     }
   });
 
-  const proposalsWithAuthor = workflowsWithDraftReminder
-    .map((workflow) =>
-      workflow.proposals.map((proposal) =>
-        proposal.authors.map((author) => ({
-          authorId: author.userId,
-          proposal
-        }))
-      )
+  const workflowIds = [...new Set(draftProposals.map((proposal) => proposal.workflowId).filter(isTruthy))];
+  const workflows = await prisma.proposalWorkflow.findMany({
+    where: {
+      id: {
+        in: workflowIds
+      }
+    },
+    select: {
+      id: true,
+      draftReminder: true
+    }
+  });
+  const sendReminders = workflows.reduce<Record<string, boolean>>((acc, workflow) => {
+    acc[workflow.id] = !!workflow.draftReminder;
+    return acc;
+  }, {});
+
+  const proposalsWithAuthor = draftProposals
+    .map((proposal) =>
+      proposal.authors.map((author) => ({
+        authorId: author.userId,
+        proposal
+      }))
     )
-    .flat(2);
+    .flat();
 
   let notificationCount = 0;
   let deletedCount = 0;
@@ -91,7 +101,7 @@ export async function sendDraftProposalNotificationTask() {
         if (success) {
           deletedCount += 1;
         }
-      } else {
+      } else if (proposal.workflowId && sendReminders[proposal.workflowId]) {
         const proposalNotification = await saveProposalNotification({
           createdAt: new Date().toISOString(),
           createdBy: authorId,
