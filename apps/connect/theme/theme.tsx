@@ -56,6 +56,9 @@ const extendedTheme = extendTheme({
         },
         textPrimary: {
           main: primaryTextColor
+        },
+        inputBackground: {
+          main: inputBackground
         }
       }
     },
@@ -84,6 +87,9 @@ const extendedTheme = extendTheme({
         },
         textPrimary: {
           main: primaryTextColorDarkMode
+        },
+        inputBackground: {
+          main: inputBackgroundDarkMode
         }
       }
     }
@@ -149,28 +155,18 @@ const extendedTheme = extendTheme({
         root: {
           textTransform: 'none'
         },
-        text: () => ({
+        text: ({ theme }) => ({
           '&:hover': {
-            backgroundColor: inputBackground
-          },
-          '[data-mui-color-scheme="dark"] &': {
-            '&:hover': {
-              backgroundColor: inputBackgroundDarkMode
-            }
+            backgroundColor: theme.vars.palette.inputBackground.main
           }
         })
       }
     },
     MuiIconButton: {
       styleOverrides: {
-        root: () => ({
+        root: ({ theme }) => ({
           '&:hover': {
-            backgroundColor: inputBackground
-          },
-          '[data-mui-color-scheme="dark"] &': {
-            '&:hover': {
-              backgroundColor: inputBackgroundDarkMode
-            }
+            backgroundColor: theme.vars.palette.inputBackground.main
           }
         })
       },
@@ -233,18 +229,17 @@ const extendedTheme = extendTheme({
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          backgroundColor: inputBackground,
+          backgroundColor: theme.vars.palette.inputBackground.main,
           '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
             borderColor: inputBorder
           },
           '[data-mui-color-scheme="dark"] &': {
-            backgroundColor: inputBackgroundDarkMode,
             '&.Mui-disabled .MuiOutlinedInput-notchedOutline': {
               borderColor: inputBorderDarkMode
             }
           }
         }),
-        notchedOutline: ({ theme }) => ({
+        notchedOutline: () => ({
           borderColor: inputBorder,
           '[data-mui-color-scheme="dark"] &': {
             borderColor: inputBorderDarkMode
