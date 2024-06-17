@@ -103,8 +103,8 @@ export function useFormFieldsWithState({
     formState,
     setValue,
     onSubmit: () => {
-      if (formState.isValid) {
-        return;
+      if (!formState.isValid) {
+        throw new Error('Form is not valid to submit');
       }
       handleSubmit((_values) => {
         onSubmit?.(_values);
