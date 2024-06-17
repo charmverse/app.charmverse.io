@@ -148,6 +148,7 @@
     "@mui/icons-material": "^5.15.7",
     "@mui/lab": "^5.0.0-alpha.118",
     "@mui/material": "^5.15.0",
+    "@mui/system": "5.15",
     "@mui/x-date-pickers": "^6.19.5",
     "@mux/mux-node": "^8.0.0",
     "@mux/mux-video-react": "^0.7.15",
@@ -426,8 +427,7 @@
     "react-dom": "^18.2.0",
     "typescript": "^5.4.2",
     "esbuild": "^0.19.5",
-    "viem": "^2.8.13",
-    "next": "^14.2.4"
+    "viem": "^2.8.13"
   },
   "msw": {
     "workerDirectory": "public"
