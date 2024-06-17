@@ -327,7 +327,6 @@ function mapApplicationToCard({
         )?.toString()
       : '',
     [REWARDS_APPLICANTS_BLOCK_ID]: (application && 'createdBy' in application && application.createdBy) || '',
-    [REWARD_STATUS_BLOCK_ID]: (reward && 'status' in reward && reward.status) || '',
     [APPLICANT_STATUS_BLOCK_ID]: (application && 'status' in application && application.status) || '',
     [REWARDER_BLOCK_ID]: (application && 'createdBy' in application && [application.createdBy]) || '',
     [DUE_DATE_ID]: reward && 'dueDate' in reward && reward.dueDate ? new Date(reward.dueDate).getTime() : '',
