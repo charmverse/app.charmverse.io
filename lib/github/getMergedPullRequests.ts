@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client';
 
-import type { PullRequestMeta } from './getPullRequestMeta';
+import { pullRequestSelect, type PullRequestMeta } from './getPullRequestMeta';
 import { githubGrapghQLClient } from './githubGraphQLClient';
 
 export type GithubUserName = { githubUsername: string };
@@ -22,20 +22,7 @@ export async function getMergedPullRequests({
       user(login: $login) {
         pullRequests(first: $limit, states: MERGED, orderBy: { field: UPDATED_AT, direction: DESC }, after: $after) {
           nodes {
-            number
-            state
-            title
-            createdAt
-            updatedAt
-            closedAt
-            mergedAt
-            mergeCommit {
-              oid
-            }
-            author {
-              login
-              id
-            }
+            ${pullRequestSelect()}
           }
           pageInfo {
             endCursor

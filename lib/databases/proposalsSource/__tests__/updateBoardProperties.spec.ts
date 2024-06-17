@@ -240,19 +240,31 @@ describe('updateBoardProperties()', () => {
 
     const properties = (updatedBlock?.fields as any).cardProperties as IPropertyTemplate[];
     // Check status
-    const rubricCriteria1Property = properties.find(
+    const rubricCriteria1TotalProperty = properties.find(
       (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 1'
     );
-    const rubricCriteria2Property = properties.find(
+    const rubricCriteria2TotalProperty = properties.find(
       (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 2'
     );
-    const rubricCriteria21Property = properties.find(
+    const rubricCriteria21TotalProperty = properties.find(
       (p) => p.type === 'proposalRubricCriteriaTotal' && p.criteriaTitle === 'Criteria 2.1'
     );
+    const rubricCriteria1AverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.criteriaTitle === 'Criteria 1'
+    );
+    const rubricCriteria2AverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.criteriaTitle === 'Criteria 2'
+    );
+    const rubricCriteria21AverageProperty = properties.find(
+      (p) => p.type === 'proposalRubricCriteriaAverage' && p.criteriaTitle === 'Criteria 2.1'
+    );
 
-    expect(rubricCriteria1Property).toBeDefined();
-    expect(rubricCriteria2Property).toBeDefined();
-    expect(rubricCriteria21Property).toBeDefined();
+    expect(rubricCriteria1TotalProperty).toBeDefined();
+    expect(rubricCriteria2TotalProperty).toBeDefined();
+    expect(rubricCriteria21TotalProperty).toBeDefined();
+    expect(rubricCriteria1AverageProperty).toBeDefined();
+    expect(rubricCriteria2AverageProperty).toBeDefined();
+    expect(rubricCriteria21AverageProperty).toBeDefined();
   });
 
   it('should leave existing property IDs and options unchanged', async () => {

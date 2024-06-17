@@ -5,8 +5,8 @@ import { prisma } from '@charmverse/core/prisma-client';
 import { getIronSession, unsealData } from 'iron-session';
 import type { Socket } from 'socket.io';
 
+import { authSecret } from 'config/constants';
 import { ActionNotPermittedError } from 'lib/middleware';
-import { authSecret } from 'lib/session/authSecret';
 import type { SessionData } from 'lib/session/config';
 import { getIronOptions } from 'lib/session/getIronOptions';
 import type { SealedUserId } from 'lib/websockets/interfaces';
@@ -49,6 +49,9 @@ export async function authOnConnect(socket: AuthenticatedSocket, next: (err?: Er
 }
 
 async function getUserIdFromToken(authToken: string) {
+  if (!authSecret) {
+    throw new Error('Auth secret not defined');
+  }
   return unsealData<SealedUserId>(authToken, {
     password: authSecret
   });
