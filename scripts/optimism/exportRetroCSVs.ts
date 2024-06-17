@@ -3,7 +3,7 @@ import { stringify } from 'csv-stringify/sync';
 import { getCurrentEvaluation } from '@charmverse/core/proposals';
 import { sortBy } from 'lodash';
 import { writeFileSync } from 'fs';
-import { spaceId, templateId } from './retroData';
+import { spaceId, templateId, getProjectsFromFile } from './retroData';
 
 type SummaryRow = {};
 
@@ -63,6 +63,8 @@ async function exportSummary() {
 }
 
 async function exportFullReviewSummary() {
+  const projects = await getProjectsFromFile('../optimism-data/applicants.json');
+
   const proposals = await prisma.proposal.findMany({
     where: {
       status: 'published',
@@ -76,7 +78,8 @@ async function exportFullReviewSummary() {
     include: {
       page: {
         select: {
-          path: true
+          path: true,
+          title: true
         }
       },
       evaluations: {
@@ -86,14 +89,19 @@ async function exportFullReviewSummary() {
       }
     }
   });
-
   const mapped: {
     'Full Review Status': string;
-    Proposal: string;
+    Link: string;
+    'Project Id': string;
     Rejected: number;
     Approved: number;
     Pending: number;
   }[] = proposals.map((proposal) => {
+    const rawProjects = projects.filter((raw) => raw.name.trim() === proposal.page?.title.trim());
+    if (rawProjects.length !== 1) {
+      console.log('could not find project', rawProjects, proposal.page?.title);
+    }
+    const rawProject = rawProjects[0].id;
     const currentEvaluation = getCurrentEvaluation(proposal.evaluations);
     const evaluation = proposal.evaluations.find((evaluation) => evaluation.title === 'Full Review');
     if (!evaluation || !currentEvaluation) throw new Error('missing evaluations?');
@@ -118,10 +126,11 @@ async function exportFullReviewSummary() {
     }
     return {
       'Full Review Status': status,
-      Proposal: 'https://app.charmverse.io/op-retrofunding-review-process/' + proposal.page?.path,
+      Link: 'https://app.charmverse.io/op-retrofunding-review-process/' + proposal.page?.path,
       Rejected: rejected,
       Approved: approved,
-      Pending: 5 - approved - rejected
+      Pending: 5 - approved - rejected,
+      'Project Id': rawProject
     };
   });
 
@@ -143,7 +152,7 @@ async function exportFullReviewSummary() {
 
   const csvString = stringify(csvData, {
     header: true,
-    columns: ['Proposal', 'Full Review Status', 'Approved', 'Rejected', 'Pending']
+    columns: ['Project Id', 'Link', 'Full Review Status', 'Approved', 'Rejected', 'Pending']
   });
 
   writeFileSync(fullReviewsummaryFile, csvString);
