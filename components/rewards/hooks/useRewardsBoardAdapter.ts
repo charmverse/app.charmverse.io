@@ -305,7 +305,7 @@ function mapApplicationToCard({
     : '';
 
   const rewardCustomProperties: Record<string, any> = {};
-  const rewardProperties = (reward.fields as RewardFields)?.properties;
+  const rewardProperties = (reward.fields as RewardFields)?.properties ?? {};
 
   Object.keys(rewardProperties).forEach((rewardPropertyKey) => {
     if (isUUID(rewardPropertyKey)) {
