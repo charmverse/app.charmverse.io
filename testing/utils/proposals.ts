@@ -196,9 +196,11 @@ type OptionalField = 'id' | 'title' | 'permissions';
 
 export async function generateProposalWorkflow({
   spaceId,
+  draftReminder,
   title,
   evaluations = []
 }: {
+  draftReminder?: boolean;
   spaceId: string;
   title?: string;
   evaluations?: (Omit<WorkflowEvaluationJson, OptionalField> & Partial<Pick<WorkflowEvaluationJson, OptionalField>>)[];
@@ -213,6 +215,7 @@ export async function generateProposalWorkflow({
   return prisma.proposalWorkflow.create({
     data: {
       index: existingFlows,
+      draftReminder,
       title: title ?? `Workflow ${existingFlows + 1}`,
       space: {
         connect: {
