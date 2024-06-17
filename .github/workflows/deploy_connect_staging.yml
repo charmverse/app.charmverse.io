@@ -6,6 +6,7 @@ on:
 
 env:
   SELECTED_PERMISSION_API_TAG: latest
+  DEPLOYED_APP: connect
 
 concurrency:
   group: staging-${{ github.ref }}
