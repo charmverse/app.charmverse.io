@@ -2,7 +2,7 @@ import { log } from '@charmverse/core/log';
 
 import { Utils } from 'components/common/DatabaseEditor/utils';
 import type { IPropertyTemplate } from 'lib/databases/board';
-import type { Card, CardPropertyValue } from 'lib/databases/card';
+import type { Card, CardPropertyValue, CardWithRelations } from 'lib/databases/card';
 import { propertyConfigs } from 'lib/databases/filterClause';
 import type {
   NumberDataTypeConditions,
@@ -21,12 +21,25 @@ import type { ProposalEvaluationResultExtended, ProposalEvaluationStep } from 'l
 import { Constants } from './constants';
 
 class CardFilter {
-  static applyFilterGroup(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], cards: Card[]): Card[] {
+  static applyFilterGroup(
+    filterGroup: FilterGroup,
+    templates: readonly IPropertyTemplate[],
+    cards: (Card | CardWithRelations)[]
+  ): Card[] {
     const hasTitleProperty = templates.find((o) => o.id === Constants.titleColumnId);
     const cardProperties: readonly IPropertyTemplate[] = hasTitleProperty
       ? templates
       : [...templates, { id: Constants.titleColumnId, name: 'Title', options: [], type: 'text' }];
-    return cards.filter((card) => this.isFilterGroupMet(filterGroup, cardProperties, card));
+
+    return cards.filter((card) => {
+      const filteredSubPages = (card as CardWithRelations)?.subPages?.filter((subPage) =>
+        this.isFilterGroupMet(filterGroup, cardProperties, subPage)
+      );
+
+      (card as CardWithRelations).subPages = filteredSubPages;
+
+      return this.isFilterGroupMet(filterGroup, cardProperties, card) || filteredSubPages?.length;
+    });
   }
 
   static isFilterGroupMet(filterGroup: FilterGroup, templates: readonly IPropertyTemplate[], card: Card): boolean {
