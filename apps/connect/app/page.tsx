@@ -1,5 +1,6 @@
-import Box from '@mui/material/Box';
+import { HomePage } from 'components/pages/HomePage';
 
 export default function Home() {
-  return <Box></Box>;
+  const user = {}; // server
+  return <HomePage user={user} />;
 }

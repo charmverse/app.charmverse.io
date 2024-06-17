@@ -1,9 +1,8 @@
 import Box from '@mui/material/Box';
-import { getInitColorSchemeScript } from '@mui/material/styles';
+import getInitColorSchemeScript from '@mui/system/cssVars/getInitColorSchemeScript';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-import './cssVariables.scss';
 import { NavBar } from '../components/Header/Navbar/NavBar';
 import { AppProviders } from '../components/providers/AppProviders';
 

@@ -96,6 +96,7 @@ const extendedTheme = extendTheme({
         disableRestoreFocus: true
       }
     },
+    MuiAppBar: {},
     MuiAvatar: {
       styleOverrides: {
         root: ({ ownerState }) => ({
