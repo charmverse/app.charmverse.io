@@ -5,17 +5,17 @@ export class ConnectAppStagingStack extends BaseCdkDeployStack {
   constructor(input: DeployStackProps) {
     super({...input, options: [
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:connect-api',
+        namespace: 'aws:elasticbeanstalk:environment:process:connectapi',
         optionName: 'HealthCheckPath',
         value: '/health-check'
       },
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:connect-api',
+        namespace: 'aws:elasticbeanstalk:environment:process:connectapi',
         optionName: 'Port',
         value: '4000'
       },
       {
-        namespace: 'aws:elasticbeanstalk:environment:process:connect-api',
+        namespace: 'aws:elasticbeanstalk:environment:process:connectapi',
         optionName: 'Protocol',
         value: 'HTTP'
       },
@@ -37,7 +37,7 @@ export class ConnectAppStagingStack extends BaseCdkDeployStack {
       {
         namespace: 'aws:elbv2:listener:4000',
         optionName: 'DefaultProcess',
-        value: 'connect-api'
+        value: 'connectapi'
       },
     ]});
   }
