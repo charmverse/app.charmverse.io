@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { DefaultStagingStack } from '../default-staging-stack';
+import { DefaultStagingStack } from '../charmverse-staging-stack';
 import { ConnectAppStagingStack } from '../connect-staging-stack';
 
 const app = new cdk.App();
