@@ -63,6 +63,7 @@ function InputSearchMemberBase({
   const inputRef = createRef<HTMLInputElement>();
 
   const filteredOptions = filter ? filterMembers(options, filter) : options;
+  // console.log('filteredOptions', filteredOptions);
   return (
     <StyledAutocomplete
       PopperComponent={popupField ? renderDiv : undefined}
@@ -147,26 +148,26 @@ export function InputSearchMemberMultiple({
   multiple = true,
   ...props
 }: IInputSearchMemberMultipleProps) {
-  const { members, membersRecord } = useMembers();
-  const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
-  const [value, setValue] = useState<Member[]>(defaultMembers);
+  const { members, isLoading, membersRecord } = useMembers();
+  const [value, setValue] = useState<Member[]>([]);
 
   function emitValue(users: Member[], reason: AutocompleteChangeReason) {
+    setValue(users);
     onChange(
       users.map((user) => (user.id.startsWith('email') ? user.username : user.id)),
       reason
     );
-    setValue(users);
   }
 
   useEffect(() => {
-    if (defaultValue && value.length === 0) {
-      const _defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
-      if (_defaultMembers.length > 0) {
-        setValue(_defaultMembers);
+    if (!isLoading) {
+      const defaultMembers = (defaultValue ?? []).map((userId) => membersRecord[userId]).filter(Boolean);
+      if (defaultMembers.length > 0) {
+        setValue(defaultMembers);
       }
     }
-  }, [defaultValue, membersRecord]);
+    // only run once members are loaded
+  }, [isLoading]);
 
   return (
     <InputSearchMemberBase
