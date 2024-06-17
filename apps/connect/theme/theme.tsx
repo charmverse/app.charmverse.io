@@ -2,7 +2,6 @@
 
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import { darken, experimental_extendTheme as extendTheme } from '@mui/material/styles';
-import { Roboto } from 'next/font/google';
 
 import {
   backgroundColor,
@@ -20,16 +19,13 @@ import {
   secondaryTextColorDarkMode
 } from './colors';
 
-const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap'
-});
+export const defaultFont =
+  'ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"';
 
 const extendedTheme = extendTheme({
   cssVarPrefix: 'charm',
   typography: {
-    fontFamily: roboto.style.fontFamily
+    fontFamily: defaultFont
   },
   colorSchemes: {
     light: {
