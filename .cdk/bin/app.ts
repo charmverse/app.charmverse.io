@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { DefaultStagingStack } from '../charmverse-staging-stack';
+import { CharmVerseStagingStack } from '../charmverse-staging-stack';
 import { ConnectAppStagingStack } from '../connect-staging-stack';
 
 const app = new cdk.App();
@@ -21,5 +21,5 @@ var deployedStack;
 if (process.env.DEPLOYED_APP === 'connect') {
   deployedStack = new ConnectAppStagingStack({ scope: app, id: stackName, props: deployProps });
 } else {
-  deployedStack = new DefaultStagingStack({ scope: app, id: stackName, props: deployProps });
+  deployedStack = new CharmVerseStagingStack({ scope: app, id: stackName, props: deployProps });
 }

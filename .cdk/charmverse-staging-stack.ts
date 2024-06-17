@@ -1,7 +1,7 @@
 
 import {BaseCdkDeployStack, DeployStackProps} from './base-staging-stack';
 
-export class DefaultStagingStack extends BaseCdkDeployStack {
+export class CharmVerseStagingStack extends BaseCdkDeployStack {
   constructor(input: DeployStackProps) {
     super({...input, options: [
       {
