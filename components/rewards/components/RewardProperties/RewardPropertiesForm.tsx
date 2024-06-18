@@ -112,7 +112,7 @@ export function RewardPropertiesForm({
               fields: {
                 ...rewards.fields,
                 properties: {
-                  ...rewards.fields.properties,
+                  ...rewards.fields?.properties,
                   [REWARD_PROPOSAL_LINK]: proposalLinkValue
                 }
               }
