@@ -94,13 +94,13 @@ beforeAll(async () => {
 });
 
 describe('POST /api/proposals/evaluations/[id]/appeal - Create a proposal and appeal failed evaluation review', () => {
-  it('should fail to appeal if the user is not a proposal author and respond with 401', async () => {
+  it('should fail to appeal if the user is not a proposal author nor an admin and respond with 401', async () => {
     const userCookie = await loginUser(spaceMember.id);
     const response = await request(baseUrl)
       .put(`/api/proposals/evaluations/${evaluationId}/appeal`)
       .set('Cookie', userCookie);
     expect(response.statusCode).toBe(401);
-    expect(response.body.message).toBe('Only authors can appeal evaluations');
+    expect(response.body.message).toBe('Only authors and admins can appeal evaluations');
   });
 
   it('should fail to appeal if the evaluation is still ongoing and result is not failed and respond with 401', async () => {
@@ -148,8 +148,43 @@ describe('POST /api/proposals/evaluations/[id]/appeal - Create a proposal and ap
     });
   });
 
-  it('should successfully appeal the evaluation and respond with 200', async () => {
+  it('should successfully appeal the evaluation as an admin and respond with 200', async () => {
+    const userCookie = await loginUser(admin.id);
+    const response = await request(baseUrl)
+      .put(`/api/proposals/evaluations/${evaluationId}/appeal`)
+      .set('Cookie', userCookie);
+    expect(response.statusCode).toBe(200);
+
+    const updatedEvaluation = await prisma.proposalEvaluation.findUniqueOrThrow({
+      where: { id: evaluationId },
+      select: {
+        appealedAt: true,
+        result: true,
+        appealedBy: true,
+        completedAt: true
+      }
+    });
+
+    expect(updatedEvaluation).toStrictEqual({
+      appealedAt: expect.any(Date),
+      result: null,
+      appealedBy: admin.id,
+      completedAt: null
+    });
+  });
+
+  it('should successfully appeal the evaluation as an author and respond with 200', async () => {
     const userCookie = await loginUser(proposalCreator.id);
+    await prisma.proposalEvaluationAppealReview.deleteMany({
+      where: {
+        evaluationId
+      }
+    });
+    await prisma.proposalEvaluation.update({
+      where: { id: evaluationId },
+      data: { appealedAt: null, result: 'fail' }
+    });
+
     const response = await request(baseUrl)
       .put(`/api/proposals/evaluations/${evaluationId}/appeal`)
       .set('Cookie', userCookie);

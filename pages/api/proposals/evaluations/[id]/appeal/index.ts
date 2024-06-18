@@ -6,7 +6,7 @@ import { ActionNotPermittedError, onError, onNoMatch } from 'lib/middleware';
 import { withSessionRoute } from 'lib/session/withSession';
 import { hasAccessToSpace } from 'lib/users/hasAccessToSpace';
 import { WebhookEventNames } from 'lib/webhookPublisher/interfaces';
-import { publishProposalEvent, publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
+import { publishProposalEventBase } from 'lib/webhookPublisher/publishEvent';
 
 const handler = nc<NextApiRequest, NextApiResponse>({ onError, onNoMatch });
 
