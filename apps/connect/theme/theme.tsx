@@ -193,9 +193,10 @@ const extendedTheme = extendTheme({
     },
     MuiCard: {
       styleOverrides: {
-        root: {
-          borderRadius: '3px'
-        }
+        root: ({ theme }) => ({
+          borderRadius: 6,
+          boxShadow: theme.shadows[2]
+        })
       }
     },
     MuiCardContent: {

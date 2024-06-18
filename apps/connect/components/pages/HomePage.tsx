@@ -3,9 +3,11 @@ import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import { Suspense } from 'react';
 
 import { PageWrapper } from 'components/common/PageWrapper';
 import { WarpcastLogin } from 'components/farcaster/WarpcastLogin';
+import { ProjectItemSkeleton } from 'components/projects/ProjectItemSkeleton';
 import { ProjectsList } from 'components/projects/ProjectsList';
 
 export function HomePage({ user }: { user: any }) {
@@ -30,7 +32,9 @@ export function HomePage({ user }: { user: any }) {
       <Divider />
       <Box mt={2} gap={2} display='flex' flexDirection='column'>
         <Typography variant='h5'>Recent Projects</Typography>
-        <ProjectsList />
+        <Suspense fallback={<ProjectItemSkeleton />}>
+          <ProjectsList />
+        </Suspense>
       </Box>
     </PageWrapper>
   );

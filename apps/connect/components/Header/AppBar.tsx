@@ -15,7 +15,7 @@ import Typography from '@mui/material/Typography';
 import type { MouseEvent } from 'react';
 import { useState } from 'react';
 
-import { ThemeModeButton } from '../../theme/ThemeModeButton';
+import { ThemeModeButton } from 'theme/ThemeModeButton';
 
 const pages = ['Projects'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];

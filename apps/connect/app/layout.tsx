@@ -3,9 +3,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 import { Main } from 'components/common/Main';
-
-import { NavBar } from '../components/Header/Navbar/NavBar';
-import { AppProviders } from '../components/providers/AppProviders';
+import { NavBar } from 'components/Header/Navbar/NavBar';
+import { AppProviders } from 'components/providers/AppProviders';
 
 import './cssVariables.scss';
 
